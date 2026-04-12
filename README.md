@@ -10,7 +10,7 @@ cp .env.example .env   # optional
 npm run dev
 ```
 
-Configure `VITE_API_BASE_URL` if the API is not at `http://127.0.0.1:8080` (see [docs/api-integration.md](./docs/api-integration.md)).
+Configure `VITE_API_BASE_URL` if the API base is not `http://127.0.0.1:8080/api` (see [docs/api-integration.md](./docs/api-integration.md)).
 
 ## Documentation
 
