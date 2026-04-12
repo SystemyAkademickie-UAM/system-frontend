@@ -2,7 +2,7 @@
 
 ## Development (Node)
 
-The app expects an API that speaks the contract in [api-integration.md](./api-integration.md). In dev, if `VITE_API_BASE_URL` is not set, requests default to `http://127.0.0.1:8080`.
+The app expects an API that speaks the contract in [api-integration.md](./api-integration.md). In dev, if `VITE_API_BASE_URL` is not set, requests default to `http://127.0.0.1:8080/api`.
 
 ```bash
 npm run dev
