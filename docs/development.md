@@ -23,7 +23,7 @@ Use `.nvmrc` with nvm / nvm-windows; GitHub Actions uses Node 24.
 
 | Variable              | Purpose |
 | --------------------- | ------- |
-| `VITE_API_BASE_URL`   | API base URL (no trailing slash). Unset in dev → `http://127.0.0.1:8080`. For production builds, set to whatever origin the browser must call. |
+| `VITE_API_BASE_URL`   | API base URL including `/api` prefix (no trailing slash). Unset in dev → `http://127.0.0.1:8080/api`. For production builds, set to the full URL the browser must call. |
 
 Never commit `.env`; only `.env.example`.
 
