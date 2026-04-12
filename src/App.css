@@ -1,0 +1,28 @@
+.app {
+  font-family: system-ui, sans-serif;
+  max-width: 24rem;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.app__label {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.app__button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.app__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app__error {
+  margin-top: 1rem;
+  color: #b00020;
+  font-size: 0.9rem;
+}
