@@ -26,7 +26,7 @@ docker run -d -p 127.0.0.1:3000:3000 --name ui system-frontend:prod
 
 ## Helper scripts (Docker CLI only)
 
-From the repository root:
+From this service directory (`system-frontend`, where this `docs/` folder lives next to `scripts/`):
 
 | Platform   | Command |
 | ---------- | ------- |
@@ -37,4 +37,7 @@ Defaults use `VITE_API_BASE_URL=http://127.0.0.1:8080/api` and image tag `system
 
 ## CI image
 
-`.github/workflows/docker-publish.yml` builds and pushes this Dockerfile (for example to GHCR). Pass the correct `VITE_API_BASE_URL` (or GitHub `vars`) for the environment where the UI will run.
+- `.github/workflows/docker-build.yml` — builds this Dockerfile on `push` to `main` (verification only).
+- `.github/workflows/docker-publish.yml` — builds and pushes on `push` to `production` (for example to GHCR). Pass the correct `VITE_API_BASE_URL` (or GitHub `vars`) for the environment where the UI will run.
+
+The build stage uses **Node.js 24.14.1** (Alpine) and **npm 11.11.0**, matching [prerequisites.md](./prerequisites.md).
