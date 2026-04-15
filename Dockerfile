@@ -1,8 +1,8 @@
 # Build stage
-FROM node:24-alpine AS builder
+FROM node:24.14.1-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm install -g npm@11.11.0 && npm ci
 COPY . .
 # URL must be reachable from the user’s browser. Behind host nginx on / + /api/, use empty string at build time.
 ARG VITE_API_BASE_URL=http://127.0.0.1:8080/api
