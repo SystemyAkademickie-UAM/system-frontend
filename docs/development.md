@@ -2,11 +2,11 @@
 
 ## Stack versions
 
-- **Node.js / npm:** see [prerequisites.md](./prerequisites.md) (local toolchain pin).
+- **Node.js:** 24.x
 - **React:** 19.x
 - **Vite:** 6.x
 
-Use `.nvmrc` with nvm / nvm-windows. CI uses Node **24.14.1** (see `.github/workflows/ci.yml`).
+Use `.nvmrc` with nvm / nvm-windows; GitHub Actions uses Node 24.
 
 ## Workflow
 
@@ -17,8 +17,7 @@ Use `.nvmrc` with nvm / nvm-windows. CI uses Node **24.14.1** (see `.github/work
 ## CI
 
 - `.github/workflows/ci.yml` — install, test, build on `push` / `pull_request` to `main`.
-- `.github/workflows/docker-build.yml` — verify a Docker image build on `push` to `main` (no registry push).
-- `.github/workflows/docker-publish.yml` — build and push the image on `push` to `production` (GHCR).
+- `.github/workflows/docker-image.yml` — build and push the Docker image on `push` to `main`.
 
 ## Environment variables
 
