@@ -17,3 +17,9 @@ The UI sends the current displayed count and replaces it with `count` from the r
 If the UI is served over **HTTPS**, this value must use **`https://`** for the same host. Otherwise the browser blocks the request (**mixed content**). If you omit `VITE_API_BASE_URL` in a production build, the app uses `window.location.origin + '/api'` (same scheme as the page). The API still allows an older `http://…` build to be corrected at runtime when the hostname matches the page.
 
 Full request/response documentation is maintained **with the API service** that implements this contract.
+
+## SAML 2.0 (institutional login)
+
+The UI exposes a link to **`GET /api/auth/saml/login`** (full URL: `getApiBaseUrl() + '/auth/saml/login'`). The browser must perform a **full page navigation** to that URL (not `fetch`), which redirects to the IdP.
+
+In local development, Vite proxies **`/api`** to `http://127.0.0.1:8080`, and the default API base uses **`window.location.origin + '/api'`** so the SSO flow and cookies stay on the same origin as the dev server. Run the Nest API on port **8080** when using this proxy.
