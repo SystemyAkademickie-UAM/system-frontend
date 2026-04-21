@@ -21,6 +21,20 @@
   cursor: not-allowed;
 }
 
+.app__saml {
+  margin-top: 1rem;
+}
+
+.app__saml-link {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.app__saml-link:hover,
+.app__saml-link:focus-visible {
+  color: #1d4ed8;
+}
+
 .app__error {
   margin-top: 1rem;
   color: #b00020;
