@@ -10,7 +10,7 @@ cp .env.example .env   # optional
 npm run dev
 ```
 
-Configure `VITE_API_BASE_URL` if the API base is not `http://127.0.0.1:8080/api` (see [docs/api-integration.md](./docs/api-integration.md)).
+By default the dev app uses `window.location.origin + '/api'` with a **Vite proxy** to `http://127.0.0.1:8080` (good for SAML cookies). Override with `VITE_API_BASE_URL` if needed ([docs/api-integration.md](./docs/api-integration.md)).
 
 ## Documentation
 
