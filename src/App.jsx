@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { getApiBaseUrl } from './constants/api.constants.js';
+import { getApiBaseUrl, getSamlLoginUrl } from './constants/api.constants.js';
 import { COUNTER_INCREMENT_PATH } from './constants/apiPaths.constants.js';
 import './App.css';
 
@@ -36,6 +36,8 @@ export default function App() {
     }
   }, [count]);
 
+  const samlLoginUrl = getSamlLoginUrl();
+
   return (
     <main className="app">
       <h1>UNDER CONSTRUCTION</h1>
@@ -43,6 +45,13 @@ export default function App() {
       <button type="button" className="app__button" onClick={onAdd} disabled={isLoading}>
         Add
       </button>
+      {samlLoginUrl.length > 0 ? (
+        <p className="app__saml">
+          <a className="app__saml-link" href={samlLoginUrl}>
+            Institutional login (SAML 2.0 / PIONIER.id)
+          </a>
+        </p>
+      ) : null}
       {errorMessage ? <p className="app__error">{errorMessage}</p> : null}
     </main>
   );
