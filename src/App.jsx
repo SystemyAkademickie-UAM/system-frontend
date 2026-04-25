@@ -48,7 +48,7 @@ export default function App() {
       {samlLoginUrl.length > 0 ? (
         <p className="app__saml">
           <a className="app__saml-link" href={samlLoginUrl}>
-            Institutional login (SAML 2.0 / PIONIER.id)
+            Institutional login (SAML 2.0 — direct IdP or proxy)
           </a>
         </p>
       ) : null}

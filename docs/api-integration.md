@@ -22,4 +22,6 @@ Full request/response documentation is maintained **with the API service** that 
 
 The UI exposes a link to **`GET /api/auth/saml/login`** (full URL: `getApiBaseUrl() + '/auth/saml/login'`). The browser must perform a **full page navigation** to that URL (not `fetch`), which redirects to the IdP.
 
+The API may be configured for a **direct** university IdP or a **local Shibboleth proxy** (see `system-backend/infrastructure/saml-proxy-shibboleth/` next to the API); the link is the same.
+
 In local development, Vite proxies **`/api`** to `http://127.0.0.1:8080`, and the default API base uses **`window.location.origin + '/api'`** so the SSO flow and cookies stay on the same origin as the dev server. Run the Nest API on port **8080** when using this proxy.
