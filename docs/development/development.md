@@ -2,7 +2,7 @@
 
 ## Stack versions
 
-- **Node.js / npm:** see [prerequisites.md](./prerequisites.md) (local toolchain pin).
+- **Node.js / npm:** see [prerequisites.md](../first-setup/prerequisites.md) (local toolchain pin).
 - **React:** 19.x
 - **Vite:** 6.x
 
@@ -10,7 +10,7 @@ Use `.nvmrc` with nvm / nvm-windows. CI uses Node **24.14.1** (see `.github/work
 
 ## Workflow
 
-1. Point `VITE_API_BASE_URL` (or rely on the dev default) at an API that implements the contract in [api-integration.md](./api-integration.md).
+1. Point `VITE_API_BASE_URL` (or rely on the dev default) at an API that implements the contract in [api-integration.md](../api/api-integration.md).
 2. Run `npm run dev`.
 3. Run `npm test` before pushing.
 

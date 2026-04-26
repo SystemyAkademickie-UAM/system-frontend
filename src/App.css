@@ -40,3 +40,142 @@
   color: #b00020;
   font-size: 0.9rem;
 }
+
+.auth {
+  font-family: system-ui, sans-serif;
+  max-width: 28rem;
+  margin: 2rem auto;
+  padding: 1.25rem;
+}
+
+.auth__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.auth__lead {
+  margin: 0 0 1.25rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.auth__nav {
+  margin-bottom: 1rem;
+}
+
+.auth__nav a {
+  color: #2563eb;
+}
+
+.auth__panel {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.auth__panel--primary {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.auth__panel--muted {
+  opacity: 0.85;
+}
+
+.auth__label {
+  display: block;
+  font-size: 0.875rem;
+  margin-bottom: 0.35rem;
+  color: #475569;
+}
+
+.auth__input,
+.auth__select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.35rem;
+}
+
+.auth__button {
+  display: inline-block;
+  padding: 0.55rem 1rem;
+  font-size: 1rem;
+  border-radius: 0.35rem;
+  border: 1px solid #94a3b8;
+  background: #f8fafc;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  color: inherit;
+}
+
+.auth__button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth__button--primary {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: #fff;
+  width: 100%;
+}
+
+.auth__button--primary:hover,
+.auth__button--primary:focus-visible {
+  background: #1d4ed8;
+}
+
+.auth__note {
+  font-size: 0.9rem;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.35rem;
+  margin: 0 0 1rem;
+}
+
+.auth__error {
+  color: #b00020;
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+
+.auth__pre {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 0.35rem;
+  overflow: auto;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.auth__actions {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.auth__actions a {
+  color: #2563eb;
+}
+
+.auth__actions .auth__action-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.auth__actions .auth__action-link:hover,
+.auth__actions .auth__action-link:focus-visible {
+  color: #1d4ed8;
+}

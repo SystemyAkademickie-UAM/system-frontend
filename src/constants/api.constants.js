@@ -1,4 +1,11 @@
-import { AUTH_SAML_LOGIN_PATH } from './authPaths.constants.js';
+import {
+  AUTH_SAML_INSTITUTIONS_PATH,
+  AUTH_SAML_LOGIN_FORCE_AUTHN_QUERY,
+  AUTH_SAML_LOGIN_FORCE_AUTHN_VALUE,
+  AUTH_SAML_LOGIN_PATH,
+  AUTH_SAML_LOGOUT_PATH,
+  AUTH_SAML_ME_PATH,
+} from './authPaths.constants.js';
 
 /**
  * If the page is https but the build still has http for the same host (old image), upgrade to https to avoid mixed content.
@@ -27,14 +34,56 @@ function upgradeApiBaseToMatchPageScheme(base) {
 }
 
 /**
- * Absolute URL to start SAML login (full browser navigation to SP `/login` route).
+ * Absolute URL to start SAML login (full browser navigation to API `GET .../auth/saml/login`).
+ * @param {string} [institutionId] When set, adds `institution=` for the picker flow (must match API registry).
+ * @param {{ forceAuthn?: boolean }} [options] When true, adds `forceAuthn=1` so the IdP performs fresh authentication.
  */
-export function getSamlLoginUrl() {
+export function getSamlLoginUrl(institutionId, options) {
   const base = getApiBaseUrl();
   if (base.length === 0) {
     return '';
   }
-  return `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGIN_PATH}`;
+  const url = new URL(`${base.replace(/\/+$/, '')}${AUTH_SAML_LOGIN_PATH}`);
+  if (institutionId !== undefined && institutionId.length > 0) {
+    url.searchParams.set('institution', institutionId);
+  }
+  if (options?.forceAuthn === true) {
+    url.searchParams.set(AUTH_SAML_LOGIN_FORCE_AUTHN_QUERY, AUTH_SAML_LOGIN_FORCE_AUTHN_VALUE);
+  }
+  return url.toString();
+}
+
+/**
+ * `GET` JSON for institution list (`{ samlReady, institutions }`).
+ */
+export function getSamlInstitutionsUrl() {
+  const base = getApiBaseUrl();
+  if (base.length === 0) {
+    return '';
+  }
+  return `${base.replace(/\/+$/, '')}${AUTH_SAML_INSTITUTIONS_PATH}`;
+}
+
+/**
+ * `GET` — reads session from cookie; call with `credentials: 'include'`.
+ */
+export function getSamlMeUrl() {
+  const base = getApiBaseUrl();
+  if (base.length === 0) {
+    return '';
+  }
+  return `${base.replace(/\/+$/, '')}${AUTH_SAML_ME_PATH}`;
+}
+
+/**
+ * `POST` — clears the SAML session cookie; call with `credentials: 'include'`.
+ */
+export function getSamlLogoutUrl() {
+  const base = getApiBaseUrl();
+  if (base.length === 0) {
+    return '';
+  }
+  return `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGOUT_PATH}`;
 }
 
 /**

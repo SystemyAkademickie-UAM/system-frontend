@@ -20,4 +20,4 @@ cp .env.example .env   # optional
 
 ## Debian / production host
 
-Build static files with `npm run build` and host `dist/`, or use the [Dockerfile](../Dockerfile). See [docker.md](./docker.md).
+Build static files with `npm run build` and host `dist/`, or use the [Dockerfile](../../Dockerfile). See [docker.md](../docker/docker.md).

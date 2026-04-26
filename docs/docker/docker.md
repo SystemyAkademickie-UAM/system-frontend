@@ -40,4 +40,8 @@ Defaults use `VITE_API_BASE_URL=http://127.0.0.1:8080/api` and image tag `system
 - `.github/workflows/docker-build.yml` — builds this Dockerfile on `push` to `main` (verification only).
 - `.github/workflows/docker-publish.yml` — builds and pushes on `push` to `production` (for example to GHCR). Pass the correct `VITE_API_BASE_URL` (or GitHub `vars`) for the environment where the UI will run.
 
-The build stage uses **Node.js 24.14.1** (Alpine) and **npm 11.11.0**, matching [prerequisites.md](./prerequisites.md).
+The build stage uses **Node.js 24.14.1** (Alpine) and **npm 11.11.0**, matching [prerequisites.md](../first-setup/prerequisites.md).
+
+## Two-service dev stack (with the API repo)
+
+If you clone **system-frontend** next to **system-backend**, run both images from the backend directory: **`../system-backend/docker-compose.dev.yml`** (see **`../system-backend/docs/docker/docker.md`** — *Developer compose*).
