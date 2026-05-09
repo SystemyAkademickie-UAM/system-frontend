@@ -9,9 +9,9 @@
     "npm": ">=10.0.0"
   },
   "scripts": {
-    "dev": "node scripts/assert-local-env.mjs && vite",
-    "build": "node scripts/assert-local-env.mjs && vite build",
-    "preview": "node scripts/assert-local-env.mjs && vite preview",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "vitest run"
   },
   "dependencies": {
