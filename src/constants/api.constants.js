@@ -1,4 +1,4 @@
-import { AUTH_SAML_LOGIN_PATH } from './authPaths.constants.js';
+import { AUTH_SAML_LOGIN_PATH, AUTH_SAML_LOGOUT_PATH } from './authPaths.constants.js';
 
 /**
  * If the page is https but the build still has http for the same host (old image), upgrade to https to avoid mixed content.
@@ -35,6 +35,17 @@ export function getSamlLoginUrl() {
     return '';
   }
   return `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGIN_PATH}`;
+}
+
+/**
+ * Absolute URL for SAML Single Logout (redirects to IdP for full logout).
+ */
+export function getSamlLogoutUrl() {
+  const base = getApiBaseUrl();
+  if (base.length === 0) {
+    return '';
+  }
+  return `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGOUT_PATH}`;
 }
 
 /**
