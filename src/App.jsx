@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AuthProvider } from './AuthContext.jsx';
 import HomePage from './HomePage.jsx';
 import TestPage from './TestPage.jsx';
 import './App.css';
@@ -11,7 +12,7 @@ function readPathname() {
   return p === '' ? '/' : p;
 }
 
-export default function App() {
+function AppRouter() {
   const [pathname, setPathname] = useState(readPathname);
 
   useEffect(() => {
@@ -25,4 +26,12 @@ export default function App() {
   }
 
   return <HomePage />;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
+  );
 }

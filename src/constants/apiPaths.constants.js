@@ -4,6 +4,9 @@ export const COUNTER_INCREMENT_PATH = '/counter/increment';
 /** Opaque bearer issuance after SAML session cookie + `X-Browser-ID`. */
 export const LOGIN_PATH = '/login';
 
+/** Clears auth cookies (logout). */
+export const LOGOUT_PATH = '/login/logout';
+
 /** Lecturer group creation. */
 export const GROUPS_NEW_PATH = '/groups/new';
 
