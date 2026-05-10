@@ -20,3 +20,5 @@ export const SAML_BYPASS_LECTURER_PATH = '/auth/saml/bypass/lecturer';
  * Dev-only: POST JSON `{ "profile": "student" | "lecturer" }` — sets `maqSamlSession` without redirect (same-origin fetch).
  */
 export const SAML_BYPASS_SESSION_PATH = '/auth/saml/bypass/session';
+
+export const AUTH_SAML_ME_PATH = '/auth/saml/me';

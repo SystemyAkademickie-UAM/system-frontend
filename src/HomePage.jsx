@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
-import { getApiBaseUrl, getSamlLoginUrl } from './constants/api.constants.js';
-import { COUNTER_INCREMENT_PATH } from './constants/apiPaths.constants.js';
+import { useCallback, useState, useEffect } from 'react';
+import { getApiBaseUrl, getSamlLoginUrl, getSamlLogoutUrl } from './constants/api.constants.js';
+import { COUNTER_INCREMENT_PATH, AUTH_SAML_ME_PATH } from './constants/apiPaths.constants.js';
+import './App.css';
 
 /**
  * Main landing: demo counter and navigation to integration test page.
@@ -9,6 +10,30 @@ export default function HomePage() {
   const [count, setCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const base = getApiBaseUrl();
+        const response = await fetch(`${base}${AUTH_SAML_ME_PATH}`, {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.authenticated && data.user) {
+            setUser(data.user);
+          }
+        }
+      } catch {
+        // Ignore auth check errors
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+    checkAuth();
+  }, []);
 
   const onAdd = useCallback(async () => {
     setErrorMessage(null);
@@ -39,30 +64,54 @@ export default function HomePage() {
   }, [count]);
 
   const samlLoginUrl = getSamlLoginUrl();
+  const samlLogoutUrl = getSamlLogoutUrl();
 
   return (
     <main className="app">
       <h1>UNDER CONSTRUCTION</h1>
-      <p className="app__nav">
-        <a className="app__saml-link" href="/test">
-          API &amp; SAML test page
-        </a>
-      </p>
-      <section className="app__section" aria-labelledby="counter-heading">
-        <h2 id="counter-heading">Demo counter</h2>
-        <p className="app__label">Count: {count}</p>
+      <hr />
+      <h1>MyAcademyQuest</h1>
+      
+      {authChecked && user ? (
+        <section className="app__user">
+          <h2>Zalogowany użytkownik</h2>
+          <pre className="app__user-json">
+            {JSON.stringify({
+              email: user.email || null,
+              name: user.givenName || null,
+              surname: user.surname || null,
+              studentId: user.studentId || null,
+            }, null, 2)}
+          </pre>
+          <a href={samlLogoutUrl} className="app__button app__button--logout">
+            Wyloguj (z IdP)
+          </a>
+        </section>
+      ) : authChecked ? (
+        <section className="app__login">
+          {samlLoginUrl.length > 0 ? (
+            <p className="app__saml">
+              <a className="app__saml-link" href={samlLoginUrl}>
+                Logowanie instytucjonalne (SAML 2.0 / PIONIER.id)
+              </a>
+            </p>
+          ) : null}
+        </section>
+      ) : (
+        <p>Sprawdzanie sesji...</p>
+      )}
+
+      <hr />
+
+      <section className="app__counter">
+        <p className="app__label">Licznik: {count}</p>
         <button type="button" className="app__button" onClick={onAdd} disabled={isLoading}>
-          Add
+          Dodaj
         </button>
-        {samlLoginUrl.length > 0 ? (
-          <p className="app__saml">
-            <a className="app__saml-link" href={samlLoginUrl}>
-              Institutional login (SAML 2.0 / PIONIER.id)
-            </a>
-          </p>
-        ) : null}
-        {errorMessage ? <p className="app__error">{errorMessage}</p> : null}
       </section>
+      
+      {errorMessage ? <p className="app__error">{errorMessage}</p> : null}
+    
     </main>
   );
 }
