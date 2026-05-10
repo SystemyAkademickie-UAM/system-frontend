@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useAuth } from './AuthContext.jsx';
 import { getApiBaseUrl, getSamlLoginUrl } from './constants/api.constants.js';
 import {
   DRIVE_PATH,
   GROUPS_NEW_PATH,
   LOGIN_PATH,
+  LOGOUT_PATH,
   SAML_BYPASS_SESSION_PATH,
 } from './constants/apiPaths.constants.js';
 import { describeDriveForbiddenReason, DRIVE_JSON_STATUS_FORBIDDEN } from './constants/driveApi.constants.js';
@@ -23,8 +25,8 @@ function formatFetchError(response, bodyText) {
 }
 
 export default function ApiSmokeTest() {
+  const { authToken, setAuthToken, clearAuthToken } = useAuth();
   const [browserId, setBrowserId] = useState(() => getOrCreateBrowserId());
-  const [authToken, setAuthToken] = useState('');
   const [groupName, setGroupName] = useState('Smoke test group');
   const [groupDescription, setGroupDescription] = useState('Created from frontend smoke page');
   const [groupCurrency, setGroupCurrency] = useState('Coin');
@@ -43,7 +45,7 @@ export default function ApiSmokeTest() {
 
   function onRegenerateBrowserId() {
     setBrowserId(resetStoredBrowserId());
-    setAuthToken('');
+    clearAuthToken();
     setErrorMessage(null);
     setLastJson('');
   }
@@ -125,6 +127,34 @@ export default function ApiSmokeTest() {
     }
   }
 
+  async function onLogout() {
+    setErrorMessage(null);
+    setLastJson('');
+    setIsBusy(true);
+    try {
+      const url = `${baseUrl}${LOGOUT_PATH}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(formatFetchError(response, text));
+      }
+      const parsed = JSON.parse(text);
+      clearAuthToken();
+      setLastJson(JSON.stringify(parsed, null, 2));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorMessage(message);
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  /**
+   * Creates group using auth from body (legacy/API client flow).
+   */
   async function onCreateGroup() {
     setErrorMessage(null);
     setLastJson('');
@@ -183,14 +213,67 @@ export default function ApiSmokeTest() {
     }
   }
 
+  /**
+   * Creates group using HTTP-only maq_auth cookie (browser flow - no auth in body).
+   */
+  async function onCreateGroupCookieAuth() {
+    setErrorMessage(null);
+    setLastJson('');
+    const currencyIcon = Number(groupCurrencyIcon);
+    const lifeIcon = Number(groupLifeIcon);
+    if (!Number.isInteger(currencyIcon) || currencyIcon < 0) {
+      setErrorMessage('currencyIcon must be a non-negative integer.');
+      return;
+    }
+    if (!Number.isInteger(lifeIcon) || lifeIcon < 0) {
+      setErrorMessage('lifeIcon must be a non-negative integer.');
+      return;
+    }
+    setIsBusy(true);
+    try {
+      const payload = {
+        group: {
+          name: groupName,
+          description: groupDescription,
+          currency: groupCurrency,
+          currencyIcon,
+          life: groupLife,
+          lifeIcon,
+        },
+      };
+      if (groupBannerRef.trim() !== '') {
+        payload.group.bannerRef = groupBannerRef.trim();
+      }
+      const url = `${baseUrl}${GROUPS_NEW_PATH}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserId,
+        },
+        body: JSON.stringify(payload),
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(formatFetchError(response, text));
+      }
+      const parsed = JSON.parse(text);
+      setLastJson(JSON.stringify(parsed, null, 2));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorMessage(message);
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  /**
+   * Drive upload using cookie auth (no auth in JSON body).
+   */
   async function onDrivePost() {
     setErrorMessage(null);
     setLastJson('');
-    const trimmedAuth = authToken.trim();
-    if (trimmedAuth === '') {
-      setErrorMessage('Set auth token first (POST /login after SAML).');
-      return;
-    }
     if (driveFile === null) {
       setErrorMessage('Choose an image file for drive upload.');
       return;
@@ -198,7 +281,6 @@ export default function ApiSmokeTest() {
     setIsBusy(true);
     try {
       const jsonPayload = {
-        auth: trimmedAuth,
         drive: {
           method: 'post',
           driveRef: '',
@@ -239,14 +321,12 @@ export default function ApiSmokeTest() {
     }
   }
 
+  /**
+   * Drive remove using cookie auth (no auth in JSON body).
+   */
   async function onDriveRemove() {
     setErrorMessage(null);
     setLastJson('');
-    const trimmedAuth = authToken.trim();
-    if (trimmedAuth === '') {
-      setErrorMessage('Set auth token first (POST /login after SAML).');
-      return;
-    }
     const trimmedRef = driveRemoveRef.trim();
     if (trimmedRef === '') {
       setErrorMessage('Enter driveRef to remove (or upload first).');
@@ -258,7 +338,6 @@ export default function ApiSmokeTest() {
       formData.append(
         'json',
         JSON.stringify({
-          auth: trimmedAuth,
           drive: {
             method: 'remove',
             driveRef: trimmedRef,
@@ -306,7 +385,7 @@ export default function ApiSmokeTest() {
       <h2 id="smoke-heading">API smoke test</h2>
       <p className="smoke__hint">
         Uses the Vite <code className="smoke__code">/api</code> proxy to Nest (<code className="smoke__code">127.0.0.1:8080</code>).
-        <strong>POST /login</strong> needs the HTTP-only <code className="smoke__code">maqSamlSession</code> cookie on this
+        <strong>POST /login</strong> needs the HTTP-only <code className="smoke__code">saml_session</code> cookie on this
         origin. In dev, use <strong>Establish dev session</strong> below (or institutional SAML). GET bypass links can miss
         the cookie if <code className="smoke__code">SAML_LOGIN_SUCCESS_REDIRECT_URL</code> uses a different host than this
         page (e.g. <code className="smoke__code">localhost</code> vs <code className="smoke__code">127.0.0.1</code>).
@@ -364,20 +443,23 @@ export default function ApiSmokeTest() {
 
       <div className="smoke__actions">
         <button type="button" className="smoke__button" onClick={onLogin} disabled={isBusy}>
-          POST /login (mint auth)
+          POST /login (mint auth + set cookie)
+        </button>
+        <button type="button" className="smoke__button smoke__button--secondary" onClick={onLogout} disabled={isBusy}>
+          POST /login/logout (clear cookies)
         </button>
       </div>
 
       <div className="smoke__field">
         <label className="smoke__label" htmlFor="smoke-auth">
-          Auth token (plaintext for JSON <code className="smoke__code">auth</code>)
+          Auth token (displayed for debugging)
         </label>
         <p className="smoke__hint">
-          This value is <strong>not</strong> stored in an HTTP-only cookie — the server returns it once in the{' '}
-          <code className="smoke__code">POST /login</code> JSON. Groups and drive send it in the request body (
-          <code className="smoke__code">auth</code> field). Only <code className="smoke__code">maqSamlSession</code> is a
-          cookie (for exchanging login). <strong>Drive</strong> needs a <strong>lecturer</strong> session + the same{' '}
-          <code className="smoke__code">X-Browser-ID</code> you used for <code className="smoke__code">POST /login</code>.
+          Returned in <code className="smoke__code">POST /login</code> JSON and also set as{' '}
+          <code className="smoke__code">maq_auth</code> HTTP-only cookie. The cookie is used automatically for API
+          calls via <code className="smoke__code">credentials: include</code>. The value shown here is for debugging /
+          API clients only. Use <strong>Create group (cookie auth)</strong> to test without sending{' '}
+          <code className="smoke__code">auth</code> in the request body.
         </p>
         <textarea
           id="smoke-auth"
@@ -387,6 +469,9 @@ export default function ApiSmokeTest() {
           onChange={(event) => setAuthToken(event.target.value)}
           spellCheck={false}
         />
+        <button type="button" className="smoke__button smoke__button--secondary" onClick={clearAuthToken}>
+          Clear auth (memory)
+        </button>
       </div>
 
       <fieldset className="smoke__fieldset">
@@ -467,7 +552,10 @@ export default function ApiSmokeTest() {
         />
         <div className="smoke__actions">
           <button type="button" className="smoke__button" onClick={onCreateGroup} disabled={isBusy}>
-            Create group
+            Create group (body auth)
+          </button>
+          <button type="button" className="smoke__button" onClick={onCreateGroupCookieAuth} disabled={isBusy}>
+            Create group (cookie auth)
           </button>
           <button type="button" className="smoke__button smoke__button--secondary" onClick={onUseDriveRefAsBanner}>
             Use last driveRef as banner
