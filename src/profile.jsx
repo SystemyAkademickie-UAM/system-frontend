@@ -151,10 +151,32 @@ export default function App() {
   }
   totalcurrency = totalcurrency.trim();
 
-  var receivedactivities = [{id: 0, image: 'rgb(255, 0, 255)', name: '', description: '', time: ''}];
+var receivedactivities = [
+  {id:0, image:'rgb(255, 99, 71)', name:'Morning Yoga', description:'Stretch and energize your body', time:'6:30 AM'},
+  {id:1, image:'rgb(135, 206, 235)', name:'Coffee Break', description:'Relax with a hot cup of coffee', time:'9:00 AM'},
+  {id:2, image:'rgb(60, 179, 113)', name:'Team Meeting', description:'Discuss project updates', time:'10:30 AM'},
+  {id:3, image:'rgb(255, 215, 0)', name:'Coding Session', description:'Work on your side project', time:'1:00 PM'},
+  {id:4, image:'rgb(138, 43, 226)', name:'Lunch with Friends', description:'Catch up over a meal', time:'12:30 PM'},
+  {id:5, image:'rgb(255, 105, 180)', name:'Afternoon Walk', description:'Refresh your mind with a stroll', time:'3:00 PM'},
+  {id:6, image:'rgb(70, 130, 180)', name:'Read a Book', description:'Dive into a new story', time:'4:30 PM'},
+  {id:7, image:'rgb(240, 128, 128)', name:'Gym Time', description:'Strengthen your body', time:'6:00 PM'},
+  {id:8, image:'rgb(50, 205, 50)', name:'Cooking Practice', description:'Try a new recipe', time:'7:30 PM'},
+  {id:9, image:'rgb(218, 112, 214)', name:'Evening Meditation', description:'Calm your mind before bed', time:'9:00 PM'}
+];
   const [activities, setActivities] = useState(receivedactivities.slice(0, 5));
 
-  var receivedbadges = [{id: 0, image: 'rgb(255, 0, 255)', name: '', description0: '', description1: '', reward: 0, time: '', rarity: 'common'}];
+  var receivedbadges = [
+  {id:0, image:'rgb(255, 223, 0)', name:'Early Bird', description0:'Wake up before 6 AM', description1:'Start your day right', reward:50, time:'6:00 AM', rarity:'common'},
+  {id:1, image:'rgb(30, 144, 255)', name:'Coffee Lover', description0:'Drink 3 cups of coffee', description1:'Stay energized', reward:30, time:'9:00 AM', rarity:'common'},
+  {id:2, image:'rgb(60, 179, 113)', name:'Team Player', description0:'Attend 5 meetings', description1:'Collaborate effectively', reward:70, time:'10:30 AM', rarity:'uncommon'},
+  {id:3, image:'rgb(255, 99, 71)', name:'Code Master', description0:'Complete 2 coding challenges', description1:'Sharpen your skills', reward:100, time:'1:00 PM', rarity:'rare'},
+  {id:4, image:'rgb(138, 43, 226)', name:'Social Butterfly', description0:'Have lunch with 3 friends', description1:'Stay connected', reward:40, time:'12:30 PM', rarity:'common'},
+  {id:5, image:'rgb(255, 105, 180)', name:'Nature Walker', description0:'Walk 5000 steps', description1:'Enjoy the outdoors', reward:60, time:'3:00 PM', rarity:'uncommon'},
+  {id:6, image:'rgb(70, 130, 180)', name:'Bookworm', description0:'Read 50 pages', description1:'Expand your knowledge', reward:80, time:'4:30 PM', rarity:'rare'},
+  {id:7, image:'rgb(240, 128, 128)', name:'Fitness Fan', description0:'Finish 1 workout', description1:'Boost your health', reward:90, time:'6:00 PM', rarity:'uncommon'},
+  {id:8, image:'rgb(50, 205, 50)', name:'Chef Apprentice', description0:'Cook a new dish', description1:'Enhance your culinary skills', reward:70, time:'7:30 PM', rarity:'rare'},
+  {id:9, image:'rgb(218, 112, 214)', name:'Zen Master', description0:'Meditate for 20 mins', description1:'Relax and focus', reward:60, time:'9:00 PM', rarity:'uncommon'}
+];
   i = 0;
   while (i < receivedbadges.length) {
     if (receivedbadges[i].rarity == 'common') {
@@ -176,7 +198,7 @@ export default function App() {
     if (i % 2 == 0) {
       receivedbadges[i].left = '1vw';
     } else {
-      receivedbadges[i].left = '30vw';
+      receivedbadges[i].left = '34vw';
     }
     receivedbadges[i].top = Math.floor(i / 2) * 31 + 38 + 'vh';
     i = i + 1;
