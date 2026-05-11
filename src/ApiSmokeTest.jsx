@@ -164,13 +164,13 @@ export default function ApiSmokeTest() {
       return;
     }
     const currencyIcon = Number(groupCurrencyIcon);
-    const lifeIcon = Number(groupLifeIcon);
+    const livesIcon = Number(groupLifeIcon);
     if (!Number.isInteger(currencyIcon) || currencyIcon < 0) {
       setErrorMessage('currencyIcon must be a non-negative integer.');
       return;
     }
-    if (!Number.isInteger(lifeIcon) || lifeIcon < 0) {
-      setErrorMessage('lifeIcon must be a non-negative integer.');
+    if (!Number.isInteger(livesIcon) || livesIcon < 0) {
+      setErrorMessage('livesIcon must be a non-negative integer.');
       return;
     }
     setIsBusy(true);
@@ -182,12 +182,12 @@ export default function ApiSmokeTest() {
           description: groupDescription,
           currency: groupCurrency,
           currencyIcon,
-          life: groupLife,
-          lifeIcon,
+          lives: groupLife,
+          livesIcon,
         },
       };
       if (groupBannerRef.trim() !== '') {
-        payload.group.bannerRef = groupBannerRef.trim();
+        payload.group.imageRef = groupBannerRef.trim();
       }
       const url = `${baseUrl}${GROUPS_NEW_PATH}`;
       const response = await fetch(url, {
@@ -220,13 +220,13 @@ export default function ApiSmokeTest() {
     setErrorMessage(null);
     setLastJson('');
     const currencyIcon = Number(groupCurrencyIcon);
-    const lifeIcon = Number(groupLifeIcon);
+    const livesIcon = Number(groupLifeIcon);
     if (!Number.isInteger(currencyIcon) || currencyIcon < 0) {
       setErrorMessage('currencyIcon must be a non-negative integer.');
       return;
     }
-    if (!Number.isInteger(lifeIcon) || lifeIcon < 0) {
-      setErrorMessage('lifeIcon must be a non-negative integer.');
+    if (!Number.isInteger(livesIcon) || livesIcon < 0) {
+      setErrorMessage('livesIcon must be a non-negative integer.');
       return;
     }
     setIsBusy(true);
@@ -237,12 +237,12 @@ export default function ApiSmokeTest() {
           description: groupDescription,
           currency: groupCurrency,
           currencyIcon,
-          life: groupLife,
-          lifeIcon,
+          lives: groupLife,
+          livesIcon,
         },
       };
       if (groupBannerRef.trim() !== '') {
-        payload.group.bannerRef = groupBannerRef.trim();
+        payload.group.imageRef = groupBannerRef.trim();
       }
       const url = `${baseUrl}${GROUPS_NEW_PATH}`;
       const response = await fetch(url, {
@@ -518,21 +518,21 @@ export default function ApiSmokeTest() {
           value={groupCurrencyIcon}
           onChange={(event) => setGroupCurrencyIcon(Number(event.target.value))}
         />
-        <label className="smoke__label" htmlFor="smoke-g-life">
-          life
+        <label className="smoke__label" htmlFor="smoke-g-lives">
+          lives
         </label>
         <input
-          id="smoke-g-life"
+          id="smoke-g-lives"
           className="smoke__input"
           type="text"
           value={groupLife}
           onChange={(event) => setGroupLife(event.target.value)}
         />
-        <label className="smoke__label" htmlFor="smoke-g-life-icon">
-          lifeIcon
+        <label className="smoke__label" htmlFor="smoke-g-lives-icon">
+          livesIcon
         </label>
         <input
-          id="smoke-g-life-icon"
+          id="smoke-g-lives-icon"
           className="smoke__input"
           type="number"
           min={0}
@@ -540,11 +540,11 @@ export default function ApiSmokeTest() {
           value={groupLifeIcon}
           onChange={(event) => setGroupLifeIcon(Number(event.target.value))}
         />
-        <label className="smoke__label" htmlFor="smoke-g-banner">
-          bannerRef (optional)
+        <label className="smoke__label" htmlFor="smoke-g-image-ref">
+          imageRef (optional)
         </label>
         <input
-          id="smoke-g-banner"
+          id="smoke-g-image-ref"
           className="smoke__input smoke__input--mono"
           type="text"
           value={groupBannerRef}
