@@ -1,0 +1,23 @@
+@import '../RouteContent.css';
+
+.settings-content__help {
+  margin: 1rem 0 0;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.settings-content__help-link {
+  color: #10b981;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.settings-content__help-link:hover {
+  text-decoration: underline;
+}
+
+.settings-content__help-link:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
