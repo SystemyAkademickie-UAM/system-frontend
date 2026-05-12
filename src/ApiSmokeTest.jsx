@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext.jsx';
 import { getApiBaseUrl, getSamlLoginUrl } from './constants/api.constants.js';
 import {
   DRIVE_PATH,
+  getGroupEnrollPath,
   GROUPS_NEW_PATH,
   LOGIN_PATH,
   LOGOUT_PATH,
@@ -34,6 +35,7 @@ export default function ApiSmokeTest() {
   const [groupLife, setGroupLife] = useState('Lives');
   const [groupLifeIcon, setGroupLifeIcon] = useState(SMOKE_TEST_DEFAULT_LIFE_ICON);
   const [groupBannerRef, setGroupBannerRef] = useState('');
+  const [enrollGroupId, setEnrollGroupId] = useState('');
   const [driveFile, setDriveFile] = useState(null);
   const [driveRemoveRef, setDriveRemoveRef] = useState('');
   const [lastJson, setLastJson] = useState('');
@@ -253,6 +255,48 @@ export default function ApiSmokeTest() {
           'X-Browser-ID': browserId,
         },
         body: JSON.stringify(payload),
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(formatFetchError(response, text));
+      }
+      const parsed = JSON.parse(text);
+      setLastJson(JSON.stringify(parsed, null, 2));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorMessage(message);
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  /**
+   * Student enrollment using cookie auth.
+   */
+  async function onEnrollInGroup() {
+    setErrorMessage(null);
+    setLastJson('');
+    const trimmedId = enrollGroupId.trim();
+    if (trimmedId === '') {
+      setErrorMessage('Enter a group ID to enroll in.');
+      return;
+    }
+    const groupId = Number(trimmedId);
+    if (!Number.isInteger(groupId) || groupId < 1) {
+      setErrorMessage('Group ID must be a positive integer.');
+      return;
+    }
+    setIsBusy(true);
+    try {
+      const url = `${baseUrl}${getGroupEnrollPath(groupId)}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserId,
+        },
+        body: JSON.stringify({}),
       });
       const text = await response.text();
       if (!response.ok) {
@@ -559,6 +603,32 @@ export default function ApiSmokeTest() {
           </button>
           <button type="button" className="smoke__button smoke__button--secondary" onClick={onUseDriveRefAsBanner}>
             Use last driveRef as banner
+          </button>
+        </div>
+      </fieldset>
+
+      <fieldset className="smoke__fieldset">
+        <legend>POST /groups/:id/enroll (Student)</legend>
+        <p className="smoke__hint">
+          Enroll as a student in a group. Requires <strong>student</strong> session (use dev bypass above).
+          Enter the public group ID (e.g. from Create group response).
+        </p>
+        <label className="smoke__label" htmlFor="smoke-enroll-group-id">
+          Group ID
+        </label>
+        <input
+          id="smoke-enroll-group-id"
+          className="smoke__input"
+          type="number"
+          min={1}
+          step={1}
+          value={enrollGroupId}
+          onChange={(event) => setEnrollGroupId(event.target.value)}
+          placeholder="e.g. 100001"
+        />
+        <div className="smoke__actions">
+          <button type="button" className="smoke__button" onClick={onEnrollInGroup} disabled={isBusy}>
+            Enroll in group
           </button>
         </div>
       </fieldset>
