@@ -10,6 +10,15 @@ export const LOGOUT_PATH = '/login/logout';
 /** Lecturer group creation. */
 export const GROUPS_NEW_PATH = '/groups/new';
 
+/**
+ * Student enrollment in a group.
+ * @param {number|string} groupId - The public group ID
+ * @returns {string} Path for POST request
+ */
+export function getGroupEnrollPath(groupId) {
+  return `/groups/${groupId}/enroll`;
+}
+
 /** Multipart drive upload / remove (lecturer). */
 export const DRIVE_PATH = '/drive';
 
