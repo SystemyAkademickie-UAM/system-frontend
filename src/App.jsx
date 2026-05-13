@@ -77,7 +77,8 @@ export default function App() {
               email: user.email || null,
               name: user.givenName || null,
               surname: user.surname || null,
-              studentId: user.studentId || null,
+              role: user.role || null,
+              affiliations: user.affiliations || null,
             }, null, 2)}
           </pre>
           <a href={samlLogoutUrl} className="app__button app__button--logout">
