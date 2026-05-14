@@ -6,6 +6,18 @@
 /** Przykładowe ID grupy zgodne z backendem (od 100001). */
 export const DEMO_GROUP_ID = '100001';
 
+export function loginPath() {
+  return '/login';
+}
+
+export function loginTempPath() {
+  return '/logintemp';
+}
+
+export function loginNikitaPath() {
+  return '/loginnikita';
+}
+
 export function groupsListPath() {
   return '/groups';
 }

@@ -13,6 +13,27 @@
 /** @type {AppRouteDefinition[]} */
 export const ROUTE_TABLE = [
   {
+    id: 'auth.login',
+    pathPattern: '/login',
+    pageTitle: 'Logowanie',
+    pageModule: 'pages/links/login/LoginHubPage.jsx',
+    contentModule: 'pages/content/login-hub/LoginHubContent.jsx',
+  },
+  {
+    id: 'auth.loginTemp',
+    pathPattern: '/logintemp',
+    pageTitle: 'Logowanie (tymczasowe)',
+    pageModule: 'pages/links/login/LoginTempPage.jsx',
+    contentModule: 'pages/content/login-temp/LoginTempContent.jsx',
+  },
+  {
+    id: 'auth.loginNikita',
+    pathPattern: '/loginnikita',
+    pageTitle: 'Logowanie — Nikita',
+    pageModule: 'pages/links/login/LoginNikitaPage.jsx',
+    contentModule: 'pages/content/login-nikita/LoginNikitaContent.jsx',
+  },
+  {
     id: 'groups.list',
     pathPattern: '/groups',
     pageTitle: 'Lista grup',

@@ -1,9 +1,9 @@
-.groups-list {
+.login-hub {
   padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
   max-width: 42rem;
 }
 
-.groups-list__title {
+.login-hub__title {
   margin: 0 0 0.5rem;
   font-size: clamp(1.25rem, 2.5vw, 1.75rem);
   font-weight: 700;
@@ -12,20 +12,23 @@
   color: #f9fafb;
 }
 
-.groups-list__hint {
+.login-hub__hint {
   margin: 0 0 1.25rem;
   color: #9ca3af;
   font-size: 0.95rem;
   line-height: 1.45;
 }
 
-.groups-list__ul {
+.login-hub__list {
   margin: 0;
   padding: 0;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
 }
 
-.groups-list__link {
+.login-hub__link {
   display: inline-flex;
   align-items: center;
   padding: 0.65rem 1rem;
@@ -40,12 +43,12 @@
     color 0.15s ease;
 }
 
-.groups-list__link:hover {
+.login-hub__link:hover {
   background: #374151;
   color: #34d399;
 }
 
-.groups-list__link:focus-visible {
+.login-hub__link:focus-visible {
   outline: 2px solid #10b981;
   outline-offset: 2px;
 }

@@ -1,5 +1,6 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
+import LoginShell from '../components/layout/LoginShell.jsx';
 import CourseManagementPage from '../pages/links/app/CourseManagementPage.jsx';
 import HelpPage from '../pages/links/app/HelpPage.jsx';
 import OrganizationManagementPage from '../pages/links/app/OrganizationManagementPage.jsx';
@@ -25,69 +26,85 @@ import GroupActivityListPage from '../pages/links/groups/main/GroupActivityListP
 import GroupMainHomePage from '../pages/links/groups/main/GroupMainHomePage.jsx';
 import GroupMainLayout from '../pages/links/groups/layouts/GroupMainLayout.jsx';
 import GroupRanksAndBadgesPage from '../pages/links/groups/main/GroupRanksAndBadgesPage.jsx';
-import { groupsListPath } from './pathRegistry.js';
+import LoginHubPage from '../pages/links/login/LoginHubPage.jsx';
+import LoginNikitaPage from '../pages/links/login/LoginNikitaPage.jsx';
+import LoginTempPage from '../pages/links/login/LoginTempPage.jsx';
+import { loginPath } from './pathRegistry.js';
 
 /**
  * Drzewo tras — zsynchronizuj z `routeTable.js` i `shellTemplates.config.js`.
  * `pages/links/` — komponenty podpięte pod router; `pages/content/` — treść ekranów.
+ * Trasy `login`, `logintemp`, `loginnikita`: layout `LoginShell` (bez paska bocznego).
  */
 const appRouteTree = [
   {
     path: '/',
-    element: <AppShell />,
     children: [
-      { index: true, element: <Navigate to="groups" replace /> },
-      { path: 'settings', element: <SettingsPage /> },
-      { path: 'help', element: <HelpPage /> },
-      { path: 'userManagement', element: <UserManagementPage /> },
-      { path: 'courseManagement', element: <CourseManagementPage /> },
-      { path: 'Statistics', element: <StatisticsPage /> },
-      { path: 'organizationManagement', element: <OrganizationManagementPage /> },
+      { index: true, element: <Navigate to="login" replace /> },
       {
-        path: 'groups',
+        element: <LoginShell />,
         children: [
-          { index: true, element: <GroupsListPage /> },
-          {
-            path: ':groupId',
-            children: [
-              {
-                path: 'main',
-                element: <GroupMainLayout />,
-                children: [
-                  { index: true, element: <GroupMainHomePage /> },
-                  { path: 'activity', element: <GroupActivityListPage /> },
-                  { path: 'ranksandbadges', element: <GroupRanksAndBadgesPage /> },
-                ],
-              },
-              {
-                path: 'controlPanel',
-                element: <ControlPanelLayout />,
-                children: [
-                  { index: true, element: <ControlPanelHomePage /> },
-                  { path: 'users', element: <ControlPanelUsersPage /> },
-                  { path: 'activity', element: <ControlPanelActivityPage /> },
-                  { path: 'posts', element: <ControlPanelPostsPage /> },
-                  { path: 'ranksandbadges', element: <ControlPanelRanksPage /> },
-                  { path: 'shopitems', element: <ControlPanelShopItemsPage /> },
-                  { path: 'currency', element: <ControlPanelCurrencyPage /> },
-                  { path: 'health', element: <ControlPanelHealthPage /> },
-                ],
-              },
-              { path: 'profile', element: <GroupProfilePage /> },
-              {
-                path: 'shop',
-                element: <GroupShopLayout />,
-                children: [
-                  { index: true, element: <GroupShopPage /> },
-                  { path: 'add', element: <GroupShopAddPage /> },
-                ],
-              },
-              { path: 'ranking', element: <GroupRankingPage /> },
-            ],
-          },
+          { path: 'login', element: <LoginHubPage /> },
+          { path: 'logintemp', element: <LoginTempPage /> },
+          { path: 'loginnikita', element: <LoginNikitaPage /> },
         ],
       },
-      { path: '*', element: <Navigate to={groupsListPath()} replace /> },
+      {
+        element: <AppShell />,
+        children: [
+          { path: 'settings', element: <SettingsPage /> },
+          { path: 'help', element: <HelpPage /> },
+          { path: 'userManagement', element: <UserManagementPage /> },
+          { path: 'courseManagement', element: <CourseManagementPage /> },
+          { path: 'Statistics', element: <StatisticsPage /> },
+          { path: 'organizationManagement', element: <OrganizationManagementPage /> },
+          {
+            path: 'groups',
+            children: [
+              { index: true, element: <GroupsListPage /> },
+              {
+                path: ':groupId',
+                children: [
+                  {
+                    path: 'main',
+                    element: <GroupMainLayout />,
+                    children: [
+                      { index: true, element: <GroupMainHomePage /> },
+                      { path: 'activity', element: <GroupActivityListPage /> },
+                      { path: 'ranksandbadges', element: <GroupRanksAndBadgesPage /> },
+                    ],
+                  },
+                  {
+                    path: 'controlPanel',
+                    element: <ControlPanelLayout />,
+                    children: [
+                      { index: true, element: <ControlPanelHomePage /> },
+                      { path: 'users', element: <ControlPanelUsersPage /> },
+                      { path: 'activity', element: <ControlPanelActivityPage /> },
+                      { path: 'posts', element: <ControlPanelPostsPage /> },
+                      { path: 'ranksandbadges', element: <ControlPanelRanksPage /> },
+                      { path: 'shopitems', element: <ControlPanelShopItemsPage /> },
+                      { path: 'currency', element: <ControlPanelCurrencyPage /> },
+                      { path: 'health', element: <ControlPanelHealthPage /> },
+                    ],
+                  },
+                  { path: 'profile', element: <GroupProfilePage /> },
+                  {
+                    path: 'shop',
+                    element: <GroupShopLayout />,
+                    children: [
+                      { index: true, element: <GroupShopPage /> },
+                      { path: 'add', element: <GroupShopAddPage /> },
+                    ],
+                  },
+                  { path: 'ranking', element: <GroupRankingPage /> },
+                ],
+              },
+            ],
+          },
+          { path: '*', element: <Navigate to={loginPath()} replace /> },
+        ],
+      },
     ],
   },
 ];

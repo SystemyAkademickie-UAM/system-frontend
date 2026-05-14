@@ -1,0 +1,39 @@
+.login-nikita {
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  max-width: 42rem;
+}
+
+.login-nikita__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f9fafb;
+}
+
+.login-nikita__hint {
+  margin: 0 0 1.25rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.login-nikita__back {
+  margin: 0;
+}
+
+.login-nikita__link {
+  color: #93c5fd;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-nikita__link:hover {
+  text-decoration: underline;
+}
+
+.login-nikita__link:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
