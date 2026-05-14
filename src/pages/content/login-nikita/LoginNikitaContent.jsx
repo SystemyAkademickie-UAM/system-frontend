@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { getApiBaseUrl, getSamlLoginUrl, getSamlLogoutUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ME_PATH } from '../../../constants/authPaths.constants.js';
 import { loginPath } from '../../../routes/pathRegistry.js';
+import MockTestPage from './mock/MockTestPage.jsx';
 import './LoginNikitaContent.css';
 
 export default function LoginNikitaContent() {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [showMockTests, setShowMockTests] = useState(false);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -76,6 +78,22 @@ export default function LoginNikitaContent() {
           ) : (
             <p className="login-nikita__status">Brak skonfigurowanego adresu logowania SAML.</p>
           )}
+        </div>
+      )}
+
+      <div className="login-nikita__mock-toggle">
+        <button
+          type="button"
+          className="login-nikita__button"
+          onClick={() => setShowMockTests((prev) => !prev)}
+        >
+          {showMockTests ? 'Ukryj testy mockowe' : 'Pokaż testy mockowe (dev)'}
+        </button>
+      </div>
+
+      {showMockTests && (
+        <div className="login-nikita__mock-section">
+          <MockTestPage />
         </div>
       )}
 

@@ -141,3 +141,19 @@
   outline: 2px solid #10b981;
   outline-offset: 2px;
 }
+
+.login-nikita__mock-toggle {
+  margin: 1.5rem 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-nikita__mock-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+}
