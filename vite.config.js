@@ -3,6 +3,7 @@ import { defineConfig } from 'vite';
 import { DEV_SERVER_HOST, DEV_SERVER_PORT } from './vite.constants.js';
 
 export default defineConfig({
+  appType: 'spa',
   plugins: [react()],
   server: {
     host: DEV_SERVER_HOST,

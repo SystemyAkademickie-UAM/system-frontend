@@ -1,0 +1,238 @@
+.mock-app {
+  font-family: system-ui, sans-serif;
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem;
+  color: #e5e7eb;
+}
+
+.mock-app--wide {
+  max-width: 44rem;
+}
+
+.mock-app__nav {
+  margin: 0.5rem 0 1rem;
+}
+
+.mock-app__section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mock-app__label {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+}
+
+.mock-app__button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 0.4rem;
+  border: 1px solid #4b5563;
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.mock-app__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mock-app__button--logout {
+  display: inline-block;
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
+  text-decoration: none;
+}
+
+.mock-app__button--logout:hover,
+.mock-app__button--logout:focus-visible {
+  background: #b91c1c;
+  color: #fff;
+}
+
+.mock-app__saml {
+  margin-top: 1rem;
+}
+
+.mock-app__saml-link {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.mock-app__saml-link:hover,
+.mock-app__saml-link:focus-visible {
+  color: #60a5fa;
+}
+
+.mock-app__error {
+  margin-top: 1rem;
+  color: #f87171;
+  font-size: 0.9rem;
+}
+
+.smoke {
+  margin-top: 0.5rem;
+}
+
+.smoke__hint {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #9ca3af;
+}
+
+.smoke__code {
+  font-size: 0.9em;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+.smoke__saml {
+  margin: 0.75rem 0 1rem;
+}
+
+.smoke__link {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.smoke__link:hover,
+.smoke__link:focus-visible {
+  color: #60a5fa;
+}
+
+.smoke__field {
+  margin: 1rem 0;
+}
+
+.smoke__fieldset {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.smoke__subheading {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.smoke__label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.25rem;
+  color: #d1d5db;
+}
+
+.smoke__input,
+.smoke__textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.45rem 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #4b5563;
+  border-radius: 4px;
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+.smoke__input--mono,
+.smoke__textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.smoke__textarea {
+  resize: vertical;
+}
+
+.smoke__actions {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.smoke__button {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #10b981;
+  background: #10b981;
+  color: #052e16;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.smoke__button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.smoke__button--secondary {
+  background: #1f2937;
+  color: #10b981;
+  border-color: #10b981;
+}
+
+.smoke__pre {
+  margin: 0.35rem 0 0;
+  padding: 0.75rem;
+  overflow: auto;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  background: #111827;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e5e7eb;
+}
+
+.mock-app__user {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid #10b981;
+  border-radius: 0.5rem;
+}
+
+.mock-app__user h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  color: #34d399;
+}
+
+.mock-app__user-json {
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.25rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  color: #e5e7eb;
+}
+
+.mock-app__login {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid #3b82f6;
+  border-radius: 0.5rem;
+}
+
+.mock-app__counter {
+  margin-top: 1rem;
+}
