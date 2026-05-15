@@ -1,0 +1,22 @@
+.profile-content {
+  width: 100%;
+  min-height: 100%;
+  position: relative;
+}
+
+.profile-content__inner {
+  position: relative;
+  width: 100%;
+  min-height: 600px;
+  height: calc(100vh - 60px);
+}
+
+.profile-content__error {
+  margin: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(176, 0, 32, 0.15);
+  border: 1px solid rgba(176, 0, 32, 0.3);
+  border-radius: 0.5rem;
+  color: #f87171;
+  font-size: 0.9rem;
+}

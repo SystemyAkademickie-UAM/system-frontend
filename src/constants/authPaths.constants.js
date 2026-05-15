@@ -1,4 +1,9 @@
 /**
+ * Session / current user (relative to API base that ends with `/api`).
+ */
+export const AUTH_SAML_ME_PATH = '/auth/saml/me';
+
+/**
  * Resource path for starting SAML SSO (relative to API base that ends with `/api`).
  * Full URL: `getApiBaseUrl() + AUTH_SAML_LOGIN_PATH`.
  */
