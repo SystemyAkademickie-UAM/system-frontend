@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:docker": "docker compose up -d --build",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"
