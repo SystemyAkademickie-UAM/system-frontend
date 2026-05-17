@@ -187,4 +187,11 @@ export const ROUTE_TABLE = [
     pageModule: 'pages/links/groups/GroupRankingPage.jsx',
     contentModule: 'pages/content/group-ranking/GroupRankingContent.jsx',
   },
+  {
+    id: 'dev.apiTest',
+    pathPattern: '/api-test',
+    pageTitle: 'API Test Dashboard',
+    pageModule: 'pages/links/dev/ApiTestPage.jsx',
+    contentModule: 'pages/content/api-test/ApiTestContent.jsx',
+  },
 ];

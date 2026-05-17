@@ -105,3 +105,8 @@ export function statisticsPath() {
 export function organizationManagementPath() {
   return '/organizationManagement';
 }
+
+/** Developer-only API test page. */
+export function apiTestPath() {
+  return '/api-test';
+}
