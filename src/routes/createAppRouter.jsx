@@ -1,5 +1,6 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
+import ApiTestPage from '../pages/links/dev/ApiTestPage.jsx';
 import LoginShell from '../components/layout/LoginShell.jsx';
 import CourseManagementPage from '../pages/links/app/CourseManagementPage.jsx';
 import HelpPage from '../pages/links/app/HelpPage.jsx';
@@ -102,6 +103,7 @@ const appRouteTree = [
               },
             ],
           },
+          { path: 'api-test', element: <ApiTestPage /> },
           { path: '*', element: <Navigate to={loginPath()} replace /> },
         ],
       },

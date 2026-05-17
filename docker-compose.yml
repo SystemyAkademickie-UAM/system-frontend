@@ -7,3 +7,9 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "3000:3000"
+    networks:
+      - academy-network
+
+networks:
+  academy-network:
+    external: true
