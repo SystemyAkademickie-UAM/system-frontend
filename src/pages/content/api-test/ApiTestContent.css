@@ -1,0 +1,199 @@
+@import '../RouteContent.css';
+
+/* ──────────────────────────────────────────────────────────────
+   API Test Page — developer-only testing dashboard
+   ────────────────────────────────────────────────────────────── */
+
+.api-test-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.api-test-content__subtitle {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* ── Endpoint Card ────────────────────────────────────────── */
+
+.endpoint-card {
+  background: linear-gradient(135deg, #1e1e2e 0%, #252540 100%);
+  border: 1px solid #2e2e48;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color 0.2s;
+}
+
+.endpoint-card:hover {
+  border-color: #6366f1;
+}
+
+.endpoint-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.endpoint-card__method {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #22c55e20;
+  color: #4ade80;
+  border: 1px solid #22c55e40;
+  flex-shrink: 0;
+}
+
+.endpoint-card__path {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+  word-break: break-all;
+}
+
+.endpoint-card__description {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* ── Payload Block ────────────────────────────────────────── */
+
+.endpoint-card__payload-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #818cf8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.endpoint-card__payload {
+  background: #0f0f1a;
+  border: 1px solid #2e2e48;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: #a5b4fc;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+}
+
+/* ── Actions Row ──────────────────────────────────────────── */
+
+.endpoint-card__actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.endpoint-card__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.endpoint-card__btn--copy {
+  background: #1e1b4b;
+  color: #a5b4fc;
+  border-color: #312e81;
+}
+
+.endpoint-card__btn--copy:hover {
+  background: #312e81;
+  color: #c7d2fe;
+}
+
+.endpoint-card__btn--send {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: #fff;
+}
+
+.endpoint-card__btn--send:hover {
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+  box-shadow: 0 0 16px #6366f140;
+}
+
+.endpoint-card__btn--send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Response Block ───────────────────────────────────────── */
+
+.endpoint-card__response {
+  background: #0f0f1a;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.endpoint-card__response--ok {
+  border: 1px solid #22c55e40;
+  color: #86efac;
+}
+
+.endpoint-card__response--error {
+  border: 1px solid #ef444440;
+  color: #fca5a5;
+}
+
+/* ── Group ID Input ───────────────────────────────────────── */
+
+.api-test-content__group-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.api-test-content__group-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d1d5db;
+}
+
+.api-test-content__group-input {
+  width: 6rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #2e2e48;
+  background: #1e1e2e;
+  color: #e5e7eb;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.api-test-content__group-input:focus {
+  border-color: #6366f1;
+}
