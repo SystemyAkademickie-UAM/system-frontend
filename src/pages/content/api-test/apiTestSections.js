@@ -4,11 +4,11 @@ import {
   getGroupEnrollPath,
   GROUPS_NEW_PATH,
   STAGES_PATH,
-} from '../login-nikita/mock/mockConstants.js';
+} from './mock/mockConstants.js';
 import {
   SMOKE_TEST_DEFAULT_CURRENCY_ICON,
   SMOKE_TEST_DEFAULT_LIFE_ICON,
-} from '../login-nikita/mock/mockConstants.js';
+} from './mock/mockConstants.js';
 
 /** @typedef {'login' | 'api' | 'multipart'} ApiTestSectionKind */
 

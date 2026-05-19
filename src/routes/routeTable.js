@@ -34,13 +34,6 @@ export const ROUTE_TABLE = [
     contentModule: 'pages/content/api-test/ApiTestWorkspace.jsx',
   },
   {
-    id: 'auth.loginNikita',
-    pathPattern: '/loginnikita',
-    pageTitle: 'Logowanie — Nikita (redirect)',
-    pageModule: 'pages/links/login/DevApiTestPage.jsx',
-    contentModule: 'pages/content/api-test/ApiTestWorkspace.jsx',
-  },
-  {
     id: 'dev.apiTestLegacy',
     pathPattern: '/api-test',
     pageTitle: 'API Test Dashboard (redirect)',
