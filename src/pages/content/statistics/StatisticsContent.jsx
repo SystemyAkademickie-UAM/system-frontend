@@ -1,4 +1,4 @@
-import './StatisticsContent.css';
+import '../RouteContent.css';
 
 export default function StatisticsContent() {
   return (

@@ -58,7 +58,7 @@ const appRouteTree = [
           { path: 'userManagement', element: <UserManagementPage /> },
           { path: 'courseManagement', element: <CourseManagementPage /> },
           { path: 'Statistics', element: <StatisticsPage /> },
-          { path: 'organizationManagement', element: <OrganizationManagementPage /> },
+          { path: 'organizations', element: <OrganizationManagementPage /> },
           {
             path: 'groups',
             children: [
@@ -67,23 +67,22 @@ const appRouteTree = [
                 path: ':groupId',
                 children: [
                   {
-                    path: 'main',
                     element: <GroupMainLayout />,
                     children: [
                       { index: true, element: <GroupMainHomePage /> },
                       { path: 'activity', element: <GroupActivityListPage /> },
-                      { path: 'ranksandbadges', element: <GroupRanksAndBadgesPage /> },
+                      { path: 'ranks', element: <GroupRanksAndBadgesPage /> },
                     ],
                   },
                   {
-                    path: 'controlPanel',
+                    path: 'control',
                     element: <ControlPanelLayout />,
                     children: [
                       { index: true, element: <ControlPanelHomePage /> },
                       { path: 'users', element: <ControlPanelUsersPage /> },
                       { path: 'activity', element: <ControlPanelActivityPage /> },
                       { path: 'posts', element: <ControlPanelPostsPage /> },
-                      { path: 'ranksandbadges', element: <ControlPanelRanksPage /> },
+                      { path: 'ranks', element: <ControlPanelRanksPage /> },
                       { path: 'shopitems', element: <ControlPanelShopItemsPage /> },
                       { path: 'currency', element: <ControlPanelCurrencyPage /> },
                       { path: 'health', element: <ControlPanelHealthPage /> },

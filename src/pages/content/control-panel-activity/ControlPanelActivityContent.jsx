@@ -1,4 +1,4 @@
-import './ControlPanelActivityContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelActivityContent() {
   return (

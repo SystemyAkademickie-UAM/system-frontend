@@ -1,4 +1,4 @@
-import './ControlPanelCurrencyContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelCurrencyContent() {
   return (

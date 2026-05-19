@@ -1,4 +1,4 @@
-import './ControlPanelRanksAndBadgesContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelRanksAndBadgesContent() {
   return (

@@ -1,9 +1,9 @@
-Komponenty podpięte w React Router (`createAppRouter.jsx`).
+pages/links/ — komponenty podpięte w createAppRouter.jsx (router).
 
 - pages/links/app/ — trasy globalne (ustawienia, pomoc, admin…)
 - pages/links/groups/ — grupy, sklep, profil, ranking
-- pages/links/groups/layouts/ — layout z pod-nawigacją `/main`
-- pages/links/groups/main/ — podstrony `/main/...`
-- pages/links/groups/control/ — layout panelu + podstrony `controlPanel/...`
+- pages/links/groups/layouts/ — layout z pod-nawigacją grupy (/groups/:groupId, activity, ranks)
+- pages/links/groups/main/ — podstrony ekranu głównego grupy
+- pages/links/groups/control/ — layout panelu prowadzącego + podstrony /control/...
 
-Treść UI: pages/content/ (README tam).
+Treść ekranów: pages/content/<nazwa>/

@@ -7,7 +7,8 @@ import SidebarLogoutButton from './sidebar/SidebarLogoutButton.jsx';
 import SidebarNavLinkButton from './sidebar/SidebarNavLinkButton.jsx';
 import SidebarNavRail from './sidebar/SidebarNavRail.jsx';
 
-const DEFAULT_DISPLAY_NAME = 'NAZWA_GLOBALNA';
+/** Placeholder — docelowo nick studenta z API (sesja / profil). */
+const PLACEHOLDER_STUDENT_NICKNAME = 'NAZWA_GLOBALNA';
 
 export default function Sidebar({ onNavigate, onLogoutClick }) {
   const { role } = useAppRole();
@@ -21,7 +22,7 @@ export default function Sidebar({ onNavigate, onLogoutClick }) {
 
   return (
     <aside className="sidebar" aria-label="Nawigacja aplikacji">
-      <SidebarBrand userDisplayName={DEFAULT_DISPLAY_NAME} userRoleLabel={userRoleLabel} />
+      <SidebarBrand userDisplayName={PLACEHOLDER_STUDENT_NICKNAME} userRoleLabel={userRoleLabel} />
 
       <div className="sidebar__cta">
         {shell.ctaItems.map((item) => (

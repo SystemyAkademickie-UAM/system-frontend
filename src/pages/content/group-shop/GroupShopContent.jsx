@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { groupShopAddPath } from '../../../routes/pathRegistry.js';
+import '../RouteContent.css';
 import './GroupShopContent.css';
 
 export default function GroupShopContent() {
