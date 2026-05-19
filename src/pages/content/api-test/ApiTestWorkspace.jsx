@@ -2,16 +2,16 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ME_PATH } from '../../../constants/authPaths.constants.js';
-import { AuthProvider, useAuth } from '../login-nikita/mock/AuthContext.jsx';
+import { AuthProvider, useAuth } from './mock/AuthContext.jsx';
 import {
   getOrCreateBrowserId,
   resetStoredBrowserId,
-} from '../login-nikita/mock/browserIdStorage.js';
+} from './mock/browserIdStorage.js';
 import {
   LOGIN_PATH,
   LOGOUT_PATH,
   SAML_BYPASS_SESSION_PATH,
-} from '../login-nikita/mock/mockConstants.js';
+} from './mock/mockConstants.js';
 import { API_TEST_SECTIONS, findSection } from './apiTestSections.js';
 import ApiMethodBadge, { parseHttpMethodLabel } from './ApiMethodBadge.jsx';
 import { useSyncedPayload } from './useSyncedPayload.js';

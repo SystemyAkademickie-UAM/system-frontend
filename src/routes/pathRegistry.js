@@ -14,10 +14,6 @@ export function loginTempPath() {
   return '/logintemp';
 }
 
-export function loginNikitaPath() {
-  return devApiTestPath();
-}
-
 export function groupsListPath() {
   return '/groups';
 }

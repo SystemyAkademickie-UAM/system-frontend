@@ -47,7 +47,6 @@ const appRouteTree = [
           { path: 'login', element: <LoginHubPage /> },
           { path: 'logintemp', element: <LoginTempPage /> },
           { path: 'dev/api-test', element: <DevApiTestPage /> },
-          { path: 'loginnikita', element: <Navigate to={devApiTestPath()} replace /> },
         ],
       },
       {

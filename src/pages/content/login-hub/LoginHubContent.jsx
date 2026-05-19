@@ -1,9 +1,5 @@
 import { Link } from 'react-router-dom';
-import {
-  devApiTestPath,
-  groupsListPath,
-  loginTempPath,
-} from '../../../routes/pathRegistry.js';
+import { groupsListPath, loginTempPath } from '../../../routes/pathRegistry.js';
 import './LoginHubContent.css';
 
 export default function LoginHubContent() {
@@ -22,11 +18,6 @@ export default function LoginHubContent() {
         <li>
           <Link className="login-hub__link" to={loginTempPath()}>
             Logowanie — tymczasowe (dev)
-          </Link>
-        </li>
-        <li>
-          <Link className="login-hub__link" to={devApiTestPath()}>
-            Dev API test
           </Link>
         </li>
       </ul>
