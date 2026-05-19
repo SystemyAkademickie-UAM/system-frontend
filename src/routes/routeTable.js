@@ -27,11 +27,18 @@ export const ROUTE_TABLE = [
     contentModule: 'pages/content/login-temp/LoginTempContent.jsx',
   },
   {
-    id: 'auth.loginNikita',
-    pathPattern: '/loginnikita',
-    pageTitle: 'Logowanie — Nikita',
-    pageModule: 'pages/links/login/LoginNikitaPage.jsx',
-    contentModule: 'pages/content/login-nikita/LoginNikitaContent.jsx',
+    id: 'dev.apiTest',
+    pathPattern: '/dev/api-test',
+    pageTitle: 'Dev API test',
+    pageModule: 'pages/links/login/DevApiTestPage.jsx',
+    contentModule: 'pages/content/api-test/ApiTestWorkspace.jsx',
+  },
+  {
+    id: 'dev.apiTestLegacy',
+    pathPattern: '/api-test',
+    pageTitle: 'API Test Dashboard (redirect)',
+    pageModule: 'pages/links/login/DevApiTestPage.jsx',
+    contentModule: 'pages/content/api-test/ApiTestWorkspace.jsx',
   },
   {
     id: 'groups.list',
@@ -186,12 +193,5 @@ export const ROUTE_TABLE = [
     pageTitle: 'Ranking',
     pageModule: 'pages/links/groups/GroupRankingPage.jsx',
     contentModule: 'pages/content/group-ranking/GroupRankingContent.jsx',
-  },
-  {
-    id: 'dev.apiTest',
-    pathPattern: '/api-test',
-    pageTitle: 'API Test Dashboard',
-    pageModule: 'pages/links/dev/ApiTestPage.jsx',
-    contentModule: 'pages/content/api-test/ApiTestContent.jsx',
   },
 ];
