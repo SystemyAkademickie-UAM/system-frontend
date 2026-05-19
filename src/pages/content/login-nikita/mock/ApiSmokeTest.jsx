@@ -8,6 +8,8 @@ import {
   LOGIN_PATH,
   LOGOUT_PATH,
   SAML_BYPASS_SESSION_PATH,
+  STAGES_PATH,
+  ACTIVITIES_PATH,
   describeDriveForbiddenReason,
   DRIVE_JSON_STATUS_FORBIDDEN,
   SMOKE_TEST_DEFAULT_CURRENCY_ICON,
@@ -37,6 +39,15 @@ export default function ApiSmokeTest() {
   const [enrollGroupId, setEnrollGroupId] = useState('');
   const [driveFile, setDriveFile] = useState(null);
   const [driveRemoveRef, setDriveRemoveRef] = useState('');
+  const [stageGroupId, setStageGroupId] = useState('');
+  const [stageName, setStageName] = useState('Test Stage');
+  const [stageId, setStageId] = useState('');
+  const [activityStageId, setActivityStageId] = useState('');
+  const [activityName, setActivityName] = useState('Test Activity');
+  const [activityCurrency, setActivityCurrency] = useState('100');
+  const [activityEduDesc, setActivityEduDesc] = useState('Educational description');
+  const [activityStoryDesc, setActivityStoryDesc] = useState('Story description');
+  const [activityId, setActivityId] = useState('');
   const [lastJson, setLastJson] = useState('');
   const [errorMessage, setErrorMessage] = useState(null);
   const [isBusy, setIsBusy] = useState(false);
@@ -423,6 +434,144 @@ export default function ApiSmokeTest() {
     }
   }
 
+  /**
+   * @param {'post' | 'modify' | 'remove' | 'retrieve'} method
+   */
+  async function onStageAction(method) {
+    setErrorMessage(null);
+    setLastJson('');
+    setIsBusy(true);
+    try {
+      /** @type {Record<string, unknown>} */
+      const payload = { method };
+      const trimmedAuth = authToken.trim();
+      if (trimmedAuth !== '') {
+        payload.auth = trimmedAuth;
+      }
+      if (method === 'post') {
+        if (!stageGroupId.trim()) {
+          throw new Error('Group ID is required for creating a stage.');
+        }
+        payload.groupId = Number(stageGroupId);
+        payload.name = stageName;
+      } else if (method === 'modify') {
+        if (!stageId.trim()) {
+          throw new Error('Stage ID is required for modification.');
+        }
+        payload.stageId = Number(stageId);
+        if (stageName.trim()) payload.name = stageName;
+        if (stageGroupId.trim()) payload.groupId = Number(stageGroupId);
+      } else if (method === 'remove') {
+        if (!stageId.trim()) {
+          throw new Error('Stage ID is required for removal.');
+        }
+        payload.stageId = Number(stageId);
+      } else if (method === 'retrieve') {
+        if (stageGroupId.trim()) payload.groupId = Number(stageGroupId);
+        if (stageId.trim()) payload.stageId = Number(stageId);
+      }
+      const url = `${baseUrl}${STAGES_PATH}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserId,
+        },
+        body: JSON.stringify(payload),
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(formatFetchError(response, text));
+      }
+      const parsed = JSON.parse(text);
+      setLastJson(JSON.stringify(parsed, null, 2));
+      if (method === 'post' && parsed.status === 200 && parsed.stage > 0) {
+        setStageId(String(parsed.stage));
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorMessage(message);
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  /**
+   * @param {'post' | 'modify' | 'remove' | 'retrieve'} method
+   */
+  async function onActivityAction(method) {
+    setErrorMessage(null);
+    setLastJson('');
+    setIsBusy(true);
+    try {
+      /** @type {Record<string, unknown>} */
+      const payload = { method };
+      const trimmedAuth = authToken.trim();
+      if (trimmedAuth !== '') {
+        payload.auth = trimmedAuth;
+      }
+      if (method === 'post') {
+        if (!activityStageId.trim()) {
+          throw new Error('Stage ID is required for creating an activity.');
+        }
+        payload.stageId = Number(activityStageId);
+        payload.name = activityName;
+        payload.currency = Number(activityCurrency);
+        payload.educationalDescription = activityEduDesc;
+        payload.storyDescription = activityStoryDesc;
+      } else if (method === 'modify') {
+        if (!activityId.trim()) {
+          throw new Error('Activity ID is required for modification.');
+        }
+        payload.activityId = Number(activityId);
+        if (activityName.trim()) payload.name = activityName;
+        if (activityStageId.trim()) payload.stageId = Number(activityStageId);
+        if (activityCurrency.trim()) payload.currency = Number(activityCurrency);
+        if (activityEduDesc.trim()) payload.educationalDescription = activityEduDesc;
+        if (activityStoryDesc.trim()) payload.storyDescription = activityStoryDesc;
+      } else if (method === 'remove') {
+        if (!activityId.trim()) {
+          throw new Error('Activity ID is required for removal.');
+        }
+        payload.activityId = Number(activityId);
+      } else if (method === 'retrieve') {
+        if (activityStageId.trim()) payload.stageId = Number(activityStageId);
+        if (activityId.trim()) payload.activityId = Number(activityId);
+      }
+      const url = `${baseUrl}${ACTIVITIES_PATH}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserId,
+        },
+        body: JSON.stringify(payload),
+      });
+      const text = await response.text();
+      if (!response.ok) {
+        throw new Error(formatFetchError(response, text));
+      }
+      const parsed = JSON.parse(text);
+      setLastJson(JSON.stringify(parsed, null, 2));
+      if (method === 'post' && parsed.status === 200 && parsed.activity > 0) {
+        setActivityId(String(parsed.activity));
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorMessage(message);
+    } finally {
+      setIsBusy(false);
+    }
+  }
+
+  function onUseStageIdForActivity() {
+    if (stageId.trim()) {
+      setActivityStageId(stageId);
+    }
+  }
+
   return (
     <section className="smoke" aria-labelledby="smoke-heading">
       <h2 id="smoke-heading">API smoke test</h2>
@@ -489,7 +638,7 @@ export default function ApiSmokeTest() {
           POST /login (mint auth + set cookie)
         </button>
         <button type="button" className="smoke__button smoke__button--secondary" onClick={onLogout} disabled={isBusy}>
-          POST /login/logout (clear cookies)
+          POST /logout (clear cookies)
         </button>
       </div>
 
@@ -664,6 +813,160 @@ export default function ApiSmokeTest() {
         <div className="smoke__actions">
           <button type="button" className="smoke__button" onClick={onDriveRemove} disabled={isBusy}>
             Remove (method remove)
+          </button>
+        </div>
+      </fieldset>
+
+      <fieldset className="smoke__fieldset">
+        <legend>POST /stages (Lecturer)</legend>
+        <p className="smoke__hint">
+          Manage stages within groups. Requires <strong>lecturer</strong> session for post/modify/remove.
+          Retrieve requires any authenticated session.
+        </p>
+        <label className="smoke__label" htmlFor="smoke-stage-group-id">
+          Group ID (public, e.g. 100001)
+        </label>
+        <input
+          id="smoke-stage-group-id"
+          className="smoke__input"
+          type="number"
+          min={1}
+          step={1}
+          value={stageGroupId}
+          onChange={(event) => setStageGroupId(event.target.value)}
+          placeholder="e.g. 100001"
+        />
+        <label className="smoke__label" htmlFor="smoke-stage-name">
+          Stage Name
+        </label>
+        <input
+          id="smoke-stage-name"
+          className="smoke__input"
+          type="text"
+          value={stageName}
+          onChange={(event) => setStageName(event.target.value)}
+        />
+        <label className="smoke__label" htmlFor="smoke-stage-id">
+          Stage ID (for modify/remove/retrieve, DB id e.g. 1)
+        </label>
+        <input
+          id="smoke-stage-id"
+          className="smoke__input"
+          type="number"
+          min={1}
+          step={1}
+          value={stageId}
+          onChange={(event) => setStageId(event.target.value)}
+          placeholder="e.g. 1"
+        />
+        <div className="smoke__actions">
+          <button type="button" className="smoke__button" onClick={() => onStageAction('post')} disabled={isBusy}>
+            Create (method post)
+          </button>
+          <button type="button" className="smoke__button" onClick={() => onStageAction('modify')} disabled={isBusy}>
+            Modify (method modify)
+          </button>
+          <button type="button" className="smoke__button smoke__button--secondary" onClick={() => onStageAction('remove')} disabled={isBusy}>
+            Remove (method remove)
+          </button>
+          <button type="button" className="smoke__button smoke__button--secondary" onClick={() => onStageAction('retrieve')} disabled={isBusy}>
+            Retrieve (method retrieve)
+          </button>
+        </div>
+      </fieldset>
+
+      <fieldset className="smoke__fieldset">
+        <legend>POST /activities (Lecturer)</legend>
+        <p className="smoke__hint">
+          Manage activities within stages. Requires <strong>lecturer</strong> session for post/modify/remove.
+          Retrieve requires any authenticated session.
+        </p>
+        <label className="smoke__label" htmlFor="smoke-activity-stage-id">
+          Stage ID (DB id e.g. 1)
+        </label>
+        <div className="smoke__actions" style={{ marginBottom: '8px' }}>
+          <input
+            id="smoke-activity-stage-id"
+            className="smoke__input"
+            type="number"
+            min={1}
+            step={1}
+            value={activityStageId}
+            onChange={(event) => setActivityStageId(event.target.value)}
+            placeholder="e.g. 1"
+            style={{ flex: 1 }}
+          />
+          <button type="button" className="smoke__button smoke__button--secondary" onClick={onUseStageIdForActivity}>
+            Use last stage ID
+          </button>
+        </div>
+        <label className="smoke__label" htmlFor="smoke-activity-name">
+          Activity Name
+        </label>
+        <input
+          id="smoke-activity-name"
+          className="smoke__input"
+          type="text"
+          value={activityName}
+          onChange={(event) => setActivityName(event.target.value)}
+        />
+        <label className="smoke__label" htmlFor="smoke-activity-currency">
+          Currency Reward
+        </label>
+        <input
+          id="smoke-activity-currency"
+          className="smoke__input"
+          type="number"
+          min={0}
+          step={1}
+          value={activityCurrency}
+          onChange={(event) => setActivityCurrency(event.target.value)}
+        />
+        <label className="smoke__label" htmlFor="smoke-activity-edu-desc">
+          Educational Description
+        </label>
+        <textarea
+          id="smoke-activity-edu-desc"
+          className="smoke__textarea"
+          rows={2}
+          value={activityEduDesc}
+          onChange={(event) => setActivityEduDesc(event.target.value)}
+        />
+        <label className="smoke__label" htmlFor="smoke-activity-story-desc">
+          Story Description
+        </label>
+        <textarea
+          id="smoke-activity-story-desc"
+          className="smoke__textarea"
+          rows={2}
+          value={activityStoryDesc}
+          onChange={(event) => setActivityStoryDesc(event.target.value)}
+        />
+        <label className="smoke__label" htmlFor="smoke-activity-id">
+          Activity ID (for modify/remove/retrieve, DB id e.g. 1)
+        </label>
+        <input
+          id="smoke-activity-id"
+          className="smoke__input"
+          type="number"
+          min={1}
+          step={1}
+          value={activityId}
+          onChange={(event) => setActivityId(event.target.value)}
+          placeholder="e.g. 1"
+        />
+        <div className="smoke__actions">
+          <button type="button" className="smoke__button" onClick={() => onActivityAction('post')} disabled={isBusy}>
+            Create (method post)
+          </button>
+          <button type="button" className="smoke__button" onClick={() => onActivityAction('modify')} disabled={isBusy}>
+            Modify (method modify)
+          </button>
+          <button type="button" className="smoke__button smoke__button--secondary" onClick={() => onActivityAction('remove')} disabled={isBusy}>
+            Remove (method remove)
+          </button>
+          <button type="button" className="smoke__button smoke__button--secondary" onClick={() => onActivityAction('retrieve')} disabled={isBusy}>
+            Retrieve (method retrieve)
           </button>
         </div>
       </fieldset>
