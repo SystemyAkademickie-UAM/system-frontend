@@ -1,4 +1,4 @@
-import './GroupMainHomeContent.css';
+import '../RouteContent.css';
 
 export default function GroupMainHomeContent() {
   return (

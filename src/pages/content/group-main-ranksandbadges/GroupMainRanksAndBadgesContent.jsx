@@ -1,4 +1,4 @@
-import './GroupMainRanksAndBadgesContent.css';
+import '../RouteContent.css';
 
 export default function GroupMainRanksAndBadgesContent() {
   return (

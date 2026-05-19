@@ -18,14 +18,14 @@ import * as paths from '../routes/pathRegistry.js';
 
 export const APP_ROLE = {
   STUDENT: 'student',
-  INSTRUCTOR: 'instructor',
+  LECTURER: 'lecturer',
   ADMIN: 'admin',
   SUPERADMIN: 'superadmin',
 };
 
 export const ROLE_UI_LABEL = {
   [APP_ROLE.STUDENT]: 'Student',
-  [APP_ROLE.INSTRUCTOR]: 'Prowadzący',
+  [APP_ROLE.LECTURER]: 'Prowadzący',
   [APP_ROLE.ADMIN]: 'Administrator',
   [APP_ROLE.SUPERADMIN]: 'Superadministrator',
 };
@@ -37,12 +37,12 @@ export const HREF_BUILDERS = {
   GROUP_PROFILE: (ctx) => (ctx.groupId ? paths.groupProfilePath(ctx.groupId) : null),
   GROUP_SHOP: (ctx) => (ctx.groupId ? paths.groupShopPath(ctx.groupId) : null),
   GROUP_RANKING: (ctx) => (ctx.groupId ? paths.groupRankingPath(ctx.groupId) : null),
-  GROUP_CONTROL_PANEL: (ctx) => (ctx.groupId ? paths.groupControlPanelPath(ctx.groupId) : null),
+  GROUP_CONTROL_PANEL: (ctx) => (ctx.groupId ? paths.groupControlPath(ctx.groupId) : null),
   APP_SETTINGS: () => paths.appSettingsPath(),
   USER_MANAGEMENT: () => paths.userManagementPath(),
   COURSE_MANAGEMENT: () => paths.courseManagementPath(),
   STATISTICS: () => paths.statisticsPath(),
-  ORG_MANAGEMENT: () => paths.organizationManagementPath(),
+  ORG_MANAGEMENT: () => paths.organizationsPath(),
 };
 
 const studentView = {
@@ -196,7 +196,7 @@ const superadminView = {
 
 export const SHELL_VIEWS = {
   [APP_ROLE.STUDENT]: studentView,
-  [APP_ROLE.INSTRUCTOR]: instructorView,
+  [APP_ROLE.LECTURER]: lecturerView,
   [APP_ROLE.ADMIN]: adminView,
   [APP_ROLE.SUPERADMIN]: superadminView,
 };
@@ -208,7 +208,7 @@ export const SHELL_VIEWS = {
 /** Eksport szkieletów do rozszerzania (np. skopiuj `studentView` i zmodyfikuj kopię). */
 export const SHELL_TEMPLATE_BLUEPRINTS = {
   student: studentView,
-  instructor: instructorView,
+  lecturer: lecturerView,
   admin: adminView,
   superadmin: superadminView,
 };

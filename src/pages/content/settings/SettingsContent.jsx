@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { appHelpPath } from '../../../routes/pathRegistry.js';
+import '../RouteContent.css';
 import './SettingsContent.css';
 
 export default function SettingsContent() {

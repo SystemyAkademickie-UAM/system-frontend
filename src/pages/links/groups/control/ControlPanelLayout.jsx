@@ -33,7 +33,7 @@ export default function ControlPanelLayout() {
         <span className="control-panel-nav__sep" aria-hidden="true">
           |
         </span>
-        <NavLink to="ranksandbadges" className={subNavClassName}>
+        <NavLink to="ranks" className={subNavClassName}>
           Odznaki i rangi
         </NavLink>
         <span className="control-panel-nav__sep" aria-hidden="true">

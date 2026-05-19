@@ -21,7 +21,7 @@ export default function GroupMainLayout() {
         <span className="group-main-nav__sep" aria-hidden="true">
           |
         </span>
-        <NavLink to="ranksandbadges" className={subNavClassName}>
+        <NavLink to="ranks" className={subNavClassName}>
           Rangi i odznaki
         </NavLink>
       </nav>

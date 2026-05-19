@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { DEMO_GROUP_ID } from '../../../constants/demo.constants.js';
 import {
   courseManagementPath,
-  DEMO_GROUP_ID,
   groupMainPath,
-  organizationManagementPath,
+  organizationsPath,
   statisticsPath,
   userManagementPath,
 } from '../../../routes/pathRegistry.js';
@@ -41,8 +41,8 @@ export default function LoginTempContent() {
           </button>
           <button
             type="button"
-            className={`login-temp__dev-btn${role === APP_ROLE.INSTRUCTOR ? ' login-temp__dev-btn--active' : ''}`}
-            onClick={() => setRole(APP_ROLE.INSTRUCTOR)}
+            className={`login-temp__dev-btn${role === APP_ROLE.LECTURER ? ' login-temp__dev-btn--active' : ''}`}
+            onClick={() => setRole(APP_ROLE.LECTURER)}
           >
             Prowadzący
           </button>
@@ -80,7 +80,7 @@ export default function LoginTempContent() {
             </Link>
           </li>
           <li>
-            <Link className="login-temp__dev-link" to={organizationManagementPath()}>
+            <Link className="login-temp__dev-link" to={organizationsPath()}>
               Zarządzanie organizacjami (superadmin)
             </Link>
           </li>

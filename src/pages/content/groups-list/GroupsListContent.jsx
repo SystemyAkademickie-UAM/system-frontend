@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { DEMO_GROUP_ID, groupMainPath } from '../../../routes/pathRegistry.js';
+import { DEMO_GROUP_ID } from '../../../constants/demo.constants.js';
+import { groupMainPath } from '../../../routes/pathRegistry.js';
 import './GroupsListContent.css';
 
 export default function GroupsListContent() {

@@ -1,4 +1,4 @@
-import './UserManagementContent.css';
+import '../RouteContent.css';
 
 export default function UserManagementContent() {
   return (

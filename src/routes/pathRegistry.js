@@ -3,9 +3,6 @@
  * Pełne ścieżki absolutne w obrębie aplikacji (bez domeny — zgodnie z React Router).
  */
 
-/** Przykładowe ID grupy zgodne z backendem (od 100001). */
-export const DEMO_GROUP_ID = '100001';
-
 export function loginPath() {
   return '/login';
 }
@@ -22,16 +19,17 @@ export function groupsListPath() {
   return '/groups';
 }
 
+/** Ekran główny grupy — `/groups/:groupId`. */
 export function groupMainPath(groupId) {
-  return `/groups/${groupId}/main`;
+  return `/groups/${groupId}`;
 }
 
 export function groupActivityPath(groupId) {
-  return `/groups/${groupId}/main/activity`;
+  return `/groups/${groupId}/activity`;
 }
 
-export function groupRanksAndBadgesPath(groupId) {
-  return `/groups/${groupId}/main/ranksandbadges`;
+export function groupRanksPath(groupId) {
+  return `/groups/${groupId}/ranks`;
 }
 
 export function groupProfilePath(groupId) {
@@ -50,36 +48,36 @@ export function groupRankingPath(groupId) {
   return `/groups/${groupId}/ranking`;
 }
 
-export function groupControlPanelPath(groupId) {
-  return `/groups/${groupId}/controlPanel`;
+export function groupControlPath(groupId) {
+  return `/groups/${groupId}/control`;
 }
 
-export function groupControlPanelUsersPath(groupId) {
-  return `/groups/${groupId}/controlPanel/users`;
+export function groupControlUsersPath(groupId) {
+  return `/groups/${groupId}/control/users`;
 }
 
-export function groupControlPanelActivityPath(groupId) {
-  return `/groups/${groupId}/controlPanel/activity`;
+export function groupControlActivityPath(groupId) {
+  return `/groups/${groupId}/control/activity`;
 }
 
-export function groupControlPanelPostsPath(groupId) {
-  return `/groups/${groupId}/controlPanel/posts`;
+export function groupControlPostsPath(groupId) {
+  return `/groups/${groupId}/control/posts`;
 }
 
-export function groupControlPanelRanksAndBadgesPath(groupId) {
-  return `/groups/${groupId}/controlPanel/ranksandbadges`;
+export function groupControlRanksPath(groupId) {
+  return `/groups/${groupId}/control/ranks`;
 }
 
-export function groupControlPanelShopItemsPath(groupId) {
-  return `/groups/${groupId}/controlPanel/shopitems`;
+export function groupControlShopItemsPath(groupId) {
+  return `/groups/${groupId}/control/shopitems`;
 }
 
-export function groupControlPanelCurrencyPath(groupId) {
-  return `/groups/${groupId}/controlPanel/currency`;
+export function groupControlCurrencyPath(groupId) {
+  return `/groups/${groupId}/control/currency`;
 }
 
-export function groupControlPanelHealthPath(groupId) {
-  return `/groups/${groupId}/controlPanel/health`;
+export function groupControlHealthPath(groupId) {
+  return `/groups/${groupId}/control/health`;
 }
 
 export function appSettingsPath() {
@@ -102,8 +100,8 @@ export function statisticsPath() {
   return '/Statistics';
 }
 
-export function organizationManagementPath() {
-  return '/organizationManagement';
+export function organizationsPath() {
+  return '/organizations';
 }
 
 /** Developer-only API test page. */
