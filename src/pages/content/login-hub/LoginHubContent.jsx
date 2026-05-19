@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
+  devApiTestPath,
   groupsListPath,
-  loginNikitaPath,
   loginTempPath,
 } from '../../../routes/pathRegistry.js';
 import './LoginHubContent.css';
@@ -25,8 +25,8 @@ export default function LoginHubContent() {
           </Link>
         </li>
         <li>
-          <Link className="login-hub__link" to={loginNikitaPath()}>
-            Logowanie — Nikita
+          <Link className="login-hub__link" to={devApiTestPath()}>
+            Dev API test
           </Link>
         </li>
       </ul>

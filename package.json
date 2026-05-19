@@ -13,7 +13,11 @@
     "dev:docker": "docker compose up -d --build",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "docker": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:build": "docker compose up -d --build",
+    "docker:rebuild": "docker compose down -v && docker compose up -d --build"
   },
   "dependencies": {
     "react": "^19.0.0",

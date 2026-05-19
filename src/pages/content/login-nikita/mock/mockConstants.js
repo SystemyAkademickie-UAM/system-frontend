@@ -40,7 +40,7 @@ export const COUNTER_INCREMENT_PATH = '/counter/increment';
 export const LOGIN_PATH = '/login';
 
 /** Clears auth cookies (logout). */
-export const LOGOUT_PATH = '/login/logout';
+export const LOGOUT_PATH = '/logout';
 
 /** Lecturer group creation. */
 export const GROUPS_NEW_PATH = '/groups/new';
@@ -69,3 +69,9 @@ export const SAML_BYPASS_LECTURER_PATH = '/auth/saml/bypass/lecturer';
 export const SAML_BYPASS_SESSION_PATH = '/auth/saml/bypass/session';
 
 export const AUTH_SAML_ME_PATH = '/auth/saml/me';
+
+/** Stage management endpoint. */
+export const STAGES_PATH = '/stages';
+
+/** Activity management endpoint. */
+export const ACTIVITIES_PATH = '/activities';
