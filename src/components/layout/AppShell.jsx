@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useId, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { APP_ROLE, ROLE_UI_LABEL } from '../../navigation/shellTemplates.config.js';
+import { useAppRole } from '../../context/AppRoleContext.jsx';
 import Sidebar from './Sidebar.jsx';
+import SuperBar from './superbar/SuperBar.jsx';
 import './AppShell.css';
+
+const PLACEHOLDER_DISPLAY_NAME = 'NAZWA_GLOBALNA';
 
 export default function AppShell() {
   const location = useLocation();
   const menuId = useId();
+  const { role } = useAppRole();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const roleLabel = ROLE_UI_LABEL[role] ?? ROLE_UI_LABEL[APP_ROLE.STUDENT];
 
   useEffect(() => {
     setIsMobileNavOpen(false);
@@ -15,11 +22,6 @@ export default function AppShell() {
   const closeMobileNav = useCallback(() => {
     setIsMobileNavOpen(false);
   }, []);
-
-  const onLogoutClick = useCallback(() => {
-    // Integracja z API / SAML — w kolejnych iteracjach
-    closeMobileNav();
-  }, [closeMobileNav]);
 
   useEffect(() => {
     if (!isMobileNavOpen) {
@@ -45,22 +47,6 @@ export default function AppShell() {
         Przejdź do treści
       </a>
 
-      <header className="app-shell__topbar">
-        <button
-          type="button"
-          className="app-shell__menu-btn"
-          aria-controls={menuId}
-          aria-expanded={isMobileNavOpen}
-          aria-label={isMobileNavOpen ? 'Zamknij menu nawigacji' : 'Otwórz menu nawigacji'}
-          onClick={() => {
-            setIsMobileNavOpen((open) => !open);
-          }}
-        >
-          <span className="app-shell__menu-icon" aria-hidden="true" />
-        </button>
-        <span className="app-shell__topbar-title">MyAcademyQuest</span>
-      </header>
-
       {isMobileNavOpen ? (
         <button
           type="button"
@@ -71,21 +57,31 @@ export default function AppShell() {
         />
       ) : null}
 
-      <div className="app-shell__body">
+      <div className="app-shell__layout">
         <div
           className={['app-shell__sidebar-wrap', isMobileNavOpen ? 'app-shell__sidebar-wrap--open' : '']
             .filter(Boolean)
             .join(' ')}
           id={menuId}
         >
-          <Sidebar onNavigate={closeMobileNav} onLogoutClick={onLogoutClick} />
+          <Sidebar onNavigate={closeMobileNav} />
         </div>
 
-        <main id="main-content" className="app-shell__main" tabIndex={-1}>
-          <div className="app-shell__content">
-            <Outlet />
-          </div>
-        </main>
+        <div className="app-shell__main-column">
+          <SuperBar
+            displayName={PLACEHOLDER_DISPLAY_NAME}
+            roleLabel={roleLabel}
+            onNavigate={closeMobileNav}
+            showMenuButton
+            menuExpanded={isMobileNavOpen}
+            onMenuToggle={() => setIsMobileNavOpen((open) => !open)}
+          />
+          <main id="main-content" className="app-shell__main" tabIndex={-1}>
+            <div className="app-shell__content">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

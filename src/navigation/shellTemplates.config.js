@@ -51,7 +51,7 @@ const studentView = {
       id: 'twoje-kursy',
       enabled: true,
       kind: 'cta',
-      label: 'Twoje Kursy',
+      label: 'Twoje grupy',
       hrefKey: 'GROUPS_LIST',
       requiresGroup: false,
       matchEnd: true,
@@ -66,6 +66,7 @@ const studentView = {
       iconId: 'nav-ekran-glowny',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
+      matchEnd: true,
     },
     {
       id: 'profil',
@@ -117,7 +118,7 @@ const studentView = {
   ],
 };
 
-const instructorView = {
+const lecturerView = {
   ctaItems: [...studentView.ctaItems],
   primaryNavItems: [
     studentView.primaryNavItems[0],
@@ -129,6 +130,7 @@ const instructorView = {
       iconId: 'nav-panel',
       hrefKey: 'GROUP_CONTROL_PANEL',
       requiresGroup: true,
+      matchEnd: true,
     },
     ...studentView.primaryNavItems.slice(2),
   ],
