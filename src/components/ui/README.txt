@@ -1,7 +1,7 @@
 components/ui/ — współdzielone elementy interfejsu
 
 Import:
-  import { Button, PageHeader, SubNav, SearchBar, ConfirmActions } from '../../components/ui/index.js';
+  import { Button, PageHeader, SubNav, SearchBar, ConfirmActions, Pagination } from '../../components/ui/index.js';
 
 --- PageHeader ---
   <PageHeader title="Tytuł" description="Opis podstrony" />
@@ -35,5 +35,12 @@ Import:
 
 --- ConfirmActions ---
   <ConfirmActions onReject={fn} onConfirm={fn} />
+
+--- Pagination ---
+  const [page, setPage] = useState(1);
+  <Pagination totalPages={10} page={page} onPageChange={setPage} />
+
+  // bez stanu nadrzędnego (wewnętrzny):
+  <Pagination totalPages={5} defaultPage={1} onPageChange={(p) => fetchPage(p)} />
 
 Kolory: src/styles/tokens.css

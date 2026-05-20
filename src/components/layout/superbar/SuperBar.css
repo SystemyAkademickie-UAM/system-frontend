@@ -158,6 +158,34 @@
   color: var(--color-nav-user-role);
 }
 
+.super-bar-user-identity--loading {
+  gap: 0.25rem;
+}
+
+.super-bar-user-identity__skeleton {
+  display: block;
+  width: 80px;
+  height: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.super-bar-user-identity__skeleton--short {
+  width: 50px;
+  height: 0.75rem;
+}
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
 .super-bar-user-menu__avatar-btn {
   margin: 0;
   padding: 0;

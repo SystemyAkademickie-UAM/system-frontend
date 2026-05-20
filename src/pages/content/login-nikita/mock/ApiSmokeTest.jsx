@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSession } from '../../../../context/SessionContext.jsx';
 import { useAuth } from './AuthContext.jsx';
 import { getApiBaseUrl, getSamlLoginUrl } from '../../../../constants/api.constants.js';
 import {
@@ -24,7 +25,8 @@ function formatFetchError(response, bodyText) {
   return `HTTP ${response.status}`;
 }
 
-export default function ApiSmokeTest() {
+export default function ApiSmokeTest({ onDevSessionEstablished }) {
+  const { refetchSession } = useSession();
   const { authToken, setAuthToken, clearAuthToken } = useAuth();
   const [browserId, setBrowserId] = useState(() => getOrCreateBrowserId());
   const [groupName, setGroupName] = useState('Smoke test group');
@@ -82,6 +84,9 @@ export default function ApiSmokeTest() {
         throw new Error('Bypass session did not return { ok: true }');
       }
       setLastJson(JSON.stringify(parsed, null, 2));
+      await refetchSession();
+      onDevSessionEstablished?.();
+      window.location.reload();
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setErrorMessage(message);
