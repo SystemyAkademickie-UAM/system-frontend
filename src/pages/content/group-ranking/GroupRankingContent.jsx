@@ -1,4 +1,4 @@
-import './GroupRankingContent.css';
+import '../RouteContent.css';
 
 export default function GroupRankingContent() {
   return (

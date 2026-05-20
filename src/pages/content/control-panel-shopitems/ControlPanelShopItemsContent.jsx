@@ -1,4 +1,4 @@
-import './ControlPanelShopItemsContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelShopItemsContent() {
   return (

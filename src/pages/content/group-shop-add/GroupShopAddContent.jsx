@@ -1,4 +1,4 @@
-import './GroupShopAddContent.css';
+import '../RouteContent.css';
 
 export default function GroupShopAddContent() {
   return (

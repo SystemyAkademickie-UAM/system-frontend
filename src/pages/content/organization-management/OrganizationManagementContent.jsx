@@ -1,4 +1,4 @@
-import './OrganizationManagementContent.css';
+import '../RouteContent.css';
 
 export default function OrganizationManagementContent() {
   return (

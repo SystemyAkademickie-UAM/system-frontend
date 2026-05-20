@@ -1,1 +1,22 @@
-@import '../RouteContent.css';
+.user-management {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  width: 100%;
+  max-width: 72rem;
+}
+
+.user-management__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.user-management__toolbar .maq-search-bar {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+}

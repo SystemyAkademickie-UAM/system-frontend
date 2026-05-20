@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import EndpointCard from './EndpointCard.jsx';
+import '../RouteContent.css';
 import './ApiTestContent.css';
 
 /** Default example payloads matching the backend DTOs (camelCase). */

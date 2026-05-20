@@ -1,4 +1,4 @@
-import './GroupMainActivityContent.css';
+import '../RouteContent.css';
 
 export default function GroupMainActivityContent() {
   return (

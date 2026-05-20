@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getApiBaseUrl, getSamlLoginUrl, getSamlLogoutUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ME_PATH } from '../../../constants/authPaths.constants.js';
-import { loginPath } from '../../../routes/pathRegistry.js';
+import { groupsListPath, loginPath } from '../../../routes/pathRegistry.js';
+import { useSession } from '../../../context/SessionContext.jsx';
+import { ROLE_UI_LABEL } from '../../../navigation/shellTemplates.config.js';
 import MockTestPage from './mock/MockTestPage.jsx';
 import './LoginNikitaContent.css';
 
@@ -10,6 +12,7 @@ export default function LoginNikitaContent() {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [showMockTests, setShowMockTests] = useState(false);
+  const { refetchSession, role: sessionRole } = useSession();
 
   const checkAuth = useCallback(async () => {
     try {
@@ -21,6 +24,7 @@ export default function LoginNikitaContent() {
         const data = await response.json();
         if (data.authenticated && data.user) {
           setUser(data.user);
+          refetchSession();
         }
       }
     } catch {
@@ -28,7 +32,7 @@ export default function LoginNikitaContent() {
     } finally {
       setAuthChecked(true);
     }
-  }, []);
+  }, [refetchSession]);
 
   useEffect(() => {
     checkAuth();
@@ -63,9 +67,17 @@ export default function LoginNikitaContent() {
               2,
             )}
           </pre>
-          <a href={samlLogoutUrl} className="login-nikita__button login-nikita__button--logout">
-            Wyloguj (z IdP)
-          </a>
+          <p className="login-nikita__role-info">
+            Rola w aplikacji: <strong>{ROLE_UI_LABEL[sessionRole] || sessionRole}</strong>
+          </p>
+          <div className="login-nikita__actions">
+            <Link to={groupsListPath()} className="login-nikita__button login-nikita__button--primary">
+              Przejdź do aplikacji
+            </Link>
+            <a href={samlLogoutUrl} className="login-nikita__button login-nikita__button--logout">
+              Wyloguj (z IdP)
+            </a>
+          </div>
         </div>
       ) : (
         <div className="login-nikita__login">
@@ -93,7 +105,11 @@ export default function LoginNikitaContent() {
 
       {showMockTests && (
         <div className="login-nikita__mock-section">
-          <MockTestPage />
+          <MockTestPage
+            onDevSessionEstablished={() => {
+              checkAuth();
+            }}
+          />
         </div>
       )}
 

@@ -1,0 +1,118 @@
+import { useState } from 'react';
+import { buildPaginationItems } from './buildPaginationItems.js';
+import './Pagination.css';
+
+function ChevronIcon({ direction }) {
+  return (
+    <svg
+      className="maq-pagination__chevron"
+      width={7}
+      height={10}
+      viewBox="0 0 7 10"
+      fill="none"
+      aria-hidden="true"
+    >
+      {direction === 'left' ? (
+        <path d="M6 1L2 5l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      ) : (
+        <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      )}
+    </svg>
+  );
+}
+
+/**
+ * Paginacja list / tabel.
+ *
+ * @param {Object} props
+ * @param {number} props.totalPages — liczba stron (≥ 1); przy 0 nic nie renderuje
+ * @param {number} [props.page] — sterowana bieżąca strona (1-based)
+ * @param {number} [props.defaultPage=1] — gdy brak `page`
+ * @param {(page: number) => void} [props.onPageChange]
+ * @param {string} [props.ariaLabel]
+ * @param {string} [props.className]
+ */
+export default function Pagination({
+  totalPages,
+  page: pageProp,
+  defaultPage = 1,
+  onPageChange,
+  ariaLabel = 'Paginacja',
+  className = '',
+}) {
+  const [internalPage, setInternalPage] = useState(defaultPage);
+  const isControlled = pageProp !== undefined;
+  const total = Math.max(0, Math.floor(totalPages));
+
+  if (total <= 0) {
+    return null;
+  }
+
+  const currentPage = isControlled
+    ? Math.min(Math.max(1, pageProp), total)
+    : Math.min(Math.max(1, internalPage), total);
+
+  const setPage = (nextPage) => {
+    const clamped = Math.min(Math.max(1, nextPage), total);
+    if (!isControlled) {
+      setInternalPage(clamped);
+    }
+    if (clamped !== currentPage) {
+      onPageChange?.(clamped);
+    }
+  };
+
+  const items = buildPaginationItems(currentPage, total);
+
+  return (
+    <nav className={['maq-pagination', className].filter(Boolean).join(' ')} aria-label={ariaLabel}>
+      <button
+        type="button"
+        className="maq-pagination__btn maq-pagination__btn--nav"
+        aria-label="Poprzednia strona"
+        disabled={currentPage <= 1}
+        onClick={() => setPage(currentPage - 1)}
+      >
+        <ChevronIcon direction="left" />
+      </button>
+
+      <div className="maq-pagination__pages">
+        {items.map((item, index) => {
+          if (item.type === 'ellipsis') {
+            return (
+              <span key={`ellipsis-${index}`} className="maq-pagination__ellipsis" aria-hidden="true">
+                …
+              </span>
+            );
+          }
+
+          const isActive = item.page === currentPage;
+          return (
+            <button
+              key={`page-${item.page}`}
+              type="button"
+              className={['maq-pagination__btn', 'maq-pagination__btn--page', isActive ? 'maq-pagination__btn--active' : '']
+                .filter(Boolean)
+                .join(' ')}
+              aria-label={`Strona ${item.page}`}
+              aria-current={isActive ? 'page' : undefined}
+              onClick={() => setPage(item.page)}
+            >
+              {item.page}
+            </button>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        className="maq-pagination__btn maq-pagination__btn--nav"
+        aria-label="Następna strona"
+        disabled={currentPage >= total}
+        onClick={() => setPage(currentPage + 1)}
+      >
+        <ChevronIcon direction="right" />
+      </button>
+    </nav>
+  );
+}

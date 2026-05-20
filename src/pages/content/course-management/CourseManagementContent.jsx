@@ -1,4 +1,4 @@
-import './CourseManagementContent.css';
+import '../RouteContent.css';
 
 export default function CourseManagementContent() {
   return (

@@ -1,4 +1,4 @@
-import './HelpContent.css';
+import '../RouteContent.css';
 
 export default function HelpContent() {
   return (

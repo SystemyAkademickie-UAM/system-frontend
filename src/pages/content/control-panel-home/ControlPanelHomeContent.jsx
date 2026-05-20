@@ -1,4 +1,4 @@
-import './ControlPanelHomeContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelHomeContent() {
   return (

@@ -8,7 +8,7 @@ import './MockApp.css';
  * Integration tests: API smoke tools and dev SAML bypass entry points.
  * Wrapped with AuthProvider for standalone usage.
  */
-export default function MockTestPage() {
+export default function MockTestPage({ onDevSessionEstablished }) {
   const base = getApiBaseUrl();
   const studentBypassUrl = `${base}${SAML_BYPASS_STUDENT_PATH}`;
   const lecturerBypassUrl = `${base}${SAML_BYPASS_LECTURER_PATH}`;
@@ -42,7 +42,7 @@ export default function MockTestPage() {
           </div>
         </section>
 
-        <ApiSmokeTest />
+        <ApiSmokeTest onDevSessionEstablished={onDevSessionEstablished} />
       </div>
     </AuthProvider>
   );

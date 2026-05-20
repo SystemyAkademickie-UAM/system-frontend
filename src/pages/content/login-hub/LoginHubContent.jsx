@@ -1,33 +1,31 @@
-import { Link } from 'react-router-dom';
 import {
   groupsListPath,
   loginNikitaPath,
   loginTempPath,
 } from '../../../routes/pathRegistry.js';
+import { Button, PageHeader } from '../../../components/ui/index.js';
 import './LoginHubContent.css';
 
 export default function LoginHubContent() {
   return (
     <section className="login-hub" aria-labelledby="login-hub-title">
-      <h1 id="login-hub-title" className="login-hub__title">
-        Logowanie
-      </h1>
-      <p className="login-hub__hint">Wybierz kolejny krok:</p>
+      <PageHeader title="Logowanie" description="Wybierz kolejny krok:" />
+
       <ul className="login-hub__list">
         <li>
-          <Link className="login-hub__link" to={groupsListPath()}>
+          <Button to={groupsListPath()} variant="primary">
             Lista grup
-          </Link>
+          </Button>
         </li>
         <li>
-          <Link className="login-hub__link" to={loginTempPath()}>
+          <Button to={loginTempPath()} variant="secondary">
             Logowanie — tymczasowe (dev)
-          </Link>
+          </Button>
         </li>
         <li>
-          <Link className="login-hub__link" to={loginNikitaPath()}>
+          <Button to={loginNikitaPath()} variant="secondary">
             Logowanie — Nikita
-          </Link>
+          </Button>
         </li>
       </ul>
     </section>

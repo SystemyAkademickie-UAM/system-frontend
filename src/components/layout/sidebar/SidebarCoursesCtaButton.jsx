@@ -1,20 +1,21 @@
 import { NavLink } from 'react-router-dom';
+import '../navigation-shell.css';
 
 function coursesBtnClassName({ isActive }) {
-  return ['sidebar__courses-btn', isActive ? 'sidebar__courses-btn--active' : ''].filter(Boolean).join(' ');
+  return ['sidebar-cta__btn', isActive ? 'sidebar-cta__btn--active' : ''].filter(Boolean).join(' ');
 }
 
-/**
- * Przycisk „Twoje Kursy” — zawsze ten sam adres z pathRegistry (przekazywany jako `to`).
- */
+/** Przycisk „Twoje grupy” / „Twoje Kursy”. */
 export default function SidebarCoursesCtaButton({ to, enabled, children, onNavigate }) {
   if (!enabled) {
     return null;
   }
 
   return (
-    <NavLink to={to} end className={coursesBtnClassName} onClick={onNavigate}>
-      {children}
-    </NavLink>
+    <div className="sidebar-cta">
+      <NavLink to={to} end className={coursesBtnClassName} onClick={onNavigate}>
+        {children}
+      </NavLink>
+    </div>
   );
 }

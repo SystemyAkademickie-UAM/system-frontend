@@ -1,20 +1,18 @@
-@import '../RouteContent.css';
-
-.group-shop-content__actions {
-  margin: 1rem 0 0;
+.group-shop-content {
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  width: 100%;
+  max-width: 72rem;
 }
 
-.group-shop-content__add-link {
-  color: #10b981;
-  font-weight: 600;
-  text-decoration: none;
+.group-shop-content__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.group-shop-content__add-link:hover {
-  text-decoration: underline;
-}
-
-.group-shop-content__add-link:focus-visible {
-  outline: 2px solid #10b981;
-  outline-offset: 2px;
+.group-shop-content__header .maq-page-header {
+  margin-bottom: 0;
 }

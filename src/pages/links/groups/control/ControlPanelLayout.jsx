@@ -1,60 +1,26 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import { SubNav } from '../../../../components/ui/index.js';
 import './ControlPanelLayout.css';
 
-function subNavClassName({ isActive }) {
-  return isActive ? 'control-panel-nav__link control-panel-nav__link--active' : 'control-panel-nav__link';
-}
+const CONTROL_PANEL_NAV_ITEMS = [
+  { id: 'home', label: 'Strona główna', to: '.', end: true },
+  { id: 'users', label: 'Użytkownicy', to: 'users' },
+  { id: 'activity', label: 'Etapy i aktywności', to: 'activity' },
+  { id: 'posts', label: 'Wpisy', to: 'posts' },
+  { id: 'ranks', label: 'Odznaki i rangi', to: 'ranks' },
+  { id: 'shopitems', label: 'Przedmioty sklepowe', to: 'shopitems' },
+  { id: 'currency', label: 'Waluta', to: 'currency' },
+  { id: 'health', label: 'System żyć', to: 'health' },
+];
 
 export default function ControlPanelLayout() {
   return (
     <div className="control-panel-layout">
-      <nav className="control-panel-nav" aria-label="Nawigacja panelu prowadzącego">
-        <NavLink to="." end className={subNavClassName}>
-          Strona główna
-        </NavLink>
-        <span className="control-panel-nav__sep" aria-hidden="true">
-          |
-        </span>
-        <NavLink to="users" className={subNavClassName}>
-          Użytkownicy
-        </NavLink>
-        <span className="control-panel-nav__sep" aria-hidden="true">
-          |
-        </span>
-        <NavLink to="activity" className={subNavClassName}>
-          Etapy i aktywności
-        </NavLink>
-        <span className="control-panel-nav__sep" aria-hidden="true">
-          |
-        </span>
-        <NavLink to="posts" className={subNavClassName}>
-          Wpisy
-        </NavLink>
-        <span className="control-panel-nav__sep" aria-hidden="true">
-          |
-        </span>
-        <NavLink to="ranksandbadges" className={subNavClassName}>
-          Odznaki i rangi
-        </NavLink>
-        <span className="control-panel-nav__sep" aria-hidden="true">
-          |
-        </span>
-        <NavLink to="shopitems" className={subNavClassName}>
-          Przedmioty sklepowe
-        </NavLink>
-        <span className="control-panel-nav__sep" aria-hidden="true">
-          |
-        </span>
-        <NavLink to="currency" className={subNavClassName}>
-          Waluta
-        </NavLink>
-        <span className="control-panel-nav__sep" aria-hidden="true">
-          |
-        </span>
-        <NavLink to="health" className={subNavClassName}>
-          System żyć
-        </NavLink>
-      </nav>
+      <SubNav
+        ariaLabel="Nawigacja panelu prowadzącego"
+        items={CONTROL_PANEL_NAV_ITEMS}
+        className="control-panel-layout__sub-nav"
+      />
       <Outlet />
     </div>
   );

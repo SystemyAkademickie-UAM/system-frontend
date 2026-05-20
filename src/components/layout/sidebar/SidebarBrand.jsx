@@ -1,15 +1,16 @@
 import { publicAssetPath } from '../../../utils/publicAssetUrl.js';
+import '../navigation-shell.css';
 
-export default function SidebarBrand({ userDisplayName, userRoleLabel }) {
+/** Logo + nazwa aplikacji (lewy górny róg sidebara). */
+export default function SidebarBrand() {
   const logoSrc = publicAssetPath('assets/logomyacademyquest.png');
 
   return (
-    <div className="sidebar__brand">
-      <img className="sidebar__logo" src={logoSrc} alt="MyAcademyQuest" width={48} height={48} decoding="async" />
-      <div className="sidebar__identity">
-        <p className="sidebar__name">{userDisplayName}</p>
-        <p className="sidebar__role">{userRoleLabel}</p>
-      </div>
+    <div className="sidebar-brand">
+      <span className="sidebar-brand__logo-wrap">
+        <img className="sidebar-brand__logo" src={logoSrc} alt="" width={46} height={46} decoding="async" />
+      </span>
+      <span className="sidebar-brand__title">MyAcademyQuest</span>
     </div>
   );
 }

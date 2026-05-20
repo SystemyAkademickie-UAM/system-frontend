@@ -1,4 +1,4 @@
-import './ControlPanelPostsContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelPostsContent() {
   return (

@@ -1,4 +1,4 @@
-import './ControlPanelUsersContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelUsersContent() {
   return (

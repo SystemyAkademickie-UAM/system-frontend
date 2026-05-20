@@ -1,4 +1,4 @@
-import './ControlPanelHealthContent.css';
+import '../RouteContent.css';
 
 export default function ControlPanelHealthContent() {
   return (
