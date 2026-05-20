@@ -1,0 +1,84 @@
+/**
+ * MyAcademyQuest — design tokens (kolory)
+ *
+ * Użycie w CSS:
+ *   background: var(--color-bg-app);
+ *   color: var(--color-text-primary);
+ *
+ * Użycie w JSX (inline style):
+ *   style={{ backgroundColor: 'var(--color-bg-surface)' }}
+ *
+ * Aliasy krótkie (--bg-app, --text-primary) — te same wartości, wygodniejsze w komponentach.
+ */
+
+:root {
+  /* --- Tła --- */
+  /** Główne tło aplikacji (obszar treści) */
+  --color-bg-app: #282834;
+  /** Wyróżnienie na tle — karty, panele, sekcje */
+  --color-bg-surface: #1a1a2a;
+  /** Podniesiona powierzchnia (np. kafelki wewnątrz karty) */
+  --color-bg-elevated: #292839;
+
+  /* --- Nawigacja --- */
+  /** Główny pasek nawigacji (sidebar + superBar) */
+  --color-nav-primary: #226242;
+  /** Przycisk „Twoje grupy” w sidebarze */
+  --color-nav-cta: #34d399;
+  /** Tekst i ikony pozycji w sidebarze */
+  --color-nav-link: #d1fae5;
+  /** Nazwa użytkownika w superBar */
+  --color-nav-user-name: #ecfdf5;
+  /** Rola użytkownika w superBar */
+  --color-nav-user-role: rgba(209, 250, 229, 0.7);
+  /** Tło logo w sidebarze */
+  --color-nav-logo-bg: #d1fae5;
+  /** Kapsuła statystyk (życia, waluta) */
+  --color-nav-stat-bg: #292839;
+  /** Podrzędny pasek nawigacji — tło aktywnego przycisku */
+  --color-nav-sub-active-bg: #292839;
+
+  /* --- Tekst --- */
+  /** Główny kolor tekstu */
+  --color-text-primary: #d9d9d9;
+  /** Dodatkowy / pomocniczy tekst */
+  --color-text-secondary: #bbcbb9;
+
+  /* --- Akcent / przyciski --- */
+  /** Kolor przycisku i akcentów interaktywnych */
+  --color-accent: #42f37d;
+  /** Tekst na przycisku akcentowym (Figma: #003915) */
+  --color-accent-on: #003915;
+  /** Przycisk po naciśnięciu / hover — nieco ciemniejszy akcent */
+  --color-accent-pressed: #36d96d;
+  /** Akcent z przezroczystością (tła badge, highlight) */
+  --color-accent-muted: rgba(66, 243, 125, 0.25);
+
+  /** Placeholder w polu wyszukiwania */
+  --color-input-placeholder: rgba(187, 203, 185, 0.25);
+
+  /** Pasek akcji (Odrzuć / Zapisz) */
+  --color-overlay-actions-bg: rgba(41, 40, 57, 0.8);
+  --color-overlay-actions-border: rgba(255, 255, 255, 0.05);
+
+  --shadow-nav-sidebar: 10px 0 30px rgba(0, 0, 0, 0.3);
+  --shadow-superbar: 0 4px 4px rgba(0, 0, 0, 0.25);
+  --shadow-stat-badge: 0 4px 4px rgba(0, 0, 0, 0.25);
+
+  --shell-sidebar-width: 224px;
+  --shell-superbar-height: 63px;
+
+  /* --- Aliasy (skróty) --- */
+  --color-button: var(--color-accent);
+  --color-button-bg: var(--color-accent);
+  --color-button-text: var(--color-accent-on);
+
+  --bg-app: var(--color-bg-app);
+  --bg-surface: var(--color-bg-surface);
+  --bg-elevated: var(--color-bg-elevated);
+  --nav-primary: var(--color-nav-primary);
+  --nav-sub-active: var(--color-nav-sub-active-bg);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --accent: var(--color-accent);
+}

@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import { AppRoleProvider } from './context/AppRoleContext.jsx';
 import { createAppRouter } from './routes/createAppRouter.jsx';
+import './styles/tokens.css';
 import './index.css';
 
 const rootElement = document.getElementById('root');
