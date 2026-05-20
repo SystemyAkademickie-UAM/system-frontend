@@ -4,8 +4,9 @@ import './GroupMainLayout.css';
 
 const GROUP_MAIN_NAV_ITEMS = [
   { id: 'home', label: 'Strona główna', to: '.', end: true },
-  { id: 'activity', label: 'Lista aktywności', to: 'activity' },
-  { id: 'ranks', label: 'Rangi i odznaki', to: 'ranks' },
+  { id: 'activities', label: 'Lista aktywności', to: 'activities' },
+  { id: 'ranks', label: 'Rangi', to: 'ranks' },
+  { id: 'badges', label: 'Odznaki', to: 'badges' },
 ];
 
 export default function GroupMainLayout() {

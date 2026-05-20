@@ -4,16 +4,16 @@ import SuperBarStat from './SuperBarStat.jsx';
 import SuperBarUserMenu from './SuperBarUserMenu.jsx';
 import './SuperBar.css';
 
-/** Placeholdery — docelowo dane z API / kontekstu sesji. */
-const PLACEHOLDER_DISPLAY_NAME = 'NAZWA_GLOBALNA';
-const PLACEHOLDER_ROLE_LABEL = 'STUDENT';
+/** Placeholdery — używane gdy brak danych z sesji. */
+const PLACEHOLDER_DISPLAY_NAME = 'Użytkownik';
+const PLACEHOLDER_ROLE_LABEL = 'Student';
 const PLACEHOLDER_LIVES = '3/3';
 const PLACEHOLDER_CURRENCY = '5000';
 
 /**
  * Górny pasek nawigacji (superBar) — statystyki, ustawienia, konto.
  * @param {Object} props
- * @param {string} [props.displayName]
+ * @param {string | null} [props.displayName] — nazwa z sesji (null = placeholder)
  * @param {string} [props.roleLabel]
  * @param {string} [props.livesDisplay]
  * @param {string} [props.currencyDisplay]
@@ -21,9 +21,10 @@ const PLACEHOLDER_CURRENCY = '5000';
  * @param {boolean} [props.showMenuButton]
  * @param {boolean} [props.menuExpanded]
  * @param {() => void} [props.onMenuToggle]
+ * @param {boolean} [props.isLoading] — czy trwa ładowanie sesji
  */
 export default function SuperBar({
-  displayName = PLACEHOLDER_DISPLAY_NAME,
+  displayName,
   roleLabel = PLACEHOLDER_ROLE_LABEL,
   livesDisplay = PLACEHOLDER_LIVES,
   currencyDisplay = PLACEHOLDER_CURRENCY,
@@ -31,7 +32,9 @@ export default function SuperBar({
   showMenuButton = false,
   menuExpanded = false,
   onMenuToggle,
+  isLoading = false,
 }) {
+  const resolvedDisplayName = displayName || PLACEHOLDER_DISPLAY_NAME;
   return (
     <header className="super-bar">
       <div className="super-bar__start">
@@ -51,7 +54,7 @@ export default function SuperBar({
         <SuperBarStat icon={<IconStar />} value={livesDisplay} ariaLabel={`Życia: ${livesDisplay}`} />
         <SuperBarStat icon={<IconMoney />} value={currencyDisplay} ariaLabel={`Waluta: ${currencyDisplay}`} />
         <SuperBarSettingsButton onNavigate={onNavigate} />
-        <SuperBarUserMenu displayName={displayName} roleLabel={roleLabel} onNavigate={onNavigate} />
+        <SuperBarUserMenu displayName={resolvedDisplayName} roleLabel={roleLabel} onNavigate={onNavigate} isLoading={isLoading} />
       </div>
     </header>
   );

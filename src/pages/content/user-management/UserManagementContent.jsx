@@ -3,6 +3,7 @@ import {
   Button,
   ConfirmActions,
   PageHeader,
+  Pagination,
   SearchBar,
   SubNav,
 } from '../../../components/ui/index.js';
@@ -17,6 +18,7 @@ const SUB_NAV_ITEMS = [
 export default function UserManagementContent() {
   const [activeSection, setActiveSection] = useState('users');
   const [searchQuery, setSearchQuery] = useState('');
+  const [listPage, setListPage] = useState(1);
 
   return (
     <section className="user-management" aria-labelledby="user-management-page-title">
@@ -40,6 +42,8 @@ export default function UserManagementContent() {
         />
         <Button onClick={() => {}}>Kup teraz</Button>
       </div>
+
+      <Pagination totalPages={10} page={listPage} onPageChange={setListPage} />
 
       <ConfirmActions
         onReject={() => {}}

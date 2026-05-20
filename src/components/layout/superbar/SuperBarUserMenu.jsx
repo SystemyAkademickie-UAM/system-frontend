@@ -1,6 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSession } from '../../../context/SessionContext.jsx';
 import { loginPath } from '../../../routes/pathRegistry.js';
+import { logoutUser } from '../../../services/authService.js';
 import { IconUserPlaceholder } from './ShellIcons.jsx';
 import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
 import './SuperBar.css';
@@ -8,11 +10,13 @@ import './SuperBar.css';
 /**
  * Awatar + rozwijane menu (Wyloguj → /login).
  */
-export default function SuperBarUserMenu({ displayName, roleLabel, onNavigate }) {
+export default function SuperBarUserMenu({ displayName, roleLabel, onNavigate, isLoading = false }) {
   const menuId = useId();
   const rootRef = useRef(null);
   const [open, setOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
+  const { refetchSession } = useSession();
 
   useEffect(() => {
     if (!open) {
@@ -36,15 +40,22 @@ export default function SuperBarUserMenu({ displayName, roleLabel, onNavigate })
     };
   }, [open]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setOpen(false);
+    setIsLoggingOut(true);
+    try {
+      await logoutUser();
+      await refetchSession();
+    } finally {
+      setIsLoggingOut(false);
+    }
     onNavigate?.();
     navigate(loginPath());
   };
 
   return (
     <div className="super-bar-user-menu" ref={rootRef}>
-      <SuperBarUserIdentity displayName={displayName} roleLabel={roleLabel} />
+      <SuperBarUserIdentity displayName={displayName} roleLabel={roleLabel} isLoading={isLoading} />
       <button
         type="button"
         className="super-bar-user-menu__avatar-btn"
@@ -61,8 +72,14 @@ export default function SuperBarUserMenu({ displayName, roleLabel, onNavigate })
       {open ? (
         <ul id={menuId} className="super-bar-user-menu__dropdown" role="menu">
           <li role="none">
-            <button type="button" className="super-bar-user-menu__dropdown-item" role="menuitem" onClick={handleLogout}>
-              Wyloguj
+            <button
+              type="button"
+              className="super-bar-user-menu__dropdown-item"
+              role="menuitem"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? 'Wylogowywanie…' : 'Wyloguj'}
             </button>
           </li>
         </ul>
