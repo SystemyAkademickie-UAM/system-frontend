@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ME_PATH } from '../../../constants/authPaths.constants.js';
+import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { groupsListPath, loginPath } from '../../../routes/pathRegistry.js';
 import { AuthProvider, useAuth } from './mock/AuthContext.jsx';
 import {
@@ -68,6 +69,7 @@ function ApiPanelTitle({ title }) {
 
 function ApiTestWorkspaceInner() {
   const { authToken, setAuthToken, clearAuthToken } = useAuth();
+  const globalSession = useSessionOptional();
   const [activeSectionId, setActiveSectionId] = useState('login');
   const [browserId, setBrowserId] = useState(() => getOrCreateBrowserId());
   const [sessionUser, setSessionUser] = useState(null);
@@ -152,6 +154,7 @@ function ApiTestWorkspaceInner() {
         }
         setResponseText(text);
         await refreshSession();
+        await globalSession?.refetchSession?.();
         return;
       }
       if (action === 'login') {
@@ -173,6 +176,8 @@ function ApiTestWorkspaceInner() {
           setAuthToken(parsed.auth.trim());
         }
         setResponseText(JSON.stringify(parsed, null, 2));
+        await refreshSession();
+        await globalSession?.refetchSession?.();
         return;
       }
       if (action === 'logout') {
@@ -187,6 +192,7 @@ function ApiTestWorkspaceInner() {
         clearAuthToken();
         setResponseText(text);
         await refreshSession();
+        await globalSession?.refetchSession?.();
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
