@@ -1,0 +1,320 @@
+.data-table-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.data-table__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.data-table__toolbar-start {
+  flex: 0 1 auto;
+}
+
+.data-table__search {
+  width: 100%;
+  max-width: 18rem;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.data-table__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.data-table-card {
+  position: relative;
+  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.data-table-header-bar {
+  border-radius: 12px 12px 0 0;
+  background: var(--color-bg-surface);
+  overflow: hidden;
+}
+
+.data-table-header-scroll {
+  overflow-x: hidden;
+}
+
+.data-table-viewport {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0 0 12px 12px;
+}
+
+.data-table-header-bar--sticky + .data-table-viewport {
+  padding-top: 45px;
+}
+
+.data-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.data-table--header {
+  border-radius: 12px 12px 0 0;
+}
+
+.data-table__head {
+  background: var(--color-bg-surface);
+}
+
+.data-table__th {
+  padding: 0.875rem 1rem;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-primary);
+  text-align: left;
+  vertical-align: middle;
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.data-table__sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.data-table__sort-btn:hover {
+  color: var(--color-accent);
+}
+
+.data-table__sort-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.data-table__sort-btn--active {
+  color: var(--color-accent);
+}
+
+.data-table__sort-label {
+  white-space: nowrap;
+}
+
+.data-table__sort-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.data-table__sort-priority {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.2rem;
+  border-radius: 999px;
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  font-size: 0.625rem;
+  font-weight: 700;
+}
+
+.data-table__row {
+  position: relative;
+  transition: background 0.15s ease;
+}
+
+.data-table__row:hover {
+  background: rgba(66, 243, 125, 0.04);
+}
+
+.data-table__row:not(:last-child) .data-table__cell {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.data-table__cell {
+  padding: 0.75rem 1rem;
+  vertical-align: middle;
+}
+
+.data-table__cell--actions {
+  text-align: right;
+}
+
+.data-table__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.data-table__row:hover .data-table__actions {
+  opacity: 1;
+}
+
+.data-table__action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.data-table__action-btn:hover {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+.data-table__action-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.data-table__action-btn--delete:hover {
+  background: rgba(185, 28, 28, 0.15);
+  color: #f87171;
+}
+
+.data-table__menu-wrap {
+  position: relative;
+}
+
+.data-table__menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.data-table__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 51;
+  min-width: 220px;
+  max-width: 280px;
+  padding: 0.5rem 0;
+  border-radius: 8px;
+  background: var(--color-bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.data-table__menu-item {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.data-table__menu-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.data-table__menu-item-label {
+  font-weight: 600;
+}
+
+.data-table__menu-item-description {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
+.data-table__menu-item:hover {
+  background: rgba(66, 243, 125, 0.1);
+}
+
+.data-table__menu-item:hover .data-table__menu-item-label {
+  color: var(--color-accent);
+}
+
+.data-table__menu-item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.data-table__pagination {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+@media (max-width: 768px) {
+  .data-table__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .data-table__search {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .data-table__col--hide-below-768,
+  .data-table__th--hide-below-768,
+  .data-table__cell--hide-below-768 {
+    display: none;
+  }
+
+  .data-table__actions {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table__col--hide-below-480,
+  .data-table__th--hide-below-480,
+  .data-table__cell--hide-below-480 {
+    display: none;
+  }
+
+  .data-table__cell {
+    padding: 0.5rem;
+  }
+}

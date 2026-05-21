@@ -5,3 +5,5 @@ export { default as SearchBar } from './SearchBar/SearchBar.jsx';
 export { default as ConfirmActions } from './ConfirmActions/ConfirmActions.jsx';
 export { default as Pagination } from './Pagination/Pagination.jsx';
 export { buildPaginationItems } from './Pagination/buildPaginationItems.js';
+export { default as DataTable } from './DataTable/DataTable.jsx';
+export { cycleSortRule, sortRows } from './DataTable/dataTableSort.js';
