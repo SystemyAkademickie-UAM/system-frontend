@@ -10,7 +10,7 @@
 
 .api-test-content__subtitle {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--font-size-body);
   color: #9ca3af;
   font-weight: 400;
 }
@@ -44,7 +44,7 @@
   align-items: center;
   padding: 0.2rem 0.6rem;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: var(--font-size-body);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -56,13 +56,13 @@
 
 .endpoint-card__path {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.95rem;
+  font-size: var(--font-size-page-description);
   color: #e5e7eb;
   word-break: break-all;
 }
 
 .endpoint-card__description {
-  font-size: 0.8rem;
+  font-size: var(--font-size-body);
   color: #9ca3af;
   margin: 0;
 }
@@ -70,7 +70,7 @@
 /* ── Payload Block ────────────────────────────────────────── */
 
 .endpoint-card__payload-label {
-  font-size: 0.75rem;
+  font-size: var(--font-size-body);
   font-weight: 600;
   color: #818cf8;
   text-transform: uppercase;
@@ -84,7 +84,7 @@
   border-radius: 8px;
   padding: 1rem;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.8rem;
+  font-size: var(--font-size-body);
   line-height: 1.6;
   color: #a5b4fc;
   overflow-x: auto;
@@ -107,7 +107,7 @@
   padding: 0.5rem 1rem;
   border-radius: 8px;
   border: 1px solid transparent;
-  font-size: 0.8rem;
+  font-size: var(--font-size-body);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -146,7 +146,7 @@
   border-radius: 8px;
   padding: 1rem;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.8rem;
+  font-size: var(--font-size-body);
   line-height: 1.6;
   overflow-x: auto;
   white-space: pre-wrap;
@@ -173,7 +173,7 @@
 }
 
 .api-test-content__group-label {
-  font-size: 0.85rem;
+  font-size: var(--font-size-body);
   font-weight: 600;
   color: #d1d5db;
 }
@@ -186,7 +186,7 @@
   background: #1e1e2e;
   color: #e5e7eb;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.85rem;
+  font-size: var(--font-size-body);
   text-align: center;
   outline: none;
   transition: border-color 0.2s;

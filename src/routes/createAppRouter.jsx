@@ -19,7 +19,7 @@ import StatisticsPage from '../pages/links/app/StatisticsPage.jsx';
 import UserManagementPage from '../pages/links/app/UserManagementPage.jsx';
 
 // Groups list
-import GroupsListPage from '../pages/links/groups/GroupsListPage.jsx';
+import GroupsListPage from '../pages/links/groups/groups-list/GroupsListPage.jsx';
 
 // Group Main (Ekran główny) - student + lecturer
 import GroupMainLayout from '../pages/links/groups/layouts/GroupMainLayout.jsx';
@@ -55,14 +55,14 @@ import ShopItemsPage from '../pages/links/groups/rewards/ShopItemsPage.jsx';
 
 // Group Settings (Ustawienia grupy) - lecturer only
 import GroupSettingsLayout from '../pages/links/groups/layouts/GroupSettingsLayout.jsx';
-import GroupSettingsHomePage from '../pages/links/groups/groupsettings/GroupSettingsHomePage.jsx';
-import GroupSettingsCurrencyPage from '../pages/links/groups/groupsettings/GroupSettingsCurrencyPage.jsx';
-import GroupSettingsHealthPage from '../pages/links/groups/groupsettings/GroupSettingsHealthPage.jsx';
+import GroupSettingsHomePage from '../pages/links/groups/group-settings/GroupSettingsHomePage.jsx';
+import GroupSettingsCurrencyPage from '../pages/links/groups/group-settings/GroupSettingsCurrencyPage.jsx';
+import GroupSettingsHealthPage from '../pages/links/groups/group-settings/GroupSettingsHealthPage.jsx';
 
 // Shop (Sklep) - student + lecturer
-import GroupShopLayout from '../pages/links/groups/GroupShopLayout.jsx';
-import GroupShopPage from '../pages/links/groups/GroupShopPage.jsx';
-import GroupShopAddPage from '../pages/links/groups/GroupShopAddPage.jsx';
+import ShopLayout from '../pages/links/groups/shop/ShopLayout.jsx';
+import ShopHomePage from '../pages/links/groups/shop/ShopHomePage.jsx';
+import ShopAddPage from '../pages/links/groups/shop/ShopAddPage.jsx';
 
 // Ranking - student + lecturer
 import RankingLayout from '../pages/links/groups/layouts/RankingLayout.jsx';
@@ -231,11 +231,11 @@ const appRouteTree = [
                   // ----------------------------------------
                   {
                     path: 'shop',
-                    element: withGuard(<GroupShopLayout />),
+                    element: withGuard(<ShopLayout />),
                     children: [
-                      { index: true, element: <GroupShopPage /> },
+                      { index: true, element: <ShopHomePage /> },
                       // Add product - lecturer only
-                      { path: 'add', element: withGuard(<GroupShopAddPage />, { allowedRoles: LECTURER_ONLY }) },
+                      { path: 'add', element: withGuard(<ShopAddPage />, { allowedRoles: LECTURER_ONLY }) },
                     ],
                   },
 

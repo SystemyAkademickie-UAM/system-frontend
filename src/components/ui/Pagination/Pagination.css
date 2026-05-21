@@ -26,7 +26,7 @@
   border-radius: 8px;
   background: var(--color-bg-surface);
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: var(--font-size-body);
   font-weight: 700;
   line-height: 1.25rem;
   color: var(--color-text-secondary);
@@ -78,7 +78,7 @@
   justify-content: center;
   min-width: 30px;
   padding: 0 8px;
-  font-size: 1rem;
+  font-size: var(--font-size-body);
   line-height: 1.5rem;
   color: var(--color-text-secondary);
   opacity: 0.5;

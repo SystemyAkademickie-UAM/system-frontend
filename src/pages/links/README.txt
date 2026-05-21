@@ -1,9 +1,15 @@
-pages/links/ — komponenty podpięte w createAppRouter.jsx (router).
+Strony podpięte w routerze (createAppRouter.jsx)
 
-- pages/links/app/ — trasy globalne (ustawienia, pomoc, admin…)
-- pages/links/groups/ — grupy, sklep, profil, ranking
-- pages/links/groups/layouts/ — layout z pod-nawigacją grupy (/groups/:groupId, activity, ranks)
-- pages/links/groups/main/ — podstrony ekranu głównego grupy
-- pages/links/groups/control/ — layout panelu prowadzącego + podstrony /control/...
-
-Treść ekranów: pages/content/<nazwa>/
+- pages/links/<obszar>/ — cienkie *Page.jsx importujące treść z pages/content/
+- pages/links/groups/ — trasy grupowe; podfoldery odpowiadają segmentom URL pod /groups/:groupId/
+  - groups-list/     → /groups
+  - main/            → /main/*
+  - profile/         → /profile/*
+  - members/         → /members/*
+  - activities/      → /activities/*
+  - posts/           → /posts
+  - rewards/         → /rewards/*
+  - group-settings/  → /groupsettings/*  (folder ≠ segment URL)
+  - shop/            → /shop/*
+  - ranking/         → /ranking/*
+  - layouts/         → layouty z <Outlet /> dla sekcji z podstronami

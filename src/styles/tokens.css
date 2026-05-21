@@ -1,14 +1,14 @@
 /**
- * MyAcademyQuest — design tokens (kolory)
+ * MyAcademyQuest — design tokens (kolory + typografia)
  *
  * Użycie w CSS:
  *   background: var(--color-bg-app);
- *   color: var(--color-text-primary);
+ *   font-size: var(--font-size-body);
  *
  * Użycie w JSX (inline style):
- *   style={{ backgroundColor: 'var(--color-bg-surface)' }}
+ *   style={{ fontSize: 'var(--font-size-body)' }}
  *
- * Aliasy krótkie (--bg-app, --text-primary) — te same wartości, wygodniejsze w komponentach.
+ * Aliasy krótkie (--bg-app, --text-primary, --text-body) — wygodniejsze w komponentach.
  */
 
 :root {
@@ -68,6 +68,16 @@
   --shell-sidebar-width: 224px;
   --shell-superbar-height: 63px;
 
+  /* --- Typografia --- */
+  /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
+  --font-size-body: 12px;
+  /** Nagłówek strony */
+  --font-size-page-title: 42px;
+  /** Tekst pod nagłówkiem (opis, podtytuł) */
+  --font-size-page-description: 14px;
+  /** Wartości statystyk na paskach nawigacji (życia, waluta) */
+  --font-size-nav-stat: 26px;
+
   /* --- Aliasy (skróty) --- */
   --color-button: var(--color-accent);
   --color-button-bg: var(--color-accent);
@@ -81,4 +91,8 @@
   --text-primary: var(--color-text-primary);
   --text-secondary: var(--color-text-secondary);
   --accent: var(--color-accent);
+  --text-body: var(--font-size-body);
+  --text-page-title: var(--font-size-page-title);
+  --text-page-description: var(--font-size-page-description);
+  --text-nav-stat: var(--font-size-nav-stat);
 }

@@ -1,63 +1,54 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Button,
-  PageHeader,
-  SearchBar,
-  SubNav,
-} from '../../../components/ui/index.js';
-import { RoleVisibility } from '../../../components/guards/index.js';
-import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import { DEMO_GROUP_ID } from '../../../constants/demo.constants.js';
-import { groupMainPath } from '../../../routes/pathRegistry.js';
+import { SearchBar } from '../../../components/ui/index.js';
+import GroupCard from './GroupCard.jsx';
+import GroupsListHero from './GroupsListHero.jsx';
+import { useGroupsList } from './useGroupsList.js';
 import './GroupsListContent.css';
 
-const SUB_NAV_ITEMS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: 'active', label: 'Aktywne' },
-  { id: 'archived', label: 'Archiwum' },
-];
-
 export default function GroupsListContent() {
-  const [activeSection, setActiveSection] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { groups, searchQuery, setSearchQuery, isLoading, errorMessage } = useGroupsList();
 
   return (
-    <section className="groups-list" aria-labelledby="groups-list-page-title">
-      <PageHeader
-        title="Twoje grupy"
-        description="Wybierz grupę, aby przejść do widoku kursu."
-      />
+    <section className="groups-list" aria-labelledby="groups-list-section-title">
+      <GroupsListHero />
 
-      <SubNav
-        ariaLabel="Filtry listy grup"
-        items={SUB_NAV_ITEMS}
-        activeId={activeSection}
-        onSelect={setActiveSection}
-      />
-
-      <div className="groups-list__toolbar">
+      <div className="groups-list__controls">
+        <h2 id="groups-list-section-title" className="groups-list__section-title">
+          Twoje grupy
+        </h2>
         <SearchBar
+          className="groups-list__search"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj grup..."
+          placeholder="Szukaj kampanii..."
+          aria-label="Szukaj kampanii po nazwie, przedmiocie lub prowadzącym"
         />
-
-        <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
-          <Button onClick={() => {}}>Utwórz nową grupę</Button>
-        </RoleVisibility>
       </div>
 
-      <div className="groups-list__demo-link">
-        <h2 className="groups-list__demo-heading">Dostępne grupy</h2>
-        <ul className="groups-list__ul">
-          <li>
-            <Link className="groups-list__link" to={groupMainPath(DEMO_GROUP_ID)}>
-              Przykładowa grupa ({DEMO_GROUP_ID})
-            </Link>
-          </li>
+      {errorMessage ? (
+        <p className="groups-list__message groups-list__message--error" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
+
+      {isLoading ? (
+        <p className="groups-list__message" aria-live="polite">
+          Ładowanie grup…
+        </p>
+      ) : groups.length === 0 ? (
+        <p className="groups-list__message" aria-live="polite">
+          {searchQuery.trim()
+            ? 'Nie znaleziono grup pasujących do wyszukiwania.'
+            : 'Brak przypisanych grup.'}
+        </p>
+      ) : (
+        <ul className="groups-list__grid">
+          {groups.map((group) => (
+            <li key={group.id} className="groups-list__grid-item">
+              <GroupCard group={group} />
+            </li>
+          ))}
         </ul>
-      </div>
+      )}
     </section>
   );
 }

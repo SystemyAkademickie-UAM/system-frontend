@@ -1,18 +1,3 @@
-.group-shop-content {
-  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+.group-shop-content__actions {
   width: 100%;
-  max-width: 72rem;
-}
-
-.group-shop-content__header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.group-shop-content__header .maq-page-header {
-  margin-bottom: 0;
 }

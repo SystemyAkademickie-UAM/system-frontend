@@ -93,9 +93,9 @@
   background: var(--color-nav-stat-bg);
   box-shadow: var(--shadow-stat-badge);
   border-radius: 9px;
-  font-size: 1.625rem;
+  font-size: var(--font-size-nav-stat);
   font-weight: 600;
-  line-height: 1.5rem;
+  line-height: 1.2;
   color: #fff;
 }
 
@@ -137,7 +137,7 @@
 .super-bar-user-identity__name {
   margin: 0;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: var(--font-size-page-description);
   font-weight: 800;
   line-height: 1.25rem;
   letter-spacing: -0.35px;
@@ -150,7 +150,7 @@
 
 .super-bar-user-identity__role {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: var(--font-size-body);
   font-weight: 700;
   line-height: 0.9375rem;
   letter-spacing: 1px;
@@ -235,7 +235,7 @@
   border: 0;
   background: transparent;
   font: inherit;
-  font-size: 0.875rem;
+  font-size: var(--font-size-body);
   font-weight: 600;
   text-align: left;
   color: var(--color-text-primary);
@@ -260,7 +260,6 @@
 
 @media (max-width: 899px) {
   .super-bar-stat-badge {
-    font-size: 1.125rem;
     padding: 0.25rem 0.65rem;
   }
 

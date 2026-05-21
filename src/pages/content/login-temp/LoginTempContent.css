@@ -5,7 +5,7 @@
 
 .login-temp__title {
   margin: 0 0 0.5rem;
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-size: var(--font-size-page-title);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -15,7 +15,7 @@
 .login-temp__hint {
   margin: 0 0 1.25rem;
   color: #9ca3af;
-  font-size: 0.95rem;
+  font-size: var(--font-size-page-description);
   line-height: 1.45;
 }
 
@@ -59,7 +59,7 @@
 
 .login-temp__dev-title {
   margin: 0 0 0.35rem;
-  font-size: 0.95rem;
+  font-size: var(--font-size-page-description);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -68,7 +68,7 @@
 
 .login-temp__dev-hint {
   margin: 0 0 0.75rem;
-  font-size: 0.85rem;
+  font-size: var(--font-size-body);
   color: #9ca3af;
 }
 
@@ -85,7 +85,7 @@
   border: 1px solid #4b5563;
   background: #1f2937;
   color: #e5e7eb;
-  font-size: 0.8rem;
+  font-size: var(--font-size-body);
   font-weight: 600;
   cursor: pointer;
 }
