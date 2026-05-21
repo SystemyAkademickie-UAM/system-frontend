@@ -1,21 +1,54 @@
-import { Link } from 'react-router-dom';
-import { DEMO_GROUP_ID, groupMainPath } from '../../../routes/pathRegistry.js';
+import { SearchBar } from '../../../components/ui/index.js';
+import GroupCard from './GroupCard.jsx';
+import GroupsListHero from './GroupsListHero.jsx';
+import { useGroupsList } from './useGroupsList.js';
 import './GroupsListContent.css';
 
 export default function GroupsListContent() {
+  const { groups, searchQuery, setSearchQuery, isLoading, errorMessage } = useGroupsList();
+
   return (
-    <section className="groups-list" aria-labelledby="groups-list-title">
-      <h1 id="groups-list-title" className="groups-list__title">
-        Lista grup
-      </h1>
-      <p className="groups-list__hint">Wybierz grupę, aby przejść do widoku kursu.</p>
-      <ul className="groups-list__ul">
-        <li>
-          <Link className="groups-list__link" to={groupMainPath(DEMO_GROUP_ID)}>
-            Przykładowa grupa ({DEMO_GROUP_ID})
-          </Link>
-        </li>
-      </ul>
+    <section className="groups-list" aria-labelledby="groups-list-section-title">
+      <GroupsListHero />
+
+      <div className="groups-list__controls">
+        <h2 id="groups-list-section-title" className="groups-list__section-title">
+          Twoje grupy
+        </h2>
+        <SearchBar
+          className="groups-list__search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Szukaj kampanii..."
+          aria-label="Szukaj kampanii po nazwie, przedmiocie lub prowadzącym"
+        />
+      </div>
+
+      {errorMessage ? (
+        <p className="groups-list__message groups-list__message--error" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
+
+      {isLoading ? (
+        <p className="groups-list__message" aria-live="polite">
+          Ładowanie grup…
+        </p>
+      ) : groups.length === 0 ? (
+        <p className="groups-list__message" aria-live="polite">
+          {searchQuery.trim()
+            ? 'Nie znaleziono grup pasujących do wyszukiwania.'
+            : 'Brak przypisanych grup.'}
+        </p>
+      ) : (
+        <ul className="groups-list__grid">
+          {groups.map((group) => (
+            <li key={group.id} className="groups-list__grid-item">
+              <GroupCard group={group} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

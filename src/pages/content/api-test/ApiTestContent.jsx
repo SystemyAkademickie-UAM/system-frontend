@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import nobodgeitImg from '../../../assets/nobodgeit.png';
 import EndpointCard from './EndpointCard.jsx';
+import '../RouteContent.css';
 import './ApiTestContent.css';
 
 /** Default example payloads matching the backend DTOs (camelCase). */
