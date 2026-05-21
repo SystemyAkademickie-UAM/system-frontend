@@ -5,7 +5,7 @@
 
 .page-placeholder__title {
   margin: 0;
-  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-size: var(--font-size-page-title);
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;

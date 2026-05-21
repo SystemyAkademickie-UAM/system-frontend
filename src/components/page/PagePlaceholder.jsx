@@ -1,15 +1,11 @@
-import './PagePlaceholder.css';
+import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
 
-/**
- * Bazowy placeholder treści podstrony (do wymiany na realny widok z API).
- * @param {{ name: string }} props
- */
-export default function PagePlaceholder({ name }) {
+/** @deprecated Użyj PageUnavailable */
+export default function PagePlaceholder({ name, description }) {
   return (
-    <section className="page-placeholder" aria-labelledby="page-placeholder-title">
-      <h1 id="page-placeholder-title" className="page-placeholder__title">
-        Strona {name}
-      </h1>
-    </section>
+    <PageUnavailable
+      title={name}
+      description={description ?? 'Ta sekcja aplikacji jest w przygotowaniu.'}
+    />
   );
 }

@@ -1,11 +1,10 @@
-import './GroupShopAddContent.css';
+import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
 
 export default function GroupShopAddContent() {
   return (
-    <section className="route-content" aria-labelledby="group-shop-add-title">
-      <h1 id="group-shop-add-title" className="route-content__title">
-        Dodawanie przedmiotu do sklepu
-      </h1>
-    </section>
+    <PageUnavailable
+      title="Dodawanie przedmiotu do sklepu"
+      description="Formularz tworzenia nowego przedmiotu dostępnego do zakupu w sklepie grupy."
+    />
   );
 }

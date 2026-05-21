@@ -10,7 +10,8 @@ export default defineConfig({
     port: DEV_SERVER_PORT,
     strictPort: true,
     proxy: {
-      '/api': {
+      // `/api/` — tylko wywołania REST; nie przechwytuj `/api-test` (strona dev SPA).
+      '/api/': {
         target: 'http://127.0.0.1:8080',
         changeOrigin: true,
       },

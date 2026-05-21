@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ME_PATH } from '../../../constants/authPaths.constants.js';
+import { groupsListPath, loginPath } from '../../../routes/pathRegistry.js';
 import { AuthProvider, useAuth } from './mock/AuthContext.jsx';
 import {
   getOrCreateBrowserId,
@@ -280,7 +282,7 @@ function ApiTestWorkspaceInner() {
   return (
     <div className="api-test-workspace">
       <aside className="api-test-workspace__sidebar" aria-label="API test sections">
-        <p className="api-test-workspace__sidebar-title">Dev API test</p>
+        <p className="api-test-workspace__sidebar-title">Szwager</p>
         <nav className="api-test-workspace__nav">
           {API_TEST_SECTIONS.map((section) => (
             <button
@@ -297,6 +299,14 @@ function ApiTestWorkspaceInner() {
             </button>
           ))}
         </nav>
+        <div className="api-test-workspace__sidebar-footer">
+          <Link to={groupsListPath()} className="api-test-workspace__sidebar-link">
+            Lista grup
+          </Link>
+          <Link to={loginPath()} className="api-test-workspace__sidebar-link">
+            Strona logowania
+          </Link>
+        </div>
       </aside>
 
       <div className="api-test-workspace__main">

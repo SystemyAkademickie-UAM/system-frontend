@@ -1,11 +1,10 @@
-import './HelpContent.css';
+import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
 
 export default function HelpContent() {
   return (
-    <section className="route-content help-content" aria-labelledby="help-content-title">
-      <h1 id="help-content-title" className="route-content__title">
-        Centrum pomocy
-      </h1>
-    </section>
+    <PageUnavailable
+      title="Centrum pomocy"
+      description="Instrukcje, FAQ i wsparcie techniczne dla użytkowników MyAcademyQuest."
+    />
   );
 }

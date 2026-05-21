@@ -20,8 +20,8 @@ export default function NavGlyph({ id }) {
           className="nav-glyph__img"
           src={src}
           alt=""
-          width={22}
-          height={22}
+          width={20}
+          height={20}
           loading="lazy"
           decoding="async"
           onError={onError}
