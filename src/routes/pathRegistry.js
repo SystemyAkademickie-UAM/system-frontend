@@ -11,14 +11,6 @@ export function loginPath() {
   return '/login';
 }
 
-export function loginTempPath() {
-  return '/logintemp';
-}
-
-export function loginNikitaPath() {
-  return '/loginnikita';
-}
-
 // ============================================================================
 // GROUPS LIST
 // ============================================================================
@@ -206,9 +198,18 @@ export function organizationsPath() {
   return '/organizations';
 }
 
-/** Developer-only API test page. */
+// ============================================================================
+// DEV
+// ============================================================================
+
+/** Developer-only API test workspace (Login shell). */
+export function devApiTestPath() {
+  return '/dev/api-test';
+}
+
+/** @deprecated Use {@link devApiTestPath}. Kept for older links. */
 export function apiTestPath() {
-  return '/api-test';
+  return devApiTestPath();
 }
 
 // ============================================================================

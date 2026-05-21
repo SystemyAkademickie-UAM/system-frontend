@@ -14,7 +14,7 @@ const AppRoleContext = createContext(null);
  *
  * Dzięki temu:
  * - W produkcji rola pochodzi z sesji backendowej
- * - W trybie dev (login-temp) można ręcznie przełączać role do testów
+ * - W trybie dev (api-test) można ręcznie przełączać role do testów
  */
 export function AppRoleProvider({ children }) {
   const session = useSessionOptional();

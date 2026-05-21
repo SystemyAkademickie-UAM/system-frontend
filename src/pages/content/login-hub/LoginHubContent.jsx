@@ -1,7 +1,6 @@
 import {
+  devApiTestPath,
   groupsListPath,
-  loginNikitaPath,
-  loginTempPath,
 } from '../../../routes/pathRegistry.js';
 import { Button, PageHeader } from '../../../components/ui/index.js';
 import './LoginHubContent.css';
@@ -18,13 +17,8 @@ export default function LoginHubContent() {
           </Button>
         </li>
         <li>
-          <Button to={loginTempPath()} variant="secondary">
-            Logowanie — tymczasowe (dev)
-          </Button>
-        </li>
-        <li>
-          <Button to={loginNikitaPath()} variant="secondary">
-            Logowanie — Nikita
+          <Button to={devApiTestPath()} variant="secondary">
+            Dev API Test
           </Button>
         </li>
       </ul>

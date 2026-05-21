@@ -195,3 +195,27 @@
 .api-test-content__group-input:focus {
   border-color: #6366f1;
 }
+
+.api-test-content__nobodgeit-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(30, 30, 46, 0.6) 0%, rgba(37, 37, 64, 0.6) 100%);
+  border: 1px solid #2e2e48;
+}
+
+.api-test-content__nobodgeit {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  border-radius: 8px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.api-test-content__nobodgeit:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+}
