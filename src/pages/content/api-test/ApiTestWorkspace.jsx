@@ -215,6 +215,13 @@ function ApiTestWorkspaceInner() {
       synced.setValidationError('Group ID is required in the path.');
       return;
     }
+    if (
+      (activeSection.id === 'badges' || activeSection.id === 'ranks') &&
+      String(synced.values.groupId ?? '').trim() === ''
+    ) {
+      synced.setValidationError('Group ID is required in the path.');
+      return;
+    }
     setIsBusy(true);
     setResponseText('');
     const base = getApiBaseUrl();

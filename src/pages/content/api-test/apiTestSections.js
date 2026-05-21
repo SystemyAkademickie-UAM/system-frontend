@@ -1,7 +1,9 @@
 import {
   ACTIVITIES_PATH,
   DRIVE_PATH,
+  getGroupBadgesPath,
   getGroupEnrollPath,
+  getGroupRanksPath,
   GROUPS_NEW_PATH,
   STAGES_PATH,
 } from './mock/mockConstants.js';
@@ -351,6 +353,137 @@ export const API_TEST_SECTIONS = [
       { key: 'educationalDescription', label: 'educationalDescription', type: 'textarea' },
       { key: 'storyDescription', label: 'storyDescription', type: 'textarea' },
       { key: 'activityId', label: 'activityId (modify/remove/retrieve)', type: 'number' },
+    ],
+  },
+  {
+    id: 'badges',
+    label: 'Badges',
+    title: 'POST /groups/:id/badges',
+    kind: 'api',
+    method: 'POST',
+    buildPath: (values) => getGroupBadgesPath(String(values.groupId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      name: 'Odznaka Pierwszych Kroków',
+      icon: '🏅',
+      educationalDescription: 'Przyznawana za ukończenie pierwszego etapu kursu.',
+      storyDescription: 'Bohater stawia pierwsze kroki w Akademii Magii...',
+      rewardAmount: 50,
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {
+        name: String(values.name ?? '').trim(),
+        icon: String(values.icon ?? '').trim(),
+        educationalDescription: String(values.educationalDescription ?? '').trim(),
+      };
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      const storyDescription = String(values.storyDescription ?? '').trim();
+      if (storyDescription !== '') {
+        payload.storyDescription = storyDescription;
+      }
+      if (values.rewardAmount !== '' && values.rewardAmount !== null && values.rewardAmount !== undefined) {
+        payload.rewardAmount = Number(values.rewardAmount);
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      name: typeof payload.name === 'string' ? payload.name : '',
+      icon: typeof payload.icon === 'string' ? payload.icon : '',
+      educationalDescription:
+        typeof payload.educationalDescription === 'string' ? payload.educationalDescription : '',
+      storyDescription: typeof payload.storyDescription === 'string' ? payload.storyDescription : '',
+      rewardAmount: payload.rewardAmount ?? '',
+    }),
+    requiredKeysForValues: () => ['name', 'icon', 'educationalDescription'],
+    fields: [
+      { key: 'groupId', label: 'Group ID (public, URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'name', label: 'name', type: 'text' },
+      { key: 'icon', label: 'icon', type: 'text' },
+      { key: 'educationalDescription', label: 'educationalDescription', type: 'textarea' },
+      { key: 'storyDescription', label: 'storyDescription (optional)', type: 'textarea' },
+      { key: 'rewardAmount', label: 'rewardAmount (optional)', type: 'number' },
+    ],
+  },
+  {
+    id: 'ranks',
+    label: 'Ranks',
+    title: 'POST /groups/:id/ranks',
+    kind: 'api',
+    method: 'POST',
+    buildPath: (values) => getGroupRanksPath(String(values.groupId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      name: 'Adept',
+      icon: '⭐',
+      requiredPoints: 100,
+      storyDescription: 'Adept to ktoś, kto opanował podstawy magii arkanowej.',
+      storeDiscount: 5,
+      uniqueStoreItemsText: 'Zwój Mądrości\nEliksir Skupienia',
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {
+        name: String(values.name ?? '').trim(),
+        icon: String(values.icon ?? '').trim(),
+        requiredPoints: Number(values.requiredPoints) || 0,
+      };
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      const storyDescription = String(values.storyDescription ?? '').trim();
+      if (storyDescription !== '') {
+        payload.storyDescription = storyDescription;
+      }
+      if (values.storeDiscount !== '' && values.storeDiscount !== null && values.storeDiscount !== undefined) {
+        payload.storeDiscount = Number(values.storeDiscount);
+      }
+      const itemsText = String(values.uniqueStoreItemsText ?? '').trim();
+      if (itemsText !== '') {
+        payload.uniqueStoreItems = itemsText
+          .split('\n')
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0);
+      }
+      return payload;
+    },
+    parsePayload: (payload) => {
+      let uniqueStoreItemsText = '';
+      if (Array.isArray(payload.uniqueStoreItems)) {
+        uniqueStoreItemsText = payload.uniqueStoreItems.map(String).join('\n');
+      }
+      return {
+        auth: typeof payload.auth === 'string' ? payload.auth : '',
+        name: typeof payload.name === 'string' ? payload.name : '',
+        icon: typeof payload.icon === 'string' ? payload.icon : '',
+        requiredPoints: payload.requiredPoints ?? 0,
+        storyDescription: typeof payload.storyDescription === 'string' ? payload.storyDescription : '',
+        storeDiscount: payload.storeDiscount ?? '',
+        uniqueStoreItemsText,
+      };
+    },
+    requiredKeysForValues: () => ['name', 'icon', 'requiredPoints'],
+    fields: [
+      { key: 'groupId', label: 'Group ID (public, URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'name', label: 'name', type: 'text' },
+      { key: 'icon', label: 'icon', type: 'text' },
+      { key: 'requiredPoints', label: 'requiredPoints', type: 'number' },
+      { key: 'storyDescription', label: 'storyDescription (optional)', type: 'textarea' },
+      { key: 'storeDiscount', label: 'storeDiscount (optional)', type: 'number' },
+      {
+        key: 'uniqueStoreItemsText',
+        label: 'uniqueStoreItems (optional, one per line)',
+        type: 'textarea',
+      },
     ],
   },
 ];
