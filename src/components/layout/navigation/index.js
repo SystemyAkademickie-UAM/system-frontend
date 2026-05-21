@@ -6,7 +6,7 @@
  */
 export { default as Sidebar } from '../Sidebar.jsx';
 export { default as SidebarBrand } from '../sidebar/SidebarBrand.jsx';
-export { default as SidebarCoursesCtaButton } from '../sidebar/SidebarCoursesCtaButton.jsx';
+export { default as SidebarGroupsCtaButton } from '../sidebar/SidebarGroupsCtaButton.jsx';
 export { default as SidebarNavItem } from '../sidebar/SidebarNavLinkButton.jsx';
 export { default as SidebarNavList } from '../sidebar/SidebarNavRail.jsx';
 

@@ -2,7 +2,7 @@ import { useOptionalGroupId } from '../../hooks/useOptionalGroupId.js';
 import { resolveShellView } from '../../navigation/shellTemplates.config.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import SidebarBrand from './sidebar/SidebarBrand.jsx';
-import SidebarCoursesCtaButton from './sidebar/SidebarCoursesCtaButton.jsx';
+import SidebarGroupsCtaButton from './sidebar/SidebarGroupsCtaButton.jsx';
 import SidebarNavLinkButton from './sidebar/SidebarNavLinkButton.jsx';
 import SidebarNavRail from './sidebar/SidebarNavRail.jsx';
 import './navigation-shell.css';
@@ -22,9 +22,9 @@ export default function Sidebar({ onNavigate }) {
 
       <div className="sidebar__cta-group">
         {shell.ctaItems.map((item) => (
-          <SidebarCoursesCtaButton key={item.id} to={item.to} enabled={item.enabled} onNavigate={handleNav}>
+          <SidebarGroupsCtaButton key={item.id} to={item.to} enabled={item.enabled} onNavigate={handleNav}>
             {item.label}
-          </SidebarCoursesCtaButton>
+          </SidebarGroupsCtaButton>
         ))}
       </div>
 
