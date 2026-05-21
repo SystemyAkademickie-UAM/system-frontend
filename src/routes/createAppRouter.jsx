@@ -1,6 +1,5 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
-import ApiTestPage from '../pages/links/dev/ApiTestPage.jsx';
 import LoginShell from '../components/layout/LoginShell.jsx';
 import CourseManagementPage from '../pages/links/app/CourseManagementPage.jsx';
 import HelpPage from '../pages/links/app/HelpPage.jsx';
@@ -28,14 +27,14 @@ import GroupMainHomePage from '../pages/links/groups/main/GroupMainHomePage.jsx'
 import GroupMainLayout from '../pages/links/groups/layouts/GroupMainLayout.jsx';
 import GroupRanksAndBadgesPage from '../pages/links/groups/main/GroupRanksAndBadgesPage.jsx';
 import LoginHubPage from '../pages/links/login/LoginHubPage.jsx';
-import LoginNikitaPage from '../pages/links/login/LoginNikitaPage.jsx';
+import DevApiTestPage from '../pages/links/login/DevApiTestPage.jsx';
 import LoginTempPage from '../pages/links/login/LoginTempPage.jsx';
-import { loginPath } from './pathRegistry.js';
+import { devApiTestPath, loginPath } from './pathRegistry.js';
 
 /**
  * Drzewo tras — zsynchronizuj z `routeTable.js` i `shellTemplates.config.js`.
  * `pages/links/` — komponenty podpięte pod router; `pages/content/` — treść ekranów.
- * Trasy `login`, `logintemp`, `loginnikita`: layout `LoginShell` (bez paska bocznego).
+ * Trasy `login`, `logintemp`, `dev/api-test`: layout `LoginShell` (bez paska bocznego).
  */
 const appRouteTree = [
   {
@@ -47,7 +46,7 @@ const appRouteTree = [
         children: [
           { path: 'login', element: <LoginHubPage /> },
           { path: 'logintemp', element: <LoginTempPage /> },
-          { path: 'loginnikita', element: <LoginNikitaPage /> },
+          { path: 'dev/api-test', element: <DevApiTestPage /> },
         ],
       },
       {
@@ -103,7 +102,7 @@ const appRouteTree = [
               },
             ],
           },
-          { path: 'api-test', element: <ApiTestPage /> },
+          { path: 'api-test', element: <Navigate to={devApiTestPath()} replace /> },
           { path: '*', element: <Navigate to={loginPath()} replace /> },
         ],
       },
