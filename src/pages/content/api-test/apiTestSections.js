@@ -44,7 +44,7 @@ import {
 export const API_TEST_SECTIONS = [
   {
     id: 'login',
-    label: 'Login',
+    label: 'Moduł logowania Nikita',
     title: 'Session & auth',
     kind: 'login',
   },

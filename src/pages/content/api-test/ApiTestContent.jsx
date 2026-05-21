@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import nobodgeitImg from '../../../assets/nobodgeit.png';
 import EndpointCard from './EndpointCard.jsx';
 import './ApiTestContent.css';
 
@@ -38,6 +39,10 @@ export default function ApiTestContent() {
       <p className="api-test-content__subtitle">
         Strona deweloperska — testuj endpointy gamifikacji bezpośrednio z przeglądarki.
       </p>
+
+      <div className="api-test-content__nobodgeit-container">
+        <img src={nobodgeitImg} alt="No Bodge It" className="api-test-content__nobodgeit" />
+      </div>
 
       <div className="api-test-content__group-row">
         <label htmlFor="api-test-group-id" className="api-test-content__group-label">

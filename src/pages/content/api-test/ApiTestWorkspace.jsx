@@ -15,6 +15,7 @@ import {
 import { API_TEST_SECTIONS, findSection } from './apiTestSections.js';
 import ApiMethodBadge, { parseHttpMethodLabel } from './ApiMethodBadge.jsx';
 import { useSyncedPayload } from './useSyncedPayload.js';
+import nobodgeitImg from '../../../assets/nobodgeit.png';
 import './ApiTestWorkspace.css';
 
 /** @returns {string} */
@@ -374,6 +375,13 @@ function ApiTestWorkspaceInner() {
               </div>
             ) : (
               <div className="api-test-workspace__form">
+                <div className="api-test-workspace__nobodgeit-container">
+                  <img
+                    src={nobodgeitImg}
+                    alt="No Bodge It"
+                    className="api-test-workspace__nobodgeit"
+                  />
+                </div>
                 {activeSection?.fields?.map((field) => {
                   if (field.type === 'file') {
                     return (
