@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from '../constants/api.constants.js';
 
-const LOGOUT_PATH = '/login/logout';
+const LOGOUT_PATH = '/logout';
 
 /**
  * Wylogowuje użytkownika — czyści ciastka sesji na backendzie.
