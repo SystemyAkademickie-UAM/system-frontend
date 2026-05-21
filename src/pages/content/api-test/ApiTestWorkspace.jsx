@@ -282,7 +282,7 @@ function ApiTestWorkspaceInner() {
   return (
     <div className="api-test-workspace">
       <aside className="api-test-workspace__sidebar" aria-label="API test sections">
-        <p className="api-test-workspace__sidebar-title">Dev API Test</p>
+        <p className="api-test-workspace__sidebar-title">Szwager</p>
         <nav className="api-test-workspace__nav">
           {API_TEST_SECTIONS.map((section) => (
             <button
