@@ -347,6 +347,20 @@ export const SHELL_TEMPLATE_BLUEPRINTS = {
 };
 
 /**
+ * Metadane sekcji z podstronami (nagłówek strony + aria-label SubNav).
+ * Klucz = klucz z SUB_NAV_CONFIG.
+ */
+export const SUB_NAV_META = {
+  'group-main': { title: 'Ekran główny', ariaLabel: 'Nawigacja sekcji grupy' },
+  'group-profile': { title: 'Profil', ariaLabel: 'Nawigacja profilu' },
+  'group-members': { title: 'Użytkownicy', ariaLabel: 'Nawigacja użytkowników' },
+  'group-activities': { title: 'Aktywności', ariaLabel: 'Nawigacja aktywności' },
+  'group-rewards': { title: 'Systemy nagród', ariaLabel: 'Nawigacja systemów nagród' },
+  'group-settings': { title: 'Ustawienia grupy', ariaLabel: 'Nawigacja ustawień grupy' },
+  'group-ranking': { title: 'Ranking', ariaLabel: 'Nawigacja rankingu' },
+};
+
+/**
  * Konfiguracja SubNav dla stron z podstronami.
  * Klucz = id strony głównej, wartość = tablica pozycji SubNav.
  */

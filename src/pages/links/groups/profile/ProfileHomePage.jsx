@@ -1,5 +1,5 @@
-import ProfileContent from '../../../content/profile/ProfileContent.jsx';
+import ProfileHomeContent from '../../../content/group-profile/ProfileHomeContent.jsx';
 
 export default function ProfileHomePage() {
-  return <ProfileContent />;
+  return <ProfileHomeContent />;
 }

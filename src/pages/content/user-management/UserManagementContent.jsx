@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import {
-  Button,
-  ConfirmActions,
-  PageHeader,
-  Pagination,
-  SearchBar,
-  SubNav,
-} from '../../../components/ui/index.js';
+import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
 import './UserManagementContent.css';
 
 const SUB_NAV_ITEMS = [
@@ -17,38 +10,16 @@ const SUB_NAV_ITEMS = [
 
 export default function UserManagementContent() {
   const [activeSection, setActiveSection] = useState('users');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [listPage, setListPage] = useState(1);
 
   return (
-    <section className="user-management" aria-labelledby="user-management-page-title">
-      <PageHeader
-        title="Zarządzanie Użytkownikami"
-        description="Zarządzaj wszystkim wygodnie z jednego miejsca"
-      />
-
-      <SubNav
-        ariaLabel="Sekcje zarządzania"
-        items={SUB_NAV_ITEMS}
-        activeId={activeSection}
-        onSelect={setActiveSection}
-      />
-
-      <div className="user-management__toolbar">
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj kampanii..."
-        />
-        <Button onClick={() => {}}>Kup teraz</Button>
-      </div>
-
-      <Pagination totalPages={10} page={listPage} onPageChange={setListPage} />
-
-      <ConfirmActions
-        onReject={() => {}}
-        onConfirm={() => {}}
-      />
-    </section>
+    <PageUnavailable
+      className="user-management"
+      title="Zarządzanie użytkownikami"
+      description="Zarządzaj dostępem, rolami i przypisaniami użytkowników w organizacji."
+      subNavAriaLabel="Sekcje zarządzania"
+      subNavItems={SUB_NAV_ITEMS}
+      activeSubNavId={activeSection}
+      onSubNavSelect={setActiveSection}
+    />
   );
 }

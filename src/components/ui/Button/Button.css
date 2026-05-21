@@ -9,7 +9,7 @@
   font-family: inherit;
   font-style: normal;
   font-weight: 700;
-  font-size: 0.875rem;
+  font-size: var(--font-size-body);
   line-height: 1.25rem;
   text-decoration: none;
   cursor: pointer;
@@ -43,7 +43,7 @@
 .maq-btn--sm {
   min-height: 2rem;
   padding: 0.35rem 0.85rem;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-body);
 }
 
 .maq-btn--md {

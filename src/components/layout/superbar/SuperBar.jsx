@@ -2,21 +2,24 @@ import { IconMoney, IconStar } from './ShellIcons.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
 import SuperBarStat from './SuperBarStat.jsx';
 import SuperBarUserMenu from './SuperBarUserMenu.jsx';
+import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import './SuperBar.css';
 
 /** Placeholdery — używane gdy brak danych z sesji. */
 const PLACEHOLDER_DISPLAY_NAME = 'Użytkownik';
 const PLACEHOLDER_ROLE_LABEL = 'Student';
-const PLACEHOLDER_LIVES = '3/3';
-const PLACEHOLDER_CURRENCY = '5000';
+const DEFAULT_LIVES_DISPLAY = '0/0';
+const DEFAULT_CURRENCY_DISPLAY = '0';
 
 /**
  * Górny pasek nawigacji (superBar) — statystyki, ustawienia, konto.
  * @param {Object} props
  * @param {string | null} [props.displayName] — nazwa z sesji (null = placeholder)
  * @param {string} [props.roleLabel]
- * @param {string} [props.livesDisplay]
- * @param {string} [props.currencyDisplay]
+ * @param {string} [props.livesDisplay] — docelowo z API grupy
+ * @param {string} [props.currencyDisplay] — docelowo z API grupy
  * @param {() => void} [props.onNavigate]
  * @param {boolean} [props.showMenuButton]
  * @param {boolean} [props.menuExpanded]
@@ -26,15 +29,19 @@ const PLACEHOLDER_CURRENCY = '5000';
 export default function SuperBar({
   displayName,
   roleLabel = PLACEHOLDER_ROLE_LABEL,
-  livesDisplay = PLACEHOLDER_LIVES,
-  currencyDisplay = PLACEHOLDER_CURRENCY,
+  livesDisplay = DEFAULT_LIVES_DISPLAY,
+  currencyDisplay = DEFAULT_CURRENCY_DISPLAY,
   onNavigate,
   showMenuButton = false,
   menuExpanded = false,
   onMenuToggle,
   isLoading = false,
 }) {
+  const { role } = useAppRole();
+  const groupId = useOptionalGroupId();
+  const showStudentGroupStats = role === APP_ROLE.STUDENT && groupId !== null;
   const resolvedDisplayName = displayName || PLACEHOLDER_DISPLAY_NAME;
+
   return (
     <header className="super-bar">
       <div className="super-bar__start">
@@ -51,8 +58,12 @@ export default function SuperBar({
         ) : null}
       </div>
       <div className="super-bar__end">
-        <SuperBarStat icon={<IconStar />} value={livesDisplay} ariaLabel={`Życia: ${livesDisplay}`} />
-        <SuperBarStat icon={<IconMoney />} value={currencyDisplay} ariaLabel={`Waluta: ${currencyDisplay}`} />
+        {showStudentGroupStats ? (
+          <>
+            <SuperBarStat icon={<IconStar />} value={livesDisplay} ariaLabel={`Życia: ${livesDisplay}`} />
+            <SuperBarStat icon={<IconMoney />} value={currencyDisplay} ariaLabel={`Waluta: ${currencyDisplay}`} />
+          </>
+        ) : null}
         <SuperBarSettingsButton onNavigate={onNavigate} />
         <SuperBarUserMenu displayName={resolvedDisplayName} roleLabel={roleLabel} onNavigate={onNavigate} isLoading={isLoading} />
       </div>
