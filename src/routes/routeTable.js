@@ -29,21 +29,25 @@ export const ROUTE_TABLE = [
     pageModule: 'pages/links/login/LoginHubPage.jsx',
     contentModule: 'pages/content/login-hub/LoginHubContent.jsx',
   },
+
+  // ===========================================================================
+  // DEV
+  // ===========================================================================
   {
-    id: 'auth.loginTemp',
-    section: 'auth',
-    pathPattern: '/logintemp',
-    pageTitle: 'Logowanie (tymczasowe)',
-    pageModule: 'pages/links/login/LoginTempPage.jsx',
-    contentModule: 'pages/content/login-temp/LoginTempContent.jsx',
+    id: 'dev.apiTest',
+    section: 'dev',
+    pathPattern: '/dev/api-test',
+    pageTitle: 'Dev API Test',
+    pageModule: 'pages/links/dev/DevApiTestPage.jsx',
+    contentModule: 'pages/content/api-test/ApiTestWorkspace.jsx',
   },
   {
-    id: 'auth.loginNikita',
-    section: 'auth',
-    pathPattern: '/loginnikita',
-    pageTitle: 'Logowanie — Nikita',
-    pageModule: 'pages/links/login/LoginNikitaPage.jsx',
-    contentModule: 'pages/content/login-nikita/LoginNikitaContent.jsx',
+    id: 'dev.apiTestLegacy',
+    section: 'dev',
+    pathPattern: '/api-test',
+    pageTitle: 'API Test (redirect)',
+    pageModule: null,
+    contentModule: null,
   },
 
   // ===========================================================================
@@ -343,18 +347,6 @@ export const ROUTE_TABLE = [
     pageTitle: 'Ranking — ranking aktywności',
     pageModule: 'pages/links/groups/ranking/RankingActivitiesPage.jsx',
     contentModule: 'pages/content/group-ranking-activities/RankingActivitiesContent.jsx',
-  },
-
-  // ===========================================================================
-  // DEV
-  // ===========================================================================
-  {
-    id: 'dev.apiTest',
-    section: 'dev',
-    pathPattern: '/api-test',
-    pageTitle: 'API Test Dashboard',
-    pageModule: 'pages/links/dev/ApiTestPage.jsx',
-    contentModule: 'pages/content/api-test/ApiTestContent.jsx',
   },
 ];
 

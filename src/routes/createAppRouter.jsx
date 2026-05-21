@@ -6,11 +6,9 @@ import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 // Login pages
 import LoginShell from '../components/layout/LoginShell.jsx';
 import LoginHubPage from '../pages/links/login/LoginHubPage.jsx';
-import LoginNikitaPage from '../pages/links/login/LoginNikitaPage.jsx';
-import LoginTempPage from '../pages/links/login/LoginTempPage.jsx';
+import DevApiTestPage from '../pages/links/dev/DevApiTestPage.jsx';
 
 // App-level pages
-import ApiTestPage from '../pages/links/dev/ApiTestPage.jsx';
 import CourseManagementPage from '../pages/links/app/CourseManagementPage.jsx';
 import HelpPage from '../pages/links/app/HelpPage.jsx';
 import OrganizationManagementPage from '../pages/links/app/OrganizationManagementPage.jsx';
@@ -70,7 +68,7 @@ import RankingHomePage from '../pages/links/groups/ranking/RankingHomePage.jsx';
 import RankingGroupPage from '../pages/links/groups/ranking/RankingGroupPage.jsx';
 import RankingActivitiesPage from '../pages/links/groups/ranking/RankingActivitiesPage.jsx';
 
-import { loginPath } from './pathRegistry.js';
+import { devApiTestPath, loginPath } from './pathRegistry.js';
 
 // Helper: wraps element with RouteGuard
 function withGuard(element, { requireAuth = true, allowedRoles, redirectTo } = {}) {
@@ -89,7 +87,7 @@ const ALL_AUTHENTICATED = undefined; // no role restriction, just auth
 /**
  * Drzewo tras — zsynchronizuj z `routeTable.js` i `shellTemplates.config.js`.
  * `pages/links/` — komponenty podpięte pod router; `pages/content/` — treść ekranów.
- * Trasy `login`, `logintemp`, `loginnikita`: layout `LoginShell` (bez paska bocznego).
+ * Trasy `login`, `dev/api-test`: layout `LoginShell` (bez paska bocznego).
  */
 const appRouteTree = [
   {
@@ -104,8 +102,7 @@ const appRouteTree = [
         element: <LoginShell />,
         children: [
           { path: 'login', element: <LoginHubPage /> },
-          { path: 'logintemp', element: <LoginTempPage /> },
-          { path: 'loginnikita', element: <LoginNikitaPage /> },
+          { path: 'dev/api-test', element: <DevApiTestPage /> },
         ],
       },
 
@@ -256,8 +253,8 @@ const appRouteTree = [
             ],
           },
 
-          // Dev pages
-          { path: 'api-test', element: <ApiTestPage /> },
+          // Legacy redirect: /api-test -> /dev/api-test
+          { path: 'api-test', element: <Navigate to={devApiTestPath()} replace /> },
 
           // Catch-all
           { path: '*', element: <Navigate to={loginPath()} replace /> },

@@ -7,7 +7,7 @@ export const SMOKE_TEST_DEFAULT_CURRENCY_ICON = 21;
 /** Default icon ids aligned with backend API examples (docs/api.md). */
 export const SMOKE_TEST_DEFAULT_LIFE_ICON = 13;
 
-/** Mirrors backend JSON `status` when drive is forbidden. */
+/** Mirrors backend JSON `statusCode` when drive is forbidden. */
 export const DRIVE_JSON_STATUS_FORBIDDEN = 403;
 
 /** Mirrors backend `DRIVE_FORBIDDEN_REASON_AUTH_OR_BROWSER`. */
@@ -40,7 +40,7 @@ export const COUNTER_INCREMENT_PATH = '/counter/increment';
 export const LOGIN_PATH = '/login';
 
 /** Clears auth cookies (logout). */
-export const LOGOUT_PATH = '/login/logout';
+export const LOGOUT_PATH = '/logout';
 
 /** Lecturer group creation. */
 export const GROUPS_NEW_PATH = '/groups/new';
@@ -69,3 +69,25 @@ export const SAML_BYPASS_LECTURER_PATH = '/auth/saml/bypass/lecturer';
 export const SAML_BYPASS_SESSION_PATH = '/auth/saml/bypass/session';
 
 export const AUTH_SAML_ME_PATH = '/auth/saml/me';
+
+/** Stage management endpoint. */
+export const STAGES_PATH = '/stages';
+
+/** Activity management endpoint. */
+export const ACTIVITIES_PATH = '/activities';
+
+/**
+ * @param {number|string} groupId - Public group ID
+ * @returns {string}
+ */
+export function getGroupBadgesPath(groupId) {
+  return `/groups/${groupId}/badges`;
+}
+
+/**
+ * @param {number|string} groupId - Public group ID
+ * @returns {string}
+ */
+export function getGroupRanksPath(groupId) {
+  return `/groups/${groupId}/ranks`;
+}
