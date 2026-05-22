@@ -116,6 +116,17 @@
   color: #fff;
 }
 
+.api-test-workspace__nav-group {
+  margin: 0.75rem 0 0.25rem;
+  padding: 0.35rem 0.5rem 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6ee7b7;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .api-test-workspace__main {
   display: flex;
   flex-direction: column;
