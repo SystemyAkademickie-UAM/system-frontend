@@ -4,6 +4,13 @@ import {
   getGroupBadgesPath,
   getGroupEnrollPath,
   getGroupRanksPath,
+  getGroupStudentsPath,
+  getGroupStudentsBulkUpdatePath,
+  getGroupStudentDeletePath,
+  getGroupStudentBadgesPath,
+  getGroupStudentBadgeTogglePath,
+  getGroupStudentProgressPath,
+  getGroupStudentActivityTogglePath,
   GROUPS_NEW_PATH,
   STAGES_PATH,
 } from './mock/mockConstants.js';
@@ -12,7 +19,7 @@ import {
   SMOKE_TEST_DEFAULT_LIFE_ICON,
 } from './mock/mockConstants.js';
 
-/** @typedef {'login' | 'api' | 'multipart'} ApiTestSectionKind */
+/** @typedef {'login' | 'api' | 'multipart' | 'get'} ApiTestSectionKind */
 
 /**
  * @typedef {Object} ApiTestField
@@ -30,6 +37,7 @@ import {
  * @property {string} title
  * @property {ApiTestSectionKind} kind
  * @property {string} [method]
+ * @property {string} [group] - Optional nav group header (renders a separator in sidebar)
  * @property {(values: Record<string, unknown>) => string} [buildPath]
  * @property {boolean} [needsBrowserId]
  * @property {ApiTestField[]} [fields]
@@ -484,6 +492,170 @@ export const API_TEST_SECTIONS = [
         label: 'uniqueStoreItems (optional, one per line)',
         type: 'textarea',
       },
+    ],
+  },
+
+  // ── Student Management: Section A ───────────────────────────────
+
+  {
+    id: 'smGetStudents',
+    label: 'List Students',
+    title: 'GET /groups/:groupId/students',
+    group: 'Student Management',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => getGroupStudentsPath(String(values.groupId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+    ],
+  },
+  {
+    id: 'smBulkUpdate',
+    label: 'Bulk Update',
+    title: 'PATCH /groups/:groupId/students/bulk-update',
+    kind: 'api',
+    method: 'PATCH',
+    buildPath: (values) => getGroupStudentsBulkUpdatePath(String(values.groupId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      studentsJson: JSON.stringify([
+        { enrollmentId: 1, rankId: 2, currency: 150, totalEarned: 200 },
+      ], null, 2),
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      try {
+        payload.students = JSON.parse(String(values.studentsJson ?? '[]'));
+      } catch {
+        payload.students = [];
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      studentsJson: Array.isArray(payload.students)
+        ? JSON.stringify(payload.students, null, 2)
+        : '[]',
+    }),
+    requiredKeysForValues: () => ['students'],
+    fields: [
+      { key: 'groupId', label: 'Group ID (public, URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'studentsJson', label: 'students (JSON array)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'smDeleteStudent',
+    label: 'Delete Student',
+    title: 'DELETE /groups/:groupId/students/:accountId',
+    kind: 'get',
+    method: 'DELETE',
+    buildPath: (values) => getGroupStudentDeletePath(String(values.groupId ?? ''), String(values.accountId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+      accountId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'accountId', label: 'Account ID', type: 'number' },
+    ],
+  },
+
+  // ── Student Management: Section B ───────────────────────────────
+
+  {
+    id: 'smGetBadges',
+    label: 'Student Badges',
+    title: 'GET /groups/:groupId/students/:accountId/badges',
+    group: 'Badges / Progress',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => getGroupStudentBadgesPath(String(values.groupId ?? ''), String(values.accountId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+      accountId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'accountId', label: 'Account ID', type: 'number' },
+    ],
+  },
+  {
+    id: 'smToggleBadge',
+    label: 'Toggle Badge',
+    title: 'POST /groups/:groupId/students/:accountId/badges/:badgeId/toggle',
+    kind: 'get',
+    method: 'POST',
+    buildPath: (values) => getGroupStudentBadgeTogglePath(
+      String(values.groupId ?? ''),
+      String(values.accountId ?? ''),
+      String(values.badgeId ?? ''),
+    ),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+      accountId: '1',
+      badgeId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'accountId', label: 'Account ID', type: 'number' },
+      { key: 'badgeId', label: 'Badge ID', type: 'number' },
+    ],
+  },
+
+  // ── Student Management: Section C ───────────────────────────────
+
+  {
+    id: 'smGetProgress',
+    label: 'Student Progress',
+    title: 'GET /groups/:groupId/students/:accountId/progress',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => getGroupStudentProgressPath(String(values.groupId ?? ''), String(values.accountId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+      accountId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'accountId', label: 'Account ID', type: 'number' },
+    ],
+  },
+  {
+    id: 'smToggleActivity',
+    label: 'Toggle Activity',
+    title: 'POST /groups/:groupId/students/:accountId/activities/:activityId/toggle',
+    kind: 'get',
+    method: 'POST',
+    buildPath: (values) => getGroupStudentActivityTogglePath(
+      String(values.groupId ?? ''),
+      String(values.accountId ?? ''),
+      String(values.activityId ?? ''),
+    ),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+      accountId: '1',
+      activityId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'accountId', label: 'Account ID', type: 'number' },
+      { key: 'activityId', label: 'Activity ID', type: 'number' },
     ],
   },
 ];

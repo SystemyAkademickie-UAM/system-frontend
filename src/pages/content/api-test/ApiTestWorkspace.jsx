@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
@@ -263,12 +263,17 @@ function ApiTestWorkspaceInner() {
         return;
       }
       headers['Content-Type'] = 'application/json';
-      const response = await fetch(url, {
-        method: activeSection.method ?? 'POST',
+      const httpMethod = activeSection.method ?? 'POST';
+      const isBodyless = activeSection.kind === 'get' || httpMethod === 'GET';
+      const fetchOptions = {
+        method: httpMethod,
         credentials: 'include',
         headers,
-        body: JSON.stringify(synced.payload),
-      });
+      };
+      if (!isBodyless) {
+        fetchOptions.body = JSON.stringify(synced.payload);
+      }
+      const response = await fetch(url, fetchOptions);
       const text = await response.text();
       let formatted = text;
       try {
@@ -291,18 +296,22 @@ function ApiTestWorkspaceInner() {
         <p className="api-test-workspace__sidebar-title">Szwager</p>
         <nav className="api-test-workspace__nav">
           {API_TEST_SECTIONS.map((section) => (
-            <button
-              key={section.id}
-              type="button"
-              className={
-                section.id === activeSectionId
-                  ? 'api-test-workspace__nav-btn api-test-workspace__nav-btn--active'
-                  : 'api-test-workspace__nav-btn'
-              }
-              onClick={() => setActiveSectionId(section.id)}
-            >
-              {section.label}
-            </button>
+            <React.Fragment key={section.id}>
+              {section.group ? (
+                <p className="api-test-workspace__nav-group">{section.group}</p>
+              ) : null}
+              <button
+                type="button"
+                className={
+                  section.id === activeSectionId
+                    ? 'api-test-workspace__nav-btn api-test-workspace__nav-btn--active'
+                    : 'api-test-workspace__nav-btn'
+                }
+                onClick={() => setActiveSectionId(section.id)}
+              >
+                {section.label}
+              </button>
+            </React.Fragment>
           ))}
         </nav>
         <div className="api-test-workspace__sidebar-footer">
@@ -503,6 +512,12 @@ function ApiTestWorkspaceInner() {
                   }}
                   spellCheck={false}
                 />
+              ) : activeSection?.kind === 'get' ? (
+                <pre className="api-test-workspace__response">
+                  {activeSection.buildPath
+                    ? `${activeSection.method ?? 'GET'} ${getApiBaseUrl()}${activeSection.buildPath(synced.values)}\n\nNo request body (parameters in URL path only).\nCookie auth is sent automatically via credentials: 'include'.`
+                    : '—'}
+                </pre>
               ) : (
                 <>
                   <textarea
