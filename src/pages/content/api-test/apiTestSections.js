@@ -382,6 +382,7 @@ export const API_TEST_SECTIONS = [
       educationalDescription: 'Przyznawana za ukończenie pierwszego etapu kursu.',
       storyDescription: 'Bohater stawia pierwsze kroki w Akademii Magii...',
       rewardAmount: 50,
+      rarity: 'common',
     }),
     buildPayload: (values) => {
       /** @type {Record<string, unknown>} */
@@ -400,6 +401,9 @@ export const API_TEST_SECTIONS = [
       if (values.rewardAmount !== '' && values.rewardAmount !== null && values.rewardAmount !== undefined) {
         payload.rewardAmount = Number(values.rewardAmount);
       }
+      if (typeof values.rarity === 'string' && values.rarity.trim() !== '') {
+        payload.rarity = values.rarity.trim();
+      }
       return payload;
     },
     parsePayload: (payload) => ({
@@ -410,6 +414,7 @@ export const API_TEST_SECTIONS = [
         typeof payload.educationalDescription === 'string' ? payload.educationalDescription : '',
       storyDescription: typeof payload.storyDescription === 'string' ? payload.storyDescription : '',
       rewardAmount: payload.rewardAmount ?? '',
+      rarity: typeof payload.rarity === 'string' ? payload.rarity : 'common',
     }),
     requiredKeysForValues: () => ['name', 'icon', 'educationalDescription'],
     fields: [
@@ -420,6 +425,17 @@ export const API_TEST_SECTIONS = [
       { key: 'educationalDescription', label: 'educationalDescription', type: 'textarea' },
       { key: 'storyDescription', label: 'storyDescription (optional)', type: 'textarea' },
       { key: 'rewardAmount', label: 'rewardAmount (optional)', type: 'number' },
+      {
+        key: 'rarity',
+        label: 'rarity',
+        type: 'select',
+        options: [
+          { value: 'common', label: 'common (zwykła)' },
+          { value: 'uncommon', label: 'uncommon (niezwykła)' },
+          { value: 'rare', label: 'rare (rzadka)' },
+          { value: 'epic', label: 'epic (epicka)' },
+        ],
+      },
     ],
   },
   {
