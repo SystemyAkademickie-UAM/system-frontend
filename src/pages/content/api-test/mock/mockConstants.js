@@ -44,6 +44,9 @@ export const LOGOUT_PATH = '/logout';
 /** Lecturer group creation. */
 export const GROUPS_NEW_PATH = '/groups/new';
 
+/** Student join group by code. */
+export const GROUPS_INVITE_PATH = '/groups/invite';
+
 /**
  * Student enrollment in a group.
  * @param {number|string} groupId - The public group ID
