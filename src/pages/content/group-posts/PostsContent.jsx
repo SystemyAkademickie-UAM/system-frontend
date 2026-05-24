@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 
+import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
+import deleteicon from '../../../../public/assets/icons/trash-01-svgrepo-com.svg';
 
 export default function App() {
 
@@ -349,11 +351,11 @@ export default function App() {
                   <div onChange = {(event) => onGroupdescriptionchange(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '18px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', paddingLeft: '1%', resize: 'none'}} placeholder = 'Temat wpisu'>{post.title}</div>
                   <div onChange = {(event) => onGroupdescriptionchange(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '20vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', resize: 'none'}} placeholder = 'Tresc wpisu'>{post.text}</div>
                 </div>
-                <div onClick={() => onEditpostclick(post.id, 0)} style={{backgroundColor: 'rgb(255, 0, 255)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '1%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img style={{width: '50%', height: '50%'}}/>
+                <div onClick={() => onEditpostclick(post.id, 0)} style={{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '1%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                  <img src = {editicon} style={{width: '50%', height: '50%'}}/>
                 </div>
-                <div onClick = {() => onDeletepostclick(post.id)} style = {{backgroundColor: 'rgb(255, 0, 255)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '2.5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img style = {{width: '50%', height: '50%'}}/>
+                <div onClick = {() => onDeletepostclick(post.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '2.5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                  <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
                 </div>
               </div>
 
@@ -362,14 +364,14 @@ export default function App() {
 
               <div key={'post' + post.id} style={{backgroundColor: 'rgb(26, 26, 42)', width: '98%', position: 'relative', left: '1%', display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '16px'}}>
                 <div style = {{backgroundColor: 'rgb(40, 40, 52)', width: '87.5%', height: '25vh', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start'}}>
-                  <input onChange={(event) => onPostChange(post.id, 'title', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '18px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', resize: 'none'}} value = {post.title} placeholder = 'Temat wpisu'></input>
-                  <textarea onChange={(event) => onPostChange(post.id, 'text', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '20vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', paddingTop: '0.5%', resize: 'none'}} value = {post.text} placeholder = 'Tresc wpisu'></textarea>
+                  <input  onChange={(event) => onPostChange(post.id, 'title', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '18px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', resize: 'none'}} value = {post.title} placeholder = 'Temat wpisu' onFocus={(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur={(event) => (event.target.style.border = '')}></input>
+                  <textarea onChange={(event) => onPostChange(post.id, 'text', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '20vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', paddingTop: '0.5%', resize: 'none'}} value = {post.text} placeholder = 'Tresc wpisu' onFocus={(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur={(event) => (event.target.style.border = '')}></textarea>
                 </div>
-                  <div onClick={() => onEditpostclick(post.id, post.editmode == 2 ? 1 : 0)} style={{backgroundColor: 'rgb(255, 0, 255)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '1%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img style={{width: '50%', height: '50%'}}/>
+                  <div onClick={() => onEditpostclick(post.id, post.editmode == 2 ? 1 : 0)} style={{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '1%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                    <img src = {editicon} style={{width: '50%', height: '50%'}}/>
                   </div>
-                <div onClick = {() => onDeletepostclick(post.id)} style = {{backgroundColor: 'rgb(255, 0, 255)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '2.5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img style = {{width: '50%', height: '50%'}}/>
+                <div onClick = {() => onDeletepostclick(post.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '2.5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                  <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
                 </div>
               </div>
             )
