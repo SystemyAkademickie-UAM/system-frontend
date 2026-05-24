@@ -44,9 +44,6 @@ export const LOGOUT_PATH = '/logout';
 /** Lecturer group creation. */
 export const GROUPS_NEW_PATH = '/groups/new';
 
-/** Lecturer generate group code. */
-export const GROUPS_GENERATE_CODE_PATH = '/groups/generate-code';
-
 /** Student join group by code. */
 export const GROUPS_INVITE_PATH = '/groups/invite';
 
