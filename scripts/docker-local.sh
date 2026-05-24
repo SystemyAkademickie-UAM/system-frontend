@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 IMAGE="${IMAGE_NAME:-system-frontend:local}"
-BUILD_ARGS=()
+BUILD_ARGS=(--build-arg "NODE_ENV=${NODE_ENV:-development}")
 if [[ -n "${VITE_API_BASE_URL:-}" ]]; then
   BUILD_ARGS+=(--build-arg "VITE_API_BASE_URL=${VITE_API_BASE_URL}")
 fi

@@ -3,13 +3,10 @@ import {
   DRIVE_PATH,
   getGroupBadgesPath,
   getGroupEnrollPath,
+  getGroupInvitePath,
   getGroupRanksPath,
-  GROUPS_NEW_PATH,
   GROUPS_GENERATE_CODE_PATH,
-  GROUPS_INVITE_PATH,
-  STAGES_PATH,
-} from './mock/mockConstants.js';
-import {
+  GROUPS_NEW_PATH,
   SMOKE_TEST_DEFAULT_CURRENCY_ICON,
   SMOKE_TEST_DEFAULT_LIFE_ICON,
 } from './mock/mockConstants.js';
@@ -40,6 +37,7 @@ import {
  * @property {(payload: Record<string, unknown>) => Record<string, unknown>} [parsePayload]
  * @property {(values: Record<string, unknown>) => string[]} [requiredKeysForValues]
  * @property {(values: Record<string, unknown>, payload: Record<string, unknown>) => string[]} [allowEmptyKeysForValues]
+ * @property {string} [hint]
  */
 
 /** @type {ApiTestSection[]} */
@@ -116,10 +114,12 @@ export const API_TEST_SECTIONS = [
   },
   {
     id: 'enroll',
-    label: 'Force enroll',
-    title: 'POST /groups/:id/enroll (Student)',
+    label: 'Group enroll',
+    title: 'POST /groups/:groupId/enroll (Student)',
     kind: 'api',
     method: 'POST',
+    hint:
+      'Student identity comes from auth token / session — there is no userId field. Log in as a student, then send groupId in the URL path.',
     buildPath: (values) => getGroupEnrollPath(String(values.enrollGroupId ?? '')),
     needsBrowserId: true,
     defaultValues: () => ({
@@ -144,68 +144,79 @@ export const API_TEST_SECTIONS = [
     ],
   },
   {
-    id: 'generateCode',
-    label: 'Generate Code',
-    title: 'POST /groups/generate-code (Lecturer)',
+    id: 'enrollByCode',
+    label: 'Enroll by code',
+    title: 'GET /groups/:groupId/invite (Student)',
     kind: 'api',
-    method: 'POST',
-    buildPath: () => GROUPS_GENERATE_CODE_PATH,
+    method: 'GET',
+    hint:
+      'Requires public groupId in the URL and a matching 6-character entry code. Same response shape as Group enroll: enrollmentId (-1 = not authorized, -2 = invalid group/code, -3 = DB error), groupId on success.',
+    buildPath: (values) =>
+      getGroupInvitePath(
+        String(values.inviteGroupId ?? '').trim(),
+        String(values.code ?? '').trim(),
+        String(values.auth ?? ''),
+      ),
     needsBrowserId: true,
     defaultValues: () => ({
       auth: '',
-      type: 'group',
+      inviteGroupId: '100001',
+      code: 'ABCDEF',
     }),
     buildPayload: (values) => {
-      const payload = {};
+      /** @type {Record<string, unknown>} */
+      const payload = {
+        groupId: Number(values.inviteGroupId),
+        code: String(values.code ?? '').trim(),
+      };
       if (typeof values.auth === 'string' && values.auth.trim() !== '') {
         payload.auth = values.auth.trim();
-      }
-      if (typeof values.type === 'string' && values.type.trim() !== '') {
-        payload.type = values.type.trim();
       }
       return payload;
     },
     parsePayload: (payload) => ({
       auth: typeof payload.auth === 'string' ? payload.auth : '',
-      type: typeof payload.type === 'string' ? payload.type : '',
+      inviteGroupId: payload.groupId ?? '',
+      code: typeof payload.code === 'string' ? payload.code : '',
     }),
-    requiredKeysForValues: () => [],
+    requiredKeysForValues: () => ['groupId', 'code'],
     fields: [
-      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
-      { key: 'type', label: 'type (optional, default: "group")', type: 'text' },
+      { key: 'inviteGroupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'code', label: 'code (query, 6 chars)', type: 'text' },
+      { key: 'auth', label: 'auth (optional query / cookie)', type: 'textarea' },
     ],
   },
   {
-    id: 'joinByCode',
-    label: 'Join by Code',
-    title: 'GET /groups/invite (Student)',
+    id: 'generateCode',
+    label: 'Generate code',
+    title: 'POST /groups/generate-code (Lecturer)',
     kind: 'api',
-    method: 'GET',
-    buildPath: (values) => {
-      const code = encodeURIComponent(String(values.code ?? '').trim());
-      let path = `${GROUPS_INVITE_PATH}?code=${code}`;
-      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
-        path += `&auth=${encodeURIComponent(values.auth.trim())}`;
-      }
-      return path;
-    },
+    method: 'POST',
+    hint:
+      'Lecturer only. Generates a 6-character code and saves it to education.groups.entry_code for the given group. Response groupId: -1 = not authorized, -2 = group not found, -3 = DB error.',
+    buildPath: () => GROUPS_GENERATE_CODE_PATH,
     needsBrowserId: true,
     defaultValues: () => ({
       auth: '',
-      code: '',
+      groupId: '100001',
     }),
     buildPayload: (values) => {
-      // GET requests shouldn't have a body, but the API test workspace syncs payload for JSON view.
-      // So we return an empty object.
-      return {};
+      /** @type {Record<string, unknown>} */
+      const payload = {
+        groupId: Number(values.groupId),
+      };
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      return payload;
     },
     parsePayload: (payload) => ({
-      auth: '',
-      code: '',
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      groupId: payload.groupId ?? '',
     }),
-    requiredKeysForValues: () => [],
+    requiredKeysForValues: () => ['groupId'],
     fields: [
-      { key: 'code', label: 'Invite Code (e.g. ABCDEF)', type: 'text' },
+      { key: 'groupId', label: 'groupId (public)', type: 'number' },
       { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
     ],
   },

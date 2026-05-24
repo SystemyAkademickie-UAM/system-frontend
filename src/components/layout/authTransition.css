@@ -1,0 +1,93 @@
+.auth-shell__transition-viewport {
+  position: relative;
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  overflow: hidden;
+}
+
+.auth-shell__transition-pane {
+  grid-area: 1 / 1;
+  width: 100%;
+  max-width: var(--auth-card-max-width);
+  display: flex;
+  justify-content: center;
+}
+
+.auth-shell__transition-pane--settled {
+  position: relative;
+}
+
+.auth-shell__transition-pane--exit {
+  z-index: 1;
+  pointer-events: none;
+  animation: auth-card-exit-forward var(--auth-card-transition-exit-ms) ease forwards;
+}
+
+.auth-shell__transition-pane--enter {
+  z-index: 1;
+  animation: auth-card-enter-forward var(--auth-card-transition-enter-ms) ease forwards;
+}
+
+.auth-shell__transition-pane--exit.auth-shell__transition-pane--back {
+  animation-name: auth-card-exit-back;
+}
+
+.auth-shell__transition-pane--enter.auth-shell__transition-pane--back {
+  animation-name: auth-card-enter-back;
+}
+
+@keyframes auth-card-exit-forward {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--auth-card-transition-slide)));
+  }
+}
+
+@keyframes auth-card-enter-forward {
+  from {
+    opacity: 0;
+    transform: translateX(var(--auth-card-transition-slide));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes auth-card-exit-back {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(var(--auth-card-transition-slide));
+  }
+}
+
+@keyframes auth-card-enter-back {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-1 * var(--auth-card-transition-slide)));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-shell__transition-pane--exit,
+  .auth-shell__transition-pane--enter {
+    animation: none;
+  }
+}
