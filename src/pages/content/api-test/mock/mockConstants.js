@@ -148,6 +148,9 @@ export function getGroupStudentActivityTogglePath(groupId, accountId, activityId
 
 // ── Profile Settings endpoints ──────────────────────────────────────
 
+/** GET /profile - Get current user profile */
+export const PROFILE_PATH = '/profile';
+
 /** GET /profile/avatars - List of available avatars */
 export const PROFILE_AVATARS_PATH = '/profile/avatars';
 

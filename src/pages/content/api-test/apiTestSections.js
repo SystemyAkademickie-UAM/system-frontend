@@ -13,6 +13,7 @@ import {
   getGroupStudentActivityTogglePath,
   GROUPS_NEW_PATH,
   STAGES_PATH,
+  PROFILE_PATH,
   PROFILE_AVATARS_PATH,
   PROFILE_SETTINGS_PATH,
 } from './mock/mockConstants.js';
@@ -664,10 +665,25 @@ export const API_TEST_SECTIONS = [
   // ── Profile Settings ────────────────────────────────────────────
 
   {
+    id: 'profileGetMe',
+    label: 'Get Profile',
+    title: 'GET /profile',
+    group: 'Profile Settings',
+    kind: 'get',
+    method: 'GET',
+    buildPath: () => PROFILE_PATH,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+    }),
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
     id: 'profileGetAvatars',
     label: 'Get Avatars',
     title: 'GET /profile/avatars',
-    group: 'Profile Settings',
     kind: 'get',
     method: 'GET',
     buildPath: () => PROFILE_AVATARS_PATH,
