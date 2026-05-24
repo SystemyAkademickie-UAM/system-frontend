@@ -1,11 +1,13 @@
 import PageAvailable from '../../../components/page/PageAvailable.jsx';
-import Posts from './PostsContent.jsx';
+import PostsContent from './PostsContent.jsx';
 
 export default function PostsHomeContent() {
   return (
-    <>
-
-      <Posts/>
-    </>
+    <PageAvailable
+      title="Wpisy"
+      description="Twórz i edytuj fabularne wpisy oraz ogłoszenia widoczne dla uczestników grupy."
+    >
+      <PostsContent />
+    </PageAvailable>
   );
 }

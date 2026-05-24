@@ -593,7 +593,7 @@ export default function App() {
   return (
     <div className="profile-content">
       <div className="profile-content__inner">
-        <div style = {{backgroundColor: 'rgb(0, 0, 0)', width: '100%', height: '100%', position: 'absolute', top: '0%', left: '0%'}}>
+        <div style = {{width: '100%', height: '100%', position: 'absolute', top: '0%', left: '0%'}}>
           <div style = {{width: '98%', height: '7.5%', position: 'absolute', top: '3%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '42px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Zarzadzanie aktywnosciami i etapami</div>
           <div style = {{width: '98%', height: '5%', position: 'absolute', top: '10.5%', left: '1%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>Panel pozwalajacy na tworzenie nowych etapow oraz przypisywanie im aktywnosci.</span></div>
         </div>

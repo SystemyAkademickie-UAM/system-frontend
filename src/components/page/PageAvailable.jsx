@@ -15,7 +15,7 @@ import './PageUnavailable.css';
  * @param {string} [props.className]
  * @param {import('react').ReactNode} [props.children]
  */
-export default function PageUnavailable({
+export default function PageAvailable({
   title,
   description,
 
@@ -25,6 +25,7 @@ export default function PageUnavailable({
   onSubNavSelect,
   className = '',
 
+  children,
 }) {
   return (
     <section className={['page-unavailable', className].filter(Boolean).join(' ')} aria-label={title}>
@@ -39,6 +40,8 @@ export default function PageUnavailable({
           className="page-unavailable__sub-nav"
         />
       )}
+
+      {children}
     </section>
   );
 }
