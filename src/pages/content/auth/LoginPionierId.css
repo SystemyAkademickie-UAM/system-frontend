@@ -1,0 +1,52 @@
+.login-pionierid {
+  box-sizing: border-box;
+  width: var(--auth-card-max-width);
+  max-width: calc(100% - 2rem);
+  padding: 1px;
+  gap: 0;
+}
+
+.login-pionierid__body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: var(--auth-card-body-padding-top) var(--auth-card-body-padding-x)
+    var(--auth-card-body-padding-bottom);
+}
+
+.login-pionierid__logo {
+  width: var(--auth-content-max-width);
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.login-pionierid__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  margin-top: var(--auth-card-logo-to-content-gap);
+}
+
+.login-pionierid__btn {
+  width: 100%;
+  margin-top: 0;
+}
+
+.login-pionierid__email-link {
+  margin-top: clamp(1.5rem, 2.5vw, 48px);
+}
+
+@media (max-width: 640px) {
+  .login-pionierid__body {
+    padding: 2rem 20px 1.75rem;
+  }
+
+  .login-pionierid__actions {
+    margin-top: 2.5rem;
+  }
+}
