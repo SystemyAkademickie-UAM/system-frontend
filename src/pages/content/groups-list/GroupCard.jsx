@@ -1,20 +1,21 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
-import { groupMainPath } from '../../../routes/pathRegistry.js';
+import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
 import './GroupCard.css';
 
 /**
  * @param {Object} props
- * @param {import('../groupsList.mock.js').GroupListItem} props.group
+ * @param {import('./groupsList.api.js').GroupListItem} props.group
  */
 export default function GroupCard({ group }) {
   const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
   const showFallback = bannerFailed || !group.bannerUrl;
+  const targetPath = group.isMine ? groupMainPath(group.id) : groupRootPath(group.id);
 
   return (
     <article className="group-card">
-      <Link className="group-card__link" to={groupMainPath(group.id)}>
+      <Link className="group-card__link" to={targetPath}>
         <div className="group-card__banner-wrap">
           {showFallback ? (
             <div className="group-card__banner-fallback" aria-hidden="true">

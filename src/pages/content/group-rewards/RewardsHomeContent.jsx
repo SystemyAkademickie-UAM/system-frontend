@@ -8,24 +8,13 @@ import {
 } from '../../../components/ui/index.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
-import { generateRewardsStudents } from './shared/rewardsStudentsMock.js';
+import { useGroupRanks } from './useGroupRanks.js';
 import RewardsRankTableRow from './shared/RewardsRankTableRow.jsx';
 import './shared/rewardsShared.css';
 import './shared/rewardsTablePreview.css';
-import {
-  createEmptyRank,
-  createInitialRanksCatalog,
-  reindexRanks,
-} from './ranksCatalogMock.js';
 import RankAssignModal from './modals/RankAssignModal.jsx';
 import RankDeleteModal from './modals/RankDeleteModal.jsx';
 import RankFormModal from './modals/RankFormModal.jsx';
-
-const INITIAL_RANKS = createInitialRanksCatalog();
-const INITIAL_STUDENTS = generateRewardsStudents(
-  [],
-  INITIAL_RANKS.map((rank) => rank.id),
-);
 
 const RANK_COLUMNS = [
   {
@@ -71,9 +60,9 @@ const RANK_COLUMNS = [
   },
   {
     key: 'costAmount',
-    label: 'Koszt',
+    label: 'Wymagane pkt',
     sort: 'number',
-    width: '100px',
+    width: '120px',
     render: (rank) => (
       <span className="rewards-table__reward">
         {rank.costAmount}
@@ -104,7 +93,7 @@ const RANK_COLUMNS = [
     hiddenBelow: 768,
     render: (rank) => (
       <span className="rewards-table__cell-text">
-        {rank.shopItems.join(', ')}
+        {rank.shopItems?.join(', ') || '—'}
       </span>
     ),
   },
@@ -112,10 +101,20 @@ const RANK_COLUMNS = [
 
 export default function RewardsHomeContent() {
   const nav = useGroupSubNav('group-rewards');
-  const [ranks, setRanks] = useState(INITIAL_RANKS);
-  const [students, setStudents] = useState(INITIAL_STUDENTS);
+  const {
+    ranks,
+    students,
+    isLoading,
+    error,
+    handleCreate,
+    handleUpdate,
+    handleDelete,
+    handleAssign,
+  } = useGroupRanks();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
   const openModal = useCallback((type, rank = null) => {
     setActiveModal({ type, rank });
@@ -125,45 +124,44 @@ export default function RewardsHomeContent() {
     setActiveModal(null);
   }, []);
 
-  const handleCreateConfirm = useCallback((values) => {
-    setRanks((prev) => reindexRanks([
-      ...prev,
-      { ...createEmptyRank(prev.length + 1), ...values },
-    ]));
-  }, []);
+  const handleCreateConfirm = useCallback(async (values) => {
+    setModalLoading(true);
+    const result = await handleCreate(values);
+    setModalLoading(false);
+    if (result.ok) {
+      closeModal();
+    }
+  }, [handleCreate, closeModal]);
 
-  const handleEditConfirm = useCallback((values) => {
+  const handleEditConfirm = useCallback(async (values) => {
     if (!activeModal?.rank) return;
+    setModalLoading(true);
+    const result = await handleUpdate(activeModal.rank.id, values);
+    setModalLoading(false);
+    if (result.ok) {
+      closeModal();
+    }
+  }, [activeModal, handleUpdate, closeModal]);
 
-    setRanks((prev) => prev.map((rank) => (
-      rank.id === activeModal.rank.id ? { ...rank, ...values } : rank
-    )));
-  }, [activeModal]);
-
-  const handleDeleteConfirm = useCallback(() => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.rank) return;
-    const rankId = activeModal.rank.id;
-    const fallbackRankId = ranks.find((rank) => rank.id !== rankId)?.id ?? null;
+    setModalLoading(true);
+    const result = await handleDelete(activeModal.rank.id);
+    setModalLoading(false);
+    if (result.ok) {
+      closeModal();
+    }
+  }, [activeModal, handleDelete, closeModal]);
 
-    setRanks((prev) => reindexRanks(prev.filter((rank) => rank.id !== rankId)));
-    setStudents((prev) => prev.map((student) => (
-      student.rankId === rankId
-        ? { ...student, rankId: fallbackRankId }
-        : student
-    )));
-  }, [activeModal, ranks]);
-
-  const handleAssignConfirm = useCallback((selectedStudentIds) => {
+  const handleAssignConfirm = useCallback(async (selectedStudentIds) => {
     if (!activeModal?.rank) return;
-    const rankId = activeModal.rank.id;
-    const selectedSet = new Set(selectedStudentIds);
-
-    setStudents((prev) => prev.map((student) => (
-      selectedSet.has(student.id)
-        ? { ...student, rankId }
-        : student
-    )));
-  }, [activeModal]);
+    setModalLoading(true);
+    const result = await handleAssign(activeModal.rank.id, selectedStudentIds);
+    setModalLoading(false);
+    if (result.ok) {
+      closeModal();
+    }
+  }, [activeModal, handleAssign, closeModal]);
 
   const rowActions = useMemo(() => ({
     onDelete: (rank) => openModal('delete', rank),
@@ -185,6 +183,18 @@ export default function RewardsHomeContent() {
   }), [openModal]);
 
   const modalRank = activeModal?.rank ?? null;
+
+  if (error) {
+    return (
+      <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
+        <PageHeader
+          title={nav.sectionTitle}
+          description="Zarządzaj rangami kursu — twórz, edytuj i przypisuj je studentom."
+        />
+        <p className="rewards-page__error" role="alert">{error}</p>
+      </section>
+    );
+  }
 
   return (
     <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
@@ -219,38 +229,46 @@ export default function RewardsHomeContent() {
         />
       </div>
 
-      <DataTable
-        columns={RANK_COLUMNS}
-        data={ranks}
-        rowKey="id"
-        tiebreakerKey="position"
-        itemsPerPage={10}
-        paginationAriaLabel="Nawigacja stron listy rang"
-        className="rewards-table rewards-table--ranks"
-        search={{
-          external: true,
-          value: searchQuery,
-          filter: (rank, query) => (
-            rank.name.toLowerCase().includes(query)
-            || rank.iconFile.toLowerCase().includes(query)
-            || rank.storyDescription.toLowerCase().includes(query)
-            || rank.shopItems.some((item) => item.toLowerCase().includes(query))
-          ),
-        }}
-        rowActions={rowActions}
-        renderRow={RewardsRankTableRow}
-      />
+      {isLoading ? (
+        <p className="rewards-page__loading">Ładowanie rang…</p>
+      ) : ranks.length === 0 ? (
+        <p className="rewards-page__empty">Brak rang w tej grupie. Kliknij "Dodaj rangę" aby utworzyć pierwszą.</p>
+      ) : (
+        <DataTable
+          columns={RANK_COLUMNS}
+          data={ranks}
+          rowKey="id"
+          tiebreakerKey="position"
+          itemsPerPage={10}
+          paginationAriaLabel="Nawigacja stron listy rang"
+          className="rewards-table rewards-table--ranks"
+          search={{
+            external: true,
+            value: searchQuery,
+            filter: (rank, query) => (
+              rank.name.toLowerCase().includes(query)
+              || rank.iconFile.toLowerCase().includes(query)
+              || rank.storyDescription.toLowerCase().includes(query)
+              || (rank.shopItems || []).some((item) => item.toLowerCase().includes(query))
+            ),
+          }}
+          rowActions={rowActions}
+          renderRow={RewardsRankTableRow}
+        />
+      )}
 
       <RankFormModal
         isOpen={activeModal?.type === 'create'}
         onClose={closeModal}
         onConfirm={handleCreateConfirm}
+        isLoading={modalLoading}
       />
       <RankFormModal
         isOpen={activeModal?.type === 'edit'}
         rank={modalRank}
         onClose={closeModal}
         onConfirm={handleEditConfirm}
+        isLoading={modalLoading}
       />
       <RankAssignModal
         isOpen={activeModal?.type === 'assign'}
@@ -258,12 +276,14 @@ export default function RewardsHomeContent() {
         students={students}
         onClose={closeModal}
         onConfirm={handleAssignConfirm}
+        isLoading={modalLoading}
       />
       <RankDeleteModal
         isOpen={activeModal?.type === 'delete'}
         rank={modalRank}
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
+        isLoading={modalLoading}
       />
     </section>
   );

@@ -1,6 +1,6 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
-import { HomeRedirect, RouteGuard } from '../components/guards/index.js';
+import { HomeRedirect, RouteGuard, GroupAccessGuard } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 
 // Login/Auth pages
@@ -152,9 +152,13 @@ const appRouteTree = [
               {
                 path: ':groupId',
                 children: [
-                  // Group root — join page (student only; later: redirect joined users to main)
-                  { index: true, element: withGuard(<GroupJoinPage />, { allowedRoles: STUDENT_ONLY }) },
+                  // Landing — join code / brak dostępu (bez nawigacji grupowej w sidebarze)
+                  { index: true, element: withGuard(<GroupJoinPage />) },
 
+                  // Podstrony grupy — wymagają dostępu (właściciel lub zapisany student)
+                  {
+                    element: withGuard(<GroupAccessGuard />),
+                    children: [
                   // ----------------------------------------
                   // MAIN (Ekran główny) - student + lecturer
                   // ----------------------------------------
@@ -264,6 +268,8 @@ const appRouteTree = [
                       { index: true, element: <RankingHomePage /> },
                       { path: 'group', element: <RankingGroupPage /> },
                       { path: 'activities', element: <RankingActivitiesPage /> },
+                    ],
+                  },
                     ],
                   },
                 ],

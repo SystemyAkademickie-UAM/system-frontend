@@ -1,9 +1,13 @@
 import {
   ACTIVITIES_PATH,
   DRIVE_PATH,
+  getGroupAccessCodePath,
+  getGroupBadgeByIdPath,
   getGroupBadgesPath,
   getGroupEnrollPath,
   getGroupInvitePath,
+  getGroupPreviewPath,
+  getGroupRankByIdPath,
   getGroupRanksPath,
   getGroupStudentsPath,
   getGroupStudentsBulkUpdatePath,
@@ -12,8 +16,10 @@ import {
   getGroupStudentBadgeTogglePath,
   getGroupStudentProgressPath,
   getGroupStudentActivityTogglePath,
+  GROUPS_CATALOG_PATH,
   GROUPS_GENERATE_CODE_PATH,
   GROUPS_NEW_PATH,
+  GROUPS_PATH,
   STAGES_PATH,
   PROFILE_PATH,
   PROFILE_AVATARS_PATH,
@@ -64,6 +70,7 @@ export const API_TEST_SECTIONS = [
     id: 'newGroup',
     label: 'New Group',
     title: 'POST /groups/new',
+    group: 'Groups',
     kind: 'api',
     method: 'POST',
     buildPath: () => GROUPS_NEW_PATH,
@@ -125,8 +132,115 @@ export const API_TEST_SECTIONS = [
     ],
   },
   {
+    id: 'getUserGroups',
+    label: 'List My Groups',
+    title: 'GET /groups',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => {
+      const auth = String(values.auth ?? '').trim();
+      return auth ? `${GROUPS_PATH}?auth=${encodeURIComponent(auth)}` : GROUPS_PATH;
+    },
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+    }),
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'getGroupsCatalog',
+    label: 'Groups Catalog',
+    title: 'GET /groups/catalog',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => {
+      const auth = String(values.auth ?? '').trim();
+      return auth ? `${GROUPS_CATALOG_PATH}?auth=${encodeURIComponent(auth)}` : GROUPS_CATALOG_PATH;
+    },
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+    }),
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'getGroupPreview',
+    label: 'Group Preview',
+    title: 'GET /groups/:groupId/preview',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) =>
+      getGroupPreviewPath(String(values.groupId ?? ''), String(values.auth ?? '')),
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'generateCode',
+    label: 'Generate Code',
+    title: 'POST /groups/generate-code (Lecturer)',
+    kind: 'api',
+    method: 'POST',
+    hint:
+      'Lecturer only. Generates a 6-character code and saves it to education.groups.entry_code for the given group. Response groupId: -1 = not authorized, -2 = group not found, -3 = DB error.',
+    buildPath: () => GROUPS_GENERATE_CODE_PATH,
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {
+        groupId: Number(values.groupId),
+      };
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      groupId: payload.groupId ?? '',
+    }),
+    requiredKeysForValues: () => ['groupId'],
+    fields: [
+      { key: 'groupId', label: 'groupId (public)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'getAccessCode',
+    label: 'Get Access Code',
+    title: 'GET /groups/:groupId/access-code (Lecturer)',
+    kind: 'get',
+    method: 'GET',
+    hint: 'Lecturer only. Returns the current entry code stored for the group (empty string if none yet).',
+    buildPath: (values) =>
+      getGroupAccessCodePath(String(values.groupId ?? ''), String(values.auth ?? '')),
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'groupId (public)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
     id: 'enroll',
-    label: 'Group enroll',
+    label: 'Group Enroll',
     title: 'POST /groups/:groupId/enroll (Student)',
     kind: 'api',
     method: 'POST',
@@ -199,43 +313,10 @@ export const API_TEST_SECTIONS = [
     ],
   },
   {
-    id: 'generateCode',
-    label: 'Generate code',
-    title: 'POST /groups/generate-code (Lecturer)',
-    kind: 'api',
-    method: 'POST',
-    hint:
-      'Lecturer only. Generates a 6-character code and saves it to education.groups.entry_code for the given group. Response groupId: -1 = not authorized, -2 = group not found, -3 = DB error.',
-    buildPath: () => GROUPS_GENERATE_CODE_PATH,
-    needsBrowserId: true,
-    defaultValues: () => ({
-      auth: '',
-      groupId: '100001',
-    }),
-    buildPayload: (values) => {
-      /** @type {Record<string, unknown>} */
-      const payload = {
-        groupId: Number(values.groupId),
-      };
-      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
-        payload.auth = values.auth.trim();
-      }
-      return payload;
-    },
-    parsePayload: (payload) => ({
-      auth: typeof payload.auth === 'string' ? payload.auth : '',
-      groupId: payload.groupId ?? '',
-    }),
-    requiredKeysForValues: () => ['groupId'],
-    fields: [
-      { key: 'groupId', label: 'groupId (public)', type: 'number' },
-      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
-    ],
-  },
-  {
     id: 'drive',
     label: 'Drive',
     title: 'POST /drive (multipart)',
+    group: 'Course content',
     kind: 'multipart',
     method: 'POST',
     buildPath: () => DRIVE_PATH,
@@ -447,9 +528,31 @@ export const API_TEST_SECTIONS = [
     ],
   },
   {
+    id: 'listBadges',
+    label: 'List Badges',
+    title: 'GET /groups/:groupId/badges',
+    group: 'Gamification',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => {
+      const path = getGroupBadgesPath(String(values.groupId ?? ''));
+      const auth = String(values.auth ?? '').trim();
+      return auth ? `${path}?auth=${encodeURIComponent(auth)}` : path;
+    },
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
     id: 'badges',
-    label: 'Badges',
-    title: 'POST /groups/:id/badges',
+    label: 'Create Badge',
+    title: 'POST /groups/:groupId/badges',
     kind: 'api',
     method: 'POST',
     buildPath: (values) => getGroupBadgesPath(String(values.groupId ?? '')),
@@ -519,9 +622,93 @@ export const API_TEST_SECTIONS = [
     ],
   },
   {
+    id: 'updateBadge',
+    label: 'Update Badge',
+    title: 'PATCH /groups/:groupId/badges/:badgeId',
+    kind: 'api',
+    method: 'PATCH',
+    buildPath: (values) =>
+      getGroupBadgeByIdPath(String(values.groupId ?? ''), String(values.badgeId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      badgeId: '1',
+      name: 'Updated badge name',
+      rewardAmount: 75,
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      const name = String(values.name ?? '').trim();
+      if (name !== '') {
+        payload.name = name;
+      }
+      if (values.rewardAmount !== '' && values.rewardAmount !== null && values.rewardAmount !== undefined) {
+        payload.rewardAmount = Number(values.rewardAmount);
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      name: typeof payload.name === 'string' ? payload.name : '',
+      rewardAmount: payload.rewardAmount ?? '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'Group ID (public, URL path)', type: 'number' },
+      { key: 'badgeId', label: 'Badge ID (URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'name', label: 'name (optional)', type: 'text' },
+      { key: 'rewardAmount', label: 'rewardAmount (optional)', type: 'number' },
+    ],
+  },
+  {
+    id: 'deleteBadge',
+    label: 'Delete Badge',
+    title: 'DELETE /groups/:groupId/badges/:badgeId',
+    kind: 'get',
+    method: 'DELETE',
+    buildPath: (values) =>
+      getGroupBadgeByIdPath(String(values.groupId ?? ''), String(values.badgeId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+      badgeId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'badgeId', label: 'Badge ID', type: 'number' },
+    ],
+  },
+  {
+    id: 'listRanks',
+    label: 'List Ranks',
+    title: 'GET /groups/:groupId/ranks',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => {
+      const path = getGroupRanksPath(String(values.groupId ?? ''));
+      const auth = String(values.auth ?? '').trim();
+      return auth ? `${path}?auth=${encodeURIComponent(auth)}` : path;
+    },
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
     id: 'ranks',
-    label: 'Ranks',
-    title: 'POST /groups/:id/ranks',
+    label: 'Create Rank',
+    title: 'POST /groups/:groupId/ranks',
     kind: 'api',
     method: 'POST',
     buildPath: (values) => getGroupRanksPath(String(values.groupId ?? '')),
@@ -593,8 +780,71 @@ export const API_TEST_SECTIONS = [
       },
     ],
   },
+  {
+    id: 'updateRank',
+    label: 'Update Rank',
+    title: 'PATCH /groups/:groupId/ranks/:rankId',
+    kind: 'api',
+    method: 'PATCH',
+    buildPath: (values) =>
+      getGroupRankByIdPath(String(values.groupId ?? ''), String(values.rankId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      rankId: '1',
+      name: 'Updated rank name',
+      requiredPoints: 150,
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      const name = String(values.name ?? '').trim();
+      if (name !== '') {
+        payload.name = name;
+      }
+      if (values.requiredPoints !== '' && values.requiredPoints !== null && values.requiredPoints !== undefined) {
+        payload.requiredPoints = Number(values.requiredPoints);
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      name: typeof payload.name === 'string' ? payload.name : '',
+      requiredPoints: payload.requiredPoints ?? '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'Group ID (public, URL path)', type: 'number' },
+      { key: 'rankId', label: 'Rank ID (URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'name', label: 'name (optional)', type: 'text' },
+      { key: 'requiredPoints', label: 'requiredPoints (optional)', type: 'number' },
+    ],
+  },
+  {
+    id: 'deleteRank',
+    label: 'Delete Rank',
+    title: 'DELETE /groups/:groupId/ranks/:rankId',
+    kind: 'get',
+    method: 'DELETE',
+    buildPath: (values) =>
+      getGroupRankByIdPath(String(values.groupId ?? ''), String(values.rankId ?? '')),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      groupId: '100001',
+      rankId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'rankId', label: 'Rank ID', type: 'number' },
+    ],
+  },
 
-  // ── Student Management: Section A ───────────────────────────────
+  // ── Student Management ──────────────────────────────────────────
 
   {
     id: 'smGetStudents',
@@ -671,13 +921,10 @@ export const API_TEST_SECTIONS = [
     ],
   },
 
-  // ── Student Management: Section B ───────────────────────────────
-
   {
     id: 'smGetBadges',
     label: 'Student Badges',
     title: 'GET /groups/:groupId/students/:accountId/badges',
-    group: 'Badges / Progress',
     kind: 'get',
     method: 'GET',
     buildPath: (values) => getGroupStudentBadgesPath(String(values.groupId ?? ''), String(values.accountId ?? '')),
@@ -714,8 +961,6 @@ export const API_TEST_SECTIONS = [
       { key: 'badgeId', label: 'Badge ID', type: 'number' },
     ],
   },
-
-  // ── Student Management: Section C ───────────────────────────────
 
   {
     id: 'smGetProgress',

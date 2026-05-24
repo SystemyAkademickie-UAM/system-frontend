@@ -1,33 +1,150 @@
-import { MOCK_GROUPS_LIST } from './groupsList.mock.js';
+import { getJson, postJson } from '../../../services/api-client.js';
 
 /**
- * Pobiera listę grup zalogowanego użytkownika.
- * Docelowo: GET /groups (lub endpoint z backendu).
- *
- * @returns {Promise<import('./groupsList.mock.js').GroupListItem[]>}
+ * @typedef {Object} GroupListItem
+ * @property {string} id - Public group ID (as string for routing)
+ * @property {string} storyName - Display name (groupName from backend)
+ * @property {string} subject - Subject name
+ * @property {string} lecturer - Lecturer name(s)
+ * @property {string | null} bannerUrl - Banner image URL (or null)
+ * @property {string | null} description - Group description
+ * @property {boolean} [isMine] - Whether the user has access to this group
  */
-export async function fetchUserGroups() {
-  // TODO: podpiąć backend — np. getJson('/groups') z api-client
-  return MOCK_GROUPS_LIST;
+
+/**
+ * Converts backend response to frontend format.
+ * @param {object} backendGroup
+ * @param {{ isMine?: boolean }} [options]
+ * @returns {GroupListItem}
+ */
+function mapBackendGroup(backendGroup, options = {}) {
+  return {
+    id: String(backendGroup.id),
+    storyName: backendGroup.groupName || backendGroup.name || '',
+    subject: backendGroup.subjectName || backendGroup.groupName || '',
+    lecturer: backendGroup.lecturers || '',
+    bannerUrl: backendGroup.bannerId || null,
+    description: backendGroup.description || null,
+    isMine: options.isMine,
+  };
 }
 
 /**
- * Pobiera szczegóły grupy po identyfikatorze.
- * Docelowo: GET /groups/:groupId
+ * Pobiera listę grup użytkownika (tylko przypisane).
+ * GET /groups
+ *
+ * @returns {Promise<GroupListItem[]>}
+ */
+export async function fetchUserGroups() {
+  const result = await getJson('/groups', { includeBrowserId: true });
+  if (!result.ok) {
+    console.error('Failed to fetch user groups:', result.status, result.data);
+    return [];
+  }
+  const data = /** @type {{ groups?: unknown[] }} */ (result.data);
+  const groups = Array.isArray(data.groups) ? data.groups : [];
+  return groups.map((group) => mapBackendGroup(group, { isMine: true }));
+}
+
+/**
+ * Pobiera katalog wszystkich grup podzielony na przypisane i pozostałe.
+ * GET /groups/catalog
+ *
+ * @returns {Promise<{ myGroups: GroupListItem[], otherGroups: GroupListItem[] }>}
+ */
+export async function fetchGroupsCatalog() {
+  const result = await getJson('/groups/catalog', { includeBrowserId: true });
+  if (!result.ok) {
+    console.error('Failed to fetch groups catalog:', result.status, result.data);
+    return { myGroups: [], otherGroups: [] };
+  }
+  const data = /** @type {{ myGroups?: unknown[], otherGroups?: unknown[] }} */ (result.data);
+  const myGroups = Array.isArray(data.myGroups)
+    ? data.myGroups.map((group) => mapBackendGroup(group, { isMine: true }))
+    : [];
+  const otherGroups = Array.isArray(data.otherGroups)
+    ? data.otherGroups.map((group) => mapBackendGroup(group, { isMine: false }))
+    : [];
+  return { myGroups, otherGroups };
+}
+
+/**
+ * @typedef {Object} GroupPreviewResult
+ * @property {GroupListItem | null} group
+ * @property {boolean} hasAccess
+ * @property {boolean} isOwner
+ * @property {boolean} isEnrolled
+ */
+
+/**
+ * Pobiera metadane grupy i status dostępu użytkownika.
+ * GET /groups/:groupId/preview
  *
  * @param {string} groupId
- * @returns {Promise<import('./groupsList.mock.js').GroupListItem | null>}
+ * @returns {Promise<GroupPreviewResult>}
+ */
+export async function fetchGroupPreview(groupId) {
+  const result = await getJson(`/groups/${groupId}/preview`, { includeBrowserId: true });
+  if (!result.ok) {
+    console.error('Failed to fetch group preview:', result.status, result.data);
+    return { group: null, hasAccess: false, isOwner: false, isEnrolled: false };
+  }
+  const data = /** @type {{ group?: object | null, hasAccess?: boolean, isOwner?: boolean, isEnrolled?: boolean }} */ (
+    result.data
+  );
+  return {
+    group: data.group ? mapBackendGroup(data.group) : null,
+    hasAccess: Boolean(data.hasAccess),
+    isOwner: Boolean(data.isOwner),
+    isEnrolled: Boolean(data.isEnrolled),
+  };
+}
+
+/**
+ * Pobiera szczegóły grupy po identyfikatorze (z podglądu dostępu).
+ *
+ * @param {string} groupId
+ * @returns {Promise<GroupListItem | null>}
  */
 export async function fetchGroupById(groupId) {
-  // TODO: podpiąć backend — np. getJson(`/groups/${groupId}`)
-  return MOCK_GROUPS_LIST.find((group) => group.id === groupId) ?? null;
+  const preview = await fetchGroupPreview(groupId);
+  return preview.group;
+}
+
+/**
+ * Tworzy nową grupę.
+ * POST /groups/new
+ *
+ * @param {object} groupData
+ * @param {string} groupData.name
+ * @param {string} [groupData.description]
+ * @param {string} [groupData.currency]
+ * @param {number} [groupData.currencyIcon]
+ * @param {string} [groupData.lives]
+ * @param {number} [groupData.livesIcon]
+ * @returns {Promise<{ ok: boolean, groupId?: number, error?: string }>}
+ */
+export async function createGroup(groupData) {
+  const result = await postJson('/groups/new', { group: groupData }, { includeBrowserId: true });
+  if (!result.ok) {
+    return { ok: false, error: 'Nie udało się utworzyć grupy' };
+  }
+  const data = /** @type {{ group?: number }} */ (result.data);
+  if (data.group === -1) {
+    return { ok: false, error: 'Brak uprawnień do tworzenia grup' };
+  }
+  if (data.group === -2) {
+    return { ok: false, error: 'Nie udało się utworzyć grupy' };
+  }
+  return { ok: true, groupId: data.group };
 }
 
 /**
  * Filtruje grupy po zapytaniu (nazwa fabularna, przedmiot, prowadzący).
  *
- * @param {import('./groupsList.mock.js').GroupListItem[]} groups
+ * @param {GroupListItem[]} groups
  * @param {string} query
+ * @returns {GroupListItem[]}
  */
 export function filterGroups(groups, query) {
   const normalized = query.trim().toLowerCase();

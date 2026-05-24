@@ -1,8 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
-import { formatShopItems, parseShopItems } from '../ranksCatalogMock.js';
 import { validateWholeNumberInput } from '../shared/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
+
+function formatShopItems(items) {
+  if (!items || !Array.isArray(items)) return '';
+  return items.join('\n');
+}
+
+function parseShopItems(text) {
+  if (!text || typeof text !== 'string') return [];
+  return text.split('\n').map((s) => s.trim()).filter(Boolean);
+}
 
 const EMPTY_FORM = {
   name: '',

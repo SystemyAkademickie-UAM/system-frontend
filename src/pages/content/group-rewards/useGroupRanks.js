@@ -1,0 +1,198 @@
+import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchGroupRanks, createRank, updateRank, deleteRank } from '../../../services/ranks.api.js';
+import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/students.api.js';
+
+/**
+ * @typedef {Object} RankData
+ * @property {string} id - Unique rank ID (as string for UI)
+ * @property {number} dbId - Database ID
+ * @property {number} position
+ * @property {string} name
+ * @property {string} icon
+ * @property {string} iconFile - Icon display name
+ * @property {number} costAmount - Required points
+ * @property {string} costEmoji
+ * @property {string} storyDescription
+ * @property {string[]} shopItems
+ * @property {number} storeDiscount
+ */
+
+/**
+ * Maps backend rank to frontend format.
+ * @param {object} rank
+ * @param {number} index
+ * @returns {RankData}
+ */
+function mapRank(rank, index) {
+  return {
+    id: `rank-${rank.id}`,
+    dbId: rank.id,
+    position: index + 1,
+    name: rank.name || 'Nieznana ranga',
+    icon: rank.icon || '⭐',
+    iconFile: rank.icon || '⭐',
+    costAmount: rank.requiredPoints || 0,
+    costEmoji: '🥕',
+    storyDescription: rank.storyDescription || '',
+    shopItems: rank.uniqueStoreItems || [],
+    storeDiscount: rank.storeDiscount || 0,
+  };
+}
+
+/**
+ * Hook for managing group ranks with real API.
+ */
+export function useGroupRanks() {
+  const { groupId } = useParams();
+  const [ranks, setRanks] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const loadData = useCallback(async () => {
+    if (!groupId) {
+      setError('Brak ID grupy');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const [ranksData, studentsData] = await Promise.all([
+        fetchGroupRanks(groupId),
+        fetchGroupStudents(groupId),
+      ]);
+
+      setRanks(ranksData.map(mapRank));
+      setStudents(studentsData.map((s) => ({
+        id: `student-${s.accountId}`,
+        accountId: s.accountId,
+        enrollmentId: s.enrollmentId,
+        name: `${s.name} ${s.surname}`.trim() || s.nickname,
+        rankId: s.rankId ? `rank-${s.rankId}` : null,
+        dbRankId: s.rankId,
+      })));
+    } catch (err) {
+      console.error('Failed to load ranks:', err);
+      setError('Nie udało się pobrać rang');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [groupId]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleCreate = useCallback(async (values) => {
+    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+
+    const result = await createRank(groupId, {
+      name: values.name,
+      icon: values.iconFile || '⭐',
+      requiredPoints: values.costAmount || 0,
+      storyDescription: values.storyDescription || '',
+      storeDiscount: values.storeDiscount || 0,
+      uniqueStoreItems: values.shopItems || [],
+    });
+
+    if (result.ok && result.rank) {
+      setRanks((prev) => {
+        const newRank = mapRank(result.rank, prev.length);
+        return [...prev, newRank];
+      });
+    }
+
+    return result;
+  }, [groupId]);
+
+  const handleUpdate = useCallback(async (rankId, values) => {
+    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+
+    const rank = ranks.find((r) => r.id === rankId);
+    if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
+
+    const result = await updateRank(groupId, rank.dbId, {
+      name: values.name,
+      icon: values.iconFile || values.icon,
+      requiredPoints: values.costAmount,
+      storyDescription: values.storyDescription,
+      storeDiscount: values.storeDiscount,
+      uniqueStoreItems: values.shopItems,
+    });
+
+    if (result.ok && result.rank) {
+      setRanks((prev) => prev.map((r) =>
+        r.id === rankId ? { ...r, ...mapRank(result.rank, r.position - 1) } : r
+      ));
+    }
+
+    return result;
+  }, [groupId, ranks]);
+
+  const handleDelete = useCallback(async (rankId) => {
+    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+
+    const rank = ranks.find((r) => r.id === rankId);
+    if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
+
+    const result = await deleteRank(groupId, rank.dbId);
+
+    if (result.ok) {
+      setRanks((prev) => {
+        const filtered = prev.filter((r) => r.id !== rankId);
+        return filtered.map((r, i) => ({ ...r, position: i + 1 }));
+      });
+      setStudents((prev) => prev.map((s) =>
+        s.rankId === rankId ? { ...s, rankId: null, dbRankId: null } : s
+      ));
+    }
+
+    return result;
+  }, [groupId, ranks]);
+
+  const handleAssign = useCallback(async (rankId, selectedStudentIds) => {
+    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+
+    const rank = ranks.find((r) => r.id === rankId);
+    if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
+
+    const selectedSet = new Set(selectedStudentIds);
+    const studentsToUpdate = students
+      .filter((s) => selectedSet.has(s.id))
+      .map((s) => ({
+        enrollmentId: s.enrollmentId,
+        rankId: rank.dbId,
+      }));
+
+    if (studentsToUpdate.length === 0) {
+      return { ok: true };
+    }
+
+    const result = await bulkUpdateStudents(groupId, studentsToUpdate);
+
+    if (result.ok) {
+      setStudents((prev) => prev.map((s) =>
+        selectedSet.has(s.id) ? { ...s, rankId, dbRankId: rank.dbId } : s
+      ));
+    }
+
+    return result;
+  }, [groupId, ranks, students]);
+
+  return {
+    groupId,
+    ranks,
+    students,
+    isLoading,
+    error,
+    refetch: loadData,
+    handleCreate,
+    handleUpdate,
+    handleDelete,
+    handleAssign,
+  };
+}

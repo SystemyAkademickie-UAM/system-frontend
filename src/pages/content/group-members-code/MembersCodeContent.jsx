@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, PageHeader, SubNav } from '../../../components/ui/index.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
-import {
-  generateGroupAccessCode,
-  getGroupAccessCode,
-  saveGroupAccessCode,
-} from '../group-shared/groupAccessCodeStorage.js';
+import { fetchAccessCode, generateAccessCode } from '../../../services/enrollment.api.js';
 import '../../../components/page/PageUnavailable.css';
 import './MembersCodeContent.css';
 
@@ -32,19 +28,58 @@ export default function MembersCodeContent() {
   const nav = useGroupSubNav('group-members');
   const [accessCode, setAccessCode] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const existingCode = getGroupAccessCode(groupId);
-    if (existingCode) {
-      setAccessCode(existingCode);
+    if (!groupId) {
+      setIsLoading(false);
+      return;
     }
+
+    let cancelled = false;
+
+    async function loadExistingCode() {
+      setIsLoading(true);
+      setError('');
+
+      const result = await fetchAccessCode(groupId);
+
+      if (cancelled) return;
+
+      setIsLoading(false);
+
+      if (result.ok && result.code) {
+        setAccessCode(result.code);
+      } else if (!result.ok && result.error) {
+        setError(result.error);
+      }
+    }
+
+    loadExistingCode();
+
+    return () => {
+      cancelled = true;
+    };
   }, [groupId]);
 
-  const handleGenerate = () => {
-    const nextCode = generateGroupAccessCode();
-    saveGroupAccessCode(groupId, nextCode);
-    setAccessCode(nextCode);
+  const handleGenerate = async () => {
+    if (!groupId) return;
+
+    setIsGenerating(true);
+    setError('');
     setCopyMessage('');
+
+    const result = await generateAccessCode(groupId);
+
+    setIsGenerating(false);
+
+    if (result.ok && result.code) {
+      setAccessCode(result.code);
+    } else {
+      setError(result.error || 'Nie udało się wygenerować kodu.');
+    }
   };
 
   const handleCopy = async () => {
@@ -72,26 +107,49 @@ export default function MembersCodeContent() {
       />
 
       <div className="members-code__panel">
-        {accessCode ? (
+        {isLoading ? (
+          <p className="members-code__hint">Ładowanie kodu dostępu…</p>
+        ) : accessCode ? (
           <div className="members-code__result">
             <div className="members-code__code-wrap">
               <span className="members-code__code-label">Aktywny kod dostępu</span>
               <code className="members-code__code">{accessCode}</code>
             </div>
-            <Button type="button" variant="secondary" onClick={handleCopy}>
-              Kopiuj kod
-            </Button>
+            <div className="members-code__actions">
+              <Button type="button" variant="secondary" onClick={handleCopy}>
+                Kopiuj kod
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                onClick={handleGenerate}
+                disabled={isGenerating}
+              >
+                {isGenerating ? 'Generowanie...' : 'Generuj nowy kod'}
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="members-code__empty">
             <p className="members-code__hint">
               Wygeneruj kod dostępu, który studenci wpiszą na stronie dołączenia do grupy.
             </p>
-            <Button type="button" variant="primary" onClick={handleGenerate}>
-              Generuj kod dostępu
+            <Button
+              type="button"
+              variant="primary"
+              onClick={handleGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? 'Generowanie...' : 'Generuj kod dostępu'}
             </Button>
           </div>
         )}
+
+        {error ? (
+          <p className="members-code__feedback members-code__feedback--error" role="alert">
+            {error}
+          </p>
+        ) : null}
 
         {copyMessage ? (
           <p className="members-code__feedback" role="status">{copyMessage}</p>
