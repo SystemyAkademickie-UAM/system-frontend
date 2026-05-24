@@ -53,6 +53,28 @@ export function getGroupEnrollPath(groupId) {
   return `/groups/${groupId}/enroll`;
 }
 
+/**
+ * @param {number|string} groupId - Public group ID
+ * @param {string} code - 6-character entry code
+ * @param {string} [auth] - Optional plaintext bearer (also via cookie)
+ * @returns {string}
+ */
+export function getGroupInvitePath(groupId, code, auth) {
+  const params = new URLSearchParams();
+  params.set('code', code);
+  const trimmedAuth = typeof auth === 'string' ? auth.trim() : '';
+  if (trimmedAuth !== '') {
+    params.set('auth', trimmedAuth);
+  }
+  return `/groups/${groupId}/invite?${params.toString()}`;
+}
+
+/** Backend requires exactly 6 characters for group entry codes. */
+export const GROUP_INVITE_CODE_LENGTH = 6;
+
+/** Random 6-character group entry code generation. */
+export const GROUPS_GENERATE_CODE_PATH = '/groups/generate-code';
+
 /** Multipart drive upload / remove (lecturer). */
 export const DRIVE_PATH = '/drive';
 
