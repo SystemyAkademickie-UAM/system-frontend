@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Pagination from '../Pagination/Pagination.jsx';
 import SearchBar from '../SearchBar/SearchBar.jsx';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
@@ -48,12 +48,59 @@ function SortableHeader({ label, sortKey, sortRules, onSort, className = '' }) {
 
 function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState(null);
+  const menuButtonRef = useRef(null);
+  const menuRef = useRef(null);
   const { onDelete, deleteAriaLabel, menuItems = [] } = rowActions ?? {};
 
   const setMenuState = (nextOpen) => {
     setMenuOpen(nextOpen);
     onMenuOpenChange?.(nextOpen);
+    if (!nextOpen) {
+      setMenuStyle(null);
+    }
   };
+
+  const updateMenuPosition = useCallback(() => {
+    const buttonEl = menuButtonRef.current;
+    const menuEl = menuRef.current;
+    if (!buttonEl || !menuEl) {
+      return;
+    }
+
+    const rect = buttonEl.getBoundingClientRect();
+    const menuHeight = menuEl.offsetHeight;
+    const menuWidth = menuEl.offsetWidth;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUpward = spaceBelow < menuHeight + 8 && rect.top > menuHeight + 8;
+    const left = Math.min(
+      Math.max(8, rect.right - menuWidth),
+      window.innerWidth - menuWidth - 8,
+    );
+
+    setMenuStyle({
+      position: 'fixed',
+      top: openUpward ? rect.top - menuHeight - 4 : rect.bottom + 4,
+      left,
+      zIndex: 1000,
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!menuOpen) {
+      return undefined;
+    }
+
+    updateMenuPosition();
+
+    window.addEventListener('resize', updateMenuPosition);
+    window.addEventListener('scroll', updateMenuPosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updateMenuPosition);
+      window.removeEventListener('scroll', updateMenuPosition, true);
+    };
+  }, [menuOpen, menuItems.length, updateMenuPosition]);
 
   const handleMenuToggle = () => setMenuState(!menuOpen);
   const handleMenuClose = () => setMenuState(false);
@@ -82,6 +129,7 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
       {menuItems.length > 0 ? (
         <div className="data-table__menu-wrap">
           <button
+            ref={menuButtonRef}
             type="button"
             className="data-table__action-btn data-table__action-btn--more"
             aria-label="Więcej opcji"
@@ -97,7 +145,12 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
                 onClick={handleMenuClose}
                 aria-hidden="true"
               />
-              <div className="data-table__menu" role="menu">
+              <div
+                ref={menuRef}
+                className="data-table__menu data-table__menu--fixed"
+                role="menu"
+                style={menuStyle ?? { visibility: 'hidden' }}
+              >
                 {menuItems.map((item) => (
                   <button
                     key={item.id}
@@ -125,9 +178,16 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
   );
 }
 
-function DefaultDataTableRow({ row, columns, rowActions }) {
+function DefaultDataTableRow({ row, columns, rowActions, rowActionsPosition = 'end' }) {
+  const actionsCell = rowActions ? (
+    <td className="data-table__cell data-table__cell--actions">
+      <DataTableRowActions row={row} rowActions={rowActions} />
+    </td>
+  ) : null;
+
   return (
     <tr className="data-table__row">
+      {rowActionsPosition === 'start' ? actionsCell : null}
       {columns.map((column) => (
         <td
           key={column.key}
@@ -142,11 +202,7 @@ function DefaultDataTableRow({ row, columns, rowActions }) {
           {column.render ? column.render(row) : String(row[column.key] ?? '')}
         </td>
       ))}
-      {rowActions ? (
-        <td className="data-table__cell data-table__cell--actions">
-          <DataTableRowActions row={row} rowActions={rowActions} />
-        </td>
-      ) : null}
+      {rowActionsPosition === 'end' ? actionsCell : null}
     </tr>
   );
 }
@@ -163,6 +219,7 @@ export default function DataTable({
   itemsPerPage = 10,
   tiebreakerKey,
   rowActions,
+  rowActionsPosition = 'end',
   paginationAriaLabel = 'Nawigacja stron tabeli',
   stickyHeader = true,
   className = '',
@@ -303,6 +360,14 @@ export default function DataTable({
 
   const hasRowActions = Boolean(rowActions?.onDelete || rowActions?.menuItems?.length);
   const RowComponent = renderRow ?? DefaultDataTableRow;
+  const actionsCol = hasRowActions ? (
+    <col className="data-table__col data-table__col--actions" style={{ width: '100px' }} />
+  ) : null;
+  const actionsHeader = hasRowActions ? (
+    <th className="data-table__th data-table__th--actions" scope="col">
+      <span className="visually-hidden">Akcje</span>
+    </th>
+  ) : null;
 
   return (
     <div className={['data-table-wrap', className].filter(Boolean).join(' ')}>
@@ -331,6 +396,7 @@ export default function DataTable({
             <div ref={headerScrollRef} className="data-table-header-scroll">
               <table className="data-table data-table--header">
                 <colgroup>
+                  {rowActionsPosition === 'start' ? actionsCol : null}
                   {columns.map((column) => (
                     <col
                       key={column.key}
@@ -344,12 +410,11 @@ export default function DataTable({
                       style={column.width ? { width: column.width } : undefined}
                     />
                   ))}
-                  {hasRowActions ? (
-                    <col className="data-table__col data-table__col--actions" style={{ width: '100px' }} />
-                  ) : null}
+                  {rowActionsPosition === 'end' ? actionsCol : null}
                 </colgroup>
                 <thead className="data-table__head">
                   <tr>
+                    {rowActionsPosition === 'start' ? actionsHeader : null}
                     {columns.map((column) => (
                       column.sort !== false ? (
                         <SortableHeader
@@ -381,11 +446,7 @@ export default function DataTable({
                         </th>
                       )
                     ))}
-                    {hasRowActions ? (
-                      <th className="data-table__th data-table__th--actions" scope="col">
-                        <span className="visually-hidden">Akcje</span>
-                      </th>
-                    ) : null}
+                    {rowActionsPosition === 'end' ? actionsHeader : null}
                   </tr>
                 </thead>
               </table>
@@ -399,6 +460,7 @@ export default function DataTable({
           >
             <table className="data-table data-table--body">
               <colgroup>
+                {rowActionsPosition === 'start' ? actionsCol : null}
                 {columns.map((column) => (
                   <col
                     key={column.key}
@@ -412,9 +474,7 @@ export default function DataTable({
                     style={column.width ? { width: column.width } : undefined}
                   />
                 ))}
-                {hasRowActions ? (
-                  <col className="data-table__col data-table__col--actions" style={{ width: '100px' }} />
-                ) : null}
+                {rowActionsPosition === 'end' ? actionsCol : null}
               </colgroup>
               <tbody className="data-table__body">
                 {paginatedRows.map((row) => (
@@ -423,6 +483,7 @@ export default function DataTable({
                     row={row}
                     columns={columns}
                     rowActions={rowActions}
+                    rowActionsPosition={rowActionsPosition}
                     getRowKey={getRowKey}
                   />
                 ))}

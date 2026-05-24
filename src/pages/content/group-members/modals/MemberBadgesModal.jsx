@@ -1,10 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BadgeMini, BADGE_RARITY, BADGE_RARITY_LABELS, Modal, SearchBar } from '../../../../components/ui/index.js';
-import {
-  ALL_BADGES,
-  BADGE_SORT_OPTIONS,
-  sortBadges,
-} from '../membersMockData.js';
+import { fetchStudentBadges, toggleStudentBadge } from '../../../../services/students.api.js';
 import './memberModals.css';
 
 const RARITY_FILTERS = [
@@ -21,11 +17,28 @@ const EARNED_FILTERS = [
   { id: 'unearned', label: 'Niezdobyte' },
 ];
 
+const BADGE_SORT_OPTIONS = [
+  { id: 'earned-first', label: 'Zdobyte → niezdobyte' },
+  { id: 'unearned-first', label: 'Niezdobyte → zdobyte' },
+  { id: 'name-asc', label: 'Nazwa A–Z' },
+  { id: 'name-desc', label: 'Nazwa Z–A' },
+  { id: 'rarity-asc', label: 'Rzadkość rosnąco' },
+  { id: 'rarity-desc', label: 'Rzadkość malejąco' },
+];
+
+const BADGE_RARITY_ORDER = {
+  [BADGE_RARITY.common]: 0,
+  [BADGE_RARITY.uncommon]: 1,
+  [BADGE_RARITY.rare]: 2,
+  [BADGE_RARITY.epic]: 3,
+};
+
 function filterBadges(badges, { searchQuery, rarityFilter, earnedFilter, selectedIds }) {
   const query = searchQuery.trim().toLowerCase();
+  const selectedSet = new Set(selectedIds);
 
   return badges.filter((badge) => {
-    const isEarned = selectedIds.includes(badge.id);
+    const isEarned = selectedSet.has(badge.id);
 
     if (rarityFilter !== 'all' && badge.rarity !== rarityFilter) {
       return false;
@@ -47,9 +60,49 @@ function filterBadges(badges, { searchQuery, rarityFilter, earnedFilter, selecte
   });
 }
 
+function sortBadges(badges, sortBy, selectedIds = []) {
+  const selectedSet = new Set(selectedIds);
+  const sorted = [...badges];
+
+  switch (sortBy) {
+    case 'earned-first':
+      return sorted.sort((a, b) => {
+        const aEarned = selectedSet.has(a.id);
+        const bEarned = selectedSet.has(b.id);
+        if (aEarned === bEarned) return a.name.localeCompare(b.name, 'pl');
+        return aEarned ? -1 : 1;
+      });
+    case 'unearned-first':
+      return sorted.sort((a, b) => {
+        const aEarned = selectedSet.has(a.id);
+        const bEarned = selectedSet.has(b.id);
+        if (aEarned === bEarned) return a.name.localeCompare(b.name, 'pl');
+        return aEarned ? 1 : -1;
+      });
+    case 'name-asc':
+      return sorted.sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+    case 'name-desc':
+      return sorted.sort((a, b) => b.name.localeCompare(a.name, 'pl'));
+    case 'rarity-asc':
+      return sorted.sort((a, b) => {
+        const diff = (BADGE_RARITY_ORDER[a.rarity] ?? 0) - (BADGE_RARITY_ORDER[b.rarity] ?? 0);
+        return diff !== 0 ? diff : a.name.localeCompare(b.name, 'pl');
+      });
+    case 'rarity-desc':
+      return sorted.sort((a, b) => {
+        const diff = (BADGE_RARITY_ORDER[b.rarity] ?? 0) - (BADGE_RARITY_ORDER[a.rarity] ?? 0);
+        return diff !== 0 ? diff : a.name.localeCompare(b.name, 'pl');
+      });
+    default:
+      return sorted;
+  }
+}
+
 export default function MemberBadgesModal({
   isOpen,
   member,
+  groupId,
+  badges = [],
   onClose,
   onConfirm,
 }) {
@@ -58,19 +111,64 @@ export default function MemberBadgesModal({
   const [earnedFilter, setEarnedFilter] = useState('all');
   const [sortBy, setSortBy] = useState('rarity-asc');
   const [selectedIds, setSelectedIds] = useState([]);
+  const [studentBadges, setStudentBadges] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!isOpen || !member) return;
+    if (!isOpen || !member || !groupId) return;
 
     setSearchQuery('');
     setRarityFilter('all');
     setEarnedFilter('all');
     setSortBy('rarity-asc');
-    setSelectedIds([...(member.earnedBadgeIds ?? [])]);
-  }, [isOpen, member]);
+
+    async function loadStudentBadges() {
+      setIsLoading(true);
+      try {
+        const data = await fetchStudentBadges(groupId, member.accountId);
+        setStudentBadges(data);
+        const earnedIds = data.filter((b) => b.isEarned).map((b) => b.id);
+        setSelectedIds(earnedIds);
+      } catch (err) {
+        console.error('Failed to load student badges:', err);
+        setStudentBadges([]);
+        setSelectedIds([]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadStudentBadges();
+  }, [isOpen, member, groupId]);
+
+  const allBadges = useMemo(() => {
+    if (studentBadges.length > 0) {
+      return studentBadges.map((sb) => {
+        const fullBadge = badges.find((b) => b.id === sb.id);
+        return {
+          id: sb.id,
+          name: sb.name || fullBadge?.name || 'Nieznana odznaka',
+          icon: sb.icon || fullBadge?.icon || '🏅',
+          rarity: fullBadge?.rarity || 'common',
+          storyDescription: fullBadge?.storyDescription || '',
+          educationalDescription: fullBadge?.educationalDescription || '',
+          rewardAmount: fullBadge?.rewardAmount || 0,
+        };
+      });
+    }
+    return badges.map((b) => ({
+      id: b.id,
+      name: b.name,
+      icon: b.icon || '🏅',
+      rarity: b.rarity || 'common',
+      storyDescription: b.storyDescription || '',
+      educationalDescription: b.educationalDescription || '',
+      rewardAmount: b.rewardAmount || 0,
+    }));
+  }, [studentBadges, badges]);
 
   const visibleBadges = useMemo(() => {
-    const filtered = filterBadges(ALL_BADGES, {
+    const filtered = filterBadges(allBadges, {
       searchQuery,
       rarityFilter,
       earnedFilter,
@@ -78,17 +176,21 @@ export default function MemberBadgesModal({
     });
 
     return sortBadges(filtered, sortBy, selectedIds);
-  }, [searchQuery, rarityFilter, earnedFilter, sortBy, selectedIds]);
+  }, [allBadges, searchQuery, rarityFilter, earnedFilter, sortBy, selectedIds]);
 
-  const handleToggleBadge = (badgeId, selected) => {
-    setSelectedIds((prev) => {
-      if (selected) {
-        return prev.includes(badgeId) ? prev : [...prev, badgeId];
-      }
+  const handleToggleBadge = useCallback(async (badgeId, selected) => {
+    if (!groupId || !member) return;
 
-      return prev.filter((id) => id !== badgeId);
-    });
-  };
+    const result = await toggleStudentBadge(groupId, member.accountId, badgeId);
+    if (result.ok) {
+      setSelectedIds((prev) => {
+        if (result.isEarned) {
+          return prev.includes(badgeId) ? prev : [...prev, badgeId];
+        }
+        return prev.filter((id) => id !== badgeId);
+      });
+    }
+  }, [groupId, member]);
 
   const handleConfirm = () => {
     onConfirm?.(selectedIds);
@@ -186,7 +288,9 @@ export default function MemberBadgesModal({
         </section>
       </div>
 
-      {visibleBadges.length > 0 ? (
+      {isLoading ? (
+        <p className="member-modal__loading">Ładowanie odznak...</p>
+      ) : visibleBadges.length > 0 ? (
         <div className="member-modal__badge-grid">
           {visibleBadges.map((badge) => (
             <BadgeMini
@@ -194,9 +298,9 @@ export default function MemberBadgesModal({
               rarity={badge.rarity}
               name={badge.name}
               storyDescription={badge.storyDescription}
-              didacticDescription={badge.didacticDescription}
+              didacticDescription={badge.educationalDescription}
               rewardAmount={badge.rewardAmount}
-              rewardEmoji={badge.rewardEmoji}
+              rewardEmoji={badge.icon}
               selected={selectedIds.includes(badge.id)}
               onSelectedChange={(selected) => handleToggleBadge(badge.id, selected)}
               previewOnHover
@@ -204,6 +308,8 @@ export default function MemberBadgesModal({
             />
           ))}
         </div>
+      ) : allBadges.length === 0 ? (
+        <p className="member-modal__empty">Brak odznak w tej grupie.</p>
       ) : (
         <p className="member-modal__empty">Brak odznak spełniających wybrane filtry.</p>
       )}

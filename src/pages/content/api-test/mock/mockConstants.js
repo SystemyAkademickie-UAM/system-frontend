@@ -44,6 +44,44 @@ export const LOGOUT_PATH = '/logout';
 /** Lecturer group creation. */
 export const GROUPS_NEW_PATH = '/groups/new';
 
+/** List groups for authenticated user. */
+export const GROUPS_PATH = '/groups';
+
+/** All groups split into myGroups / otherGroups. */
+export const GROUPS_CATALOG_PATH = '/groups/catalog';
+
+/**
+ * @param {number|string} groupId - Public group ID
+ * @param {string} [auth]
+ * @returns {string}
+ */
+export function getGroupPreviewPath(groupId, auth) {
+  const params = new URLSearchParams();
+  const trimmedAuth = typeof auth === 'string' ? auth.trim() : '';
+  if (trimmedAuth !== '') {
+    params.set('auth', trimmedAuth);
+  }
+  const query = params.toString();
+  const base = `/groups/${groupId}/preview`;
+  return query ? `${base}?${query}` : base;
+}
+
+/**
+ * @param {number|string} groupId - Public group ID
+ * @param {string} [auth]
+ * @returns {string}
+ */
+export function getGroupAccessCodePath(groupId, auth) {
+  const params = new URLSearchParams();
+  const trimmedAuth = typeof auth === 'string' ? auth.trim() : '';
+  if (trimmedAuth !== '') {
+    params.set('auth', trimmedAuth);
+  }
+  const query = params.toString();
+  const base = `/groups/${groupId}/access-code`;
+  return query ? `${base}?${query}` : base;
+}
+
 /** Student join group by code. */
 export const GROUPS_INVITE_PATH = '/groups/invite';
 
@@ -104,11 +142,29 @@ export function getGroupBadgesPath(groupId) {
 }
 
 /**
+ * @param {number|string} groupId
+ * @param {number|string} badgeId
+ * @returns {string}
+ */
+export function getGroupBadgeByIdPath(groupId, badgeId) {
+  return `/groups/${groupId}/badges/${badgeId}`;
+}
+
+/**
  * @param {number|string} groupId - Public group ID
  * @returns {string}
  */
 export function getGroupRanksPath(groupId) {
   return `/groups/${groupId}/ranks`;
+}
+
+/**
+ * @param {number|string} groupId
+ * @param {number|string} rankId
+ * @returns {string}
+ */
+export function getGroupRankByIdPath(groupId, rankId) {
+  return `/groups/${groupId}/ranks/${rankId}`;
 }
 
 // ── Student Management endpoints ────────────────────────────────────

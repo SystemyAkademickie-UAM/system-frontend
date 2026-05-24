@@ -10,24 +10,13 @@ import {
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { getBadgeCssVars } from '../../../components/ui/Badge/badgeCssVars.js';
-import { generateRewardsStudents } from '../group-rewards/shared/rewardsStudentsMock.js';
+import { useGroupBadges } from './useGroupBadges.js';
 import RewardsBadgeTableRow from '../group-rewards/shared/RewardsBadgeTableRow.jsx';
 import '../group-rewards/shared/rewardsShared.css';
 import '../group-rewards/shared/rewardsTablePreview.css';
-import {
-  createEmptyBadge,
-  createInitialBadgesCatalog,
-  reindexBadges,
-} from './badgesCatalogMock.js';
 import BadgeDeleteModal from './modals/BadgeDeleteModal.jsx';
 import BadgeFormModal from './modals/BadgeFormModal.jsx';
 import BadgeGiveModal from './modals/BadgeGiveModal.jsx';
-
-const INITIAL_BADGES = createInitialBadgesCatalog();
-const INITIAL_STUDENTS = generateRewardsStudents(
-  INITIAL_BADGES.map((badge) => badge.id),
-  [],
-);
 
 const BADGE_COLUMNS = [
   {
@@ -132,10 +121,19 @@ const BADGE_COLUMNS = [
 
 export default function RewardsBadgesContent() {
   const nav = useGroupSubNav('group-rewards');
-  const [badges, setBadges] = useState(INITIAL_BADGES);
-  const [students, setStudents] = useState(INITIAL_STUDENTS);
+  const {
+    badges,
+    students,
+    isLoading,
+    error,
+    handleCreate,
+    handleUpdate,
+    handleDelete,
+  } = useGroupBadges();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
   const openModal = useCallback((type, badge = null) => {
     setActiveModal({ type, badge });
@@ -145,58 +143,39 @@ export default function RewardsBadgesContent() {
     setActiveModal(null);
   }, []);
 
-  const handleCreateConfirm = useCallback((values) => {
-    setBadges((prev) => reindexBadges([
-      ...prev,
-      { ...createEmptyBadge(prev.length + 1), ...values },
-    ]));
-  }, []);
+  const handleCreateConfirm = useCallback(async (values) => {
+    setModalLoading(true);
+    const result = await handleCreate(values);
+    setModalLoading(false);
+    if (result.ok) {
+      closeModal();
+    }
+  }, [handleCreate, closeModal]);
 
-  const handleEditConfirm = useCallback((values) => {
+  const handleEditConfirm = useCallback(async (values) => {
     if (!activeModal?.badge) return;
+    setModalLoading(true);
+    const result = await handleUpdate(activeModal.badge.id, values);
+    setModalLoading(false);
+    if (result.ok) {
+      closeModal();
+    }
+  }, [activeModal, handleUpdate, closeModal]);
 
-    setBadges((prev) => prev.map((badge) => (
-      badge.id === activeModal.badge.id ? { ...badge, ...values } : badge
-    )));
-  }, [activeModal]);
-
-  const handleDeleteConfirm = useCallback(() => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.badge) return;
-    const badgeId = activeModal.badge.id;
-
-    setBadges((prev) => reindexBadges(prev.filter((badge) => badge.id !== badgeId)));
-    setStudents((prev) => prev.map((student) => ({
-      ...student,
-      earnedBadgeIds: student.earnedBadgeIds.filter((id) => id !== badgeId),
-    })));
-  }, [activeModal]);
+    setModalLoading(true);
+    const result = await handleDelete(activeModal.badge.id);
+    setModalLoading(false);
+    if (result.ok) {
+      closeModal();
+    }
+  }, [activeModal, handleDelete, closeModal]);
 
   const handleGiveConfirm = useCallback((selectedStudentIds) => {
     if (!activeModal?.badge) return;
-    const badgeId = activeModal.badge.id;
-    const selectedSet = new Set(selectedStudentIds);
-
-    setStudents((prev) => prev.map((student) => {
-      const hasBadge = student.earnedBadgeIds.includes(badgeId);
-      const shouldHave = selectedSet.has(student.id);
-
-      if (shouldHave && !hasBadge) {
-        return {
-          ...student,
-          earnedBadgeIds: [...student.earnedBadgeIds, badgeId],
-        };
-      }
-
-      if (!shouldHave && hasBadge) {
-        return {
-          ...student,
-          earnedBadgeIds: student.earnedBadgeIds.filter((id) => id !== badgeId),
-        };
-      }
-
-      return student;
-    }));
-  }, [activeModal]);
+    closeModal();
+  }, [activeModal, closeModal]);
 
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
@@ -218,6 +197,18 @@ export default function RewardsBadgesContent() {
   }), [openModal]);
 
   const modalBadge = activeModal?.badge ?? null;
+
+  if (error) {
+    return (
+      <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
+        <PageHeader
+          title={nav.sectionTitle}
+          description="Zarządzaj odznakami kursu — twórz, edytuj i przyznawaj je studentom."
+        />
+        <p className="rewards-page__error" role="alert">{error}</p>
+      </section>
+    );
+  }
 
   return (
     <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
@@ -252,38 +243,46 @@ export default function RewardsBadgesContent() {
         />
       </div>
 
-      <DataTable
-        columns={BADGE_COLUMNS}
-        data={badges}
-        rowKey="id"
-        tiebreakerKey="position"
-        itemsPerPage={10}
-        paginationAriaLabel="Nawigacja stron listy odznak"
-        className="rewards-table"
-        search={{
-          external: true,
-          value: searchQuery,
-          filter: (badge, query) => (
-            badge.name.toLowerCase().includes(query)
-            || badge.iconFile.toLowerCase().includes(query)
-            || badge.storyDescription.toLowerCase().includes(query)
-            || badge.didacticDescription.toLowerCase().includes(query)
-          ),
-        }}
-        rowActions={rowActions}
-        renderRow={RewardsBadgeTableRow}
-      />
+      {isLoading ? (
+        <p className="rewards-page__loading">Ładowanie odznak…</p>
+      ) : badges.length === 0 ? (
+        <p className="rewards-page__empty">Brak odznak w tej grupie. Kliknij "Dodaj odznakę" aby utworzyć pierwszą.</p>
+      ) : (
+        <DataTable
+          columns={BADGE_COLUMNS}
+          data={badges}
+          rowKey="id"
+          tiebreakerKey="position"
+          itemsPerPage={10}
+          paginationAriaLabel="Nawigacja stron listy odznak"
+          className="rewards-table"
+          search={{
+            external: true,
+            value: searchQuery,
+            filter: (badge, query) => (
+              badge.name.toLowerCase().includes(query)
+              || badge.iconFile.toLowerCase().includes(query)
+              || badge.storyDescription.toLowerCase().includes(query)
+              || badge.didacticDescription.toLowerCase().includes(query)
+            ),
+          }}
+          rowActions={rowActions}
+          renderRow={RewardsBadgeTableRow}
+        />
+      )}
 
       <BadgeFormModal
         isOpen={activeModal?.type === 'create'}
         onClose={closeModal}
         onConfirm={handleCreateConfirm}
+        isLoading={modalLoading}
       />
       <BadgeFormModal
         isOpen={activeModal?.type === 'edit'}
         badge={modalBadge}
         onClose={closeModal}
         onConfirm={handleEditConfirm}
+        isLoading={modalLoading}
       />
       <BadgeGiveModal
         isOpen={activeModal?.type === 'give'}
@@ -291,12 +290,14 @@ export default function RewardsBadgesContent() {
         students={students}
         onClose={closeModal}
         onConfirm={handleGiveConfirm}
+        isLoading={modalLoading}
       />
       <BadgeDeleteModal
         isOpen={activeModal?.type === 'delete'}
         badge={modalBadge}
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
+        isLoading={modalLoading}
       />
     </section>
   );

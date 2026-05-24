@@ -232,6 +232,12 @@
     0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.data-table__menu--fixed {
+  position: fixed;
+  right: auto;
+  top: auto;
+}
+
 .data-table__menu-item {
   display: flex;
   align-items: flex-start;

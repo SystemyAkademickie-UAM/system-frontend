@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { fetchUserGroups, filterGroups } from './groupsList.api.js';
+import { fetchGroupsCatalog, filterGroups } from './groupsList.api.js';
 
 export function useGroupsList() {
-  const [groups, setGroups] = useState([]);
+  const [myGroups, setMyGroups] = useState([]);
+  const [otherGroups, setOtherGroups] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -14,9 +15,10 @@ export function useGroupsList() {
       setIsLoading(true);
       setErrorMessage('');
       try {
-        const data = await fetchUserGroups();
+        const data = await fetchGroupsCatalog();
         if (!cancelled) {
-          setGroups(data);
+          setMyGroups(data.myGroups);
+          setOtherGroups(data.otherGroups);
         }
       } catch (error) {
         if (!cancelled) {
@@ -36,14 +38,22 @@ export function useGroupsList() {
     };
   }, []);
 
-  const visibleGroups = useMemo(() => filterGroups(groups, searchQuery), [groups, searchQuery]);
+  const visibleMyGroups = useMemo(
+    () => filterGroups(myGroups, searchQuery),
+    [myGroups, searchQuery],
+  );
+  const visibleOtherGroups = useMemo(
+    () => filterGroups(otherGroups, searchQuery),
+    [otherGroups, searchQuery],
+  );
 
   return {
-    groups: visibleGroups,
+    myGroups: visibleMyGroups,
+    otherGroups: visibleOtherGroups,
     searchQuery,
     setSearchQuery,
     isLoading,
     errorMessage,
-    totalCount: groups.length,
+    totalCount: myGroups.length + otherGroups.length,
   };
 }

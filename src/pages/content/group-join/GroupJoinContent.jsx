@@ -1,24 +1,36 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, PageHeader } from '../../../components/ui/index.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { groupMainPath } from '../../../routes/pathRegistry.js';
 import { validateAlphanumericInput } from '../group-shared/alphanumericValidation.js';
-import { getGroupAccessCode } from '../group-shared/groupAccessCodeStorage.js';
-import { useGroupDetails } from '../group-shared/useGroupDetails.js';
+import { useGroupPreview } from '../group-shared/useGroupPreview.js';
+import { enrollByCode } from '../../../services/enrollment.api.js';
 import '../../../components/page/PageUnavailable.css';
 import './GroupJoinContent.css';
 
 export default function GroupJoinContent() {
   const { groupId } = useParams();
   const navigate = useNavigate();
-  const { group, isLoading, errorMessage } = useGroupDetails(groupId);
+  const { role } = useAppRole();
+  const { group, hasAccess, isLoading, errorMessage } = useGroupPreview(groupId);
   const [codeInput, setCodeInput] = useState('');
   const [submitError, setSubmitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validation = useMemo(() => validateAlphanumericInput(codeInput), [codeInput]);
+  const isStudent = role === APP_ROLE.STUDENT;
+  const validation = useMemo(() => validateAlphanumericInput(codeInput, 6), [codeInput]);
   const showValidationError = codeInput.trim() !== '' && !validation.valid;
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    if (isLoading || !group || !hasAccess || !groupId) {
+      return;
+    }
+    navigate(groupMainPath(groupId), { replace: true });
+  }, [isLoading, group, hasAccess, groupId, navigate]);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setSubmitError('');
 
@@ -26,21 +38,37 @@ export default function GroupJoinContent() {
       return;
     }
 
-    const expectedCode = getGroupAccessCode(groupId);
-
-    if (!expectedCode || validation.value.toUpperCase() !== expectedCode.toUpperCase()) {
-      setSubmitError('Nieprawidłowy kod dostępu.');
+    if (!groupId) {
+      setSubmitError('Brak identyfikatora grupy.');
       return;
     }
 
-    navigate(groupMainPath(groupId), { replace: true });
+    setIsSubmitting(true);
+
+    const result = await enrollByCode(groupId, validation.value.toUpperCase());
+
+    setIsSubmitting(false);
+
+    if (result.ok) {
+      navigate(groupMainPath(groupId), { replace: true });
+    } else {
+      setSubmitError(result.error || 'Nieprawidłowy kod dostępu.');
+    }
   };
+
+  if (!isLoading && hasAccess && group) {
+    return <p className="group-join__message" role="status">Przekierowywanie do grupy…</p>;
+  }
 
   return (
     <section className="page-unavailable group-join" aria-label="Dołączenie do grupy">
       <PageHeader
         title="Dołączenie do grupy"
-        description="Wpisz kod dostępu, aby wejść do wybranej grupy."
+        description={
+          isStudent
+            ? 'Wpisz kod dostępu, aby wejść do wybranej grupy.'
+            : 'Ta grupa nie należy do Twoich kursów.'
+        }
       />
 
       {isLoading ? (
@@ -53,7 +81,13 @@ export default function GroupJoinContent() {
         </p>
       ) : null}
 
-      {!isLoading && group ? (
+      {!isLoading && group && !hasAccess && !isStudent ? (
+        <p className="group-join__message group-join__message--error" role="alert">
+          Nie masz dostępu do tej grupy. Możesz zarządzać wyłącznie własnymi kursami.
+        </p>
+      ) : null}
+
+      {!isLoading && group && !hasAccess && isStudent ? (
         <>
           <div className="group-join__info">
             <p className="group-join__lead">
@@ -101,7 +135,8 @@ export default function GroupJoinContent() {
                     setCodeInput(event.target.value);
                     setSubmitError('');
                   }}
-                  placeholder="Wpisz kod dostępu"
+                  placeholder="Wpisz 6-znakowy kod"
+                  maxLength={6}
                   aria-invalid={showValidationError}
                   aria-describedby={
                     showValidationError || submitError ? 'group-join-code-error' : undefined
@@ -110,9 +145,9 @@ export default function GroupJoinContent() {
                 <Button
                   type="submit"
                   variant="primary"
-                  disabled={!validation.valid}
+                  disabled={!validation.valid || isSubmitting}
                 >
-                  Dołącz
+                  {isSubmitting ? 'Dołączanie...' : 'Dołącz'}
                 </Button>
               </div>
 

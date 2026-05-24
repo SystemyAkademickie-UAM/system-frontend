@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchGroupById } from '../groups-list/groupsList.api.js';
+import { fetchGroupPreview } from '../groups-list/groupsList.api.js';
 
 export function useGroupDetails(groupId) {
   const [group, setGroup] = useState(null);
@@ -21,16 +21,16 @@ export function useGroupDetails(groupId) {
       setErrorMessage('');
 
       try {
-        const data = await fetchGroupById(groupId);
+        const preview = await fetchGroupPreview(groupId);
         if (cancelled) return;
 
-        if (!data) {
+        if (!preview.group) {
           setGroup(null);
           setErrorMessage('Nie znaleziono grupy o podanym identyfikatorze.');
           return;
         }
 
-        setGroup(data);
+        setGroup(preview.group);
       } catch (error) {
         if (!cancelled) {
           setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać danych grupy.');

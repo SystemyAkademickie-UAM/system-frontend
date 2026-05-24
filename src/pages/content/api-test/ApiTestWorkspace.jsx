@@ -260,7 +260,14 @@ function ApiTestWorkspaceInner() {
       }
     }
     if (
-      (activeSection.id === 'badges' || activeSection.id === 'ranks') &&
+      (activeSection.id === 'badges' ||
+        activeSection.id === 'ranks' ||
+        activeSection.id === 'updateBadge' ||
+        activeSection.id === 'updateRank' ||
+        activeSection.id === 'deleteBadge' ||
+        activeSection.id === 'deleteRank' ||
+        activeSection.id === 'listBadges' ||
+        activeSection.id === 'listRanks') &&
       String(synced.values.groupId ?? '').trim() === ''
     ) {
       synced.setValidationError('Group ID is required in the path.');
