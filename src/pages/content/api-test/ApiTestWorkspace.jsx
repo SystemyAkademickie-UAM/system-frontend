@@ -12,6 +12,7 @@ import {
   getOrCreateBrowserId,
   resetStoredBrowserId,
 } from './mock/browserIdStorage.js';
+import { GROUP_INVITE_CODE_LENGTH } from './mock/mockConstants.js';
 import {
   LOGIN_PATH,
   LOGOUT_PATH,
@@ -238,6 +239,27 @@ function ApiTestWorkspaceInner() {
       return;
     }
     if (
+      activeSection.id === 'generateCode' &&
+      (synced.values.groupId === '' ||
+        synced.values.groupId === null ||
+        synced.values.groupId === undefined ||
+        Number.isNaN(Number(synced.values.groupId)))
+    ) {
+      synced.setValidationError('groupId is required in the request body.');
+      return;
+    }
+    if (activeSection.id === 'enrollByCode') {
+      if (String(synced.values.inviteGroupId ?? '').trim() === '') {
+        synced.setValidationError('Group ID is required in the path.');
+        return;
+      }
+      const code = String(synced.values.code ?? '').trim();
+      if (code.length !== GROUP_INVITE_CODE_LENGTH) {
+        synced.setValidationError(`Invite code must be exactly ${GROUP_INVITE_CODE_LENGTH} characters.`);
+        return;
+      }
+    }
+    if (
       (activeSection.id === 'badges' || activeSection.id === 'ranks') &&
       String(synced.values.groupId ?? '').trim() === ''
     ) {
@@ -275,13 +297,18 @@ function ApiTestWorkspaceInner() {
         setResponseText(formatFetchError(response, text));
         return;
       }
-      headers['Content-Type'] = 'application/json';
-      const response = await fetch(url, {
-        method: activeSection.method ?? 'POST',
+      const method = activeSection.method ?? 'POST';
+      /** @type {RequestInit} */
+      const fetchOptions = {
+        method,
         credentials: 'include',
         headers,
-        body: JSON.stringify(synced.payload),
-      });
+      };
+      if (method !== 'GET') {
+        headers['Content-Type'] = 'application/json';
+        fetchOptions.body = JSON.stringify(synced.payload);
+      }
+      const response = await fetch(url, fetchOptions);
       const text = await response.text();
       let formatted = text;
       try {
@@ -490,6 +517,9 @@ function ApiTestWorkspaceInner() {
                     </label>
                   );
                 })}
+                {activeSection?.hint ? (
+                  <p className="api-test-workspace__hint">{activeSection.hint}</p>
+                ) : null}
                 {activeSection?.buildPath ? (
                   <p className="api-test-workspace__path">
                     Path: <code>{activeSection.buildPath(synced.values)}</code>
