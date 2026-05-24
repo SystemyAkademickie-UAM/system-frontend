@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../login-nikita/mock/browserIdStorage.js';
+
 //import Button from '../../../components/ui/Button/Button.jsx';
 
 export default function App({popupclose}) {
