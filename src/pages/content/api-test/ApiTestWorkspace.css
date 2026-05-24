@@ -1,4 +1,4 @@
-.login-shell:has(.api-test-workspace) {
+﻿.login-shell:has(.api-test-workspace) {
   --api-test-sidebar-width: 220px;
   --api-test-topbar-height: 3.25rem;
   --api-test-shell-header-height: 3.25rem;
@@ -379,6 +379,13 @@
   flex-shrink: 0;
 }
 
+.api-test-workspace__hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: rgba(189, 202, 190, 0.75);
+}
+
 .api-test-workspace__response {
   flex: 1 1 auto;
   min-height: 6rem;
@@ -491,4 +498,3 @@
   transform: scale(1.03);
   filter: drop-shadow(0 6px 12px rgba(16, 185, 129, 0.25));
 }
-
