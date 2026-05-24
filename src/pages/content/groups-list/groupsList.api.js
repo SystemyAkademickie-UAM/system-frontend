@@ -12,6 +12,18 @@ export async function fetchUserGroups() {
 }
 
 /**
+ * Pobiera szczegóły grupy po identyfikatorze.
+ * Docelowo: GET /groups/:groupId
+ *
+ * @param {string} groupId
+ * @returns {Promise<import('./groupsList.mock.js').GroupListItem | null>}
+ */
+export async function fetchGroupById(groupId) {
+  // TODO: podpiąć backend — np. getJson(`/groups/${groupId}`)
+  return MOCK_GROUPS_LIST.find((group) => group.id === groupId) ?? null;
+}
+
+/**
  * Filtruje grupy po zapytaniu (nazwa fabularna, przedmiot, prowadzący).
  *
  * @param {import('./groupsList.mock.js').GroupListItem[]} groups

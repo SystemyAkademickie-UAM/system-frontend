@@ -186,7 +186,7 @@
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: var(--color-text-secondary);
+  color: var(--color-asset-icon);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }

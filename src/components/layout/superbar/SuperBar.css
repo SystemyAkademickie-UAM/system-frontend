@@ -81,7 +81,7 @@
 
 .super-bar-stat__icon {
   display: inline-flex;
-  color: #fff;
+  color: var(--color-nav-icon-on-primary);
 }
 
 .super-bar-stat-badge {
@@ -105,7 +105,7 @@
   justify-content: center;
   width: 30px;
   height: 30px;
-  color: #fff;
+  color: var(--color-nav-icon-on-primary);
   text-decoration: none;
 }
 

@@ -64,4 +64,49 @@ Import:
 
   sort kolumny: 'number' | 'text' | { type: 'custom', order: [...] } | false (bez sortowania)
 
+--- Badge (odznaka) ---
+  import { Badge, BADGE_RARITY } from '../../components/ui/index.js';
+
+  <Badge
+    rarity={BADGE_RARITY.common}
+    name="Dzielny Królik"
+    storyDescription="Królik nie uciekł z pola misji."
+    didacticDescription="Opis warunków zdobycia…"
+    rewardAmount={10}
+    rewardEmoji="🥕"
+    earnedAt="Dzisiaj"
+    showEarnedAt={true}
+  />
+
+  rarity: common | uncommon | rare | epic
+  showEarnedAt={false} — ukrywa stopkę z czasem zdobycia
+
+--- BadgeMini (mini odznaka + podgląd pełnej) ---
+  <BadgeMini
+    rarity={BADGE_RARITY.common}
+    name="Dzielny Królik"
+    storyDescription="…"
+    didacticDescription="…"
+    rewardAmount={10}
+    previewOnHover
+    selected={isSelected}
+    onSelectedChange={setIsSelected}
+  />
+
+  previewOnHover — pełna odznaka przy kursorze
+  klik — przełącza stan zaznaczenia (odznaczona / zaznaczona)
+
+--- Rank (ranga) ---
+  import { Rank } from '../../components/ui/index.js';
+
+  <Rank
+    name="Rekrut"
+    costAmount={0}
+    costEmoji="🥕"
+    storyDescription="Świeżo zrekrutowany królik. Lubi marchew i Sędzię Annę Marię Wesołowską na tefałenie."
+    shopItems={['+0,5 do oceny', 'zaliczenie wejściówki']}
+  />
+
+  theme — motyw kolorystyczny (domyślnie 'default'; rozszerzalny)
+
 Kolory: src/styles/tokens.css

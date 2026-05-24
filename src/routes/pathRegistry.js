@@ -20,6 +20,15 @@ export function groupsListPath() {
 }
 
 // ============================================================================
+// GROUP ROOT
+// ============================================================================
+
+/** Korzeń grupy — `/groups/:groupId`. */
+export function groupRootPath(groupId) {
+  return `/groups/${groupId}`;
+}
+
+// ============================================================================
 // GROUP MAIN (Ekran główny) - student + lecturer
 // ============================================================================
 
@@ -74,6 +83,11 @@ export function groupMembersPath(groupId) {
 /** Log aktywności użytkowników — `/groups/:groupId/members/log`. */
 export function groupMembersLogPath(groupId) {
   return `/groups/${groupId}/members/log`;
+}
+
+/** Kody dostępu — `/groups/:groupId/members/code`. */
+export function groupMembersCodePath(groupId) {
+  return `/groups/${groupId}/members/code`;
 }
 
 // ============================================================================

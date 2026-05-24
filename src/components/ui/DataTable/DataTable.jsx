@@ -1,35 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Pagination from '../Pagination/Pagination.jsx';
 import SearchBar from '../SearchBar/SearchBar.jsx';
+import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { cycleSortRule, sortRows } from './dataTableSort.js';
 import './DataTable.css';
 
 const SUPERBAR_HEIGHT = 63;
 const HEADER_BORDER_RADIUS = '12px 12px 0 0';
-
-function TrashIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path
-        d="M3 4.5h12M7.5 4.5V3a1.5 1.5 0 0 1 1.5-1.5h0a1.5 1.5 0 0 1 1.5 1.5v1.5M14.25 4.5v10.5a1.5 1.5 0 0 1-1.5 1.5h-7.5a1.5 1.5 0 0 1-1.5-1.5V4.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function MoreIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <circle cx="9" cy="4" r="1.25" fill="currentColor" />
-      <circle cx="9" cy="9" r="1.25" fill="currentColor" />
-      <circle cx="9" cy="14" r="1.25" fill="currentColor" />
-    </svg>
-  );
-}
 
 function SortableHeader({ label, sortKey, sortRules, onSort, className = '' }) {
   const ruleIndex = sortRules.findIndex((rule) => rule.key === sortKey);
@@ -69,12 +46,17 @@ function SortableHeader({ label, sortKey, sortRules, onSort, className = '' }) {
   );
 }
 
-function DataTableRowActions({ row, rowActions }) {
+function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { onDelete, deleteAriaLabel, menuItems = [] } = rowActions ?? {};
 
-  const handleMenuToggle = () => setMenuOpen((prev) => !prev);
-  const handleMenuClose = () => setMenuOpen(false);
+  const setMenuState = (nextOpen) => {
+    setMenuOpen(nextOpen);
+    onMenuOpenChange?.(nextOpen);
+  };
+
+  const handleMenuToggle = () => setMenuState(!menuOpen);
+  const handleMenuClose = () => setMenuState(false);
 
   const handleAction = (item) => {
     item.onSelect?.(row);
@@ -94,7 +76,7 @@ function DataTableRowActions({ row, rowActions }) {
           aria-label={deleteAriaLabel?.(row) ?? 'Usuń wiersz'}
           onClick={() => onDelete(row)}
         >
-          <TrashIcon />
+          <AssetSvg name="ui-trash.svg" width={18} height={18} alt="" />
         </button>
       ) : null}
       {menuItems.length > 0 ? (
@@ -106,7 +88,7 @@ function DataTableRowActions({ row, rowActions }) {
             aria-expanded={menuOpen}
             onClick={handleMenuToggle}
           >
-            <MoreIcon />
+            <AssetSvg name="ui-more.svg" width={18} height={18} alt="" />
           </button>
           {menuOpen ? (
             <>
@@ -463,3 +445,5 @@ export default function DataTable({
     </div>
   );
 }
+
+export { DataTableRowActions };
