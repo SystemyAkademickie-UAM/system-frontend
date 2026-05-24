@@ -7,8 +7,27 @@
 // LOGIN / AUTH
 // ============================================================================
 
+export function homePath() {
+  return '/';
+}
+
 export function loginPath() {
   return '/login';
+}
+
+/** @deprecated All auth wizard steps live on `/login` (in-page state). */
+export function loginInstitutionPath() {
+  return loginPath();
+}
+
+/** @deprecated All auth wizard steps live on `/login` (in-page state). */
+export function registerPath() {
+  return loginPath();
+}
+
+/** @deprecated All auth wizard steps live on `/login` (in-page state). */
+export function registerEulaPath() {
+  return loginPath();
 }
 
 // ============================================================================
