@@ -5,6 +5,8 @@ import {
   getGroupEnrollPath,
   getGroupRanksPath,
   GROUPS_NEW_PATH,
+  GROUPS_GENERATE_CODE_PATH,
+  GROUPS_INVITE_PATH,
   STAGES_PATH,
 } from './mock/mockConstants.js';
 import {
@@ -138,6 +140,72 @@ export const API_TEST_SECTIONS = [
     requiredKeysForValues: () => [],
     fields: [
       { key: 'enrollGroupId', label: 'Group ID (public, URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'generateCode',
+    label: 'Generate Code',
+    title: 'POST /groups/generate-code (Lecturer)',
+    kind: 'api',
+    method: 'POST',
+    buildPath: () => GROUPS_GENERATE_CODE_PATH,
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+      type: 'group',
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      if (typeof values.type === 'string' && values.type.trim() !== '') {
+        payload.type = values.type.trim();
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      type: typeof payload.type === 'string' ? payload.type : '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'type', label: 'type (optional, default: "group")', type: 'text' },
+    ],
+  },
+  {
+    id: 'joinByCode',
+    label: 'Join by Code',
+    title: 'GET /groups/invite (Student)',
+    kind: 'api',
+    method: 'GET',
+    buildPath: (values) => {
+      const code = encodeURIComponent(String(values.code ?? '').trim());
+      let path = `${GROUPS_INVITE_PATH}?code=${code}`;
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        path += `&auth=${encodeURIComponent(values.auth.trim())}`;
+      }
+      return path;
+    },
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+      code: '',
+    }),
+    buildPayload: (values) => {
+      // GET requests shouldn't have a body, but the API test workspace syncs payload for JSON view.
+      // So we return an empty object.
+      return {};
+    },
+    parsePayload: (payload) => ({
+      auth: '',
+      code: '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'code', label: 'Invite Code (e.g. ABCDEF)', type: 'text' },
       { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
     ],
   },
