@@ -263,12 +263,16 @@ function ApiTestWorkspaceInner() {
         return;
       }
       headers['Content-Type'] = 'application/json';
-      const response = await fetch(url, {
-        method: activeSection.method ?? 'POST',
+      const method = activeSection.method ?? 'POST';
+      const fetchOptions = {
+        method,
         credentials: 'include',
         headers,
-        body: JSON.stringify(synced.payload),
-      });
+      };
+      if (method !== 'GET' && method !== 'HEAD') {
+        fetchOptions.body = JSON.stringify(synced.payload);
+      }
+      const response = await fetch(url, fetchOptions);
       const text = await response.text();
       let formatted = text;
       try {
