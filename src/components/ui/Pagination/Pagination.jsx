@@ -1,25 +1,7 @@
 import { useState } from 'react';
+import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { buildPaginationItems } from './buildPaginationItems.js';
 import './Pagination.css';
-
-function ChevronIcon({ direction }) {
-  return (
-    <svg
-      className="maq-pagination__chevron"
-      width={7}
-      height={10}
-      viewBox="0 0 7 10"
-      fill="none"
-      aria-hidden="true"
-    >
-      {direction === 'left' ? (
-        <path d="M6 1L2 5l4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      ) : (
-        <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      )}
-    </svg>
-  );
-}
 
 /**
  * Paginacja list / tabel.
@@ -73,7 +55,13 @@ export default function Pagination({
         disabled={currentPage <= 1}
         onClick={() => setPage(currentPage - 1)}
       >
-        <ChevronIcon direction="left" />
+        <AssetSvg
+          name="ui-chevron-left.svg"
+          className="maq-pagination__chevron"
+          width={7}
+          height={10}
+          alt=""
+        />
       </button>
 
       <div className="maq-pagination__pages">
@@ -111,7 +99,13 @@ export default function Pagination({
         disabled={currentPage >= total}
         onClick={() => setPage(currentPage + 1)}
       >
-        <ChevronIcon direction="right" />
+        <AssetSvg
+          name="ui-chevron-right.svg"
+          className="maq-pagination__chevron"
+          width={7}
+          height={10}
+          alt=""
+        />
       </button>
     </nav>
   );

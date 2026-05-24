@@ -1,0 +1,28 @@
+.maq-asset-svg {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.maq-asset-svg--mask {
+  flex-shrink: 0;
+  color: var(--color-asset-icon);
+  background-color: currentColor;
+  mask-image: var(--maq-asset-mask-url);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: var(--maq-asset-mask-url);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+.maq-asset-svg__probe {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}

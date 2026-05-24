@@ -1,0 +1,118 @@
+.group-join__message {
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  color: var(--color-text-secondary);
+}
+
+.group-join__message--error {
+  color: #f87171;
+}
+
+.group-join__info {
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  background: var(--color-bg-surface);
+}
+
+.group-join__lead {
+  margin: 0 0 1rem;
+  font-size: var(--font-size-page-description);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.group-join__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.5rem;
+  margin: 0;
+}
+
+.group-join__detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.group-join__detail dt {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.group-join__detail dd {
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.group-join__form {
+  width: 100%;
+  max-width: 36rem;
+}
+
+.group-join__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.group-join__label {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.group-join__input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.group-join__input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-modal-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  font: inherit;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.group-join__input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.group-join__input--error {
+  border-color: var(--color-input-error-border);
+}
+
+.group-join__input--error:focus {
+  outline-color: var(--color-input-error);
+}
+
+.group-join__error {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-input-error);
+}
+
+@media (max-width: 640px) {
+  .group-join__details {
+    grid-template-columns: 1fr;
+  }
+
+  .group-join__input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

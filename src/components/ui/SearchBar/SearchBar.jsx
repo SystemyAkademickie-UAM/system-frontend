@@ -1,18 +1,5 @@
+import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import './SearchBar.css';
-
-function SearchIcon() {
-  return (
-    <svg className="maq-search-bar__icon-svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path
-        d="M7.875 13.5a5.625 5.625 0 1 0 0-11.25 5.625 5.625 0 0 0 0 11.25Zm7.087 3.338-2.74-2.74"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 /**
  * Pasek wyszukiwania z ikoną lupy.
@@ -35,7 +22,13 @@ export default function SearchBar({
   return (
     <div className={['maq-search-bar', className].filter(Boolean).join(' ')}>
       <span className="maq-search-bar__icon">
-        <SearchIcon />
+        <AssetSvg
+          name="ui-search.svg"
+          className="maq-search-bar__icon-svg"
+          width={18}
+          height={18}
+          alt=""
+        />
       </span>
       <input
         type="search"

@@ -1,0 +1,133 @@
+.maq-badge-mini {
+  --badge-mini-bg: var(--color-bg-surface);
+
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: var(--badge-mini-max-width);
+  min-height: var(--badge-mini-min-height);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-left: var(--badge-mini-accent-width) solid var(--badge-rarity-color);
+  border-radius: var(--badge-mini-border-radius);
+  background: var(--badge-mini-bg);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.maq-badge-mini:hover {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.maq-badge-mini:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.maq-badge-mini--selected {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--badge-rarity-color) 20%, transparent);
+}
+
+.maq-badge-mini__accent {
+  display: none;
+}
+
+.maq-badge-mini__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  min-height: var(--badge-mini-min-height);
+  padding: 0 9px 0 0;
+}
+
+.maq-badge-mini__icon-slot {
+  flex-shrink: 0;
+  padding: 30px 0 0 16px;
+}
+
+.maq-badge-mini__content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  min-width: 0;
+  min-height: var(--badge-mini-min-height);
+  padding: 0 8px 12px 8px;
+}
+
+.maq-badge-mini__name {
+  font-size: var(--font-size-badge-title);
+  font-weight: 700;
+  line-height: var(--line-height-badge-title-mini);
+  color: var(--color-badge-text);
+}
+
+.maq-badge-mini__rarity {
+  margin-top: 2px;
+  font-size: var(--font-size-badge-rarity-mini);
+  font-weight: 600;
+  line-height: var(--line-height-badge-meta);
+  letter-spacing: var(--letter-spacing-badge-label);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--badge-rarity-color);
+}
+
+.maq-badge-mini__divider {
+  display: block;
+  height: 0;
+  margin: 14px 0 0;
+  border: 0;
+  border-top: 1px solid var(--color-badge-divider);
+}
+
+.maq-badge-mini__reward {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 6px;
+  min-height: 20px;
+}
+
+.maq-badge-mini__reward-label {
+  padding: 0 8px;
+  font-size: var(--font-size-badge-label-mini);
+  font-weight: 700;
+  line-height: var(--line-height-badge-label);
+  text-transform: uppercase;
+  color: var(--badge-rarity-color);
+}
+
+.maq-badge-mini__reward-value {
+  padding: 0 8px;
+  font-size: var(--font-size-badge-reward);
+  font-weight: 600;
+  line-height: var(--line-height-badge-body);
+  color: var(--badge-rarity-color);
+  white-space: nowrap;
+}
+
+.maq-badge-mini__reward-emoji {
+  line-height: 1;
+}
+
+.maq-badge-mini-preview {
+  position: fixed;
+  z-index: 1100;
+  width: min(var(--badge-compact-max-width), calc(100vw - 2rem));
+  pointer-events: none;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
+}
+
+.maq-badge-mini-preview .maq-badge {
+  width: 100%;
+}

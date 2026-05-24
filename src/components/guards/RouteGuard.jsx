@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
-import { loginPath } from '../../routes/pathRegistry.js';
+import { groupsListPath, loginPath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
 /**
@@ -38,7 +38,8 @@ export default function RouteGuard({
   if (allowedRoles && allowedRoles.length > 0) {
     const hasAccess = allowedRoles.includes(role);
     if (!hasAccess) {
-      return <Navigate to={redirectTo || loginPath()} replace />;
+      const fallback = redirectTo ?? (isAuthenticated ? groupsListPath() : loginPath());
+      return <Navigate to={fallback} replace />;
     }
   }
 

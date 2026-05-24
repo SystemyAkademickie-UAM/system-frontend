@@ -1,4 +1,6 @@
+export { default as AppLogo } from './AppLogo/AppLogo.jsx';
 export { default as Button } from './Button/Button.jsx';
+export { default as AssetSvg } from './AssetSvg/AssetSvg.jsx';
 export { default as PageHeader } from './PageHeader/PageHeader.jsx';
 export { default as SubNav } from './SubNav/SubNav.jsx';
 export { default as SearchBar } from './SearchBar/SearchBar.jsx';
@@ -7,3 +9,9 @@ export { default as Pagination } from './Pagination/Pagination.jsx';
 export { buildPaginationItems } from './Pagination/buildPaginationItems.js';
 export { default as DataTable } from './DataTable/DataTable.jsx';
 export { cycleSortRule, sortRows } from './DataTable/dataTableSort.js';
+export { default as Badge, BADGE_RARITY, BADGE_RARITY_LABELS, getBadgeRarityConfig } from './Badge/Badge.jsx';
+export { default as BadgeMini } from './Badge/BadgeMini.jsx';
+export { default as Rank, RANK_THEME, getRankThemeConfig } from './Rank/Rank.jsx';
+export { default as Modal } from './Modal/Modal.jsx';
+export { default as ActivityCard } from './ActivityCard/ActivityCard.jsx';
+export { default as ActivityProgressIcon } from './ActivityCard/ActivityProgressIcon.jsx';
