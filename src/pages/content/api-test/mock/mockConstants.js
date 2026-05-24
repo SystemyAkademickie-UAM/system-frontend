@@ -145,3 +145,12 @@ export function getGroupStudentProgressPath(groupId, accountId) {
 export function getGroupStudentActivityTogglePath(groupId, accountId, activityId) {
   return `/groups/${groupId}/students/${accountId}/activities/${activityId}/toggle`;
 }
+
+// ── Profile Settings endpoints ──────────────────────────────────────
+
+/** GET /profile/avatars - List of available avatars */
+export const PROFILE_AVATARS_PATH = '/profile/avatars';
+
+/** PATCH /profile/settings - Update profile nickname/avatar */
+export const PROFILE_SETTINGS_PATH = '/profile/settings';
+
