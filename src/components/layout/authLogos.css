@@ -1,0 +1,14 @@
+/**
+ * Shared auth logo treatments (Figma-aligned).
+ * Import from auth pages and AuthShell.
+ */
+
+.auth-logo--maq-muted {
+  opacity: var(--auth-maq-logo-opacity, 0.6);
+  filter: grayscale(1) brightness(1.15);
+}
+
+/* Colors live in pionierid-logo.png — no CSS filter (avoids graying whites). */
+.auth-logo--pionier {
+  display: block;
+}

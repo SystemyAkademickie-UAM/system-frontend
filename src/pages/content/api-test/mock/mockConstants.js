@@ -1,5 +1,4 @@
-/** localStorage key for stable `X-Browser-ID` across reloads (API smoke test page). */
-export const BROWSER_ID_LOCAL_STORAGE_KEY = 'maq.smokeTest.browserUuid';
+export { BROWSER_ID_LOCAL_STORAGE_KEY } from '../../../../constants/browserId.constants.js';
 
 /** Default icon ids aligned with backend API examples (docs/api.md). */
 export const SMOKE_TEST_DEFAULT_CURRENCY_ICON = 21;
@@ -54,19 +53,36 @@ export function getGroupEnrollPath(groupId) {
   return `/groups/${groupId}/enroll`;
 }
 
+/**
+ * @param {number|string} groupId - Public group ID
+ * @param {string} code - 6-character entry code
+ * @param {string} [auth] - Optional plaintext bearer (also via cookie)
+ * @returns {string}
+ */
+export function getGroupInvitePath(groupId, code, auth) {
+  const params = new URLSearchParams();
+  params.set('code', code);
+  const trimmedAuth = typeof auth === 'string' ? auth.trim() : '';
+  if (trimmedAuth !== '') {
+    params.set('auth', trimmedAuth);
+  }
+  return `/groups/${groupId}/invite?${params.toString()}`;
+}
+
+/** Backend requires exactly 6 characters for group entry codes. */
+export const GROUP_INVITE_CODE_LENGTH = 6;
+
+/** Random 6-character group entry code generation. */
+export const GROUPS_GENERATE_CODE_PATH = '/groups/generate-code';
+
 /** Multipart drive upload / remove (lecturer). */
 export const DRIVE_PATH = '/drive';
 
-/** Dev-only: mint HTTP-only session cookie as fake student (requires backend SAML_BYPASS_ENABLED). */
-export const SAML_BYPASS_STUDENT_PATH = '/auth/saml/bypass/student';
-
-/** Dev-only: mint session cookie as fake lecturer (`auth.konta.rola` = lecturer). */
-export const SAML_BYPASS_LECTURER_PATH = '/auth/saml/bypass/lecturer';
-
-/**
- * Dev-only: POST JSON `{ "profile": "student" | "lecturer" }` — sets `maqSamlSession` without redirect (same-origin fetch).
- */
+/** Dev-only: POST JSON `{ "persona": "student1" | … }` — sets `maqSamlSession` without redirect. */
 export const SAML_BYPASS_SESSION_PATH = '/auth/saml/bypass/session';
+
+/** Dev-only: bypass availability and persona list. */
+export const SAML_BYPASS_STATUS_PATH = '/auth/saml/bypass/status';
 
 export const AUTH_SAML_ME_PATH = '/auth/saml/me';
 

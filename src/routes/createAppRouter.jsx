@@ -1,11 +1,12 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
-import { RouteGuard } from '../components/guards/index.js';
+import { HomeRedirect, RouteGuard } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 
-// Login pages
+// Login/Auth pages
+import AuthShell from '../components/layout/AuthShell.jsx';
 import LoginShell from '../components/layout/LoginShell.jsx';
-import LoginHubPage from '../pages/links/login/LoginHubPage.jsx';
+import LoginPage from '../pages/links/auth/LoginPage.jsx';
 import DevApiTestPage from '../pages/links/dev/DevApiTestPage.jsx';
 
 // App-level pages
@@ -68,7 +69,7 @@ import RankingHomePage from '../pages/links/groups/ranking/RankingHomePage.jsx';
 import RankingGroupPage from '../pages/links/groups/ranking/RankingGroupPage.jsx';
 import RankingActivitiesPage from '../pages/links/groups/ranking/RankingActivitiesPage.jsx';
 
-import { devApiTestPath, loginPath } from './pathRegistry.js';
+import { devApiTestPath, homePath, loginPath } from './pathRegistry.js';
 
 // Helper: wraps element with RouteGuard
 function withGuard(element, { requireAuth = true, allowedRoles, redirectTo } = {}) {
@@ -93,15 +94,29 @@ const appRouteTree = [
   {
     path: '/',
     children: [
-      { index: true, element: <Navigate to="login" replace /> },
+      { index: true, element: <HomeRedirect /> },
 
       // ========================================
-      // LOGIN (public, no auth required)
+      // AUTH PAGES (public, no auth required)
+      // ========================================
+      {
+        element: <AuthShell />,
+        children: [
+          { path: 'login', element: <LoginPage /> },
+          { path: 'login/institution', element: <Navigate to={loginPath()} replace /> },
+          { path: 'login/register/eula', element: <Navigate to={loginPath()} replace /> },
+          { path: 'login/register', element: <Navigate to={loginPath()} replace /> },
+          { path: 'register/eula', element: <Navigate to={loginPath()} replace /> },
+          { path: 'register', element: <Navigate to={loginPath()} replace /> },
+        ],
+      },
+
+      // ========================================
+      // DEV PAGES (LoginShell for dev tools)
       // ========================================
       {
         element: <LoginShell />,
         children: [
-          { path: 'login', element: <LoginHubPage /> },
           { path: 'dev/api-test', element: <DevApiTestPage /> },
         ],
       },
@@ -256,8 +271,8 @@ const appRouteTree = [
           // Legacy redirect: /api-test -> /dev/api-test
           { path: 'api-test', element: <Navigate to={devApiTestPath()} replace /> },
 
-          // Catch-all
-          { path: '*', element: <Navigate to={loginPath()} replace /> },
+          // Catch-all: unknown paths → home (session-aware redirect from `/`)
+          { path: '*', element: <Navigate to={homePath()} replace /> },
         ],
       },
     ],
