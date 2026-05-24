@@ -3,13 +3,16 @@ import { Link } from 'react-router-dom';
 
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ME_PATH } from '../../../constants/authPaths.constants.js';
+import { DEV_BYPASS_DEFAULT_PERSONA_ID } from '../../../constants/devBypass.constants.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
+import { useDevBypassStatus } from '../../../hooks/useDevBypassStatus.js';
 import { groupsListPath, loginPath } from '../../../routes/pathRegistry.js';
 import { AuthProvider, useAuth } from './mock/AuthContext.jsx';
 import {
   getOrCreateBrowserId,
   resetStoredBrowserId,
 } from './mock/browserIdStorage.js';
+import { GROUP_INVITE_CODE_LENGTH } from './mock/mockConstants.js';
 import {
   LOGIN_PATH,
   LOGOUT_PATH,
@@ -70,6 +73,7 @@ function ApiPanelTitle({ title }) {
 function ApiTestWorkspaceInner() {
   const { authToken, setAuthToken, clearAuthToken } = useAuth();
   const globalSession = useSessionOptional();
+  const { devBypassQuery } = useDevBypassStatus();
   const [activeSectionId, setActiveSectionId] = useState('login');
   const [browserId, setBrowserId] = useState(() => getOrCreateBrowserId());
   const [sessionUser, setSessionUser] = useState(null);
@@ -77,7 +81,7 @@ function ApiTestWorkspaceInner() {
   const [responseText, setResponseText] = useState('');
   const [isBusy, setIsBusy] = useState(false);
   const [driveFile, setDriveFile] = useState(null);
-  const [loginBypassProfile, setLoginBypassProfile] = useState('lecturer');
+  const [loginBypassPersona, setLoginBypassPersona] = useState(DEV_BYPASS_DEFAULT_PERSONA_ID);
   const [loginPreviewJson, setLoginPreviewJson] = useState('{}');
 
   const activeSection = findSection(activeSectionId);
@@ -129,8 +133,18 @@ function ApiTestWorkspaceInner() {
   }, [refreshSession]);
 
   useEffect(() => {
-    setLoginPreviewJson(JSON.stringify({ profile: loginBypassProfile }, null, 2));
-  }, [loginBypassProfile]);
+    if (devBypassQuery.personas.length === 0) {
+      return;
+    }
+    const stillValid = devBypassQuery.personas.some((persona) => persona.id === loginBypassPersona);
+    if (!stillValid) {
+      setLoginBypassPersona(devBypassQuery.personas[0].id);
+    }
+  }, [devBypassQuery.personas, loginBypassPersona]);
+
+  useEffect(() => {
+    setLoginPreviewJson(JSON.stringify({ persona: loginBypassPersona }, null, 2));
+  }, [loginBypassPersona]);
 
   const displayName = authChecked ? formatSessionUserName(sessionUser) : '…';
   const displayRole = authChecked ? (sessionUser?.role ?? '—') : '…';
@@ -146,7 +160,7 @@ function ApiTestWorkspaceInner() {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ profile: loginBypassProfile }),
+          body: JSON.stringify({ persona: loginBypassPersona }),
         });
         const text = await response.text();
         if (!response.ok) {
@@ -225,6 +239,27 @@ function ApiTestWorkspaceInner() {
       return;
     }
     if (
+      activeSection.id === 'generateCode' &&
+      (synced.values.groupId === '' ||
+        synced.values.groupId === null ||
+        synced.values.groupId === undefined ||
+        Number.isNaN(Number(synced.values.groupId)))
+    ) {
+      synced.setValidationError('groupId is required in the request body.');
+      return;
+    }
+    if (activeSection.id === 'enrollByCode') {
+      if (String(synced.values.inviteGroupId ?? '').trim() === '') {
+        synced.setValidationError('Group ID is required in the path.');
+        return;
+      }
+      const code = String(synced.values.code ?? '').trim();
+      if (code.length !== GROUP_INVITE_CODE_LENGTH) {
+        synced.setValidationError(`Invite code must be exactly ${GROUP_INVITE_CODE_LENGTH} characters.`);
+        return;
+      }
+    }
+    if (
       (activeSection.id === 'badges' || activeSection.id === 'ranks') &&
       String(synced.values.groupId ?? '').trim() === ''
     ) {
@@ -264,12 +299,14 @@ function ApiTestWorkspaceInner() {
       }
       headers['Content-Type'] = 'application/json';
       const method = activeSection.method ?? 'POST';
+      /** @type {RequestInit} */
       const fetchOptions = {
         method,
         credentials: 'include',
         headers,
       };
       if (method !== 'GET' && method !== 'HEAD') {
+        headers['Content-Type'] = 'application/json';
         fetchOptions.body = JSON.stringify(synced.payload);
       }
       const response = await fetch(url, fetchOptions);
@@ -362,17 +399,6 @@ function ApiTestWorkspaceInner() {
                   </button>
                 </div>
                 <label className="api-test-workspace__field">
-                  <span className="api-test-workspace__field-label">Bypass profile</span>
-                  <select
-                    className="api-test-workspace__input"
-                    value={loginBypassProfile}
-                    onChange={(event) => setLoginBypassProfile(event.target.value)}
-                  >
-                    <option value="student">student</option>
-                    <option value="lecturer">lecturer</option>
-                  </select>
-                </label>
-                <label className="api-test-workspace__field">
                   <span className="api-test-workspace__field-label">Auth token (debug)</span>
                   <textarea
                     className="api-test-workspace__textarea api-test-workspace__input--mono"
@@ -381,10 +407,35 @@ function ApiTestWorkspaceInner() {
                     onChange={(event) => setAuthToken(event.target.value)}
                   />
                 </label>
+                {devBypassQuery.enabled ? (
+                  <>
+                    <label className="api-test-workspace__field">
+                      <span className="api-test-workspace__field-label">Dev bypass persona</span>
+                      <select
+                        className="api-test-workspace__input"
+                        value={loginBypassPersona}
+                        onChange={(event) => setLoginBypassPersona(event.target.value)}
+                        disabled={devBypassQuery.isLoading || devBypassQuery.personas.length === 0}
+                      >
+                        {devBypassQuery.personas.map((persona) => (
+                          <option key={persona.id} value={persona.id}>
+                            {persona.label} ({persona.sessionRole})
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <div className="api-test-workspace__actions">
+                      <button type="button" className="api-test-workspace__btn" disabled={isBusy} onClick={() => runLoginAction('bypass')}>
+                        Establish dev session
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="api-test-workspace__hint">
+                    Dev SAML bypass is disabled (`NODE_ENV=production` or `SAML_BYPASS_ENABLED` is off).
+                  </p>
+                )}
                 <div className="api-test-workspace__actions">
-                  <button type="button" className="api-test-workspace__btn" disabled={isBusy} onClick={() => runLoginAction('bypass')}>
-                    Establish dev session
-                  </button>
                   <button type="button" className="api-test-workspace__btn" disabled={isBusy} onClick={() => runLoginAction('login')}>
                     POST /login
                   </button>
@@ -467,6 +518,9 @@ function ApiTestWorkspaceInner() {
                     </label>
                   );
                 })}
+                {activeSection?.hint ? (
+                  <p className="api-test-workspace__hint">{activeSection.hint}</p>
+                ) : null}
                 {activeSection?.buildPath ? (
                   <p className="api-test-workspace__path">
                     Path: <code>{activeSection.buildPath(synced.values)}</code>
@@ -498,8 +552,12 @@ function ApiTestWorkspaceInner() {
                     setLoginPreviewJson(text);
                     try {
                       const parsed = JSON.parse(text);
-                      if (parsed.profile === 'student' || parsed.profile === 'lecturer') {
-                        setLoginBypassProfile(parsed.profile);
+                      if (typeof parsed.persona === 'string' && parsed.persona.trim() !== '') {
+                        setLoginBypassPersona(parsed.persona.trim());
+                      } else if (parsed.profile === 'student') {
+                        setLoginBypassPersona('student1');
+                      } else if (parsed.profile === 'lecturer') {
+                        setLoginBypassPersona('lecturer1');
                       }
                     } catch {
                       // keep form state until JSON is valid
