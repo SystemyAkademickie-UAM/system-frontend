@@ -13,6 +13,8 @@ import {
   getGroupStudentActivityTogglePath,
   GROUPS_NEW_PATH,
   STAGES_PATH,
+  PROFILE_AVATARS_PATH,
+  PROFILE_SETTINGS_PATH,
 } from './mock/mockConstants.js';
 import {
   SMOKE_TEST_DEFAULT_CURRENCY_ICON,
@@ -656,6 +658,61 @@ export const API_TEST_SECTIONS = [
       { key: 'groupId', label: 'Group ID (public)', type: 'number' },
       { key: 'accountId', label: 'Account ID', type: 'number' },
       { key: 'activityId', label: 'Activity ID', type: 'number' },
+    ],
+  },
+
+  // ── Profile Settings ────────────────────────────────────────────
+
+  {
+    id: 'profileGetAvatars',
+    label: 'Get Avatars',
+    title: 'GET /profile/avatars',
+    group: 'Profile Settings',
+    kind: 'get',
+    method: 'GET',
+    buildPath: () => PROFILE_AVATARS_PATH,
+    needsBrowserId: false,
+    defaultValues: () => ({}),
+    fields: [],
+  },
+  {
+    id: 'profileUpdateSettings',
+    label: 'Update Profile',
+    title: 'PATCH /profile/settings',
+    kind: 'api',
+    method: 'PATCH',
+    buildPath: () => PROFILE_SETTINGS_PATH,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      nickname: 'SuperStudent',
+      avatarId: 2,
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      const nickname = String(values.nickname ?? '').trim();
+      if (nickname !== '') {
+        payload.nickname = nickname;
+      }
+      if (values.avatarId !== '' && values.avatarId !== null && values.avatarId !== undefined) {
+        payload.avatarId = Number(values.avatarId);
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      nickname: typeof payload.nickname === 'string' ? payload.nickname : '',
+      avatarId: payload.avatarId ?? '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'nickname', label: 'nickname (optional)', type: 'text' },
+      { key: 'avatarId', label: 'avatarId (optional)', type: 'number' },
     ],
   },
 ];
