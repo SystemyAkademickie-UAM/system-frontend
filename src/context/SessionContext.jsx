@@ -7,7 +7,7 @@ const SessionContext = createContext(null);
 
 /**
  * Mapuje rolę z backendu na APP_ROLE.
- * Backend zwraca: 'student' | 'lecturer' | 'admin' | 'superadmin'
+ * Backend zwraca: 'student' | 'lecturer' | 'admin' | 'superadmin' (also 'administrator' | 'super' from DB)
  */
 function mapBackendRoleToAppRole(backendRole) {
   if (!backendRole || typeof backendRole !== 'string') {
@@ -19,7 +19,11 @@ function mapBackendRoleToAppRole(backendRole) {
       return APP_ROLE.LECTURER;
     case 'admin':
       return APP_ROLE.ADMIN;
+    case 'administrator':
+      return APP_ROLE.ADMIN;
     case 'superadmin':
+      return APP_ROLE.SUPERADMIN;
+    case 'super':
       return APP_ROLE.SUPERADMIN;
     case 'student':
     default:

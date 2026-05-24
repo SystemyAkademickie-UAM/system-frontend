@@ -1,0 +1,140 @@
+.auth-role-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth-role-picker__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(13, 13, 24, 0.72);
+  cursor: pointer;
+}
+
+.auth-role-picker__dialog {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(420px, 100%);
+  padding: 32px 28px 24px;
+  background: #343440;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.55);
+}
+
+.auth-role-picker__title {
+  margin: 0 0 24px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 28px;
+  color: #BDCABE;
+  text-align: center;
+}
+
+.auth-role-picker__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-role-picker__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.auth-role-picker__field-label {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(189, 202, 190, 0.75);
+}
+
+.auth-role-picker__select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #0D0D18;
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+  color: #BDCABE;
+  cursor: pointer;
+}
+
+.auth-role-picker__select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.auth-role-picker__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #44E286;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 28px;
+  color: #00391F;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.auth-role-picker__option:hover:not(:disabled) {
+  background: #3DD47A;
+}
+
+.auth-role-picker__option:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.auth-role-picker__error {
+  margin: 16px 0 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #ff8a8a;
+  text-align: center;
+}
+
+.auth-role-picker__cancel {
+  display: block;
+  width: 100%;
+  margin-top: 0;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: #42F37D;
+  cursor: pointer;
+}
+
+.auth-role-picker__cancel:hover:not(:disabled) {
+  color: #3DD47A;
+}
+
+.auth-role-picker__cancel:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}

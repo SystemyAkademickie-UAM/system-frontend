@@ -1,0 +1,104 @@
+.login-institution {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: var(--auth-card-max-width);
+  max-width: calc(100% - 2rem);
+  padding: var(--auth-card-back-padding-top) var(--auth-card-body-padding-x)
+    var(--auth-card-body-padding-bottom);
+  gap: 0;
+}
+
+.login-institution .auth-card__back-button {
+  margin-top: 0;
+  margin-bottom: var(--auth-card-back-to-logo-gap);
+}
+
+.login-institution__logo {
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  height: auto;
+  object-fit: contain;
+  margin: 0 0 var(--auth-card-logo-to-label-gap);
+}
+
+.login-institution__field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  margin: 0;
+  flex-shrink: 0;
+  gap: var(--auth-institution-label-to-field-gap);
+}
+
+.login-institution .auth-card__title {
+  display: block;
+  margin: 0;
+}
+
+.login-institution__select-wrap {
+  width: 100%;
+}
+
+.login-institution__select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 64px;
+  padding: 20px 48px 20px 16px;
+  background: #0D0D18;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: rgba(189, 202, 190, 0.65);
+  appearance: none;
+  cursor: not-allowed;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23BDCABE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+.login-institution__select:disabled {
+  opacity: 1;
+}
+
+.login-institution__continue {
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  flex-shrink: 0;
+  margin: calc(
+      var(--auth-card-field-to-button-gap) - var(--auth-institution-label-to-field-gap)
+    )
+    0 0;
+  padding: 16px 0;
+}
+
+.login-institution__error {
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  margin: 0 0 var(--auth-card-field-to-button-gap);
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #ff8a8a;
+}
+
+@media (max-width: 640px) {
+  .login-institution {
+    padding: 1rem 20px 1.75rem;
+  }
+
+  .login-institution__logo {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  .login-institution__continue {
+    min-height: 60px;
+  }
+}

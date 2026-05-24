@@ -1,0 +1,114 @@
+.register-eula {
+  box-sizing: border-box;
+  width: var(--auth-card-max-width);
+  max-width: calc(100% - 2rem);
+  padding: 16px clamp(1rem, 1.67vw, 32px) 32px;
+  gap: 0;
+  align-items: center;
+}
+
+.register-eula__subtitle {
+  max-width: 451px;
+  margin-bottom: 48px;
+}
+
+.register-eula__error {
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  margin: -32px 0 24px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #ff8a8a;
+  text-align: center;
+}
+
+.register-eula__checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 451px;
+  margin-bottom: 64px;
+}
+
+.register-eula__checkbox-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.register-eula__checkbox-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.register-eula__checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.register-eula__checkbox-custom {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #BDCABE;
+  border-radius: 2px;
+  background: transparent;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.register-eula__checkbox-input:checked + .register-eula__checkbox-custom {
+  background: #44E286;
+  border-color: #44E286;
+}
+
+.register-eula__checkbox-input:focus-visible + .register-eula__checkbox-custom {
+  outline: 2px solid #44E286;
+  outline-offset: 2px;
+}
+
+.register-eula__check-icon {
+  width: 12px;
+  height: 12px;
+  color: #00391F;
+}
+
+.register-eula__checkbox-label {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 28px;
+  color: #BDCABE;
+  opacity: 0.6;
+}
+
+.register-eula__submit {
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+}
+
+@media (max-width: 600px) {
+  .register-eula {
+    padding: 16px;
+  }
+
+  .register-eula__checkbox-label {
+    font-size: 18px;
+  }
+
+  .register-eula__checkboxes {
+    margin-bottom: 32px;
+  }
+}
