@@ -8,9 +8,6 @@ import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 //import './ProfileContent.css';
 
-import lefticon from '../../../../public/assets/icons/arrow-left-svgrepo-com.svg';
-import righticon from '../../../../public/assets/icons/arrow-right-svgrepo-com.svg';
-
 export default function ProfileContent() {
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -73,12 +70,7 @@ export default function ProfileContent() {
     }
   }
 
-  function previousicon() {
-    console.log();
-  }
-  function nexticon() {
-    console.log();
-  }
+
 
   function onNicknamechange(stringvalue) {
     while (stringvalue.length > 15) {
@@ -164,13 +156,9 @@ export default function ProfileContent() {
         <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '98%', height: '30%', position: 'absolute', top: '16%', left: '1%', display: 'flex', flexDirection: 'column', alignItems: 'center', borderRadius: '16px'}}>
           <div style = {{width: '100%', height: '30%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}>{avatarLABEL[language]}</div>
           <div style = {{width: '100%', height: '60%', position: 'relative', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '2.5%'}}>
-            <div onClick = {previousicon} style = {{backgroundColor: 'rgb(40, 40, 52', height: '45%', aspectRatio: '1 / 1', position: 'relative', alignItems: 'center', justifyContent: 'center', display: 'flex', borderRadius: '50%', cursor: 'pointer'}}>
-              <img src = {lefticon} style = {{width: '100%', height: '100%'}}/>
-            </div>
+            <div style = {{backgroundColor: 'rgb(255, 0, 255', height: '45%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', borderRadius: '50%'}}></div>
             <div style = {{backgroundColor: 'rgb(255, 0, 255', height: '90%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', borderRadius: '50%'}}></div>
-            <div onClick = {nexticon} style = {{backgroundColor: 'rgb(40, 40, 52', height: '45%', aspectRatio: '1 / 1', position: 'relative', alignItems: 'center', justifyContent: 'center', display: 'flex', borderRadius: '50%', cursor: 'pointer'}}>
-              <img src = {righticon} style = {{width: '100%', height: '100%'}}/>
-            </div>
+            <div style = {{backgroundColor: 'rgb(255, 0, 255', height: '45%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', borderRadius: '50%'}}></div>
           </div>
         </div>
 

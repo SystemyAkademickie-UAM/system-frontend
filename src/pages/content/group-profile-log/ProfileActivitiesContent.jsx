@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
-import './ProfileContent.css';
+import { getOrCreateBrowserId } from '../../content/api-test/mock/browserIdStorage.js';
+//import './ProfileContent.css';
 
 export default function ProfileContent() {
   const { groupId } = useParams();
@@ -45,21 +45,20 @@ export default function ProfileContent() {
   }
   totalcurrency = totalcurrency.trim();
 
-  var receivedactivities = [];
-
+  var receivedactivities = [
+    {id: 0, image: 'rgb(255, 0, 0)', name: 'Zlota marchewka', description: 'Osiagnij maksymalny wynik z kolokwium.', time: '2 godziny temu'},
+    {id: 1, image: 'rgb(0, 255, 0)', name: 'Mistrz marchewki', description: 'Wykonanaj 3 trudne zadania.', time: 'Wczoraj'},
+    {id: 2, image: 'rgb(0, 0, 255)', name: 'Agent specjalny', description: 'Wykonaj obie prace domowe.', time: 'Tydzien temu'}
+  ];
+  
   i = 0;
   while (i < receivedactivities.length) {
     receivedactivities[i].top = i * 12.25 + 38 + '%';
     i = i + 1;
   }
-  const [activities, setActivities] = useState(receivedactivities.slice(0, 5));
+  const [activities, setActivities] = useState(receivedactivities.slice(0, 2));
 
-  var receivedbadges = [
-    {id: 0, image: 'rgb(255, 0, 0)', name: 'Pierwsza marchewka', description0: 'Witaj nowy rekrucie!', description1: 'Wykonaj pierwsza aktywnosc.', reward: 3, time: 'Miesiąc temu', rarity: 'common'},
-    {id: 1, image: 'rgb(0, 255, 0)', name: 'Perfekcjonista', description0: 'Wykonujesz swoje zadania bez najmniejszych potkniec.', description1: 'Uzyskaj 100% punktow za wykonanie zadania domowego.', reward: 5, time: '2 tygodnie temu', rarity: 'uncommon'},
-    {id: 2, image: 'rgb(0, 0, 255)', name: 'Aktywny', description0: 'Wykaz sie ponadprzecietna wiedza.', description1: 'Zglos sie trzykrotnie w trakcie jednego spotkania.', reward: 10, time: 'Tydzień temu', rarity: 'rare'},
-    {id: 3, image: 'rgb(255, 0, 255)', name: 'Ekspert', description0: 'Dowiedz swojej wiedzy w wykonywaniu codziennych zadan.', description1: 'Wykonaj wszystkie zadania z jednego zestawu', reward: 15, time: '3 dni temu', rarity: 'epic'}
-  ];
+  var receivedbadges = [];
   i = 0;
   while (i < receivedbadges.length) {
     if (receivedbadges[i].rarity == 'common') {
@@ -86,7 +85,7 @@ export default function ProfileContent() {
     receivedbadges[i].top = Math.floor(i / 2) * 31 + 38 + '%';
     i = i + 1;
   }
-  const [badges, setBadges] = useState(receivedbadges.slice(0, 3));
+  const [badges, setBadges] = useState(receivedbadges.slice(0, 8));
 
   async function onFetchStudent() {
     setErrorMessage('');
@@ -104,17 +103,20 @@ export default function ProfileContent() {
       });
 
       const responsetext = await response.text();
-      console.log('GET /groups/' + groupId + '/student-profile HTTP status: ', response.status);
-      console.log('GET /groups/' + groupId + '/student-profile raw body: ', responsetext);
+      console.log('GET /groups/' + groupId + '/student-profile: ', response.status);
+      console.log('GET /groups/' + groupId + '/student-profile: ', responsetext);
 
       let data;
       try {
         data = JSON.parse(responsetext);
       } catch {
-        throw new Error('/groups/' + groupId + '/student-profile not JSON: ' + responsetext);
+        console.log('/groups/' + groupId + '/student-profile not JSON: ' + responsetext);
+
       }
 
       console.log('GET /groups/' + groupId + '/student-profile JSON:', data);
+
+
 
 
 
@@ -142,8 +144,6 @@ export default function ProfileContent() {
 
       setCurrency(temporarycurrency);
       setTitle('');
-
-
     } catch (error) {
       let message;
       if (error instanceof Error) {
@@ -184,7 +184,7 @@ export default function ProfileContent() {
         setActivitieslabel('UKRYJ AKTYWNOŚCI');
       } else {
         setAllactivities(0);
-        setActivities(receivedactivities.slice(0, 5));
+        setActivities(receivedactivities.slice(0, 2));
         setActivitieslabel('WSZYSTKIE AKTYWNOŚCI');
       }
     } else {
@@ -194,7 +194,7 @@ export default function ProfileContent() {
         setBadgeslabel('UKRYJ ODZNAKI');
       } else {
         setAllbadges(0);
-        setBadges(receivedbadges.slice(0, 3));
+        setBadges(receivedbadges.slice(0, 4));
         setBadgeslabel('WSZYSTKIE ODZNAKI');
       }
     }
@@ -245,33 +245,17 @@ export default function ProfileContent() {
         </div>
 
 
-        <div style = {{width: '49%', height: '7%', position: 'absolute', top: '48%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Odznaki</div>
-        <div style = {{width: '49%', height: '7%', position: 'absolute', top: '48%', left: '50%', color: 'rgb(66, 243, 125)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-end', paddingRight: '1%'}}><span onClick={() => toggleAll('badges')} style={{cursor: 'pointer'}}>{badgeslabel}</span></div>
+        <div style = {{width: '49%', height: '7%', position: 'absolute', top: '48%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Aktywności</div>
+        <div style = {{width: '49%', height: '7%', position: 'absolute', top: '48%', left: '50%', color: 'rgb(66, 243, 125)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-end', paddingRight: '1%'}}><span onClick={() => toggleAll('activities')} style={{cursor: 'pointer'}}>{activitieslabel}</span></div>
 
 
-
-        <div style = {{width: '98%', position: 'absolute', top: '56%', left: '1%', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', columnGap: '3.5%', rowGap: '2.5vh', paddingBottom: '2vh', borderRadius: '8px'}}>
-          {badges.map((badge) => (
-            <div key = {'badge' + badge.id} style = {{backgroundColor: 'rgb(41, 40, 57)', width: '31%', display: 'flex', flexWrap: 'wrap', borderLeft: '4px solid ' + badge.colour, borderRadius: '16px'}}>
-              <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', display: 'flex', flexDirection: 'row'}}>
-                <div style = {{width: '13%', display: 'flex', flexDirection: 'column', paddingTop: '1vh', paddingBottom: '1vh', alignItems: 'center', gap: '1vh'}}>
-                  <div style = {{backgroundColor: badge.image, width: '75%', aspectRatio: '1 / 1', borderRadius: '50%'}}></div>
-                </div>
-                <div style = {{width: '87%', display: 'flex', flexDirection: 'column', paddingTop: '1vh', paddingBottom: '1vh', gap: '2vh'}}>
-                  <div style = {{width: '100%', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{badge.name}</span></div>
-                  <div style = {{width: '100%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>OPIS FABULARNY</span></div>
-                  <div style = {{width: '100%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{badge.description0}</span></div>
-                  <div style = {{width: '100%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>OPIS DYDAKTYCZNY</span></div>
-                  <div style = {{width: '100%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{badge.description1}</span></div>
-                  <div style = {{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                    <div style = {{width: '75%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>NAGRODA</span></div>
-                    <div style = {{width: '17.5%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{badge.reward}</span></div>
-                    <div style = {{backgroundColor: 'rgb(255, 0, 255)', width: '7.5%', aspectRatio: '1 / 1', position: 'relative'}}></div>
-                  </div>
-                  <div style = {{width: '100%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>• {badge.time}</span></div>
-                  <div style = {{width: '100%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{badge.rarity}</span></div>
-                </div>
-              </div>
+        <div style = {{width: '98%', position: 'absolute', top: '56%', left: '1%', display: 'flex', flexDirection: 'column', flexWrap: 'wrap', columnGap: '2.5%', rowGap: '3.5vh', paddingBottom: '2vh', borderRadius: '8px'}}>
+          {activities.map((activity) => (
+            <div key = {'activity' + activity.id} style={{backgroundColor: 'rgb(26, 26, 42)', width: '100%', height: '20%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderLeft: '4px solid rgb(66, 243, 125)', paddingLeft: '2.5%', paddingRight: '2.5%', paddingTop: '1%', paddingBottom: '1%', gap: '2.5%', borderRadius: '16px'}}>
+              <div style = {{backgroundColor: activity.image, width: '7.5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', borderRadius: '50%'}}></div>
+              <div style={{width: '25%', height: '25%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style={{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{activity.name}</span></div>
+              <div style={{width: '60%', height: '25%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style={{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 5, overflow: 'hidden'}}>{activity.description}</span></div>
+              <div style={{width: '15%', height: '25%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 100, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>• {activity.time}</span></div>
             </div>
           ))}
         </div>
@@ -281,3 +265,5 @@ export default function ProfileContent() {
     </div>
   );
 }
+
+
