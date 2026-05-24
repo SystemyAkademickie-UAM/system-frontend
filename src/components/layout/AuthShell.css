@@ -1,0 +1,176 @@
+.auth-shell {
+  --auth-panel-max-width: min(1113px, 58vw);
+  --auth-card-max-width: min(569px, 29.64vw);
+  --auth-content-max-width: min(501px, 26.09vw);
+  --auth-maq-logo-opacity: 0.6;
+  --auth-card-min-height: 558px;
+  --auth-card-body-padding-top: clamp(2.5rem, 4.3vw, 83px);
+  --auth-card-body-padding-x: clamp(1rem, 1.67vw, 32px);
+  --auth-card-body-padding-bottom: clamp(2rem, 3.3vw, 64px);
+  /** Institution step: back arrow sits flush to card top (not login’s logo inset). */
+  --auth-card-back-padding-top: clamp(1rem, 1.67vw, 16px);
+  --auth-card-logo-to-content-gap: clamp(3rem, 7vw, 136px);
+  --auth-card-logo-to-label-gap: clamp(2.5rem, 5vw, 80px);
+  --auth-card-label-to-field-gap: clamp(1.25rem, 2vw, 32px);
+  --auth-card-field-to-button-gap: clamp(1rem, 2vw, 32px);
+  --auth-card-back-to-logo-gap: clamp(1.5rem, 2.5vw, 32px);
+  /** Institution: label → dropdown (inline labels ignore vertical margins). */
+  --auth-institution-label-to-field-gap: clamp(0.5rem, 1vw, 12px);
+  --auth-card-transition-exit-ms: 240ms;
+  --auth-card-transition-enter-ms: 240ms;
+  --auth-card-transition-slide: 50%;
+
+  position: relative;
+  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #008040;
+  font-family: 'Manrope', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.auth-shell__bg-texture,
+.auth-shell__bg-gradient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.auth-shell__bg-texture {
+  background: url('/images/login-bg.png') center / cover no-repeat;
+  opacity: 0.3;
+}
+
+.auth-shell__bg-gradient {
+  background: linear-gradient(
+    180deg,
+    rgba(66, 243, 125, 0.37) 0%,
+    rgba(40, 40, 52, 0.33) 100%
+  );
+}
+
+.auth-shell__skip {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: #44E286;
+  color: #00391F;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+}
+
+.auth-shell__skip:focus {
+  left: 0;
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.auth-shell__main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: clamp(1.5rem, 10vh, 6rem) clamp(1rem, 21vw, 21%) 0;
+  outline: none;
+}
+
+.auth-shell__panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--auth-panel-max-width);
+  flex: 1;
+  min-height: 0;
+  background: #282834;
+  border-radius: 28px 28px 0 0;
+}
+
+.auth-shell__panel-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: clamp(2.5rem, 8vh, 150px) clamp(1rem, 2vw, 2rem) clamp(2rem, 5vh, 100px);
+  gap: clamp(2rem, 5vh, 70px);
+  overflow-y: auto;
+}
+
+.auth-shell__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.auth-shell__footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.auth-shell__footer-logo {
+  width: clamp(36px, 2.66vw, 51px);
+  height: clamp(32px, 2.4vw, 46px);
+  object-fit: contain;
+}
+
+.auth-shell__footer-text {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 0.94vw, 18px);
+  line-height: 28px;
+  color: rgba(189, 202, 190, 0.6);
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .auth-shell {
+    --auth-panel-max-width: 100%;
+    --auth-card-max-width: min(569px, calc(100% - 2rem));
+    --auth-content-max-width: min(501px, calc(100% - 3rem));
+  }
+
+  .auth-shell__main {
+    padding: 0.75rem 0 0;
+  }
+
+  .auth-shell__footer-text {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .auth-shell {
+    --auth-panel-max-width: 1113px;
+    --auth-card-max-width: 569px;
+    --auth-content-max-width: 501px;
+  }
+}
+
+@media (max-height: 820px) {
+  .auth-shell__main {
+    padding-top: 0.75rem;
+  }
+
+  .auth-shell__panel-inner {
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
+    gap: 2rem;
+  }
+}
