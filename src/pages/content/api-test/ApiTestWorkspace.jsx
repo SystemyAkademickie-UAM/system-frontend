@@ -297,6 +297,7 @@ function ApiTestWorkspaceInner() {
         setResponseText(formatFetchError(response, text));
         return;
       }
+      headers['Content-Type'] = 'application/json';
       const method = activeSection.method ?? 'POST';
       /** @type {RequestInit} */
       const fetchOptions = {
@@ -304,7 +305,7 @@ function ApiTestWorkspaceInner() {
         credentials: 'include',
         headers,
       };
-      if (method !== 'GET') {
+      if (method !== 'GET' && method !== 'HEAD') {
         headers['Content-Type'] = 'application/json';
         fetchOptions.body = JSON.stringify(synced.payload);
       }

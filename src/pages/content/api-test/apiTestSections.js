@@ -7,9 +7,6 @@ import {
   getGroupRanksPath,
   GROUPS_GENERATE_CODE_PATH,
   GROUPS_NEW_PATH,
-  STAGES_PATH,
-} from './mock/mockConstants.js';
-import {
   SMOKE_TEST_DEFAULT_CURRENCY_ICON,
   SMOKE_TEST_DEFAULT_LIFE_ICON,
 } from './mock/mockConstants.js';
