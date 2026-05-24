@@ -1,4 +1,4 @@
-.login-shell:has(.api-test-workspace) {
+﻿.login-shell:has(.api-test-workspace) {
   --api-test-sidebar-width: 220px;
   --api-test-topbar-height: 3.25rem;
   --api-test-shell-header-height: 3.25rem;
@@ -114,6 +114,17 @@
   border-color: rgba(16, 185, 129, 0.45);
   background: rgba(16, 185, 129, 0.2);
   color: #fff;
+}
+
+.api-test-workspace__nav-group {
+  margin: 0.75rem 0 0.25rem;
+  padding: 0.35rem 0.5rem 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6ee7b7;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .api-test-workspace__main {
@@ -487,4 +498,3 @@
   transform: scale(1.03);
   filter: drop-shadow(0 6px 12px rgba(16, 185, 129, 0.25));
 }
-

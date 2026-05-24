@@ -110,3 +110,69 @@ export function getGroupBadgesPath(groupId) {
 export function getGroupRanksPath(groupId) {
   return `/groups/${groupId}/ranks`;
 }
+
+// ── Student Management endpoints ────────────────────────────────────
+
+/** @param {number|string} groupId */
+export function getGroupStudentsPath(groupId) {
+  return `/groups/${groupId}/students`;
+}
+
+/** @param {number|string} groupId */
+export function getGroupStudentsBulkUpdatePath(groupId) {
+  return `/groups/${groupId}/students/bulk-update`;
+}
+
+/**
+ * @param {number|string} groupId
+ * @param {number|string} accountId
+ */
+export function getGroupStudentDeletePath(groupId, accountId) {
+  return `/groups/${groupId}/students/${accountId}`;
+}
+
+/**
+ * @param {number|string} groupId
+ * @param {number|string} accountId
+ */
+export function getGroupStudentBadgesPath(groupId, accountId) {
+  return `/groups/${groupId}/students/${accountId}/badges`;
+}
+
+/**
+ * @param {number|string} groupId
+ * @param {number|string} accountId
+ * @param {number|string} badgeId
+ */
+export function getGroupStudentBadgeTogglePath(groupId, accountId, badgeId) {
+  return `/groups/${groupId}/students/${accountId}/badges/${badgeId}/toggle`;
+}
+
+/**
+ * @param {number|string} groupId
+ * @param {number|string} accountId
+ */
+export function getGroupStudentProgressPath(groupId, accountId) {
+  return `/groups/${groupId}/students/${accountId}/progress`;
+}
+
+/**
+ * @param {number|string} groupId
+ * @param {number|string} accountId
+ * @param {number|string} activityId
+ */
+export function getGroupStudentActivityTogglePath(groupId, accountId, activityId) {
+  return `/groups/${groupId}/students/${accountId}/activities/${activityId}/toggle`;
+}
+
+// ── Profile Settings endpoints ──────────────────────────────────────
+
+/** GET /profile - Get current user profile */
+export const PROFILE_PATH = '/profile';
+
+/** GET /profile/avatars - List of available avatars */
+export const PROFILE_AVATARS_PATH = '/profile/avatars';
+
+/** PATCH /profile/settings - Update profile nickname/avatar */
+export const PROFILE_SETTINGS_PATH = '/profile/settings';
+
