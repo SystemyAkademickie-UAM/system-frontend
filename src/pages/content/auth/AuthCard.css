@@ -1,0 +1,218 @@
+.auth-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--auth-card-max-width);
+  max-width: calc(100% - 2rem);
+  background: #343440;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 64px 64px -12px rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+}
+
+.auth-card--left-aligned {
+  align-items: flex-start;
+}
+
+/** Same outer card size as `/login` on large screens (Figma 569×558). */
+@media (min-width: 1920px) {
+  .auth-card.auth-card--wizard-panel {
+    min-height: var(--auth-card-min-height);
+  }
+}
+
+.auth-card__back-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  align-self: flex-start;
+  margin-bottom: 16px;
+}
+
+.auth-card__back-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-card__back-button:focus-visible {
+  outline: 2px solid #44E286;
+  outline-offset: 2px;
+}
+
+.auth-card__back-icon {
+  width: 32px;
+  height: 32px;
+  color: #FDFBFF;
+}
+
+.auth-card__logo {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 32px;
+}
+
+.auth-card__primary-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0;
+  gap: 12px;
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  min-height: 52px;
+  background: #44E286;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: clamp(15px, 0.94vw, 18px);
+  line-height: 28px;
+  color: #00391F;
+  text-decoration: none;
+}
+
+.auth-card__primary-btn:hover {
+  background: #3DD47A;
+}
+
+.auth-card__primary-btn:active {
+  transform: scale(0.98);
+}
+
+.auth-card__primary-btn:focus-visible {
+  outline: 2px solid #FDFBFF;
+  outline-offset: 2px;
+}
+
+.auth-card__primary-btn:disabled {
+  background: rgba(68, 226, 134, 0.5);
+  cursor: not-allowed;
+}
+
+.auth-card__secondary-link {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: clamp(14px, 0.83vw, 16px);
+  line-height: 24px;
+  letter-spacing: -0.4px;
+  color: #42F37D;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.auth-card__secondary-link:hover {
+  color: #3DD47A;
+}
+
+.auth-card__secondary-link:focus-visible {
+  outline: 2px solid #44E286;
+  outline-offset: 2px;
+}
+
+.auth-card__title {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: clamp(18px, 1.15vw, 22px);
+  line-height: 20px;
+  color: #BDCABE;
+  margin: 0 0 24px 0;
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+}
+
+.auth-card__subtitle {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: clamp(18px, 1.15vw, 22px);
+  line-height: 28px;
+  color: #BDCABE;
+  text-align: center;
+  margin: 0 0 48px 0;
+  max-width: 451px;
+}
+
+.auth-card__input-wrapper {
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  margin-bottom: 24px;
+}
+
+.auth-card__input-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 18px 16px 18px 48px;
+  width: 100%;
+  min-height: 56px;
+  background: #0D0D18;
+  border-radius: 8px;
+  position: relative;
+}
+
+.auth-card__input-icon {
+  position: absolute;
+  left: 19px;
+  width: 18px;
+  height: 18px;
+  color: #BDCABE;
+}
+
+.auth-card__input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: #BDCABE;
+  outline: none;
+}
+
+.auth-card__input::placeholder {
+  color: rgba(189, 202, 190, 0.4);
+}
+
+.auth-card__input-container:focus-within {
+  outline: 2px solid #44E286;
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    border-radius: 8px;
+  }
+
+  .auth-card__title,
+  .auth-card__subtitle {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .auth-card__primary-btn {
+    font-size: 16px;
+    min-height: 48px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .auth-card__primary-btn {
+    padding: 20px 0;
+    min-height: 60px;
+  }
+
+  .auth-card__input-container {
+    padding: 21px 16px 21px 48px;
+    min-height: 64px;
+  }
+}

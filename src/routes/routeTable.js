@@ -26,8 +26,8 @@ export const ROUTE_TABLE = [
     section: 'auth',
     pathPattern: '/login',
     pageTitle: 'Logowanie',
-    pageModule: 'pages/links/login/LoginHubPage.jsx',
-    contentModule: 'pages/content/login-hub/LoginHubContent.jsx',
+    pageModule: 'pages/links/auth/LoginPage.jsx',
+    contentModule: 'pages/content/auth/LoginPionierId.jsx',
   },
 
   // ===========================================================================
