@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BADGE_RARITY, BADGE_RARITY_LABELS, Modal } from '../../../../components/ui/index.js';
+import { fetchIconCatalog } from '../../../../services/icons.api.js';
 import { validateWholeNumberInput } from '../../group-rewards/shared/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
@@ -19,7 +20,18 @@ export default function BadgeFormModal({
   onConfirm,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
+  const [iconCatalog, setIconCatalog] = useState([]);
   const isEdit = Boolean(badge);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+    fetchIconCatalog().then((catalog) => {
+      if (!cancelled) setIconCatalog(catalog);
+    });
+    return () => { cancelled = true; };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -69,7 +81,6 @@ export default function BadgeFormModal({
       didacticDescription: form.didacticDescription.trim(),
       rewardAmount: rewardValidation.value,
     });
-    onClose();
   };
 
   return (
@@ -96,15 +107,18 @@ export default function BadgeFormModal({
 
         <div className="rewards-modal__row">
           <div className="rewards-modal__field">
-            <label htmlFor="badge-icon" className="rewards-modal__label">Ikona (plik SVG)</label>
-            <input
+            <label htmlFor="badge-icon" className="rewards-modal__label">Ikona</label>
+            <select
               id="badge-icon"
-              type="text"
-              className="rewards-modal__input"
+              className="rewards-modal__select"
               value={form.iconFile}
               onChange={handleChange('iconFile')}
-              placeholder="np. rocket.svg"
-            />
+            >
+              <option value="">Wybierz ikonę…</option>
+              {iconCatalog.map((icon) => (
+                <option key={icon.id} value={icon.id}>{icon.label}</option>
+              ))}
+            </select>
           </div>
 
           <div className="rewards-modal__field">

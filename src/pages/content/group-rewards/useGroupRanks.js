@@ -100,14 +100,12 @@ export function useGroupRanks() {
     });
 
     if (result.ok && result.rank) {
-      setRanks((prev) => {
-        const newRank = mapRank(result.rank, prev.length);
-        return [...prev, newRank];
-      });
+      await loadData();
+      return result;
     }
 
     return result;
-  }, [groupId]);
+  }, [groupId, loadData]);
 
   const handleUpdate = useCallback(async (rankId, values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };

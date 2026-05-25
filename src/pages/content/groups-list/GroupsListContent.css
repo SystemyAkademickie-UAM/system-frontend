@@ -42,6 +42,18 @@
   white-space: nowrap;
 }
 
+.groups-list__creator-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  background: rgba(8, 8, 16, 0.72);
+  overflow-y: auto;
+}
+
 .groups-list__search {
   flex: 0 0 18rem;
   width: 18rem;

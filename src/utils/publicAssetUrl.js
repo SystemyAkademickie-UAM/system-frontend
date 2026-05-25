@@ -12,3 +12,8 @@ export function publicAssetPath(relativePath) {
 export function appLogoPath() {
   return publicAssetPath('assets/icon/maq.ico');
 }
+
+/** Ikona UI z public/assets/icons/ (np. "arrow-left-svgrepo-com.svg"). */
+export function publicIconPath(fileName) {
+  return publicAssetPath(`assets/icons/${fileName}`);
+}

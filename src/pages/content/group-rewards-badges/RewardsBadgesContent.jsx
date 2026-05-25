@@ -33,8 +33,7 @@ const BADGE_COLUMNS = [
     key: 'name',
     label: 'Nazwa',
     sort: 'text',
-    width: '180px',
-    cellClassName: 'rewards-table__cell--truncate',
+    width: '260px',
     render: (badge) => (
       <span className="rewards-table__name">{badge.name}</span>
     ),

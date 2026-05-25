@@ -8,7 +8,7 @@ export default function ActivitiesHomeContent() {
   return (
     <PageAvailable
       title={nav.sectionTitle}
-      description="Etapy"
+      description="Panel pozwalający na tworzenie nowych etapów oraz przypisywanie im aktywności."
       subNavAriaLabel={nav.ariaLabel}
       subNavItems={nav.items}
     >

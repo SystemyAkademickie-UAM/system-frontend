@@ -30,8 +30,7 @@ const RANK_COLUMNS = [
     key: 'name',
     label: 'Nazwa',
     sort: 'text',
-    width: '160px',
-    cellClassName: 'rewards-table__cell--truncate',
+    width: '240px',
     render: (rank) => (
       <span className="rewards-table__name">{rank.name}</span>
     ),

@@ -5,7 +5,7 @@ import ActivityCard from './ActivityCard.jsx';
 import './ActivityProgressIcon.css';
 
 const PREVIEW_OFFSET = 16;
-const PREVIEW_WIDTH = 320;
+const PREVIEW_WIDTH = 420;
 
 /**
  * Okrągła ikona postępu aktywności — klik przełącza stan, hover pokazuje ActivityCard.

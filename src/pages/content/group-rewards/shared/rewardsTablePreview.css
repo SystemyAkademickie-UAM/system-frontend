@@ -3,6 +3,7 @@
   z-index: 1100;
   pointer-events: none;
   filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 .rewards-table-preview--badge {

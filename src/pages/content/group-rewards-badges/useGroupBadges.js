@@ -99,14 +99,12 @@ export function useGroupBadges() {
     });
 
     if (result.ok && result.badge) {
-      setBadges((prev) => {
-        const newBadge = mapBadge(result.badge, prev.length);
-        return [...prev, newBadge];
-      });
+      await loadData();
+      return result;
     }
 
     return result;
-  }, [groupId]);
+  }, [groupId, loadData]);
 
   const handleUpdate = useCallback(async (badgeId, values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };

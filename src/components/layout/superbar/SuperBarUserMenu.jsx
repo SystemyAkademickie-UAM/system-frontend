@@ -10,7 +10,13 @@ import './SuperBar.css';
 /**
  * Awatar + rozwijane menu (Wyloguj → /login).
  */
-export default function SuperBarUserMenu({ displayName, roleLabel, onNavigate, isLoading = false }) {
+export default function SuperBarUserMenu({
+  displayName,
+  roleLabel,
+  avatarUrl = null,
+  onNavigate,
+  isLoading = false,
+}) {
   const menuId = useId();
   const rootRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -66,7 +72,11 @@ export default function SuperBarUserMenu({ displayName, roleLabel, onNavigate, i
         onClick={() => setOpen((value) => !value)}
       >
         <span className="super-bar-user-menu__avatar" aria-hidden="true">
-          <IconUserPlaceholder />
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="" className="super-bar-user-menu__avatar-img" />
+          ) : (
+            <IconUserPlaceholder />
+          )}
         </span>
       </button>
       {open ? (

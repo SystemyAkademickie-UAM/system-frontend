@@ -23,6 +23,7 @@ export default function MembersHomeContent() {
     badges,
     isLoading,
     error,
+    refetch,
     updateMember,
     deleteMember,
     updateMemberRank,
@@ -41,22 +42,15 @@ export default function MembersHomeContent() {
     setActiveModal(null);
   }, []);
 
-  const handleBadgesConfirm = useCallback((earnedBadgeIds) => {
-    if (!activeModal?.member) return;
-    updateMember(activeModal.member.id, {
-      badgesCount: earnedBadgeIds.length,
-    });
+  const handleBadgesConfirm = useCallback(() => {
     closeModal();
-  }, [activeModal, updateMember, closeModal]);
+    refetch();
+  }, [closeModal, refetch]);
 
-  const handleProgressConfirm = useCallback((activityProgress) => {
-    if (!activeModal?.member) return;
-    const completedCount = Object.values(activityProgress).filter(Boolean).length;
-    updateMember(activeModal.member.id, {
-      completedActivitiesCount: completedCount,
-    });
+  const handleProgressConfirm = useCallback(() => {
     closeModal();
-  }, [activeModal, updateMember, closeModal]);
+    refetch();
+  }, [closeModal, refetch]);
 
   const handleCurrencyConfirm = useCallback(async ({ delta }) => {
     if (!activeModal?.member) return;
@@ -142,13 +136,13 @@ export default function MembersHomeContent() {
       key: 'rank',
       label: 'Ranga',
       sort: { type: 'custom', order: rankNames },
-      width: '120px',
+      width: '140px',
       className: 'members-table__th--rank',
       colClassName: 'members-table__col--rank',
       cellClassName: 'members-table__cell--rank',
       hiddenBelow: 768,
       render: (member) => (
-        <span className="members-table__rank-badge">{member.rank}</span>
+        <span className="members-table__rank-badge" title={member.rank}>{member.rank}</span>
       ),
     },
     {
@@ -292,6 +286,7 @@ export default function MembersHomeContent() {
       <MemberProgressModal
         isOpen={activeModal?.type === 'progress'}
         member={modalMember}
+        groupId={groupId}
         onClose={closeModal}
         onConfirm={handleProgressConfirm}
       />

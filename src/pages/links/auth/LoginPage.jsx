@@ -16,6 +16,7 @@ import {
   LOGIN_FLOW_STEP_REGISTER,
 } from '../../../constants/loginFlow.constants.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
+import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import { logoutUser } from '../../../services/authService.js';
 import { homePath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
@@ -29,6 +30,7 @@ import {
 export default function LoginPage() {
   const navigate = useNavigate();
   const session = useSessionOptional();
+  const { refetchProfile } = useUserProfile();
   const [step, setStep] = useState(LOGIN_FLOW_STEP_PIONIER);
   const [profileData, setProfileData] = useState({ nickname: '', avatarId: 1 });
   const [eulaError, setEulaError] = useState(null);
@@ -186,6 +188,11 @@ export default function LoginPage() {
       }
 
       await session?.refetchSession?.();
+      // Wymuś świeży fetch profilu z backendu — `UserProfileContext` był
+      // załadowany przed zapisem wizarda i trzyma stary nick / avatarId,
+      // więc bez tego SuperBar pokazywałby zaseedowane wartości do czasu
+      // ręcznego zapisu w /settings.
+      await refetchProfile?.();
       navigate(homePath());
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Nie udało się utworzyć konta.';
@@ -193,7 +200,7 @@ export default function LoginPage() {
     } finally {
       setIsEulaSubmitting(false);
     }
-  }, [navigate, profileData, session]);
+  }, [navigate, profileData, refetchProfile, session]);
 
   const stepContent = useMemo(() => {
     if (session?.isAuthenticated && !registrationCheckDone) {

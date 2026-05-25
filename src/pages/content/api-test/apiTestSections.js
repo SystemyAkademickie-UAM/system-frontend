@@ -9,6 +9,7 @@ import {
   getGroupPreviewPath,
   getGroupRankByIdPath,
   getGroupRanksPath,
+  getGroupStudentProfilePath,
   getGroupStudentsPath,
   getGroupStudentsBulkUpdatePath,
   getGroupStudentDeletePath,
@@ -310,6 +311,23 @@ export const API_TEST_SECTIONS = [
       { key: 'inviteGroupId', label: 'groupId (public, URL path)', type: 'number' },
       { key: 'code', label: 'code (query, 6 chars)', type: 'text' },
       { key: 'auth', label: 'auth (optional query / cookie)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'getStudentProfile',
+    label: 'Student Profile',
+    title: 'GET /groups/:groupId/student-profile',
+    group: 'Student Profile',
+    kind: 'get',
+    method: 'GET',
+    hint: 'Student only. Returns nickname, avatar, rank, currency stats and earned badges for the authenticated student in the given group.',
+    buildPath: (values) => getGroupStudentProfilePath(String(values.groupId ?? '')),
+    needsBrowserId: true,
+    defaultValues: () => ({
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
     ],
   },
   {
