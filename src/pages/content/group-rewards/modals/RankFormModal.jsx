@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
+import { fetchIconCatalog } from '../../../../services/icons.api.js';
 import { validateWholeNumberInput } from '../shared/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
@@ -28,7 +29,18 @@ export default function RankFormModal({
   onConfirm,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
+  const [iconCatalog, setIconCatalog] = useState([]);
   const isEdit = Boolean(rank);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+    fetchIconCatalog().then((catalog) => {
+      if (!cancelled) setIconCatalog(catalog);
+    });
+    return () => { cancelled = true; };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -75,7 +87,6 @@ export default function RankFormModal({
       storyDescription: form.storyDescription.trim(),
       shopItems: parseShopItems(form.shopItems),
     });
-    onClose();
   };
 
   return (
@@ -102,15 +113,18 @@ export default function RankFormModal({
 
         <div className="rewards-modal__row">
           <div className="rewards-modal__field">
-            <label htmlFor="rank-icon" className="rewards-modal__label">Ikona (plik SVG)</label>
-            <input
+            <label htmlFor="rank-icon" className="rewards-modal__label">Ikona</label>
+            <select
               id="rank-icon"
-              type="text"
-              className="rewards-modal__input"
+              className="rewards-modal__select"
               value={form.iconFile}
               onChange={handleChange('iconFile')}
-              placeholder="np. recruit.svg"
-            />
+            >
+              <option value="">Wybierz ikonę…</option>
+              {iconCatalog.map((icon) => (
+                <option key={icon.id} value={icon.id}>{icon.label}</option>
+              ))}
+            </select>
           </div>
 
           <div className="rewards-modal__field">

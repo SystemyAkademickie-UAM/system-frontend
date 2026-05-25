@@ -3,6 +3,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { APP_ROLE, ROLE_UI_LABEL } from '../../navigation/shellTemplates.config.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { useSession } from '../../context/SessionContext.jsx';
+import { useUserProfile } from '../../context/UserProfileContext.jsx';
+import { useStudentSuperBarStats } from '../../hooks/useStudentSuperBarStats.js';
 import Sidebar from './Sidebar.jsx';
 import SuperBar from './superbar/SuperBar.jsx';
 import './AppShell.css';
@@ -32,10 +34,19 @@ export default function AppShell() {
   const menuId = useId();
   const { role } = useAppRole();
   const { user, isLoading: isSessionLoading } = useSession();
+  const { profile, avatarUrl, isLoading: isProfileLoading } = useUserProfile();
+  const { livesDisplay, currencyDisplay, totalEarnedTooltip } = useStudentSuperBarStats();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const roleLabel = ROLE_UI_LABEL[role] ?? ROLE_UI_LABEL[APP_ROLE.STUDENT];
-  const displayName = useMemo(() => buildDisplayName(user), [user]);
+  const displayName = useMemo(() => {
+    const nickname = profile?.nickname?.trim();
+    if (nickname) {
+      return nickname;
+    }
+    return buildDisplayName(user);
+  }, [profile, user]);
+  const isHeaderLoading = isSessionLoading || isProfileLoading;
 
   useEffect(() => {
     setIsMobileNavOpen(false);
@@ -93,11 +104,15 @@ export default function AppShell() {
           <SuperBar
             displayName={displayName}
             roleLabel={roleLabel}
+            avatarUrl={avatarUrl}
+            livesDisplay={livesDisplay}
+            currencyDisplay={currencyDisplay}
+            currencyTooltip={totalEarnedTooltip}
             onNavigate={closeMobileNav}
             showMenuButton
             menuExpanded={isMobileNavOpen}
             onMenuToggle={() => setIsMobileNavOpen((open) => !open)}
-            isLoading={isSessionLoading}
+            isLoading={isHeaderLoading}
           />
           <main id="main-content" className="app-shell__main" tabIndex={-1}>
             <div className="app-shell__content">

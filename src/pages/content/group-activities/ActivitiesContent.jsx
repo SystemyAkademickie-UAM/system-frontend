@@ -3,11 +3,15 @@ import { useParams } from 'react-router-dom';
 import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 
-import itemicon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
-import infoicon from '../../../../public/assets/icons/info-circle-svgrepo-com.svg';
-import copyicon from '../../../../public/assets/icons/copy-01-svgrepo-com.svg';
-import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
-import deleteicon from '../../../../public/assets/icons/trash-01-svgrepo-com.svg';
+import { publicIconPath } from '../../../utils/publicAssetUrl.js';
+
+const itemicon = publicIconPath('arrow-circle-right-svgrepo-com.svg');
+const infoicon = publicIconPath('info-circle-svgrepo-com.svg');
+const copyicon = publicIconPath('copy-01-svgrepo-com.svg');
+const editicon = publicIconPath('edit-02-svgrepo-com.svg');
+const deleteicon = publicIconPath('trash-01-svgrepo-com.svg');
+import '../group-profile/ProfileContent.css';
+import '../shared/LegacyContentLayout.css';
 
 export default function App() {
 
@@ -1026,42 +1030,46 @@ export default function App() {
 
 
   return (
-    <div className="profile-content">
+    <section className="legacy-content profile-content" aria-label="Aktywności">
       <div className="profile-content__inner">
-        <div style = {{width: '100%', height: '100%', position: 'absolute', top: '0%', left: '0%'}}>
-          <div style = {{width: '98%', height: '7.5%', position: 'absolute', top: '3%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '42px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Zarzadzanie aktywnosciami i etapami</div>
-          <div style = {{width: '98%', height: '5%', position: 'absolute', top: '10.5%', left: '1%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>Panel pozwalajacy na tworzenie nowych etapow oraz przypisywanie im aktywnosci.</span></div>
+        {errorMessage ? <p className="legacy-content__error" role="alert">{errorMessage}</p> : null}
+
+        <div className="legacy-content__panel">
+          <div style={{ color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900 }}>NAZWA NOWEGO ETAPU</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'stretch' }}>
+            <input onChange={(event) => setStageName(event.target.value)} style={{ flex: '1 1 16rem', minWidth: 0, backgroundColor: 'rgb(40, 40, 52)', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, padding: '0.85rem 1rem', borderRadius: '8px', border: '2px solid transparent' }} value={stagename} placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne" onFocus={(event) => { event.target.style.border = '2px solid rgb(66, 243, 125)'; }} onBlur={(event) => { event.target.style.border = '2px solid transparent'; }} />
+            <button type="button" onClick={() => createstage(stagename)} style={{ flex: '0 0 auto', padding: '0.85rem 1.25rem', border: 0, borderRadius: '8px', background: 'rgba(66, 243, 125, 1)', color: 'rgb(0, 57, 21)', fontSize: '16px', fontWeight: 900, cursor: 'pointer' }}>
+              Dodaj etap
+            </button>
+          </div>
         </div>
 
-        <div style={{backgroundColor: 'rgb(26, 26, 42)', width: '98%', height: '20%', position: 'absolute', top: '17.5%', left: '1%', borderRadius: '16px'}}>
-          <div style = {{width: '98%', height: '25%', position: 'absolute', top: '10%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>NAZWA NOWEGO ETAPU</span></div>
-          <input onChange={(event) => setStageName(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '82%', height: '40%', position: 'absolute', top: '45%', left: '1%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px'}} value={stagename} placeholder = 'np. Laboratorium nr 1: Zajecia organizacyjne' onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}></input>
-          <div onClick={() => createstage(stagename)} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '15%', height: '40%', position: 'absolute', top: '45%', left: '84%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>Dodaj etap</div>
+
+
+
+
+
+
+
+
+
+        <div className="legacy-content__section-head">
+          <h2 className="legacy-content__section-title">Lista etapów</h2>
+          <span className="legacy-content__badge">Etapy {stages.length}</span>
         </div>
 
-
-
-
-
-
-
-
-
-
-        <div style = {{width: '81.25%', height: '7.5%', position: 'absolute', top: '40%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Lista etapow</div>
-        <div style = {{backgroundColor: 'rgba(227, 224, 247, 0.2)', width: '15%', height: '7.5%', position: 'absolute', top: '40%', left: '83.75%', borderRadius: '32px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>Etapy {stages.length}</div>
-        <div style={{width: '98%', top: '50%', position: 'absolute', left: '1%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center'}}>
+        <div className="legacy-content__stages-list">
 
 
           {stages.map((stage) => (
-            <div key = {'stage' + stage.id} style={{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', paddingBottom: '0%', gap: '0vh'}}>
-              <div style={{backgroundColor: 'rgb(41, 40, 57)', width: '100%', height: '10vh', position: 'relative', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', display: 'flex', flexDirection: 'row', paddingTop: '1%', paddingLeft: '1%', paddingBottom: '1%', gap: '1vh'}}>
-                <img src = {itemicon} onClick = {createstage} style = {{position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%'}}/>
+            <div key = {'stage' + stage.id} style={{backgroundColor: 'var(--color-bg-elevated)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', paddingBottom: '0%', gap: '0vh'}}>
+              <div style={{backgroundColor: 'rgb(41, 40, 57)', width: '100%', minHeight: '10vh', position: 'relative', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '0.75rem 1rem', gap: '1rem'}}>
+                <img src={itemicon} alt="" className="legacy-content__stage-icon" />
 
 
                 {stage.editmode < 1 ? (
 
-                <div style = {{width: '76%', height: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', alignItems: 'center'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{stage.name}</span></div>
+                <div style = {{width: '76%', height: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{stage.name}</span></div>
 
                 ) : (
 
@@ -1071,36 +1079,38 @@ export default function App() {
 
 
 
-                <div onClick = {() => editstage(stage.id)} style = {{width: '5%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
-                </div>
-                <div onClick = {() => copystage(stage.id)} style = {{width: '5%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img src = {copyicon} style = {{width: '50%', height: '50%'}}/>
-                </div>
-                <div onClick = {() => deletestage(stage.id)} style = {{width: '5%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
-                </div>
-                <div onClick = {() => togglestage(stage.id)} style = {{width: '5%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img src = {infoicon} style = {{width: '50%', height: '50%'}}/>
+                <div className="legacy-content__row-actions">
+                <button type="button" onClick={() => editstage(stage.id)} className="legacy-content__icon-btn" aria-label="Edytuj etap">
+                  <img src={editicon} alt="" />
+                </button>
+                <button type="button" onClick={() => copystage(stage.id)} className="legacy-content__icon-btn" aria-label="Kopiuj etap">
+                  <img src={copyicon} alt="" />
+                </button>
+                <button type="button" onClick={() => deletestage(stage.id)} className="legacy-content__icon-btn" aria-label="Usuń etap">
+                  <img src={deleteicon} alt="" />
+                </button>
+                <button type="button" onClick={() => togglestage(stage.id)} className="legacy-content__icon-btn" aria-label="Szczegóły etapu">
+                  <img src={infoicon} alt="" />
+                </button>
                 </div>
               </div>
 
 
               <div style = {{display: stage.open}}>
                 <div style={{backgroundColor: 'rgb(26, 26, 42)', width: '100%', height: '10vh', position: 'relative', display: 'flex', flexDirection: 'row', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%'}}>
-                  <div style = {{width: '20%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                  <div style = {{width: '20%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                     <span>NAZWA AKTYWNOSCI</span>
                   </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                     <span>OPIS FABULARNY</span>
                   </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                    <span>OPIS DYDAKTYCZNY</span>
                   </div>
-                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                     <span>NAGRODA</span>
                   </div>
-                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                     <span>OPCJE</span>
                   </div>
                 </div>
@@ -1110,25 +1120,25 @@ export default function App() {
                 activity.editmode < 1 ? (
 
                 <div key = {'activity' + stage.id + activity.id} style={{backgroundColor: 'rgb(41, 40, 57)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '4px solid rgb(66, 243, 125)', borderRadius: '16px'}}>
-                 <div style = {{width: '20%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                 <div style = {{width: '20%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                     <span>{activity.name}</span>
                   </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                     <span>{activity.description0}</span>
                   </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
                     <span>{activity.description1}</span>
                   </div>
-                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '5%'}}>
+                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '5%'}}>
                     <span>{activity.reward}</span>
                     <div style = {{backgroundColor: 'rgb(255, 0, 255)', width: '25%', height: '3vh', position: 'relative'}}></div>
                   </div>
-                  <div onClick = {() => editactivity(stage.id, activity.id, activity.editmode == 2 ? 1 : 0)} style = {{width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
-                  </div>
-                  <div onClick={() => activity.editmode == 2 ? deletetempactivity(stage.id, activity.id) : deleteactivity(stage.id, activity.id)} style = {{width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
-                  </div>
+                  <button type="button" onClick={() => editactivity(stage.id, activity.id, activity.editmode == 2 ? 1 : 0)} className="legacy-content__icon-btn" aria-label="Edytuj aktywność">
+                    <img src={editicon} alt="" />
+                  </button>
+                  <button type="button" onClick={() => (activity.editmode == 2 ? deletetempactivity(stage.id, activity.id) : deleteactivity(stage.id, activity.id))} className="legacy-content__icon-btn" aria-label="Usuń aktywność">
+                    <img src={deleteicon} alt="" />
+                  </button>
                 </div>
 
                 ) : (
@@ -1147,18 +1157,18 @@ export default function App() {
                     <input onChange={(event) => onActivityChange(stage.id, activity.id, 'reward', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '50%', height: '5vh', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderRadius: '8px'}} value = {activity.reward} placeholder = '0' onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}></input>
                     <div style = {{backgroundColor: 'rgb(255, 0, 255)', width: '25%', height: '3vh', position: 'relative'}}></div>
                   </div>
-                  <div onClick = {() => editactivity(stage.id, activity.id, activity.editmode == 2 ? 1 : 0)} style = {{width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
-                  </div>
-                  <div onClick={() => activity.editmode == 2 ? deletetempactivity(stage.id, activity.id) : deleteactivity(stage.id, activity.id)} style = {{width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
-                  </div>
+                  <button type="button" onClick={() => editactivity(stage.id, activity.id, activity.editmode == 2 ? 1 : 0)} className="legacy-content__icon-btn" aria-label="Edytuj aktywność">
+                    <img src={editicon} alt="" />
+                  </button>
+                  <button type="button" onClick={() => (activity.editmode == 2 ? deletetempactivity(stage.id, activity.id) : deleteactivity(stage.id, activity.id))} className="legacy-content__icon-btn" aria-label="Usuń aktywność">
+                    <img src={deleteicon} alt="" />
+                  </button>
                 </div>
 
                 )
 
 ))}
-            {stage.tempactivities.length == 0 && (<div onClick = {() => addactivity(stage.id)} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '40%', height: '10%', position: 'relative', left: '30%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: '0%', cursor: 'pointer', marginTop: '2.5vh', marginBottom: '2.5vh', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj nowa aktywnosc</div>)}
+            {stage.tempactivities.length == 0 && (<div onClick = {() => addactivity(stage.id)} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '40%', height: '10%', position: 'relative', left: '30%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj nowa aktywnosc</div>)}
             </div>
 
 
@@ -1178,8 +1188,8 @@ export default function App() {
 
 
 
-    </div>
-  )
+    </section>
+  );
 }
 
 

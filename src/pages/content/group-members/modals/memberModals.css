@@ -1,11 +1,5 @@
-.maq-modal.member-modal {
-  --members-font-heading: 18px;
-  --members-font-input: 14px;
-  --members-font-value: 20px;
-}
-
-.maq-modal.member-modal .maq-modal__title {
-  font-size: var(--members-font-heading);
+.member-modal {
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 .member-modal__toolbar {
@@ -36,7 +30,7 @@
 }
 
 .member-modal__search--prominent .maq-search-bar__input {
-  font-size: var(--members-font-input);
+  font-size: var(--font-size-body);
 }
 
 .member-modal__toolbar--search {
@@ -211,7 +205,7 @@
   border-radius: 12px;
   background: var(--color-bg-elevated);
   font: inherit;
-  font-size: var(--members-font-input);
+  font-size: var(--font-size-body);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -256,7 +250,7 @@
 }
 
 .member-modal__currency-stat-value {
-  font-size: var(--members-font-value);
+  font-size: var(--font-size-page-description);
   font-weight: 700;
   color: var(--color-text-primary);
 }
@@ -311,6 +305,10 @@
   font-size: var(--font-size-page-description);
   line-height: 1.5;
   color: var(--color-text-primary);
+}
+
+.member-modal__empty--error {
+  color: #f87171;
 }
 
 @media (max-width: 640px) {

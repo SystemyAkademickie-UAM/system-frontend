@@ -11,6 +11,8 @@
   background: var(--color-bg-surface);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
   pointer-events: none;
+  max-height: min(70vh, 28rem);
+  overflow-y: auto;
 }
 
 .maq-activity-card__name {

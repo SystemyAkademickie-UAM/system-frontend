@@ -1,6 +1,7 @@
 .maq-modal.rewards-modal {
-  --rewards-modal-heading: 18px;
-  --rewards-modal-input: 14px;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --rewards-modal-heading: var(--font-size-page-description);
+  --rewards-modal-input: var(--font-size-body);
 }
 
 .maq-modal.rewards-modal .maq-modal__title {

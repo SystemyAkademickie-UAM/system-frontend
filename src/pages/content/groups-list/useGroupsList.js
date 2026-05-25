@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchGroupsCatalog, filterGroups } from './groupsList.api.js';
 
 export function useGroupsList() {
@@ -8,35 +8,23 @@ export function useGroupsList() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadGroups() {
-      setIsLoading(true);
-      setErrorMessage('');
-      try {
-        const data = await fetchGroupsCatalog();
-        if (!cancelled) {
-          setMyGroups(data.myGroups);
-          setOtherGroups(data.otherGroups);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać listy grup.');
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
+  const loadGroups = useCallback(async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    try {
+      const data = await fetchGroupsCatalog();
+      setMyGroups(data.myGroups);
+      setOtherGroups(data.otherGroups);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać listy grup.');
+    } finally {
+      setIsLoading(false);
     }
-
-    loadGroups();
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
+
+  useEffect(() => {
+    loadGroups();
+  }, [loadGroups]);
 
   const visibleMyGroups = useMemo(
     () => filterGroups(myGroups, searchQuery),
@@ -55,5 +43,6 @@ export function useGroupsList() {
     isLoading,
     errorMessage,
     totalCount: myGroups.length + otherGroups.length,
+    refetch: loadGroups,
   };
 }

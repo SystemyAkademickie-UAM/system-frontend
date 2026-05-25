@@ -82,6 +82,14 @@ export function getGroupAccessCodePath(groupId, auth) {
   return query ? `${base}?${query}` : base;
 }
 
+/**
+ * @param {number|string} groupId - Public group ID
+ * @returns {string}
+ */
+export function getGroupStudentProfilePath(groupId) {
+  return `/groups/${groupId}/student-profile`;
+}
+
 /** Student join group by code. */
 export const GROUPS_INVITE_PATH = '/groups/invite';
 

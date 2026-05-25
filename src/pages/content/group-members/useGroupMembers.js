@@ -23,14 +23,8 @@ import { fetchGroupBadges } from '../../../services/badges.api.js';
 
 const AVATAR_BASE = 'https://api.dicebear.com/7.x/adventurer/svg?seed=';
 
-/**
- * Generates avatar URL from email or name.
- * @param {string} email
- * @param {string} name
- * @returns {string}
- */
-function generateAvatar(email, name) {
-  const seed = email.split('@')[0] || name.replace(/\s+/g, '') || 'default';
+function generateAvatarFallback(email, nickname) {
+  const seed = email.split('@')[0] || nickname.replace(/\s+/g, '') || 'default';
   return `${AVATAR_BASE}${encodeURIComponent(seed)}`;
 }
 
@@ -75,7 +69,7 @@ export function useGroupMembers() {
         name: `${student.name} ${student.surname}`.trim() || student.nickname || student.email,
         nickname: student.nickname,
         email: student.email,
-        avatar: generateAvatar(student.email, student.nickname),
+        avatar: student.avatarUrl || generateAvatarFallback(student.email, student.nickname),
         rankId: student.rankId,
         rank: student.rankId ? (ranksMap.get(student.rankId) || 'Brak rangi') : 'Brak rangi',
         currency: student.currency,

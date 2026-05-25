@@ -1,4 +1,4 @@
-import { getJson, postJson } from '../../../services/api-client.js';
+import { getJson, patchJson, postJson } from '../../../services/api-client.js';
 
 /**
  * @typedef {Object} GroupListItem
@@ -21,7 +21,9 @@ function mapBackendGroup(backendGroup, options = {}) {
   return {
     id: String(backendGroup.id),
     storyName: backendGroup.groupName || backendGroup.name || '',
-    subject: backendGroup.subjectName || backendGroup.groupName || '',
+    // Backend nie ma jeszcze osobnej kolumny na nazwę przedmiotu —
+    // zwracamy pustą wartość, żeby pole nie kopiowało się z nazwy grupy.
+    subject: backendGroup.subjectName || '',
     lecturer: backendGroup.lecturers || '',
     bannerUrl: backendGroup.bannerId || null,
     description: backendGroup.description || null,
@@ -117,11 +119,13 @@ export async function fetchGroupById(groupId) {
  *
  * @param {object} groupData
  * @param {string} groupData.name
+ * @param {string} [groupData.subjectName]
  * @param {string} [groupData.description]
  * @param {string} [groupData.currency]
  * @param {number} [groupData.currencyIcon]
  * @param {string} [groupData.lives]
  * @param {number} [groupData.livesIcon]
+ * @param {string} [groupData.imageRef]
  * @returns {Promise<{ ok: boolean, groupId?: number, error?: string }>}
  */
 export async function createGroup(groupData) {
@@ -137,6 +141,35 @@ export async function createGroup(groupData) {
     return { ok: false, error: 'Nie udało się utworzyć grupy' };
   }
   return { ok: true, groupId: data.group };
+}
+
+/**
+ * Aktualizuje istniejącą grupę.
+ * PATCH /groups/:groupId
+ *
+ * Wysyłane są tylko pola obecne w `groupData` (partial update).
+ *
+ * @param {string | number} groupId
+ * @param {Partial<{ name: string, subjectName: string, description: string, currency: string, currencyIcon: string, lives: number, livesIcon: string, imageRef: string }>} groupData
+ * @returns {Promise<{ ok: boolean, groupId?: number, updated?: boolean, error?: string }>}
+ */
+export async function updateGroup(groupId, groupData) {
+  const result = await patchJson(
+    `/groups/${groupId}`,
+    { group: groupData },
+    { includeBrowserId: true },
+  );
+  if (!result.ok) {
+    return { ok: false, error: 'Nie udało się zapisać zmian grupy' };
+  }
+  const data = /** @type {{ group?: number, updated?: boolean }} */ (result.data);
+  if (data.group === -1) {
+    return { ok: false, error: 'Brak uprawnień do edycji grupy' };
+  }
+  if (data.group === -2) {
+    return { ok: false, error: 'Nie udało się zapisać zmian grupy' };
+  }
+  return { ok: true, groupId: data.group, updated: Boolean(data.updated) };
 }
 
 /**

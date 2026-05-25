@@ -162,7 +162,7 @@
   --color-activity-icon-unlocked-bg: var(--color-accent);
   --color-activity-icon-unlocked-glow: rgba(66, 243, 125, 0.45);
   --color-activity-text: var(--color-badge-text);
-  --activity-card-max-width: 320px;
+  --activity-card-max-width: 420px;
   --activity-icon-size: 36px;
   --font-size-activity-title: 14px;
   --font-size-activity-body: 12px;

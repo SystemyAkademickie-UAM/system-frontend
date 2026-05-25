@@ -212,6 +212,12 @@
   overflow: hidden;
 }
 
+.super-bar-user-menu__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .super-bar-user-menu__dropdown {
   position: absolute;
   top: calc(100% + 0.35rem);

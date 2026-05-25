@@ -2,6 +2,7 @@
   --rewards-font-table-emphasis: 18px;
   --rewards-font-table-primary: 16px;
   --rewards-font-table-secondary: 14px;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 .rewards-page__header-row {
@@ -56,14 +57,18 @@
   max-width: 100%;
   font-size: var(--rewards-font-table-secondary);
   color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .rewards-table__name {
   font-size: var(--rewards-font-table-primary);
   font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.rewards-table__cell-text--truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rewards-table__cell-text--muted {

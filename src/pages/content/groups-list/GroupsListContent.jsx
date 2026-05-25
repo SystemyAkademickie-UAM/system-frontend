@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { SearchBar, Button } from '../../../components/ui/index.js';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import GroupCard from './GroupCard.jsx';
+import GroupsListCreator from './GroupsListCreator.jsx';
 import GroupsListHero from './GroupsListHero.jsx';
 import { useGroupsList } from './useGroupsList.js';
 import './GroupsListContent.css';
@@ -30,10 +33,29 @@ export default function GroupsListContent() {
     setSearchQuery,
     isLoading,
     errorMessage,
+    refetch,
   } = useGroupsList();
+  const [isCreatorOpen, setIsCreatorOpen] = useState(false);
 
   const hasAnyGroups = myGroups.length > 0 || otherGroups.length > 0;
   const isFiltering = searchQuery.trim().length > 0;
+
+  const handleCreatorClose = () => {
+    setIsCreatorOpen(false);
+  };
+
+  const handleGroupCreated = async () => {
+    await refetch();
+    setIsCreatorOpen(false);
+  };
+
+  // Portaluj overlay popupa do głównej sekcji treści (#main-content),
+  // żeby przykrywał tylko obszar strony, a nie sidebar/superbar.
+  const [portalTarget, setPortalTarget] = useState(null);
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    setPortalTarget(document.getElementById('main-content'));
+  }, []);
 
   return (
     <section className="groups-list" aria-labelledby="groups-list-section-title">
@@ -56,12 +78,30 @@ export default function GroupsListContent() {
               type="button"
               variant="primary"
               className="groups-list__create-btn"
+              onClick={() => setIsCreatorOpen(true)}
             >
               Stwórz grupę
             </Button>
           </RoleVisibility>
         </div>
       </div>
+
+      {isCreatorOpen && portalTarget
+        ? createPortal(
+            <div
+              className="groups-list__creator-overlay"
+              role="presentation"
+              onClick={(event) => {
+                if (event.target === event.currentTarget) {
+                  handleCreatorClose();
+                }
+              }}
+            >
+              <GroupsListCreator onClose={handleCreatorClose} onCreated={handleGroupCreated} />
+            </div>,
+            portalTarget,
+          )
+        : null}
 
       {errorMessage ? (
         <p className="groups-list__message groups-list__message--error" role="alert">

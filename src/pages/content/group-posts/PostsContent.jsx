@@ -3,8 +3,12 @@ import { useParams } from 'react-router-dom';
 import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 
-import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
-import deleteicon from '../../../../public/assets/icons/trash-01-svgrepo-com.svg';
+import { publicIconPath } from '../../../utils/publicAssetUrl.js';
+
+const editicon = publicIconPath('edit-02-svgrepo-com.svg');
+const deleteicon = publicIconPath('trash-01-svgrepo-com.svg');
+import '../shared/LegacyContentLayout.css';
+import './PostsContent.css';
 
 export default function App() {
 
@@ -155,17 +159,48 @@ export default function App() {
 
 
 
-  function onDeletepostclick(id) {
-    const newposts = [];
-    let i = 0;
+  async function onDeletepostclick(id) {
+    setErrorMessage('');
 
-    while (i < posts.length) {
-      if (posts[i].id != id) {
-        newposts.push(posts[i]);
+    const previousPosts = posts;
+    setPosts(posts.filter((p) => p.id != id));
+
+    try {
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+      const url = base + '/groups/' + groupId + '/post/' + id;
+
+      const response = await fetch(url, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid,
+        },
+      });
+
+      const responsetext = await response.text();
+      console.log('DELETE /groups/' + groupId + '/post/' + id + ':', response.status, responsetext);
+
+      let data = null;
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+        // empty body is acceptable
       }
-      i = i + 1;
+
+      if (!response.ok || (data && data.deleted === false)) {
+        setPosts(previousPosts);
+        setErrorMessage('Nie udało się usunąć wpisu.');
+        return;
+      }
+
+      onFetchPosts();
+    } catch (error) {
+      setPosts(previousPosts);
+      const message = error instanceof Error ? error.message : String(error);
+      setErrorMessage(message);
     }
-    setPosts(newposts);
   }
 
   function onEditpostclick(id, temporary = 0) {
@@ -316,64 +351,66 @@ export default function App() {
 
 
   return (
-    <div className="profile-content">
-      <div className="profile-content__inner">
+    <section className="legacy-content posts-content" aria-label="Wpisy">
+      {errorMessage ? <p className="legacy-content__error" role="alert">{errorMessage}</p> : null}
 
-
-
-
-
-
-          <div style = {{width: '98%', height: '7.5%', position: 'absolute', top: '3%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '42px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Zarzadzanie Wpisami</div>
-          <div style = {{width: '98%', height: '5%', position: 'absolute', top: '10.5%', left: '1%', color: 'rgb(187, 203, 185)', fontSize: '100%', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>Edytor wpisow pozwalajacy tworzyc niesamowite historie budujace tlo fabularne grupy.</span></div>
+      {tempPosts.length === 0 ? (
+        <div className="legacy-content__actions">
+          <button type="button" onClick={addpost} className="posts-content__add-btn">
+            + Dodaj wpis
+          </button>
         </div>
+      ) : null}
 
-
-
-        <div style = {{width: '49%', height: '5%', top: '17.5%', left: '1%', position: 'absolute', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>Wpisy</span></div>
-        {tempPosts.length == 0 && (<div onClick = {addpost} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '15%', height: '5%', top: '17.5%', left: '84%', position: 'absolute', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>Dodaj wpis</div>)}
-
-
-
-
-
-        <div style={{backgroundColor: 'rgb(26, 26, 42)', width: '98%', position: 'absolute', top: '25%', left: '1%', display: 'flex', flexDirection: 'column', gap: '2.5vh', borderRadius: '16px', paddingTop: '1%', paddingBottom: '1%'}}>
-
-
+      <div className="posts-content__list">
 
           {[...tempPosts, ...posts].map((post) => (
 
             post.editmode < 1 ? (
 
 
-              <div key={'post' + post.id} style={{backgroundColor: 'rgb(26, 26, 42)', width: '98%', position: 'relative', left: '1%', display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '16px'}}>
-                <div style = {{backgroundColor: 'rgb(40, 40, 52)', width: '87.5%', height: '25vh', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start'}}>
-                  <div onChange = {(event) => onGroupdescriptionchange(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '18px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', paddingLeft: '1%', resize: 'none'}} placeholder = 'Temat wpisu'>{post.title}</div>
-                  <div onChange = {(event) => onGroupdescriptionchange(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '20vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', resize: 'none'}} placeholder = 'Tresc wpisu'>{post.text}</div>
+              <article key={'post' + post.id} className="posts-content__card">
+                <div className="posts-content__card-body">
+                  <h3 className="posts-content__card-title">{post.title || 'Bez tytułu'}</h3>
+                  <p className="posts-content__card-text">{post.text || 'Brak treści.'}</p>
                 </div>
-                <div onClick={() => onEditpostclick(post.id, 0)} style={{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '1%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img src = {editicon} style={{width: '50%', height: '50%'}}/>
+                <div className="posts-content__actions">
+                  <button type="button" onClick={() => onEditpostclick(post.id, 0)} className="posts-content__action-btn" aria-label="Edytuj wpis">
+                    <img src={editicon} alt="" />
+                  </button>
+                  <button type="button" onClick={() => onDeletepostclick(post.id)} className="posts-content__action-btn posts-content__action-btn--danger" aria-label="Usuń wpis">
+                    <img src={deleteicon} alt="" />
+                  </button>
                 </div>
-                <div onClick = {() => onDeletepostclick(post.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '2.5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
-                </div>
-              </div>
+              </article>
 
 
             ) : (
 
-              <div key={'post' + post.id} style={{backgroundColor: 'rgb(26, 26, 42)', width: '98%', position: 'relative', left: '1%', display: 'flex', flexDirection: 'row', alignItems: 'center', borderRadius: '16px'}}>
-                <div style = {{backgroundColor: 'rgb(40, 40, 52)', width: '87.5%', height: '25vh', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start'}}>
-                  <input  onChange={(event) => onPostChange(post.id, 'title', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '18px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', resize: 'none'}} value = {post.title} placeholder = 'Temat wpisu' onFocus={(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur={(event) => (event.target.style.border = '')}></input>
-                  <textarea onChange={(event) => onPostChange(post.id, 'text', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '20vh', left: '0%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', paddingLeft: '1%', paddingTop: '0.5%', resize: 'none'}} value = {post.text} placeholder = 'Tresc wpisu' onFocus={(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur={(event) => (event.target.style.border = '')}></textarea>
+              <article key={'post' + post.id} className="posts-content__card posts-content__card--editing">
+                <div className="posts-content__card-body">
+                  <input
+                    onChange={(event) => onPostChange(post.id, 'title', event.target.value)}
+                    className="posts-content__input"
+                    value={post.title}
+                    placeholder="Temat wpisu"
+                  />
+                  <textarea
+                    onChange={(event) => onPostChange(post.id, 'text', event.target.value)}
+                    className="posts-content__textarea"
+                    value={post.text}
+                    placeholder="Treść wpisu"
+                  />
                 </div>
-                  <div onClick={() => onEditpostclick(post.id, post.editmode == 2 ? 1 : 0)} style={{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '1%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {editicon} style={{width: '50%', height: '50%'}}/>
-                  </div>
-                <div onClick = {() => onDeletepostclick(post.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', left: '2.5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                  <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
+                <div className="posts-content__actions">
+                  <button type="button" onClick={() => onEditpostclick(post.id, post.editmode == 2 ? 1 : 0)} className="posts-content__action-btn posts-content__action-btn--primary" aria-label="Zapisz wpis">
+                    <img src={editicon} alt="" />
+                  </button>
+                  <button type="button" onClick={() => onDeletepostclick(post.id)} className="posts-content__action-btn posts-content__action-btn--danger" aria-label="Usuń wpis">
+                    <img src={deleteicon} alt="" />
+                  </button>
                 </div>
-              </div>
+              </article>
             )
           ))}
 
@@ -385,12 +422,8 @@ export default function App() {
 
 
         </div>
-
-
-
-      </div>
-
-  )
+    </section>
+  );
 }
 
 
