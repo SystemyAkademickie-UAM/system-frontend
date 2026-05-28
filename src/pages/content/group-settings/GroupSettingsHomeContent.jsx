@@ -7,12 +7,10 @@ export default function GroupSettingsHomeContent() {
 
   return (
     <PageAvailable
-      title={nav.sectionTitle}
-      description="Kreator grupy"
-      subNavAriaLabel={nav.ariaLabel}
-      subNavItems={nav.items}
+      title="Ustawienia grupy"
+      description="Zmień podstawowe ustawienia grupy"
     >
-      <TemporaryGroupsListCreator />
+      <TemporaryGroupsListCreator subNav={nav} />
     </PageAvailable>
   );
 }

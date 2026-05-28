@@ -29,9 +29,35 @@
   white-space: nowrap;
 }
 
+.groups-list__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.groups-list__create-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.groups-list__creator-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  background: rgba(8, 8, 16, 0.72);
+  overflow-y: auto;
+}
+
 .groups-list__search {
-  flex: 1 1 16rem;
-  max-width: none;
+  flex: 0 0 18rem;
+  width: 18rem;
+  max-width: 18rem;
 }
 
 .groups-list__grid {
@@ -59,6 +85,30 @@
   color: #f87171;
 }
 
+.groups-list__subsection-title {
+  margin: 0 0 0.75rem;
+  font-size: var(--font-size-page-description);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.groups-list__divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 0.5rem 0 1.25rem;
+  width: 100%;
+}
+
+.groups-list__section {
+  width: 100%;
+}
+
+.groups-list__message--section {
+  padding: 0.5rem 0 0.25rem;
+}
+
 @media (max-width: 1199px) {
   .groups-list__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -79,6 +129,18 @@
   .groups-list__controls {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .groups-list__actions {
+    flex-wrap: wrap;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .groups-list__search {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: none;
   }
 
   .groups-list__section-title {

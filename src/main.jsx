@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import { SessionProvider } from './context/SessionContext.jsx';
+import { UserProfileProvider } from './context/UserProfileContext.jsx';
 import { AppRoleProvider } from './context/AppRoleContext.jsx';
 import { createAppRouter } from './routes/createAppRouter.jsx';
 import './styles/tokens.css';
@@ -17,9 +18,11 @@ const router = createAppRouter();
 createRoot(rootElement).render(
   <StrictMode>
     <SessionProvider>
-      <AppRoleProvider>
-        <RouterProvider router={router} />
-      </AppRoleProvider>
+      <UserProfileProvider>
+        <AppRoleProvider>
+          <RouterProvider router={router} />
+        </AppRoleProvider>
+      </UserProfileProvider>
     </SessionProvider>
   </StrictMode>,
 );

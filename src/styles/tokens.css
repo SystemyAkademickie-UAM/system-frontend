@@ -27,6 +27,10 @@
   --color-nav-cta: #34d399;
   /** Tekst i ikony pozycji w sidebarze */
   --color-nav-link: #d1fae5;
+  /** Domyślny kolor ikon SVG (tryb mask) */
+  --color-asset-icon: #ffffff;
+  /** Ikony na zielonym pasku nawigacji (SuperBar, statystyki) */
+  --color-nav-icon-on-primary: var(--color-asset-icon);
   /** Nazwa użytkownika w superBar */
   --color-nav-user-name: #ecfdf5;
   /** Rola użytkownika w superBar */
@@ -54,12 +58,119 @@
   /** Akcent z przezroczystością (tła badge, highlight) */
   --color-accent-muted: rgba(66, 243, 125, 0.25);
 
+  /* --- Odznaki — rzadkość (pasek boczny, etykieta, nagłówki sekcji) --- */
+  --color-badge-rarity-common: #00eeff;
+  --color-badge-rarity-uncommon: #ddff00;
+  --color-badge-rarity-rare: #ff9142;
+  --color-badge-rarity-epic: #e486db;
+
+  /** Tło kółka ikony odznaki */
+  --color-badge-icon-bg-common: #333344;
+  --color-badge-icon-bg-uncommon: #2d3026;
+  --color-badge-icon-bg-rare: #301726;
+  --color-badge-icon-bg-epic: #30173d;
+
+  /** Kolor ikony SVG w odznace (Zwykła ma wyjątek — nie kolor rzadkości) */
+  --color-badge-icon-common: #859584;
+  --color-badge-icon-uncommon: var(--color-badge-rarity-uncommon);
+  --color-badge-icon-rare: var(--color-badge-rarity-rare);
+  --color-badge-icon-epic: var(--color-badge-rarity-epic);
+
+  /** Tło mini odznaki — stan zaznaczony (zmieszane z rzadkością) */
+  --color-badge-mini-selected-common: #1a2a32;
+  --color-badge-mini-selected-uncommon: #222818;
+  --color-badge-mini-selected-rare: #2a1e18;
+  --color-badge-mini-selected-epic: #261a2e;
+
+  /** Tekst i linie w kafelkach odznak (Figma) */
+  --color-badge-text: #e3e0f7;
+  --color-badge-divider: rgba(60, 74, 60, 0.2);
+
+  /** Typografia odznak */
+  --font-size-badge-title: 18px;
+  --line-height-badge-title: 24px;
+  --line-height-badge-title-mini: 28px;
+  --font-size-badge-label: 14px;
+  --font-size-badge-label-mini: 10px;
+  --line-height-badge-label: 16px;
+  --font-size-badge-body: 12px;
+  --line-height-badge-body: 23px;
+  --line-height-badge-meta: 15px;
+  --font-size-badge-rarity: 12px;
+  --font-size-badge-rarity-mini: 10px;
+  --font-size-badge-reward: 14px;
+  --letter-spacing-badge-label: 1px;
+
+  /** Wymiary odznak */
+  --size-badge-icon-circle: 64px;
+  --size-badge-icon: 30px;
+  --badge-max-width: 533px;
+  --badge-mini-max-width: 300px;
+  --badge-mini-min-height: 125px;
+  --badge-border-radius: 16px;
+  --badge-mini-border-radius: 12px;
+  --badge-accent-width: 5px;
+  --badge-mini-accent-width: 4px;
+
+  /* --- Rangi — kafelek (domyślny motyw; później zależny od liczby rang) --- */
+  --color-rank-accent: var(--color-accent);
+  --color-rank-icon-bg: #333344;
+  --color-rank-icon-color: #ffffff;
+  --color-rank-label: #9ca8b8;
+  --color-rank-text: #e3e0f7;
+  --color-rank-cost-bg: var(--color-bg-elevated);
+  --color-rank-check: var(--color-accent);
+
+  --font-size-rank-title: 18px;
+  --line-height-rank-title: 24px;
+  --font-size-rank-label: 12px;
+  --line-height-rank-label: 16px;
+  --font-size-rank-body: 12px;
+  --line-height-rank-body: 23px;
+  --font-size-rank-cost: 14px;
+  --letter-spacing-rank-label: 0.5px;
+
+  --size-rank-icon-circle: 64px;
+  --size-rank-icon: 30px;
+  --rank-max-width: 720px;
+  --rank-border-radius: 16px;
+  --rank-accent-width: 5px;
+
   /** Placeholder w polu wyszukiwania */
   --color-input-placeholder: rgba(187, 203, 185, 0.25);
+  /** Błąd walidacji pola */
+  --color-input-error: #f87171;
+  --color-input-error-border: #ef4444;
 
   /** Pasek akcji (Odrzuć / Zapisz) */
   --color-overlay-actions-bg: rgba(41, 40, 57, 0.8);
   --color-overlay-actions-border: rgba(255, 255, 255, 0.05);
+
+  /** Modal — tło i panel */
+  --color-modal-backdrop: rgba(0, 0, 0, 0.55);
+  --color-modal-surface: var(--color-bg-surface);
+  --color-modal-border: rgba(255, 255, 255, 0.08);
+  --modal-border-radius: 16px;
+  --modal-max-width-sm: 420px;
+  --modal-max-width-md: 640px;
+  --modal-max-width-lg: 800px;
+  --modal-max-width-xl: 960px;
+
+  /** Aktywność — kafelek podglądu i ikony postępu */
+  --color-activity-icon-locked-bg: var(--color-bg-elevated);
+  --color-activity-icon-locked-border: rgba(255, 255, 255, 0.35);
+  --color-activity-icon-unlocked-bg: var(--color-accent);
+  --color-activity-icon-unlocked-glow: rgba(66, 243, 125, 0.45);
+  --color-activity-text: var(--color-badge-text);
+  --activity-card-max-width: 420px;
+  --activity-icon-size: 36px;
+  --font-size-activity-title: 14px;
+  --font-size-activity-body: 12px;
+
+  /** Odznaka — wariant kompaktowy (podgląd przy mini) */
+  --badge-compact-max-width: 360px;
+  --size-badge-icon-circle-compact: 48px;
+  --size-badge-icon-compact: 22px;
 
   --shadow-nav-sidebar: 10px 0 30px rgba(0, 0, 0, 0.3);
   --shadow-superbar: 0 4px 4px rgba(0, 0, 0, 0.25);

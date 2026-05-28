@@ -115,6 +115,19 @@ export const ROUTE_TABLE = [
   },
 
   // ===========================================================================
+  // GROUP — Korzeń (/groups/:groupId)
+  // ===========================================================================
+  {
+    id: 'group.root',
+    section: 'group',
+    pathPattern: '/groups/:groupId',
+    pageTitle: 'Grupa — dołączenie',
+    pageModule: 'pages/links/groups/GroupJoinPage.jsx',
+    contentModule: 'pages/content/group-join/GroupJoinContent.jsx',
+    roles: ['student'],
+  },
+
+  // ===========================================================================
   // GROUP — Ekran główny (/main)
   // ===========================================================================
   {
@@ -200,6 +213,15 @@ export const ROUTE_TABLE = [
     pageTitle: 'Użytkownicy — log aktywności',
     pageModule: 'pages/links/groups/members/MembersLogPage.jsx',
     contentModule: 'pages/content/group-members-log/MembersLogContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
+  },
+  {
+    id: 'group.members.code',
+    section: 'group',
+    pathPattern: '/groups/:groupId/members/code',
+    pageTitle: 'Użytkownicy — kody dostępu',
+    pageModule: 'pages/links/groups/members/MembersCodePage.jsx',
+    contentModule: 'pages/content/group-members-code/MembersCodeContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
   },
 

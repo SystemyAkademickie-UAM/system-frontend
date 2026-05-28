@@ -1,0 +1,144 @@
+.members-page {
+  --members-font-table-emphasis: 18px;
+  --members-font-table-primary: 16px;
+  --members-font-table-secondary: 14px;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.members-page__nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.members-page__sub-nav {
+  flex: 0 1 auto;
+}
+
+.members-page__search {
+  width: 100%;
+  max-width: 18rem;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.members-table__position {
+  font-size: var(--members-font-table-emphasis);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.members-table__cell--user {
+  padding-left: 0.75rem;
+}
+
+.members-table__user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.members-table__avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-bg-elevated);
+  object-fit: cover;
+}
+
+.members-table__user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.members-table__name {
+  font-size: var(--members-font-table-primary);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.members-table__nickname {
+  font-size: var(--members-font-table-secondary);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.members-table__rank-badge {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  background: var(--color-bg-elevated);
+  font-size: var(--members-font-table-secondary);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.members-table__currency,
+.members-table__total-currency,
+.members-table__stat {
+  font-size: var(--members-font-table-secondary);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.members-page .data-table {
+  min-width: 880px;
+}
+
+.members-table__col--user {
+  width: 28%;
+  min-width: 12rem;
+}
+
+.members-table__col--rank {
+  width: 140px;
+  max-width: 140px;
+}
+
+.members-page .data-table__menu-item {
+  font-size: var(--members-font-table-primary);
+}
+
+.members-page .data-table__menu-item-description {
+  font-size: var(--members-font-table-secondary);
+}
+
+@media (max-width: 768px) {
+  .members-page__nav-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .members-page__search {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .members-table__position {
+    font-size: var(--members-font-table-primary);
+  }
+
+  .members-table__avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .members-table__name {
+    font-size: 15px;
+  }
+}

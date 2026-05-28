@@ -5,7 +5,7 @@ export default function PostsHomeContent() {
   return (
     <PageAvailable
       title="Wpisy"
-      description="Twórz i edytuj fabularne wpisy oraz ogłoszenia widoczne dla uczestników grupy."
+      description="Edytor wpisów pozwalający tworzyć historie budujące tło fabularne grupy."
     >
       <PostsContent />
     </PageAvailable>

@@ -17,8 +17,12 @@
   justify-content: center;
   width: 1.125rem;
   height: 1.125rem;
-  color: var(--color-text-secondary);
+  color: var(--color-input-placeholder);
   pointer-events: none;
+}
+
+.maq-search-bar__icon .maq-asset-svg--mask {
+  color: inherit;
 }
 
 .maq-search-bar__input {

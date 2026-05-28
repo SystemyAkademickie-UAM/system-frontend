@@ -10,7 +10,7 @@ function itemClassName(isActive) {
  *
  * @param {Object} props
  * @param {string} props.ariaLabel
- * @param {{ id: string, label: string, to?: string, onClick?: () => void }[]} props.items
+ * @param {{ id: string, label: string, to?: string, end?: boolean, onClick?: () => void }[]} props.items
  * @param {string} [props.activeId] — tryb przycisków (bez routera)
  * @param {(id: string) => void} [props.onSelect]
  * @param {string} [props.className]

@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import AppLogo from '../ui/AppLogo/AppLogo.jsx';
 import './LoginShell.css';
 
 export default function LoginShell() {
@@ -9,7 +10,10 @@ export default function LoginShell() {
       </a>
 
       <header className="login-shell__header">
-        <span className="login-shell__brand">MyAcademyQuest</span>
+        <div className="login-shell__brand">
+          <AppLogo className="login-shell__brand-logo" width={40} height={40} alt="" />
+          <span className="login-shell__brand-title">MyAcademyQuest</span>
+        </div>
       </header>
 
       <main id="login-main-content" className="login-shell__main" tabIndex={-1}>

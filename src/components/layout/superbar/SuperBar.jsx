@@ -16,10 +16,12 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
 /**
  * Górny pasek nawigacji (superBar) — statystyki, ustawienia, konto.
  * @param {Object} props
- * @param {string | null} [props.displayName] — nazwa z sesji (null = placeholder)
+ * @param {string | null} [props.displayName] — ksywka lub nazwa z sesji (null = placeholder)
  * @param {string} [props.roleLabel]
+ * @param {string | null} [props.avatarUrl] — awatar z profilu użytkownika
  * @param {string} [props.livesDisplay] — docelowo z API grupy
- * @param {string} [props.currencyDisplay] — docelowo z API grupy
+ * @param {string} [props.currencyDisplay] — aktualna waluta studenta
+ * @param {string} [props.currencyTooltip] — podpowiedź przy najechaniu na walutę (np. zgromadzona all-time)
  * @param {() => void} [props.onNavigate]
  * @param {boolean} [props.showMenuButton]
  * @param {boolean} [props.menuExpanded]
@@ -29,8 +31,10 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
 export default function SuperBar({
   displayName,
   roleLabel = PLACEHOLDER_ROLE_LABEL,
+  avatarUrl = null,
   livesDisplay = DEFAULT_LIVES_DISPLAY,
   currencyDisplay = DEFAULT_CURRENCY_DISPLAY,
+  currencyTooltip,
   onNavigate,
   showMenuButton = false,
   menuExpanded = false,
@@ -61,11 +65,22 @@ export default function SuperBar({
         {showStudentGroupStats ? (
           <>
             <SuperBarStat icon={<IconStar />} value={livesDisplay} ariaLabel={`Życia: ${livesDisplay}`} />
-            <SuperBarStat icon={<IconMoney />} value={currencyDisplay} ariaLabel={`Waluta: ${currencyDisplay}`} />
+            <SuperBarStat
+              icon={<IconMoney />}
+              value={currencyDisplay}
+              ariaLabel={`Waluta: ${currencyDisplay}`}
+              title={currencyTooltip || undefined}
+            />
           </>
         ) : null}
         <SuperBarSettingsButton onNavigate={onNavigate} />
-        <SuperBarUserMenu displayName={resolvedDisplayName} roleLabel={roleLabel} onNavigate={onNavigate} isLoading={isLoading} />
+        <SuperBarUserMenu
+          displayName={resolvedDisplayName}
+          roleLabel={roleLabel}
+          avatarUrl={avatarUrl}
+          onNavigate={onNavigate}
+          isLoading={isLoading}
+        />
       </div>
     </header>
   );

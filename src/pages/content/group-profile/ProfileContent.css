@@ -1,14 +1,16 @@
 .profile-content {
   width: 100%;
   min-height: 100%;
-  position: relative;
 }
 
 .profile-content__inner {
   position: relative;
   width: 100%;
-  min-height: 600px;
-  height: calc(100vh - 60px);
+  min-height: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .profile-content__error {
