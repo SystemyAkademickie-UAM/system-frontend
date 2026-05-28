@@ -1,0 +1,201 @@
+.groups-list-creator {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: min(100%, 56rem);
+  max-height: calc(100% - 0.5rem);
+  padding: 1.5rem clamp(1rem, 2.5vw, 1.75rem);
+  border-radius: 16px;
+  background: var(--color-bg-app);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+}
+
+.groups-list-creator__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.groups-list-creator__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+
+.groups-list-creator__title {
+  margin: 0;
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-weight: 900;
+  color: rgb(227, 224, 247);
+}
+
+.groups-list-creator__subtitle {
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  color: var(--color-text-secondary);
+}
+
+.groups-list-creator__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  background: var(--color-bg-surface);
+}
+
+.groups-list-creator__panel-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 900;
+  color: rgb(227, 224, 247);
+}
+
+.groups-list-creator__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.groups-list-creator__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.groups-list-creator__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: var(--font-size-page-description);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.groups-list-creator__label-error {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.groups-list-creator__input,
+.groups-list-creator__textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  font: inherit;
+  font-size: var(--font-size-page-description);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.groups-list-creator__input:focus,
+.groups-list-creator__textarea:focus {
+  border-color: var(--color-accent);
+}
+
+.groups-list-creator__textarea {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.groups-list-creator__banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 10rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  color: var(--color-accent);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.15s ease;
+}
+
+.groups-list-creator__banner:hover {
+  background: rgba(66, 243, 125, 0.08);
+}
+
+.groups-list-creator__banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.groups-list-creator__error {
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  color: #f87171;
+}
+
+.groups-list-creator__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.groups-list-creator__footer-spacer {
+  flex: 1 1 auto;
+}
+
+.groups-list-creator__btn {
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: var(--font-size-page-description);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.groups-list-creator__btn:active {
+  transform: translateY(1px);
+}
+
+.groups-list-creator__btn--primary {
+  background: var(--color-accent);
+  color: var(--color-accent-on);
+}
+
+.groups-list-creator__btn--primary:hover {
+  background: var(--color-accent-pressed);
+}
+
+.groups-list-creator__btn--secondary {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+.groups-list-creator__btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.groups-list-creator__btn--ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.groups-list-creator__btn--ghost:hover {
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 720px) {
+  .groups-list-creator__grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,96 @@
+.register-profile {
+  box-sizing: border-box;
+  width: var(--auth-card-max-width);
+  max-width: calc(100% - 2rem);
+  padding: 16px clamp(1rem, 1.67vw, 32px) clamp(2rem, 3.3vw, 64px);
+  gap: 0;
+}
+
+.register-profile__avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 24px 0 32px;
+}
+
+.register-profile__avatar-label {
+  font-family: 'Caveat', 'Segoe Script', cursive;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1.2;
+  color: #FDFBFF;
+  margin: 0 0 16px 0;
+  text-align: center;
+}
+
+.register-profile__avatar-selector {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.register-profile__avatar-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.register-profile__avatar-arrow:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.register-profile__avatar-arrow:focus-visible {
+  outline: 2px solid #44E286;
+  outline-offset: 2px;
+}
+
+.register-profile__arrow-icon {
+  width: 32px;
+  height: 32px;
+  color: #FDFBFF;
+}
+
+.register-profile__avatar-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.register-profile__avatar-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #0d0d18;
+}
+
+.register-profile__avatar-number {
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  color: rgba(189, 202, 190, 0.6);
+}
+
+@media (max-width: 600px) {
+  .register-profile {
+    padding: 16px;
+  }
+
+  .register-profile__avatar-label {
+    font-size: 28px;
+  }
+
+  .register-profile__avatar-image {
+    width: 100px;
+    height: 100px;
+  }
+}

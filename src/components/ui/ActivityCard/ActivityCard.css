@@ -1,0 +1,51 @@
+.maq-activity-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: var(--activity-card-max-width);
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--color-modal-border);
+  border-radius: 12px;
+  background: var(--color-bg-surface);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  max-height: min(70vh, 28rem);
+  overflow-y: auto;
+}
+
+.maq-activity-card__name {
+  margin: 0;
+  font-size: var(--font-size-activity-title);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-activity-text);
+}
+
+.maq-activity-card__story {
+  margin: 0;
+  font-size: var(--font-size-activity-body);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.maq-activity-card__didactic {
+  margin: 0;
+  font-size: var(--font-size-activity-body);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-activity-text);
+}
+
+.maq-activity-card__reward {
+  margin: 0.125rem 0 0;
+  font-size: var(--font-size-activity-body);
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.maq-activity-card-preview {
+  position: fixed;
+  z-index: 1100;
+}

@@ -1,0 +1,137 @@
+.maq-modal.rewards-modal {
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --rewards-modal-heading: var(--font-size-page-description);
+  --rewards-modal-input: var(--font-size-body);
+}
+
+.maq-modal.rewards-modal .maq-modal__title {
+  font-size: var(--rewards-modal-heading);
+}
+
+.rewards-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rewards-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.rewards-modal__label {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.rewards-modal__input,
+.rewards-modal__select,
+.rewards-modal__textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--color-modal-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  font: inherit;
+  font-size: var(--rewards-modal-input);
+  color: var(--color-text-primary);
+}
+
+.rewards-modal__textarea {
+  min-height: 4.5rem;
+  resize: vertical;
+}
+
+.rewards-modal__input:focus,
+.rewards-modal__select:focus,
+.rewards-modal__textarea:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.rewards-modal__input--error {
+  border-color: var(--color-input-error-border);
+}
+
+.rewards-modal__input--error:focus {
+  outline-color: var(--color-input-error);
+}
+
+.rewards-modal__field-error {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-input-error);
+}
+
+.rewards-modal__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.rewards-modal__delete-text {
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.rewards-modal__student-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  max-height: 22rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.rewards-modal__student-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--color-modal-border);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rewards-modal__student-option:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.rewards-modal__student-option--selected {
+  border-color: var(--color-accent);
+  background: var(--color-accent-muted);
+}
+
+.rewards-modal__student-checkbox {
+  flex-shrink: 0;
+  accent-color: var(--color-accent);
+}
+
+.rewards-modal__student-name {
+  font-size: var(--font-size-page-description);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.rewards-modal__toolbar {
+  margin-bottom: 0.75rem;
+}
+
+.rewards-modal__toolbar .maq-search-bar {
+  max-width: none;
+}
+
+@media (max-width: 640px) {
+  .rewards-modal__row {
+    grid-template-columns: 1fr;
+  }
+}

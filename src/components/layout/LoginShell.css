@@ -1,0 +1,82 @@
+/* Zmienne zgodne z AppShell — spójny motyw bez paska bocznego */
+:root {
+  --shell-sidebar-top: #14532d;
+  --shell-sidebar-bottom: #111827;
+  --shell-accent: #10b981;
+  --shell-text: #ffffff;
+  --shell-content: #23232e;
+  --shell-cta-text: #052e16;
+  --shell-muted: #9ca3af;
+}
+
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--shell-text);
+  background: var(--shell-content);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.login-shell__skip {
+  position: absolute;
+  left: -9999px;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--shell-accent);
+  color: var(--shell-cta-text);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0;
+}
+
+.login-shell__skip:focus {
+  left: 0;
+  top: 0;
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.login-shell__header {
+  flex: 0 0 auto;
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+  background: linear-gradient(
+    135deg,
+    var(--shell-sidebar-top) 0%,
+    var(--shell-sidebar-bottom) 100%
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.login-shell__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.login-shell__brand-logo {
+  flex-shrink: 0;
+}
+
+.login-shell__brand-title {
+  font-size: var(--font-size-page-description);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.login-shell__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  overflow: auto;
+}
+
+.login-shell__content {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background: var(--shell-content);
+}

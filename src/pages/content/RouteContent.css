@@ -1,0 +1,13 @@
+.route-content {
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  min-height: 12rem;
+}
+
+.route-content__title {
+  margin: 0;
+  font-size: var(--font-size-page-title);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}

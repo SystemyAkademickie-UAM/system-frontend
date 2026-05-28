@@ -1,0 +1,114 @@
+.auth-logout-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth-logout-confirm__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(13, 13, 24, 0.72);
+  cursor: pointer;
+}
+
+.auth-logout-confirm__dialog {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: min(420px, 100%);
+  padding: 32px 28px 24px;
+  background: #343440;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.55);
+}
+
+.auth-logout-confirm__title {
+  margin: 0 0 12px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 28px;
+  color: #BDCABE;
+  text-align: center;
+}
+
+.auth-logout-confirm__message {
+  margin: 0 0 24px;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  color: rgba(189, 202, 190, 0.75);
+  text-align: center;
+}
+
+.auth-logout-confirm__error {
+  margin: -12px 0 16px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #ff8a8a;
+  text-align: center;
+}
+
+.auth-logout-confirm__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-logout-confirm__confirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #44E286;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 28px;
+  color: #00391F;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.auth-logout-confirm__confirm:hover:not(:disabled) {
+  background: #3DD47A;
+}
+
+.auth-logout-confirm__confirm:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.auth-logout-confirm__cancel {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: #42F37D;
+  cursor: pointer;
+}
+
+.auth-logout-confirm__cancel:hover:not(:disabled) {
+  color: #3DD47A;
+}
+
+.auth-logout-confirm__cancel:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}

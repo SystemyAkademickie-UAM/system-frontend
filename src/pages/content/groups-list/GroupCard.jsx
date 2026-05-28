@@ -1,0 +1,60 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
+import './GroupCard.css';
+
+/**
+ * @param {Object} props
+ * @param {import('./groupsList.api.js').GroupListItem} props.group
+ */
+export default function GroupCard({ group }) {
+  const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
+  const showFallback = bannerFailed || !group.bannerUrl;
+  const targetPath = group.isMine ? groupMainPath(group.id) : groupRootPath(group.id);
+
+  return (
+    <article className="group-card">
+      <Link className="group-card__link" to={targetPath}>
+        <div className="group-card__banner-wrap">
+          {showFallback ? (
+            <div className="group-card__banner-fallback" aria-hidden="true">
+              <AssetSvg
+                name="banner-placeholder.svg"
+                className="group-card__banner-fallback-icon"
+                width={48}
+                height={48}
+                alt=""
+              />
+              <span className="group-card__banner-fallback-text">Brak grafiki</span>
+            </div>
+          ) : (
+            <img
+              className="group-card__banner"
+              src={group.bannerUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              onError={() => setBannerFailed(true)}
+            />
+          )}
+        </div>
+
+        <div className="group-card__body">
+          <h2 className="group-card__title">{group.storyName}</h2>
+
+          <dl className="group-card__meta">
+            <div className="group-card__meta-col">
+              <dt className="group-card__label">Przedmiot</dt>
+              <dd className="group-card__value">{group.subject}</dd>
+            </div>
+            <div className="group-card__meta-col">
+              <dt className="group-card__label">Prowadzący</dt>
+              <dd className="group-card__value">{group.lecturer}</dd>
+            </div>
+          </dl>
+        </div>
+      </Link>
+    </article>
+  );
+}
