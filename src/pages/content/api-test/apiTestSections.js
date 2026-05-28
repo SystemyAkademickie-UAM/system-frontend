@@ -462,6 +462,75 @@ export const API_TEST_SECTIONS = [
     ],
   },
   {
+    id: 'getProfile',
+    label: 'Get Profile',
+    title: 'GET /profile',
+    group: 'Profile Settings',
+    kind: 'get',
+    method: 'GET',
+    buildPath: () => PROFILE_PATH,
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+    }),
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'getAvatars',
+    label: 'List Avatars',
+    title: 'GET /profile/avatars',
+    kind: 'get',
+    method: 'GET',
+    buildPath: () => PROFILE_AVATARS_PATH,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+    }),
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'updateProfile',
+    label: 'Update Profile',
+    title: 'PATCH /profile/settings',
+    kind: 'api',
+    method: 'PATCH',
+    buildPath: () => PROFILE_SETTINGS_PATH,
+    needsBrowserId: true,
+    defaultValues: () => ({
+      auth: '',
+      nickname: 'New Nickname',
+      avatarId: 1,
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      if (typeof values.nickname === 'string' && values.nickname.trim() !== '') {
+        payload.nickname = values.nickname.trim();
+      }
+      if (values.avatarId !== '' && values.avatarId !== null && values.avatarId !== undefined) {
+        payload.avatarId = Number(values.avatarId);
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      nickname: typeof payload.nickname === 'string' ? payload.nickname : '',
+      avatarId: payload.avatarId ?? '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'nickname', label: 'nickname (optional)', type: 'text' },
+      { key: 'avatarId', label: 'avatarId (optional)', type: 'number' },
+    ],
+  },
+  {
     id: 'activities',
     label: 'Activities',
     title: 'POST /activities (Lecturer)',

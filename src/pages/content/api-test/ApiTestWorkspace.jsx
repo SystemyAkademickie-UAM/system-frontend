@@ -116,7 +116,18 @@ function ApiTestWorkspaceInner() {
       if (response.ok) {
         const data = await response.json();
         if (data.authenticated && data.user) {
-          setSessionUser(data.user);
+          const userObj = { ...data.user };
+          try {
+            const profileResponse = await fetch(`${base}/profile`, { credentials: 'include' });
+            if (profileResponse.ok) {
+              const profileData = await profileResponse.json();
+              userObj.nickname = profileData.nickname;
+              userObj.avatarUrl = profileData.avatar?.imageUrl;
+            }
+          } catch (e) {
+            // ignore
+          }
+          setSessionUser(userObj);
           return;
         }
       }
@@ -326,6 +337,9 @@ function ApiTestWorkspaceInner() {
         formatted = formatFetchError(response, text);
       }
       setResponseText(formatted);
+      if (activeSection.id === 'updateProfile' && response.ok) {
+        await refreshSession();
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setResponseText(message);
@@ -370,6 +384,20 @@ function ApiTestWorkspaceInner() {
 
       <div className="api-test-workspace__main">
         <header className="api-test-workspace__topbar">
+          <div className="api-test-workspace__topbar-item">
+            <span className="api-test-workspace__topbar-label">Avatar</span>
+            <span className="api-test-workspace__topbar-value">
+              {authChecked ? (
+                sessionUser?.avatarUrl ? (
+                  <img src={sessionUser.avatarUrl} alt="Avatar" style={{ width: 32, height: 32, borderRadius: '50%' }} />
+                ) : '—'
+              ) : '…'}
+            </span>
+          </div>
+          <div className="api-test-workspace__topbar-item">
+            <span className="api-test-workspace__topbar-label">Nickname</span>
+            <span className="api-test-workspace__topbar-value">{authChecked ? (sessionUser?.nickname || '—') : '…'}</span>
+          </div>
           <div className="api-test-workspace__topbar-item">
             <span className="api-test-workspace__topbar-label">Name</span>
             <span className="api-test-workspace__topbar-value">{authChecked ? displayName : '…'}</span>
