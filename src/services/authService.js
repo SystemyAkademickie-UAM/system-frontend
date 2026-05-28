@@ -1,23 +1,16 @@
-import { getApiBaseUrl } from '../constants/api.constants.js';
-
-const LOGOUT_PATH = '/logout';
+import { getSamlLogoutUrl } from '../constants/api.constants.js';
 
 /**
- * Wylogowuje użytkownika — czyści ciastka sesji na backendzie.
- * @returns {Promise<boolean>} true jeśli sukces
+ * Wylogowuje użytkownika — przekierowuje na SAML Single Logout (IdP + lokalne ciastka).
+ * Nie używaj POST /logout przed tym krokiem: backend potrzebuje ciastka sesji SAML w żądaniu GET.
+ *
+ * @returns {boolean} true jeśli rozpoczęto przekierowanie
  */
-export async function logoutUser() {
-  try {
-    const base = getApiBaseUrl();
-    if (!base) {
-      return false;
-    }
-    const response = await fetch(`${base}${LOGOUT_PATH}`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    return response.ok;
-  } catch {
+export function logoutUser() {
+  const samlLogoutUrl = getSamlLogoutUrl();
+  if (samlLogoutUrl.length === 0) {
     return false;
   }
+  window.location.assign(samlLogoutUrl);
+  return true;
 }

@@ -123,27 +123,15 @@ export default function LoginPage() {
     setLogoutError(null);
   }, [isLogoutBusy]);
 
-  const handleLogoutConfirm = useCallback(async () => {
+  const handleLogoutConfirm = useCallback(() => {
     setIsLogoutBusy(true);
     setLogoutError(null);
-    try {
-      const didLogout = await logoutUser();
-      if (!didLogout) {
-        throw new Error('Nie udało się wylogować.');
-      }
-      await session?.refetchSession?.();
-      setProfileData({ nickname: '', avatarId: 1 });
-      setEulaError(null);
-      setStep(LOGIN_FLOW_STEP_PIONIER);
-      setRegistrationCheckDone(true);
-      setIsLogoutConfirmOpen(false);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Nie udało się wylogować.';
-      setLogoutError(message);
-    } finally {
+    const didLogout = logoutUser();
+    if (!didLogout) {
+      setLogoutError('Nie udało się wylogować.');
       setIsLogoutBusy(false);
     }
-  }, [session]);
+  }, []);
 
   const handleProfileContinue = useCallback(({ nickname, avatarId }) => {
     setProfileData({ nickname, avatarId });
