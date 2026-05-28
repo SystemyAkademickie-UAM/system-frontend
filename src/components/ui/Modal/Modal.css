@@ -1,0 +1,116 @@
+.maq-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.maq-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--color-modal-backdrop);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.maq-modal__dialog {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: min(90vh, 800px);
+  border: 1px solid var(--color-modal-border);
+  border-radius: var(--modal-border-radius);
+  background: var(--color-modal-surface);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.maq-modal__dialog--sm {
+  max-width: var(--modal-max-width-sm);
+}
+
+.maq-modal__dialog--md {
+  max-width: var(--modal-max-width-md);
+}
+
+.maq-modal__dialog--lg {
+  max-width: var(--modal-max-width-lg);
+}
+
+.maq-modal__dialog--xl {
+  max-width: var(--modal-max-width-xl);
+}
+
+.maq-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 0.75rem;
+  flex-shrink: 0;
+}
+
+.maq-modal__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.maq-modal__subtitle {
+  margin: 0.25rem 0 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.maq-modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem -0.25rem 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-asset-icon);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.maq-modal__close:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.maq-modal__close-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: inherit;
+}
+
+.maq-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0.75rem 1.5rem 1rem;
+  overflow-y: auto;
+}
+
+.maq-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem 1.25rem;
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-modal-border);
+}

@@ -4,9 +4,12 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install -g npm@11.11.0 && npm ci
 COPY . .
-# URL must be reachable from the user’s browser. Behind host nginx on / + /api/, use empty string at build time.
-ARG VITE_API_BASE_URL=http://127.0.0.1:8080/api
+# Empty = production-like bundle (`location.origin + /api`). Optional override for split-origin deployments.
+ARG VITE_API_BASE_URL=
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+# Baked into the SPA at build time (dev bypass UI, /dev/api-test). Default production for safety.
+ARG NODE_ENV=production
+ENV NODE_ENV=$NODE_ENV
 RUN npm run build
 
 # Serve static assets on port 3000 (matches host nginx proxy_pass http://localhost:3000)
