@@ -18,6 +18,7 @@ export default function SuperBarUserMenu({
   const rootRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState(null);
 
   useEffect(() => {
     if (!open) {
@@ -42,10 +43,19 @@ export default function SuperBarUserMenu({
   }, [open]);
 
   const handleLogout = () => {
+    setLogoutError(null);
+    const didLogout = logoutUser(() => {
+      setIsLoggingOut(false);
+      setLogoutError('Nie udało się wylogować.');
+      setOpen(true);
+    });
+    if (!didLogout) {
+      setLogoutError('Nie udało się wylogować.');
+      return;
+    }
     setOpen(false);
-    setIsLoggingOut(true);
     onNavigate?.();
-    logoutUser();
+    setIsLoggingOut(true);
   };
 
   return (
@@ -58,7 +68,10 @@ export default function SuperBarUserMenu({
         aria-controls={menuId}
         aria-haspopup="menu"
         aria-label="Menu konta użytkownika"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          setLogoutError(null);
+          setOpen((value) => !value);
+        }}
       >
         <span className="super-bar-user-menu__avatar" aria-hidden="true">
           {avatarUrl ? (
@@ -70,6 +83,11 @@ export default function SuperBarUserMenu({
       </button>
       {open ? (
         <ul id={menuId} className="super-bar-user-menu__dropdown" role="menu">
+          {logoutError ? (
+            <li className="super-bar-user-menu__dropdown-error" role="alert">
+              {logoutError}
+            </li>
+          ) : null}
           <li role="none">
             <button
               type="button"
