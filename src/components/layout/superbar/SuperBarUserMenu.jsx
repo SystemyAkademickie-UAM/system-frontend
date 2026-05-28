@@ -1,7 +1,4 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSession } from '../../../context/SessionContext.jsx';
-import { loginPath } from '../../../routes/pathRegistry.js';
 import { logoutUser } from '../../../services/authService.js';
 import { IconUserPlaceholder } from './ShellIcons.jsx';
 import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
@@ -21,8 +18,6 @@ export default function SuperBarUserMenu({
   const rootRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const navigate = useNavigate();
-  const { refetchSession } = useSession();
 
   useEffect(() => {
     if (!open) {
@@ -46,17 +41,11 @@ export default function SuperBarUserMenu({
     };
   }, [open]);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setOpen(false);
     setIsLoggingOut(true);
-    try {
-      await logoutUser();
-      await refetchSession();
-    } finally {
-      setIsLoggingOut(false);
-    }
     onNavigate?.();
-    navigate(loginPath());
+    logoutUser();
   };
 
   return (
