@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { logoutUser } from '../../../services/authService.js';
+import { logoutUser, isLogoutAvailable } from '../../../services/authService.js';
 import { IconUserPlaceholder } from './ShellIcons.jsx';
 import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
 import './SuperBar.css';
@@ -44,18 +44,18 @@ export default function SuperBarUserMenu({
 
   const handleLogout = () => {
     setLogoutError(null);
-    const didLogout = logoutUser(() => {
+    if (!isLogoutAvailable()) {
+      setLogoutError('Nie udało się wylogować.');
+      return;
+    }
+    setIsLoggingOut(true);
+    setOpen(false);
+    onNavigate?.();
+    logoutUser(() => {
       setIsLoggingOut(false);
       setLogoutError('Nie udało się wylogować.');
       setOpen(true);
     });
-    if (!didLogout) {
-      setLogoutError('Nie udało się wylogować.');
-      return;
-    }
-    setOpen(false);
-    onNavigate?.();
-    setIsLoggingOut(true);
   };
 
   return (
