@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import { AUTH_SAML_ME_PATH } from '../constants/authPaths.constants.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
+import { exchangeSamlSessionForAuthToken } from '../services/exchangeAuthToken.js';
 
 const SessionContext = createContext(null);
 
@@ -32,7 +33,8 @@ function mapBackendRoleToAppRole(backendRole) {
 }
 
 /**
- * Kontekst sesji użytkownika — pobiera dane z backendu (GET /auth/saml/me).
+ * Kontekst sesji użytkownika — pobiera dane z backendu (GET /auth/saml/me),
+ * potem wymienia sesję SAML na ciastko `maq_auth` (POST /login + X-Browser-ID).
  *
  * Dostarcza:
  * - user: obiekt użytkownika z backendu (lub null)
@@ -62,6 +64,12 @@ export function SessionProvider({ children }) {
       if (response.ok) {
         const data = await response.json();
         if (data.authenticated && data.user) {
+          const tokenExchange = await exchangeSamlSessionForAuthToken();
+          if (!tokenExchange.ok) {
+            setUser(null);
+            setSessionError(tokenExchange.message);
+            return;
+          }
           setUser(data.user);
           return;
         }

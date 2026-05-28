@@ -1,11 +1,11 @@
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import {
-  AUTH_LOGIN_PATH,
   AUTH_LOGIN_REGISTRATION_STATUS_PATH,
   AUTH_SAML_BYPASS_SESSION_PATH,
   AUTH_SAML_ME_PATH,
 } from '../../../constants/authPaths.constants.js';
-import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
+import { exchangeSamlSessionForAuthToken } from '../../../services/exchangeAuthToken.js';
 
 /**
  * @param {Response} response
@@ -51,17 +51,9 @@ export async function performTemporaryRoleLogin(persona) {
     throw new Error(await readErrorMessage(bypassResponse, 'Logowanie nie powiodło się.'));
   }
 
-  const loginResponse = await fetch(`${baseUrl}${AUTH_LOGIN_PATH}`, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Browser-ID': browserId,
-    },
-    body: '{}',
-  });
-  if (!loginResponse.ok) {
-    throw new Error(await readErrorMessage(loginResponse, 'Logowanie nie powiodło się.'));
+  const tokenExchange = await exchangeSamlSessionForAuthToken();
+  if (!tokenExchange.ok) {
+    throw new Error(tokenExchange.message);
   }
 
   const statusResponse = await fetch(`${baseUrl}${AUTH_LOGIN_REGISTRATION_STATUS_PATH}`, {
