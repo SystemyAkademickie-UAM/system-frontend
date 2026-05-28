@@ -3,6 +3,7 @@ import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 import './GroupsListCreator.css';
 
+
 const GROUP_NAME_MAX = 64;
 const SUBJECT_NAME_MAX = 64;
 
