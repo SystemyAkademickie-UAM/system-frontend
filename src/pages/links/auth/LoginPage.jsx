@@ -17,7 +17,7 @@ import {
 } from '../../../constants/loginFlow.constants.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
-import { logoutUser } from '../../../services/authService.js';
+import { isLogoutAvailable, logoutUser } from '../../../services/authService.js';
 import { homePath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
 import {
@@ -123,18 +123,31 @@ export default function LoginPage() {
     setLogoutError(null);
   }, [isLogoutBusy]);
 
+  const resetLoginWizardAfterLogout = useCallback(() => {
+    setProfileData({ nickname: '', avatarId: 1 });
+    setEulaError(null);
+    setStep(LOGIN_FLOW_STEP_PIONIER);
+    setRegistrationCheckDone(true);
+    setIsLogoutConfirmOpen(false);
+  }, []);
+
+  const handleLogoutFailed = useCallback(async () => {
+    setIsLogoutBusy(false);
+    await session?.refetchSession?.();
+    resetLoginWizardAfterLogout();
+  }, [resetLoginWizardAfterLogout, session]);
+
   const handleLogoutConfirm = useCallback(() => {
     setLogoutError(null);
-    const didLogout = logoutUser(() => {
-      setIsLogoutBusy(false);
-      setLogoutError('Nie udało się wylogować.');
-    });
-    if (!didLogout) {
+    if (!isLogoutAvailable()) {
       setLogoutError('Nie udało się wylogować.');
       return;
     }
     setIsLogoutBusy(true);
-  }, []);
+    logoutUser(() => {
+      void handleLogoutFailed();
+    });
+  }, [handleLogoutFailed]);
 
   const handleProfileContinue = useCallback(({ nickname, avatarId }) => {
     setProfileData({ nickname, avatarId });
