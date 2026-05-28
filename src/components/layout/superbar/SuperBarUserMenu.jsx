@@ -1,8 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSession } from '../../../context/SessionContext.jsx';
-import { loginPath } from '../../../routes/pathRegistry.js';
-import { logoutUser } from '../../../services/authService.js';
+import { logoutUser, isLogoutAvailable } from '../../../services/authService.js';
 import { IconUserPlaceholder } from './ShellIcons.jsx';
 import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
 import './SuperBar.css';
@@ -21,8 +18,7 @@ export default function SuperBarUserMenu({
   const rootRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const navigate = useNavigate();
-  const { refetchSession } = useSession();
+  const [logoutError, setLogoutError] = useState(null);
 
   useEffect(() => {
     if (!open) {
@@ -46,17 +42,20 @@ export default function SuperBarUserMenu({
     };
   }, [open]);
 
-  const handleLogout = async () => {
-    setOpen(false);
-    setIsLoggingOut(true);
-    try {
-      await logoutUser();
-      await refetchSession();
-    } finally {
-      setIsLoggingOut(false);
+  const handleLogout = () => {
+    setLogoutError(null);
+    if (!isLogoutAvailable()) {
+      setLogoutError('Nie udało się wylogować.');
+      return;
     }
+    setIsLoggingOut(true);
+    setOpen(false);
     onNavigate?.();
-    navigate(loginPath());
+    logoutUser(() => {
+      setIsLoggingOut(false);
+      setLogoutError('Nie udało się wylogować.');
+      setOpen(true);
+    });
   };
 
   return (
@@ -69,7 +68,10 @@ export default function SuperBarUserMenu({
         aria-controls={menuId}
         aria-haspopup="menu"
         aria-label="Menu konta użytkownika"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          setLogoutError(null);
+          setOpen((value) => !value);
+        }}
       >
         <span className="super-bar-user-menu__avatar" aria-hidden="true">
           {avatarUrl ? (
@@ -81,6 +83,11 @@ export default function SuperBarUserMenu({
       </button>
       {open ? (
         <ul id={menuId} className="super-bar-user-menu__dropdown" role="menu">
+          {logoutError ? (
+            <li className="super-bar-user-menu__dropdown-error" role="alert">
+              {logoutError}
+            </li>
+          ) : null}
           <li role="none">
             <button
               type="button"
