@@ -159,6 +159,29 @@ export default function App() {
 
 
 
+  async function onUpdatePost(post) {
+    setErrorMessage('');
+    try {
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+      const url = base + '/groups/' + groupId + '/post/' + post.id;
+      const response = await fetch(url, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', 'X-Browser-ID': browserid },
+        body: JSON.stringify({ title: post.title, content: post.text })
+      });
+      const responsetext = await response.text();
+      let data = null;
+      try { data = JSON.parse(responsetext); } catch {}
+      if (!response.ok || (data && data.updated === false)) {
+        setErrorMessage('Nie udało się zapisać zmian wpisu.');
+      }
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error));
+    }
+  }
+
   async function onDeletepostclick(id) {
     setErrorMessage('');
 
@@ -220,6 +243,7 @@ export default function App() {
             updatedpost.editmode = 1;
           } else if (posts[i].editmode == 1) {
             updatedpost.editmode = 0;
+            onUpdatePost(updatedpost);
           }
 
           newposts.push(updatedpost);
