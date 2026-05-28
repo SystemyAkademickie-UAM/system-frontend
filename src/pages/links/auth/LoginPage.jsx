@@ -124,13 +124,16 @@ export default function LoginPage() {
   }, [isLogoutBusy]);
 
   const handleLogoutConfirm = useCallback(() => {
-    setIsLogoutBusy(true);
     setLogoutError(null);
-    const didLogout = logoutUser();
+    const didLogout = logoutUser(() => {
+      setIsLogoutBusy(false);
+      setLogoutError('Nie udało się wylogować.');
+    });
     if (!didLogout) {
       setLogoutError('Nie udało się wylogować.');
-      setIsLogoutBusy(false);
+      return;
     }
+    setIsLogoutBusy(true);
   }, []);
 
   const handleProfileContinue = useCallback(({ nickname, avatarId }) => {
