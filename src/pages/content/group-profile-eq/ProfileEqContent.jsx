@@ -1,15 +1,9 @@
-import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
-import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
+import ProfilePageLayout from '../group-profile/ProfilePageLayout.jsx';
 
 export default function ProfileEqContent() {
-  const nav = useGroupSubNav('group-profile');
-
   return (
-    <PageUnavailable
-      title={nav.sectionTitle}
-      description="Ekwipunek"
-      subNavAriaLabel={nav.ariaLabel}
-      subNavItems={nav.items}
-    />
+    <ProfilePageLayout>
+      <p className="profile-page-layout__message">Ekwipunek — w przygotowaniu.</p>
+    </ProfilePageLayout>
   );
 }

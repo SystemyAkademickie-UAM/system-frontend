@@ -1,6 +1,6 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
-import { HomeRedirect, RouteGuard } from '../components/guards/index.js';
+import { HomeRedirect, RouteGuard, GroupAccessGuard } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 
 // Login/Auth pages
@@ -19,6 +19,7 @@ import UserManagementPage from '../pages/links/app/UserManagementPage.jsx';
 
 // Groups list
 import GroupsListPage from '../pages/links/groups/groups-list/GroupsListPage.jsx';
+import GroupJoinPage from '../pages/links/groups/GroupJoinPage.jsx';
 
 // Group Main (Ekran główny) - student + lecturer
 import GroupMainLayout from '../pages/links/groups/layouts/GroupMainLayout.jsx';
@@ -37,6 +38,7 @@ import ProfileEqPage from '../pages/links/groups/profile/ProfileEqPage.jsx';
 import MembersLayout from '../pages/links/groups/layouts/MembersLayout.jsx';
 import MembersHomePage from '../pages/links/groups/members/MembersHomePage.jsx';
 import MembersLogPage from '../pages/links/groups/members/MembersLogPage.jsx';
+import MembersCodePage from '../pages/links/groups/members/MembersCodePage.jsx';
 
 // Activities (Aktywności) - lecturer only
 import ActivitiesLayout from '../pages/links/groups/layouts/ActivitiesLayout.jsx';
@@ -150,9 +152,13 @@ const appRouteTree = [
               {
                 path: ':groupId',
                 children: [
-                  // Redirect bare groupId to main
-                  { index: true, element: <Navigate to="main" replace /> },
+                  // Landing — join code / brak dostępu (bez nawigacji grupowej w sidebarze)
+                  { index: true, element: withGuard(<GroupJoinPage />) },
 
+                  // Podstrony grupy — wymagają dostępu (właściciel lub zapisany student)
+                  {
+                    element: withGuard(<GroupAccessGuard />),
+                    children: [
                   // ----------------------------------------
                   // MAIN (Ekran główny) - student + lecturer
                   // ----------------------------------------
@@ -188,6 +194,7 @@ const appRouteTree = [
                     element: withGuard(<MembersLayout />, { allowedRoles: LECTURER_ONLY }),
                     children: [
                       { index: true, element: <MembersHomePage /> },
+                      { path: 'code', element: <MembersCodePage /> },
                       { path: 'log', element: <MembersLogPage /> },
                     ],
                   },
@@ -261,6 +268,8 @@ const appRouteTree = [
                       { index: true, element: <RankingHomePage /> },
                       { path: 'group', element: <RankingGroupPage /> },
                       { path: 'activities', element: <RankingActivitiesPage /> },
+                    ],
+                  },
                     ],
                   },
                 ],

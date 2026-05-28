@@ -28,17 +28,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 50px;
-  width: 50px;
-  height: 50px;
-  background: var(--color-nav-logo-bg);
-  border-radius: 8px;
+  flex: 0 0 auto;
 }
 
 .sidebar-brand__logo {
   width: 46px;
   height: 46px;
   object-fit: contain;
+  background: transparent;
 }
 
 .sidebar-brand__title {
@@ -143,8 +140,8 @@
     color 0.15s ease;
 }
 
-.sidebar-nav__link:hover {
-  background: rgba(255, 255, 255, 0.06);
+.sidebar-nav__link:hover:not(.sidebar-nav__link--active) {
+  background: rgba(0, 0, 0, 0.14);
 }
 
 .sidebar-nav__link:focus-visible {
@@ -158,10 +155,21 @@
   color: var(--color-nav-cta);
 }
 
-.sidebar-nav__link .nav-glyph {
-  color: var(--color-nav-link);
+.sidebar-nav__link--active:hover {
+  background: color-mix(in srgb, var(--color-bg-app) 86%, black 14%);
+  box-shadow: -4px 0 0 0 var(--color-accent-pressed);
+  color: var(--color-accent);
 }
 
-.sidebar-nav__link--active .nav-glyph {
-  color: var(--color-nav-cta);
+.nav-glyph {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-glyph__img {
+  display: block;
+  width: 20px;
+  height: 20px;
 }

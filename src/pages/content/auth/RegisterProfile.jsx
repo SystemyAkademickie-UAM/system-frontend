@@ -1,10 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginPath } from '../../../routes/pathRegistry.js';
+import { fetchAvatars } from '../../../services/profile.api.js';
 import './AuthCard.css';
 import './RegisterProfile.css';
-
-const AVATAR_COUNT = 8;
 
 function ArrowLeftIcon({ className }) {
   return (
@@ -57,7 +56,29 @@ export default function RegisterProfile({
 }) {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
-  const [avatarId, setAvatarId] = useState(initialAvatarId);
+  const [avatars, setAvatars] = useState([]);
+  const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(0);
+  const [isLoadingAvatars, setIsLoadingAvatars] = useState(true);
+
+  // Awatary pobieramy z backendu (`GET /profile/avatars`) — w bazie jest tylko
+  // 6 zaseedowanych, więc trzymanie `AVATAR_COUNT = 8` po stronie frontu
+  // powodowało FK violation przy zapisie profilu.
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoadingAvatars(true);
+    fetchAvatars()
+      .then((list) => {
+        if (cancelled) return;
+        setAvatars(list);
+        if (list.length === 0) return;
+        const initialIndex = list.findIndex((a) => a.id === initialAvatarId);
+        setSelectedAvatarIndex(initialIndex >= 0 ? initialIndex : 0);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingAvatars(false);
+      });
+    return () => { cancelled = true; };
+  }, [initialAvatarId]);
 
   const handleBack = useCallback(() => {
     if (onBack) {
@@ -68,23 +89,37 @@ export default function RegisterProfile({
   }, [navigate, onBack]);
 
   const handlePrevAvatar = useCallback(() => {
-    setAvatarId((prev) => (prev <= 1 ? AVATAR_COUNT : prev - 1));
-  }, []);
+    setSelectedAvatarIndex((prev) => {
+      if (avatars.length === 0) return prev;
+      return prev <= 0 ? avatars.length - 1 : prev - 1;
+    });
+  }, [avatars.length]);
 
   const handleNextAvatar = useCallback(() => {
-    setAvatarId((prev) => (prev >= AVATAR_COUNT ? 1 : prev + 1));
-  }, []);
+    setSelectedAvatarIndex((prev) => {
+      if (avatars.length === 0) return prev;
+      return prev >= avatars.length - 1 ? 0 : prev + 1;
+    });
+  }, [avatars.length]);
 
   const handleContinue = useCallback(() => {
     if (nickname.trim().length === 0) {
       return;
     }
     if (onContinue) {
-      onContinue({ nickname: nickname.trim(), avatarId });
+      const selectedAvatar = avatars[selectedAvatarIndex];
+      const avatarIdToSubmit = selectedAvatar?.id ?? initialAvatarId;
+      onContinue({ nickname: nickname.trim(), avatarId: avatarIdToSubmit });
     }
-  }, [nickname, avatarId, onContinue]);
+  }, [nickname, avatars, selectedAvatarIndex, initialAvatarId, onContinue]);
 
-  const isValid = nickname.trim().length > 0;
+  const selectedAvatar = avatars[selectedAvatarIndex] ?? null;
+  const displayedAvatarLabel = selectedAvatar
+    ? selectedAvatar.id
+    : isLoadingAvatars
+      ? '…'
+      : '—';
+  const isValid = nickname.trim().length > 0 && avatars.length > 0;
 
   return (
     <div className="auth-card auth-card--wizard-panel auth-card--left-aligned register-profile">
@@ -126,8 +161,16 @@ export default function RegisterProfile({
             <ArrowLeftIcon className="register-profile__arrow-icon" />
           </button>
           <div className="register-profile__avatar-preview">
-            <AvatarPlaceholder className="register-profile__avatar-image" />
-            <span className="register-profile__avatar-number">{avatarId}</span>
+            {selectedAvatar?.imageUrl ? (
+              <img
+                src={selectedAvatar.imageUrl}
+                alt={selectedAvatar.name ?? `Avatar ${selectedAvatar.id}`}
+                className="register-profile__avatar-image"
+              />
+            ) : (
+              <AvatarPlaceholder className="register-profile__avatar-image" />
+            )}
+            <span className="register-profile__avatar-number">{displayedAvatarLabel}</span>
           </div>
           <button
             type="button"

@@ -50,6 +50,10 @@ export const HREF_BUILDERS = {
   // Użytkownicy (lecturer) + podstrony
   GROUP_MEMBERS: (ctx) => (ctx.groupId ? paths.groupMembersPath(ctx.groupId) : null),
   GROUP_MEMBERS_LOG: (ctx) => (ctx.groupId ? paths.groupMembersLogPath(ctx.groupId) : null),
+  GROUP_MEMBERS_CODE: (ctx) => (ctx.groupId ? paths.groupMembersCodePath(ctx.groupId) : null),
+
+  // Korzeń grupy
+  GROUP_ROOT: (ctx) => (ctx.groupId ? paths.groupRootPath(ctx.groupId) : null),
 
   // Aktywności (lecturer) + podstrony
   GROUP_ACTIVITIES: (ctx) => (ctx.groupId ? paths.groupActivitiesPath(ctx.groupId) : null),
@@ -280,8 +284,8 @@ const adminView = {
       id: 'zarzadzanie-kursami',
       enabled: true,
       kind: 'navlink',
-      label: 'Zarządzanie kursami',
-      iconId: 'nav-courses',
+      label: 'Zarządzanie grupami',
+      iconId: 'nav-groups',
       hrefKey: 'COURSE_MANAGEMENT',
       requiresGroup: false,
     },
@@ -383,6 +387,7 @@ export const SUB_NAV_CONFIG = {
   // Użytkownicy (lecturer)
   'group-members': [
     { id: 'list', label: 'Uczestnicy', hrefKey: 'GROUP_MEMBERS', end: true },
+    { id: 'code', label: 'Kody dostępu', hrefKey: 'GROUP_MEMBERS_CODE' },
     { id: 'log', label: 'Log aktywności', hrefKey: 'GROUP_MEMBERS_LOG' },
   ],
 

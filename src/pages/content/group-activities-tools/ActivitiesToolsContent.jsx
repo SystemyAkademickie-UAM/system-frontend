@@ -7,8 +7,8 @@ export default function ActivitiesToolsContent() {
 
   return (
     <PageAvailable
-      title={nav.sectionTitle}
-      description="Narzędzia"
+      title="Narzędzia"
+      description="Widok pozwalający na wygenerowanie podsumowania, importowanie danych przy użyciu plików CSV oraz eksportowanie danych."
       subNavAriaLabel={nav.ariaLabel}
       subNavItems={nav.items}
     >

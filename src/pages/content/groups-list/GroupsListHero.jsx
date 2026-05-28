@@ -1,9 +1,7 @@
-import { publicAssetPath } from '../../../utils/publicAssetUrl.js';
+import AppLogo from '../../../components/ui/AppLogo/AppLogo.jsx';
 import './GroupsListHero.css';
 
 export default function GroupsListHero() {
-  const logoSrc = publicAssetPath('assets/logomyacademyquest.png');
-
   return (
     <header className="groups-list-hero" aria-labelledby="groups-list-hero-title">
       <div className="groups-list-hero__content">
@@ -18,14 +16,7 @@ export default function GroupsListHero() {
       </div>
 
       <div className="groups-list-hero__logo-wrap" aria-hidden="true">
-        <img
-          className="groups-list-hero__logo"
-          src={logoSrc}
-          alt=""
-          width={120}
-          height={120}
-          decoding="async"
-        />
+        <AppLogo className="groups-list-hero__logo" width={120} height={120} alt="" />
       </div>
     </header>
   );

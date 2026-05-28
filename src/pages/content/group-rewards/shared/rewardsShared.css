@@ -1,0 +1,141 @@
+.rewards-page {
+  --rewards-font-table-emphasis: 18px;
+  --rewards-font-table-primary: 16px;
+  --rewards-font-table-secondary: 14px;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.rewards-page__header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.rewards-page__header-row .maq-page-header {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.rewards-page__add-btn {
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.rewards-page__nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.rewards-page__sub-nav {
+  flex: 0 1 auto;
+}
+
+.rewards-page__search {
+  width: 100%;
+  max-width: 18rem;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.rewards-table__position {
+  font-size: var(--rewards-font-table-emphasis);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.rewards-table__name,
+.rewards-table__cell-text {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  font-size: var(--rewards-font-table-secondary);
+  color: var(--color-text-primary);
+}
+
+.rewards-table__name {
+  font-size: var(--rewards-font-table-primary);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.rewards-table__cell-text--truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rewards-table__cell-text--muted {
+  color: var(--color-text-secondary);
+}
+
+.rewards-table__reward {
+  font-size: var(--rewards-font-table-secondary);
+  font-weight: 600;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.rewards-page .data-table__menu-item {
+  font-size: var(--rewards-font-table-primary);
+}
+
+.rewards-page .data-table__menu-item-description {
+  font-size: var(--rewards-font-table-secondary);
+}
+
+.rewards-table .data-table {
+  min-width: 960px;
+}
+
+.rewards-table--ranks .data-table {
+  min-width: 1180px;
+}
+
+.rewards-table .data-table__cell--truncate {
+  overflow: hidden;
+  min-width: 0;
+}
+
+.rewards-table .data-table__cell:not(.rewards-table__cell--spacer):not(.data-table__cell--actions) {
+  overflow: hidden;
+}
+
+.rewards-table__th--spacer,
+.rewards-table__col--spacer,
+.rewards-table__cell--spacer {
+  width: auto;
+  min-width: 2rem;
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .rewards-page__header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rewards-page__add-btn {
+    align-self: stretch;
+  }
+
+  .rewards-page__nav-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rewards-page__search {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .rewards-table__position {
+    font-size: var(--rewards-font-table-primary);
+  }
+}
