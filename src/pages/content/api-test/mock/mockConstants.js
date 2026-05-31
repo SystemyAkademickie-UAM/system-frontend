@@ -71,21 +71,6 @@ export function getGroupPreviewPath(groupId, auth) {
  * @param {string} [auth]
  * @returns {string}
  */
-export function getGroupAccessCodePath(groupId, auth) {
-  const params = new URLSearchParams();
-  const trimmedAuth = typeof auth === 'string' ? auth.trim() : '';
-  if (trimmedAuth !== '') {
-    params.set('auth', trimmedAuth);
-  }
-  const query = params.toString();
-  const base = `/groups/${groupId}/access-code`;
-  return query ? `${base}?${query}` : base;
-}
-
-/**
- * @param {number|string} groupId - Public group ID
- * @returns {string}
- */
 export function getGroupStudentProfilePath(groupId) {
   return `/groups/${groupId}/student-profile`;
 }
@@ -118,20 +103,46 @@ export function getGroupInvitePath(groupId, code, auth) {
   return `/groups/${groupId}/invite?${params.toString()}`;
 }
 
-/** Backend requires exactly 6 characters for group entry codes. */
-export const GROUP_INVITE_CODE_LENGTH = 6;
+/** Auto-generated codes use 3 random bytes → 6 hex chars; custom codes up to 10. */
+export const ENROLLMENT_CODE_MIN_LENGTH = 1;
 
-/** Random 6-character group entry code generation. */
-export const GROUPS_GENERATE_CODE_PATH = '/groups/generate-code';
+export const ENROLLMENT_CODE_MAX_LENGTH = 10;
+
+/**
+ * @param {number|string} groupId - Public group ID
+ * @param {string} [auth]
+ * @returns {string}
+ */
+export function getGroupEnrollmentCodesPath(groupId, auth) {
+  const params = new URLSearchParams();
+  const trimmedAuth = typeof auth === 'string' ? auth.trim() : '';
+  if (trimmedAuth !== '') {
+    params.set('auth', trimmedAuth);
+  }
+  const query = params.toString();
+  const base = `/groups/${groupId}/enrollment-codes`;
+  return query ? `${base}?${query}` : base;
+}
+
+/**
+ * @param {number|string} groupId
+ * @param {number|string} codeId
+ * @param {string} [auth]
+ * @returns {string}
+ */
+export function getGroupEnrollmentCodeByIdPath(groupId, codeId, auth) {
+  const params = new URLSearchParams();
+  const trimmedAuth = typeof auth === 'string' ? auth.trim() : '';
+  if (trimmedAuth !== '') {
+    params.set('auth', trimmedAuth);
+  }
+  const query = params.toString();
+  const base = `/groups/${groupId}/enrollment-codes/${codeId}`;
+  return query ? `${base}?${query}` : base;
+}
 
 /** Multipart drive upload / remove (lecturer). */
 export const DRIVE_PATH = '/drive';
-
-/** Dev-only: POST JSON `{ "persona": "student1" | … }` — sets `maqSamlSession` without redirect. */
-export const SAML_BYPASS_SESSION_PATH = '/auth/saml/bypass/session';
-
-/** Dev-only: bypass availability and persona list. */
-export const SAML_BYPASS_STATUS_PATH = '/auth/saml/bypass/status';
 
 export const AUTH_SAML_ME_PATH = '/auth/saml/me';
 

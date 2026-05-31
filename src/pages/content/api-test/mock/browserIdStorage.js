@@ -1,1 +1,1 @@
-export { getOrCreateBrowserId, resetStoredBrowserId } from '../../../../auth/browserIdStorage.js';
+export { getOrCreateBrowserId, getBrowserIdForAuth, resetStoredBrowserId } from '../../../../auth/browserIdStorage.js';
