@@ -24,7 +24,7 @@
 .maq-currency-icon--sm {
   width: 14px;
   height: 14px;
-  font-size: var(--font-size-min);
+  font-size: 12px;
 }
 
 .maq-currency-icon--md {
@@ -40,7 +40,7 @@
 }
 
 .maq-currency-display--sm .maq-currency-display__amount {
-  font-size: var(--font-size-min);
+  font-size: 12px;
 }
 
 .maq-currency-display--md .maq-currency-display__amount {

@@ -1,4 +1,6 @@
-import { getSamlLogoutUrl } from '../constants/api.constants.js';
+import { clearPendingSamlBrowserId } from '../auth/browserIdStorage.js';
+import { getApiBaseUrl, getSamlLogoutUrl } from '../constants/api.constants.js';
+import { AUTH_LOGOUT_PATH } from '../constants/authPaths.constants.js';
 
 /** If the page is still active after redirect, treat logout navigation as failed. */
 const LOGOUT_NAVIGATION_FALLBACK_MS = 5000;
@@ -11,9 +13,7 @@ export function isLogoutAvailable() {
 }
 
 /**
- * Wylogowuje użytkownika — przekierowuje na SAML Single Logout (IdP + lokalne ciastka).
- * Nawigacja jest opóźniona o jeden tick, żeby React zdążył narysować stan ładowania.
- * Nie używaj POST /logout przed tym krokiem: backend potrzebuje ciastka sesji SAML w żądaniu GET.
+ * Wylogowuje użytkownika — czyści token API, potem przekierowuje na SAML Single Logout (IdP + lokalne ciastka).
  *
  * @param {() => void} [onNavigationFailed] Wywoływane, gdy przekierowanie nie nastąpiło (np. zablokowane).
  * @returns {boolean} true jeśli zaplanowano przekierowanie
@@ -22,6 +22,18 @@ export function logoutUser(onNavigationFailed) {
   const samlLogoutUrl = getSamlLogoutUrl();
   if (samlLogoutUrl.length === 0) {
     return false;
+  }
+
+  clearPendingSamlBrowserId();
+
+  const baseUrl = getApiBaseUrl();
+  if (baseUrl.length > 0) {
+    fetch(`${baseUrl}${AUTH_LOGOUT_PATH}`, {
+      method: 'POST',
+      credentials: 'include',
+    }).catch(() => {
+      // fire-and-forget; SAML logout still clears browser cookies
+    });
   }
 
   window.setTimeout(() => {
