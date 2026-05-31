@@ -99,7 +99,17 @@ export function getAssetUrl(path) {
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  const apiBase = getApiBaseUrl();
-  const backendBase = apiBase.replace(/\/api$/, '');
+  
+  const configured = import.meta.env.VITE_API_BASE_URL;
+  let backendBase;
+  if (configured !== undefined && configured !== '') {
+    backendBase = configured.replace(/\/+$/, '').replace(/\/api$/, '');
+  } else if (import.meta.env.DEV) {
+    backendBase = 'http://127.0.0.1:8080';
+  } else {
+    const apiBase = getApiBaseUrl();
+    backendBase = apiBase.replace(/\/api$/, '');
+  }
+  
   return `${backendBase}${path.startsWith('/') ? '' : '/'}${path}`;
 }
