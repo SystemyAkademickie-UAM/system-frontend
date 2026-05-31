@@ -148,9 +148,8 @@ function ApiTestWorkspaceInner() {
     setResponseText('');
     const base = getApiBaseUrl();
     try {
-      if (action === 'login' || action === 'dev-bypass') {
-        const endpoint = action === 'dev-bypass' ? `${LOGIN_PATH}/dev-bypass` : LOGIN_PATH;
-        const response = await fetch(`${base}${endpoint}`, {
+      if (action === 'login') {
+        const response = await fetch(`${base}${LOGIN_PATH}`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -414,9 +413,6 @@ function ApiTestWorkspaceInner() {
                 <div className="api-test-workspace__actions">
                   <button type="button" className="api-test-workspace__btn" disabled={isBusy} onClick={() => runLoginAction('login')}>
                     POST /login
-                  </button>
-                  <button type="button" className="api-test-workspace__btn api-test-workspace__btn--primary" disabled={isBusy} onClick={() => runLoginAction('dev-bypass')}>
-                    DEV BYPASS (Mock Auth)
                   </button>
                   <button type="button" className="api-test-workspace__btn api-test-workspace__btn--secondary" disabled={isBusy} onClick={() => runLoginAction('logout')}>
                     POST /logout
