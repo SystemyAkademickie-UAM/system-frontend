@@ -91,13 +91,13 @@
   --line-height-badge-title: 24px;
   --line-height-badge-title-mini: 28px;
   --font-size-badge-label: 14px;
-  --font-size-badge-label-mini: 10px;
+  --font-size-badge-label-mini: 14px;
   --line-height-badge-label: 16px;
-  --font-size-badge-body: 12px;
+  --font-size-badge-body: 14px;
   --line-height-badge-body: 23px;
   --line-height-badge-meta: 15px;
-  --font-size-badge-rarity: 12px;
-  --font-size-badge-rarity-mini: 10px;
+  --font-size-badge-rarity: 14px;
+  --font-size-badge-rarity-mini: 14px;
   --font-size-badge-reward: 14px;
   --letter-spacing-badge-label: 1px;
 
@@ -123,9 +123,9 @@
 
   --font-size-rank-title: 18px;
   --line-height-rank-title: 24px;
-  --font-size-rank-label: 12px;
+  --font-size-rank-label: 14px;
   --line-height-rank-label: 16px;
-  --font-size-rank-body: 12px;
+  --font-size-rank-body: 14px;
   --line-height-rank-body: 23px;
   --font-size-rank-cost: 14px;
   --letter-spacing-rank-label: 0.5px;
@@ -165,7 +165,7 @@
   --activity-card-max-width: 420px;
   --activity-icon-size: 36px;
   --font-size-activity-title: 14px;
-  --font-size-activity-body: 12px;
+  --font-size-activity-body: 14px;
 
   /** Odznaka — wariant kompaktowy (podgląd przy mini) */
   --badge-compact-max-width: 360px;
@@ -180,8 +180,10 @@
   --shell-superbar-height: 63px;
 
   /* --- Typografia --- */
+  /** Minimalny rozmiar czcionki w całej aplikacji */
+  --font-size-min: 14px;
   /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
-  --font-size-body: 12px;
+  --font-size-body: 14px;
   /** Nagłówek strony */
   --font-size-page-title: 42px;
   /** Tekst pod nagłówkiem (opis, podtytuł) */
