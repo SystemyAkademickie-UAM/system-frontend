@@ -27,14 +27,25 @@ function upgradeApiBaseToMatchPageScheme(base) {
 }
 
 /**
- * Absolute URL to start SAML login (full browser navigation to SP `/login` route).
+ * Absolute URL to start SAML login for a registered organization.
+ * @param {number} organizationId
+ * @param {string} [browserId] RFC 4122 UUID for `X-Browser-ID` / RelayState (recommended for browsers).
  */
-export function getSamlLoginUrl() {
+export function getSamlLoginUrl(organizationId, browserId) {
   const base = getApiBaseUrl();
   if (base.length === 0) {
     return '';
   }
-  return `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGIN_PATH}`;
+  const parsedId = Number(organizationId);
+  if (!Number.isFinite(parsedId) || parsedId <= 0) {
+    return '';
+  }
+  let url = `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGIN_PATH}?organizationId=${parsedId}`;
+  const trimmedBrowserId = typeof browserId === 'string' ? browserId.trim() : '';
+  if (trimmedBrowserId.length > 0) {
+    url += `&browserId=${encodeURIComponent(trimmedBrowserId)}`;
+  }
+  return url;
 }
 
 /**

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { getOrCreateBrowserId } from '../../auth/browserIdStorage.js';
+import { getBrowserIdForAuth } from '../../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../../constants/api.constants.js';
 import { AUTH_LOGIN_REGISTRATION_STATUS_PATH } from '../../constants/authPaths.constants.js';
 import { useSession } from '../../context/SessionContext.jsx';
@@ -43,7 +43,7 @@ export default function HomeRedirect() {
         return;
       }
 
-      const browserId = getOrCreateBrowserId();
+      const browserId = getBrowserIdForAuth();
       try {
         const response = await fetch(`${baseUrl}${AUTH_LOGIN_REGISTRATION_STATUS_PATH}`, {
           credentials: 'include',

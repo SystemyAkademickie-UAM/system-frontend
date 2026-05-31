@@ -1,4 +1,4 @@
-import { getOrCreateBrowserId } from '../auth/browserIdStorage.js';
+import { getBrowserIdForAuth } from '../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import { AUTH_LOGIN_PATH } from '../constants/authPaths.constants.js';
 
@@ -35,7 +35,7 @@ export async function exchangeSamlSessionForAuthToken() {
     return { ok: false, status: 0, message: 'Brak adresu API.' };
   }
 
-  const browserId = getOrCreateBrowserId();
+  const browserId = getBrowserIdForAuth();
   const response = await fetch(`${baseUrl}${AUTH_LOGIN_PATH}`, {
     method: 'POST',
     credentials: 'include',
