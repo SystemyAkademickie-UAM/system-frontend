@@ -1,6 +1,8 @@
 import {
   BROWSER_ID_LOCAL_STORAGE_KEY,
   BROWSER_ID_LOCAL_STORAGE_KEY_LEGACY,
+  BROWSER_ID_SAML_PENDING_SESSION_KEY,
+  BROWSER_ID_UUID_REGEX,
 } from '../constants/browserId.constants.js';
 
 function readStoredBrowserId() {
@@ -31,6 +33,22 @@ function writeStoredBrowserId(id) {
   }
 }
 
+function readPendingSamlBrowserId() {
+  try {
+    const raw = globalThis.sessionStorage?.getItem(BROWSER_ID_SAML_PENDING_SESSION_KEY);
+    if (typeof raw !== 'string') {
+      return null;
+    }
+    const trimmed = raw.trim();
+    if (BROWSER_ID_UUID_REGEX.test(trimmed)) {
+      return trimmed;
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 /**
  * Returns a persisted UUID for `X-Browser-ID`, creating and storing one when missing.
  * @returns {string}
@@ -46,10 +64,49 @@ export function getOrCreateBrowserId() {
 }
 
 /**
+ * Browser id for authenticated API calls — prefers SAML RelayState pin from sessionStorage.
+ * @returns {string}
+ */
+export function getBrowserIdForAuth() {
+  const pendingSamlBrowserId = readPendingSamlBrowserId();
+  if (pendingSamlBrowserId !== null) {
+    return pendingSamlBrowserId;
+  }
+  return getOrCreateBrowserId();
+}
+
+/**
+ * Pin browser id before SAML redirect so ACS token binding matches subsequent `X-Browser-ID`.
+ * @param {string} browserId
+ */
+export function pinBrowserIdForSamlFlow(browserId) {
+  const trimmed = typeof browserId === 'string' ? browserId.trim() : '';
+  if (!BROWSER_ID_UUID_REGEX.test(trimmed)) {
+    return;
+  }
+  writeStoredBrowserId(trimmed);
+  try {
+    globalThis.sessionStorage?.setItem(BROWSER_ID_SAML_PENDING_SESSION_KEY, trimmed);
+  } catch {
+    // ignore
+  }
+}
+
+/** Clears SAML pending pin after session is established. */
+export function clearPendingSamlBrowserId() {
+  try {
+    globalThis.sessionStorage?.removeItem(BROWSER_ID_SAML_PENDING_SESSION_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+/**
  * Replaces stored browser id (invalidates prior auth token binding for this install).
  * @returns {string}
  */
 export function resetStoredBrowserId() {
+  clearPendingSamlBrowserId();
   const id = globalThis.crypto.randomUUID();
   writeStoredBrowserId(id);
   return id;

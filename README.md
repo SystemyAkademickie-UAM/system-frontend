@@ -2,6 +2,8 @@
 
 React 19 + Vite 6 (JavaScript) SPA. Dev server: `http://127.0.0.1:3000`.
 
+Institutional login uses **SAML 2.0** (organization picker → IdP → session cookies). See [docs/api-integration.md](./docs/api-integration.md) and backend [saml-local-idp.md](../system-backend/docs/saml-local-idp.md) for the full local stack.
+
 ## Quick start
 
 ```bash
@@ -10,7 +12,7 @@ cp .env.example .env   # optional
 npm run dev
 ```
 
-By default the dev app uses `window.location.origin + '/api'` with a **Vite proxy** to `http://127.0.0.1:8080` (good for SAML cookies). Override with `VITE_API_BASE_URL` if needed ([docs/api-integration.md](./docs/api-integration.md)).
+By default the dev app uses `window.location.origin + '/api'` with a **Vite proxy** to `http://127.0.0.1:8080` (keeps SAML cookies on the SPA origin). Override with `VITE_API_BASE_URL` only for split-origin setups ([docs/api-integration.md](./docs/api-integration.md)).
 
 ## Documentation
 

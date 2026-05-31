@@ -24,8 +24,8 @@ Use `.nvmrc` with nvm / nvm-windows. CI uses Node **24.14.1** (see `.github/work
 
 | Variable              | Purpose |
 | --------------------- | ------- |
-| `NODE_ENV`            | Same as **system-backend**: `development` or `production`. Gates dev SAML bypass UI and `/dev/api-test`. Set in local `.env` (copy from `.env.example`). Docker Compose build arg defaults to `development`; plain `docker build` defaults to `production`. Unset during `npm run dev` → Vite defaults to `development`. |
-| `VITE_API_BASE_URL`   | API base URL including `/api` prefix (no trailing slash). Unset in dev → `http://127.0.0.1:8080/api`. For production builds, set to the full URL the browser must call. |
+| `NODE_ENV`            | `development` or `production`. Gates `/dev/api-test` in production builds. Set in local `.env` (copy from `.env.example`). Docker Compose build arg defaults to `development`; plain `docker build` defaults to `production`. Unset during `npm run dev` → Vite defaults to `development`. |
+| `VITE_API_BASE_URL`   | API base URL including `/api` prefix (no trailing slash). Unset in dev → `window.location.origin + '/api'` (Vite proxy to Nest **8080**). For production builds, set only when the browser must call a separate API origin; otherwise rely on same-host `/api` proxy. |
 
 Never commit `.env`; only `.env.example`.
 

@@ -1,18 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getOrCreateBrowserId, pinBrowserIdForSamlFlow } from '../../../auth/browserIdStorage.js';
 import { getSamlLoginUrl } from '../../../constants/api.constants.js';
-import { DEV_BYPASS_DEFAULT_PERSONA_ID } from '../../../constants/devBypass.constants.js';
-import { useSessionOptional } from '../../../context/SessionContext.jsx';
-import { useDevBypassStatus } from '../../../hooks/useDevBypassStatus.js';
-import { homePath, loginPath } from '../../../routes/pathRegistry.js';
-import AuthRolePickerOverlay from './AuthRolePickerOverlay.jsx';
-import { performTemporaryRoleLogin } from './performTemporaryRoleLogin.js';
-import {
-  PIONIER_DEFAULT_INSTITUTION_ID,
-  PIONIER_INSTITUTIONS,
-} from '../../../constants/authLayout.constants.js';
+import { AUTH_SAML_ORGANIZATIONS_PATH, AUTH_SAML_STATUS_PATH } from '../../../constants/authPaths.constants.js';
+import { loginPath } from '../../../routes/pathRegistry.js';
+import { getJson } from '../../../services/api-client.js';
 import './AuthCard.css';
 import './LoginInstitution.css';
+
+/** @typedef {{ id: number, name: string }} SamlOrganizationOption */
 
 function BackIcon({ className }) {
   return (
@@ -24,25 +20,32 @@ function BackIcon({ className }) {
 
 export default function LoginInstitution({ onBack }) {
   const navigate = useNavigate();
-  const session = useSessionOptional();
-  const { devBypassQuery } = useDevBypassStatus();
-  const selectedInstitution = PIONIER_INSTITUTIONS.find(
-    (item) => item.id === PIONIER_DEFAULT_INSTITUTION_ID,
-  );
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [organizations, setOrganizations] = useState(/** @type {SamlOrganizationOption[]} */ ([]));
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
+  const [isOrganizationsLoading, setIsOrganizationsLoading] = useState(true);
   const [isBusy, setIsBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [selectedPersonaId, setSelectedPersonaId] = useState(DEV_BYPASS_DEFAULT_PERSONA_ID);
 
   useEffect(() => {
-    if (devBypassQuery.personas.length === 0) {
-      return;
-    }
-    const stillValid = devBypassQuery.personas.some((persona) => persona.id === selectedPersonaId);
-    if (!stillValid) {
-      setSelectedPersonaId(devBypassQuery.personas[0].id);
-    }
-  }, [devBypassQuery.personas, selectedPersonaId]);
+    let cancelled = false;
+    (async () => {
+      const result = await getJson(AUTH_SAML_ORGANIZATIONS_PATH);
+      if (cancelled) {
+        return;
+      }
+      if (result.ok && result.data && typeof result.data === 'object' && Array.isArray(result.data.organizations)) {
+        const rows = result.data.organizations;
+        setOrganizations(rows);
+        if (rows.length > 0) {
+          setSelectedOrganizationId(String(rows[0].id));
+        }
+      }
+      setIsOrganizationsLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleBack = useCallback(() => {
     if (onBack) {
@@ -52,114 +55,96 @@ export default function LoginInstitution({ onBack }) {
     navigate(loginPath());
   }, [navigate, onBack]);
 
-  const handleContinue = useCallback(() => {
+  const handleContinue = useCallback(async () => {
     setErrorMessage(null);
-    if (devBypassQuery.enabled) {
-      setIsPickerOpen(true);
+    const organizationId = Number.parseInt(selectedOrganizationId, 10);
+    if (!Number.isFinite(organizationId) || organizationId <= 0) {
+      setErrorMessage('Wybierz uczelnię z listy.');
       return;
     }
-    const samlLoginUrl = getSamlLoginUrl();
+    setIsBusy(true);
+    const statusResult = await getJson(AUTH_SAML_STATUS_PATH);
+    if (
+      !statusResult.ok ||
+      !statusResult.data ||
+      typeof statusResult.data !== 'object' ||
+      statusResult.data.configured !== true
+    ) {
+      setIsBusy(false);
+      setErrorMessage('Logowanie SAML nie jest skonfigurowane (brak certyfikatów SP w backendzie).');
+      return;
+    }
+    const browserId = getOrCreateBrowserId();
+    pinBrowserIdForSamlFlow(browserId);
+    const samlLoginUrl = getSamlLoginUrl(organizationId, browserId);
     if (samlLoginUrl.length === 0) {
+      setIsBusy(false);
       setErrorMessage('Brak adresu logowania SAML.');
       return;
     }
     window.location.assign(samlLoginUrl);
-  }, [devBypassQuery.enabled]);
+  }, [selectedOrganizationId]);
 
-  const handleClosePicker = useCallback(() => {
-    if (isBusy) {
-      return;
-    }
-    setIsPickerOpen(false);
-    setErrorMessage(null);
-  }, [isBusy]);
-
-  const handleConfirmPersona = useCallback(async (personaId) => {
-    setIsBusy(true);
-    setErrorMessage(null);
-    try {
-      const status = await performTemporaryRoleLogin(personaId);
-      if (!status.sessionAuthenticated) {
-        throw new Error('Sesja nie została ustalona. Spróbuj ponownie.');
-      }
-
-      await session?.refetchSession?.();
-      setIsPickerOpen(false);
-      navigate(homePath());
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Logowanie nie powiodło się.';
-      setErrorMessage(message);
-    } finally {
-      setIsBusy(false);
-    }
-  }, [navigate, session]);
+  const isSelectDisabled = isOrganizationsLoading || organizations.length === 0 || isBusy;
 
   return (
-    <>
-      <div className="auth-card auth-card--wizard-panel auth-card--left-aligned login-institution">
-        <button
-          type="button"
-          className="auth-card__back-button"
-          onClick={handleBack}
-          aria-label="Wróć"
-        >
-          <BackIcon className="auth-card__back-icon" />
-        </button>
+    <div className="auth-card auth-card--wizard-panel auth-card--left-aligned login-institution">
+      <button
+        type="button"
+        className="auth-card__back-button"
+        onClick={handleBack}
+        aria-label="Wróć"
+      >
+        <BackIcon className="auth-card__back-icon" />
+      </button>
 
-        <img
-          src="/images/pionierid-logo.png"
-          alt="PIONIER.id"
-          className="login-institution__logo auth-logo--pionier"
-        />
+      <img
+        src="/images/pionierid-logo.png"
+        alt="PIONIER.id"
+        className="login-institution__logo auth-logo--pionier"
+      />
 
-        <div className="login-institution__field">
-          <label className="auth-card__title" htmlFor="institution-select">
-            Wybierz uczelnię
-          </label>
-          <div className="login-institution__select-wrap">
-            <select
-              id="institution-select"
-              className="login-institution__select"
-              value={selectedInstitution?.id ?? PIONIER_DEFAULT_INSTITUTION_ID}
-              disabled
-            >
-              {PIONIER_INSTITUTIONS.map((institution) => (
-                <option key={institution.id} value={institution.id}>
-                  {institution.label}
-                </option>
-              ))}
-            </select>
-          </div>
+      <div className="login-institution__field">
+        <label className="auth-card__title" htmlFor="institution-select">
+          Wybierz uczelnię
+        </label>
+        <div className="login-institution__select-wrap">
+          <select
+            id="institution-select"
+            className="login-institution__select"
+            value={selectedOrganizationId}
+            disabled={isSelectDisabled}
+            onChange={(event) => setSelectedOrganizationId(event.target.value)}
+          >
+            {isOrganizationsLoading && (
+              <option value="">Ładowanie…</option>
+            )}
+            {!isOrganizationsLoading && organizations.length === 0 && (
+              <option value="">Brak zarejestrowanych uczelni</option>
+            )}
+            {organizations.map((organization) => (
+              <option key={organization.id} value={String(organization.id)}>
+                {organization.name}
+              </option>
+            ))}
+          </select>
         </div>
-
-        {errorMessage && !isPickerOpen && (
-          <p className="login-institution__error" role="alert">
-            {errorMessage}
-          </p>
-        )}
-
-        <button
-          type="button"
-          className="auth-card__primary-btn login-institution__continue"
-          onClick={handleContinue}
-          disabled={isBusy || devBypassQuery.isLoading}
-        >
-          Kontynuuj
-        </button>
       </div>
 
-      {devBypassQuery.enabled && (
-        <AuthRolePickerOverlay
-          isOpen={isPickerOpen}
-          isBusy={isBusy}
-          errorMessage={errorMessage}
-          personas={devBypassQuery.personas}
-          selectedPersonaId={selectedPersonaId}
-          onSelectedPersonaIdChange={setSelectedPersonaId}
-          onConfirmPersona={handleConfirmPersona}
-          onClose={handleClosePicker}
-        />
+      {errorMessage && (
+        <p className="login-institution__error" role="alert">
+          {errorMessage}
+        </p>
       )}
-    </>
+
+      <button
+        type="button"
+        className="auth-card__primary-btn login-institution__continue"
+        onClick={handleContinue}
+        disabled={isBusy || isOrganizationsLoading || organizations.length === 0}
+      >
+        Kontynuuj
+      </button>
+    </div>
   );
 }
