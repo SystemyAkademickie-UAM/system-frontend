@@ -1,4 +1,5 @@
 import { getJson, patchJson } from './api-client.js';
+import { getAssetUrl } from '../constants/api.constants.js';
 
 /**
  * @typedef {Object} UserProfile
@@ -48,7 +49,11 @@ export async function fetchAvatars() {
     console.error('Failed to fetch avatars:', result.status, result.data);
     return [];
   }
-  return Array.isArray(result.data) ? result.data : [];
+  const list = Array.isArray(result.data) ? result.data : [];
+  return list.map(item => ({
+    ...item,
+    imageUrl: getAssetUrl(item.imageUrl)
+  }));
 }
 
 /**

@@ -76,3 +76,19 @@ export function getApiBaseUrl() {
   }
   return '';
 }
+
+/**
+ * Resolves the absolute URL for an asset (e.g. image) using the backend base URL.
+ * If the path is already an absolute URL, it returns it as is.
+ * @param {string | null | undefined} path
+ * @returns {string | null}
+ */
+export function getAssetUrl(path) {
+  if (!path) return null;
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const apiBase = getApiBaseUrl();
+  const backendBase = apiBase.replace(/\/api$/, '');
+  return `${backendBase}${path.startsWith('/') ? '' : '/'}${path}`;
+}

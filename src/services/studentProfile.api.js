@@ -1,4 +1,5 @@
 import { getJson } from './api-client.js';
+import { getAssetUrl } from '../constants/api.constants.js';
 
 /**
  * @typedef {Object} GroupStudentProfileBadge
@@ -55,7 +56,13 @@ export async function fetchGroupStudentProfile(groupId) {
     return { ok: false, error: data.error };
   }
 
-  return { ok: true, profile: data };
+  return {
+    ok: true,
+    profile: {
+      ...data,
+      avatarUrl: getAssetUrl(data.avatarUrl)
+    }
+  };
 }
 
 /**
