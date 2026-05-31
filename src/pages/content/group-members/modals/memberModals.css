@@ -311,6 +311,138 @@
   color: #f87171;
 }
 
+.member-modal__controls-toggle-wrap {
+  margin-bottom: 0.75rem;
+}
+
+.member-modal__controls-toggle {
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.member-modal__field-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.member-modal__input,
+.member-modal__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.member-modal__textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.member-progress-tree {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.member-progress-tree__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.member-progress-tree__table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-elevated);
+}
+
+.member-progress-tree__stage-row td {
+  padding: 0;
+  background: var(--color-bg-surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.member-progress-tree__stage-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-page-description);
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.member-progress-tree__stage-toggle svg {
+  transition: transform 0.15s ease;
+}
+
+.member-progress-tree__stage-toggle--open svg {
+  transform: rotate(90deg);
+}
+
+.member-progress-tree__activity-item td {
+  padding: 0;
+  background: var(--color-bg-app);
+}
+
+.member-progress-tree__activity-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem 0.65rem 2.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.member-progress-tree__activity-label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.member-progress-tree__activity-name {
+  font-size: var(--font-size-page-description);
+  color: var(--color-text-primary);
+}
+
+.member-progress-tree__checkbox {
+  accent-color: var(--color-accent);
+}
+
+.member-progress-tree__preview {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  z-index: 20;
+  width: min(360px, 70vw);
+  transform: translateY(-50%);
+  pointer-events: none;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
+}
+
 @media (max-width: 640px) {
   .member-modal__badge-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

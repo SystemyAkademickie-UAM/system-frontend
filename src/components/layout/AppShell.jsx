@@ -4,6 +4,7 @@ import { APP_ROLE, ROLE_UI_LABEL } from '../../navigation/shellTemplates.config.
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useUserProfile } from '../../context/UserProfileContext.jsx';
+import { useLeaderDisplayPreferences } from '../../hooks/useLeaderDisplayPreferences.js';
 import { useStudentSuperBarStats } from '../../hooks/useStudentSuperBarStats.js';
 import Sidebar from './Sidebar.jsx';
 import SuperBar from './superbar/SuperBar.jsx';
@@ -35,17 +36,25 @@ export default function AppShell() {
   const { role } = useAppRole();
   const { user, isLoading: isSessionLoading } = useSession();
   const { profile, avatarUrl, isLoading: isProfileLoading } = useUserProfile();
-  const { livesDisplay, currencyDisplay, totalEarnedTooltip } = useStudentSuperBarStats();
+  const { showNickname: leaderShowsNickname } = useLeaderDisplayPreferences();
+  const { livesDisplay, currencyDisplay, totalEarnedDisplay, currencyLabel } = useStudentSuperBarStats();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const roleLabel = ROLE_UI_LABEL[role] ?? ROLE_UI_LABEL[APP_ROLE.STUDENT];
   const displayName = useMemo(() => {
     const nickname = profile?.nickname?.trim();
+    const legalName = buildDisplayName(user);
+
+    if (role === APP_ROLE.LECTURER && !leaderShowsNickname) {
+      return legalName || nickname || 'Użytkownik';
+    }
+
     if (nickname) {
       return nickname;
     }
-    return buildDisplayName(user);
-  }, [profile, user]);
+
+    return legalName;
+  }, [profile, user, role, leaderShowsNickname]);
   const isHeaderLoading = isSessionLoading || isProfileLoading;
 
   useEffect(() => {
@@ -107,7 +116,8 @@ export default function AppShell() {
             avatarUrl={avatarUrl}
             livesDisplay={livesDisplay}
             currencyDisplay={currencyDisplay}
-            currencyTooltip={totalEarnedTooltip}
+            totalEarnedDisplay={totalEarnedDisplay}
+            currencyLabel={currencyLabel}
             onNavigate={closeMobileNav}
             showMenuButton
             menuExpanded={isMobileNavOpen}

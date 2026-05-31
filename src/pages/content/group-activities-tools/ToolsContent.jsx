@@ -140,15 +140,13 @@ export default function App() {
           <p className="legacy-content__panel-description">Prosimy o zaznaczenie elementów, których podsumowanie zostanie wygenerowane.</p>
 
           {stages.map((stage) => (
-            <div key={`checkbox${stage.id}`} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 0' }}>
-              <input type="checkbox" id={`checkbox-${stage.id}`} style={{ cursor: 'pointer' }} />
-              <label htmlFor={`checkbox-${stage.id}`} style={{ color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 500 }}>
-                {stage.name}
-              </label>
-            </div>
+            <label key={`checkbox${stage.id}`} className="legacy-content__checkbox-row" htmlFor={`checkbox-${stage.id}`}>
+              <input type="checkbox" id={`checkbox-${stage.id}`} className="legacy-content__checkbox" />
+              <span>{stage.name}</span>
+            </label>
           ))}
 
-          <button type="button" style={{ alignSelf: 'center', marginTop: '0.5rem', padding: '0.85rem 1.5rem', border: 0, borderRadius: '8px', background: 'rgba(66, 243, 125, 1)', color: 'rgb(0, 57, 21)', fontWeight: 900, cursor: 'pointer' }}>
+          <button type="button" className="legacy-content__primary-btn">
             Wygeneruj podsumowanie
           </button>
         </div>

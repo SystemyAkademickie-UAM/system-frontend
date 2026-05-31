@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { DataTable, PageHeader, SearchBar, SubNav } from '../../../components/ui/index.js';
+import { DataTable, CurrencyDisplay, PageHeader, SearchBar, SubNav } from '../../../components/ui/index.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { useGroupMembers } from './useGroupMembers.js';
@@ -168,7 +168,7 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--currency',
       hiddenBelow: 480,
       render: (member) => (
-        <span className="members-table__currency">{member.currency}</span>
+        <CurrencyDisplay amount={member.currency} size="sm" />
       ),
     },
     {
@@ -181,37 +181,42 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--total',
       hiddenBelow: 768,
       render: (member) => (
-        <span className="members-table__total-currency">{member.totalCurrency}</span>
+        <CurrencyDisplay amount={member.totalCurrency} size="sm" />
       ),
     },
   ], [rankNames]);
 
   const rowActions = useMemo(() => ({
     onDelete: (member) => openModal('delete', member),
+    deleteLabel: 'Usuń uczestnika',
     deleteAriaLabel: (member) => `Usuń ${member.name}`,
-    menuItems: [
+    inlineActions: [
       {
         id: 'badges',
         label: 'Edytuj odznaki',
-        description: 'Przypisz lub odbierz odznaki uczestnikowi.',
+        iconFile: 'ui-member-badges.svg',
+        ariaLabel: 'Edytuj odznaki uczestnika',
         onSelect: (member) => openModal('badges', member),
       },
       {
         id: 'progress',
         label: 'Edytuj postęp',
-        description: 'Zmień poziom, XP lub ukończone zadania.',
+        iconFile: 'ui-member-progress.svg',
+        ariaLabel: 'Edytuj postęp uczestnika',
         onSelect: (member) => openModal('progress', member),
       },
+    ],
+    menuItems: [
       {
         id: 'rank',
         label: 'Zmień rangę',
-        description: 'Ustaw rangę w hierarchii grupy.',
+        description: 'Ustaw ręcznie rangę uczestnikowi.',
         onSelect: (member) => openModal('rank', member),
       },
       {
         id: 'currency',
         label: 'Zarządzaj walutą',
-        description: 'Dodaj lub odejmij punkty waluty uczestnika.',
+        description: 'Dodaj lub odejmij ręcznie walutę uczestnikowi.',
         onSelect: (member) => openModal('currency', member),
       },
     ],

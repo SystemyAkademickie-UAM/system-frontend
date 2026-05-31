@@ -1,0 +1,291 @@
+import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getApiBaseUrl } from '../../../constants/api.constants.js';
+import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import { useToast } from '../../../components/ui/Toast/Toast.jsx';
+
+async function postJson(path, body) {
+  const base = getApiBaseUrl();
+  const browserid = getOrCreateBrowserId();
+
+  const response = await fetch(`${base}${path}`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Browser-ID': browserid,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const text = await response.text();
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.message || `Błąd HTTP ${response.status}`);
+  }
+
+  return data;
+}
+
+function mapActivity(raw) {
+  return {
+    id: raw.id,
+    name: raw.name,
+    description0: raw.storyDescription,
+    description1: raw.educationalDescription,
+    reward: raw.currency,
+  };
+}
+
+export function useGroupActivities() {
+  const { groupId } = useParams();
+  const { showSuccess, showError } = useToast();
+  const [stages, setStages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchActivitiesForStage = useCallback(async (stageId) => {
+    const data = await postJson('/activities', {
+      method: 'retrieve',
+      stageId,
+    });
+
+    const activities = (data?.activities ?? []).map(mapActivity);
+
+    setStages((prev) => prev.map((stage) => (
+      stage.id === stageId
+        ? { ...stage, activities }
+        : stage
+    )));
+
+    return activities;
+  }, []);
+
+  const fetchStages = useCallback(async () => {
+    if (!groupId) {
+      setError('Brak ID grupy');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await postJson('/stages', {
+        method: 'retrieve',
+        groupId: Number(groupId),
+      });
+
+      const receivedStages = (data?.stages ?? []).map((stage) => ({
+        id: stage.id,
+        name: stage.name,
+        activities: [],
+        expanded: false,
+      }));
+
+      setStages(receivedStages);
+      setIsLoading(false);
+
+      await Promise.all(
+        receivedStages.map((stage) => fetchActivitiesForStage(stage.id)),
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
+      showError(message);
+      setIsLoading(false);
+    }
+  }, [groupId, fetchActivitiesForStage, showError]);
+
+  useEffect(() => {
+    fetchStages();
+  }, [fetchStages]);
+
+  const toggleStageExpanded = useCallback((stageId) => {
+    setStages((prev) => prev.map((stage) => (
+      stage.id === stageId
+        ? { ...stage, expanded: !stage.expanded }
+        : stage
+    )));
+  }, []);
+
+  const createStage = useCallback(async (name) => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      showError('Podaj nazwę etapu.');
+      return { ok: false };
+    }
+
+    try {
+      await postJson('/stages', {
+        method: 'post',
+        groupId: Number(groupId),
+        name: trimmed,
+      });
+      showSuccess('Etap został dodany.');
+      await fetchStages();
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [groupId, fetchStages, showSuccess, showError]);
+
+  const updateStage = useCallback(async (stageId, name) => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      showError('Podaj nazwę etapu.');
+      return { ok: false };
+    }
+
+    try {
+      await postJson('/stages', {
+        method: 'modify',
+        stageId,
+        name: trimmed,
+      });
+      setStages((prev) => prev.map((stage) => (
+        stage.id === stageId ? { ...stage, name: trimmed } : stage
+      )));
+      showSuccess('Etap został zaktualizowany.');
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [showSuccess, showError]);
+
+  const deleteStage = useCallback(async (stageId) => {
+    try {
+      await postJson('/stages', {
+        method: 'remove',
+        stageId,
+      });
+      showSuccess('Etap został usunięty.');
+      await fetchStages();
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [fetchStages, showSuccess, showError]);
+
+  const copyStage = useCallback(async (stageId) => {
+    const sourceStage = stages.find((stage) => stage.id === stageId);
+    if (!sourceStage) {
+      return { ok: false };
+    }
+
+    try {
+      const data = await postJson('/stages', {
+        method: 'post',
+        groupId: Number(groupId),
+        name: sourceStage.name,
+      });
+
+      const newStageId = data?.stage;
+      if (newStageId > 0) {
+        await Promise.all(
+          sourceStage.activities.map((activity) => postJson('/activities', {
+            method: 'post',
+            stageId: newStageId,
+            name: activity.name,
+            currency: activity.reward,
+            educationalDescription: activity.description1,
+            storyDescription: activity.description0,
+          })),
+        );
+      }
+
+      showSuccess('Etap został skopiowany.');
+      await fetchStages();
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [groupId, stages, fetchStages, showSuccess, showError]);
+
+  const createActivity = useCallback(async (stageId, values) => {
+    try {
+      await postJson('/activities', {
+        method: 'post',
+        stageId,
+        name: values.name,
+        currency: values.reward,
+        educationalDescription: values.description1,
+        storyDescription: values.description0,
+      });
+      showSuccess('Aktywność została dodana.');
+      await fetchActivitiesForStage(stageId);
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [fetchActivitiesForStage, showSuccess, showError]);
+
+  const updateActivity = useCallback(async (stageId, activityId, values) => {
+    try {
+      await postJson('/activities', {
+        method: 'modify',
+        activityId,
+        name: values.name,
+        currency: Number(values.reward),
+        educationalDescription: values.description1,
+        storyDescription: values.description0,
+      });
+      showSuccess('Aktywność została zaktualizowana.');
+      await fetchActivitiesForStage(stageId);
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [fetchActivitiesForStage, showSuccess, showError]);
+
+  const deleteActivity = useCallback(async (stageId, activityId) => {
+    try {
+      await postJson('/activities', {
+        method: 'remove',
+        activityId,
+      });
+      showSuccess('Aktywność została usunięta.');
+      await fetchStages();
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [fetchStages, showSuccess, showError]);
+
+  return {
+    stages,
+    isLoading,
+    error,
+    refetch: fetchStages,
+    toggleStageExpanded,
+    createStage,
+    updateStage,
+    deleteStage,
+    copyStage,
+    createActivity,
+    updateActivity,
+    deleteActivity,
+  };
+}

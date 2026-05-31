@@ -3,7 +3,8 @@
 
   box-sizing: border-box;
   position: relative;
-  display: block;
+  display: flex;
+  align-items: stretch;
   width: 100%;
   max-width: var(--badge-mini-max-width);
   min-height: var(--badge-mini-min-height);
@@ -34,21 +35,17 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--badge-rarity-color) 20%, transparent);
 }
 
-.maq-badge-mini__accent {
-  display: none;
-}
-
-.maq-badge-mini__body {
-  display: flex;
-  align-items: flex-start;
-  gap: 0;
-  min-height: var(--badge-mini-min-height);
-  padding: 0 9px 0 0;
-}
-
 .maq-badge-mini__icon-slot {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
   padding: 30px 0 0 16px;
+}
+
+.maq-badge-mini__icon-slot .maq-badge__icon-circle {
+  margin: 0;
 }
 
 .maq-badge-mini__content {
@@ -57,21 +54,23 @@
   flex-direction: column;
   align-items: stretch;
   justify-content: center;
-  gap: 0;
   min-width: 0;
   min-height: var(--badge-mini-min-height);
-  padding: 0 8px 12px 8px;
+  padding: 0 9px 12px 8px;
 }
 
 .maq-badge-mini__name {
+  font-family: 'Manrope', sans-serif;
   font-size: var(--font-size-badge-title);
   font-weight: 700;
   line-height: var(--line-height-badge-title-mini);
+  text-align: center;
   color: var(--color-badge-text);
 }
 
 .maq-badge-mini__rarity {
   margin-top: 2px;
+  font-family: 'Inter', sans-serif;
   font-size: var(--font-size-badge-rarity-mini);
   font-weight: 600;
   line-height: var(--line-height-badge-meta);
@@ -100,6 +99,7 @@
 
 .maq-badge-mini__reward-label {
   padding: 0 8px;
+  font-family: 'Inter', sans-serif;
   font-size: var(--font-size-badge-label-mini);
   font-weight: 700;
   line-height: var(--line-height-badge-label);
@@ -109,21 +109,13 @@
 
 .maq-badge-mini__reward-value {
   padding: 0 8px;
-  font-size: var(--font-size-badge-reward);
-  font-weight: 600;
-  line-height: var(--line-height-badge-body);
   color: var(--badge-rarity-color);
-  white-space: nowrap;
-}
-
-.maq-badge-mini__reward-emoji {
-  line-height: 1;
 }
 
 .maq-badge-mini-preview {
   position: fixed;
-  z-index: 1100;
-  width: min(var(--badge-compact-max-width), calc(100vw - 2rem));
+  z-index: var(--z-index-toast, 12000);
+  width: min(var(--badge-max-width), calc(100vw - 2rem));
   pointer-events: none;
   filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.45));
 }
