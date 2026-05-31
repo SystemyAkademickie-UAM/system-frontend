@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthStepTransition from '../../../components/layout/AuthStepTransition.jsx';
-import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
+import { getBrowserIdForAuth } from '../../../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import {
   AUTH_LOGIN_ACCEPT_EULA_PATH,
@@ -62,7 +62,7 @@ export default function LoginPage() {
         return;
       }
 
-      const browserId = getOrCreateBrowserId();
+      const browserId = getBrowserIdForAuth();
       try {
         const response = await fetch(`${baseUrl}${AUTH_LOGIN_REGISTRATION_STATUS_PATH}`, {
           credentials: 'include',
@@ -79,7 +79,11 @@ export default function LoginPage() {
         const status = await response.json();
         if (!cancelled) {
           const isComplete = status.registrationCompleted === true && status.eulaAccepted === true;
-          setStep(isComplete ? LOGIN_FLOW_STEP_PIONIER : LOGIN_FLOW_STEP_REGISTER);
+          if (isComplete) {
+            navigate(homePath(), { replace: true });
+            return;
+          }
+          setStep(LOGIN_FLOW_STEP_REGISTER);
           setRegistrationCheckDone(true);
         }
       } catch {
@@ -96,7 +100,7 @@ export default function LoginPage() {
     return () => {
       cancelled = true;
     };
-  }, [session?.isAuthenticated, session?.isLoading]);
+  }, [session?.isAuthenticated, session?.isLoading, navigate]);
 
   const handlePionierContinue = useCallback(() => {
     setStep(LOGIN_FLOW_STEP_INSTITUTION);
@@ -163,7 +167,7 @@ export default function LoginPage() {
   const handleEulaAccept = useCallback(async () => {
     setIsEulaSubmitting(true);
     setEulaError(null);
-    const browserId = getOrCreateBrowserId();
+    const browserId = getBrowserIdForAuth();
     const baseUrl = getApiBaseUrl();
     try {
       const profileResponse = await fetch(`${baseUrl}${AUTH_LOGIN_PROFILE_PATH}`, {

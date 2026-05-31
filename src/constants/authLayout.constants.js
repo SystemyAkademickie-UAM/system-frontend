@@ -1,15 +1,3 @@
-/** Default Pionier.id institution (locked until multi-IdP support). */
-export const PIONIER_DEFAULT_INSTITUTION_ID = 'uam';
-
-/** @type {{ id: string, label: string, enabled: boolean }[]} */
-export const PIONIER_INSTITUTIONS = [
-  {
-    id: 'uam',
-    label: 'Uniwersytet im. Adama Mickiewicza w Poznaniu (UAM)',
-    enabled: true,
-  },
-];
-
 /** Card width as fraction of 1920px Figma artboard (569 / 1920). */
 export const AUTH_CARD_VIEWPORT_WIDTH_RATIO = 569 / 1920;
 

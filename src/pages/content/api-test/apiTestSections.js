@@ -1,7 +1,8 @@
 import {
   ACTIVITIES_PATH,
   DRIVE_PATH,
-  getGroupAccessCodePath,
+  getGroupEnrollmentCodeByIdPath,
+  getGroupEnrollmentCodesPath,
   getGroupBadgeByIdPath,
   getGroupBadgesPath,
   getGroupEnrollPath,
@@ -18,7 +19,8 @@ import {
   getGroupStudentProgressPath,
   getGroupStudentActivityTogglePath,
   GROUPS_CATALOG_PATH,
-  GROUPS_GENERATE_CODE_PATH,
+  ENROLLMENT_CODE_MAX_LENGTH,
+  ENROLLMENT_CODE_MIN_LENGTH,
   GROUPS_NEW_PATH,
   GROUPS_PATH,
   STAGES_PATH,
@@ -187,56 +189,201 @@ export const API_TEST_SECTIONS = [
     ],
   },
   {
-    id: 'generateCode',
-    label: 'Generate Code',
-    title: 'POST /groups/generate-code (Lecturer)',
-    kind: 'api',
-    method: 'POST',
+    id: 'listEnrollmentCodes',
+    label: 'List Codes',
+    title: 'GET /groups/:groupId/enrollment-codes',
+    group: 'Enrollment codes',
+    kind: 'get',
+    method: 'GET',
     hint:
-      'Lecturer only. Generates a 6-character code and saves it to education.groups.entry_code for the given group. Response groupId: -1 = not authorized, -2 = group not found, -3 = DB error.',
-    buildPath: () => GROUPS_GENERATE_CODE_PATH,
-    needsBrowserId: true,
+      'Lecturer only. Lists all codes for the group (newest first). Pick the latest active row to see the current invite code.',
+    buildPath: (values) =>
+      getGroupEnrollmentCodesPath(String(values.groupId ?? ''), String(values.auth ?? '')),
+    needsBrowserId: false,
     defaultValues: () => ({
       auth: '',
       groupId: '100001',
     }),
-    buildPayload: (values) => {
-      /** @type {Record<string, unknown>} */
-      const payload = {
-        groupId: Number(values.groupId),
-      };
-      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
-        payload.auth = values.auth.trim();
-      }
-      return payload;
-    },
-    parsePayload: (payload) => ({
-      auth: typeof payload.auth === 'string' ? payload.auth : '',
-      groupId: payload.groupId ?? '',
-    }),
-    requiredKeysForValues: () => ['groupId'],
     fields: [
       { key: 'groupId', label: 'groupId (public)', type: 'number' },
       { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
     ],
   },
   {
-    id: 'getAccessCode',
-    label: 'Get Access Code',
-    title: 'GET /groups/:groupId/access-code (Lecturer)',
+    id: 'getEnrollmentCode',
+    label: 'Get Code',
+    title: 'GET /groups/:groupId/enrollment-codes/:codeId',
     kind: 'get',
     method: 'GET',
-    hint: 'Lecturer only. Returns the current entry code stored for the group (empty string if none yet).',
     buildPath: (values) =>
-      getGroupAccessCodePath(String(values.groupId ?? ''), String(values.auth ?? '')),
-    needsBrowserId: true,
+      getGroupEnrollmentCodeByIdPath(
+        String(values.groupId ?? ''),
+        String(values.codeId ?? ''),
+        String(values.auth ?? ''),
+      ),
+    needsBrowserId: false,
     defaultValues: () => ({
       auth: '',
       groupId: '100001',
+      codeId: '1',
     }),
     fields: [
       { key: 'groupId', label: 'groupId (public)', type: 'number' },
+      { key: 'codeId', label: 'codeId (URL path)', type: 'number' },
       { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'createEnrollmentCode',
+    label: 'Generate Code',
+    title: 'POST /groups/:groupId/enrollment-codes',
+    kind: 'api',
+    method: 'POST',
+    hint:
+      'Lecturer only. Primary way to mint a code — omit `code` to auto-generate a 6-char hex value. Optional expiresAt (ISO-8601) and maxUses (≥1). Returns 201 with the created row.',
+    buildPath: (values) => `/groups/${String(values.groupId ?? '').trim()}/enrollment-codes`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      code: '',
+      expiresAt: '',
+      maxUses: '',
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      const code = String(values.code ?? '').trim();
+      if (code !== '') {
+        payload.code = code.toUpperCase();
+      }
+      const expiresAt = String(values.expiresAt ?? '').trim();
+      if (expiresAt !== '') {
+        payload.expiresAt = expiresAt;
+      }
+      if (values.maxUses !== '' && values.maxUses !== null && values.maxUses !== undefined) {
+        payload.maxUses = Number(values.maxUses);
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      code: typeof payload.code === 'string' ? payload.code : '',
+      expiresAt: typeof payload.expiresAt === 'string' ? payload.expiresAt : '',
+      maxUses: payload.maxUses ?? '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      {
+        key: 'code',
+        label: `code (optional, ${ENROLLMENT_CODE_MIN_LENGTH}-${ENROLLMENT_CODE_MAX_LENGTH} chars)`,
+        type: 'text',
+        placeholder: 'Leave empty to auto-generate',
+      },
+      { key: 'expiresAt', label: 'expiresAt (optional ISO-8601)', type: 'text', placeholder: '2026-12-31T23:59:59.000Z' },
+      { key: 'maxUses', label: 'maxUses (optional, ≥1)', type: 'number' },
+    ],
+  },
+  {
+    id: 'updateEnrollmentCode',
+    label: 'Update Code',
+    title: 'PATCH /groups/:groupId/enrollment-codes/:codeId',
+    kind: 'api',
+    method: 'PATCH',
+    buildPath: (values) =>
+      `/groups/${String(values.groupId ?? '').trim()}/enrollment-codes/${String(values.codeId ?? '').trim()}`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      codeId: '1',
+      expiresAt: '',
+      maxUses: '',
+      isActive: 'true',
+    }),
+    buildPayload: (values) => {
+      /** @type {Record<string, unknown>} */
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      const expiresAtRaw = String(values.expiresAt ?? '').trim();
+      if (expiresAtRaw === 'null') {
+        payload.expiresAt = null;
+      } else if (expiresAtRaw !== '') {
+        payload.expiresAt = expiresAtRaw;
+      }
+      const maxUsesRaw = String(values.maxUses ?? '').trim();
+      if (maxUsesRaw === 'null') {
+        payload.maxUses = null;
+      } else if (maxUsesRaw !== '') {
+        payload.maxUses = Number(maxUsesRaw);
+      }
+      if (values.isActive === 'true') {
+        payload.isActive = true;
+      } else if (values.isActive === 'false') {
+        payload.isActive = false;
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      expiresAt:
+        payload.expiresAt === null
+          ? 'null'
+          : typeof payload.expiresAt === 'string'
+            ? payload.expiresAt
+            : '',
+      maxUses:
+        payload.maxUses === null ? 'null' : payload.maxUses ?? '',
+      isActive:
+        payload.isActive === true ? 'true' : payload.isActive === false ? 'false' : 'true',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'codeId', label: 'codeId (URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'expiresAt', label: 'expiresAt (optional; "null" clears)', type: 'text' },
+      { key: 'maxUses', label: 'maxUses (optional; "null" = unlimited)', type: 'text' },
+      {
+        key: 'isActive',
+        label: 'isActive',
+        type: 'select',
+        options: [
+          { value: 'true', label: 'true' },
+          { value: 'false', label: 'false' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'deleteEnrollmentCode',
+    label: 'Delete Code',
+    title: 'DELETE /groups/:groupId/enrollment-codes/:codeId',
+    kind: 'get',
+    method: 'DELETE',
+    buildPath: (values) =>
+      getGroupEnrollmentCodeByIdPath(
+        String(values.groupId ?? ''),
+        String(values.codeId ?? ''),
+        String(values.auth ?? ''),
+      ),
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      codeId: '1',
+    }),
+    fields: [
+      { key: 'groupId', label: 'groupId (public)', type: 'number' },
+      { key: 'codeId', label: 'codeId', type: 'number' },
+      { key: 'auth', label: 'auth (optional query / cookie)', type: 'textarea' },
     ],
   },
   {
@@ -277,7 +424,7 @@ export const API_TEST_SECTIONS = [
     kind: 'api',
     method: 'GET',
     hint:
-      'Requires public groupId in the URL and a matching 6-character entry code. Same response shape as Group enroll: enrollmentId (-1 = not authorized, -2 = invalid group/code, -3 = DB error), groupId on success.',
+      'Student: validates a code from education.enrollment_codes and enrolls. enrollmentId: >0 success; -1 unauthorized; -2 group not found; -4 invalid/inactive/expired/exhausted code.',
     buildPath: (values) =>
       getGroupInvitePath(
         String(values.inviteGroupId ?? '').trim(),
@@ -288,7 +435,7 @@ export const API_TEST_SECTIONS = [
     defaultValues: () => ({
       auth: '',
       inviteGroupId: '100001',
-      code: 'ABCDEF',
+      code: 'A1B2C3',
     }),
     buildPayload: (values) => {
       /** @type {Record<string, unknown>} */
@@ -309,7 +456,7 @@ export const API_TEST_SECTIONS = [
     requiredKeysForValues: () => ['groupId', 'code'],
     fields: [
       { key: 'inviteGroupId', label: 'groupId (public, URL path)', type: 'number' },
-      { key: 'code', label: 'code (query, 6 chars)', type: 'text' },
+      { key: 'code', label: `code (query, ${ENROLLMENT_CODE_MIN_LENGTH}-${ENROLLMENT_CODE_MAX_LENGTH} chars)`, type: 'text' },
       { key: 'auth', label: 'auth (optional query / cookie)', type: 'textarea' },
     ],
   },
