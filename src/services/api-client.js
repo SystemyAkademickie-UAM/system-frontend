@@ -1,5 +1,5 @@
 import { getApiBaseUrl } from '../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../auth/browserIdStorage.js';
+import { getBrowserIdForAuth } from '../auth/browserIdStorage.js';
 
 /**
  * Lightweight API client using native `fetch`.
@@ -41,7 +41,7 @@ export async function getJson(resourcePath, options = {}) {
   /** @type {Record<string, string>} */
   const headers = {};
   if (options.includeBrowserId) {
-    headers['X-Browser-ID'] = getOrCreateBrowserId();
+    headers['X-Browser-ID'] = getBrowserIdForAuth();
   }
 
   const response = await fetch(url, {
@@ -68,7 +68,7 @@ export async function postJson(resourcePath, body, options = {}) {
   /** @type {Record<string, string>} */
   const headers = { 'Content-Type': 'application/json' };
   if (options.includeBrowserId) {
-    headers['X-Browser-ID'] = getOrCreateBrowserId();
+    headers['X-Browser-ID'] = getBrowserIdForAuth();
   }
 
   const response = await fetch(url, {
@@ -96,7 +96,7 @@ export async function patchJson(resourcePath, body, options = {}) {
   /** @type {Record<string, string>} */
   const headers = { 'Content-Type': 'application/json' };
   if (options.includeBrowserId) {
-    headers['X-Browser-ID'] = getOrCreateBrowserId();
+    headers['X-Browser-ID'] = getBrowserIdForAuth();
   }
 
   const response = await fetch(url, {
@@ -123,7 +123,7 @@ export async function deleteJson(resourcePath, options = {}) {
   /** @type {Record<string, string>} */
   const headers = {};
   if (options.includeBrowserId) {
-    headers['X-Browser-ID'] = getOrCreateBrowserId();
+    headers['X-Browser-ID'] = getBrowserIdForAuth();
   }
 
   const response = await fetch(url, {
