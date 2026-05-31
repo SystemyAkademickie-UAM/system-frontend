@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
-
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
+import { useToast } from '../../../components/ui/index.js';
 
 import { appHelpPath } from '../../../routes/pathRegistry.js';
 
@@ -57,7 +60,18 @@ const helpcenter1LABEL = {
 
 };
 
-const savebuttonLABEL = { polish: 'Zapisz zmiany', english: 'Save Changes', japanese: '変更を保存', kana: 'へんこうをほぞん' };
+const showNicknameLABEL = {
+  polish: 'Wyświetlaj ksywkę',
+  english: 'Show nickname',
+  japanese: 'ニックネームを表示',
+  kana: 'ニックネームをひょうじ',
+};
+const showNicknameDescLABEL = {
+  polish: 'Gdy wyłączone, w pasku nawigacji i opisie grupy widać imię i nazwisko zamiast ksywki.',
+  english: 'When disabled, the navigation bar and group description show your legal name instead of nickname.',
+  japanese: 'オフにすると、ナビバーとグループ説明にニックネームではなく氏名が表示されます。',
+  kana: 'オフにすると、ナビバーとグループ説明にニックネームではなく氏名が表示されます。',
+};
 
 
 
@@ -82,8 +96,10 @@ function readLanguageCookie() {
 
 
 export default function SettingsContent() {
-
   const { refetchProfile } = useUserProfile();
+  const { role } = useAppRole();
+  const { showNickname, setShowNickname } = useLeaderDisplayPreferences();
+  const { showSuccess, showError } = useToast();
 
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -260,13 +276,9 @@ export default function SettingsContent() {
     const result = await updateProfile(payload);
 
     if (!result.ok) {
-
       setIsSaving(false);
-
-      setErrorMessage(result.error || 'Nie udało się zapisać ustawień');
-
+      showError(result.error || 'Nie udało się zapisać ustawień');
       return;
-
     }
 
 
@@ -280,11 +292,8 @@ export default function SettingsContent() {
 
 
     await refetchProfile();
-
     setIsSaving(false);
-
-    setSaveMessage('Zmiany zostały zapisane.');
-
+    showSuccess('Zmiany zostały zapisane.');
   }
 
 
@@ -431,7 +440,19 @@ export default function SettingsContent() {
 
           </div>
 
-
+          {role === APP_ROLE.LECTURER ? (
+            <div className="settings-content__panel settings-content__panel--toggle">
+              <label className="settings-content__toggle">
+                <input
+                  type="checkbox"
+                  checked={showNickname}
+                  onChange={(event) => setShowNickname(event.target.checked)}
+                />
+                <span className="settings-content__field-label">{showNicknameLABEL[language]}</span>
+              </label>
+              <p className="settings-content__toggle-description">{showNicknameDescLABEL[language]}</p>
+            </div>
+          ) : null}
 
           <div className="settings-content__footer">
 
@@ -478,8 +499,6 @@ export default function SettingsContent() {
 
 
       {errorMessage ? <p className="settings-content__error" role="alert">{errorMessage}</p> : null}
-
-      {saveMessage ? <p className="settings-content__success">{saveMessage}</p> : null}
 
     </section>
 

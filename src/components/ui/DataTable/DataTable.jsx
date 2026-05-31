@@ -51,7 +51,26 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
   const [menuStyle, setMenuStyle] = useState(null);
   const menuButtonRef = useRef(null);
   const menuRef = useRef(null);
-  const { onDelete, deleteAriaLabel, menuItems = [] } = rowActions ?? {};
+  const {
+    onDelete,
+    deleteLabel = 'Usuń',
+    deleteAriaLabel,
+    inlineActions = [],
+    menuItems = [],
+  } = rowActions ?? {};
+
+  const resolvedMenuItems = useMemo(() => {
+    const items = [...menuItems];
+    if (onDelete) {
+      items.push({
+        id: '__delete',
+        label: deleteLabel,
+        destructive: true,
+        onSelect: onDelete,
+      });
+    }
+    return items;
+  }, [menuItems, onDelete, deleteLabel]);
 
   const setMenuState = (nextOpen) => {
     setMenuOpen(nextOpen);
@@ -100,7 +119,7 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
       window.removeEventListener('resize', updateMenuPosition);
       window.removeEventListener('scroll', updateMenuPosition, true);
     };
-  }, [menuOpen, menuItems.length, updateMenuPosition]);
+  }, [menuOpen, resolvedMenuItems.length, updateMenuPosition]);
 
   const handleMenuToggle = () => setMenuState(!menuOpen);
   const handleMenuClose = () => setMenuState(false);
@@ -110,23 +129,29 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
     handleMenuClose();
   };
 
-  if (!onDelete && menuItems.length === 0) {
+  if (inlineActions.length === 0 && resolvedMenuItems.length === 0) {
     return null;
   }
 
   return (
     <div className="data-table__actions">
-      {onDelete ? (
+      {inlineActions.map((item) => (
         <button
+          key={item.id}
           type="button"
-          className="data-table__action-btn data-table__action-btn--delete"
-          aria-label={deleteAriaLabel?.(row) ?? 'Usuń wiersz'}
-          onClick={() => onDelete(row)}
+          className="data-table__action-btn data-table__action-btn--inline"
+          aria-label={item.ariaLabel ?? item.label}
+          title={item.label}
+          onClick={() => item.onSelect?.(row)}
         >
-          <AssetSvg name="ui-trash.svg" width={18} height={18} alt="" />
+          {item.iconFile ? (
+            <AssetSvg name={item.iconFile} width={18} height={18} alt="" />
+          ) : (
+            <span className="data-table__action-btn-text">{item.label}</span>
+          )}
         </button>
-      ) : null}
-      {menuItems.length > 0 ? (
+      ))}
+      {resolvedMenuItems.length > 0 ? (
         <div className="data-table__menu-wrap">
           <button
             ref={menuButtonRef}
@@ -151,12 +176,16 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
                 role="menu"
                 style={menuStyle ?? { visibility: 'hidden' }}
               >
-                {menuItems.map((item) => (
+                {resolvedMenuItems.map((item) => (
                   <button
                     key={item.id}
                     type="button"
-                    className="data-table__menu-item"
+                    className={[
+                      'data-table__menu-item',
+                      item.destructive ? 'data-table__menu-item--destructive' : '',
+                    ].filter(Boolean).join(' ')}
                     role="menuitem"
+                    aria-label={item.destructive ? deleteAriaLabel?.(row) ?? item.label : undefined}
                     onClick={() => handleAction(item)}
                   >
                     <span className="data-table__menu-item-content">
@@ -358,7 +387,16 @@ export default function DataTable({
     };
   }, [stickyHeader, updateHeaderPosition]);
 
-  const hasRowActions = Boolean(rowActions?.onDelete || rowActions?.menuItems?.length);
+  const hasRowActions = Boolean(
+    rowActions?.onDelete
+    || rowActions?.inlineActions?.length
+    || rowActions?.menuItems?.length,
+  );
+  const tableDensityClass = columns.length >= 8
+    ? 'data-table--dense'
+    : columns.length >= 6
+      ? 'data-table--compact'
+      : '';
   const RowComponent = renderRow ?? DefaultDataTableRow;
   const actionsCol = hasRowActions ? (
     <col className="data-table__col data-table__col--actions" style={{ width: '100px' }} />
@@ -394,7 +432,7 @@ export default function DataTable({
             className={`data-table-header-bar${isHeaderSticky ? ' data-table-header-bar--sticky' : ''}`}
           >
             <div ref={headerScrollRef} className="data-table-header-scroll">
-              <table className="data-table data-table--header">
+              <table className={['data-table', 'data-table--header', tableDensityClass].filter(Boolean).join(' ')}>
                 <colgroup>
                   {rowActionsPosition === 'start' ? actionsCol : null}
                   {columns.map((column) => (
@@ -458,7 +496,7 @@ export default function DataTable({
             className="data-table-viewport"
             onScroll={syncHeaderScroll}
           >
-            <table className="data-table data-table--body">
+            <table className={['data-table', 'data-table--body', tableDensityClass].filter(Boolean).join(' ')}>
               <colgroup>
                 {rowActionsPosition === 'start' ? actionsCol : null}
                 {columns.map((column) => (

@@ -281,3 +281,40 @@
     display: none;
   }
 }
+
+.super-bar-stat--currency {
+  cursor: default;
+}
+
+.super-bar-currency-preview {
+  position: fixed;
+  z-index: var(--z-index-toast, 12000);
+  width: 220px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.super-bar-currency-preview__title {
+  margin: 0 0 4px;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+}
+
+.super-bar-currency-preview__label {
+  margin: 0 0 6px;
+  font-size: var(--font-size-badge-label-mini);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.super-bar-currency-preview__value {
+  color: var(--color-text-primary);
+}

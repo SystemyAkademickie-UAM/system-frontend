@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
+import IconPicker from '../../../../components/ui/IconPicker/IconPicker.jsx';
 import { fetchIconCatalog } from '../../../../services/icons.api.js';
 import { validateWholeNumberInput } from '../shared/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
@@ -111,44 +112,37 @@ export default function RankFormModal({
           />
         </div>
 
-        <div className="rewards-modal__row">
-          <div className="rewards-modal__field">
-            <label htmlFor="rank-icon" className="rewards-modal__label">Ikona</label>
-            <select
-              id="rank-icon"
-              className="rewards-modal__select"
-              value={form.iconFile}
-              onChange={handleChange('iconFile')}
-            >
-              <option value="">Wybierz ikonę…</option>
-              {iconCatalog.map((icon) => (
-                <option key={icon.id} value={icon.id}>{icon.label}</option>
-              ))}
-            </select>
-          </div>
+        <div className="rewards-modal__field">
+          <label className="rewards-modal__label">Ikona</label>
+          <IconPicker
+            icons={iconCatalog}
+            value={form.iconFile}
+            onChange={(iconId) => setForm((prev) => ({ ...prev, iconFile: iconId }))}
+            name="rank-icon"
+          />
+        </div>
 
-          <div className="rewards-modal__field">
-            <label htmlFor="rank-cost" className="rewards-modal__label">Koszt</label>
-            <input
-              id="rank-cost"
-              type="text"
-              inputMode="numeric"
-              className={[
-                'rewards-modal__input',
-                showCostError ? 'rewards-modal__input--error' : '',
-              ].filter(Boolean).join(' ')}
-              value={form.costAmount}
-              onChange={handleChange('costAmount')}
-              placeholder="np. 100"
-              aria-invalid={showCostError}
-              aria-describedby={showCostError ? 'rank-cost-error' : undefined}
-            />
-            {showCostError ? (
-              <p id="rank-cost-error" className="rewards-modal__field-error" role="alert">
-                {costValidation.error}
-              </p>
-            ) : null}
-          </div>
+        <div className="rewards-modal__field">
+          <label htmlFor="rank-cost" className="rewards-modal__label">Koszt</label>
+          <input
+            id="rank-cost"
+            type="text"
+            inputMode="numeric"
+            className={[
+              'rewards-modal__input',
+              showCostError ? 'rewards-modal__input--error' : '',
+            ].filter(Boolean).join(' ')}
+            value={form.costAmount}
+            onChange={handleChange('costAmount')}
+            placeholder="np. 100"
+            aria-invalid={showCostError}
+            aria-describedby={showCostError ? 'rank-cost-error' : undefined}
+          />
+          {showCostError ? (
+            <p id="rank-cost-error" className="rewards-modal__field-error" role="alert">
+              {costValidation.error}
+            </p>
+          ) : null}
         </div>
 
         <div className="rewards-modal__field">

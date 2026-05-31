@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BADGE_RARITY, BADGE_RARITY_LABELS, Modal } from '../../../../components/ui/index.js';
+import { BADGE_RARITY, BADGE_RARITY_LABELS, InfoTooltip, Modal } from '../../../../components/ui/index.js';
+import IconPicker from '../../../../components/ui/IconPicker/IconPicker.jsx';
 import { fetchIconCatalog } from '../../../../services/icons.api.js';
 import { validateWholeNumberInput } from '../../group-rewards/shared/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
@@ -105,37 +106,33 @@ export default function BadgeFormModal({
           />
         </div>
 
-        <div className="rewards-modal__row">
-          <div className="rewards-modal__field">
-            <label htmlFor="badge-icon" className="rewards-modal__label">Ikona</label>
-            <select
-              id="badge-icon"
-              className="rewards-modal__select"
-              value={form.iconFile}
-              onChange={handleChange('iconFile')}
-            >
-              <option value="">Wybierz ikonę…</option>
-              {iconCatalog.map((icon) => (
-                <option key={icon.id} value={icon.id}>{icon.label}</option>
-              ))}
-            </select>
-          </div>
+        <div className="rewards-modal__field">
+          <label className="rewards-modal__label">Ikona</label>
+          <IconPicker
+            icons={iconCatalog}
+            value={form.iconFile}
+            onChange={(iconId) => setForm((prev) => ({ ...prev, iconFile: iconId }))}
+            name="badge-icon"
+          />
+        </div>
 
-          <div className="rewards-modal__field">
-            <label htmlFor="badge-rarity" className="rewards-modal__label">Jakość</label>
-            <select
-              id="badge-rarity"
-              className="rewards-modal__select"
-              value={form.rarity}
-              onChange={handleChange('rarity')}
-            >
-              {Object.values(BADGE_RARITY).map((rarity) => (
-                <option key={rarity} value={rarity}>
-                  {BADGE_RARITY_LABELS[rarity]}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="rewards-modal__field">
+          <label htmlFor="badge-rarity" className="rewards-modal__label rewards-modal__label--with-info">
+            Jakość
+            <InfoTooltip text="Określa rzadkość odznaki i kolor akcentu kafelka (pasek boczny, etykiety)." />
+          </label>
+          <select
+            id="badge-rarity"
+            className="rewards-modal__select"
+            value={form.rarity}
+            onChange={handleChange('rarity')}
+          >
+            {Object.values(BADGE_RARITY).map((rarity) => (
+              <option key={rarity} value={rarity}>
+                {BADGE_RARITY_LABELS[rarity]}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="rewards-modal__field">

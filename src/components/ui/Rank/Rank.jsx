@@ -1,26 +1,16 @@
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 import { getRankCssVars } from './rankCssVars.js';
 import { RANK_THEME } from './rankTheme.js';
 import './Rank.css';
 
 /**
- * Kafelek rangi z ikoną, kosztem, statusem fabularnym i listą odblokowanych przedmiotów.
- *
- * @param {Object} props
- * @param {string} props.name — nazwa rangi
- * @param {number} [props.costAmount=0] — koszt otrzymania
- * @param {string} [props.costEmoji='🥕']
- * @param {string} props.storyDescription — tekst statusu fabularnego
- * @param {string[]} [props.shopItems=[]] — odblokowane przedmioty w sklepie
- * @param {import('react').ReactNode} [props.icon] — własna ikona
- * @param {string} [props.iconFile] — nazwa pliku w public/assets/svg/
- * @param {string} [props.theme='default'] — motyw kolorystyczny (rozszerzalny)
- * @param {string} [props.className]
+ * Kafelek rangi (Figma: Background+VerticalBorder).
  */
 export default function Rank({
   name,
   costAmount = 0,
-  costEmoji = '🥕',
+  costEmoji,
   storyDescription,
   shopItems = [],
   icon,
@@ -48,9 +38,7 @@ export default function Rank({
         </div>
         <h3 className="maq-rank__name">{name}</h3>
         <span className="maq-rank__cost">
-          {costAmount}
-          {' '}
-          <span className="maq-rank__cost-emoji" aria-hidden="true">{costEmoji}</span>
+          <CurrencyDisplay amount={costAmount} symbol={costEmoji} size="md" />
         </span>
       </header>
 
@@ -69,8 +57,8 @@ export default function Rank({
                   <AssetSvg
                     name="ui-check-circle.svg"
                     className="maq-rank__check-icon"
-                    width={16}
-                    height={16}
+                    width={11}
+                    height={11}
                     alt=""
                   />
                   <span>{item}</span>

@@ -208,6 +208,28 @@
   font-size: var(--font-size-body);
 }
 
+.settings-content__panel--toggle {
+  margin-top: 1rem;
+}
+
+.settings-content__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.settings-content__toggle input {
+  accent-color: var(--color-accent);
+}
+
+.settings-content__toggle-description {
+  margin: 0.5rem 0 0;
+  font-size: var(--font-size-body);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+}
+
 @media (max-width: 768px) {
   .settings-content__row {
     grid-template-columns: 1fr;

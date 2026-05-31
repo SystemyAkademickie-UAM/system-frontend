@@ -1,4 +1,5 @@
-import { IconMoney, IconStar } from './ShellIcons.jsx';
+import { IconStar } from './ShellIcons.jsx';
+import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
 import SuperBarStat from './SuperBarStat.jsx';
 import SuperBarUserMenu from './SuperBarUserMenu.jsx';
@@ -21,7 +22,8 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
  * @param {string | null} [props.avatarUrl] — awatar z profilu użytkownika
  * @param {string} [props.livesDisplay] — docelowo z API grupy
  * @param {string} [props.currencyDisplay] — aktualna waluta studenta
- * @param {string} [props.currencyTooltip] — podpowiedź przy najechaniu na walutę (np. zgromadzona all-time)
+ * @param {string} [props.totalEarnedDisplay] — zgromadzona waluta (podgląd hover)
+ * @param {string} [props.currencyLabel] — nazwa waluty grupy
  * @param {() => void} [props.onNavigate]
  * @param {boolean} [props.showMenuButton]
  * @param {boolean} [props.menuExpanded]
@@ -34,7 +36,8 @@ export default function SuperBar({
   avatarUrl = null,
   livesDisplay = DEFAULT_LIVES_DISPLAY,
   currencyDisplay = DEFAULT_CURRENCY_DISPLAY,
-  currencyTooltip,
+  totalEarnedDisplay = '0',
+  currencyLabel = 'Waluta',
   onNavigate,
   showMenuButton = false,
   menuExpanded = false,
@@ -65,11 +68,11 @@ export default function SuperBar({
         {showStudentGroupStats ? (
           <>
             <SuperBarStat icon={<IconStar />} value={livesDisplay} ariaLabel={`Życia: ${livesDisplay}`} />
-            <SuperBarStat
-              icon={<IconMoney />}
-              value={currencyDisplay}
+            <SuperBarCurrencyStat
+              currentAmount={currencyDisplay}
+              totalEarned={totalEarnedDisplay}
+              currencyLabel={currencyLabel}
               ariaLabel={`Waluta: ${currencyDisplay}`}
-              title={currencyTooltip || undefined}
             />
           </>
         ) : null}

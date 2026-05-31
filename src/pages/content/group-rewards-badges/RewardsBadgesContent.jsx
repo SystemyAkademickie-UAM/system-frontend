@@ -1,11 +1,15 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
   Button,
+  CurrencyDisplay,
   DataTable,
+  AssetSvg,
   getBadgeRarityConfig,
+  InfoTooltip,
   PageHeader,
   SearchBar,
   SubNav,
+  useToast,
 } from '../../../components/ui/index.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
@@ -55,9 +59,11 @@ const BADGE_COLUMNS = [
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
     render: (badge) => (
-      <span className="rewards-table__cell-text rewards-table__cell-text--muted">
-        {badge.iconFile}
-      </span>
+      badge.iconFile ? (
+        <AssetSvg name={badge.iconFile} className="rewards-table__icon-preview" width={28} height={28} alt="" />
+      ) : (
+        <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+      )
     ),
   },
   {
@@ -109,17 +115,14 @@ const BADGE_COLUMNS = [
     sort: 'number',
     width: '100px',
     render: (badge) => (
-      <span className="rewards-table__reward">
-        {badge.rewardAmount}
-        {' '}
-        {badge.rewardEmoji}
-      </span>
+      <CurrencyDisplay amount={badge.rewardAmount} symbol={badge.rewardEmoji} size="sm" />
     ),
   },
 ];
 
 export default function RewardsBadgesContent() {
   const nav = useGroupSubNav('group-rewards');
+  const { showSuccess, showError } = useToast();
   const {
     badges,
     students,
@@ -147,9 +150,12 @@ export default function RewardsBadgesContent() {
     const result = await handleCreate(values);
     setModalLoading(false);
     if (result.ok) {
+      showSuccess('Odznaka została utworzona.');
       closeModal();
+    } else {
+      showError(result.error || 'Nie udało się utworzyć odznaki.');
     }
-  }, [handleCreate, closeModal]);
+  }, [handleCreate, closeModal, showSuccess, showError]);
 
   const handleEditConfirm = useCallback(async (values) => {
     if (!activeModal?.badge) return;
@@ -157,9 +163,12 @@ export default function RewardsBadgesContent() {
     const result = await handleUpdate(activeModal.badge.id, values);
     setModalLoading(false);
     if (result.ok) {
+      showSuccess('Odznaka została zaktualizowana.');
       closeModal();
+    } else {
+      showError(result.error || 'Nie udało się zaktualizować odznaki.');
     }
-  }, [activeModal, handleUpdate, closeModal]);
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.badge) return;
@@ -167,9 +176,12 @@ export default function RewardsBadgesContent() {
     const result = await handleDelete(activeModal.badge.id);
     setModalLoading(false);
     if (result.ok) {
+      showSuccess('Odznaka została usunięta.');
       closeModal();
+    } else {
+      showError(result.error || 'Nie udało się usunąć odznaki.');
     }
-  }, [activeModal, handleDelete, closeModal]);
+  }, [activeModal, handleDelete, closeModal, showSuccess, showError]);
 
   const handleGiveConfirm = useCallback((selectedStudentIds) => {
     if (!activeModal?.badge) return;
@@ -178,19 +190,23 @@ export default function RewardsBadgesContent() {
 
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
+    deleteLabel: 'Usuń odznakę',
     deleteAriaLabel: (badge) => `Usuń odznakę ${badge.name}`,
+    inlineActions: [
+      {
+        id: 'give',
+        label: 'Daj odznakę',
+        iconFile: 'ui-badge-give.svg',
+        ariaLabel: 'Daj odznakę studentom',
+        onSelect: (badge) => openModal('give', badge),
+      },
+    ],
     menuItems: [
       {
         id: 'edit',
         label: 'Edytuj odznakę',
         description: 'Zmień dane odznaki w kreatorze.',
         onSelect: (badge) => openModal('edit', badge),
-      },
-      {
-        id: 'give',
-        label: 'Daj odznakę',
-        description: 'Przyznaj odznakę wielu studentom naraz.',
-        onSelect: (badge) => openModal('give', badge),
       },
     ],
   }), [openModal]);
