@@ -62,10 +62,9 @@ export default function RewardsBadgeTableRow({ row, columns, rowActions }) {
               storyDescription={row.storyDescription}
               didacticDescription={row.didacticDescription}
               rewardAmount={row.rewardAmount}
-              rewardEmoji={row.rewardEmoji ?? '🥕'}
+              rewardEmoji={row.rewardEmoji}
               iconFile={row.iconFile}
               showEarnedAt={false}
-              compact
             />
           </div>,
           document.body,

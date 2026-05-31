@@ -1,0 +1,60 @@
+.help-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--shell-superbar-height) - 4rem);
+  padding: 2rem 1rem;
+}
+
+.help-content__card {
+  width: min(520px, 100%);
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  background: var(--color-bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+}
+
+.help-content__title {
+  margin: 0 0 2rem;
+  font-size: var(--font-size-page-title);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--color-badge-text);
+}
+
+.help-content__section + .help-content__section {
+  margin-top: 1.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.help-content__section-title {
+  margin: 0 0 0.75rem;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-badge-text);
+}
+
+.help-content__link {
+  display: inline-block;
+  font-size: var(--font-size-page-description);
+  font-weight: 700;
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.help-content__link:hover {
+  text-decoration: underline;
+}
+
+.help-content__text {
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  color: var(--color-badge-text);
+}
+
+.help-content__text--muted {
+  margin-top: 0.35rem;
+  color: var(--color-text-secondary);
+}

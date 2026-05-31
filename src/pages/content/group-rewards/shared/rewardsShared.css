@@ -115,6 +115,16 @@
   padding: 0;
 }
 
+.rewards-table__icon-preview {
+  color: var(--color-asset-icon);
+}
+
+.rewards-modal__label--with-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 @media (max-width: 768px) {
   .rewards-page__header-row {
     flex-direction: column;

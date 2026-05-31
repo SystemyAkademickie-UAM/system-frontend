@@ -1,1196 +1,266 @@
-import { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import { useCallback, useMemo, useState } from 'react';
+import { Button, SearchBar } from '../../../components/ui/index.js';
+import { useGroupActivities } from './useGroupActivities.js';
+import ActivitiesTreeTable from './shared/ActivitiesTreeTable.jsx';
+import ActivityFormModal from './modals/ActivityFormModal.jsx';
+import ActivityDeleteModal from './modals/ActivityDeleteModal.jsx';
+import StageFormModal from './modals/StageFormModal.jsx';
+import StageDeleteModal from './modals/StageDeleteModal.jsx';
+import './shared/activitiesShared.css';
 
-import { publicIconPath } from '../../../utils/publicAssetUrl.js';
+function filterStages(stages, query) {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return stages;
 
-const itemicon = publicIconPath('arrow-circle-right-svgrepo-com.svg');
-const infoicon = publicIconPath('info-circle-svgrepo-com.svg');
-const copyicon = publicIconPath('copy-01-svgrepo-com.svg');
-const editicon = publicIconPath('edit-02-svgrepo-com.svg');
-const deleteicon = publicIconPath('trash-01-svgrepo-com.svg');
-import '../group-profile/ProfileContent.css';
-import '../shared/LegacyContentLayout.css';
+  return stages.reduce((result, stage) => {
+    const stageMatches = stage.name.toLowerCase().includes(normalized);
+    const matchingActivities = stage.activities.filter((activity) => (
+      activity.name.toLowerCase().includes(normalized)
+      || (activity.description0 ?? '').toLowerCase().includes(normalized)
+      || (activity.description1 ?? '').toLowerCase().includes(normalized)
+    ));
 
-export default function App() {
+    if (stageMatches) {
+      result.push(stage);
+      return result;
+    }
 
-  const {groupId} = useParams();
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const [stages, setStages] = useState([]);
-  const [stagename, setStageName] = useState('');
-
-
-  async function onFetchStages() {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'retrieve',
-          groupId: Number(groupId)
-        })
+    if (matchingActivities.length > 0) {
+      result.push({
+        ...stage,
+        expanded: true,
+        activities: matchingActivities,
       });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages retrieve: ', response.status);
-      console.log('POST /stages retrieve: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages retrieve not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages retrieve JSON:', data);
-
-      let receiveddata = data;
-
-      const receivedstages = [];
-
-      let i = 0;
-
-      while (i < receiveddata.stages.length) {
-
-        receivedstages.push({id: receiveddata.stages[i].id, name: receiveddata.stages[i].name, activities: [], tempactivities: [], editmode: 0, open: 'none'});
-
-        i = i + 1;
-      }
-
-      setStages(receivedstages);
-
-      i = 0;
-
-      while (i < receivedstages.length) {
-
-        onFetchActivities(receivedstages[i].id);
-
-        i = i + 1;
-      }
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function onFetchActivities(stageId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'retrieve',
-          stageId: stageId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities: ', response.status);
-      console.log('POST /activities: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities JSON:', data);
-
-      let receiveddata = data;
-
-      setStages(function (prevStages) {
-
-        const newstages = [];
-
-        let i = 0;
-
-        while (i < prevStages.length) {
-
-          if (prevStages[i].id == stageId) {
-
-            const newactivities = [];
-
-            let j = 0;
-
-            while (j < receiveddata.activities.length) {
-
-              newactivities.push({id: receiveddata.activities[j].id, name: receiveddata.activities[j].name, description0: receiveddata.activities[j].storyDescription, description1: receiveddata.activities[j].educationalDescription, reward: receiveddata.activities[j].currency,  editmode: 0});
-
-              j = j + 1;
-            }
-
-            newstages.push({id: prevStages[i].id, name: prevStages[i].name, activities: newactivities, tempactivities: prevStages[i].tempactivities, editmode: prevStages[i].editmode, open: prevStages[i].open});
-
-          } else {
-
-            newstages.push(prevStages[i]);
-          }
-
-          i = i + 1;
-        }
-
-        return newstages;
-      });
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function createstage(name) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          groupId: Number(groupId),
-          name: name
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages post: ', response.status);
-      console.log('POST /stages post: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages post not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages post JSON:', data);
-
-      onFetchStages();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function createactivity(stageId, name, reward, description0, description1) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          stageId: stageId,
-          name: name,
-          currency: reward,
-          educationalDescription: description1,
-          storyDescription: description0
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities post: ', response.status);
-      console.log('POST /activities post: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities post not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities post JSON:', data);
-
-      onFetchActivities(stageId);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function updateactivity(activityId, name, reward, description0, description1) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'modify',
-          activityId: activityId,
-          name: name,
-          currency: Number(reward),
-          educationalDescription: description1,
-          storyDescription: description0
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities modify: ', response.status);
-      console.log('POST /activities modify: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities modify not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities modify JSON:', data);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-  async function copystage(stageId) {
-    setErrorMessage('');
-
-    try {
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      let copiedstage = null;
-
-      let i = 0;
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-          copiedstage = stages[i];
-        }
-
-        i = i + 1;
-      }
-
-
-
-      const response = await fetch(base + '/stages', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          groupId: Number(groupId),
-          name: copiedstage.name
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages: ', response.status);
-      console.log('POST /stages: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages JSON:', data);
-
-      if (data.stage > 0) {
-
-        let newstageid = data.stage;
-
-        i = 0;
-        while (i < copiedstage.activities.length) {
-
-          await fetch(base + '/activities', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Browser-ID': browserid
-            },
-            body: JSON.stringify({
-              method: 'post',
-              stageId: newstageid,
-              name: copiedstage.activities[i].name,
-              currency: copiedstage.activities[i].reward,
-              educationalDescription: copiedstage.activities[i].description1,
-              storyDescription: copiedstage.activities[i].description0
-            })
-          });
-
-          i = i + 1;
-        }
-
-        onFetchStages();
-      }
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-  async function deletestage(stageId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'remove',
-          stageId: stageId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages remove: ', response.status);
-      console.log('POST /stages remove: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages remove not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages remove JSON:', data);
-
-      onFetchStages();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function updatestage(stageId, name) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'modify',
-          stageId: stageId,
-          name: name
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages modify: ', response.status);
-      console.log('POST /stages modify: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages modify not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages modify JSON:', data);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  function editstage(stageId) {
-
-    let stagenamevalue = null;
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        let updatedstage = {id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open};
-
-        if (stages[i].editmode == 0) {
-          updatedstage.editmode = 1;
-        } else if (stages[i].editmode == 1) {
-          updatedstage.editmode = 0;
-          stagenamevalue = stages[i].name;
-        }
-
-        newstages.push(updatedstage);
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
     }
 
-    setStages(newstages);
-
-    if (stagenamevalue != null) {
-      updatestage(stageId, stagenamevalue);
-    }
-  }
-
-
-
-
-
-  function onStageChange(stageId, value) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        let updatedstage = {id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open};
-
-        updatedstage.name = value;
-
-        newstages.push(updatedstage);
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function togglestage(stageId) {
-
-    let newstages = [];
-
-    let i = 0;
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        let newstage = {
-          id: stages[i].id,
-          name: stages[i].name,
-          activities: stages[i].activities,
-          tempactivities: stages[i].tempactivities,
-          editmode: stages[i].editmode,
-          open: ''
-        };
-
-        if (stages[i].open == '') {
-          newstage.open = 'none';
-        } else {
-          newstage.open = '';
-        }
-
-        newstages.push(newstage);
-      } else {
-
-        newstages.push(stages[i]);
-      }
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function addactivity(stageId) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newtemp = [];
-
-        let j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-          newtemp.push(stages[i].tempactivities[j]);
-          j = j + 1;
-        }
-
-        const newactivity = {id: stages[i].tempactivities.length, name: '', description0: '', description1: '', reward: '', editmode: 2};
-
-        newtemp.push(newactivity);
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function editactivity(stageId, activityId, temporary = 0) {
-
-    if (temporary == 0) {
-
-      let activitytosave = null;
-
-      const newstages = [];
-
-      let i = 0;
-
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-
-          const newactivities = [];
-
-          let j = 0;
-
-          while (j < stages[i].activities.length) {
-
-            if (stages[i].activities[j].id == activityId) {
-
-              let updatedactivity = {id: stages[i].activities[j].id, name: stages[i].activities[j].name, description0: stages[i].activities[j].description0, description1: stages[i].activities[j].description1, reward: stages[i].activities[j].reward, editmode: stages[i].activities[j].editmode};
-
-              if (stages[i].activities[j].editmode == 0) {
-                updatedactivity.editmode = 1;
-              } else if (stages[i].activities[j].editmode == 1) {
-                updatedactivity.editmode = 0;
-                activitytosave = updatedactivity;
-              }
-
-              newactivities.push(updatedactivity);
-
-            } else {
-              newactivities.push(stages[i].activities[j]);
-            }
-
-            j = j + 1;
-          }
-
-          newstages.push({id: stages[i].id, name: stages[i].name, activities: newactivities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open});
-
-        } else {
-          newstages.push(stages[i]);
-        }
-
-        i = i + 1;
-      }
-
-      setStages(newstages);
-
-      if (activitytosave != null) {
-        updateactivity(activitytosave.id, activitytosave.name, activitytosave.reward, activitytosave.description0, activitytosave.description1);
-      }
-
-    } else {
-
-      let movingactivity = null;
-
-      const newstages = [];
-
-      let i = 0;
-
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-
-          const newtemp = [];
-
-          let j = 0;
-
-          while (j < stages[i].tempactivities.length) {
-
-            if (stages[i].tempactivities[j].id == activityId) {
-              movingactivity = stages[i].tempactivities[j];
-            } else {
-              newtemp.push(stages[i].tempactivities[j]);
-            }
-
-            j = j + 1;
-          }
-
-          newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-        } else {
-          newstages.push(stages[i]);
-        }
-
-        i = i + 1;
-      }
-
-      setStages(newstages);
-
-      createactivity(stageId, movingactivity.name, movingactivity.reward, movingactivity.description0, movingactivity.description1);
-    }
-  }
-
-
-
-
-
-  function onActivityChange(stageId, activityId, field, value) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newactivities = [];
-
-        let j = 0;
-
-        while (j < stages[i].activities.length) {
-
-          if (stages[i].activities[j].id == activityId) {
-
-            let updatedactivity = {id: stages[i].activities[j].id, name: stages[i].activities[j].name, description0: stages[i].activities[j].description0, description1: stages[i].activities[j].description1, reward: stages[i].activities[j].reward, editmode: stages[i].activities[j].editmode};
-
-            if (field == 'name') {
-              updatedactivity.name = value;
-            } else if (field == 'description0') {
-              updatedactivity.description0 = value;
-            } else if (field == 'description1') {
-              updatedactivity.description1 = value;
-            } else if (field == 'reward') {
-              updatedactivity.reward = value;
-            }
-
-            newactivities.push(updatedactivity);
-
-          } else {
-            newactivities.push(stages[i].activities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        const newtemp = [];
-
-        j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-
-          if (stages[i].tempactivities[j].id == activityId) {
-
-            let updatedactivity = {id: stages[i].tempactivities[j].id, name: stages[i].tempactivities[j].name, description0: stages[i].tempactivities[j].description0, description1: stages[i].tempactivities[j].description1, reward: stages[i].tempactivities[j].reward, editmode: stages[i].tempactivities[j].editmode};
-
-            if (field == 'name') {
-              updatedactivity.name = value;
-            } else if (field == 'description0') {
-              updatedactivity.description0 = value;
-            } else if (field == 'description1') {
-              updatedactivity.description1 = value;
-            } else if (field == 'reward') {
-              updatedactivity.reward = value;
-            }
-
-            newtemp.push(updatedactivity);
-
-          } else {
-            newtemp.push(stages[i].tempactivities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: newactivities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function deletetempactivity(stageId, activityId) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newtemp = [];
-
-        let j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-
-          if (stages[i].tempactivities[j].id != activityId) {
-            newtemp.push(stages[i].tempactivities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  async function deleteactivity(stageId, activityId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'remove',
-          activityId: activityId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities remove: ', response.status);
-      console.log('POST /activities remove: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities remove not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities remove JSON:', data);
-
-      onFetchStages();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  useEffect(() => {
-    onFetchStages();
+    return result;
   }, []);
-
-
-
-
-
-  return (
-    <section className="legacy-content profile-content" aria-label="Aktywności">
-      <div className="profile-content__inner">
-        {errorMessage ? <p className="legacy-content__error" role="alert">{errorMessage}</p> : null}
-
-        <div className="legacy-content__panel">
-          <div style={{ color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900 }}>NAZWA NOWEGO ETAPU</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'stretch' }}>
-            <input onChange={(event) => setStageName(event.target.value)} style={{ flex: '1 1 16rem', minWidth: 0, backgroundColor: 'rgb(40, 40, 52)', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, padding: '0.85rem 1rem', borderRadius: '8px', border: '2px solid transparent' }} value={stagename} placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne" onFocus={(event) => { event.target.style.border = '2px solid rgb(66, 243, 125)'; }} onBlur={(event) => { event.target.style.border = '2px solid transparent'; }} />
-            <button type="button" onClick={() => createstage(stagename)} style={{ flex: '0 0 auto', padding: '0.85rem 1.25rem', border: 0, borderRadius: '8px', background: 'rgba(66, 243, 125, 1)', color: 'rgb(0, 57, 21)', fontSize: '16px', fontWeight: 900, cursor: 'pointer' }}>
-              Dodaj etap
-            </button>
-          </div>
-        </div>
-
-
-
-
-
-
-
-
-
-
-        <div className="legacy-content__section-head">
-          <h2 className="legacy-content__section-title">Lista etapów</h2>
-          <span className="legacy-content__badge">Etapy {stages.length}</span>
-        </div>
-
-        <div className="legacy-content__stages-list">
-
-
-          {stages.map((stage) => (
-            <div key = {'stage' + stage.id} style={{backgroundColor: 'var(--color-bg-elevated)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', paddingBottom: '0%', gap: '0vh'}}>
-              <div style={{backgroundColor: 'rgb(41, 40, 57)', width: '100%', minHeight: '10vh', position: 'relative', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px', display: 'flex', flexDirection: 'row', alignItems: 'center', padding: '0.75rem 1rem', gap: '1rem'}}>
-                <img src={itemicon} alt="" className="legacy-content__stage-icon" />
-
-
-                {stage.editmode < 1 ? (
-
-                <div style = {{width: '76%', height: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{stage.name}</span></div>
-
-                ) : (
-
-                <input onChange={(event) => onStageChange(stage.id, event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '76%', height: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px'}} value = {stage.name} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}></input>
-
-                )}
-
-
-
-                <div className="legacy-content__row-actions">
-                <button type="button" onClick={() => editstage(stage.id)} className="legacy-content__icon-btn" aria-label="Edytuj etap">
-                  <img src={editicon} alt="" />
-                </button>
-                <button type="button" onClick={() => copystage(stage.id)} className="legacy-content__icon-btn" aria-label="Kopiuj etap">
-                  <img src={copyicon} alt="" />
-                </button>
-                <button type="button" onClick={() => deletestage(stage.id)} className="legacy-content__icon-btn" aria-label="Usuń etap">
-                  <img src={deleteicon} alt="" />
-                </button>
-                <button type="button" onClick={() => togglestage(stage.id)} className="legacy-content__icon-btn" aria-label="Szczegóły etapu">
-                  <img src={infoicon} alt="" />
-                </button>
-                </div>
-              </div>
-
-
-              <div style = {{display: stage.open}}>
-                <div style={{backgroundColor: 'rgb(26, 26, 42)', width: '100%', height: '10vh', position: 'relative', display: 'flex', flexDirection: 'row', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%'}}>
-                  <div style = {{width: '20%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <span>NAZWA AKTYWNOSCI</span>
-                  </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <span>OPIS FABULARNY</span>
-                  </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                   <span>OPIS DYDAKTYCZNY</span>
-                  </div>
-                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <span>NAGRODA</span>
-                  </div>
-                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <span>OPCJE</span>
-                  </div>
-                </div>
-
-                {[...(stage.tempactivities || []), ...(stage.activities || [])].map((activity) => (
-
-                activity.editmode < 1 ? (
-
-                <div key = {'activity' + stage.id + activity.id} style={{backgroundColor: 'rgb(41, 40, 57)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '4px solid rgb(66, 243, 125)', borderRadius: '16px'}}>
-                 <div style = {{width: '20%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <span>{activity.name}</span>
-                  </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <span>{activity.description0}</span>
-                  </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <span>{activity.description1}</span>
-                  </div>
-                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', color: 'rgb(227, 224, 247)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '5%'}}>
-                    <span>{activity.reward}</span>
-                    <div style = {{backgroundColor: 'rgb(255, 0, 255)', width: '25%', height: '3vh', position: 'relative'}}></div>
-                  </div>
-                  <button type="button" onClick={() => editactivity(stage.id, activity.id, activity.editmode == 2 ? 1 : 0)} className="legacy-content__icon-btn" aria-label="Edytuj aktywność">
-                    <img src={editicon} alt="" />
-                  </button>
-                  <button type="button" onClick={() => (activity.editmode == 2 ? deletetempactivity(stage.id, activity.id) : deleteactivity(stage.id, activity.id))} className="legacy-content__icon-btn" aria-label="Usuń aktywność">
-                    <img src={deleteicon} alt="" />
-                  </button>
-                </div>
-
-                ) : (
-
-                <div key = {'activity' + stage.id + activity.id} style={{backgroundColor: 'rgb(41, 40, 57)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '4px solid rgb(66, 243, 125)', borderRadius: '16px'}}>
-                 <div style = {{width: '20%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <input onChange={(event) => onActivityChange(stage.id, activity.id, 'name', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderRadius: '8px', paddingLeft: '1%', paddingRight: '1%'}} value = {activity.name} placeholder = 'Nazwa aktywnosci' onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}></input>
-                  </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <textarea onChange={(event) => onActivityChange(stage.id, activity.id, 'description0', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '15vh', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderRadius: '8px', paddingLeft: '1%', paddingRight: '1%'}} value = {activity.description0} placeholder = 'Opis fabularny' onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}></textarea>
-                  </div>
-                  <div style = {{width: '30%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-                    <textarea onChange={(event) => onActivityChange(stage.id, activity.id, 'description1', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '15vh', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderRadius: '8px', paddingLeft: '1%', paddingRight: '1%'}} value = {activity.description1} placeholder = 'Opis dydaktyczny' onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}></textarea>
-                  </div>
-                  <div style = {{width: '10%', height: '100%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '5%'}}>
-                    <input onChange={(event) => onActivityChange(stage.id, activity.id, 'reward', event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '50%', height: '5vh', color: 'rgb(187, 203, 185)', fontSize: '14px', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', borderRadius: '8px'}} value = {activity.reward} placeholder = '0' onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}></input>
-                    <div style = {{backgroundColor: 'rgb(255, 0, 255)', width: '25%', height: '3vh', position: 'relative'}}></div>
-                  </div>
-                  <button type="button" onClick={() => editactivity(stage.id, activity.id, activity.editmode == 2 ? 1 : 0)} className="legacy-content__icon-btn" aria-label="Edytuj aktywność">
-                    <img src={editicon} alt="" />
-                  </button>
-                  <button type="button" onClick={() => (activity.editmode == 2 ? deletetempactivity(stage.id, activity.id) : deleteactivity(stage.id, activity.id))} className="legacy-content__icon-btn" aria-label="Usuń aktywność">
-                    <img src={deleteicon} alt="" />
-                  </button>
-                </div>
-
-                )
-
-))}
-            {stage.tempactivities.length == 0 && (<div onClick = {() => addactivity(stage.id)} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '40%', height: '10%', position: 'relative', left: '30%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj nowa aktywnosc</div>)}
-            </div>
-
-
-          </div>
-))}
-
-
-        </div>
-
-
-
-
-
-      </div>
-
-
-
-
-
-    </section>
-  );
 }
 
+export default function ActivitiesContent() {
+  const {
+    stages,
+    isLoading,
+    error,
+    toggleStageExpanded,
+    createStage,
+    updateStage,
+    deleteStage,
+    copyStage,
+    createActivity,
+    updateActivity,
+    deleteActivity,
+  } = useGroupActivities();
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [newStageName, setNewStageName] = useState('');
+  const [activeModal, setActiveModal] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
+  const openModal = useCallback((type, payload = {}) => {
+    setActiveModal({ type, ...payload });
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setActiveModal(null);
+  }, []);
+
+  const filteredStages = useMemo(
+    () => filterStages(stages, searchQuery),
+    [stages, searchQuery],
+  );
+
+  const handleAddStage = useCallback(async () => {
+    const result = await createStage(newStageName);
+    if (result.ok) {
+      setNewStageName('');
+    }
+  }, [createStage, newStageName]);
+
+  const handleStageEditConfirm = useCallback(async ({ name }) => {
+    if (!activeModal?.stage) return;
+    setModalLoading(true);
+    const result = await updateStage(activeModal.stage.id, name);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, updateStage, closeModal]);
+
+  const handleStageDeleteConfirm = useCallback(async () => {
+    if (!activeModal?.stage) return;
+    setModalLoading(true);
+    const result = await deleteStage(activeModal.stage.id);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, deleteStage, closeModal]);
+
+  const handleActivityCreateConfirm = useCallback(async (values) => {
+    if (!activeModal?.stage) return;
+    setModalLoading(true);
+    const result = await createActivity(activeModal.stage.id, values);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, createActivity, closeModal]);
+
+  const handleActivityEditConfirm = useCallback(async (values) => {
+    if (!activeModal?.stage || !activeModal?.activity) return;
+    setModalLoading(true);
+    const result = await updateActivity(
+      activeModal.stage.id,
+      activeModal.activity.id,
+      values,
+    );
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, updateActivity, closeModal]);
+
+  const handleActivityDeleteConfirm = useCallback(async () => {
+    if (!activeModal?.stage || !activeModal?.activity) return;
+    setModalLoading(true);
+    const result = await deleteActivity(activeModal.stage.id, activeModal.activity.id);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, deleteActivity, closeModal]);
+
+  const stageRowActions = useMemo(() => ({
+    menuItems: [
+      {
+        id: 'edit',
+        label: 'Edytuj etap',
+        description: 'Zmień nazwę etapu.',
+        onSelect: (stage) => openModal('editStage', { stage }),
+      },
+      {
+        id: 'copy',
+        label: 'Kopiuj etap',
+        description: 'Utwórz kopię etapu wraz z aktywnościami.',
+        onSelect: async (stage) => {
+          await copyStage(stage.id);
+        },
+      },
+    ],
+    onDelete: (stage) => openModal('deleteStage', { stage }),
+    deleteLabel: 'Usuń etap',
+    deleteAriaLabel: (stage) => `Usuń etap ${stage.name}`,
+  }), [openModal, copyStage]);
+
+  const activityRowActions = useMemo(() => ({
+    inlineActions: [
+      {
+        id: 'edit',
+        label: 'Edytuj',
+        ariaLabel: 'Edytuj aktywność',
+        onSelect: ({ stage, activity }) => openModal('editActivity', { stage, activity }),
+      },
+    ],
+    onDelete: ({ stage, activity }) => openModal('deleteActivity', { stage, activity }),
+    deleteLabel: 'Usuń aktywność',
+    deleteAriaLabel: ({ activity }) => `Usuń aktywność ${activity.name}`,
+  }), [openModal]);
+
+  const modalStage = activeModal?.stage ?? null;
+  const modalActivity = activeModal?.activity ?? null;
+
+  return (
+    <div className="activities-page">
+      {error ? (
+        <p className="activities-page__error" role="alert">{error}</p>
+      ) : null}
+
+      <div className="activities-page__add-panel">
+        <p className="activities-page__add-label">Nazwa nowego etapu</p>
+        <div className="activities-page__add-row">
+          <input
+            type="text"
+            className="activities-page__add-input"
+            value={newStageName}
+            onChange={(event) => setNewStageName(event.target.value)}
+            placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne"
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                handleAddStage();
+              }
+            }}
+          />
+          <Button variant="primary" size="md" onClick={handleAddStage}>
+            Dodaj etap
+          </Button>
+        </div>
+      </div>
+
+      <div className="activities-page__toolbar">
+        <span className="activities-page__count">
+          Etapy
+          {' '}
+          {stages.length}
+        </span>
+        <SearchBar
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Szukaj etapów i aktywności…"
+          name="activities-search"
+          className="activities-page__search"
+          aria-label="Szukaj etapów i aktywności"
+        />
+      </div>
+
+      {isLoading ? (
+        <p className="activities-page__loading">Ładowanie etapów…</p>
+      ) : filteredStages.length === 0 ? (
+        <p className="activities-page__empty">
+          {stages.length === 0
+            ? 'Brak etapów w tej grupie. Dodaj pierwszy etap powyżej.'
+            : 'Brak wyników wyszukiwania.'}
+        </p>
+      ) : (
+        <ActivitiesTreeTable
+          stages={filteredStages}
+          onToggleExpand={toggleStageExpanded}
+          onAddActivity={(stage) => openModal('createActivity', { stage })}
+          stageRowActions={stageRowActions}
+          activityRowActions={activityRowActions}
+        />
+      )}
+
+      <StageFormModal
+        isOpen={activeModal?.type === 'editStage'}
+        stage={modalStage}
+        onClose={closeModal}
+        onConfirm={handleStageEditConfirm}
+        isLoading={modalLoading}
+      />
+
+      <StageDeleteModal
+        isOpen={activeModal?.type === 'deleteStage'}
+        stage={modalStage}
+        onClose={closeModal}
+        onConfirm={handleStageDeleteConfirm}
+        isLoading={modalLoading}
+      />
+
+      <ActivityFormModal
+        isOpen={activeModal?.type === 'createActivity'}
+        stageName={modalStage?.name}
+        onClose={closeModal}
+        onConfirm={handleActivityCreateConfirm}
+        isLoading={modalLoading}
+      />
+
+      <ActivityFormModal
+        isOpen={activeModal?.type === 'editActivity'}
+        activity={modalActivity}
+        stageName={modalStage?.name}
+        onClose={closeModal}
+        onConfirm={handleActivityEditConfirm}
+        isLoading={modalLoading}
+      />
+
+      <ActivityDeleteModal
+        isOpen={activeModal?.type === 'deleteActivity'}
+        activity={modalActivity}
+        onClose={closeModal}
+        onConfirm={handleActivityDeleteConfirm}
+        isLoading={modalLoading}
+      />
+    </div>
+  );
+}

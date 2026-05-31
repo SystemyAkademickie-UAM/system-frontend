@@ -8,7 +8,7 @@ export default function GroupSettingsHomeContent() {
   return (
     <PageAvailable
       title="Ustawienia grupy"
-      description="Zmień podstawowe ustawienia grupy"
+      description="Edytuj podstawowe ustawienia grupy"
     >
       <TemporaryGroupsListCreator subNav={nav} />
     </PageAvailable>

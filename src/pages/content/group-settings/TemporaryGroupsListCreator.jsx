@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { SubNav } from '../../../components/ui/index.js';
+import { SubNav, useToast } from '../../../components/ui/index.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 import { createGroup, fetchGroupById, updateGroup } from '../groups-list/groupsList.api.js';
@@ -8,9 +8,9 @@ import './GroupSettingsForm.css';
 
 export default function App({ popupclose, subNav }) {
   const { groupId } = useParams();
+  const { showSuccess, showError } = useToast();
 
   const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const [groupnamevalue, setGroupnamevalue] = useState('');
   const [subjectnamevalue, setSubjectnamevalue] = useState('');
   const [groupnamevalueerror, setGroupnamevalueerror] = useState('');
@@ -23,12 +23,6 @@ export default function App({ popupclose, subNav }) {
   const [bannerpreview, setBannerpreview] = useState(null);
   const [existingBannerUrl, setExistingBannerUrl] = useState(null);
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
-
-  useEffect(() => {
-    if (!successMessage) return;
-    const timer = setTimeout(() => setSuccessMessage(''), 3500);
-    return () => clearTimeout(timer);
-  }, [successMessage]);
 
   useEffect(() => {
     if (!groupId) return;
@@ -200,18 +194,15 @@ export default function App({ popupclose, subNav }) {
         : await createGroup(payload);
 
       if (!result.ok) {
-        setErrorMessage(result.error ?? 'Nie udało się zapisać grupy.');
+        showError(result.error ?? 'Nie udało się zapisać grupy.');
         return;
       }
 
       await onTryFetchGroupsList();
-      setSuccessMessage(groupId ? 'Zmiany zostały zapisane.' : 'Grupa została utworzona.');
-      if (!groupId) {
-        onRejectclick();
-      }
+      showSuccess(groupId ? 'Zmiany zostały zapisane.' : 'Grupa została utworzona.');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      setErrorMessage(message);
+      showError(message);
     } finally {
       setIsSaving(false);
     }
@@ -244,7 +235,7 @@ export default function App({ popupclose, subNav }) {
       </div>
 
       <div className="group-settings-form__panel">
-        <h3 className="group-settings-form__panel-title">Grupa</h3>
+        <h3 className="group-settings-form__panel-title">{groupId ? 'Edytor grupy' : 'Grupa'}</h3>
         {isLoadingGroup ? (
           <p className="group-settings-form__label">Ładowanie danych grupy…</p>
         ) : null}
@@ -293,17 +284,9 @@ export default function App({ popupclose, subNav }) {
         </div>
       </div>
 
-      {successMessage ? (
-        <p className="group-settings-form__success" role="status" aria-live="polite">
-          {successMessage}
-        </p>
-      ) : null}
       {errorMessage ? <p className="group-settings-form__error" role="alert">{errorMessage}</p> : null}
 
       <div className="group-settings-form__footer">
-        <button type="button" className="group-settings-form__btn group-settings-form__btn--secondary" onClick={onRejectclick} disabled={isSaving}>
-          Odrzuć
-        </button>
         <button type="button" className="group-settings-form__btn group-settings-form__btn--primary" onClick={onSavegroupclick} disabled={isSaving}>
           {isSaving ? 'Zapisywanie…' : 'Zapisz'}
         </button>
