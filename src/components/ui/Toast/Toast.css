@@ -1,0 +1,98 @@
+:root {
+  --z-index-modal: 1000;
+  --z-index-toast: 12000;
+}
+
+.maq-toast-viewport {
+  position: fixed;
+  top: calc(var(--shell-superbar-height, 63px) + 12px);
+  right: 16px;
+  z-index: var(--z-index-toast);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.maq-toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-elevated);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  pointer-events: auto;
+  transform: translateX(120%);
+  opacity: 0;
+  animation: maq-toast-slide-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.maq-toast--exit {
+  animation: maq-toast-slide-out 0.45s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+.maq-toast--success {
+  border-left: 4px solid var(--color-accent);
+}
+
+.maq-toast--error {
+  border-left: 4px solid var(--color-input-error);
+}
+
+.maq-toast__message {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  line-height: 1.4;
+  color: var(--color-text-primary);
+}
+
+.maq-toast__close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.maq-toast__close:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary);
+}
+
+@keyframes maq-toast-slide-in {
+  from {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes maq-toast-slide-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+}

@@ -12,13 +12,15 @@ export function useStudentSuperBarStats() {
   const groupId = useOptionalGroupId();
   const [livesDisplay, setLivesDisplay] = useState('0/0');
   const [currencyDisplay, setCurrencyDisplay] = useState('0');
-  const [totalEarnedTooltip, setTotalEarnedTooltip] = useState('');
+  const [totalEarnedDisplay, setTotalEarnedDisplay] = useState('0');
+  const [currencyLabel, setCurrencyLabel] = useState('Waluta');
 
   const loadStats = useCallback(async () => {
     if (role !== APP_ROLE.STUDENT || !groupId) {
       setLivesDisplay('0/0');
       setCurrencyDisplay('0');
-      setTotalEarnedTooltip('');
+      setTotalEarnedDisplay('0');
+      setCurrencyLabel('Waluta');
       return;
     }
 
@@ -30,10 +32,8 @@ export function useStudentSuperBarStats() {
     const { profile } = result;
     setLivesDisplay(profile.lives?.trim() || '0/0');
     setCurrencyDisplay(formatProfileNumber(profile.currency));
-    const currencyLabel = profile.groupCurrency?.trim() || 'Waluta';
-    setTotalEarnedTooltip(
-      `${currencyLabel} — zgromadzona: ${formatProfileNumber(profile.totalEarned)}`,
-    );
+    setTotalEarnedDisplay(formatProfileNumber(profile.totalEarned));
+    setCurrencyLabel(profile.groupCurrency?.trim() || 'Waluta');
   }, [role, groupId]);
 
   useEffect(() => {
@@ -43,7 +43,8 @@ export function useStudentSuperBarStats() {
   return {
     livesDisplay,
     currencyDisplay,
-    totalEarnedTooltip,
+    totalEarnedDisplay,
+    currencyLabel,
     refetch: loadStats,
   };
 }

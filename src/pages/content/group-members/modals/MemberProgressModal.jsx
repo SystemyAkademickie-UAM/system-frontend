@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ActivityProgressIcon from '../../../../components/ui/ActivityCard/ActivityProgressIcon.jsx';
-import { Modal, SearchBar } from '../../../../components/ui/index.js';
+import { Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
 import { fetchStudentProgress, toggleStudentActivity } from '../../../../services/students.api.js';
+import MemberProgressTree from './MemberProgressTree.jsx';
 import './memberModals.css';
 
 export default function MemberProgressModal({
@@ -11,12 +11,12 @@ export default function MemberProgressModal({
   onClose,
   onConfirm,
 }) {
+  const { showSuccess, showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [progress, setProgress] = useState({});
   const [stages, setStages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState('');
   const initialProgressRef = useRef({});
 
   useEffect(() => {
@@ -28,7 +28,6 @@ export default function MemberProgressModal({
 
     async function loadProgress() {
       setIsLoading(true);
-      setError('');
       setSearchQuery('');
 
       const progressStages = await fetchStudentProgress(groupId, member.accountId);
@@ -57,10 +56,7 @@ export default function MemberProgressModal({
 
   const visibleStages = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-
-    if (!query) {
-      return stages;
-    }
+    if (!query) return stages;
 
     return stages
       .map((stage) => {
@@ -71,31 +67,24 @@ export default function MemberProgressModal({
           || activity.educationalDescription.toLowerCase().includes(query)
         ));
 
-        if (stageMatches) {
-          return stage;
-        }
-
-        if (matchingActivities.length === 0) {
-          return null;
-        }
-
+        if (stageMatches) return stage;
+        if (matchingActivities.length === 0) return null;
         return { ...stage, activities: matchingActivities };
       })
       .filter(Boolean);
   }, [searchQuery, stages]);
 
-  const handleToggleActivity = (activityId) => {
+  const handleToggleActivity = useCallback((activityId) => {
     setProgress((prev) => ({
       ...prev,
       [activityId]: !prev[activityId],
     }));
-  };
+  }, []);
 
   const handleConfirm = async () => {
     if (!member || !groupId) return;
 
     setIsSaving(true);
-    setError('');
 
     const initialProgress = initialProgressRef.current;
     const changedActivityIds = Object.keys(progress).filter((activityId) => (
@@ -112,9 +101,10 @@ export default function MemberProgressModal({
 
       const completedCount = Object.values(progress).filter(Boolean).length;
       onConfirm?.({ completedCount, progress });
+      showSuccess('Postęp uczestnika został zapisany.');
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Nie udało się zapisać postępu');
+      showError(err instanceof Error ? err.message : 'Nie udało się zapisać postępu');
     } finally {
       setIsSaving(false);
     }
@@ -133,7 +123,7 @@ export default function MemberProgressModal({
       onConfirm={handleConfirm}
       confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}
       confirmDisabled={isSaving || isLoading}
-      size="lg"
+      size="xl"
       className="member-modal"
     >
       <div className="member-modal__toolbar">
@@ -152,29 +142,11 @@ export default function MemberProgressModal({
       ) : null}
 
       {!isLoading && visibleStages.length > 0 ? (
-        <div className="member-modal__stage-list">
-          {visibleStages.map((stage) => (
-            <div key={stage.id} className="member-modal__stage-row">
-              <span className="member-modal__stage-name">{stage.name}</span>
-              <div className="member-modal__stage-activities">
-                {stage.activities.map((activity) => (
-                  <ActivityProgressIcon
-                    key={activity.id}
-                    activity={{
-                      name: activity.name,
-                      storyDescription: activity.storyDescription,
-                      didacticDescription: activity.educationalDescription,
-                      rewardAmount: activity.currency,
-                      rewardEmoji: '🥕',
-                    }}
-                    unlocked={Boolean(progress[activity.id])}
-                    onToggle={() => handleToggleActivity(activity.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <MemberProgressTree
+          stages={visibleStages}
+          progress={progress}
+          onToggleActivity={handleToggleActivity}
+        />
       ) : null}
 
       {!isLoading && visibleStages.length === 0 ? (
@@ -183,10 +155,6 @@ export default function MemberProgressModal({
             ? 'Brak aktywności w tej grupie.'
             : 'Brak etapów spełniających kryteria wyszukiwania.'}
         </p>
-      ) : null}
-
-      {error ? (
-        <p className="member-modal__empty member-modal__empty--error" role="alert">{error}</p>
       ) : null}
     </Modal>
   );

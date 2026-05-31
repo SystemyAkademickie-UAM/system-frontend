@@ -1,10 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
   Button,
+  CurrencyDisplay,
   DataTable,
+  AssetSvg,
   PageHeader,
   SearchBar,
   SubNav,
+  useToast,
 } from '../../../components/ui/index.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
@@ -52,9 +55,11 @@ const RANK_COLUMNS = [
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
     render: (rank) => (
-      <span className="rewards-table__cell-text rewards-table__cell-text--muted">
-        {rank.iconFile}
-      </span>
+      rank.iconFile ? (
+        <AssetSvg name={rank.iconFile} className="rewards-table__icon-preview" width={28} height={28} alt="" />
+      ) : (
+        <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+      )
     ),
   },
   {
@@ -63,11 +68,7 @@ const RANK_COLUMNS = [
     sort: 'number',
     width: '120px',
     render: (rank) => (
-      <span className="rewards-table__reward">
-        {rank.costAmount}
-        {' '}
-        {rank.costEmoji}
-      </span>
+      <CurrencyDisplay amount={rank.costAmount} symbol={rank.costEmoji} size="sm" />
     ),
   },
   {
@@ -100,6 +101,7 @@ const RANK_COLUMNS = [
 
 export default function RewardsHomeContent() {
   const nav = useGroupSubNav('group-rewards');
+  const { showSuccess, showError } = useToast();
   const {
     ranks,
     students,
@@ -128,9 +130,12 @@ export default function RewardsHomeContent() {
     const result = await handleCreate(values);
     setModalLoading(false);
     if (result.ok) {
+      showSuccess('Ranga została utworzona.');
       closeModal();
+    } else {
+      showError(result.error || 'Nie udało się utworzyć rangi.');
     }
-  }, [handleCreate, closeModal]);
+  }, [handleCreate, closeModal, showSuccess, showError]);
 
   const handleEditConfirm = useCallback(async (values) => {
     if (!activeModal?.rank) return;
@@ -138,9 +143,12 @@ export default function RewardsHomeContent() {
     const result = await handleUpdate(activeModal.rank.id, values);
     setModalLoading(false);
     if (result.ok) {
+      showSuccess('Ranga została zaktualizowana.');
       closeModal();
+    } else {
+      showError(result.error || 'Nie udało się zaktualizować rangi.');
     }
-  }, [activeModal, handleUpdate, closeModal]);
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.rank) return;
@@ -148,9 +156,12 @@ export default function RewardsHomeContent() {
     const result = await handleDelete(activeModal.rank.id);
     setModalLoading(false);
     if (result.ok) {
+      showSuccess('Ranga została usunięta.');
       closeModal();
+    } else {
+      showError(result.error || 'Nie udało się usunąć rangi.');
     }
-  }, [activeModal, handleDelete, closeModal]);
+  }, [activeModal, handleDelete, closeModal, showSuccess, showError]);
 
   const handleAssignConfirm = useCallback(async (selectedStudentIds) => {
     if (!activeModal?.rank) return;
@@ -158,25 +169,32 @@ export default function RewardsHomeContent() {
     const result = await handleAssign(activeModal.rank.id, selectedStudentIds);
     setModalLoading(false);
     if (result.ok) {
+      showSuccess('Ranga została przypisana.');
       closeModal();
+    } else {
+      showError(result.error || 'Nie udało się przypisać rangi.');
     }
-  }, [activeModal, handleAssign, closeModal]);
+  }, [activeModal, handleAssign, closeModal, showSuccess, showError]);
 
   const rowActions = useMemo(() => ({
     onDelete: (rank) => openModal('delete', rank),
+    deleteLabel: 'Usuń rangę',
     deleteAriaLabel: (rank) => `Usuń rangę ${rank.name}`,
+    inlineActions: [
+      {
+        id: 'assign',
+        label: 'Zmień rangę',
+        iconFile: 'ui-rank-assign.svg',
+        ariaLabel: 'Przypisz rangę studentom',
+        onSelect: (rank) => openModal('assign', rank),
+      },
+    ],
     menuItems: [
       {
         id: 'edit',
         label: 'Edytuj rangę',
         description: 'Zmień dane rangi w kreatorze.',
         onSelect: (rank) => openModal('edit', rank),
-      },
-      {
-        id: 'assign',
-        label: 'Zmień rangę',
-        description: 'Przypisz rangę wielu studentom naraz.',
-        onSelect: (rank) => openModal('assign', rank),
       },
     ],
   }), [openModal]);

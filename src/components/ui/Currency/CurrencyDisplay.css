@@ -1,0 +1,52 @@
+.maq-currency-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.maq-currency-display__amount {
+  font-weight: 600;
+}
+
+.maq-currency-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.maq-currency-icon--emoji {
+  font-style: normal;
+}
+
+.maq-currency-icon--sm {
+  width: 14px;
+  height: 14px;
+  font-size: 12px;
+}
+
+.maq-currency-icon--md {
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+}
+
+.maq-currency-icon--lg {
+  width: 22px;
+  height: 22px;
+  font-size: 18px;
+}
+
+.maq-currency-display--sm .maq-currency-display__amount {
+  font-size: 12px;
+}
+
+.maq-currency-display--md .maq-currency-display__amount {
+  font-size: 14px;
+}
+
+.maq-currency-display--lg .maq-currency-display__amount {
+  font-size: 16px;
+}

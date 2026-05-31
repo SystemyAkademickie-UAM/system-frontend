@@ -110,6 +110,7 @@ export default function MemberBadgesModal({
   const [rarityFilter, setRarityFilter] = useState('all');
   const [earnedFilter, setEarnedFilter] = useState('all');
   const [sortBy, setSortBy] = useState('rarity-asc');
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [studentBadges, setStudentBadges] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -148,10 +149,10 @@ export default function MemberBadgesModal({
         return {
           id: sb.id,
           name: sb.name || fullBadge?.name || 'Nieznana odznaka',
-          icon: sb.icon || fullBadge?.icon || '🏅',
+          iconFile: fullBadge?.iconFile || sb.iconFile || '',
           rarity: fullBadge?.rarity || 'common',
           storyDescription: fullBadge?.storyDescription || '',
-          educationalDescription: fullBadge?.educationalDescription || '',
+          didacticDescription: fullBadge?.didacticDescription || fullBadge?.educationalDescription || '',
           rewardAmount: fullBadge?.rewardAmount || 0,
         };
       });
@@ -159,10 +160,10 @@ export default function MemberBadgesModal({
     return badges.map((b) => ({
       id: b.id,
       name: b.name,
-      icon: b.icon || '🏅',
+      iconFile: b.iconFile || '',
       rarity: b.rarity || 'common',
       storyDescription: b.storyDescription || '',
-      educationalDescription: b.educationalDescription || '',
+      didacticDescription: b.didacticDescription || '',
       rewardAmount: b.rewardAmount || 0,
     }));
   }, [studentBadges, badges]);
@@ -222,7 +223,19 @@ export default function MemberBadgesModal({
         />
       </div>
 
-      <div className="member-modal__controls">
+      <div className="member-modal__controls-toggle-wrap">
+        <button
+          type="button"
+          className="member-modal__controls-toggle"
+          aria-expanded={filtersExpanded}
+          onClick={() => setFiltersExpanded((prev) => !prev)}
+        >
+          {filtersExpanded ? 'Ukryj filtry i sortowanie' : 'Pokaż filtry i sortowanie'}
+        </button>
+      </div>
+
+      {filtersExpanded ? (
+        <div className="member-modal__controls">
         <section className="member-modal__control-group" aria-label="Filtry odznak">
           <h3 className="member-modal__control-heading">Filtry</h3>
 
@@ -287,6 +300,7 @@ export default function MemberBadgesModal({
           </div>
         </section>
       </div>
+      ) : null}
 
       {isLoading ? (
         <p className="member-modal__loading">Ładowanie odznak...</p>
@@ -298,9 +312,9 @@ export default function MemberBadgesModal({
               rarity={badge.rarity}
               name={badge.name}
               storyDescription={badge.storyDescription}
-              didacticDescription={badge.educationalDescription}
+              didacticDescription={badge.didacticDescription}
               rewardAmount={badge.rewardAmount}
-              rewardEmoji={badge.icon}
+              iconFile={badge.iconFile}
               selected={selectedIds.includes(badge.id)}
               onSelectedChange={(selected) => handleToggleBadge(badge.id, selected)}
               previewOnHover

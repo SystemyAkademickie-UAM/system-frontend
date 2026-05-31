@@ -1,22 +1,23 @@
 import { getBadgeCssVars } from './badgeCssVars.js';
 import BadgeIcon from './BadgeIcon.jsx';
+import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 import { BADGE_RARITY, getBadgeRarityConfig } from './badgeRarity.js';
 import './Badge.css';
+
 /**
- * Kafelek odznaki z paskiem rzadkości, ikoną, opisami i nagrodą.
+ * Pełny kafelek odznaki (Figma: Achievement Card).
  *
  * @param {Object} props
  * @param {'common' | 'uncommon' | 'rare' | 'epic'} [props.rarity='common']
- * @param {string} props.name — nazwa odznaki
- * @param {string} props.storyDescription — opis fabularny
- * @param {string} props.didacticDescription — opis dydaktyczny
+ * @param {string} props.name
+ * @param {string} props.storyDescription
+ * @param {string} props.didacticDescription
  * @param {number} [props.rewardAmount=0]
- * @param {string} [props.rewardEmoji='🥕']
- * @param {string} [props.earnedAt] — tekst czasu zdobycia (np. „Dzisiaj”)
- * @param {boolean} [props.showEarnedAt=true] — wyświetlanie stopki z czasem zdobycia
- * @param {boolean} [props.compact=false] — mniejszy wariant dopasowany do treści
- * @param {import('react').ReactNode} [props.icon] — własna ikona (domyślnie plik SVG z iconFile)
- * @param {string} [props.iconFile] — nazwa pliku w public/assets/svg/
+ * @param {string} [props.rewardEmoji] — nadpisanie symbolu waluty
+ * @param {string} [props.earnedAt]
+ * @param {boolean} [props.showEarnedAt=true]
+ * @param {import('react').ReactNode} [props.icon]
+ * @param {string} [props.iconFile]
  * @param {string} [props.className]
  */
 export default function Badge({
@@ -25,10 +26,9 @@ export default function Badge({
   storyDescription,
   didacticDescription,
   rewardAmount = 0,
-  rewardEmoji = '🥕',
+  rewardEmoji,
   earnedAt,
   showEarnedAt = true,
-  compact = false,
   icon,
   iconFile,
   className = '',
@@ -38,11 +38,7 @@ export default function Badge({
 
   return (
     <article
-      className={[
-        'maq-badge',
-        compact ? 'maq-badge--compact' : '',
-        className,
-      ].filter(Boolean).join(' ')}
+      className={['maq-badge', className].filter(Boolean).join(' ')}
       data-rarity={rarity}
       style={getBadgeCssVars(rarity)}
     >
@@ -70,18 +66,20 @@ export default function Badge({
 
           <div className="maq-badge__reward">
             <span className="maq-badge__section-label">Nagroda</span>
-            <span className="maq-badge__reward-value">
-              {rewardAmount}
-              {' '}
-              <span className="maq-badge__reward-emoji" aria-hidden="true">{rewardEmoji}</span>
-            </span>
+            <CurrencyDisplay
+              amount={rewardAmount}
+              symbol={rewardEmoji}
+              size="md"
+              className="maq-badge__reward-value"
+            />
           </div>
 
           {showFooter ? (
             <p className="maq-badge__earned-at">{`• ${earnedAt}`}</p>
           ) : null}
         </div>
-      </div>    </article>
+      </div>
+    </article>
   );
 }
 
