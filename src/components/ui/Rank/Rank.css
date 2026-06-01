@@ -81,7 +81,7 @@
 
 .maq-rank__label {
   font-family: 'Inter', sans-serif;
-  font-size: 10px;
+  font-size: var(--font-size-min);
   font-weight: 600;
   line-height: 20px;
   letter-spacing: 1px;

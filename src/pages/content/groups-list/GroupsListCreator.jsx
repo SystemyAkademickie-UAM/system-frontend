@@ -109,7 +109,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
     } catch {
       throw new Error('/drive not JSON: ' + drivetext);
     }
-    if (!driveresponse.ok || drivedata.status == 403) {
+    if (!driveresponse.ok || drivedata.statusCode === 403) {
       throw new Error('Błąd /drive.');
     }
     if (typeof drivedata.driveRef != 'string' || drivedata.driveRef.trim() == '') {

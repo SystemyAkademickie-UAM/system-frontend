@@ -1,12 +1,16 @@
 import { useCallback, useState } from 'react';
-import { SVG_PLACEHOLDER_FILENAME, svgAssetPath, svgPlaceholderPath } from '../../../utils/svgAssetPath.js';
+import {
+  resolveSvgAssetName,
+  svgAssetPath,
+  svgPlaceholderPath,
+} from '../../../utils/svgAssetPath.js';
 import './AssetSvg.css';
 
 /**
- * Obrazek SVG z public/assets/svg/. Gdy plik nie istnieje, wyświetla placeholder.svg.
+ * Obrazek SVG z public/assets/svg/. Gdy brak pliku lub nieprawidłowa nazwa, wyświetla shared/placeholder.svg.
  *
  * @param {Object} props
- * @param {string} props.name — nazwa pliku w public/assets/svg/ (np. "rocket.svg")
+ * @param {string} [props.name] — ścieżka względna w public/assets/svg/ (np. "actions/add.svg")
  * @param {'mask' | 'original'} [props.tone='mask'] — mask: kolor z tokenów CSS; original: plik bez przekolorowania
  * @param {string} [props.className]
  * @param {number} [props.width]
@@ -23,9 +27,8 @@ export default function AssetSvg({
   ...rest
 }) {
   const placeholderSrc = svgPlaceholderPath();
-  const [src, setSrc] = useState(() => (
-    name ? svgAssetPath(name) : placeholderSrc
-  ));
+  const assetName = resolveSvgAssetName(name);
+  const [src, setSrc] = useState(() => svgAssetPath(assetName));
 
   const handleError = useCallback(() => {
     setSrc((current) => (current === placeholderSrc ? current : placeholderSrc));
@@ -54,7 +57,7 @@ export default function AssetSvg({
           }}
           aria-hidden={!alt}
           aria-label={alt || undefined}
-          data-asset-name={name ?? SVG_PLACEHOLDER_FILENAME}
+          data-asset-name={assetName}
           {...rest}
         />
       </>
@@ -71,7 +74,7 @@ export default function AssetSvg({
       loading="lazy"
       decoding="async"
       onError={handleError}
-      data-asset-name={name ?? SVG_PLACEHOLDER_FILENAME}
+      data-asset-name={assetName}
       {...rest}
     />
   );

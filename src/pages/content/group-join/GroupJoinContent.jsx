@@ -10,6 +10,8 @@ import { enrollByCode } from '../../../services/enrollment.api.js';
 import '../../../components/page/PageUnavailable.css';
 import './GroupJoinContent.css';
 
+const GROUP_JOIN_SUCCESS_MESSAGE = 'Pomyślnie dołączono do grupy.';
+
 export default function GroupJoinContent() {
   const { groupId } = useParams();
   const navigate = useNavigate();
@@ -50,7 +52,10 @@ export default function GroupJoinContent() {
     setIsSubmitting(false);
 
     if (result.ok) {
-      navigate(groupMainPath(groupId), { replace: true });
+      navigate(groupMainPath(groupId), {
+        replace: true,
+        state: { joinSuccessMessage: GROUP_JOIN_SUCCESS_MESSAGE },
+      });
     } else {
       setSubmitError(result.error || 'Nieprawidłowy kod dostępu.');
     }

@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import './InfoTooltip.css';
 
 /**
@@ -7,13 +8,13 @@ import './InfoTooltip.css';
  *
  * @param {Object} props
  * @param {string} props.text — treść wyjaśnienia
- * @param {string} [props.iconFile='ui-info-circle.svg'] — SVG w public/assets/svg/
+ * @param {string} [props.iconFile] — SVG w public/assets/svg/ (domyślnie status/info.svg)
  * @param {string} [props.className]
  * @param {string} [props.ariaLabel='Informacja']
  */
 export default function InfoTooltip({
   text,
-  iconFile = 'ui-info-circle.svg',
+  iconFile = SVG_ICONS.status.info,
   className = '',
   ariaLabel = 'Informacja',
 }) {

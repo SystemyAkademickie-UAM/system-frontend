@@ -13,6 +13,7 @@ import { getJson, patchJson, deleteJson } from './api-client.js';
  * @property {number} totalEarned
  * @property {number} avatarId
  * @property {string | null} avatarUrl
+ * @property {number} [badgesCount]
  */
 
 /**
@@ -168,4 +169,47 @@ export async function toggleStudentActivity(groupId, accountId, activityId) {
   }
   const data = /** @type {{ isCompleted?: boolean }} */ (result.data);
   return { ok: true, isCompleted: data.isCompleted };
+}
+
+/**
+ * Pobiera listę accountId uczestników z ukończoną aktywnością.
+ * GET /groups/:groupId/activities/:activityId/completions
+ *
+ * @param {string | number} groupId
+ * @param {number} activityId
+ * @returns {Promise<number[]>}
+ */
+export async function fetchActivityCompletions(groupId, activityId) {
+  const result = await getJson(`/groups/${groupId}/activities/${activityId}/completions`);
+  if (!result.ok) {
+    const errorData = /** @type {{ message?: string }} */ (result.data);
+    throw new Error(errorData?.message || 'Nie udało się pobrać przypisań aktywności');
+  }
+  const data = /** @type {{ completedAccountIds?: number[] }} */ (result.data);
+  return Array.isArray(data?.completedAccountIds) ? data.completedAccountIds : [];
+}
+
+/**
+ * Ustawia docelowy zbiór uczestników z ukończoną aktywnością.
+ * PATCH /groups/:groupId/activities/:activityId/completions
+ *
+ * @param {string | number} groupId
+ * @param {number} activityId
+ * @param {number[]} accountIds
+ * @returns {Promise<{ ok: boolean, granted?: number, revoked?: number, error?: string }>}
+ */
+export async function setActivityCompletions(groupId, activityId, accountIds) {
+  const result = await patchJson(
+    `/groups/${groupId}/activities/${activityId}/completions`,
+    { accountIds },
+  );
+  if (!result.ok) {
+    const errorData = /** @type {{ message?: string }} */ (result.data);
+    return {
+      ok: false,
+      error: errorData?.message || 'Nie udało się zapisać przypisania aktywności',
+    };
+  }
+  const data = /** @type {{ granted?: number, revoked?: number }} */ (result.data);
+  return { ok: true, granted: data.granted, revoked: data.revoked };
 }

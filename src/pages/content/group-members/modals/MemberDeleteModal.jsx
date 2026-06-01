@@ -6,10 +6,10 @@ export default function MemberDeleteModal({
   member,
   onClose,
   onConfirm,
+  isLoading = false,
 }) {
-  const handleConfirm = () => {
-    onConfirm?.();
-    onClose();
+  const handleConfirm = async () => {
+    await onConfirm?.();
   };
 
   if (!member) {
@@ -22,7 +22,8 @@ export default function MemberDeleteModal({
       onClose={onClose}
       title="Usuń uczestnika"
       onConfirm={handleConfirm}
-      confirmLabel="Usuń"
+      confirmLabel={isLoading ? 'Usuwanie…' : 'Usuń'}
+      confirmDisabled={isLoading}
       confirmVariant="danger"
       size="sm"
       className="member-modal"

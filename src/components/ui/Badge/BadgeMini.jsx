@@ -98,7 +98,7 @@ export default function BadgeMini({
         onMouseLeave={handleMouseLeave}
       >
         <span className="maq-badge-mini__icon-slot">
-          <BadgeIcon icon={icon} iconFile={iconFile} />
+          <BadgeIcon iconFile={iconFile} />
         </span>
 
         <span className="maq-badge-mini__content">
