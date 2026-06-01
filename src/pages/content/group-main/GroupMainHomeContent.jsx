@@ -1,15 +1,9 @@
-import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
-import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
+import './GroupMainHomeContent.css';
 
 export default function GroupMainHomeContent() {
-  const nav = useGroupSubNav('group-main');
-
   return (
-    <PageUnavailable
-      title={nav.sectionTitle}
-      description="Strona główna"
-      subNavAriaLabel={nav.ariaLabel}
-      subNavItems={nav.items}
-    />
+    <p className="group-main-home__notice" role="status">
+      Ta strona jest obecnie niedostępna. Funkcjonalność zostanie udostępniona w kolejnej wersji aplikacji.
+    </p>
   );
 }
