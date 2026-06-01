@@ -159,12 +159,21 @@ export function useGroupRanks() {
     if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
 
     const selectedSet = new Set(selectedStudentIds);
-    const studentsToUpdate = students
-      .filter((s) => selectedSet.has(s.id))
-      .map((s) => ({
-        enrollmentId: s.enrollmentId,
-        rankId: rank.dbId,
-      }));
+    const studentsToUpdate = students.reduce((updates, student) => {
+      const hadThisRank = student.rankId === rankId;
+      const shouldHaveRank = selectedSet.has(student.id);
+
+      if (shouldHaveRank && !hadThisRank) {
+        updates.push({ enrollmentId: student.enrollmentId, rankId: rank.dbId });
+        return updates;
+      }
+
+      if (!shouldHaveRank && hadThisRank) {
+        updates.push({ enrollmentId: student.enrollmentId, rankId: null });
+      }
+
+      return updates;
+    }, []);
 
     if (studentsToUpdate.length === 0) {
       return { ok: true };
@@ -173,9 +182,15 @@ export function useGroupRanks() {
     const result = await bulkUpdateStudents(groupId, studentsToUpdate);
 
     if (result.ok) {
-      setStudents((prev) => prev.map((s) =>
-        selectedSet.has(s.id) ? { ...s, rankId, dbRankId: rank.dbId } : s
-      ));
+      setStudents((prev) => prev.map((s) => {
+        if (selectedSet.has(s.id)) {
+          return { ...s, rankId, dbRankId: rank.dbId };
+        }
+        if (s.rankId === rankId) {
+          return { ...s, rankId: null, dbRankId: null };
+        }
+        return s;
+      }));
     }
 
     return result;

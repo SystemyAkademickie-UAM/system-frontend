@@ -22,6 +22,10 @@
 .rewards-page__add-btn {
   flex-shrink: 0;
   align-self: center;
+  white-space: nowrap;
+  min-width: 9.5rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 .rewards-page__nav-row {

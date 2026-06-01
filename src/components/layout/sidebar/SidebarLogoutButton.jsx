@@ -18,7 +18,7 @@ export default function SidebarLogoutButton({ enabled, onLogoutClick, onNavigate
           onNavigate?.();
         }}
       >
-        <NavGlyph id="nav-wyloguj" />
+        <NavGlyph id="nav/logout" />
         <span>Wyloguj</span>
       </button>
     </li>
