@@ -1,0 +1,12 @@
+.group-main-home__notice {
+  margin: 0;
+  width: 100%;
+  padding: 2rem 1.5rem;
+  border-radius: 16px;
+  background: var(--color-bg-surface);
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
