@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { buildPaginationItems } from './buildPaginationItems.js';
 import './Pagination.css';
 
@@ -56,7 +57,7 @@ export default function Pagination({
         onClick={() => setPage(currentPage - 1)}
       >
         <AssetSvg
-          name="ui-chevron-left.svg"
+          name={SVG_ICONS.controls.chevronLeft}
           className="maq-pagination__chevron"
           width={7}
           height={10}
@@ -100,7 +101,7 @@ export default function Pagination({
         onClick={() => setPage(currentPage + 1)}
       >
         <AssetSvg
-          name="ui-chevron-right.svg"
+          name={SVG_ICONS.controls.chevronRight}
           className="maq-pagination__chevron"
           width={7}
           height={10}

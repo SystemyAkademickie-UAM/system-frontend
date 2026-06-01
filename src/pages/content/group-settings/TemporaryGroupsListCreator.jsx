@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { SubNav, useToast } from '../../../components/ui/index.js';
+import { Button, useToast } from '../../../components/ui/index.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 import { createGroup, fetchGroupById, updateGroup } from '../groups-list/groupsList.api.js';
 import './GroupSettingsForm.css';
 
-export default function App({ popupclose, subNav }) {
+const GROUP_NAME_MAX = 64;
+const SUBJECT_NAME_MAX = 64;
+
+export default function TemporaryGroupsListCreator({ popupclose }) {
   const { groupId } = useParams();
   const { showSuccess, showError } = useToast();
 
@@ -22,6 +25,7 @@ export default function App({ popupclose, subNav }) {
   const [bannerfile, setBannerfile] = useState(null);
   const [bannerpreview, setBannerpreview] = useState(null);
   const [existingBannerUrl, setExistingBannerUrl] = useState(null);
+  const [bannerRemoved, setBannerRemoved] = useState(false);
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
 
   useEffect(() => {
@@ -36,6 +40,7 @@ export default function App({ popupclose, subNav }) {
         setSubjectnamevalue(group.subject ?? '');
         setGroupdescriptionvalue(group.description ?? '');
         setExistingBannerUrl(group.bannerUrl ?? null);
+        setBannerRemoved(false);
       })
       .finally(() => {
         if (!cancelled) setIsLoadingGroup(false);
@@ -43,9 +48,6 @@ export default function App({ popupclose, subNav }) {
 
     return () => { cancelled = true; };
   }, [groupId]);
-
-  const GROUP_NAME_MAX = 64;
-  const SUBJECT_NAME_MAX = 64;
 
   function onGroupnamechange(value) {
     const trimmed = value.length > GROUP_NAME_MAX ? value.slice(0, GROUP_NAME_MAX) : value;
@@ -68,59 +70,30 @@ export default function App({ popupclose, subNav }) {
     }
     setSubjectnamevalue(trimmed);
   }
-  function onGroupdescriptionchange(stringvalue) {
-    setGroupdescriptionvalue(stringvalue);
-  }
-  function onTemplatesgalleryclick() {
-    // Templates gallery placeholder.
-  }
-  function onRejectclick() {
-    setGroupnamevalue('');
-    setSubjectnamevalue('');
-    setGroupdescriptionvalue('');
-    setBannerfile(null);
-    setBannerpreview(null);
-    setGroupnamevalueerror('');
-    setSubjectnamevalueerror('');
-    setErrorMessage('');
-    setIsvisible(false);
-    if (popupclose) {
-      popupclose();
-    }
-  }
+
   function onUploadbannerclick() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.onchange = (event) => {
       const file = event.target.files[0];
-      if (file) {
-        setBannerfile(file);
-        const reader = new FileReader();
-        reader.onload = () => {
-          setBannerpreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-      }
+      if (!file) return;
+      setBannerfile(file);
+      setBannerRemoved(false);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setBannerpreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     };
     input.click();
   }
-  async function onTryFetchGroupsList() {
-    try {
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-      const url = base + '/groups';
-      await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid,
-        },
-      });
-    } catch (error) {
-      console.log('GET /groups error:', error instanceof Error ? error.message : String(error));
-    }
+
+  function onRemovebannerclick() {
+    setBannerfile(null);
+    setBannerpreview(null);
+    setExistingBannerUrl(null);
+    setBannerRemoved(true);
   }
 
   async function uploadBannerToDrive(url, browserid) {
@@ -135,8 +108,7 @@ export default function App({ popupclose, subNav }) {
     formdata.append('json', JSON.stringify(drivejson));
     formdata.append('banner', bannerfile, bannerfile.name);
 
-    const driveurl = url + '/drive';
-    const driveresponse = await fetch(driveurl, {
+    const driveresponse = await fetch(`${url}/drive`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'X-Browser-ID': browserid },
@@ -151,11 +123,11 @@ export default function App({ popupclose, subNav }) {
       throw new Error('/drive not JSON: ' + drivetest);
     }
 
-    if (!driveresponse.ok || drivedata.status == 403) {
-      throw new Error('Error.');
+    if (!driveresponse.ok || drivedata.statusCode === 403) {
+      throw new Error('Nie udało się przesłać banera.');
     }
-    if (typeof drivedata.driveRef != 'string' || drivedata.driveRef.trim() == '') {
-      throw new Error('Error driveRef.');
+    if (typeof drivedata.driveRef !== 'string' || drivedata.driveRef.trim() === '') {
+      throw new Error('Brak driveRef w odpowiedzi serwera.');
     }
 
     return drivedata.driveRef.trim();
@@ -168,7 +140,6 @@ export default function App({ popupclose, subNav }) {
     }
 
     setErrorMessage('');
-    setSuccessMessage('');
     setIsSaving(true);
 
     try {
@@ -181,12 +152,14 @@ export default function App({ popupclose, subNav }) {
       }
 
       const payload = {
-        name: groupnamevalue,
-        subjectName: subjectnamevalue,
-        description: groupdescriptionvalue,
+        name: groupnamevalue.trim(),
+        subjectName: subjectnamevalue.trim(),
+        description: groupdescriptionvalue.trim(),
       };
       if (imageref) {
         payload.imageRef = imageref;
+      } else if (bannerRemoved && groupId) {
+        payload.imageRef = '';
       }
 
       const result = groupId
@@ -198,78 +171,106 @@ export default function App({ popupclose, subNav }) {
         return;
       }
 
-      await onTryFetchGroupsList();
+      if (groupId) {
+        const refreshed = await fetchGroupById(groupId);
+        if (refreshed) {
+          setGroupnamevalue(refreshed.storyName ?? '');
+          setSubjectnamevalue(refreshed.subject ?? '');
+          setGroupdescriptionvalue(refreshed.description ?? '');
+          setExistingBannerUrl(refreshed.bannerUrl ?? null);
+          setBannerfile(null);
+          setBannerpreview(null);
+          setBannerRemoved(false);
+        }
+      }
+
       showSuccess(groupId ? 'Zmiany zostały zapisane.' : 'Grupa została utworzona.');
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      setErrorMessage(message);
       showError(message);
     } finally {
       setIsSaving(false);
     }
   }
-  function onRemovebannerclick() {
+
+  function onRejectclick() {
+    setGroupnamevalue('');
+    setSubjectnamevalue('');
+    setGroupdescriptionvalue('');
     setBannerfile(null);
     setBannerpreview(null);
-    setExistingBannerUrl(null);
+    setGroupnamevalueerror('');
+    setSubjectnamevalueerror('');
+    setErrorMessage('');
+    setIsvisible(false);
+    popupclose?.();
   }
 
   const displayedBanner = bannerpreview || existingBannerUrl;
 
-  return isVisible ? (
-    <div className="group-settings-form">
-      <div className="group-settings-form__nav-row">
-        {subNav && subNav.items?.length > 0 ? (
-          <SubNav
-            ariaLabel={subNav.ariaLabel}
-            items={subNav.items}
-            className="group-settings-form__sub-nav"
-          />
-        ) : <div />}
-        <button
-          type="button"
-          className="group-settings-form__btn group-settings-form__btn--primary"
-          onClick={onTemplatesgalleryclick}
-        >
-          Gotowy wzór
-        </button>
-      </div>
+  if (!isVisible) {
+    return null;
+  }
 
+  return (
+    <div className="group-settings-form">
       <div className="group-settings-form__panel">
-        <h3 className="group-settings-form__panel-title">{groupId ? 'Edytor grupy' : 'Grupa'}</h3>
+        <h2 className="group-settings-form__panel-title">Edytor grupy</h2>
         {isLoadingGroup ? (
-          <p className="group-settings-form__label">Ładowanie danych grupy…</p>
+          <p className="group-settings-form__hint">Ładowanie danych grupy…</p>
         ) : null}
         <div className="group-settings-form__grid">
           <div className="group-settings-form__field">
             <label className="group-settings-form__label" htmlFor="group-settings-name">
               Nazwa grupy
-              {groupnamevalueerror ? <span className="group-settings-form__label-error"> {groupnamevalueerror}</span> : null}
+              {groupnamevalueerror ? (
+                <span className="group-settings-form__label-error">{groupnamevalueerror}</span>
+              ) : null}
             </label>
-            <input id="group-settings-name" className="group-settings-form__input" value={groupnamevalue} onChange={(event) => onGroupnamechange(event.target.value)} />
+            <input
+              id="group-settings-name"
+              className="group-settings-form__input"
+              value={groupnamevalue}
+              maxLength={GROUP_NAME_MAX}
+              onChange={(event) => onGroupnamechange(event.target.value)}
+            />
           </div>
           <div className="group-settings-form__field">
             <label className="group-settings-form__label" htmlFor="group-settings-subject">
               Nazwa przedmiotu
-              {subjectnamevalueerror ? <span className="group-settings-form__label-error"> {subjectnamevalueerror}</span> : null}
+              {subjectnamevalueerror ? (
+                <span className="group-settings-form__label-error">{subjectnamevalueerror}</span>
+              ) : null}
             </label>
-            <input id="group-settings-subject" className="group-settings-form__input" value={subjectnamevalue} onChange={(event) => onSubjectnamechange(event.target.value)} />
+            <input
+              id="group-settings-subject"
+              className="group-settings-form__input"
+              value={subjectnamevalue}
+              maxLength={SUBJECT_NAME_MAX}
+              onChange={(event) => onSubjectnamechange(event.target.value)}
+            />
           </div>
-          <div className="group-settings-form__field">
-            <label className="group-settings-form__label">Baner grupy</label>
+          <div className="group-settings-form__field group-settings-form__field--banner">
+            <span className="group-settings-form__label">Baner grupy</span>
             <button type="button" className="group-settings-form__banner" onClick={onUploadbannerclick}>
-              {displayedBanner ? <img src={displayedBanner} alt="Podgląd banera" /> : 'Dodaj baner'}
+              {displayedBanner ? (
+                <img src={displayedBanner} alt="Podgląd banera" />
+              ) : (
+                'Dodaj baner'
+              )}
             </button>
             {displayedBanner ? (
-              <button type="button" className="group-settings-form__btn group-settings-form__btn--secondary" onClick={onRemovebannerclick}>
+              <Button variant="secondary" size="sm" onClick={onRemovebannerclick}>
                 Usuń baner
-              </button>
+              </Button>
             ) : null}
           </div>
         </div>
       </div>
 
       <div className="group-settings-form__panel">
-        <h3 className="group-settings-form__panel-title">Opis grupy</h3>
+        <h2 className="group-settings-form__panel-title">Opis grupy</h2>
         <div className="group-settings-form__field">
           <label className="group-settings-form__label" htmlFor="group-settings-description">
             Opis fabularny i organizacyjny
@@ -278,19 +279,26 @@ export default function App({ popupclose, subNav }) {
             id="group-settings-description"
             className="group-settings-form__textarea"
             value={groupdescriptionvalue}
-            onChange={(event) => onGroupdescriptionchange(event.target.value)}
+            onChange={(event) => setGroupdescriptionvalue(event.target.value)}
             placeholder="Krótko opisz tło fabularne i cele grupy…"
           />
         </div>
       </div>
 
-      {errorMessage ? <p className="group-settings-form__error" role="alert">{errorMessage}</p> : null}
+      {errorMessage ? (
+        <p className="group-settings-form__error" role="alert">{errorMessage}</p>
+      ) : null}
 
       <div className="group-settings-form__footer">
-        <button type="button" className="group-settings-form__btn group-settings-form__btn--primary" onClick={onSavegroupclick} disabled={isSaving}>
-          {isSaving ? 'Zapisywanie…' : 'Zapisz'}
-        </button>
+        {popupclose ? (
+          <Button variant="ghost" size="md" onClick={onRejectclick}>
+            Anuluj
+          </Button>
+        ) : null}
+        <Button variant="primary" size="md" onClick={onSavegroupclick} disabled={isSaving || isLoadingGroup}>
+          {isSaving ? 'Zapisywanie…' : 'Zapisz zmiany'}
+        </Button>
       </div>
     </div>
-  ) : null;
+  );
 }

@@ -1,5 +1,7 @@
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
+import { resolveSvgAssetName } from '../../../utils/svgAssetPath.js';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { getRankCssVars } from './rankCssVars.js';
 import { RANK_THEME } from './rankTheme.js';
 import './Rank.css';
@@ -13,12 +15,11 @@ export default function Rank({
   costEmoji,
   storyDescription,
   shopItems = [],
-  icon,
   iconFile,
   theme = RANK_THEME.default,
   className = '',
 }) {
-  const assetName = iconFile || 'rank-default.svg';
+  const assetName = resolveSvgAssetName(iconFile);
 
   return (
     <article
@@ -28,13 +29,11 @@ export default function Rank({
     >
       <header className="maq-rank__header">
         <div className="maq-rank__icon-circle">
-          {icon ?? (
-            <AssetSvg
-              name={assetName}
-              className="maq-rank__icon-svg"
-              alt=""
-            />
-          )}
+          <AssetSvg
+            name={assetName}
+            className="maq-rank__icon-svg"
+            alt=""
+          />
         </div>
         <h3 className="maq-rank__name">{name}</h3>
         <span className="maq-rank__cost">
@@ -55,7 +54,7 @@ export default function Rank({
               {shopItems.map((item) => (
                 <li key={item} className="maq-rank__shop-item">
                   <AssetSvg
-                    name="ui-check-circle.svg"
+                    name={SVG_ICONS.status.checkCircle}
                     className="maq-rank__check-icon"
                     width={11}
                     height={11}

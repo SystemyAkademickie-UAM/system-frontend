@@ -168,7 +168,7 @@
   --font-size-activity-body: 14px;
 
   /** Odznaka — wariant kompaktowy (podgląd przy mini) */
-  --badge-compact-max-width: 360px;
+  --badge-compact-max-width: 533px;
   --size-badge-icon-circle-compact: 48px;
   --size-badge-icon-compact: 22px;
 

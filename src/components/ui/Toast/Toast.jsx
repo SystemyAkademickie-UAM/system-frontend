@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './Toast.css';
 
@@ -9,13 +9,23 @@ const EXIT_ANIMATION_MS = 450;
 
 let toastCounter = 0;
 
-function ToastItem({ toast, onDismiss }) {
+function ToastItem({ toast, onRemove, onRegisterDismiss }) {
   const [phase, setPhase] = useState('enter');
 
-  const handleDismiss = useCallback(() => {
-    setPhase('exit');
-    window.setTimeout(() => onDismiss(toast.id), EXIT_ANIMATION_MS);
-  }, [onDismiss, toast.id]);
+  const beginDismiss = useCallback(() => {
+    setPhase((current) => {
+      if (current === 'exit') {
+        return current;
+      }
+      window.setTimeout(() => onRemove(toast.id), EXIT_ANIMATION_MS);
+      return 'exit';
+    });
+  }, [onRemove, toast.id]);
+
+  useEffect(() => {
+    onRegisterDismiss(toast.id, beginDismiss);
+    return () => onRegisterDismiss(toast.id, null);
+  }, [toast.id, beginDismiss, onRegisterDismiss]);
 
   return (
     <div
@@ -33,7 +43,7 @@ function ToastItem({ toast, onDismiss }) {
         type="button"
         className="maq-toast__close"
         aria-label="Zamknij komunikat"
-        onClick={handleDismiss}
+        onClick={beginDismiss}
       >
         ×
       </button>
@@ -41,7 +51,7 @@ function ToastItem({ toast, onDismiss }) {
   );
 }
 
-function ToastViewport({ toasts, onDismiss }) {
+function ToastViewport({ toasts, onRemove, onRegisterDismiss }) {
   if (toasts.length === 0) {
     return null;
   }
@@ -49,7 +59,12 @@ function ToastViewport({ toasts, onDismiss }) {
   return createPortal(
     <div className="maq-toast-viewport" aria-label="Powiadomienia">
       {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
+        <ToastItem
+          key={toast.id}
+          toast={toast}
+          onRemove={onRemove}
+          onRegisterDismiss={onRegisterDismiss}
+        />
       ))}
     </div>,
     document.body,
@@ -59,15 +74,34 @@ function ToastViewport({ toasts, onDismiss }) {
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const timersRef = useRef(new Map());
+  const dismissHandlersRef = useRef(new Map());
 
-  const dismissToast = useCallback((id) => {
+  const removeToast = useCallback((id) => {
     setToasts((prev) => prev.filter((item) => item.id !== id));
     const timerId = timersRef.current.get(id);
     if (timerId) {
       window.clearTimeout(timerId);
       timersRef.current.delete(id);
     }
+    dismissHandlersRef.current.delete(id);
   }, []);
+
+  const registerDismissHandler = useCallback((id, handler) => {
+    if (handler) {
+      dismissHandlersRef.current.set(id, handler);
+      return;
+    }
+    dismissHandlersRef.current.delete(id);
+  }, []);
+
+  const requestDismiss = useCallback((id) => {
+    const handler = dismissHandlersRef.current.get(id);
+    if (handler) {
+      handler();
+      return;
+    }
+    removeToast(id);
+  }, [removeToast]);
 
   const showToast = useCallback(({ message, variant = 'success', durationMs = DEFAULT_DURATION_MS }) => {
     if (!message) {
@@ -77,23 +111,27 @@ export function ToastProvider({ children }) {
     const id = `toast-${++toastCounter}`;
     setToasts((prev) => [...prev, { id, message, variant }]);
 
-    const timerId = window.setTimeout(() => dismissToast(id), durationMs);
+    const timerId = window.setTimeout(() => requestDismiss(id), durationMs);
     timersRef.current.set(id, timerId);
 
     return id;
-  }, [dismissToast]);
+  }, [requestDismiss]);
 
   const value = useMemo(() => ({
     showToast,
     showSuccess: (message, durationMs) => showToast({ message, variant: 'success', durationMs }),
     showError: (message, durationMs) => showToast({ message, variant: 'error', durationMs }),
-    dismissToast,
-  }), [showToast, dismissToast]);
+    dismissToast: requestDismiss,
+  }), [showToast, requestDismiss]);
 
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <ToastViewport toasts={toasts} onDismiss={dismissToast} />
+      <ToastViewport
+        toasts={toasts}
+        onRemove={removeToast}
+        onRegisterDismiss={registerDismissHandler}
+      />
     </ToastContext.Provider>
   );
 }

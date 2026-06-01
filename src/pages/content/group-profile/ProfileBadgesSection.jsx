@@ -34,7 +34,7 @@ export default function ProfileBadgesSection() {
               storyDescription={badge.storyDescription || '—'}
               didacticDescription={badge.educationalDescription || '—'}
               rewardAmount={badge.rewardAmount ?? 0}
-              icon={badge.icon}
+              iconFile={badge.icon}
               showEarnedAt={false}
             />
           ))}

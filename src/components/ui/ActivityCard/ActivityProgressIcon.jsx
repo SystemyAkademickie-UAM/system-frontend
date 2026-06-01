@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import ActivityCard from './ActivityCard.jsx';
 import './ActivityProgressIcon.css';
 
@@ -68,9 +69,9 @@ export default function ActivityProgressIcon({
         onMouseLeave={handleMouseLeave}
       >
         {unlocked ? (
-          <AssetSvg name="ui-activity-check.svg" width={16} height={16} alt="" />
+          <AssetSvg name={SVG_ICONS.status.check} width={16} height={16} alt="" />
         ) : (
-          <AssetSvg name="ui-activity-lock.svg" width={16} height={16} alt="" />
+          <AssetSvg name={SVG_ICONS.status.lock} width={16} height={16} alt="" />
         )}
       </button>
 

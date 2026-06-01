@@ -1,12 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { DataTable, CurrencyDisplay, PageHeader, SearchBar, SubNav } from '../../../components/ui/index.js';
+import { DataTable, CurrencyDisplay, PageHeader, SearchBar, SubNav, useToast } from '../../../components/ui/index.js';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { useGroupMembers } from './useGroupMembers.js';
 
 import MemberBadgesModal from './modals/MemberBadgesModal.jsx';
 import MemberCurrencyModal from './modals/MemberCurrencyModal.jsx';
+import MemberTotalEarnedModal from './modals/MemberTotalEarnedModal.jsx';
 import MemberDeleteModal from './modals/MemberDeleteModal.jsx';
 import MemberProgressModal from './modals/MemberProgressModal.jsx';
 import MemberRankModal from './modals/MemberRankModal.jsx';
@@ -15,6 +17,7 @@ import './MembersHomeContent.css';
 
 export default function MembersHomeContent() {
   const nav = useGroupSubNav('group-members');
+  const { showSuccess } = useToast();
   const {
     groupId,
     members,
@@ -23,11 +26,11 @@ export default function MembersHomeContent() {
     badges,
     isLoading,
     error,
-    refetch,
-    updateMember,
+    refetchWithRankNotice,
     deleteMember,
     updateMemberRank,
     updateMemberCurrency,
+    updateMemberTotalEarned,
   } = useGroupMembers();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,31 +45,62 @@ export default function MembersHomeContent() {
     setActiveModal(null);
   }, []);
 
-  const handleBadgesConfirm = useCallback(() => {
-    closeModal();
-    refetch();
-  }, [closeModal, refetch]);
+  const notifyRankPromotion = useCallback((promotedRankName) => {
+    if (!promotedRankName) return;
+    showSuccess(`Uczestnik awansował na rangę: ${promotedRankName}.`);
+  }, [showSuccess]);
 
-  const handleProgressConfirm = useCallback(() => {
+  const handleBadgesConfirm = useCallback(async () => {
+    const member = activeModal?.member ?? null;
     closeModal();
-    refetch();
-  }, [closeModal, refetch]);
+    const promotedRankName = await refetchWithRankNotice(member);
+    notifyRankPromotion(promotedRankName);
+  }, [activeModal, closeModal, refetchWithRankNotice, notifyRankPromotion]);
 
-  const handleCurrencyConfirm = useCallback(async ({ delta }) => {
+  const handleProgressConfirm = useCallback(async () => {
+    const member = activeModal?.member ?? null;
+    closeModal();
+    const promotedRankName = await refetchWithRankNotice(member);
+    notifyRankPromotion(promotedRankName);
+  }, [activeModal, closeModal, refetchWithRankNotice, notifyRankPromotion]);
+
+  const handleCurrencyConfirm = useCallback(async ({ delta, setValue }) => {
     if (!activeModal?.member) return;
 
     const member = activeModal.member;
-    const nextCurrency = Math.max(0, member.currency + delta);
-    const nextTotal = member.totalCurrency + (delta > 0 ? delta : 0);
+    const nextCurrency = setValue != null
+      ? setValue
+      : Math.max(0, member.currency + delta);
 
     setModalLoading(true);
-    const result = await updateMemberCurrency(member, nextCurrency, nextTotal);
+    const result = await updateMemberCurrency(member, nextCurrency);
     setModalLoading(false);
 
     if (result.ok) {
+      showSuccess('Waluta uczestnika została zaktualizowana.');
+      notifyRankPromotion(result.promotedRankName);
       closeModal();
     }
-  }, [activeModal, updateMemberCurrency, closeModal]);
+  }, [activeModal, updateMemberCurrency, closeModal, notifyRankPromotion, showSuccess]);
+
+  const handleTotalEarnedConfirm = useCallback(async ({ delta, setValue }) => {
+    if (!activeModal?.member) return;
+
+    const member = activeModal.member;
+    const nextTotal = setValue != null
+      ? setValue
+      : Math.max(0, member.totalCurrency + delta);
+
+    setModalLoading(true);
+    const result = await updateMemberTotalEarned(member, nextTotal);
+    setModalLoading(false);
+
+    if (result.ok) {
+      showSuccess('Zgromadzona waluta uczestnika została zaktualizowana.');
+      notifyRankPromotion(result.promotedRankName);
+      closeModal();
+    }
+  }, [activeModal, updateMemberTotalEarned, closeModal, notifyRankPromotion, showSuccess]);
 
   const handleRankConfirm = useCallback(async (rankName) => {
     if (!activeModal?.member) return;
@@ -91,9 +125,10 @@ export default function MembersHomeContent() {
     setModalLoading(false);
 
     if (result.ok) {
+      showSuccess('Uczestnik został usunięty z grupy.');
       closeModal();
     }
-  }, [activeModal, deleteMember, closeModal]);
+  }, [activeModal, deleteMember, closeModal, showSuccess]);
 
   const memberColumns = useMemo(() => [
     {
@@ -194,14 +229,14 @@ export default function MembersHomeContent() {
       {
         id: 'badges',
         label: 'Edytuj odznaki',
-        iconFile: 'ui-member-badges.svg',
+        iconFile: SVG_ICONS.actions.manageBadges,
         ariaLabel: 'Edytuj odznaki uczestnika',
         onSelect: (member) => openModal('badges', member),
       },
       {
         id: 'progress',
         label: 'Edytuj postęp',
-        iconFile: 'ui-member-progress.svg',
+        iconFile: SVG_ICONS.actions.manageProgress,
         ariaLabel: 'Edytuj postęp uczestnika',
         onSelect: (member) => openModal('progress', member),
       },
@@ -218,6 +253,12 @@ export default function MembersHomeContent() {
         label: 'Zarządzaj walutą',
         description: 'Dodaj lub odejmij ręcznie walutę uczestnikowi.',
         onSelect: (member) => openModal('currency', member),
+      },
+      {
+        id: 'totalEarned',
+        label: 'Edytuj zgromadzoną walutę',
+        description: 'Zmień tylko zgromadzoną walutę uczestnika.',
+        onSelect: (member) => openModal('totalEarned', member),
       },
     ],
   }), [openModal]);
@@ -300,6 +341,13 @@ export default function MembersHomeContent() {
         member={modalMember}
         onClose={closeModal}
         onConfirm={handleCurrencyConfirm}
+        isLoading={modalLoading}
+      />
+      <MemberTotalEarnedModal
+        isOpen={activeModal?.type === 'totalEarned'}
+        member={modalMember}
+        onClose={closeModal}
+        onConfirm={handleTotalEarnedConfirm}
         isLoading={modalLoading}
       />
       <MemberRankModal

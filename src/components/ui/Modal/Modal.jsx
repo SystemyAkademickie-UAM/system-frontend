@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import Button from '../Button/Button.jsx';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import './Modal.css';
 
 /**
@@ -93,7 +94,7 @@ export default function Modal({
             onClick={onClose}
             aria-label="Zamknij"
           >
-            <AssetSvg name="ui-close.svg" className="maq-modal__close-icon" width={24} height={24} alt="" />
+            <AssetSvg name={SVG_ICONS.controls.close} className="maq-modal__close-icon" width={24} height={24} alt="" />
           </button>
         </header>
 

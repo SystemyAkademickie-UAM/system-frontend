@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { useSession } from '../../../context/SessionContext.jsx';
+import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
+import { resolveGroupLecturerDisplay } from '../../../utils/resolveGroupLecturerDisplay.js';
 import './GroupCard.css';
 
 /**
@@ -10,8 +15,12 @@ import './GroupCard.css';
  */
 export default function GroupCard({ group }) {
   const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
+  const { role } = useAppRole();
+  const { user } = useSession();
+  const { showNickname } = useLeaderDisplayPreferences();
   const showFallback = bannerFailed || !group.bannerUrl;
   const targetPath = group.isMine ? groupMainPath(group.id) : groupRootPath(group.id);
+  const lecturerDisplay = resolveGroupLecturerDisplay(group, { role, showNickname, user });
 
   return (
     <article className="group-card">
@@ -20,7 +29,7 @@ export default function GroupCard({ group }) {
           {showFallback ? (
             <div className="group-card__banner-fallback" aria-hidden="true">
               <AssetSvg
-                name="banner-placeholder.svg"
+                name={SVG_PLACEHOLDER}
                 className="group-card__banner-fallback-icon"
                 width={48}
                 height={48}
@@ -50,7 +59,7 @@ export default function GroupCard({ group }) {
             </div>
             <div className="group-card__meta-col">
               <dt className="group-card__label">Prowadzący</dt>
-              <dd className="group-card__value">{group.lecturer}</dd>
+              <dd className="group-card__value">{lecturerDisplay}</dd>
             </div>
           </dl>
         </div>

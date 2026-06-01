@@ -46,7 +46,7 @@ export default function Badge({
 
       <div className="maq-badge__body">
         <div className="maq-badge__icon-wrap">
-          <BadgeIcon icon={icon} iconFile={iconFile} />
+          <BadgeIcon iconFile={iconFile} />
         </div>
 
         <div className="maq-badge__content">
