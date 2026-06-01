@@ -1,4 +1,10 @@
 import { getJson, patchJson, postJson } from '../../../services/api-client.js';
+import { buildDriveBannerUrl } from '../../../constants/drive.constants.js';
+
+/** Matches backend `GROUP_RESPONSE_GROUP_NOT_CREATED_ID`. */
+const GROUP_RESPONSE_NOT_CREATED = 0;
+/** Matches backend `GROUP_RESPONSE_GROUP_NOT_AUTHORIZED_ID`. */
+const GROUP_RESPONSE_NOT_AUTHORIZED = 1;
 
 /**
  * @typedef {Object} GroupListItem
@@ -25,7 +31,7 @@ function mapBackendGroup(backendGroup, options = {}) {
     // zwracamy pustą wartość, żeby pole nie kopiowało się z nazwy grupy.
     subject: backendGroup.subjectName || '',
     lecturer: backendGroup.lecturers || '',
-    bannerUrl: backendGroup.bannerId || null,
+    bannerUrl: buildDriveBannerUrl(backendGroup.bannerId),
     description: backendGroup.description || null,
     isMine: options.isMine,
   };
@@ -134,10 +140,10 @@ export async function createGroup(groupData) {
     return { ok: false, error: 'Nie udało się utworzyć grupy' };
   }
   const data = /** @type {{ group?: number }} */ (result.data);
-  if (data.group === -1) {
+  if (data.group === GROUP_RESPONSE_NOT_AUTHORIZED) {
     return { ok: false, error: 'Brak uprawnień do tworzenia grup' };
   }
-  if (data.group === -2) {
+  if (data.group === GROUP_RESPONSE_NOT_CREATED) {
     return { ok: false, error: 'Nie udało się utworzyć grupy' };
   }
   return { ok: true, groupId: data.group };
@@ -163,10 +169,10 @@ export async function updateGroup(groupId, groupData) {
     return { ok: false, error: 'Nie udało się zapisać zmian grupy' };
   }
   const data = /** @type {{ group?: number, updated?: boolean }} */ (result.data);
-  if (data.group === -1) {
+  if (data.group === GROUP_RESPONSE_NOT_AUTHORIZED) {
     return { ok: false, error: 'Brak uprawnień do edycji grupy' };
   }
-  if (data.group === -2) {
+  if (data.group === GROUP_RESPONSE_NOT_CREATED) {
     return { ok: false, error: 'Nie udało się zapisać zmian grupy' };
   }
   return { ok: true, groupId: data.group, updated: Boolean(data.updated) };

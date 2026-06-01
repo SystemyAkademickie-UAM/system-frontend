@@ -2,11 +2,13 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import Pagination from '../Pagination/Pagination.jsx';
 import SearchBar from '../SearchBar/SearchBar.jsx';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { cycleSortRule, sortRows } from './dataTableSort.js';
 import './DataTable.css';
 
 const SUPERBAR_HEIGHT = 63;
 const HEADER_BORDER_RADIUS = '12px 12px 0 0';
+const INLINE_ACTION_ICON_SIZE = 20;
 
 function SortableHeader({ label, sortKey, sortRules, onSort, className = '' }) {
   const ruleIndex = sortRules.findIndex((rule) => rule.key === sortKey);
@@ -145,7 +147,12 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
           onClick={() => item.onSelect?.(row)}
         >
           {item.iconFile ? (
-            <AssetSvg name={item.iconFile} width={18} height={18} alt="" />
+            <AssetSvg
+              name={item.iconFile}
+              width={INLINE_ACTION_ICON_SIZE}
+              height={INLINE_ACTION_ICON_SIZE}
+              alt=""
+            />
           ) : (
             <span className="data-table__action-btn-text">{item.label}</span>
           )}
@@ -161,7 +168,12 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
             aria-expanded={menuOpen}
             onClick={handleMenuToggle}
           >
-            <AssetSvg name="ui-more.svg" width={18} height={18} alt="" />
+            <AssetSvg
+              name={SVG_ICONS.controls.more}
+              width={INLINE_ACTION_ICON_SIZE}
+              height={INLINE_ACTION_ICON_SIZE}
+              alt=""
+            />
           </button>
           {menuOpen ? (
             <>

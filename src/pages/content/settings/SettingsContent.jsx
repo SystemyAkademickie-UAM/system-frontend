@@ -73,6 +73,13 @@ const showNicknameDescLABEL = {
   kana: 'オフにすると、ナビバーとグループ説明にニックネームではなく氏名が表示されます。',
 };
 
+const savebuttonLABEL = {
+  polish: 'Zapisz zmiany',
+  english: 'Save Changes',
+  japanese: '変更を保存',
+  kana: 'へんこうをほぞん',
+};
+
 
 
 function readLanguageCookie() {
@@ -100,6 +107,8 @@ export default function SettingsContent() {
   const { role } = useAppRole();
   const { showNickname, setShowNickname } = useLeaderDisplayPreferences();
   const { showSuccess, showError } = useToast();
+
+  const [draftShowNickname, setDraftShowNickname] = useState(showNickname);
 
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -158,6 +167,10 @@ export default function SettingsContent() {
       const avatarIndex = avatarList.findIndex((avatar) => avatar.id === profile.avatarId);
 
       setSelectedAvatarIndex(avatarIndex >= 0 ? avatarIndex : 0);
+
+      if (role === APP_ROLE.LECTURER) {
+        setDraftShowNickname(showNickname);
+      }
 
     } catch (error) {
 
@@ -292,6 +305,11 @@ export default function SettingsContent() {
 
 
     await refetchProfile();
+
+    if (role === APP_ROLE.LECTURER) {
+      setShowNickname(draftShowNickname);
+    }
+
     setIsSaving(false);
     showSuccess('Zmiany zostały zapisane.');
   }
@@ -445,8 +463,8 @@ export default function SettingsContent() {
               <label className="settings-content__toggle">
                 <input
                   type="checkbox"
-                  checked={showNickname}
-                  onChange={(event) => setShowNickname(event.target.checked)}
+                  checked={draftShowNickname}
+                  onChange={(event) => setDraftShowNickname(event.target.checked)}
                 />
                 <span className="settings-content__field-label">{showNicknameLABEL[language]}</span>
               </label>

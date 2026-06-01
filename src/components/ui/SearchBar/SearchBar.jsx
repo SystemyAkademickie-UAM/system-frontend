@@ -1,4 +1,5 @@
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import './SearchBar.css';
 
 /**
@@ -23,7 +24,7 @@ export default function SearchBar({
     <div className={['maq-search-bar', className].filter(Boolean).join(' ')}>
       <span className="maq-search-bar__icon">
         <AssetSvg
-          name="ui-search.svg"
+          name={SVG_ICONS.controls.search}
           className="maq-search-bar__icon-svg"
           width={18}
           height={18}

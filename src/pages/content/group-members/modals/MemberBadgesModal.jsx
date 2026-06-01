@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BadgeMini, BADGE_RARITY, BADGE_RARITY_LABELS, Modal, SearchBar } from '../../../../components/ui/index.js';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { BadgeMini, BADGE_RARITY, BADGE_RARITY_LABELS, Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
 import { fetchStudentBadges, toggleStudentBadge } from '../../../../services/students.api.js';
 import './memberModals.css';
 
@@ -106,6 +106,7 @@ export default function MemberBadgesModal({
   onClose,
   onConfirm,
 }) {
+  const { showSuccess, showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState('all');
   const [earnedFilter, setEarnedFilter] = useState('all');
@@ -114,6 +115,8 @@ export default function MemberBadgesModal({
   const [selectedIds, setSelectedIds] = useState([]);
   const [studentBadges, setStudentBadges] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const initialSelectedIdsRef = useRef([]);
 
   useEffect(() => {
     if (!isOpen || !member || !groupId) return;
@@ -129,10 +132,12 @@ export default function MemberBadgesModal({
         const data = await fetchStudentBadges(groupId, member.accountId);
         setStudentBadges(data);
         const earnedIds = data.filter((b) => b.isEarned).map((b) => b.id);
+        initialSelectedIdsRef.current = earnedIds;
         setSelectedIds(earnedIds);
       } catch (err) {
         console.error('Failed to load student badges:', err);
         setStudentBadges([]);
+        initialSelectedIdsRef.current = [];
         setSelectedIds([]);
       } finally {
         setIsLoading(false);
@@ -179,23 +184,48 @@ export default function MemberBadgesModal({
     return sortBadges(filtered, sortBy, selectedIds);
   }, [allBadges, searchQuery, rarityFilter, earnedFilter, sortBy, selectedIds]);
 
-  const handleToggleBadge = useCallback(async (badgeId, selected) => {
+  const handleToggleBadge = useCallback((badgeId) => {
+    setSelectedIds((prev) => (
+      prev.includes(badgeId)
+        ? prev.filter((id) => id !== badgeId)
+        : [...prev, badgeId]
+    ));
+  }, []);
+
+  const handleConfirm = async () => {
     if (!groupId || !member) return;
 
-    const result = await toggleStudentBadge(groupId, member.accountId, badgeId);
-    if (result.ok) {
-      setSelectedIds((prev) => {
-        if (result.isEarned) {
-          return prev.includes(badgeId) ? prev : [...prev, badgeId];
-        }
-        return prev.filter((id) => id !== badgeId);
-      });
-    }
-  }, [groupId, member]);
+    const initialSet = new Set(initialSelectedIdsRef.current);
+    const selectedSet = new Set(selectedIds);
+    const badgeIdsToToggle = [
+      ...selectedIds.filter((badgeId) => !initialSet.has(badgeId)),
+      ...initialSelectedIdsRef.current.filter((badgeId) => !selectedSet.has(badgeId)),
+    ];
 
-  const handleConfirm = () => {
-    onConfirm?.(selectedIds);
-    onClose();
+    if (badgeIdsToToggle.length === 0) {
+      onClose();
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      for (const badgeId of badgeIdsToToggle) {
+        const result = await toggleStudentBadge(groupId, member.accountId, badgeId);
+        if (!result.ok) {
+          throw new Error(result.error || 'Nie udało się zmienić odznaki.');
+        }
+      }
+
+      initialSelectedIdsRef.current = [...selectedIds];
+      showSuccess('Odznaki uczestnika zostały zapisane.');
+      onConfirm?.(selectedIds);
+      onClose();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Nie udało się zapisać odznak.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!member) {
@@ -209,6 +239,8 @@ export default function MemberBadgesModal({
       title="Dodaj / usuń odznakę"
       subtitle={member.name}
       onConfirm={handleConfirm}
+      confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}
+      confirmDisabled={isSaving || isLoading}
       size="xl"
       className="member-modal"
     >
@@ -316,7 +348,7 @@ export default function MemberBadgesModal({
               rewardAmount={badge.rewardAmount}
               iconFile={badge.iconFile}
               selected={selectedIds.includes(badge.id)}
-              onSelectedChange={(selected) => handleToggleBadge(badge.id, selected)}
+              onSelectedChange={() => handleToggleBadge(badge.id)}
               previewOnHover
               showEarnedAt={false}
             />

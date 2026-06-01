@@ -1,9 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Button, SearchBar } from '../../../components/ui/index.js';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { useGroupActivities } from './useGroupActivities.js';
 import ActivitiesTreeTable from './shared/ActivitiesTreeTable.jsx';
 import ActivityFormModal from './modals/ActivityFormModal.jsx';
 import ActivityDeleteModal from './modals/ActivityDeleteModal.jsx';
+import ActivityAssignModal from './modals/ActivityAssignModal.jsx';
 import StageFormModal from './modals/StageFormModal.jsx';
 import StageDeleteModal from './modals/StageDeleteModal.jsx';
 import './shared/activitiesShared.css';
@@ -16,8 +19,6 @@ function filterStages(stages, query) {
     const stageMatches = stage.name.toLowerCase().includes(normalized);
     const matchingActivities = stage.activities.filter((activity) => (
       activity.name.toLowerCase().includes(normalized)
-      || (activity.description0 ?? '').toLowerCase().includes(normalized)
-      || (activity.description1 ?? '').toLowerCase().includes(normalized)
     ));
 
     if (stageMatches) {
@@ -51,6 +52,7 @@ export default function ActivitiesContent() {
     updateActivity,
     deleteActivity,
   } = useGroupActivities();
+  const { groupId } = useParams();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [newStageName, setNewStageName] = useState('');
@@ -69,6 +71,10 @@ export default function ActivitiesContent() {
     () => filterStages(stages, searchQuery),
     [stages, searchQuery],
   );
+
+  const handleToggleExpand = useCallback((stageId) => {
+    toggleStageExpanded(stageId);
+  }, [toggleStageExpanded]);
 
   const handleAddStage = useCallback(async () => {
     const result = await createStage(newStageName);
@@ -122,6 +128,15 @@ export default function ActivitiesContent() {
   }, [activeModal, deleteActivity, closeModal]);
 
   const stageRowActions = useMemo(() => ({
+    inlineActions: [
+      {
+        id: 'addActivity',
+        label: 'Dodaj aktywność',
+        iconFile: SVG_ICONS.actions.add,
+        ariaLabel: 'Dodaj aktywność do etapu',
+        onSelect: (stage) => openModal('createActivity', { stage }),
+      },
+    ],
     menuItems: [
       {
         id: 'edit',
@@ -146,9 +161,18 @@ export default function ActivitiesContent() {
   const activityRowActions = useMemo(() => ({
     inlineActions: [
       {
+        id: 'assign',
+        label: 'Przypisz aktywność',
+        iconFile: SVG_ICONS.actions.assign,
+        ariaLabel: 'Przypisz aktywność uczestnikom',
+        onSelect: ({ stage, activity }) => openModal('assignActivity', { stage, activity }),
+      },
+    ],
+    menuItems: [
+      {
         id: 'edit',
-        label: 'Edytuj',
-        ariaLabel: 'Edytuj aktywność',
+        label: 'Edytuj aktywność',
+        description: 'Zmień nazwę, opisy lub nagrodę.',
         onSelect: ({ stage, activity }) => openModal('editActivity', { stage, activity }),
       },
     ],
@@ -166,41 +190,44 @@ export default function ActivitiesContent() {
         <p className="activities-page__error" role="alert">{error}</p>
       ) : null}
 
-      <div className="activities-page__add-panel">
-        <p className="activities-page__add-label">Nazwa nowego etapu</p>
-        <div className="activities-page__add-row">
-          <input
-            type="text"
-            className="activities-page__add-input"
-            value={newStageName}
-            onChange={(event) => setNewStageName(event.target.value)}
-            placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne"
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                handleAddStage();
-              }
-            }}
-          />
-          <Button variant="primary" size="md" onClick={handleAddStage}>
-            Dodaj etap
-          </Button>
+      <div className="activities-page__controls">
+        <div className="activities-page__controls-start">
+          <div className="activities-page__add-island">
+            <input
+              type="text"
+              className="activities-page__add-input"
+              value={newStageName}
+              onChange={(event) => setNewStageName(event.target.value)}
+              placeholder="Nazwa nowego etapu"
+              aria-label="Nazwa nowego etapu"
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  handleAddStage();
+                }
+              }}
+            />
+            <Button variant="primary" size="md" onClick={handleAddStage}>
+              Dodaj etap
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="activities-page__toolbar">
-        <span className="activities-page__count">
-          Etapy
-          {' '}
-          {stages.length}
-        </span>
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj etapów i aktywności…"
-          name="activities-search"
-          className="activities-page__search"
-          aria-label="Szukaj etapów i aktywności"
-        />
+        <div className="activities-page__controls-end">
+          <span className="activities-page__count">
+            Etapy
+            {' '}
+            {stages.length}
+          </span>
+
+          <SearchBar
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Szukaj etapów i aktywności…"
+            name="activities-search"
+            className="activities-page__search"
+            aria-label="Szukaj etapów i aktywności"
+          />
+        </div>
       </div>
 
       {isLoading ? (
@@ -214,8 +241,7 @@ export default function ActivitiesContent() {
       ) : (
         <ActivitiesTreeTable
           stages={filteredStages}
-          onToggleExpand={toggleStageExpanded}
-          onAddActivity={(stage) => openModal('createActivity', { stage })}
+          onToggleExpand={handleToggleExpand}
           stageRowActions={stageRowActions}
           activityRowActions={activityRowActions}
         />
@@ -260,6 +286,13 @@ export default function ActivitiesContent() {
         onClose={closeModal}
         onConfirm={handleActivityDeleteConfirm}
         isLoading={modalLoading}
+      />
+
+      <ActivityAssignModal
+        isOpen={activeModal?.type === 'assignActivity'}
+        activity={modalActivity}
+        groupId={groupId}
+        onClose={closeModal}
       />
     </div>
   );

@@ -2,7 +2,7 @@ import AssetSvg from '../ui/AssetSvg/AssetSvg.jsx';
 
 /**
  * @param {Object} props
- * @param {string} props.id — identyfikator ikony nawigacji (np. nav-ekran-glowny)
+ * @param {string} props.id — ścieżka ikony nawigacji bez rozszerzenia (np. nav/home)
  */
 export default function NavGlyph({ id }) {
   return (

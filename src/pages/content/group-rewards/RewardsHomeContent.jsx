@@ -4,11 +4,13 @@ import {
   CurrencyDisplay,
   DataTable,
   AssetSvg,
+  InfoTooltip,
   PageHeader,
   SearchBar,
   SubNav,
   useToast,
 } from '../../../components/ui/index.js';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { useGroupRanks } from './useGroupRanks.js';
@@ -169,7 +171,7 @@ export default function RewardsHomeContent() {
     const result = await handleAssign(activeModal.rank.id, selectedStudentIds);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Ranga została przypisana.');
+      showSuccess('Przypisanie rangi zostało zapisane.');
       closeModal();
     } else {
       showError(result.error || 'Nie udało się przypisać rangi.');
@@ -183,8 +185,8 @@ export default function RewardsHomeContent() {
     inlineActions: [
       {
         id: 'assign',
-        label: 'Zmień rangę',
-        iconFile: 'ui-rank-assign.svg',
+        label: 'Przydziel rangę',
+        iconFile: SVG_ICONS.actions.assign,
         ariaLabel: 'Przypisz rangę studentom',
         onSelect: (rank) => openModal('assign', rank),
       },

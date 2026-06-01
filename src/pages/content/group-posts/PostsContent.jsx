@@ -1,455 +1,170 @@
-import { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
-
-import { publicIconPath } from '../../../utils/publicAssetUrl.js';
-
-const editicon = publicIconPath('edit-02-svgrepo-com.svg');
-const deleteicon = publicIconPath('trash-01-svgrepo-com.svg');
-import '../shared/LegacyContentLayout.css';
+import { useCallback, useMemo, useState } from 'react';
+import { Button, SearchBar } from '../../../components/ui/index.js';
+import { DataTableRowActions } from '../../../components/ui/DataTable/DataTable.jsx';
+import '../../../components/ui/DataTable/DataTable.css';
+import { useGroupPosts } from './useGroupPosts.js';
+import PostFormModal from './PostFormModal.jsx';
+import PostDeleteModal from './PostDeleteModal.jsx';
 import './PostsContent.css';
 
-export default function App() {
-
-  const { groupId } = useParams();
-
-  const [errorMessage, setErrorMessage] = useState('');
-  const [groupnamevalue, setGroupnamevalue] = useState('');
-  const [subjectnamevalue, setSubjectnamevalue] = useState('');
-  const [groupnamevalueerror, setGroupnamevalueerror] = useState('');
-  const [subjectnamevalueerror, setSubjectnamevalueerror] = useState('');
-  const [groupdescriptionvalue, setGroupdescriptionvalue] = useState('');
-  const [isVisible, setIsvisible] = useState(true);
-
-  const [bannerFile, setBannerfile] = useState(null);
-  const [bannerPreview, setBannerpreview] = useState(null);
-
-
-  const [tempPosts, setTempPosts] = useState([]);
-  const [posts, setPosts] = useState([]);
-
-
-
-
-
-  async function onFetchPosts() {
-    setErrorMessage('');
-
-    try {
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-      const url = base + '/groups/' + groupId + '/post';
-
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
-      });
-
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/post: ', response.status);
-      console.log('GET /groups/' + groupId + '/post: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/post not JSON: ' + responsetext);
-      }
-
-      console.log('GET /groups/' + groupId + '/post JSON:', data);
-
-      let receiveddata = data;
-      const receivedposts = [];
-
-      let i = 0;
-
-      while (i < receiveddata.posts.length) {
-
-        receivedposts.push({
-          id: receiveddata.posts[i].id,
-          title: receiveddata.posts[i].title,
-          text: receiveddata.posts[i].content,
-          editmode: 0
-        });
-
-        i = i + 1;
-      }
-
-      setPosts(receivedposts);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function onCreatePost(post) {
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-      const url = base + '/groups/' + groupId + '/post';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          title: post.title,
-          content: post.text
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /groups/' + groupId + '/post: ', response.status);
-      console.log('POST /groups/' + groupId + '/post: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/post not JSON: ' + responsetext);
-      }
-
-      console.log('POST /groups/' + groupId + '/post JSON:', data);
-
-      onFetchPosts();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function onUpdatePost(post) {
-    setErrorMessage('');
-    try {
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-      const url = base + '/groups/' + groupId + '/post/' + post.id;
-      const response = await fetch(url, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json', 'X-Browser-ID': browserid },
-        body: JSON.stringify({ title: post.title, content: post.text })
-      });
-      const responsetext = await response.text();
-      let data = null;
-      try { data = JSON.parse(responsetext); } catch {}
-      if (!response.ok || (data && data.updated === false)) {
-        setErrorMessage('Nie udało się zapisać zmian wpisu.');
-      }
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : String(error));
-    }
-  }
-
-  async function onDeletepostclick(id) {
-    setErrorMessage('');
-
-    const previousPosts = posts;
-    setPosts(posts.filter((p) => p.id != id));
-
-    try {
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-      const url = base + '/groups/' + groupId + '/post/' + id;
-
-      const response = await fetch(url, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid,
-        },
-      });
-
-      const responsetext = await response.text();
-      console.log('DELETE /groups/' + groupId + '/post/' + id + ':', response.status, responsetext);
-
-      let data = null;
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        // empty body is acceptable
-      }
-
-      if (!response.ok || (data && data.deleted === false)) {
-        setPosts(previousPosts);
-        setErrorMessage('Nie udało się usunąć wpisu.');
-        return;
-      }
-
-      onFetchPosts();
-    } catch (error) {
-      setPosts(previousPosts);
-      const message = error instanceof Error ? error.message : String(error);
-      setErrorMessage(message);
-    }
-  }
-
-  function onEditpostclick(id, temporary = 0) {
-
-    if (temporary == 0) {
-
-      const newposts = [];
-      let i = 0;
-
-      while (i < posts.length) {
-
-        if (posts[i].id == id) {
-
-          let updatedpost = {id: posts[i].id, title: posts[i].title, text: posts[i].text, editmode: posts[i].editmode};
-
-          if (posts[i].editmode == 0) {
-            updatedpost.editmode = 1;
-          } else if (posts[i].editmode == 1) {
-            updatedpost.editmode = 0;
-            onUpdatePost(updatedpost);
-          }
-
-          newposts.push(updatedpost);
-
-        } else {
-          newposts.push(posts[i]);
-        }
-
-        i = i + 1;
-      }
-
-      setPosts(newposts);
-
-    } else {
-
-      let movingPost = null;
-      const newTemp = [];
-      let i = 0;
-
-      while (i < tempPosts.length) {
-
-        if (tempPosts[i].id == id) {
-          movingPost = tempPosts[i];
-        } else {
-          newTemp.push(tempPosts[i]);
-        }
-
-        i = i + 1;
-      }
-
-      movingPost.editmode = 0;
-
-      onCreatePost(movingPost);
-
-      setTempPosts(newTemp);
-    }
-  }
-
-  function onPostChange(id, field, value) {
-
-    const newposts = [];
-    let i = 0;
-
-    while (i < posts.length) {
-
-      if (posts[i].id == id) {
-
-        let updatedpost = {id: posts[i].id, title: posts[i].title, text: posts[i].text, editmode: posts[i].editmode};
-
-        if (field == 'title') {
-          updatedpost.title = value;
-        } else if (field == 'text') {
-          updatedpost.text = value;
-        }
-
-        newposts.push(updatedpost);
-
-      } else {
-        newposts.push(posts[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setPosts(newposts);
-
-
-
-
-
-    const newtempposts = [];
-    i = 0;
-
-    while (i < tempPosts.length) {
-
-      if (tempPosts[i].id == id) {
-
-        let updatedpost = {id: tempPosts[i].id, title: tempPosts[i].title, text: tempPosts[i].text, editmode: tempPosts[i].editmode};
-
-        if (field == 'title') {
-          updatedpost.title = value;
-        } else if (field == 'text') {
-          updatedpost.text = value;
-        }
-
-        newtempposts.push(updatedpost);
-
-      } else {
-        newtempposts.push(tempPosts[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setTempPosts(newtempposts);
-  }
-
-
-
-
-
-  function addpost() {
-
-    const newtemp = [];
-    let i = 0;
-
-    while (i < tempPosts.length) {
-      newtemp.push(tempPosts[i]);
-      i = i + 1;
-    }
-
-    const newpost = {id: tempPosts.length, title: '', text: '', editmode: 2};
-
-    newtemp.push(newpost);
-
-    setTempPosts(newtemp);
-  }
-
-
-
-
-
-  useEffect(() => {
-    onFetchPosts();
-  }, []);
-
-
-
-
-
-  return (
-    <section className="legacy-content posts-content" aria-label="Wpisy">
-      {errorMessage ? <p className="legacy-content__error" role="alert">{errorMessage}</p> : null}
-
-      {tempPosts.length === 0 ? (
-        <div className="legacy-content__actions">
-          <button type="button" onClick={addpost} className="posts-content__add-btn">
-            + Dodaj wpis
-          </button>
-        </div>
-      ) : null}
-
-      <div className="posts-content__list">
-
-          {[...tempPosts, ...posts].map((post) => (
-
-            post.editmode < 1 ? (
-
-
-              <article key={'post' + post.id} className="posts-content__card">
-                <div className="posts-content__card-body">
-                  <h3 className="posts-content__card-title">{post.title || 'Bez tytułu'}</h3>
-                  <p className="posts-content__card-text">{post.text || 'Brak treści.'}</p>
-                </div>
-                <div className="posts-content__actions">
-                  <button type="button" onClick={() => onEditpostclick(post.id, 0)} className="posts-content__action-btn" aria-label="Edytuj wpis">
-                    <img src={editicon} alt="" />
-                  </button>
-                  <button type="button" onClick={() => onDeletepostclick(post.id)} className="posts-content__action-btn posts-content__action-btn--danger" aria-label="Usuń wpis">
-                    <img src={deleteicon} alt="" />
-                  </button>
-                </div>
-              </article>
-
-
-            ) : (
-
-              <article key={'post' + post.id} className="posts-content__card posts-content__card--editing">
-                <div className="posts-content__card-body">
-                  <input
-                    onChange={(event) => onPostChange(post.id, 'title', event.target.value)}
-                    className="posts-content__input"
-                    value={post.title}
-                    placeholder="Temat wpisu"
-                  />
-                  <textarea
-                    onChange={(event) => onPostChange(post.id, 'text', event.target.value)}
-                    className="posts-content__textarea"
-                    value={post.text}
-                    placeholder="Treść wpisu"
-                  />
-                </div>
-                <div className="posts-content__actions">
-                  <button type="button" onClick={() => onEditpostclick(post.id, post.editmode == 2 ? 1 : 0)} className="posts-content__action-btn posts-content__action-btn--primary" aria-label="Zapisz wpis">
-                    <img src={editicon} alt="" />
-                  </button>
-                  <button type="button" onClick={() => onDeletepostclick(post.id)} className="posts-content__action-btn posts-content__action-btn--danger" aria-label="Usuń wpis">
-                    <img src={deleteicon} alt="" />
-                  </button>
-                </div>
-              </article>
-            )
-          ))}
-
-
-
-
-
-
-
-
-        </div>
-    </section>
-  );
+function filterPosts(posts, query) {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return posts;
+
+  return posts.filter((post) => (
+    post.title.toLowerCase().includes(normalized)
+    || post.text.toLowerCase().includes(normalized)
+  ));
 }
 
+export default function PostsContent() {
+  const {
+    posts,
+    isLoading,
+    error,
+    createPost,
+    updatePost,
+    deletePost,
+  } = useGroupPosts();
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeModal, setActiveModal] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
+  const openModal = useCallback((type, payload = {}) => {
+    setActiveModal({ type, ...payload });
+  }, []);
 
+  const closeModal = useCallback(() => {
+    setActiveModal(null);
+  }, []);
+
+  const filteredPosts = useMemo(
+    () => filterPosts(posts, searchQuery),
+    [posts, searchQuery],
+  );
+
+  const postRowActions = useMemo(() => ({
+    menuItems: [
+      {
+        id: 'edit',
+        label: 'Edytuj wpis',
+        description: 'Zmień temat lub treść wpisu.',
+        onSelect: (post) => openModal('edit', { post }),
+      },
+    ],
+    onDelete: (post) => openModal('delete', { post }),
+    deleteLabel: 'Usuń wpis',
+    deleteAriaLabel: (post) => `Usuń wpis ${post.title || 'bez tytułu'}`,
+  }), [openModal]);
+
+  const handleCreateConfirm = useCallback(async (values) => {
+    setModalLoading(true);
+    const result = await createPost(values);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [createPost, closeModal]);
+
+  const handleEditConfirm = useCallback(async (values) => {
+    if (!activeModal?.post) return;
+    setModalLoading(true);
+    const result = await updatePost(activeModal.post.id, values);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, updatePost, closeModal]);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!activeModal?.post) return;
+    setModalLoading(true);
+    const result = await deletePost(activeModal.post.id);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, deletePost, closeModal]);
+
+  const modalPost = activeModal?.post ?? null;
+
+  return (
+    <div className="posts-page">
+      {error ? (
+        <p className="posts-page__error" role="alert">{error}</p>
+      ) : null}
+
+      <div className="posts-page__controls">
+        <span className="posts-page__count">
+          Wpisy
+          {' '}
+          {posts.length}
+        </span>
+
+        <div className="posts-page__controls-end">
+          <Button
+            variant="primary"
+            size="md"
+            className="posts-page__add-btn"
+            onClick={() => openModal('create')}
+          >
+            Dodaj wpis
+          </Button>
+
+          <SearchBar
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Szukaj wpisów…"
+            name="posts-search"
+            className="posts-page__search"
+            aria-label="Szukaj wpisów"
+          />
+        </div>
+      </div>
+
+      {isLoading ? (
+        <p className="posts-page__loading">Ładowanie wpisów…</p>
+      ) : filteredPosts.length === 0 ? (
+        <p className="posts-page__empty">
+          {posts.length === 0
+            ? 'Brak wpisów w tej grupie. Dodaj pierwszy wpis powyżej.'
+            : 'Brak wyników wyszukiwania.'}
+        </p>
+      ) : (
+        <div className="posts-islands">
+          {filteredPosts.map((post) => (
+            <article key={`post-${post.id}`} className="posts-island">
+              <div className="posts-island__content">
+                <h3 className="posts-island__title">
+                  {post.title.trim() || 'Bez tytułu'}
+                </h3>
+                <p className="posts-island__text">
+                  {post.text.trim() || 'Brak treści.'}
+                </p>
+              </div>
+              <div className="posts-island__actions">
+                <DataTableRowActions row={post} rowActions={postRowActions} />
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      <PostFormModal
+        isOpen={activeModal?.type === 'create'}
+        onClose={closeModal}
+        onConfirm={handleCreateConfirm}
+        isLoading={modalLoading}
+      />
+      <PostFormModal
+        isOpen={activeModal?.type === 'edit'}
+        post={modalPost}
+        onClose={closeModal}
+        onConfirm={handleEditConfirm}
+        isLoading={modalLoading}
+      />
+      <PostDeleteModal
+        isOpen={activeModal?.type === 'delete'}
+        post={modalPost}
+        onClose={closeModal}
+        onConfirm={handleDeleteConfirm}
+        isLoading={modalLoading}
+      />
+    </div>
+  );
+}

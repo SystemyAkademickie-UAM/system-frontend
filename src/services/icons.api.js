@@ -1,3 +1,5 @@
+import { SVG_PLACEHOLDER } from '../constants/svgIcons.js';
+
 /**
  * Katalog dostępnych ikon dla rang i odznak.
  *
@@ -9,13 +11,13 @@
 /**
  * @typedef {Object} IconCatalogItem
  * @property {string} id        — identyfikator ikony (zapisywany w `badge.icon` / `rank.icon`)
- * @property {string} fileName  — nazwa pliku SVG w `public/assets/svg/`
+ * @property {string} fileName  — ścieżka względna w `public/assets/svg/`
  * @property {string} label     — czytelna nazwa do wyświetlenia w liście
  */
 
 /** @type {IconCatalogItem[]} */
 const PLACEHOLDER_CATALOG = [
-  { id: 'placeholder.svg', fileName: 'placeholder.svg', label: 'Domyślna ikona (placeholder)' },
+  { id: SVG_PLACEHOLDER, fileName: SVG_PLACEHOLDER, label: 'Placeholder' },
 ];
 
 /**

@@ -11,6 +11,7 @@ import {
   SubNav,
   useToast,
 } from '../../../components/ui/index.js';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { getBadgeCssVars } from '../../../components/ui/Badge/badgeCssVars.js';
@@ -128,6 +129,7 @@ export default function RewardsBadgesContent() {
     students,
     isLoading,
     error,
+    groupId,
     handleCreate,
     handleUpdate,
     handleDelete,
@@ -183,10 +185,15 @@ export default function RewardsBadgesContent() {
     }
   }, [activeModal, handleDelete, closeModal, showSuccess, showError]);
 
-  const handleGiveConfirm = useCallback((selectedStudentIds) => {
-    if (!activeModal?.badge) return;
-    closeModal();
-  }, [activeModal, closeModal]);
+  const handleGiveConfirm = useCallback(({ changed, error: giveError } = {}) => {
+    if (giveError) {
+      showError(giveError);
+      return;
+    }
+    if (changed > 0) {
+      showSuccess(`Zaktualizowano odznakę u ${changed} studentów.`);
+    }
+  }, [showSuccess, showError]);
 
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
@@ -195,8 +202,8 @@ export default function RewardsBadgesContent() {
     inlineActions: [
       {
         id: 'give',
-        label: 'Daj odznakę',
-        iconFile: 'ui-badge-give.svg',
+        label: 'Przydziel odznakę',
+        iconFile: SVG_ICONS.actions.assign,
         ariaLabel: 'Daj odznakę studentom',
         onSelect: (badge) => openModal('give', badge),
       },
@@ -302,6 +309,7 @@ export default function RewardsBadgesContent() {
       <BadgeGiveModal
         isOpen={activeModal?.type === 'give'}
         badge={modalBadge}
+        groupId={groupId}
         students={students}
         onClose={closeModal}
         onConfirm={handleGiveConfirm}

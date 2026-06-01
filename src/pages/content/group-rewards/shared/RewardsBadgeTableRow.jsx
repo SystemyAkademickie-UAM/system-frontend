@@ -8,8 +8,8 @@ import './rewardsTablePreview.css';
 export default function RewardsBadgeTableRow({ row, columns, rowActions }) {
   const rowRef = useRef(null);
   const { previewVisible, previewPos, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview({
-    previewWidth: 360,
-    previewHeight: 260,
+    previewWidth: 533,
+    previewHeight: 297,
   });
 
   const handleMouseEnter = () => {

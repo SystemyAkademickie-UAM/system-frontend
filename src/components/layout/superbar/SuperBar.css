@@ -261,7 +261,7 @@
 .super-bar-user-menu__dropdown-error {
   margin: 0;
   padding: 0.5rem 1rem 0.35rem;
-  font-size: var(--font-size-body-sm, 0.875rem);
+  font-size: var(--font-size-body-sm, var(--font-size-min));
   line-height: 1.35;
   color: #ff8a8a;
 }

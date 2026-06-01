@@ -34,6 +34,23 @@ async function postJson(path, body) {
   return data;
 }
 
+const ACTIVITY_ERROR_IDS = {
+  NOT_CREATED: -1,
+  NOT_AUTHORIZED: -2,
+  NOT_FOUND: -3,
+};
+
+function assertActivityResponse(data, failureMessage) {
+  const activityId = data?.activity;
+  if (typeof activityId !== 'number' || activityId <= 0) {
+    if (activityId === ACTIVITY_ERROR_IDS.NOT_AUTHORIZED) {
+      throw new Error('Brak uprawnień do wykonania tej operacji.');
+    }
+    throw new Error(failureMessage);
+  }
+  return data;
+}
+
 function mapActivity(raw) {
   return {
     id: raw.id,
@@ -42,6 +59,10 @@ function mapActivity(raw) {
     description1: raw.educationalDescription,
     reward: raw.currency,
   };
+}
+
+function sortByNewestFirst(items) {
+  return [...items].sort((a, b) => b.id - a.id);
 }
 
 export function useGroupActivities() {
@@ -57,7 +78,7 @@ export function useGroupActivities() {
       stageId,
     });
 
-    const activities = (data?.activities ?? []).map(mapActivity);
+    const activities = sortByNewestFirst((data?.activities ?? []).map(mapActivity));
 
     setStages((prev) => prev.map((stage) => (
       stage.id === stageId
@@ -84,12 +105,12 @@ export function useGroupActivities() {
         groupId: Number(groupId),
       });
 
-      const receivedStages = (data?.stages ?? []).map((stage) => ({
+      const receivedStages = sortByNewestFirst((data?.stages ?? []).map((stage) => ({
         id: stage.id,
         name: stage.name,
         activities: [],
         expanded: false,
-      }));
+      })));
 
       setStages(receivedStages);
       setIsLoading(false);
@@ -260,19 +281,20 @@ export function useGroupActivities() {
 
   const deleteActivity = useCallback(async (stageId, activityId) => {
     try {
-      await postJson('/activities', {
+      const data = await postJson('/activities', {
         method: 'remove',
         activityId,
       });
+      assertActivityResponse(data, 'Nie udało się usunąć aktywności.');
       showSuccess('Aktywność została usunięta.');
-      await fetchStages();
+      await fetchActivitiesForStage(stageId);
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       showError(message);
       return { ok: false, error: message };
     }
-  }, [fetchStages, showSuccess, showError]);
+  }, [fetchActivitiesForStage, showSuccess, showError]);
 
   return {
     stages,
