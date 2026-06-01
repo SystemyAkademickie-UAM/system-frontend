@@ -1,4 +1,5 @@
 import { getJson, patchJson, deleteJson } from './api-client.js';
+import { getAssetUrl } from '../constants/api.constants.js';
 
 /**
  * @typedef {Object} StudentListItem
@@ -29,7 +30,11 @@ export async function fetchGroupStudents(groupId) {
     console.error('Failed to fetch students:', result.status, result.data);
     return [];
   }
-  return Array.isArray(result.data) ? result.data : [];
+  const list = Array.isArray(result.data) ? result.data : [];
+  return list.map(student => ({
+    ...student,
+    avatarUrl: getAssetUrl(student.avatarUrl)
+  }));
 }
 
 /**
