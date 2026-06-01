@@ -191,6 +191,19 @@
   /** Wartości statystyk na paskach nawigacji (życia, waluta) */
   --font-size-nav-stat: 26px;
 
+  /** Baner grupy — tytuł i opis na grafice */
+  --group-banner-min-height: 220px;
+  --group-banner-border-radius: 16px;
+  --font-size-group-banner-title: clamp(28px, 4vw, 48px);
+  --font-size-group-banner-description: var(--font-size-page-description);
+  --color-group-banner-gradient: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.88) 0%,
+    rgba(0, 0, 0, 0.5) 42%,
+    rgba(0, 0, 0, 0.18) 72%,
+    transparent 100%
+  );
+
   /* --- Aliasy (skróty) --- */
   --color-button: var(--color-accent);
   --color-button-bg: var(--color-accent);
