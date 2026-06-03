@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidation.js';
 import { fetchGroupRanks, createRank, updateRank, deleteRank } from '../../../services/ranks.api.js';
 import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/students.api.js';
 
@@ -101,6 +102,7 @@ export function useGroupRanks() {
 
     if (result.ok && result.rank) {
       await loadData();
+      notifyGroupContentChanged(groupId, 'ranks');
       return result;
     }
 
@@ -126,6 +128,7 @@ export function useGroupRanks() {
       setRanks((prev) => prev.map((r) =>
         r.id === rankId ? { ...r, ...mapRank(result.rank, r.position - 1) } : r
       ));
+      notifyGroupContentChanged(groupId, 'ranks');
     }
 
     return result;
@@ -147,6 +150,7 @@ export function useGroupRanks() {
       setStudents((prev) => prev.map((s) =>
         s.rankId === rankId ? { ...s, rankId: null, dbRankId: null } : s
       ));
+      notifyGroupContentChanged(groupId, 'ranks');
     }
 
     return result;
@@ -191,6 +195,7 @@ export function useGroupRanks() {
         }
         return s;
       }));
+      notifyGroupContentChanged(groupId, 'ranks');
     }
 
     return result;

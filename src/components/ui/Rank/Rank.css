@@ -46,11 +46,11 @@
   flex: 1 1 auto;
   margin: 0;
   min-width: 0;
-  font-family: 'Manrope', sans-serif;
+  font-family: inherit;
   font-size: 20px;
   font-weight: 700;
   line-height: 28px;
-  color: var(--color-rank-text);
+  color: var(--rank-name-color, var(--color-rank-text));
 }
 
 .maq-rank__cost {
@@ -125,7 +125,11 @@
 
 .maq-rank__check-icon {
   flex-shrink: 0;
-  color: #42f37d;
+  color: var(--rank-check-color, var(--color-accent));
+}
+
+.maq-rank--locked {
+  opacity: 0.82;
 }
 
 @media (max-width: 640px) {

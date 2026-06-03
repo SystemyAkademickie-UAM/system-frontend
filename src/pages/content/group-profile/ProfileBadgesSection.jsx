@@ -36,6 +36,7 @@ export default function ProfileBadgesSection() {
               rewardAmount={badge.rewardAmount ?? 0}
               iconFile={badge.icon}
               showEarnedAt={false}
+              className="maq-badge--grid-fit"
             />
           ))}
         </div>

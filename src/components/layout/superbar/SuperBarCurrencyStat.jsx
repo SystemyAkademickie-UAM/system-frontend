@@ -61,7 +61,7 @@ export default function SuperBarCurrencyStat({
           >
             <p className="super-bar-currency-preview__title">{currencyLabel}</p>
             <p className="super-bar-currency-preview__label">Zgromadzona</p>
-            <CurrencyDisplay amount={totalEarned} size="lg" className="super-bar-currency-preview__value" />
+            <CurrencyDisplay amount={totalEarned} size="md" className="super-bar-currency-preview__value" />
           </div>,
           document.body,
         )

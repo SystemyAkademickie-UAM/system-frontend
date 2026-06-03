@@ -93,11 +93,13 @@ export default function ProfilePageLayout({ children }) {
         </>
       ) : null}
 
-      <SubNav
-        ariaLabel={nav.ariaLabel}
-        items={nav.items}
-        className="profile-page-layout__sub-nav"
-      />
+      <div className="profile-page-layout__sub-nav-wrap">
+        <SubNav
+          ariaLabel={nav.ariaLabel}
+          items={nav.items}
+          className="profile-page-layout__sub-nav"
+        />
+      </div>
 
       <div className="profile-page-layout__content">
         {children}

@@ -107,8 +107,15 @@
   color: rgb(227, 224, 247);
 }
 
-.profile-page-layout__sub-nav {
+.profile-page-layout__sub-nav-wrap {
+  display: flex;
+  justify-content: flex-start;
   width: 100%;
+}
+
+.profile-page-layout__sub-nav {
+  width: fit-content;
+  max-width: 100%;
 }
 
 .profile-page-layout__content {
