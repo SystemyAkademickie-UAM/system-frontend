@@ -8,10 +8,15 @@ import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 import arrowrighticon from '../../../../public/assets/icons/arrow-right-svgrepo-com.svg';
 import arrowlefticon from '../../../../public/assets/icons/arrow-left-svgrepo-com.svg';
 import arrowcirclerighticon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
-import infoicon from '../../../../public/assets/icons/info-circle-svgrepo-com.svg';
-import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
-import firststageicon from '../../../../public/assets/icons/upload-01-svgrepo-com.svg';
-import laststageicon from '../../../../public/assets/icons/download-01-svgrepo-com.svg';
+import editicon from '../../../../public/assets/icons/info-circle-svgrepo-com.svg';
+import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
+import lefticon from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
+import leftlefticon from '../../../../public/assets/icons/chevron-left-double-svgrepo-com.svg';
+import righticon from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg';
+import rightrighticon from '../../../../public/assets/icons/chevron-right-double-svgrepo-com.svg';
+import unlockedicon from '../../../../public/assets/icons/check-circle-broken-svgrepo-com.svg';
+import lockedicon from '../../../../public/assets/icons/x-circle-svgrepo-com.svg';
+
 
 export default function GroupMainActivities() {
 
@@ -23,6 +28,9 @@ export default function GroupMainActivities() {
   const [currentstageindex, setCurrentstageindex] = useState(0);
   const [whichfirst, setWhichfirst] = useState(0);
   const [completedids, setCompletedids] = useState([]);
+  const [windowopen, setWindowopen] = useState(0);
+  const [selectedactivityid, setSelectedactivityid] = useState(0);
+  const [selectedactivityname, setSelectedactivityname] = useState('');
 
 
   async function onFetchStages() {
@@ -271,7 +279,34 @@ export default function GroupMainActivities() {
 
 
   function assign(activityId) {
-    console.log(activityId);
+
+    var activitynamevalue = '';
+
+    if (stages.length > 0 && currentstageindex < stages.length) {
+
+      let i = 0;
+
+      while (i < stages[currentstageindex].activities.length) {
+
+        if (stages[currentstageindex].activities[i].id == activityId) {
+          activitynamevalue = stages[currentstageindex].activities[i].name;
+        }
+
+        i = i + 1;
+      }
+
+    }
+
+    setSelectedactivityid(activityId);
+    setSelectedactivityname(activitynamevalue);
+    setWindowopen(1);
+  }
+
+
+
+
+  function closewindow() {
+    setWindowopen(0);
   }
 
 
@@ -483,24 +518,24 @@ export default function GroupMainActivities() {
 
 
   return (
-    <div className="profile-content">
-      <div className="profile-content__inner">
-        <div style = {{width: '98%', height: '7%', position: 'absolute', top: '1vh', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{currentstagename}</span></div>
+    <div>
+      <div style = {{width: '96%', height: '7%', position: 'absolute', top: '44vh', left: '3%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
+        <div style = {{width: '100%', height: '7%', position: 'absolute', top: '1vh', left: '-1%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{currentstagename}</span></div>
         <div style = {{width: '49%', height: '5%', position: 'absolute', top: '5vh', left: '1%', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>{isstudent == 1 ? (<span>{completedcount} / {totalactivities} aktywności ukończonych</span>) : (<span>{totalactivities} aktywności</span>)}</div>
         <div style = {{width: '49%', height: '5%', position: 'absolute', top: '5vh', left: '50%', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-end', paddingRight: '1%'}}>{isstudent == 1 ? (<span>Zdobyto: {earnedrewards} / {totalrewards}</span>) : (<span>{totalrewards} możliwych do zdobycia</span>)}</div>
 
 
-        <div style={{width: '98%', top: '9vh', position: 'absolute', left: '0%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
-        <div style={{width: '100%', top: '1%', position: 'relative', left: '0%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
+        <div style = {{width: '98%', top: '9vh', position: 'absolute', left: '0%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
+        <div style = {{width: '100%', top: '1%', position: 'relative', left: '0%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
 
 
           {displayactivities.map((activity) => (
 
-            <div key = {'activity' + activity.id} style={{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '4px solid ' + activity.bordercolour, borderRadius: '16px'}}>
+            <div key = {'activity' + activity.id} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '4px solid ' + activity.bordercolour, borderRadius: '16px'}}>
               {islecturer == 1 ? (
-                <img src = {arrowrighticon} style = {{width: '5%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'}}/>
+                <img src = {arrowcirclerighticon} style = {{width: '4%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'}}/>
               ) : (
-                <img src = {activity.unlocked == 1 ? arrowcirclerighticon : infoicon} style = {{width: '5%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'}}/>
+                <img src = {activity.unlocked == 1 ? unlockedicon : lockedicon} style = {{width: '4%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'}}/>
               )}
               <div style = {{width: '85%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingLeft: '2%'}}>
                 <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{activity.name}</span></div>
@@ -510,7 +545,7 @@ export default function GroupMainActivities() {
               {islecturer == 1 ? (
                 <div style = {{width: '10%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '5%'}}>
                   <div onClick = {() => assign(activity.id)} style = {{width: '50%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
+                    <img src = {editicon} style = {{width: '30%', height: '25%'}}/>
                   </div>
                   <div style = {{width: '45%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '21px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{activity.reward}</span></div>
                 </div>
@@ -524,19 +559,19 @@ export default function GroupMainActivities() {
 
         </div>
 
-        <div style = {{width: '98%', height: '10vh', position: 'relative', top: '2%', left: '1%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>
+        <div style = {{width: '100%', height: '10vh', position: 'relative', top: '2%', left: '0%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>
           <div onClick = {atfirststage == 0 ? firststage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atfirststage == 0 ? 'pointer' : 'default', opacity: atfirststage == 0 ? 1 : 0.5}}>
-            <img src = {firststageicon} style = {{width: '50%', height: '50%'}}/>
+            <img src = {leftlefticon} style = {{width: '50%', height: '50%'}}/>
           </div>
           <div onClick = {atfirststage == 0 ? previousstage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atfirststage == 0 ? 'pointer' : 'default', opacity: atfirststage == 0 ? 1 : 0.5}}>
-            <img src = {arrowlefticon} style = {{width: '50%', height: '50%'}}/>
+            <img src = {lefticon} style = {{width: '50%', height: '50%'}}/>
           </div>
           <div style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'rgb(227, 224, 247)', fontSize: '18px', fontWeight: 900}}><span>{currentpagenumber}</span></div>
           <div onClick = {atlaststage == 0 ? nextstage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atlaststage == 0 ? 'pointer' : 'default', opacity: atlaststage == 0 ? 1 : 0.5}}>
-            <img src = {arrowrighticon} style = {{width: '50%', height: '50%'}}/>
+            <img src = {righticon} style = {{width: '40%', height: '40%'}}/>
           </div>
           <div onClick = {atlaststage == 0 ? laststage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atlaststage == 0 ? 'pointer' : 'default', opacity: atlaststage == 0 ? 1 : 0.5}}>
-            <img src = {laststageicon} style = {{width: '50%', height: '50%'}}/>
+            <img src = {rightrighticon} style = {{width: '50%', height: '50%'}}/>
           </div>
         </div>
 
@@ -546,7 +581,10 @@ export default function GroupMainActivities() {
 
 </div>
       </div>
-      {errorMessage && <p className="profile-content__error">{errorMessage}</p>}
+
+      {windowopen == 1 ? (
+        <GroupMainActivitiesWindow popupclose = {closewindow} groupId = {groupId} stagename = {currentstagename} activityname = {selectedactivityname} activityid = {selectedactivityid} />
+      ) : null}
     </div>
   )
 }
