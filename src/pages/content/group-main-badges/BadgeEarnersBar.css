@@ -1,0 +1,83 @@
+.badge-earners-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 2px solid var(--color-accent);
+}
+
+.badge-earners-bar--empty {
+  min-height: 0;
+  padding: 0;
+  border-top: 0;
+}
+
+.badge-earners-bar__overflow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.badge-earners-bar__overflow:hover,
+.badge-earners-bar__overflow:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  outline: none;
+}
+
+.badge-earners-bar__overflow-tooltip {
+  position: fixed;
+  z-index: var(--z-index-toast, 12000);
+  min-width: 220px;
+  max-width: 280px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: var(--font-size-min);
+}
+
+.badge-earners-bar__overflow-title {
+  margin: 0 0 8px;
+  font-size: var(--font-size-min);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.badge-earners-bar__overflow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.badge-earners-bar__overflow-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: var(--font-size-min);
+  color: var(--color-text-secondary);
+}
+
+.badge-earners-bar__overflow-earned {
+  font-size: var(--font-size-min);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}

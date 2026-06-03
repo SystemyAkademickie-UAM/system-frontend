@@ -142,6 +142,41 @@
   color: var(--color-badge-text);
 }
 
+.maq-badge--locked {
+  opacity: 0.82;
+}
+
+.maq-badge--grid-fit {
+  max-width: none;
+  height: 100%;
+}
+
+.maq-badge--grid-fit .maq-badge__body {
+  flex: 1 1 auto;
+  align-items: stretch;
+}
+
+.maq-badge--grid-fit .maq-badge__content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.maq-badge--grid-fit .maq-badge__sections {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 1200px) {
+  .maq-badge--grid-fit .maq-badge__body {
+    gap: 1.25rem;
+    padding: 1.125rem 1rem;
+  }
+
+  .maq-badge--grid-fit .maq-badge__content {
+    padding-right: 3rem;
+  }
+}
+
 @media (max-width: 560px) {
   .maq-badge__body {
     flex-direction: column;

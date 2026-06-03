@@ -108,5 +108,21 @@ Import:
   />
 
   theme — motyw kolorystyczny (domyślnie 'default'; rozszerzalny)
+  accentColor — dynamiczny kolor akcentu (gradient rang)
+  isLocked — szary wariant dla studenta (ranga nieodblokowana)
+
+--- PlayerAvatar (awatar użytkownika) ---
+  import { PlayerAvatar } from '../../components/ui/index.js';
+
+  <PlayerAvatar
+    nickname="KrólikMarcin"
+    avatarUrl="/api/..."
+    totalEarned={150}
+    currencySymbol="🥕"
+    tooltipPlacement="left"
+  />
+
+  tooltipPlacement: right | left | top
+  Po najechaniu: nick + zgromadzona waluta
 
 Kolory: src/styles/tokens.css
