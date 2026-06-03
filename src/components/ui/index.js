@@ -12,6 +12,7 @@ export { cycleSortRule, sortRows } from './DataTable/dataTableSort.js';
 export { default as Badge, BADGE_RARITY, BADGE_RARITY_LABELS, getBadgeRarityConfig } from './Badge/Badge.jsx';
 export { default as BadgeMini } from './Badge/BadgeMini.jsx';
 export { default as Rank, RANK_THEME, getRankThemeConfig } from './Rank/Rank.jsx';
+export { default as PlayerAvatar } from './PlayerAvatar/PlayerAvatar.jsx';
 export { default as CurrencyDisplay, CurrencyIcon } from './Currency/CurrencyDisplay.jsx';
 export { default as InfoTooltip } from './InfoTooltip/InfoTooltip.jsx';
 export { ToastProvider, useToast } from './Toast/Toast.jsx';

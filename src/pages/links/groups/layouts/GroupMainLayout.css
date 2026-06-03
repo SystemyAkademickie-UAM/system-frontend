@@ -1,8 +1,11 @@
 .group-main-layout {
+  --group-main-subnav-height: 2.75rem;
+  --group-main-layout-gap: 1.25rem;
+
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 1.25rem;
+  gap: var(--group-main-layout-gap);
   min-height: 100%;
   width: 100%;
   padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
@@ -20,6 +23,8 @@
 }
 
 .group-main-layout__sub-nav-wrap {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: center;
   width: 100%;

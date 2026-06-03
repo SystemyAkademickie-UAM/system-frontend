@@ -31,12 +31,23 @@
 
 .profile-badges-section__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--badge-max-width)), 1fr));
-  align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
   gap: 1.25rem;
 }
 
 .profile-badges-section__grid .maq-badge {
   width: 100%;
-  max-width: var(--badge-max-width);
+}
+
+@media (max-width: 960px) {
+  .profile-badges-section__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-badges-section__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

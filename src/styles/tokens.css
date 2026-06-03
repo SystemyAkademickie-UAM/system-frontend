@@ -178,6 +178,7 @@
 
   --shell-sidebar-width: 224px;
   --shell-superbar-height: 63px;
+  --z-index-shell-header: 10;
 
   /* --- Typografia --- */
   /** Minimalny rozmiar czcionki w całej aplikacji */

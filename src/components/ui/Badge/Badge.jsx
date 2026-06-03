@@ -18,6 +18,7 @@ import './Badge.css';
  * @param {boolean} [props.showEarnedAt=true]
  * @param {import('react').ReactNode} [props.icon]
  * @param {string} [props.iconFile]
+ * @param {boolean} [props.isLocked=false]
  * @param {string} [props.className]
  */
 export default function Badge({
@@ -31,6 +32,7 @@ export default function Badge({
   showEarnedAt = true,
   icon,
   iconFile,
+  isLocked = false,
   className = '',
 }) {
   const config = getBadgeRarityConfig(rarity);
@@ -38,9 +40,9 @@ export default function Badge({
 
   return (
     <article
-      className={['maq-badge', className].filter(Boolean).join(' ')}
+      className={['maq-badge', isLocked ? 'maq-badge--locked' : '', className].filter(Boolean).join(' ')}
       data-rarity={rarity}
-      style={getBadgeCssVars(rarity)}
+      style={getBadgeCssVars(rarity, { isLocked })}
     >
       <span className="maq-badge__rarity">{config.label}</span>
 

@@ -17,15 +17,17 @@ export default function Rank({
   shopItems = [],
   iconFile,
   theme = RANK_THEME.default,
+  accentColor,
+  isLocked = false,
   className = '',
 }) {
   const assetName = resolveSvgAssetName(iconFile);
 
   return (
     <article
-      className={['maq-rank', className].filter(Boolean).join(' ')}
+      className={['maq-rank', isLocked ? 'maq-rank--locked' : '', className].filter(Boolean).join(' ')}
       data-theme={theme}
-      style={getRankCssVars(theme)}
+      style={getRankCssVars(theme, { accentColor, isLocked })}
     >
       <header className="maq-rank__header">
         <div className="maq-rank__icon-circle">

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidation.js';
 import { fetchGroupBadges, createBadge, updateBadge, deleteBadge } from '../../../services/badges.api.js';
 import { fetchGroupStudents } from '../../../services/students.api.js';
 
@@ -100,6 +101,7 @@ export function useGroupBadges() {
 
     if (result.ok && result.badge) {
       await loadData();
+      notifyGroupContentChanged(groupId, 'badges');
       return result;
     }
 
@@ -125,6 +127,7 @@ export function useGroupBadges() {
       setBadges((prev) => prev.map((b) =>
         b.id === badgeId ? { ...b, ...mapBadge(result.badge, b.position - 1) } : b
       ));
+      notifyGroupContentChanged(groupId, 'badges');
     }
 
     return result;
@@ -147,6 +150,7 @@ export function useGroupBadges() {
         ...s,
         earnedBadgeIds: s.earnedBadgeIds.filter((id) => id !== badgeId),
       })));
+      notifyGroupContentChanged(groupId, 'badges');
     }
 
     return result;

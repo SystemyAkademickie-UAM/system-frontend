@@ -1,7 +1,7 @@
 .super-bar {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: var(--z-index-shell-header, 10);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -296,6 +296,7 @@
   background: var(--color-bg-elevated);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
   pointer-events: none;
+  font-family: inherit;
 }
 
 .super-bar-currency-preview__title {
@@ -317,4 +318,5 @@
 
 .super-bar-currency-preview__value {
   color: var(--color-text-primary);
+  font-size: var(--font-size-body);
 }
