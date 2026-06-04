@@ -45,13 +45,28 @@
   border-color: var(--color-input-error-border);
 }
 
-.maq-toast__message {
+.maq-toast__content {
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.maq-toast__emphasis {
   margin: 0;
   font-size: var(--font-size-page-description);
-  font-weight: 400;
-  line-height: 1.4;
+  font-weight: 700;
+  line-height: 1.35;
   color: var(--color-text-primary);
+}
+
+.maq-toast__detail {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--color-text-secondary);
 }
 
 .maq-toast__close {

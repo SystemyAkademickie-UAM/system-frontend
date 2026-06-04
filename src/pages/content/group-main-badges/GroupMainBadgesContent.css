@@ -1,9 +1,25 @@
 .badge-treasury {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   width: 100%;
-  max-width: min(100%, calc(3 * var(--badge-max-width) + 2 * 1.25rem));
-  margin: 0 auto;
+}
+
+.badge-treasury__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: var(--group-main-subnav-height);
+  margin-top: calc(-1 * (var(--group-main-subnav-height) + var(--group-main-layout-gap)));
+  margin-bottom: var(--group-main-layout-gap);
+  pointer-events: none;
+}
+
+.badge-treasury__page-header {
+  max-width: min(100%, 22rem);
+  text-align: left;
+  pointer-events: auto;
 }
 
 .badge-treasury__top {
@@ -13,12 +29,8 @@
   margin-bottom: 1.5rem;
 }
 
-.badge-treasury__header {
-  min-width: 0;
-}
-
 .badge-treasury__eyebrow {
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.15rem;
   font-size: var(--font-size-body);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -144,6 +156,9 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
   gap: 1.25rem;
+  width: 100%;
+  max-width: min(100%, calc(3 * var(--badge-max-width) + 2 * 1.25rem));
+  margin: 0 auto;
 }
 
 .badge-treasury__grid .badge-treasury-card {
@@ -169,10 +184,6 @@
 }
 
 @media (max-width: 640px) {
-  .badge-treasury {
-    max-width: 100%;
-  }
-
   .badge-treasury__grid {
     grid-template-columns: minmax(0, 1fr);
   }

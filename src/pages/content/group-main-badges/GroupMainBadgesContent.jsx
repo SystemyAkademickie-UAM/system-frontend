@@ -73,12 +73,14 @@ export default function GroupMainBadgesContent() {
 
   return (
     <section className="badge-treasury" aria-label="Skarbiec odznak">
-      <div className="badge-treasury__top">
-        <header className="badge-treasury__header">
+      <div className="badge-treasury__title-row">
+        <header className="badge-treasury__page-header">
           <p className="badge-treasury__eyebrow">Skarbiec</p>
           <h1 className="badge-treasury__title">Odznaki kursu</h1>
         </header>
+      </div>
 
+      <div className="badge-treasury__top">
         <div className="badge-treasury__controls">
           <SearchBar
             value={searchQuery}

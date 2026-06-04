@@ -1,242 +1,251 @@
-import {useState, useEffect} from 'react';
-import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
-import {useToast} from '../../../components/ui/index.js';
+import { useEffect, useMemo, useState } from 'react';
 
-export default function MembersCodeContentWindow({popupclose, groupId, editCodeId, onsaved}) {
+import { Modal, useToast } from '../../../components/ui/index.js';
+import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import { getApiBaseUrl } from '../../../constants/api.constants.js';
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
+import {
+  clampExpireDateTime,
+  EXPIRE_IN_PAST_MESSAGE,
+  formatLocalDateInput,
+  formatLocalTimeInput,
+  isExpireDateTimeInPast,
+} from './enrollmentCodeExpiry.js';
+import './MembersCodeContent.css';
 
-  const [errorMessage, setErrorMessage] = useState('');
-  const {showSuccess, showError} = useToast();
+function buildExpiresAt(hasExpires, expireDate, expireTime) {
+  if (hasExpires === 0) {
+    return '';
+  }
 
-  const [inputcode, setInputcode] = useState('');
-  const [hasexpires, setHasexpires] = useState(0);
-  const [expiredate, setExpiredate] = useState('');
-  const [expiretime, setExpiretime] = useState('23:59');
-  const [hasmaxuses, setHasmaxuses] = useState(0);
-  const [maxusesvalue, setMaxusesvalue] = useState('10');
-  const [isactive, setIsactive] = useState(1);
+  if (expireDate === '') {
+    return '';
+  }
 
-  const [displaycode, setDisplaycode] = useState('');
+  return parseLocalExpireDateTime(expireDate, expireTime).toISOString();
+}
 
+function getDefaultExpireValues() {
+  const now = new Date();
+  return {
+    date: formatLocalDateInput(now),
+    time: formatLocalTimeInput(now),
+  };
+}
 
+function ModalOptionCheckbox({ id, checked, onChange, ariaLabel }) {
+  return (
+    <label className="members-code-modal__checkbox-label" htmlFor={id}>
+      <input
+        id={id}
+        type="checkbox"
+        className="members-code-modal__checkbox-input"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        aria-label={ariaLabel}
+      />
+      <span
+        className={[
+          'members-code-modal__checkbox',
+          checked ? 'members-code-modal__checkbox--checked' : '',
+        ].filter(Boolean).join(' ')}
+        aria-hidden="true"
+      >
+        {checked ? (
+          <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+        ) : null}
+      </span>
+    </label>
+  );
+}
 
+export default function MembersCodeContentWindow({ popupclose, groupId, editCodeId, onsaved }) {  const [errorMessage, setErrorMessage] = useState('');
+  const { showSuccess } = useToast();
 
-  function cleardata() {
+  const [inputCode, setInputCode] = useState('');
+  const [hasExpires, setHasExpires] = useState(0);
+  const [expireDate, setExpireDate] = useState(() => getDefaultExpireValues().date);
+  const [expireTime, setExpireTime] = useState(() => getDefaultExpireValues().time);
+  const [hasMaxUses, setHasMaxUses] = useState(0);
+  const [maxUsesValue, setMaxUsesValue] = useState('10');
+  const [isActive, setIsActive] = useState(1);
+  const [displayCode, setDisplayCode] = useState('');
+
+  const isEditMode = editCodeId !== 0;
+
+  const minExpireDate = useMemo(() => formatLocalDateInput(new Date()), [hasExpires, expireDate, expireTime]);
+  const minExpireTime = useMemo(() => {
+    if (expireDate !== minExpireDate) {
+      return '00:00';
+    }
+    return formatLocalTimeInput(new Date());
+  }, [expireDate, minExpireDate]);
+
+  const expireValidationError = useMemo(() => {
+    if (hasExpires !== 1 || !expireDate) {
+      return '';
+    }
+
+    return isExpireDateTimeInPast(expireDate, expireTime) ? EXPIRE_IN_PAST_MESSAGE : '';
+  }, [hasExpires, expireDate, expireTime]);
+
+  function clearData() {
+    const defaults = getDefaultExpireValues();
     setErrorMessage('');
-    setInputcode('');
-    setHasexpires(0);
-    setExpiredate('');
-    setExpiretime('23:59');
-    setHasmaxuses(0);
-    setMaxusesvalue('10');
-    setIsactive(1);
-    setDisplaycode('');
+    setInputCode('');
+    setHasExpires(0);
+    setExpireDate(defaults.date);
+    setExpireTime(defaults.time);
+    setHasMaxUses(0);
+    setMaxUsesValue('10');
+    setIsActive(1);
+    setDisplayCode('');
   }
 
+  function closeWindow() {
+    clearData();
+    popupclose?.();
+  }
 
+  function enableExpiration() {
+    const now = new Date();
+    setHasExpires(1);
+    const clamped = clampExpireDateTime(
+      expireDate || formatLocalDateInput(now),
+      expireTime || formatLocalTimeInput(now),
+    );
+    setExpireDate(clamped.date);
+    setExpireTime(clamped.time);
+    setErrorMessage('');
+  }
 
+  function disableExpiration() {
+    setHasExpires(0);
+    setErrorMessage('');
+  }
 
-  function closewindow() {
-    cleardata();
-    if (popupclose) {
-      popupclose();
+  function handleExpireDateChange(nextDate) {
+    const clamped = clampExpireDateTime(nextDate, expireTime);
+    setExpireDate(clamped.date);
+    setExpireTime(clamped.time);
+    setErrorMessage('');
+  }
+
+  function handleExpireTimeChange(nextTime) {
+    const clamped = clampExpireDateTime(expireDate, nextTime);
+    setExpireDate(clamped.date);
+    setExpireTime(clamped.time);
+    setErrorMessage('');
+  }
+
+  function validateExpiration() {
+    if (hasExpires !== 1) {
+      return true;
     }
+
+    if (!expireDate) {
+      setErrorMessage('Wybierz datę wygaśnięcia kodu.');
+      return false;
+    }
+
+    if (isExpireDateTimeInPast(expireDate, expireTime)) {
+      setErrorMessage(EXPIRE_IN_PAST_MESSAGE);
+      return false;
+    }
+
+    return true;
   }
 
+  function fillFromReceivedData(receivedData) {
+    setDisplayCode(receivedData.code);
 
-
-
-  function togglehasexpires() {
-    if (hasexpires == 0) {
-      setHasexpires(1);
+    if (receivedData.expiresAt != null && receivedData.expiresAt !== '') {
+      setHasExpires(1);
+      const date = new Date(receivedData.expiresAt);
+      setExpireDate(formatLocalDateInput(date));
+      setExpireTime(formatLocalTimeInput(date));
     } else {
-      setHasexpires(0);
+      setHasExpires(0);
+      const defaults = getDefaultExpireValues();
+      setExpireDate(defaults.date);
+      setExpireTime(defaults.time);
     }
+
+    if (receivedData.maxUses != null) {
+      setHasMaxUses(1);
+      setMaxUsesValue(String(receivedData.maxUses));
+    } else {
+      setHasMaxUses(0);
+      setMaxUsesValue('10');
+    }
+
+    setIsActive(receivedData.isActive === true ? 1 : 0);
   }
 
-
-
-
-  function togglehasmaxuses() {
-    if (hasmaxuses == 0) {
-      setHasmaxuses(1);
-    } else {
-      setHasmaxuses(0);
-    }
-  }
-
-
-
-
-  function toggleisactive() {
-    if (isactive == 0) {
-      setIsactive(1);
-    } else {
-      setIsactive(0);
-    }
-  }
-
-
-
-
-  function buildexpiresat() {
-    if (hasexpires == 0) {
-      return '';
-    }
-
-    if (expiredate == '') {
-      return '';
-    }
-
-    var data = expiredate.split('-');
-
-    var year = data[0];
-    var month = data[1] - 1;
-    var day = data[2];
-
-    var time = expiretime.split(':');
-    var hour = time[0];
-    var minute = time[1];
-
-    var date = new Date(year, month, day, hour, minute, 0, 0);
-
-    return date.toISOString();
-  }
-
-
-
-
-  function fillfromreceiveddata(receiveddata) {
-    setDisplaycode(receiveddata.code);
-
-    if (receiveddata.expiresAt != null && receiveddata.expiresAt != '') {
-      setHasexpires(1);
-      var date = new Date(receiveddata.expiresAt);
-      var monthnumber = date.getMonth() + 1;
-      var monthstring = String(monthnumber);
-      if (monthstring.length == 1) {
-        monthstring = '0' + monthstring;
-      }
-      var daystring = String(date.getDate());
-      if (daystring.length == 1) {
-        daystring = '0' + daystring;
-      }
-      setExpiredate(date.getFullYear() + '-' + monthstring + '-' + daystring);
-      var hourstring = String(date.getHours());
-      if (hourstring.length == 1) {
-        hourstring = '0' + hourstring;
-      }
-      var minutestring = String(date.getMinutes());
-      if (minutestring.length == 1) {
-        minutestring = '0' + minutestring;
-      }
-      setExpiretime(hourstring + ':' + minutestring);
-    } else {
-      setHasexpires(0);
-      setExpiredate('');
-      setExpiretime('23:59');
-    }
-
-    if (receiveddata.maxUses != null) {
-      setHasmaxuses(1);
-      setMaxusesvalue(String(receiveddata.maxUses));
-    } else {
-      setHasmaxuses(0);
-      setMaxusesvalue('10');
-    }
-
-    if (receiveddata.isActive == true) {
-      setIsactive(1);
-    } else {
-      setIsactive(0);
-    }
-  }
-
-
-
-
-  async function onFetchOneCode() {
-
+  async function fetchOneCode() {
     setErrorMessage('');
 
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/enrollment-codes/' + editCodeId;
+      const browserId = getOrCreateBrowserId();
+      const url = `${base}/groups/${groupId}/enrollment-codes/${editCodeId}`;
 
       const response = await fetch(url, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
 
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/enrollment-codes/' + editCodeId + ': ', response.status);
-      console.log('GET /groups/' + groupId + '/enrollment-codes/' + editCodeId + ': ', responsetext);
-
+      const responseText = await response.text();
       let data;
 
       try {
-        data = JSON.parse(responsetext);
+        data = JSON.parse(responseText);
       } catch {
-        console.log('/groups/' + groupId + '/enrollment-codes/' + editCodeId + ' not JSON: ' + responsetext);
+        throw new Error('Nie udało się odczytać kodu.');
       }
 
-      console.log('GET one enrollment code JSON:', data);
+      if (!response.ok) {
+        throw new Error(`Nie udało się pobrać kodu (status ${response.status}).`);
+      }
 
-      let receiveddata = data;
-
-      fillfromreceiveddata(receiveddata);
-
+      fillFromReceivedData(data);
     } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
+      const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
     }
   }
 
-
-
-
-  async function onCreateCode() {
-
+  async function createCode() {
     setErrorMessage('');
 
+    if (!validateExpiration()) {
+      return;
+    }
+
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/enrollment-codes';
-
+      const browserId = getOrCreateBrowserId();
+      const url = `${base}/groups/${groupId}/enrollment-codes`;
       const body = {};
 
-      if (inputcode.trim() != '') {
-        body.code = inputcode.trim();
+      if (inputCode.trim() !== '') {
+        body.code = inputCode.trim();
       }
 
-      if (hasexpires == 1) {
-        const expiresatiso = buildexpiresat();
-        if (expiresatiso != '') {
-          body.expiresAt = expiresatiso;
+      if (hasExpires === 1) {
+        const expiresAtIso = buildExpiresAt(hasExpires, expireDate, expireTime);
+        if (expiresAtIso !== '') {
+          body.expiresAt = expiresAtIso;
         }
       }
 
-      if (hasmaxuses == 1) {
-        body.maxUses = Number(maxusesvalue);
+      if (hasMaxUses === 1) {
+        body.maxUses = Number(maxUsesValue);
       }
 
       const response = await fetch(url, {
@@ -244,222 +253,204 @@ export default function MembersCodeContentWindow({popupclose, groupId, editCodeI
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
+          'X-Browser-ID': browserId,
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
 
-      const responsetext = await response.text();
-
-      console.log('POST /groups/' + groupId + '/enrollment-codes: ', response.status);
-      console.log('POST /groups/' + groupId + '/enrollment-codes: ', responsetext);
-
       if (response.status < 200 || response.status >= 300) {
-        setErrorMessage('Nie udało się wygenerować kodu (status ' + response.status + ')');
+        setErrorMessage(`Nie udało się wygenerować kodu (status ${response.status}).`);
         return;
       }
 
-      closewindow();
-
-      if (onsaved) {
-        onsaved();
-      }
+      closeWindow();
+      onsaved?.();
       showSuccess('Kod został utworzony.');
-
     } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
+      const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
     }
   }
 
-
-
-
-  async function onUpdateCode() {
-
+  async function updateCode() {
     setErrorMessage('');
 
+    if (!validateExpiration()) {
+      return;
+    }
+
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/enrollment-codes/' + editCodeId;
-
+      const browserId = getOrCreateBrowserId();
+      const url = `${base}/groups/${groupId}/enrollment-codes/${editCodeId}`;
       const body = {};
 
-      if (hasexpires == 1) {
-        const expiresatiso = buildexpiresat();
-        if (expiresatiso != '') {
-          body.expiresAt = expiresatiso;
+      if (hasExpires === 1) {
+        const expiresAtIso = buildExpiresAt(hasExpires, expireDate, expireTime);
+        if (expiresAtIso !== '') {
+          body.expiresAt = expiresAtIso;
         }
       } else {
         body.expiresAt = null;
       }
 
-      if (hasmaxuses == 1) {
-        body.maxUses = Number(maxusesvalue);
+      if (hasMaxUses === 1) {
+        body.maxUses = Number(maxUsesValue);
       } else {
         body.maxUses = null;
       }
 
-      if (isactive == 1) {
-        body.isActive = true;
-      } else {
-        body.isActive = false;
-      }
+      body.isActive = isActive === 1;
 
       const response = await fetch(url, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
+          'X-Browser-ID': browserId,
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
       });
 
-      const responsetext = await response.text();
-
-      console.log('PATCH /groups/' + groupId + '/enrollment-codes/' + editCodeId + ': ', response.status);
-      console.log('PATCH /groups/' + groupId + '/enrollment-codes/' + editCodeId + ': ', responsetext);
-
       if (response.status < 200 || response.status >= 300) {
-        setErrorMessage('Nie udało się zmienić kodu (status ' + response.status + ')');
+        setErrorMessage(`Nie udało się zmienić kodu (status ${response.status}).`);
         return;
       }
 
-      closewindow();
-
-      if (onsaved) {
-        onsaved();
-      }
+      closeWindow();
+      onsaved?.();
       showSuccess('Kod został zmieniony.');
-
     } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
+      const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
     }
   }
 
-
-
-
-  function onsaveclick() {
-    if (editCodeId == 0) {
-      onCreateCode();
+  function handleSaveClick() {
+    if (isEditMode) {
+      updateCode();
     } else {
-      onUpdateCode();
+      createCode();
     }
   }
 
-
-
-
   useEffect(() => {
-    if (editCodeId == 0) {
-      cleardata();
+    if (editCodeId === 0) {
+      clearData();
     } else {
-      onFetchOneCode();
+      fetchOneCode();
     }
   }, [editCodeId]);
 
-
-
-
-  var iseditmode = 0;
-  var savetext = 'Generuj';
-  var titletext = 'Generuj nowy kod dostępu';
-
-  if (editCodeId != 0) {
-    iseditmode = 1;
-    savetext = 'Zmień';
-    titletext = 'Edytuj kod dostępu';
-  }
-
-
-
+  const saveDisabled = Boolean(expireValidationError);
 
   return (
-    <div onClick = {closewindow} style = {{width: '100%', height: '100%', position: 'fixed', top: '0%', left: '0%', backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(2px)', zIndex: 9, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-      <div onClick = {(event) => event.stopPropagation()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '75%', height: '75%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
-        <div style = {{width: '100%', height: '12%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '24px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: '2%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{titletext}</span></div>
+    <Modal
+      isOpen
+      onClose={closeWindow}
+      title={isEditMode ? 'Edytuj kod dostępu' : 'Generuj nowy kod dostępu'}
+      onConfirm={handleSaveClick}
+      confirmLabel={isEditMode ? 'Zmień' : 'Generuj'}
+      confirmDisabled={saveDisabled}
+      size="md"
+      className="members-code-modal"
+    >
+      <div className="members-code-modal__form">
+        {errorMessage ? (
+          <p className="members-code-modal__error" role="alert">{errorMessage}</p>
+        ) : null}
 
-        <div style = {{width: '96%', position: 'relative', left: '2%', display: 'flex', flexDirection: 'column', gap: '1.5vh', overflowY: 'auto', flex: 1, paddingBottom: '2%', paddingTop: '1%'}}>
-
-          {iseditmode == 1 ? (
-            <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1.5%', paddingBottom: '1.5%', paddingLeft: '2%', paddingRight: '6%', borderRadius: '12px'}}>
-              <div style = {{width: '45%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Kod:</span></div>
-              <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-end'}}><span>{displaycode}</span></div>
-            </div>
-          ) : (
-            <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '100%', height: '10vh', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1.5%', paddingBottom: '1.5%', paddingLeft: '2%', paddingRight: '2%', borderRadius: '12px'}}>
-              <div style = {{width: '45%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Własny kod (opcjonalnie)</span></div>
-              <div style = {{width: '55%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                <input value = {inputcode} onChange = {(event) => setInputcode(event.target.value.slice(0, 6))} placeholder = "losowy kod" style = {{width: '100%', backgroundColor: 'rgb(26, 26, 42)', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', paddingTop: '1vh', paddingBottom: '1vh', paddingLeft: '2%', paddingRight: '2%', outline: 'none'}} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}/>
-              </div>
-            </div>
-          )}
-
-          <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '100%', height: '10vh', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1.5%', paddingBottom: '1.5%', paddingLeft: '2%', paddingRight: '2%', borderRadius: '12px'}}>
-            <div style = {{width: '45%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Data wygaśnięcia</span></div>
-            <div style = {{width: '55%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
-              {hasexpires == 1 ? (
-                <div style = {{width: '73%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
-                  <input type = "date" value = {expiredate} onChange = {(event) => setExpiredate(event.target.value)} style = {{width: '55%', backgroundColor: 'rgb(26, 26, 42)', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', paddingTop: '1vh', paddingBottom: '1vh', paddingLeft: '2%', paddingRight: '2%', outline: 'none'}} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}/>
-                  <input type = "time" value = {expiretime} onChange = {(event) => setExpiretime(event.target.value)} style = {{width: '40%', backgroundColor: 'rgb(26, 26, 42)', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', paddingTop: '1vh', paddingBottom: '1vh', paddingLeft: '2%', paddingRight: '2%', outline: 'none'}} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}/>
-                </div>
-              ) : null}
-              <div onClick = {togglehasexpires} style = {{backgroundColor: hasexpires == 1 ? 'rgba(66, 243, 125)' : 'rgb(26, 26, 42)', width: '25%', height: '4vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', color: hasexpires == 1 ? 'rgb(0, 57, 21)' : 'rgb(227, 224, 247)', fontSize: '16px', fontWeight: 900, cursor: 'pointer'}}><span>{hasexpires == 1 ? 'Tak' : 'Brak'}</span></div>
-            </div>
+        {isEditMode ? (
+          <div className="members-code-modal__field">
+            <span className="members-code-modal__label">Kod</span>
+            <span className="members-code-modal__code-value">{displayCode}</span>
           </div>
-
-          <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '100%', height: '10vh', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1.5%', paddingBottom: '1.5%', paddingLeft: '2%', paddingRight: '2%', borderRadius: '12px'}}>
-            <div style = {{width: '45%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Limit użyć</span></div>
-            <div style = {{width: '55%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
-
-              {hasmaxuses == 1 ? (
-                <input type = "number" min = "1" value = {maxusesvalue} onChange = {(event) => setMaxusesvalue(event.target.value)} style = {{width: '73%', backgroundColor: 'rgb(26, 26, 42)', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', paddingTop: '1vh', paddingBottom: '1vh', paddingLeft: '2%', paddingRight: '2%', outline: 'none'}} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = '')}/>
-              ) : null}
-              <div onClick = {togglehasmaxuses} style = {{backgroundColor: hasmaxuses == 1 ? 'rgba(66, 243, 125)' : 'rgb(26, 26, 42)', width: '25%', height: '4vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', color: hasmaxuses == 1 ? 'rgb(0, 57, 21)' : 'rgb(227, 224, 247)', fontSize: '16px', fontWeight: 900, cursor: 'pointer'}}><span>{hasmaxuses == 1 ? 'Tak' : 'Brak'}</span></div>
-            </div>
+        ) : (
+          <div className="members-code-modal__field">
+            <label htmlFor="members-code-custom" className="members-code-modal__label">
+              Własny kod (opcjonalnie)
+            </label>
+            <input
+              id="members-code-custom"
+              type="text"
+              className="members-code-modal__input"
+              value={inputCode}
+              onChange={(event) => setInputCode(event.target.value.slice(0, 6))}
+              placeholder="losowy kod"
+              maxLength={6}
+            />
           </div>
+        )}
 
-          {iseditmode == 1 ? (
-            <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '100%', height: '10vh', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1.5%', paddingBottom: '1.5%', paddingLeft: '2%', paddingRight: '2%', borderRadius: '12px'}}>
-              <div style = {{width: '45%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Kod aktywny</span></div>
-              <div style = {{width: '55%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
-                <div onClick = {toggleisactive} style = {{backgroundColor: isactive == 1 ? 'rgba(66, 243, 125)' : 'rgb(26, 26, 42)', width: '25%', height: '4vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', color: isactive == 1 ? 'rgb(0, 57, 21)' : 'rgb(227, 224, 247)', fontSize: '16px', fontWeight: 900, cursor: 'pointer'}}><span>{isactive == 1 ? 'Tak' : 'Nie'}</span></div>
-              </div>
-            </div>
+        <div className="members-code-modal__field">
+          <span className="members-code-modal__label">Data wygaśnięcia</span>
+          <div className="members-code-modal__option-row">
+            <input
+              type="date"
+              className="members-code-modal__input members-code-modal__input--date"
+              value={expireDate}
+              min={minExpireDate}
+              disabled={hasExpires !== 1}
+              onChange={(event) => handleExpireDateChange(event.target.value)}
+              aria-label="Data wygaśnięcia kodu"
+            />
+            <input
+              type="time"
+              className="members-code-modal__input members-code-modal__input--time"
+              value={expireTime}
+              min={hasExpires === 1 && expireDate === minExpireDate ? minExpireTime : undefined}
+              disabled={hasExpires !== 1}
+              onChange={(event) => handleExpireTimeChange(event.target.value)}
+              aria-label="Godzina wygaśnięcia kodu"
+            />
+            <ModalOptionCheckbox
+              id="members-code-expires-enabled"
+              checked={hasExpires === 1}
+              onChange={(checked) => (checked ? enableExpiration() : disableExpiration())}
+              ariaLabel="Włącz datę wygaśnięcia kodu"
+            />
+          </div>
+          {expireValidationError ? (
+            <p className="members-code-modal__field-error" role="alert">{expireValidationError}</p>
           ) : null}
-
         </div>
 
-
-
-        <div style = {{width: '96%', position: 'relative', left: '2%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%', paddingBottom: '2%', paddingTop: '1%'}}>
-          <div onClick = {closewindow} style = {{backgroundColor: 'rgb(128, 128, 128)', width: '20%', height: '5vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', color: 'rgb(26, 26, 42)', fontSize: '16px', fontWeight: 900, cursor: 'pointer'}}><span>Anuluj</span></div>
-          <div onClick = {onsaveclick} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '20%', height: '5vh', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', fontWeight: 900, cursor: 'pointer'}}><span>{savetext}</span></div>
+        <div className="members-code-modal__field">
+          <span className="members-code-modal__label">Limit użyć</span>
+          <div className="members-code-modal__option-row">
+            <input
+              type="number"
+              min="1"
+              className="members-code-modal__input members-code-modal__input--number"
+              value={maxUsesValue}
+              disabled={hasMaxUses !== 1}
+              onChange={(event) => setMaxUsesValue(event.target.value)}
+              aria-label="Limit użyć kodu"
+            />
+            <ModalOptionCheckbox
+              id="members-code-max-uses-enabled"
+              checked={hasMaxUses === 1}
+              onChange={(checked) => {
+                setHasMaxUses(checked ? 1 : 0);
+                setErrorMessage('');
+              }}
+              ariaLabel="Włącz limit użyć kodu"
+            />
+          </div>
         </div>
 
+        {isEditMode ? (
+          <div className="members-code-modal__field members-code-modal__field--inline">
+            <span className="members-code-modal__label">Kod aktywny</span>
+            <ModalOptionCheckbox
+              id="members-code-active"
+              checked={isActive === 1}
+              onChange={(checked) => setIsActive(checked ? 1 : 0)}
+              ariaLabel="Kod aktywny"
+            />
+          </div>
+        ) : null}
       </div>
-    </div>
-  )
+    </Modal>
+  );
 }

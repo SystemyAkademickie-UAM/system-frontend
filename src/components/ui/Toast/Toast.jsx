@@ -9,6 +9,42 @@ const EXIT_ANIMATION_MS = 450;
 
 let toastCounter = 0;
 
+function parseToastMessage(message, variant = 'success') {
+  if (message && typeof message === 'object') {
+    return {
+      emphasis: message.title ?? message.emphasis ?? '',
+      detail: message.detail ?? message.body ?? message.message ?? '',
+    };
+  }
+
+  const text = String(message ?? '').trim();
+  if (!text) {
+    return { emphasis: '', detail: '' };
+  }
+
+  const colonIndex = text.indexOf(': ');
+  if (colonIndex > 0) {
+    return {
+      emphasis: text.slice(0, colonIndex),
+      detail: text.slice(colonIndex + 2).trim(),
+    };
+  }
+
+  const dashMatch = text.match(/^(.+?)\s[—–-]\s(.+)$/);
+  if (dashMatch) {
+    return {
+      emphasis: dashMatch[1].trim(),
+      detail: dashMatch[2].trim(),
+    };
+  }
+
+  if (variant === 'error') {
+    return { emphasis: 'Błąd', detail: text };
+  }
+
+  return { emphasis: text, detail: '' };
+}
+
 function ToastItem({ toast, onRemove, onRegisterDismiss }) {
   const [phase, setPhase] = useState('enter');
 
@@ -27,6 +63,8 @@ function ToastItem({ toast, onRemove, onRegisterDismiss }) {
     return () => onRegisterDismiss(toast.id, null);
   }, [toast.id, beginDismiss, onRegisterDismiss]);
 
+  const { emphasis, detail } = parseToastMessage(toast.message, toast.variant);
+
   return (
     <div
       className={[
@@ -38,7 +76,14 @@ function ToastItem({ toast, onRemove, onRegisterDismiss }) {
       role={toast.variant === 'error' ? 'alert' : 'status'}
       aria-live="polite"
     >
-      <p className="maq-toast__message">{toast.message}</p>
+      <div className="maq-toast__content">
+        {emphasis ? (
+          <p className="maq-toast__emphasis">{emphasis}</p>
+        ) : null}
+        {detail ? (
+          <p className="maq-toast__detail">{detail}</p>
+        ) : null}
+      </div>
       <button
         type="button"
         className="maq-toast__close"
