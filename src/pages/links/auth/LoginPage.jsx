@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthStepTransition from '../../../components/layout/AuthStepTransition.jsx';
-import { getBrowserIdForAuth } from '../../../auth/browserIdStorage.js';
+import { getBrowserIdForAuth, hasPendingSamlBrowserId } from '../../../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import {
   AUTH_LOGIN_ACCEPT_EULA_PATH,
@@ -39,6 +39,19 @@ export default function LoginPage() {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isLogoutBusy, setIsLogoutBusy] = useState(false);
   const [logoutError, setLogoutError] = useState(null);
+  const samlRecoveryAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (session?.isLoading || session?.isAuthenticated || !hasPendingSamlBrowserId()) {
+      return;
+    }
+    if (samlRecoveryAttemptedRef.current) {
+      return;
+    }
+
+    samlRecoveryAttemptedRef.current = true;
+    void session?.refetchSession?.();
+  }, [session?.isAuthenticated, session?.isLoading, session?.refetchSession]);
 
   useEffect(() => {
     if (session?.isLoading) {

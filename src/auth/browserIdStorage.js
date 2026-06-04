@@ -92,6 +92,11 @@ export function pinBrowserIdForSamlFlow(browserId) {
   }
 }
 
+/** @returns {boolean} True while returning from SAML redirect (browser id pinned in sessionStorage). */
+export function hasPendingSamlBrowserId() {
+  return readPendingSamlBrowserId() !== null;
+}
+
 /** Clears SAML pending pin after session is established. */
 export function clearPendingSamlBrowserId() {
   try {
