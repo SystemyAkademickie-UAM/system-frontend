@@ -1,5 +1,5 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { clearPendingSamlBrowserId } from '../auth/browserIdStorage.js';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { clearPendingSamlBrowserId, hasPendingSamlBrowserId } from '../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import { AUTH_LOGIN_ME_PATH, AUTH_SAML_ME_PATH } from '../constants/authPaths.constants.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
@@ -10,6 +10,17 @@ const SessionContext = createContext(null);
 
 /** Retry delays after SAML redirect — cookies may not be visible to fetch on the first tick. */
 const SESSION_CHECK_RETRY_DELAYS_MS = [0, 100, 250, 500, 1000];
+const SESSION_CHECK_SAML_EXTRA_RETRY_DELAYS_MS = [2000, 3000];
+
+/**
+ * @returns {number[]}
+ */
+function getSessionCheckRetryDelaysMs() {
+  if (hasPendingSamlBrowserId()) {
+    return [...SESSION_CHECK_RETRY_DELAYS_MS, ...SESSION_CHECK_SAML_EXTRA_RETRY_DELAYS_MS];
+  }
+  return SESSION_CHECK_RETRY_DELAYS_MS;
+}
 
 /**
  * Mapuje rolę z backendu na APP_ROLE.
@@ -92,10 +103,19 @@ export function SessionProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionError, setSessionError] = useState(null);
+  const sessionCheckInFlightRef = useRef(false);
 
   const checkSession = useCallback(async () => {
+    if (sessionCheckInFlightRef.current) {
+      return;
+    }
+
+    sessionCheckInFlightRef.current = true;
     setIsLoading(true);
     setSessionError(null);
+
+    const retryDelaysMs = getSessionCheckRetryDelaysMs();
+
     try {
       const base = getApiBaseUrl();
       if (!base) {
@@ -103,9 +123,9 @@ export function SessionProvider({ children }) {
         return;
       }
 
-      for (let attempt = 0; attempt < SESSION_CHECK_RETRY_DELAYS_MS.length; attempt += 1) {
+      for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
         if (attempt > 0) {
-          await delay(SESSION_CHECK_RETRY_DELAYS_MS[attempt]);
+          await delay(retryDelaysMs[attempt]);
         }
 
         const apiUser = await loadApiTokenSessionUser();
@@ -142,7 +162,7 @@ export function SessionProvider({ children }) {
           return;
         }
 
-        if (attempt === SESSION_CHECK_RETRY_DELAYS_MS.length - 1) {
+        if (attempt === retryDelaysMs.length - 1) {
           setUser(null);
           setSessionError(tokenExchange.message);
           return;
@@ -154,6 +174,7 @@ export function SessionProvider({ children }) {
       setUser(null);
       setSessionError(err instanceof Error ? err.message : 'Błąd sprawdzania sesji');
     } finally {
+      sessionCheckInFlightRef.current = false;
       setIsLoading(false);
     }
   }, []);

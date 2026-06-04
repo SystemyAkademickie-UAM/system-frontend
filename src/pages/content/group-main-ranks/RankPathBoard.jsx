@@ -399,29 +399,15 @@ export default function RankPathBoard({
 
       ) : (
 
-        <div className={['rank-path-board__canvas', isStudentView ? 'rank-path-board__canvas--student' : ''].filter(Boolean).join(' ')}>
+        <div className={['rank-path-board__canvas', isStudentView ? 'rank-path-board__canvas--student' : 'rank-path-board__canvas--lecturer'].filter(Boolean).join(' ')}>
 
-          {isStudentView ? (
+          <div className="rank-path-board__track">
 
-            <div className="rank-path-board__student-layout">
+            {axisContent}
 
-              {rowsContent}
+            {rowsContent}
 
-              {axisContent}
-
-            </div>
-
-          ) : (
-
-            <>
-
-              {axisContent}
-
-              {rowsContent}
-
-            </>
-
-          )}
+          </div>
 
         </div>
 

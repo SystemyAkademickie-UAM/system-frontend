@@ -1,7 +1,7 @@
 .rank-path-board {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -45,31 +45,22 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  max-width: calc(var(--rank-max-width) + 220px + 4rem);
-  margin-left: 150px;
+  overflow: visible;
 }
 
-.rank-path-board__canvas--student {
-  max-width: none;
-}
-
-.rank-path-board__student-layout {
-  position: relative;
-  width: var(--rank-max-width);
+.rank-path-board__track {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: min(100%, calc(48px + 1rem + var(--rank-max-width) + 1.5rem + 220px));
   max-width: 100%;
+  margin-left: 100px;
 }
 
 .rank-path-board__axis {
   position: relative;
   flex: 0 0 48px;
   margin-right: 1rem;
-}
-
-.rank-path-board__canvas--student .rank-path-board__axis {
-  position: absolute;
-  top: 0;
-  right: calc(100% + 1rem);
-  margin-right: 0;
 }
 
 .rank-path-board__axis-track {
@@ -142,8 +133,7 @@
 }
 
 .rank-path-board__canvas--student .rank-path-board__rows {
-  max-width: none;
-  width: 100%;
+  max-width: var(--rank-max-width);
 }
 
 @media (max-width: 960px) {
@@ -152,21 +142,20 @@
   }
 
   .rank-path-board__canvas {
-    flex-direction: column;
-    align-items: stretch;
+    justify-content: stretch;
   }
 
-  .rank-path-board__canvas--student .rank-path-board__student-layout {
+  .rank-path-board__track {
     width: 100%;
-  }
-
-  .rank-path-board__axis,
-  .rank-path-board__canvas--student .rank-path-board__axis {
-    display: none;
-  }
-
-  .rank-path-board__canvas {
     margin-left: 0;
+  }
+
+  .rank-path-board__canvas--student .rank-path-board__rows {
+    max-width: none;
+  }
+
+  .rank-path-board__axis {
+    display: none;
   }
 }
 
