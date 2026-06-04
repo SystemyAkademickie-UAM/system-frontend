@@ -6,8 +6,31 @@ import '../../group-activities/shared/activitiesShared.css';
 import './memberModals.css';
 
 function ProgressActivityRow({ activity, completed, onToggle }) {
+  const handleRowClick = () => {
+    onToggle();
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onToggle();
+    }
+  };
+
   return (
-    <tr className="activities-island__row member-progress-tree__row">
+    <tr
+      className={[
+        'activities-island__row',
+        'member-progress-tree__row',
+        completed ? 'member-progress-tree__row--completed' : '',
+      ].filter(Boolean).join(' ')}
+      onClick={handleRowClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-pressed={completed}
+      aria-label={`${activity.name} — ${completed ? 'ukończona' : 'nieukończona'}`}
+    >
       <td className="activities-island__cell activities-island__cell--name">
         <span className="activities-island__activity-name">{activity.name}</span>
       </td>
@@ -25,22 +48,17 @@ function ProgressActivityRow({ activity, completed, onToggle }) {
         <CurrencyDisplay amount={activity.currency ?? 0} size="sm" />
       </td>
       <td className="activities-island__cell activities-island__cell--actions member-progress-tree__cell--status">
-        <label
-          className="member-progress-tree__checkbox-label"
-          onClick={(event) => event.stopPropagation()}
-          onKeyDown={(event) => event.stopPropagation()}
+        <span
+          className={[
+            'member-progress-tree__checkbox',
+            completed ? 'member-progress-tree__checkbox--checked' : '',
+          ].filter(Boolean).join(' ')}
+          aria-hidden="true"
         >
-          <input
-            type="checkbox"
-            className="member-progress-tree__checkbox"
-            checked={completed}
-            onChange={onToggle}
-            aria-label={`Oznacz aktywność ${activity.name} jako ukończoną`}
-          />
-          <span className="member-progress-tree__checkbox-text">
-            {completed ? 'Ukończona' : 'Nieukończona'}
-          </span>
-        </label>
+          {completed ? (
+            <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+          ) : null}
+        </span>
       </td>
     </tr>
   );
@@ -109,20 +127,20 @@ function ProgressStageIsland({ stage, progress, isExpanded, onToggleExpand, onTo
           {activityCount === 0 ? (
             <p className="activities-island__empty">Brak aktywności w tym etapie.</p>
           ) : (
-            <div className="activities-island__table-wrap">
-              <table className="activities-island__table">
+            <div className="activities-island__table-wrap member-progress-tree__table-wrap">
+              <table className="activities-island__table member-progress-tree__table">
                 <thead>
                   <tr>
-                    <th className="activities-island__th" scope="col">Nazwa</th>
-                    <th className="activities-island__th activities-island__th--hide-mobile" scope="col">
+                    <th className="activities-island__th member-progress-tree__th--name" scope="col">Nazwa</th>
+                    <th className="activities-island__th activities-island__th--hide-mobile member-progress-tree__th--story" scope="col">
                       Opis fabularny
                     </th>
-                    <th className="activities-island__th activities-island__th--hide-mobile" scope="col">
+                    <th className="activities-island__th activities-island__th--hide-mobile member-progress-tree__th--edu" scope="col">
                       Opis dydaktyczny
                     </th>
-                    <th className="activities-island__th" scope="col">Nagroda</th>
-                    <th className="activities-island__th activities-island__th--actions" scope="col">
-                      Postęp
+                    <th className="activities-island__th member-progress-tree__th--reward" scope="col">Nagroda</th>
+                    <th className="activities-island__th activities-island__th--actions member-progress-tree__th--status" scope="col">
+                      <span className="visually-hidden">Ukończona</span>
                     </th>
                   </tr>
                 </thead>

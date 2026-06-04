@@ -4,6 +4,15 @@ import { fetchStudentProgress, toggleStudentActivity } from '../../../../service
 import MemberProgressTree from './MemberProgressTree.jsx';
 import './memberModals.css';
 
+function sortProgressStagesNewestFirst(stages) {
+  return [...stages]
+    .sort((a, b) => b.id - a.id)
+    .map((stage) => ({
+      ...stage,
+      activities: [...stage.activities].sort((a, b) => b.id - a.id),
+    }));
+}
+
 export default function MemberProgressModal({
   isOpen,
   member,
@@ -43,7 +52,7 @@ export default function MemberProgressModal({
 
       initialProgressRef.current = { ...nextProgress };
       setProgress(nextProgress);
-      setStages(progressStages);
+      setStages(sortProgressStagesNewestFirst(progressStages));
       setIsLoading(false);
     }
 
@@ -124,7 +133,7 @@ export default function MemberProgressModal({
       confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}
       confirmDisabled={isSaving || isLoading}
       size="xl"
-      className="member-modal"
+      className="member-modal member-modal--progress"
     >
       <div className="member-modal__toolbar">
         <SearchBar

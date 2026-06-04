@@ -354,26 +354,92 @@
   width: 100%;
 }
 
-.member-progress-tree__cell--status {
-  text-align: right;
+.maq-modal.member-modal--progress .maq-modal__dialog {
+  max-width: min(96vw, 72rem);
 }
 
-.member-progress-tree__checkbox-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.5rem;
+.member-progress-tree .activities-island__table-wrap,
+.member-progress-tree__table-wrap {
+  overflow-x: visible;
+}
+
+.member-progress-tree__table {
+  min-width: 0;
+  width: 100%;
+}
+
+.member-progress-tree__th--name,
+.member-progress-tree .activities-island__cell--name {
+  width: 18%;
+}
+
+.member-progress-tree__th--story {
+  width: 28%;
+}
+
+.member-progress-tree__th--edu {
+  width: 28%;
+}
+
+.member-progress-tree__th--reward {
+  width: 10%;
+}
+
+.member-progress-tree__th--status,
+.member-progress-tree__cell--status {
+  width: 4.5rem;
+}
+
+.member-progress-tree__row {
   cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.member-progress-tree__row:hover {
+  background: rgba(66, 243, 125, 0.04);
+}
+
+.member-progress-tree__row:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.member-progress-tree__row--completed {
+  box-shadow: inset 0 0 0 2px var(--color-accent);
+  background: rgba(66, 243, 125, 0.06);
+}
+
+.member-progress-tree__row--completed:hover {
+  background: rgba(66, 243, 125, 0.1);
+}
+
+.member-progress-tree__cell--status {
+  text-align: center;
 }
 
 .member-progress-tree__checkbox {
-  accent-color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 8px;
+  background: transparent;
+  color: rgb(0, 57, 21);
+  pointer-events: none;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.member-progress-tree__checkbox-text {
-  font-size: var(--font-size-min);
-  font-weight: 600;
-  color: var(--color-text-secondary);
+.member-progress-tree__checkbox--checked {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px rgba(66, 243, 125, 0.35);
+}
+
+.member-progress-tree__checkbox .maq-asset-svg--mask {
+  width: 1.125rem;
+  height: 1.125rem;
 }
 
 @media (max-width: 640px) {
