@@ -1,9 +1,12 @@
 import ProfilePageLayout from '../group-profile/ProfilePageLayout.jsx';
+import ProfileEq from './ProfileEqContentContent.jsx';
 
 export default function ProfileEqContent() {
   return (
     <ProfilePageLayout>
-      <p className="profile-page-layout__message">Ekwipunek — w przygotowaniu.</p>
+      <ProfileEq></ProfileEq>
     </ProfilePageLayout>
   );
 }
+
+
