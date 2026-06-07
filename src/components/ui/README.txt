@@ -111,6 +111,23 @@ Import:
   accentColor — dynamiczny kolor akcentu (gradient rang)
   isLocked — szary wariant dla studenta (ranga nieodblokowana)
 
+--- ProductCard (kafelek produktu sklepu) ---
+  import { ProductCard } from '../../components/ui/index.js';
+
+  <ProductCard
+    name="Konsultacja z Mistrzem"
+    storyDescription="Trzydzieści minut bezpośredniego łącza z Wielkim Mistrzem programu."
+    didacticDescription="Indywidualna rozmowa wideo 15 minut w celu rozwiązania blokad na ścieżce nauki."
+    priceAmount={1200}
+    priceEmoji="🥕"
+    imageUrl="/api/..."
+    badgeLabel="Epicka"
+    onBuy={() => {}}
+  />
+
+  priceEmoji — opcjonalne nadpisanie symbolu waluty (jak rewardEmoji w Badge);
+  bez propsa CurrencyDisplay korzysta z GroupCurrencyContext (placeholder 🥕).
+
 --- PlayerAvatar (awatar użytkownika) ---
   import { PlayerAvatar } from '../../components/ui/index.js';
 

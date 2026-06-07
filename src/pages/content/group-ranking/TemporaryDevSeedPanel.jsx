@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { isNodeProduction } from '../../../utils/nodeEnv.js';
+import { seedTemporaryShopItems } from '../group-shop/temporarySeedShopItems.js';
 import { seedGroupData } from './temporarySeedGroupData.js';
 import './TemporaryDevSeedPanel.css';
 
@@ -34,15 +35,37 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
     const lines = [];
 
     try {
-      await seedGroupData({
-        groupId,
-        count: SEED_COUNT,
-        onLog: (line) => {
-          lines.push(line);
-          setLogText(lines.join('\n'));
-        },
-        ...options,
-      });
+      if (options.seedShopItems) {
+        await seedTemporaryShopItems({
+          groupId,
+          count: SEED_COUNT,
+          onLog: (line) => {
+            lines.push(line);
+            setLogText(lines.join('\n'));
+          },
+        });
+      }
+
+      if (
+        options.seedStages
+        || options.seedActivities
+        || options.seedRanks
+        || options.seedBadges
+      ) {
+        await seedGroupData({
+          groupId,
+          count: SEED_COUNT,
+          onLog: (line) => {
+            lines.push(line);
+            setLogText(lines.join('\n'));
+          },
+          seedStages: options.seedStages,
+          seedActivities: options.seedActivities,
+          seedRanks: options.seedRanks,
+          seedBadges: options.seedBadges,
+        });
+      }
+
       onComplete?.();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -78,6 +101,7 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
             seedActivities: true,
             seedRanks: true,
             seedBadges: true,
+            seedShopItems: true,
           })}
         >
           {isBusy ? 'Generowanie…' : `Wszystko (×${SEED_COUNT})`}
@@ -113,6 +137,14 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
           onClick={() => runSeed({ seedStages: false, seedActivities: false, seedRanks: false, seedBadges: true })}
         >
           Odznaki
+        </button>
+        <button
+          type="button"
+          className="temporary-dev-seed__btn"
+          disabled={isBusy}
+          onClick={() => runSeed({ seedShopItems: true })}
+        >
+          Produkty sklepu
         </button>
       </div>
 
