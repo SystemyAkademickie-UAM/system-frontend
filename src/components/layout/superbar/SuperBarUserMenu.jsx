@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { logoutUser, isLogoutAvailable } from '../../../services/authService.js';
 import { IconUserPlaceholder } from './ShellIcons.jsx';
 import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
+import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import './SuperBar.css';
 
 /**
@@ -75,7 +76,11 @@ export default function SuperBarUserMenu({
       >
         <span className="super-bar-user-menu__avatar" aria-hidden="true">
           {avatarUrl ? (
-            <img src={avatarUrl} alt="" className="super-bar-user-menu__avatar-img" />
+            <img
+              src={avatarUrl}
+              alt=""
+              className={getAvatarImageClassName(avatarUrl, 'super-bar-user-menu__avatar-img')}
+            />
           ) : (
             <IconUserPlaceholder />
           )}

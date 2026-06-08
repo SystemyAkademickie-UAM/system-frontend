@@ -78,7 +78,7 @@ export function mapBadgeForTreasury(badge, index, earnedBadgeIds = null) {
     dbId,
     position: index + 1,
     name: badge.name || 'Nieznana odznaka',
-    iconFile: badge.icon || '🏅',
+    iconFile: badge.icon ? `backend:${badge.icon}` : '🏅',
     rarity: badge.rarity || BADGE_RARITY.common,
     storyDescription: badge.storyDescription || '',
     didacticDescription: badge.educationalDescription || '',

@@ -38,7 +38,7 @@ export function mapRankForPath(rank, index) {
     dbId: rank.id,
     position: index + 1,
     name: rank.name || 'Nieznana ranga',
-    iconFile: rank.icon || '⭐',
+    iconFile: rank.icon ? `backend:${rank.icon}` : '⭐',
     costAmount: rank.requiredPoints ?? 0,
     costEmoji: '🥕',
     storyDescription: rank.storyDescription || '',

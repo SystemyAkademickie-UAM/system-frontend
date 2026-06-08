@@ -32,7 +32,7 @@ function mapRank(rank, index) {
     position: index + 1,
     name: rank.name || 'Nieznana ranga',
     icon: rank.icon || '⭐',
-    iconFile: rank.icon || '⭐',
+    iconFile: rank.icon ? `backend:${rank.icon}` : '⭐',
     costAmount: rank.requiredPoints || 0,
     costEmoji: '🥕',
     storyDescription: rank.storyDescription || '',
@@ -91,9 +91,10 @@ export function useGroupRanks() {
   const handleCreate = useCallback(async (values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
+    const iconVal = values.iconFile || '⭐';
     const result = await createRank(groupId, {
       name: values.name,
-      icon: values.iconFile || '⭐',
+      icon: iconVal.replace('backend:', ''),
       requiredPoints: values.costAmount || 0,
       storyDescription: values.storyDescription || '',
       storeDiscount: values.storeDiscount || 0,
@@ -115,9 +116,10 @@ export function useGroupRanks() {
     const rank = ranks.find((r) => r.id === rankId);
     if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
 
+    const iconVal = values.iconFile || values.icon;
     const result = await updateRank(groupId, rank.dbId, {
       name: values.name,
-      icon: values.iconFile || values.icon,
+      icon: iconVal.replace('backend:', ''),
       requiredPoints: values.costAmount,
       storyDescription: values.storyDescription,
       storeDiscount: values.storeDiscount,

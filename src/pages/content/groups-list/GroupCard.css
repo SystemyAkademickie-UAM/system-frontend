@@ -41,6 +41,10 @@
   object-fit: cover;
 }
 
+.group-card__banner--color {
+  object-fit: unset;
+}
+
 .group-card__banner-fallback {
   display: flex;
   flex-direction: column;

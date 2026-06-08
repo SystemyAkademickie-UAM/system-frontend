@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { isColorBannerRef, parseColorBannerRef } from '../../../constants/drive.constants.js';
 import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useSession } from '../../../context/SessionContext.jsx';
@@ -15,10 +16,17 @@ import './GroupCard.css';
  */
 export default function GroupCard({ group }) {
   const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
+  const isColorBanner = isColorBannerRef(group.bannerUrl);
+  const colorBannerValue = parseColorBannerRef(group.bannerUrl);
+  const showFallback = !isColorBanner && (bannerFailed || !group.bannerUrl);
   const { role } = useAppRole();
   const { user } = useSession();
   const { showNickname } = useLeaderDisplayPreferences();
-  const showFallback = bannerFailed || !group.bannerUrl;
+
+  useEffect(() => {
+    setBannerFailed(!group.bannerUrl || isColorBannerRef(group.bannerUrl));
+  }, [group.bannerUrl]);
+
   const targetPath = group.isMine ? groupMainPath(group.id) : groupRootPath(group.id);
   const lecturerDisplay = resolveGroupLecturerDisplay(group, { role, showNickname, user });
 
@@ -26,7 +34,13 @@ export default function GroupCard({ group }) {
     <article className="group-card">
       <Link className="group-card__link" to={targetPath}>
         <div className="group-card__banner-wrap">
-          {showFallback ? (
+          {isColorBanner ? (
+            <div
+              className="group-card__banner group-card__banner--color"
+              style={{ backgroundColor: colorBannerValue ?? '#3b82f6' }}
+              aria-hidden="true"
+            />
+          ) : showFallback ? (
             <div className="group-card__banner-fallback" aria-hidden="true">
               <AssetSvg
                 name={SVG_PLACEHOLDER}

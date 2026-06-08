@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
+import {
+  buildBannerImageRefPayload,
+  createDefaultBannerPickerValue,
+} from '../../../utils/groupBannerRef.js';
 import './GroupsListCreator.css';
-
 
 const GROUP_NAME_MAX = 64;
 const SUBJECT_NAME_MAX = 64;
@@ -14,9 +18,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
   const [groupnamevalueerror, setGroupnamevalueerror] = useState('');
   const [subjectnamevalueerror, setSubjectnamevalueerror] = useState('');
   const [groupdescriptionvalue, setGroupdescriptionvalue] = useState('');
-
-  const [bannerfile, setBannerfile] = useState(null);
-  const [bannerpreview, setBannerpreview] = useState(null);
+  const [bannerSelection, setBannerSelection] = useState(createDefaultBannerPickerValue);
 
   function onGroupnamechange(value) {
     const trimmed = value.length > GROUP_NAME_MAX ? value.slice(0, GROUP_NAME_MAX) : value;
@@ -45,15 +47,14 @@ export default function GroupsListCreator({ onClose, onCreated }) {
   }
 
   function onTemplatesgalleryclick() {
-    // Galeria szablonów — placeholder.
+    setBannerSelection((current) => ({ ...current, mode: 'gallery' }));
   }
 
   function resetForm() {
     setGroupnamevalue('');
     setSubjectnamevalue('');
     setGroupdescriptionvalue('');
-    setBannerfile(null);
-    setBannerpreview(null);
+    setBannerSelection(createDefaultBannerPickerValue());
     setGroupnamevalueerror('');
     setSubjectnamevalueerror('');
     setErrorMessage('');
@@ -64,38 +65,15 @@ export default function GroupsListCreator({ onClose, onCreated }) {
     onClose?.();
   }
 
-  function onUploadbannerclick() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        setBannerfile(file);
-        const reader = new FileReader();
-        reader.onload = () => {
-          setBannerpreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-    input.click();
-  }
-
-  function onRemovebannerclick() {
-    setBannerfile(null);
-    setBannerpreview(null);
-  }
-
-  async function uploadBannerToDrive(url, browserid) {
+  async function uploadBannerToDrive(url, browserid, file) {
     const formdata = new FormData();
     const drivejson = {
-      drive: { method: 'post', driveRef: '', size: bannerfile.size },
+      drive: { method: 'post', driveRef: '', size: file.size },
     };
     formdata.append('json', JSON.stringify(drivejson));
-    formdata.append('banner', bannerfile, bannerfile.name);
+    formdata.append('banner', file, file.name);
 
-    const driveresponse = await fetch(url + '/drive', {
+    const driveresponse = await fetch(`${url}/drive`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'X-Browser-ID': browserid },
@@ -112,10 +90,17 @@ export default function GroupsListCreator({ onClose, onCreated }) {
     if (!driveresponse.ok || drivedata.statusCode === 403) {
       throw new Error('Błąd /drive.');
     }
-    if (typeof drivedata.driveRef != 'string' || drivedata.driveRef.trim() == '') {
+    if (typeof drivedata.driveRef !== 'string' || drivedata.driveRef.trim() === '') {
       throw new Error('Pusty driveRef.');
     }
     return drivedata.driveRef.trim();
+  }
+
+  async function resolveImageRefForSave(base, browserid) {
+    if (bannerSelection.mode === 'file' && bannerSelection.file) {
+      return uploadBannerToDrive(base, browserid, bannerSelection.file);
+    }
+    return buildBannerImageRefPayload(bannerSelection);
   }
 
   async function onSavegroupclick() {
@@ -128,11 +113,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
     try {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
-
-      let imageref = null;
-      if (bannerfile) {
-        imageref = await uploadBannerToDrive(base, browserid);
-      }
+      const imageref = await resolveImageRefForSave(base, browserid);
 
       const datatopost = {
         group: {
@@ -141,11 +122,11 @@ export default function GroupsListCreator({ onClose, onCreated }) {
           description: groupdescriptionvalue,
         },
       };
-      if (imageref) {
+      if (imageref !== undefined) {
         datatopost.group.imageRef = imageref;
       }
 
-      const response = await fetch(base + '/groups/new', {
+      const response = await fetch(`${base}/groups/new`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -192,6 +173,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
       aria-labelledby="groups-list-creator-title"
       onClick={(event) => event.stopPropagation()}
     >
+      <div className="groups-list-creator__body">
       <header className="groups-list-creator__header">
         <div className="groups-list-creator__titles">
           <h2 id="groups-list-creator-title" className="groups-list-creator__title">
@@ -247,28 +229,13 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               autoComplete="off"
             />
           </div>
-          <div className="groups-list-creator__field" style={{ gridColumn: '1 / -1' }}>
-            <label className="groups-list-creator__label">Baner grupy</label>
-            <button
-              type="button"
-              className="groups-list-creator__banner"
-              onClick={onUploadbannerclick}
-            >
-              {bannerpreview ? (
-                <img src={bannerpreview} alt="Podgląd banera" />
-              ) : (
-                'Dodaj baner'
-              )}
-            </button>
-            {bannerpreview ? (
-              <button
-                type="button"
-                className="groups-list-creator__btn groups-list-creator__btn--secondary"
-                onClick={onRemovebannerclick}
-              >
-                Usuń baner
-              </button>
-            ) : null}
+          <div className="groups-list-creator__field groups-list-creator__field--banner">
+            <span className="groups-list-creator__label">Baner grupy</span>
+            <GroupBannerPicker
+              value={bannerSelection}
+              onChange={setBannerSelection}
+              className="groups-list-creator__banner-picker"
+            />
           </div>
         </div>
       </section>
@@ -288,8 +255,9 @@ export default function GroupsListCreator({ onClose, onCreated }) {
           {errorMessage}
         </p>
       ) : null}
+      </div>
 
-      <footer className="groups-list-creator__footer">
+      <footer className="groups-list-creator__footer groups-list-creator__footer--sticky">
         <div className="groups-list-creator__footer-spacer" />
         <button
           type="button"

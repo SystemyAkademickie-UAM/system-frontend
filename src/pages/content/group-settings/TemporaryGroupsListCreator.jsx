@@ -2,7 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, useToast } from '../../../components/ui/index.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
+import {
+  buildBannerImageRefPayload,
+  createDefaultBannerPickerValue,
+  parseImageRefToBannerPickerValue,
+} from '../../../utils/groupBannerRef.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
 import { createGroup, fetchGroupById, updateGroup } from '../groups-list/groupsList.api.js';
 import './GroupSettingsForm.css';
 
@@ -21,11 +27,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
   const [groupdescriptionvalue, setGroupdescriptionvalue] = useState('');
   const [isVisible, setIsvisible] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-
-  const [bannerfile, setBannerfile] = useState(null);
-  const [bannerpreview, setBannerpreview] = useState(null);
-  const [existingBannerUrl, setExistingBannerUrl] = useState(null);
-  const [bannerRemoved, setBannerRemoved] = useState(false);
+  const [bannerSelection, setBannerSelection] = useState(createDefaultBannerPickerValue);
   const [isLoadingGroup, setIsLoadingGroup] = useState(false);
 
   useEffect(() => {
@@ -39,8 +41,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
         setGroupnamevalue(group.storyName ?? '');
         setSubjectnamevalue(group.subject ?? '');
         setGroupdescriptionvalue(group.description ?? '');
-        setExistingBannerUrl(group.bannerUrl ?? null);
-        setBannerRemoved(false);
+        setBannerSelection(parseImageRefToBannerPickerValue(group.imageRef, group.bannerUrl));
       })
       .finally(() => {
         if (!cancelled) setIsLoadingGroup(false);
@@ -71,42 +72,17 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
     setSubjectnamevalue(trimmed);
   }
 
-  function onUploadbannerclick() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
-      setBannerfile(file);
-      setBannerRemoved(false);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setBannerpreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  }
-
-  function onRemovebannerclick() {
-    setBannerfile(null);
-    setBannerpreview(null);
-    setExistingBannerUrl(null);
-    setBannerRemoved(true);
-  }
-
-  async function uploadBannerToDrive(url, browserid) {
+  async function uploadBannerToDrive(url, browserid, file) {
     const formdata = new FormData();
     const drivejson = {
       drive: {
         method: 'post',
         driveRef: '',
-        size: bannerfile.size,
+        size: file.size,
       },
     };
     formdata.append('json', JSON.stringify(drivejson));
-    formdata.append('banner', bannerfile, bannerfile.name);
+    formdata.append('banner', file, file.name);
 
     const driveresponse = await fetch(`${url}/drive`, {
       method: 'POST',
@@ -133,6 +109,13 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
     return drivedata.driveRef.trim();
   }
 
+  async function resolveImageRefForSave(base, browserid) {
+    if (bannerSelection.mode === 'file' && bannerSelection.file) {
+      return uploadBannerToDrive(base, browserid, bannerSelection.file);
+    }
+    return buildBannerImageRefPayload(bannerSelection);
+  }
+
   async function onSavegroupclick() {
     if (groupnamevalue.length < 1) {
       setGroupnamevalueerror('musi zawierać minimum 1 znak.');
@@ -145,21 +128,15 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
     try {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
-
-      let imageref = null;
-      if (bannerfile) {
-        imageref = await uploadBannerToDrive(base, browserid);
-      }
+      const imageref = await resolveImageRefForSave(base, browserid);
 
       const payload = {
         name: groupnamevalue.trim(),
         subjectName: subjectnamevalue.trim(),
         description: groupdescriptionvalue.trim(),
       };
-      if (imageref) {
+      if (imageref !== undefined) {
         payload.imageRef = imageref;
-      } else if (bannerRemoved && groupId) {
-        payload.imageRef = '';
       }
 
       const result = groupId
@@ -177,10 +154,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
           setGroupnamevalue(refreshed.storyName ?? '');
           setSubjectnamevalue(refreshed.subject ?? '');
           setGroupdescriptionvalue(refreshed.description ?? '');
-          setExistingBannerUrl(refreshed.bannerUrl ?? null);
-          setBannerfile(null);
-          setBannerpreview(null);
-          setBannerRemoved(false);
+          setBannerSelection(parseImageRefToBannerPickerValue(refreshed.imageRef, refreshed.bannerUrl));
         }
       }
 
@@ -198,16 +172,13 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
     setGroupnamevalue('');
     setSubjectnamevalue('');
     setGroupdescriptionvalue('');
-    setBannerfile(null);
-    setBannerpreview(null);
+    setBannerSelection(createDefaultBannerPickerValue());
     setGroupnamevalueerror('');
     setSubjectnamevalueerror('');
     setErrorMessage('');
     setIsvisible(false);
     popupclose?.();
   }
-
-  const displayedBanner = bannerpreview || existingBannerUrl;
 
   if (!isVisible) {
     return null;
@@ -253,18 +224,11 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
           </div>
           <div className="group-settings-form__field group-settings-form__field--banner">
             <span className="group-settings-form__label">Baner grupy</span>
-            <button type="button" className="group-settings-form__banner" onClick={onUploadbannerclick}>
-              {displayedBanner ? (
-                <img src={displayedBanner} alt="Podgląd banera" />
-              ) : (
-                'Dodaj baner'
-              )}
-            </button>
-            {displayedBanner ? (
-              <Button variant="secondary" size="sm" onClick={onRemovebannerclick}>
-                Usuń baner
-              </Button>
-            ) : null}
+            <GroupBannerPicker
+              value={bannerSelection}
+              onChange={setBannerSelection}
+              className="group-settings-form__banner-picker"
+            />
           </div>
         </div>
       </div>

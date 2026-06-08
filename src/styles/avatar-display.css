@@ -1,0 +1,5 @@
+.maq-avatar-image--scaled {
+  object-fit: cover;
+  transform: scale(1.45);
+  transform-origin: center center;
+}

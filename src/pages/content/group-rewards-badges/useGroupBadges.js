@@ -32,7 +32,7 @@ function mapBadge(badge, index) {
     position: index + 1,
     name: badge.name || 'Nieznana odznaka',
     icon: badge.icon || '🏅',
-    iconFile: badge.icon || '🏅',
+    iconFile: badge.icon ? `backend:${badge.icon}` : '🏅',
     rarity: badge.rarity || 'common',
     storyDescription: badge.storyDescription || '',
     didacticDescription: badge.educationalDescription || '',
@@ -90,9 +90,10 @@ export function useGroupBadges() {
   const handleCreate = useCallback(async (values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
+    const iconVal = values.iconFile || '🏅';
     const result = await createBadge(groupId, {
       name: values.name,
-      icon: values.iconFile || '🏅',
+      icon: iconVal.replace('backend:', ''),
       educationalDescription: values.didacticDescription || '',
       storyDescription: values.storyDescription || '',
       rewardAmount: values.rewardAmount || 0,
@@ -114,9 +115,10 @@ export function useGroupBadges() {
     const badge = badges.find((b) => b.id === badgeId);
     if (!badge) return { ok: false, error: 'Odznaka nie istnieje' };
 
+    const iconVal = values.iconFile || values.icon;
     const result = await updateBadge(groupId, badge.dbId, {
       name: values.name,
-      icon: values.iconFile || values.icon,
+      icon: iconVal.replace('backend:', ''),
       educationalDescription: values.didacticDescription,
       storyDescription: values.storyDescription,
       rewardAmount: values.rewardAmount,

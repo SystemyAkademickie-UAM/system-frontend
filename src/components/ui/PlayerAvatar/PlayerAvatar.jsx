@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 
+import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import './PlayerAvatar.css';
 
 
@@ -222,7 +223,12 @@ export default function PlayerAvatar({
 
         {avatarUrl ? (
 
-          <img src={avatarUrl} alt="" className="maq-player-avatar__image" decoding="async" />
+          <img
+            src={avatarUrl}
+            alt=""
+            className={getAvatarImageClassName(avatarUrl, 'maq-player-avatar__image')}
+            decoding="async"
+          />
 
         ) : (
 

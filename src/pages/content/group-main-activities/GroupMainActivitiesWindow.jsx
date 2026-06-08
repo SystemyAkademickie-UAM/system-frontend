@@ -3,9 +3,11 @@ import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import {useToast} from '../../../components/ui/index.js';
 
-import closeicon from '../../../../public/assets/icons/x-close-svgrepo-com.svg';
-import unlockedicon from '../../../../public/assets/icons/check-circle-broken-svgrepo-com.svg';
-import lockedicon from '../../../../public/assets/icons/x-circle-svgrepo-com.svg';
+import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
+
+const closeicon = PUBLIC_UI_ICONS.close;
+const unlockedicon = PUBLIC_UI_ICONS.unlocked;
+const lockedicon = PUBLIC_UI_ICONS.locked;
 
 export default function GroupMainActivitiesWindow({popupclose, groupId, stagename, activityname, activityid}) {
 

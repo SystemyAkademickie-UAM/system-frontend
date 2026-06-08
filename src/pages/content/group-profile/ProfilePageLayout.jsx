@@ -3,6 +3,7 @@ import { SubNav } from '../../../components/ui/index.js';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { formatProfileNumber } from '../../../services/studentProfile.api.js';
+import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { ProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
 import { useGroupStudentProfile } from './useGroupStudentProfile.js';
 import './ProfilePageLayout.css';
@@ -52,7 +53,7 @@ export default function ProfilePageLayout({ children }) {
                 <img
                   src={avatarUrl}
                   alt=""
-                  className="profile-page-layout__avatar"
+                  className={getAvatarImageClassName(avatarUrl, 'profile-page-layout__avatar')}
                 />
               ) : (
                 <div className="profile-page-layout__avatar profile-page-layout__avatar--placeholder" />

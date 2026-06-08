@@ -7,6 +7,7 @@ import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
+import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useToast } from '../../../components/ui/index.js';
 
 import { appHelpPath } from '../../../routes/pathRegistry.js';
@@ -390,7 +391,11 @@ export default function SettingsContent() {
 
                 {selectedAvatar?.imageUrl ? (
 
-                  <img src={selectedAvatar.imageUrl} alt="" />
+                  <img
+                    src={selectedAvatar.imageUrl}
+                    alt=""
+                    className={getAvatarImageClassName(selectedAvatar.imageUrl)}
+                  />
 
                 ) : null}
 

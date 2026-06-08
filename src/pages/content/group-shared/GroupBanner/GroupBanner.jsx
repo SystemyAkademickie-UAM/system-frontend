@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { isColorBannerRef, parseColorBannerRef } from '../../../../constants/drive.constants.js';
 import { SVG_PLACEHOLDER } from '../../../../constants/svgIcons.js';
 import { splitGroupStoryTitle } from './splitGroupStoryTitle.js';
 import './GroupBanner.css';
@@ -22,13 +23,15 @@ export default function GroupBanner({
   className = '',
 }) {
   const [bannerFailed, setBannerFailed] = useState(!bannerUrl);
-  const showFallback = bannerFailed || !bannerUrl;
+  const isColorBanner = isColorBannerRef(bannerUrl);
+  const colorBannerValue = parseColorBannerRef(bannerUrl);
+  const showFallback = !isColorBanner && (bannerFailed || !bannerUrl);
   const { primary, accentLines } = splitGroupStoryTitle(storyName);
   const trimmedDescription = String(description ?? '').trim();
   const bannerLabel = [primary, ...accentLines].filter(Boolean).join(' ');
 
   useEffect(() => {
-    setBannerFailed(!bannerUrl);
+    setBannerFailed(!bannerUrl || isColorBannerRef(bannerUrl));
   }, [bannerUrl]);
 
   return (
@@ -37,7 +40,13 @@ export default function GroupBanner({
       aria-label={bannerLabel || 'Grupa'}
     >
       <div className="group-banner__media">
-        {showFallback ? (
+        {isColorBanner ? (
+          <div
+            className="group-banner__image group-banner__image--color"
+            style={{ backgroundColor: colorBannerValue ?? '#3b82f6' }}
+            aria-hidden="true"
+          />
+        ) : showFallback ? (
           <div className="group-banner__fallback" aria-hidden="true">
             <AssetSvg
               name={SVG_PLACEHOLDER}
