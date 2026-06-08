@@ -1,5 +1,6 @@
 import { publicAssetPath } from './publicAssetUrl.js';
 import { SVG_PLACEHOLDER } from '../constants/svgIcons.js';
+import { getAssetUrl } from '../constants/api.constants.js';
 
 export { SVG_PLACEHOLDER as SVG_PLACEHOLDER_FILENAME };
 
@@ -29,6 +30,12 @@ export function resolveSvgAssetName(filename) {
  */
 export function svgAssetPath(filename) {
   const resolved = resolveSvgAssetName(filename);
+
+  if (resolved.startsWith('backend:')) {
+    const backendFilename = resolved.replace('backend:', '');
+    return getAssetUrl(`assets/icons/${backendFilename}`);
+  }
+
   return publicAssetPath(`assets/svg/${resolved}`);
 }
 

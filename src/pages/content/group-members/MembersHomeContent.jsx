@@ -4,6 +4,7 @@ import { DataTable, CurrencyDisplay, PageHeader, SearchBar, SubNav, useToast } f
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
+import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useGroupMembers } from './useGroupMembers.js';
 
 import MemberBadgesModal from './modals/MemberBadgesModal.jsx';
@@ -152,12 +153,14 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--user',
       render: (member) => (
         <div className="members-table__user">
-          <img
-            src={member.avatar}
-            alt=""
-            className="members-table__avatar"
-            loading="lazy"
-          />
+          <span className="members-table__avatar-wrap">
+            <img
+              src={member.avatar}
+              alt=""
+              className={getAvatarImageClassName(member.avatar, 'members-table__avatar-img')}
+              loading="lazy"
+            />
+          </span>
           <div className="members-table__user-info">
             <span className="members-table__name">{member.name}</span>
             {member.nickname && member.nickname !== member.name && (

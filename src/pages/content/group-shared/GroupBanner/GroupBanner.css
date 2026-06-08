@@ -24,6 +24,10 @@
   object-position: center;
 }
 
+.group-banner__image--color {
+  object-fit: unset;
+}
+
 .group-banner__fallback {
   display: flex;
   flex-direction: column;

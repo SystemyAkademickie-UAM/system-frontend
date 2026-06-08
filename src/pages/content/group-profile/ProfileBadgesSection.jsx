@@ -34,7 +34,7 @@ export default function ProfileBadgesSection() {
               storyDescription={badge.storyDescription || '—'}
               didacticDescription={badge.educationalDescription || '—'}
               rewardAmount={badge.rewardAmount ?? 0}
-              iconFile={badge.icon}
+              iconFile={badge.icon ? `backend:${badge.icon}` : '🏅'}
               showEarnedAt={false}
               className="maq-badge--grid-fit"
             />

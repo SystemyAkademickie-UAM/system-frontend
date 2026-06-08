@@ -5,10 +5,12 @@ import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import {useToast} from '../../../components/ui/index.js';
 
-import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
-import deleteicon from '../../../../public/assets/icons/trash-01-svgrepo-com.svg';
-import accepticon from '../../../../public/assets/icons/check-svgrepo-com.svg';
-import cancelicon from '../../../../public/assets/icons/x-close-svgrepo-com.svg';
+import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
+
+const editicon = PUBLIC_UI_ICONS.edit;
+const deleteicon = PUBLIC_UI_ICONS.delete;
+const accepticon = PUBLIC_UI_ICONS.accept;
+const cancelicon = PUBLIC_UI_ICONS.cancel;
 
 export default function App() {
 

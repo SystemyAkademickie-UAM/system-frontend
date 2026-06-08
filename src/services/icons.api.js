@@ -1,29 +1,26 @@
-import { SVG_PLACEHOLDER } from '../constants/svgIcons.js';
-
-/**
- * Katalog dostępnych ikon dla rang i odznak.
- *
- * Docelowo pobierany z backendu (GET /icons). Na razie zwraca placeholder
- * — gdy w bazie pojawi się tabela ikon, wystarczy podmienić implementację
- * na fetch i zachować kontrakt zwracanej tablicy.
- */
+import { getJson } from './api-client.js';
 
 /**
  * @typedef {Object} IconCatalogItem
- * @property {string} id        — identyfikator ikony (zapisywany w `badge.icon` / `rank.icon`)
- * @property {string} fileName  — ścieżka względna w `public/assets/svg/`
- * @property {string} label     — czytelna nazwa do wyświetlenia w liście
+ * @property {string} id
+ * @property {string} fileName
+ * @property {string} label
  */
 
-/** @type {IconCatalogItem[]} */
-const PLACEHOLDER_CATALOG = [
-  { id: SVG_PLACEHOLDER, fileName: SVG_PLACEHOLDER, label: 'Placeholder' },
-];
-
 /**
- * Zwraca dostępne ikony.
+ * Zwraca dostępne ikony z backendu.
  * @returns {Promise<IconCatalogItem[]>}
  */
 export async function fetchIconCatalog() {
-  return PLACEHOLDER_CATALOG;
+  const result = await getJson('/gamification/icons');
+  if (!result.ok || !Array.isArray(result.data)) {
+    console.error('Failed to fetch icons catalog:', result.status, result.data);
+    return [];
+  }
+
+  return result.data.map((icon) => ({
+    id: `backend:${icon.filename}`,
+    fileName: `backend:${icon.filename}`,
+    label: icon.name || icon.filename,
+  }));
 }

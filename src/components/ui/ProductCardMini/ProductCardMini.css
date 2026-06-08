@@ -1,0 +1,53 @@
+.maq-product-card-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.maq-product-card-mini__thumb-wrap {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-bg-elevated);
+}
+
+.maq-product-card-mini__thumb {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.maq-product-card-mini__thumb-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0.35rem;
+  opacity: 0.65;
+}
+
+.maq-product-card-mini__content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.maq-product-card-mini__name {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.maq-product-card-mini__price {
+  color: var(--color-accent);
+}

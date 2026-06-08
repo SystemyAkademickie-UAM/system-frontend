@@ -1,0 +1,20 @@
+.rewards-shop-items__toggle {
+  flex-shrink: 0;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.rewards-shop-items__hint {
+  margin: 0;
+  max-width: 42rem;
+  font-size: var(--font-size-body);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .rewards-shop-items__toggle {
+    align-self: stretch;
+    width: 100%;
+  }
+}

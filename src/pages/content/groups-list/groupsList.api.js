@@ -12,7 +12,8 @@ const GROUP_RESPONSE_NOT_AUTHORIZED = 1;
  * @property {string} storyName - Display name (groupName from backend)
  * @property {string} subject - Subject name
  * @property {string} lecturer - Lecturer name(s)
- * @property {string | null} bannerUrl - Banner image URL (or null)
+ * @property {string | null} bannerUrl - Banner image URL, color ref (color:#hex) or null
+ * @property {string | null} [imageRef] - Raw image_ref from backend
  * @property {string | null} description - Group description
  * @property {boolean} [isMine] - Whether the user has access to this group
  */
@@ -24,6 +25,7 @@ const GROUP_RESPONSE_NOT_AUTHORIZED = 1;
  * @returns {GroupListItem}
  */
 function mapBackendGroup(backendGroup, options = {}) {
+  const imageRef = backendGroup.imageRef ?? backendGroup.bannerId ?? null;
   return {
     id: String(backendGroup.id),
     storyName: backendGroup.groupName || backendGroup.name || '',
@@ -31,7 +33,8 @@ function mapBackendGroup(backendGroup, options = {}) {
     // zwracamy pustą wartość, żeby pole nie kopiowało się z nazwy grupy.
     subject: backendGroup.subjectName || '',
     lecturer: backendGroup.lecturers || '',
-    bannerUrl: buildDriveBannerUrl(backendGroup.bannerId),
+    imageRef: imageRef ? String(imageRef) : null,
+    bannerUrl: buildDriveBannerUrl(imageRef),
     description: backendGroup.description || null,
     isMine: options.isMine,
   };

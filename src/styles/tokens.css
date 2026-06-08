@@ -167,6 +167,9 @@
   --font-size-activity-title: 14px;
   --font-size-activity-body: 14px;
 
+  /** Sklep — kafelek produktu */
+  --product-card-max-width: 320px;
+
   /** Odznaka — wariant kompaktowy (podgląd przy mini) */
   --badge-compact-max-width: 533px;
   --size-badge-icon-circle-compact: 48px;
@@ -182,7 +185,7 @@
 
   /* --- Typografia --- */
   /** Minimalny rozmiar czcionki w całej aplikacji */
-  --font-size-min: 14px;
+  --font-size-min: 12px;
   /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
   --font-size-body: 14px;
   /** Nagłówek strony */

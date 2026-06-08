@@ -5,17 +5,19 @@ import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 
-import arrowrighticon from '../../../../public/assets/icons/arrow-right-svgrepo-com.svg';
-import arrowlefticon from '../../../../public/assets/icons/arrow-left-svgrepo-com.svg';
-import arrowcirclerighticon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
-import editicon from '../../../../public/assets/icons/info-circle-svgrepo-com.svg';
+import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
-import lefticon from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
-import leftlefticon from '../../../../public/assets/icons/chevron-left-double-svgrepo-com.svg';
-import righticon from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg';
-import rightrighticon from '../../../../public/assets/icons/chevron-right-double-svgrepo-com.svg';
-import unlockedicon from '../../../../public/assets/icons/check-circle-broken-svgrepo-com.svg';
-import lockedicon from '../../../../public/assets/icons/x-circle-svgrepo-com.svg';
+
+const arrowrighticon = PUBLIC_UI_ICONS.arrowRight;
+const arrowlefticon = PUBLIC_UI_ICONS.arrowLeft;
+const arrowcirclerighticon = PUBLIC_UI_ICONS.arrowCircleRight;
+const editicon = PUBLIC_UI_ICONS.info;
+const lefticon = PUBLIC_UI_ICONS.chevronLeft;
+const leftlefticon = PUBLIC_UI_ICONS.chevronLeftDouble;
+const righticon = PUBLIC_UI_ICONS.chevronRight;
+const rightrighticon = PUBLIC_UI_ICONS.chevronRightDouble;
+const unlockedicon = PUBLIC_UI_ICONS.unlocked;
+const lockedicon = PUBLIC_UI_ICONS.locked;
 
 
 export default function GroupMainActivities() {

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { fetchAvatars } from '../../../services/profile.api.js';
+import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import './AuthCard.css';
 import './RegisterProfile.css';
 
@@ -165,7 +166,7 @@ export default function RegisterProfile({
               <img
                 src={selectedAvatar.imageUrl}
                 alt={selectedAvatar.name ?? `Avatar ${selectedAvatar.id}`}
-                className="register-profile__avatar-image"
+                className={getAvatarImageClassName(selectedAvatar.imageUrl, 'register-profile__avatar-image')}
               />
             ) : (
               <AvatarPlaceholder className="register-profile__avatar-image" />
