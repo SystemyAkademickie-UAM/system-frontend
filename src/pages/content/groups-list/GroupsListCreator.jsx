@@ -259,20 +259,22 @@ export default function GroupsListCreator({ onClose, onCreated }) {
 
       <footer className="groups-list-creator__footer groups-list-creator__footer--sticky">
         <div className="groups-list-creator__footer-spacer" />
-        <button
-          type="button"
-          className="groups-list-creator__btn groups-list-creator__btn--ghost"
-          onClick={onRejectclick}
-        >
-          Odrzuć
-        </button>
-        <button
-          type="button"
-          className="groups-list-creator__btn groups-list-creator__btn--primary"
-          onClick={onSavegroupclick}
-        >
-          Zapisz
-        </button>
+        <div className="groups-list-creator__footer-actions">
+          <button
+            type="button"
+            className="groups-list-creator__btn groups-list-creator__btn--ghost"
+            onClick={onRejectclick}
+          >
+            Odrzuć
+          </button>
+          <button
+            type="button"
+            className="groups-list-creator__btn groups-list-creator__btn--primary"
+            onClick={onSavegroupclick}
+          >
+            Zapisz
+          </button>
+        </div>
       </footer>
     </article>
   );

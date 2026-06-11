@@ -31,27 +31,25 @@
   height: 14px;
 }
 
-.maq-info-tooltip__bubble {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 8px);
-  z-index: calc(var(--z-index-modal) + 1);
+.maq-info-tooltip__bubble--portal {
+  position: fixed;
+  z-index: var(--z-index-tooltip);
   width: max-content;
-  max-width: 240px;
+  max-width: min(240px, calc(100vw - 16px));
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--color-bg-elevated);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  transform: translateX(-50%);
   font-size: var(--font-size-body);
   line-height: 1.45;
   color: var(--color-text-primary);
   text-align: left;
   pointer-events: none;
+  transform: translate(-50%, calc(-100% - 8px));
 }
 
-.maq-info-tooltip__bubble::after {
+.maq-info-tooltip__bubble--portal::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -59,4 +57,15 @@
   transform: translateX(-50%);
   border: 6px solid transparent;
   border-top-color: var(--color-bg-elevated);
+}
+
+.maq-info-tooltip__bubble--portal.maq-info-tooltip__bubble--below {
+  transform: translate(-50%, 8px);
+}
+
+.maq-info-tooltip__bubble--portal.maq-info-tooltip__bubble--below::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--color-bg-elevated);
 }

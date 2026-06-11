@@ -1,0 +1,99 @@
+/**
+ * Wspólny układ podstron — wzorzec jak Uczestnicy (members-page).
+ * Używaj z: group-main-layout / app-page-layout + page-unavailable + members-page
+ * lub komponentem AppSectionPage (strony aplikacji: admin, superadmin, ustawienia).
+ */
+
+.group-main-layout > .page-unavailable,
+.app-page-layout > .page-unavailable {
+  padding: 0;
+}
+
+.app-page-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--group-main-layout-gap, 1.25rem);
+  min-height: 100%;
+  width: 100%;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+}
+
+.members-page {
+  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.members-page__header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.members-page__header-row .maq-page-header {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.members-page__header-action {
+  flex-shrink: 0;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.members-page__nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.members-page__sub-nav {
+  flex: 0 1 auto;
+}
+
+.members-page__search {
+  width: 100%;
+  max-width: 18rem;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.members-page__notice {
+  margin: 0;
+  width: 100%;
+  padding: 2rem 1.5rem;
+  border-radius: 16px;
+  background: var(--color-bg-surface);
+  font-size: var(--font-size-page-description);
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .members-page__header-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .members-page__header-action {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .members-page__nav-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .members-page__search {
+    max-width: none;
+    margin-left: 0;
+  }
+}

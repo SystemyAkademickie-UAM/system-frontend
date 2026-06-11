@@ -2,9 +2,8 @@
   display: flex;
   flex-direction: column;
   align-self: stretch;
-  gap: 1.5rem;
+  gap: 1.25rem;
   width: 100%;
-  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 .posts-page__error {
@@ -17,41 +16,7 @@
 }
 
 .posts-page__controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
   width: 100%;
-  box-sizing: border-box;
-}
-
-.posts-page__controls-end {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex: 0 1 auto;
-  margin-left: auto;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.posts-page__add-btn {
-  flex-shrink: 0;
-  white-space: nowrap;
-  min-width: 9.5rem;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-.posts-page__search {
-  width: 18rem;
-  max-width: 18rem;
-  flex: 0 0 auto;
-}
-
-.posts-page .posts-page__search.maq-search-bar {
-  width: 18rem;
-  max-width: 18rem;
 }
 
 .posts-page__count {
@@ -63,7 +28,7 @@
   background: var(--color-accent-muted);
   color: var(--color-accent);
   font-size: var(--font-size-body);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .posts-page__loading,
@@ -111,7 +76,7 @@
 .posts-island__title {
   margin: 0;
   font-size: 1.0625rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.35;
   color: var(--color-text-primary);
   overflow-wrap: anywhere;

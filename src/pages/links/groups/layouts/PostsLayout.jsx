@@ -1,8 +1,7 @@
 import { Outlet } from 'react-router-dom';
-import '../layouts/GroupMainLayout.css';
+import './GroupMainLayout.css';
 
-/** Layout: lista sklepu oraz /shop/add */
-export default function ShopLayout() {
+export default function PostsLayout() {
   return (
     <div className="group-main-layout">
       <Outlet />

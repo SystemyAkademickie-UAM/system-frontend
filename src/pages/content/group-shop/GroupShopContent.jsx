@@ -36,6 +36,9 @@ import {
 import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
 import ShopBuyModal from './modals/ShopBuyModal.jsx';
 import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
+import '../../../components/page/PageUnavailable.css';
+import '../shared/groupSectionPage.css';
+import '../group-members/MembersHomeContent.css';
 import './GroupShopContent.css';
 
 const ITEMS_PER_PAGE = 10;
@@ -188,14 +191,14 @@ export default function GroupShopContent() {
     : null;
 
   return (
-    <section className="group-shop" aria-label="Sklep">
-      <div className="group-shop__header">
+    <section className="page-unavailable members-page group-shop-page" aria-label="Sklep">
+      <div className="members-page__header-row group-shop-page__header-row">
         <PageHeader
           title="Sklep"
           description="Przeglądaj i wymieniaj zgromadzoną walutę na bonusy dydaktyczne."
         />
 
-        <div className="group-shop__header-actions">
+        <div className="group-shop-page__header-actions">
           <Button
             type="button"
             variant="ghost"
@@ -235,7 +238,7 @@ export default function GroupShopContent() {
         </div>
       </div>
 
-      <div className="group-shop__toolbar">
+      <div className="group-shop-page__toolbar group-shop__toolbar">
         <SearchBar
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}

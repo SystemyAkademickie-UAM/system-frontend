@@ -182,6 +182,10 @@
   --shell-sidebar-width: 224px;
   --shell-superbar-height: 63px;
   --z-index-shell-header: 10;
+  --z-index-modal: 1000;
+  --z-index-page-overlay: 1100;
+  --z-index-tooltip: 12100;
+  --z-index-toast: 12200;
 
   /* --- Typografia --- */
   /** Minimalny rozmiar czcionki w całej aplikacji */

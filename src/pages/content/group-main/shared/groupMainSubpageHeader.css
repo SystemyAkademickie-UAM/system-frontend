@@ -1,0 +1,56 @@
+.group-main-subpage__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: var(--group-main-subnav-height);
+  margin-top: calc(-1 * (var(--group-main-subnav-height) + var(--group-main-layout-gap)));
+  margin-bottom: var(--group-main-layout-gap);
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.group-main-subpage__page-header {
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-width: min(100%, 22rem);
+  text-align: left;
+  pointer-events: auto;
+}
+
+.group-main-subpage__eyebrow {
+  margin: 0 0 0.15rem;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.group-main-subpage__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.group-main-subpage__actions {
+  flex-shrink: 0;
+  margin-left: auto;
+  pointer-events: auto;
+}
+
+.group-main-subpage__add-btn {
+  white-space: nowrap;
+  min-width: 9.5rem;
+}
+
+@media (max-width: 960px) {
+  .group-main-subpage__title-row {
+    margin-bottom: 1rem;
+  }
+}
