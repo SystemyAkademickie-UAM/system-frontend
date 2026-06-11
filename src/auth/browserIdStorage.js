@@ -1,14 +1,24 @@
 import {
   BROWSER_ID_LOCAL_STORAGE_KEY,
   BROWSER_ID_LOCAL_STORAGE_KEY_LEGACY,
+  BROWSER_ID_LOCAL_STORAGE_KEY_ORPHAN,
   BROWSER_ID_SAML_PENDING_SESSION_KEY,
   BROWSER_ID_UUID_REGEX,
 } from '../constants/browserId.constants.js';
+
+function removeOrphanBrowserIdKey() {
+  try {
+    globalThis.localStorage?.removeItem(BROWSER_ID_LOCAL_STORAGE_KEY_ORPHAN);
+  } catch {
+    // ignore
+  }
+}
 
 function readStoredBrowserId() {
   try {
     const current = globalThis.localStorage?.getItem(BROWSER_ID_LOCAL_STORAGE_KEY);
     if (typeof current === 'string' && current.trim().length > 0) {
+      removeOrphanBrowserIdKey();
       return current.trim();
     }
     const legacy = globalThis.localStorage?.getItem(BROWSER_ID_LOCAL_STORAGE_KEY_LEGACY);
@@ -16,6 +26,14 @@ function readStoredBrowserId() {
       const migrated = legacy.trim();
       globalThis.localStorage?.setItem(BROWSER_ID_LOCAL_STORAGE_KEY, migrated);
       globalThis.localStorage?.removeItem(BROWSER_ID_LOCAL_STORAGE_KEY_LEGACY);
+      removeOrphanBrowserIdKey();
+      return migrated;
+    }
+    const orphan = globalThis.localStorage?.getItem(BROWSER_ID_LOCAL_STORAGE_KEY_ORPHAN);
+    if (typeof orphan === 'string' && orphan.trim().length > 0 && BROWSER_ID_UUID_REGEX.test(orphan.trim())) {
+      const migrated = orphan.trim();
+      globalThis.localStorage?.setItem(BROWSER_ID_LOCAL_STORAGE_KEY, migrated);
+      removeOrphanBrowserIdKey();
       return migrated;
     }
   } catch {
@@ -28,6 +46,7 @@ function writeStoredBrowserId(id) {
   try {
     globalThis.localStorage?.setItem(BROWSER_ID_LOCAL_STORAGE_KEY, id);
     globalThis.localStorage?.removeItem(BROWSER_ID_LOCAL_STORAGE_KEY_LEGACY);
+    removeOrphanBrowserIdKey();
   } catch {
     // ignore
   }
@@ -64,13 +83,22 @@ export function getOrCreateBrowserId() {
 }
 
 /**
- * Browser id for authenticated API calls — prefers SAML RelayState pin from sessionStorage.
+ * Browser id for authenticated API calls — prefers SAML RelayState pin from sessionStorage
+ * when it matches persisted localStorage (stale pending pins are discarded).
  * @returns {string}
  */
 export function getBrowserIdForAuth() {
+  const storedBrowserId = readStoredBrowserId();
   const pendingSamlBrowserId = readPendingSamlBrowserId();
   if (pendingSamlBrowserId !== null) {
+    if (storedBrowserId !== null && pendingSamlBrowserId !== storedBrowserId) {
+      clearPendingSamlBrowserId();
+      return storedBrowserId;
+    }
     return pendingSamlBrowserId;
+  }
+  if (storedBrowserId !== null) {
+    return storedBrowserId;
   }
   return getOrCreateBrowserId();
 }

@@ -45,3 +45,37 @@
   font-weight: 700;
   color: var(--color-accent);
 }
+
+.shop-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.shop-edit-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.shop-edit-form__label {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.shop-edit-form__input,
+.shop-edit-form__textarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.shop-edit-form__textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
