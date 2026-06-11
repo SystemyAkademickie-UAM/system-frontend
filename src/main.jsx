@@ -7,6 +7,7 @@ import { ToastProvider } from './components/ui/Toast/Toast.jsx';
 import { AppRoleProvider } from './context/AppRoleContext.jsx';
 import { createAppRouter } from './routes/createAppRouter.jsx';
 import './styles/tokens.css';
+import './styles/messages.css';
 import './index.css';
 
 const rootElement = document.getElementById('root');

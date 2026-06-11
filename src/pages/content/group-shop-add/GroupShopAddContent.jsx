@@ -1,13 +1,10 @@
-import PageAvailable from '../../../components/page/PageAvailable.jsx';
-import GroupShopAddForm from './GroupShopAddForm.jsx';
+import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
 
 export default function GroupShopAddContent() {
   return (
-    <PageAvailable
+    <PageUnavailable
       title="Dodawanie przedmiotu do sklepu"
-      description="Wybierz gotowy szablon lub utwórz własny produkt dostępny w sklepie grupy."
-    >
-      <GroupShopAddForm />
-    </PageAvailable>
+      description="Formularz tworzenia nowego przedmiotu dostępnego do zakupu w sklepie grupy."
+    />
   );
 }

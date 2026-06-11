@@ -36,7 +36,6 @@ import {
 import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
 import ShopBuyModal from './modals/ShopBuyModal.jsx';
 import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
-import ShopEditModal from './modals/ShopEditModal.jsx';
 import './GroupShopContent.css';
 
 const ITEMS_PER_PAGE = 10;
@@ -45,7 +44,7 @@ export default function GroupShopContent() {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const { role } = useAppRole();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError, showToast } = useToast();
   const isStudentView = role === APP_ROLE.STUDENT;
   const isLecturerView = !isStudentView;
 
@@ -55,7 +54,6 @@ export default function GroupShopContent() {
     error,
     refetch,
     deleteItem,
-    updateItem,
     buyItem,
   } = useGroupShopItems(groupId);
   const {
@@ -64,6 +62,7 @@ export default function GroupShopContent() {
     cartTotal,
     cartItemIds,
     addToCart,
+    removeFromCart,
     clearCart,
   } = useGroupShopCart(groupId, items);
   const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
@@ -174,20 +173,6 @@ export default function GroupShopContent() {
     closeModal();
   }, [activeModal, closeModal, deleteItem, showError, showSuccess]);
 
-  const handleEditConfirm = useCallback(async (itemId, payload) => {
-    setIsSubmitting(true);
-    const result = await updateItem(itemId, payload);
-    setIsSubmitting(false);
-
-    if (!result.ok) {
-      showError(result.error ?? 'Nie udało się zapisać produktu.');
-      return;
-    }
-
-    showSuccess('Produkt został zaktualizowany.');
-    closeModal();
-  }, [closeModal, showError, showSuccess, updateItem]);
-
   const handleToggleShopOpen = useCallback(async () => {
     const result = await toggleShopOpen();
     if (!result.ok) {
@@ -199,7 +184,6 @@ export default function GroupShopContent() {
 
   const modalItem = activeModal?.type === 'delete'
     || activeModal?.type === 'buy'
-    || activeModal?.type === 'edit'
     ? activeModal.item
     : null;
 
@@ -234,21 +218,20 @@ export default function GroupShopContent() {
             </div>
           </RoleVisibility>
 
-          {isStudentView ? (
-            <ShopCartPanel
-              cartCount={cartCount}
-              cartItems={cartItems.map((item) => ({
-                id: item.id,
-                name: item.name,
-                priceAmount: getShopItemEffectivePrice(item),
-                imageUrl: item.imageUrl,
-              }))}
-              cartTotal={cartTotal}
-              disabled={shopInteractionDisabled}
-              onBuyAll={() => setActiveModal({ type: 'buyAll' })}
-              className="group-shop__cart"
-            />
-          ) : null}
+          <ShopCartPanel
+            cartCount={cartCount}
+            cartItems={cartItems.map((item) => ({
+              id: item.id,
+              name: item.name,
+              priceAmount: getShopItemEffectivePrice(item),
+              imageUrl: item.imageUrl,
+            }))}
+            cartTotal={cartTotal}
+            disabled={shopInteractionDisabled}
+            onBuyAll={() => setActiveModal({ type: 'buyAll' })}
+            onRemoveFromCart={removeFromCart}
+            className="group-shop__cart"
+          />
         </div>
       </div>
 
@@ -370,7 +353,7 @@ export default function GroupShopContent() {
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
-                    onEdit={() => setActiveModal({ type: 'edit', item })}
+                    onEdit={() => showToast({ message: 'Edycja produktu będzie dostępna w kolejnej wersji.' })}
                     onDelete={() => setActiveModal({ type: 'delete', item })}
                     className="group-shop__card"
                   />
@@ -411,13 +394,6 @@ export default function GroupShopContent() {
         item={modalItem}
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
-      />
-
-      <ShopEditModal
-        isOpen={activeModal?.type === 'edit'}
-        item={modalItem}
-        onClose={closeModal}
-        onConfirm={handleEditConfirm}
       />
     </section>
   );

@@ -4,7 +4,7 @@
   flex-direction: column;
   color: var(--color-text-primary);
   background: var(--color-bg-app);
-  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: var(--font-family-app);
 }
 
 .app-shell__skip {

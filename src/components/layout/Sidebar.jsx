@@ -1,6 +1,7 @@
 import { useOptionalGroupId } from '../../hooks/useOptionalGroupId.js';
 import { resolveShellView } from '../../navigation/shellTemplates.config.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
+import { groupsListPath } from '../../routes/pathRegistry.js';
 import SidebarBrand from './sidebar/SidebarBrand.jsx';
 import SidebarGroupsCtaButton from './sidebar/SidebarGroupsCtaButton.jsx';
 import SidebarNavLinkButton from './sidebar/SidebarNavLinkButton.jsx';
@@ -16,9 +17,11 @@ export default function Sidebar({ onNavigate }) {
     onNavigate?.();
   };
 
+  const groupsListRoute = shell.ctaItems.find((item) => item.id === 'twoje-kursy')?.to ?? groupsListPath();
+
   return (
     <aside className="sidebar" aria-label="Nawigacja aplikacji">
-      <SidebarBrand />
+      <SidebarBrand to={groupsListRoute} onNavigate={handleNav} />
 
       <div className="sidebar__cta-group">
         {shell.ctaItems.map((item) => (

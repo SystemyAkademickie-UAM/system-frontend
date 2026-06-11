@@ -9,6 +9,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  font-family: var(--font-family-app);
   font-size: var(--font-size-body);
   color: var(--color-text-primary);
   background: var(--color-bg-app);
