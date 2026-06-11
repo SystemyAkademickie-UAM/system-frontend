@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
   PageHeader,
@@ -15,6 +15,7 @@ import { RoleVisibility } from '../../../components/guards/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { groupShopAddPath } from '../../../routes/pathRegistry.js';
+import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.js';
 import { resolveShopCategoryLabels } from './shopCategories.js';
 import { getShopItemEffectivePrice } from './shopPricing.js';
 import { EXTRA_LIFE_PRODUCT, EXTRA_LIFE_PRODUCT_ID } from './shopExtraLife.js';
@@ -35,18 +36,28 @@ import {
 import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
 import ShopBuyModal from './modals/ShopBuyModal.jsx';
 import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
+import ShopEditModal from './modals/ShopEditModal.jsx';
 import './GroupShopContent.css';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function GroupShopContent() {
   const { groupId } = useParams();
+  const navigate = useNavigate();
   const { role } = useAppRole();
-  const { showSuccess, showToast } = useToast();
+  const { showSuccess, showError } = useToast();
   const isStudentView = role === APP_ROLE.STUDENT;
   const isLecturerView = !isStudentView;
 
-  const { items, deleteItem } = useGroupShopItems(groupId);
+  const {
+    items,
+    isLoading,
+    error,
+    refetch,
+    deleteItem,
+    updateItem,
+    buyItem,
+  } = useGroupShopItems(groupId);
   const {
     cartItems,
     cartCount,
@@ -54,7 +65,7 @@ export default function GroupShopContent() {
     cartItemIds,
     addToCart,
     clearCart,
-  } = useGroupShopCart(groupId);
+  } = useGroupShopCart(groupId, items);
   const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
   const { livesBlocked, toggleLivesBlocked, unblockLives } = useGroupShopLives(groupId);
 
@@ -64,6 +75,7 @@ export default function GroupShopContent() {
   const [page, setPage] = useState(1);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const closeModal = useCallback(() => setActiveModal(null), []);
 
@@ -89,29 +101,105 @@ export default function GroupShopContent() {
 
   const shopInteractionDisabled = !isShopOpen || livesBlocked;
 
-  const handleBuyConfirm = useCallback(() => {
-    if (activeModal?.item?.id === EXTRA_LIFE_PRODUCT_ID) {
-      unblockLives();
-      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
-      return;
+  const refreshAfterPurchase = useCallback(async () => {
+    await refetch();
+    if (isStudentView && groupId) {
+      await fetchGroupStudentProfile(groupId);
     }
-    showSuccess('Zakup produktu został potwierdzony.');
-  }, [activeModal, showSuccess, unblockLives]);
+  }, [refetch, isStudentView, groupId]);
 
-  const handleBuyAllConfirm = useCallback(() => {
-    clearCart();
-    showSuccess('Zakup produktów z koszyka został potwierdzony.');
-  }, [clearCart, showSuccess]);
-
-  const handleDeleteConfirm = useCallback(() => {
+  const handleBuyConfirm = useCallback(async () => {
     if (!activeModal?.item) {
       return;
     }
-    deleteItem(activeModal.item.id);
-    showSuccess('Produkt został usunięty ze sklepu.');
-  }, [activeModal, deleteItem, showSuccess]);
 
-  const modalItem = activeModal?.type === 'delete' || activeModal?.type === 'buy'
+    if (activeModal.item.id === EXTRA_LIFE_PRODUCT_ID) {
+      unblockLives();
+      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
+      closeModal();
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await buyItem(activeModal.item.id);
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      showError(result.error ?? 'Nie udało się kupić produktu.');
+      return;
+    }
+
+    await refreshAfterPurchase();
+    showSuccess('Produkt został zakupiony.');
+    closeModal();
+  }, [activeModal, buyItem, closeModal, refreshAfterPurchase, showError, showSuccess, unblockLives]);
+
+  const handleBuyAllConfirm = useCallback(async () => {
+    if (cartItems.length === 0) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    for (const item of cartItems) {
+      const result = await buyItem(item.id);
+      if (!result.ok) {
+        setIsSubmitting(false);
+        showError(result.error ?? `Nie udało się kupić: ${item.name}`);
+        await refreshAfterPurchase();
+        return;
+      }
+    }
+    setIsSubmitting(false);
+    clearCart();
+    await refreshAfterPurchase();
+    showSuccess('Zakup produktów z koszyka został potwierdzony.');
+    closeModal();
+  }, [buyItem, cartItems, clearCart, closeModal, refreshAfterPurchase, showError, showSuccess]);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!activeModal?.item) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    const result = await deleteItem(activeModal.item.id);
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      showError(result.error ?? 'Nie udało się usunąć produktu.');
+      return;
+    }
+
+    showSuccess('Produkt został usunięty ze sklepu.');
+    closeModal();
+  }, [activeModal, closeModal, deleteItem, showError, showSuccess]);
+
+  const handleEditConfirm = useCallback(async (itemId, payload) => {
+    setIsSubmitting(true);
+    const result = await updateItem(itemId, payload);
+    setIsSubmitting(false);
+
+    if (!result.ok) {
+      showError(result.error ?? 'Nie udało się zapisać produktu.');
+      return;
+    }
+
+    showSuccess('Produkt został zaktualizowany.');
+    closeModal();
+  }, [closeModal, showError, showSuccess, updateItem]);
+
+  const handleToggleShopOpen = useCallback(async () => {
+    const result = await toggleShopOpen();
+    if (!result.ok) {
+      showError(result.error ?? 'Nie udało się zmienić statusu sklepu.');
+      return;
+    }
+    showSuccess(isShopOpen ? 'Sklep został zamknięty.' : 'Sklep został otwarty.');
+  }, [isShopOpen, showError, showSuccess, toggleShopOpen]);
+
+  const modalItem = activeModal?.type === 'delete'
+    || activeModal?.type === 'buy'
+    || activeModal?.type === 'edit'
     ? activeModal.item
     : null;
 
@@ -142,23 +230,25 @@ export default function GroupShopContent() {
                   Dodaj produkt
                 </Button>
               ) : null}
-              <ShopToggleButton isShopOpen={isShopOpen} onToggle={toggleShopOpen} />
+              <ShopToggleButton isShopOpen={isShopOpen} onToggle={handleToggleShopOpen} />
             </div>
           </RoleVisibility>
 
-          <ShopCartPanel
-            cartCount={cartCount}
-            cartItems={cartItems.map((item) => ({
-              id: item.id,
-              name: item.name,
-              priceAmount: getShopItemEffectivePrice(item),
-              imageUrl: item.imageUrl,
-            }))}
-            cartTotal={cartTotal}
-            disabled={shopInteractionDisabled}
-            onBuyAll={() => setActiveModal({ type: 'buyAll' })}
-            className="group-shop__cart"
-          />
+          {isStudentView ? (
+            <ShopCartPanel
+              cartCount={cartCount}
+              cartItems={cartItems.map((item) => ({
+                id: item.id,
+                name: item.name,
+                priceAmount: getShopItemEffectivePrice(item),
+                imageUrl: item.imageUrl,
+              }))}
+              cartTotal={cartTotal}
+              disabled={shopInteractionDisabled}
+              onBuyAll={() => setActiveModal({ type: 'buyAll' })}
+              className="group-shop__cart"
+            />
+          ) : null}
         </div>
       </div>
 
@@ -224,6 +314,10 @@ export default function GroupShopContent() {
         </div>
       ) : null}
 
+      {error ? (
+        <p className="group-shop__error" role="alert">{error}</p>
+      ) : null}
+
       <div
         className={[
           'group-shop__catalog',
@@ -240,10 +334,19 @@ export default function GroupShopContent() {
         />
 
         <div className="group-shop__catalog-surface">
-          {items.length === 0 ? (
+          {isLoading ? (
+            <p className="group-shop__empty" role="status">Ładowanie produktów sklepu…</p>
+          ) : items.length === 0 ? (
             <p className="group-shop__empty" role="status">
               W sklepie nie ma jeszcze żadnych produktów.
-              {isLecturerView ? ' Użyj narzędzi dev na stronie rankingu lub dodaj produkt ręcznie.' : ''}
+              {isLecturerView ? (
+                <>
+                  {' '}
+                  <button type="button" className="group-shop__empty-link" onClick={() => navigate(groupShopAddPath(groupId))}>
+                    Dodaj pierwszy produkt
+                  </button>
+                </>
+              ) : null}
             </p>
           ) : visibleItems.length === 0 ? (
             <p className="group-shop__empty" role="status">
@@ -263,11 +366,11 @@ export default function GroupShopContent() {
                     imageUrl={item.imageUrl}
                     categories={resolveShopCategoryLabels(item.categories)}
                     showLecturerActions={isLecturerView}
-                    disabled={shopInteractionDisabled}
+                    disabled={shopInteractionDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0)}
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
-                    onEdit={() => showToast({ message: 'Edycja produktu będzie dostępna w kolejnej wersji.' })}
+                    onEdit={() => setActiveModal({ type: 'edit', item })}
                     onDelete={() => setActiveModal({ type: 'delete', item })}
                     className="group-shop__card"
                   />
@@ -308,6 +411,13 @@ export default function GroupShopContent() {
         item={modalItem}
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
+      />
+
+      <ShopEditModal
+        isOpen={activeModal?.type === 'edit'}
+        item={modalItem}
+        onClose={closeModal}
+        onConfirm={handleEditConfirm}
       />
     </section>
   );

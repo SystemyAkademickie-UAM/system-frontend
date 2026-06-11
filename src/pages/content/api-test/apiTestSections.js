@@ -1306,6 +1306,323 @@ export const API_TEST_SECTIONS = [
       { key: 'avatarId', label: 'avatarId (optional)', type: 'number' },
     ],
   },
+  {
+    id: 'getShopTemplates',
+    label: 'Get Shop Templates',
+    title: 'GET /shop-templates',
+    group: 'Shop Items',
+    kind: 'get',
+    method: 'GET',
+    buildPath: () => '/shop-templates',
+    needsBrowserId: false,
+    defaultValues: () => ({}),
+    fields: [],
+  },
+  {
+    id: 'getShopItems',
+    label: 'Get Shop Items',
+    title: 'GET /groups/:groupId/shop-items',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => {
+      const path = `/groups/${String(values.groupId ?? '').trim()}/shop-items`;
+      const auth = String(values.auth ?? '').trim();
+      return auth ? `${path}?auth=${encodeURIComponent(auth)}` : path;
+    },
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'createShopItem',
+    label: 'Create Shop Item',
+    title: 'POST /groups/:groupId/shop-items',
+    kind: 'api',
+    method: 'POST',
+    buildPath: (values) => `/groups/${String(values.groupId ?? '').trim()}/shop-items`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      name: 'Magiczny napój',
+      storyDescription: 'Regeneruje 5 punktów many.',
+      educationalDescription: 'Pozwala na ponowne podejście do testu.',
+      imageRef: '',
+      categoryId: '',
+      basePrice: '5',
+      stockQuantity: '',
+      perStudentLimit: '1',
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      payload.name = String(values.name ?? '').trim();
+      if (typeof values.storyDescription === 'string' && values.storyDescription.trim() !== '') payload.storyDescription = values.storyDescription.trim();
+      if (typeof values.educationalDescription === 'string' && values.educationalDescription.trim() !== '') payload.educationalDescription = values.educationalDescription.trim();
+      if (typeof values.imageRef === 'string' && values.imageRef.trim() !== '') payload.imageRef = values.imageRef.trim();
+      if (values.categoryId !== '' && values.categoryId !== null && values.categoryId !== undefined) payload.categoryId = Number(values.categoryId);
+      if (values.basePrice !== '' && values.basePrice !== null && values.basePrice !== undefined) payload.basePrice = Number(values.basePrice);
+      if (values.stockQuantity !== '' && values.stockQuantity !== null && values.stockQuantity !== undefined) payload.stockQuantity = Number(values.stockQuantity);
+      if (values.perStudentLimit !== '' && values.perStudentLimit !== null && values.perStudentLimit !== undefined) payload.perStudentLimit = Number(values.perStudentLimit);
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      name: typeof payload.name === 'string' ? payload.name : '',
+      storyDescription: typeof payload.storyDescription === 'string' ? payload.storyDescription : '',
+      educationalDescription: typeof payload.educationalDescription === 'string' ? payload.educationalDescription : '',
+      imageRef: typeof payload.imageRef === 'string' ? payload.imageRef : '',
+      categoryId: payload.categoryId ?? '',
+      basePrice: payload.basePrice ?? '',
+      stockQuantity: payload.stockQuantity ?? '',
+      perStudentLimit: payload.perStudentLimit ?? '',
+    }),
+    requiredKeysForValues: () => ['name', 'basePrice'],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'name', label: 'name', type: 'text' },
+      { key: 'storyDescription', label: 'storyDescription', type: 'textarea' },
+      { key: 'educationalDescription', label: 'educationalDescription', type: 'textarea' },
+      { key: 'imageRef', label: 'imageRef', type: 'text' },
+      { key: 'categoryId', label: 'categoryId (optional)', type: 'number' },
+      { key: 'basePrice', label: 'basePrice', type: 'number' },
+      { key: 'stockQuantity', label: 'stockQuantity (optional)', type: 'number' },
+      { key: 'perStudentLimit', label: 'perStudentLimit (optional)', type: 'number' },
+    ],
+  },
+  {
+    id: 'createShopItemFromTemplate',
+    label: 'Create Item From Template',
+    title: 'POST /groups/:groupId/shop-items/from-template',
+    kind: 'api',
+    method: 'POST',
+    buildPath: (values) => `/groups/${String(values.groupId ?? '').trim()}/shop-items/from-template`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      templateId: '1',
+      categoryId: '',
+      basePrice: '',
+      stockQuantity: '',
+      perStudentLimit: '',
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      payload.templateId = Number(values.templateId);
+      if (values.categoryId !== '' && values.categoryId !== null && values.categoryId !== undefined) payload.categoryId = Number(values.categoryId);
+      if (values.basePrice !== '' && values.basePrice !== null && values.basePrice !== undefined) payload.basePrice = Number(values.basePrice);
+      if (values.stockQuantity !== '' && values.stockQuantity !== null && values.stockQuantity !== undefined) payload.stockQuantity = Number(values.stockQuantity);
+      if (values.perStudentLimit !== '' && values.perStudentLimit !== null && values.perStudentLimit !== undefined) payload.perStudentLimit = Number(values.perStudentLimit);
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      templateId: payload.templateId ?? '',
+      categoryId: payload.categoryId ?? '',
+      basePrice: payload.basePrice ?? '',
+      stockQuantity: payload.stockQuantity ?? '',
+      perStudentLimit: payload.perStudentLimit ?? '',
+    }),
+    requiredKeysForValues: () => ['templateId'],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'templateId', label: 'templateId', type: 'number' },
+      { key: 'categoryId', label: 'categoryId (optional)', type: 'number' },
+      { key: 'basePrice', label: 'basePrice (optional)', type: 'number' },
+      { key: 'stockQuantity', label: 'stockQuantity (optional)', type: 'number' },
+      { key: 'perStudentLimit', label: 'perStudentLimit (optional)', type: 'number' },
+    ],
+  },
+  {
+    id: 'updateShopItem',
+    label: 'Update Shop Item',
+    title: 'PATCH /groups/:groupId/shop-items/:itemId',
+    kind: 'api',
+    method: 'PATCH',
+    buildPath: (values) => `/groups/${String(values.groupId ?? '').trim()}/shop-items/${String(values.itemId ?? '').trim()}`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      itemId: '1',
+      name: '',
+      storyDescription: '',
+      educationalDescription: '',
+      imageRef: '',
+      categoryId: '',
+      basePrice: '',
+      stockQuantity: '',
+      perStudentLimit: '',
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      if (typeof values.name === 'string' && values.name.trim() !== '') payload.name = values.name.trim();
+      if (typeof values.storyDescription === 'string' && values.storyDescription.trim() !== '') payload.storyDescription = values.storyDescription.trim();
+      if (typeof values.educationalDescription === 'string' && values.educationalDescription.trim() !== '') payload.educationalDescription = values.educationalDescription.trim();
+      if (typeof values.imageRef === 'string' && values.imageRef.trim() !== '') payload.imageRef = values.imageRef.trim();
+      if (values.categoryId !== '' && values.categoryId !== null && values.categoryId !== undefined) payload.categoryId = Number(values.categoryId);
+      if (values.basePrice !== '' && values.basePrice !== null && values.basePrice !== undefined) payload.basePrice = Number(values.basePrice);
+      if (values.stockQuantity !== '' && values.stockQuantity !== null && values.stockQuantity !== undefined) payload.stockQuantity = Number(values.stockQuantity);
+      if (values.perStudentLimit !== '' && values.perStudentLimit !== null && values.perStudentLimit !== undefined) payload.perStudentLimit = Number(values.perStudentLimit);
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+      name: typeof payload.name === 'string' ? payload.name : '',
+      storyDescription: typeof payload.storyDescription === 'string' ? payload.storyDescription : '',
+      educationalDescription: typeof payload.educationalDescription === 'string' ? payload.educationalDescription : '',
+      imageRef: typeof payload.imageRef === 'string' ? payload.imageRef : '',
+      categoryId: payload.categoryId ?? '',
+      basePrice: payload.basePrice ?? '',
+      stockQuantity: payload.stockQuantity ?? '',
+      perStudentLimit: payload.perStudentLimit ?? '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'itemId', label: 'itemId (URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+      { key: 'name', label: 'name (optional)', type: 'text' },
+      { key: 'storyDescription', label: 'storyDescription (optional)', type: 'textarea' },
+      { key: 'educationalDescription', label: 'educationalDescription (optional)', type: 'textarea' },
+      { key: 'imageRef', label: 'imageRef (optional)', type: 'text' },
+      { key: 'categoryId', label: 'categoryId (optional)', type: 'number' },
+      { key: 'basePrice', label: 'basePrice (optional)', type: 'number' },
+      { key: 'stockQuantity', label: 'stockQuantity (optional)', type: 'number' },
+      { key: 'perStudentLimit', label: 'perStudentLimit (optional)', type: 'number' },
+    ],
+  },
+  {
+    id: 'deleteShopItem',
+    label: 'Delete Shop Item',
+    title: 'DELETE /groups/:groupId/shop-items/:itemId',
+    kind: 'api',
+    method: 'DELETE',
+    buildPath: (values) => `/groups/${String(values.groupId ?? '').trim()}/shop-items/${String(values.itemId ?? '').trim()}`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      itemId: '1',
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'itemId', label: 'itemId (URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'buyShopItem',
+    label: 'Buy Shop Item',
+    title: 'POST /groups/:groupId/shop-items/:itemId/buy',
+    group: 'Shop Student',
+    kind: 'api',
+    method: 'POST',
+    buildPath: (values) => `/groups/${String(values.groupId ?? '').trim()}/shop-items/${String(values.itemId ?? '').trim()}/buy`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      itemId: '1',
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'itemId', label: 'itemId (URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'getStudentInventory',
+    label: 'Get Student Inventory',
+    title: 'GET /groups/:groupId/inventory',
+    group: 'Shop Student',
+    kind: 'get',
+    method: 'GET',
+    buildPath: (values) => {
+      const path = `/groups/${String(values.groupId ?? '').trim()}/inventory`;
+      const auth = String(values.auth ?? '').trim();
+      return auth ? `${path}?auth=${encodeURIComponent(auth)}` : path;
+    },
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+    }),
+    fields: [
+      { key: 'groupId', label: 'Group ID (public)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
+  {
+    id: 'useInventoryItem',
+    label: 'Use Inventory Item',
+    title: 'POST /groups/:groupId/inventory/:itemId/use',
+    group: 'Shop Student',
+    kind: 'api',
+    method: 'POST',
+    buildPath: (values) => `/groups/${String(values.groupId ?? '').trim()}/inventory/${String(values.itemId ?? '').trim()}/use`,
+    needsBrowserId: false,
+    defaultValues: () => ({
+      auth: '',
+      groupId: '100001',
+      itemId: '1',
+    }),
+    buildPayload: (values) => {
+      const payload = {};
+      if (typeof values.auth === 'string' && values.auth.trim() !== '') {
+        payload.auth = values.auth.trim();
+      }
+      return payload;
+    },
+    parsePayload: (payload) => ({
+      auth: typeof payload.auth === 'string' ? payload.auth : '',
+    }),
+    requiredKeysForValues: () => [],
+    fields: [
+      { key: 'groupId', label: 'groupId (public, URL path)', type: 'number' },
+      { key: 'itemId', label: 'itemId (URL path)', type: 'number' },
+      { key: 'auth', label: 'auth (optional if cookie set)', type: 'textarea' },
+    ],
+  },
 ];
 
 /**

@@ -1,12 +1,10 @@
 import ProfilePageLayout from '../group-profile/ProfilePageLayout.jsx';
-import ProfileEq from './ProfileEqContentContent.jsx';
+import ProfileInventoryPanel from './ProfileInventoryPanel.jsx';
 
 export default function ProfileEqContent() {
   return (
     <ProfilePageLayout>
-      <ProfileEq></ProfileEq>
+      <ProfileInventoryPanel />
     </ProfilePageLayout>
   );
 }
-
-

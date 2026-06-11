@@ -1,0 +1,121 @@
+.group-shop-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(100%, 52rem);
+}
+
+.group-shop-add-form__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.group-shop-add-form__tab {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.group-shop-add-form__tab--active {
+  border-color: rgba(66, 243, 125, 0.45);
+  color: var(--color-accent);
+  background: var(--color-nav-sub-active-bg);
+}
+
+.group-shop-add-form__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background: var(--color-bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.group-shop-add-form__hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.group-shop-add-form__template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
+.group-shop-add-form__template-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.875rem;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  text-align: left;
+  cursor: pointer;
+}
+
+.group-shop-add-form__template-card--active {
+  border-color: rgba(66, 243, 125, 0.45);
+}
+
+.group-shop-add-form__template-name {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.group-shop-add-form__template-price {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.group-shop-add-form__template-desc {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.group-shop-add-form__fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.group-shop-add-form__fields--stack {
+  grid-template-columns: 1fr;
+}
+
+.group-shop-add-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.group-shop-add-form__field input,
+.group-shop-add-form__field textarea {
+  padding: 0.625rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.group-shop-add-form__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .group-shop-add-form__fields {
+    grid-template-columns: 1fr;
+  }
+}

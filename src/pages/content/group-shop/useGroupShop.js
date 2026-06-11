@@ -1,93 +1,120 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  buyGroupShopItem,
+  deleteGroupShopItem,
+  fetchGroupInventory,
+  fetchGroupShopItems,
+  fetchGroupShopOpenStatus,
+  updateGroupShopItem,
+  updateGroupShopOpenStatus,
+  useGroupInventoryItem,
+} from '../../../services/shop.api.js';
 import { getShopItemEffectivePrice } from './shopPricing.js';
 import {
   getShopCartItemIds,
   setShopCartItemIds,
-  setShopIsOpen,
   setShopLivesBlocked,
   useShopCartItemIds,
-  useShopIsOpen,
   useShopLivesBlocked,
 } from './groupShopState.js';
-import { appendShopItems, readShopItems, writeShopItems, SHOP_ITEMS_EVENT } from './shopItemsStorage.js';
-
-function subscribeShopItems(listener) {
-  if (typeof window === 'undefined') {
-    return () => {};
-  }
-
-  const onStorage = (event) => {
-    if (event.key?.startsWith('maq-shop-items:')) {
-      listener();
-    }
-  };
-  const onCustom = () => listener();
-  window.addEventListener('storage', onStorage);
-  window.addEventListener(SHOP_ITEMS_EVENT, onCustom);
-
-  return () => {
-    window.removeEventListener('storage', onStorage);
-    window.removeEventListener(SHOP_ITEMS_EVENT, onCustom);
-  };
-}
 
 /**
  * @param {string | number | null | undefined} groupId
  */
 export function useGroupShopItems(groupId) {
-  const [revision, setRevision] = useState(0);
+  const [items, setItemsState] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const refetch = useCallback(async () => {
+    if (!groupId) {
+      setItemsState([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    const result = await fetchGroupShopItems(groupId);
+    setIsLoading(false);
+
+    if (result.ok) {
+      setItemsState(result.items);
+      return;
+    }
+
+    setItemsState([]);
+    setError(result.error ?? 'Nie udało się pobrać produktów sklepu');
+  }, [groupId]);
 
   useEffect(() => {
-    if (!groupId) {
-      return undefined;
+    refetch();
+  }, [refetch]);
+
+  const deleteItem = useCallback(async (itemId) => {
+    if (!groupId || !itemId) {
+      return { ok: false, error: 'Brak identyfikatora produktu' };
     }
-    return subscribeShopItems(() => setRevision((value) => value + 1));
-  }, [groupId]);
 
-  const items = useMemo(() => {
-    void revision;
-    return readShopItems(groupId);
-  }, [groupId, revision]);
-
-  const setItems = useCallback((nextItems) => {
-    if (!groupId) {
-      return;
+    const result = await deleteGroupShopItem(groupId, itemId);
+    if (!result.ok) {
+      return result;
     }
-    writeShopItems(groupId, nextItems);
-  }, [groupId]);
 
-  const addItems = useCallback((newItems) => {
-    if (!groupId || newItems.length === 0) {
-      return;
-    }
-    appendShopItems(groupId, newItems);
-  }, [groupId]);
-
-  const deleteItem = useCallback((itemId) => {
-    if (!groupId) {
-      return;
-    }
-    const nextItems = readShopItems(groupId).filter((item) => item.id !== itemId);
-    writeShopItems(groupId, nextItems);
-
-    const cartIds = getShopCartItemIds(groupId).filter((id) => id !== itemId);
+    setItemsState((current) => current.filter((item) => item.id !== String(itemId)));
+    const cartIds = getShopCartItemIds(groupId).filter((id) => id !== String(itemId));
     setShopCartItemIds(groupId, cartIds);
+    return { ok: true };
   }, [groupId]);
+
+  const updateItem = useCallback(async (itemId, payload) => {
+    if (!groupId || !itemId) {
+      return { ok: false, error: 'Brak identyfikatora produktu' };
+    }
+
+    const result = await updateGroupShopItem(groupId, itemId, payload);
+    if (!result.ok || !result.item) {
+      return { ok: false, error: result.error ?? 'Nie udało się zapisać produktu' };
+    }
+
+    setItemsState((current) => current.map((item) => (
+      item.id === String(itemId) ? result.item : item
+    )));
+    return { ok: true, item: result.item };
+  }, [groupId]);
+
+  const buyItem = useCallback(async (itemId) => {
+    if (!groupId || !itemId) {
+      return { ok: false, error: 'Brak identyfikatora produktu' };
+    }
+
+    const result = await buyGroupShopItem(groupId, itemId);
+    if (!result.ok) {
+      return result;
+    }
+
+    await refetch();
+    return { ok: true };
+  }, [groupId, refetch]);
 
   return {
     items,
-    setItems,
-    addItems,
+    isLoading,
+    error,
+    refetch,
     deleteItem,
+    updateItem,
+    buyItem,
   };
 }
 
 /**
  * @param {string | number | null | undefined} groupId
+ * @param {import('./shopItem.types.js').ShopItem[]} [items]
  */
-export function useGroupShopCart(groupId) {
+export function useGroupShopCart(groupId, items = []) {
   const cartItemIds = useShopCartItemIds(groupId);
-  const { items } = useGroupShopItems(groupId);
 
   const cartItems = useMemo(
     () => cartItemIds
@@ -105,11 +132,12 @@ export function useGroupShopCart(groupId) {
     if (!groupId || !itemId) {
       return;
     }
+    const normalizedId = String(itemId);
     const current = getShopCartItemIds(groupId);
-    if (current.includes(itemId)) {
+    if (current.includes(normalizedId)) {
       return;
     }
-    setShopCartItemIds(groupId, [...current, itemId]);
+    setShopCartItemIds(groupId, [...current, normalizedId]);
   }, [groupId]);
 
   const removeFromCart = useCallback((itemId) => {
@@ -118,7 +146,7 @@ export function useGroupShopCart(groupId) {
     }
     setShopCartItemIds(
       groupId,
-      getShopCartItemIds(groupId).filter((id) => id !== itemId),
+      getShopCartItemIds(groupId).filter((id) => id !== String(itemId)),
     );
   }, [groupId]);
 
@@ -144,34 +172,62 @@ export function useGroupShopCart(groupId) {
  * @param {string | number | null | undefined} groupId
  */
 export function useGroupShopOpen(groupId) {
-  const isShopOpen = useShopIsOpen(groupId);
+  const [isShopOpen, setIsShopOpenState] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const toggleShopOpen = useCallback(() => {
+  const refetch = useCallback(async () => {
     if (!groupId) {
+      setIsShopOpenState(true);
+      setIsLoading(false);
       return;
     }
-    setShopIsOpen(groupId, !isShopOpen);
+
+    setIsLoading(true);
+    const result = await fetchGroupShopOpenStatus(groupId);
+    setIsLoading(false);
+    if (result.ok) {
+      setIsShopOpenState(result.shopOpen);
+    }
+  }, [groupId]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  const toggleShopOpen = useCallback(async () => {
+    if (!groupId) {
+      return { ok: false };
+    }
+
+    const nextValue = !isShopOpen;
+    const result = await updateGroupShopOpenStatus(groupId, nextValue);
+    if (result.ok) {
+      setIsShopOpenState(nextValue);
+    }
+    return result;
   }, [groupId, isShopOpen]);
 
-  const openShop = useCallback(() => {
-    if (!groupId) {
-      return;
+  const openShop = useCallback(async () => {
+    if (!groupId || isShopOpen) {
+      return { ok: true };
     }
-    setShopIsOpen(groupId, true);
-  }, [groupId]);
+    return toggleShopOpen();
+  }, [groupId, isShopOpen, toggleShopOpen]);
 
-  const closeShop = useCallback(() => {
-    if (!groupId) {
-      return;
+  const closeShop = useCallback(async () => {
+    if (!groupId || !isShopOpen) {
+      return { ok: true };
     }
-    setShopIsOpen(groupId, false);
-  }, [groupId]);
+    return toggleShopOpen();
+  }, [groupId, isShopOpen, toggleShopOpen]);
 
   return {
     isShopOpen,
+    isLoading,
     toggleShopOpen,
     openShop,
     closeShop,
+    refetchShopOpen: refetch,
   };
 }
 
@@ -201,5 +257,74 @@ export function useGroupShopLives(groupId) {
     livesBlocked,
     toggleLivesBlocked,
     unblockLives,
+  };
+}
+
+/**
+ * @param {string | number | null | undefined} groupId
+ */
+export function useGroupInventory(groupId) {
+  const [entries, setEntries] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const refetch = useCallback(async () => {
+    if (!groupId) {
+      setEntries([]);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    const result = await fetchGroupInventory(groupId);
+    setIsLoading(false);
+
+    if (result.ok) {
+      setEntries(result.entries);
+      return;
+    }
+
+    setEntries([]);
+    setError(result.error ?? 'Nie udało się pobrać ekwipunku');
+  }, [groupId]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  const useItem = useCallback(async (itemId) => {
+    if (!groupId || !itemId) {
+      return { ok: false, error: 'Brak identyfikatora przedmiotu' };
+    }
+
+    const result = await useGroupInventoryItem(groupId, itemId);
+    if (!result.ok) {
+      return result;
+    }
+
+    setEntries((current) => current
+      .map((entry) => {
+        if (entry.itemId !== Number(itemId)) {
+          return entry;
+        }
+        const nextQuantity = entry.quantity - 1;
+        if (nextQuantity <= 0) {
+          return null;
+        }
+        return { ...entry, quantity: nextQuantity };
+      })
+      .filter(Boolean));
+
+    return { ok: true };
+  }, [groupId]);
+
+  return {
+    entries,
+    isLoading,
+    error,
+    refetch,
+    useItem,
   };
 }
