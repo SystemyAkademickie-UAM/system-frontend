@@ -18,6 +18,14 @@
   max-width: none;
 }
 
+.rewards-table-preview--shop-item {
+  width: min(360px, calc(100vw - 2rem));
+}
+
+.rewards-table-preview--shop-item .maq-product-card {
+  max-width: none;
+}
+
 .rewards-table__row {
   cursor: default;
 }
