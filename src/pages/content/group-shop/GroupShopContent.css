@@ -1,10 +1,21 @@
-.group-shop {
+.group-shop-page {
   position: relative;
+}
+
+.group-shop-page__header-row {
+  align-items: flex-start;
+}
+
+.group-shop-page__header-actions {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.group-shop-page__toolbar {
   width: 100%;
-  padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 2rem;
 }
 
 .group-shop__header {

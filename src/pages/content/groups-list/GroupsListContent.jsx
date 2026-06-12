@@ -6,6 +6,7 @@ import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import GroupCard from './GroupCard.jsx';
 import GroupsListCreator from './GroupsListCreator.jsx';
 import GroupsListHero from './GroupsListHero.jsx';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useGroupsList } from './useGroupsList.js';
 import './GroupsListContent.css';
 
@@ -35,9 +36,11 @@ export default function GroupsListContent() {
     errorMessage,
     refetch,
   } = useGroupsList();
+  const { role } = useAppRole();
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
 
-  const hasAnyGroups = myGroups.length > 0 || otherGroups.length > 0;
+  const showOtherGroups = role !== APP_ROLE.LECTURER;
+  const hasAnyGroups = myGroups.length > 0 || (showOtherGroups && otherGroups.length > 0);
   const isFiltering = searchQuery.trim().length > 0;
 
   const handleCreatorClose = () => {
@@ -133,19 +136,23 @@ export default function GroupsListContent() {
             />
           </div>
 
-          <hr className="groups-list__divider" aria-hidden="true" />
+          {showOtherGroups ? (
+            <>
+              <hr className="groups-list__divider" aria-hidden="true" />
 
-          <div className="groups-list__section">
-            <h3 className="groups-list__subsection-title">Pozostałe grupy</h3>
-            <GroupsGrid
-              groups={otherGroups}
-              emptyMessage={
-                isFiltering
-                  ? 'Brak pozostałych grup pasujących do wyszukiwania.'
-                  : 'Brak innych grup w systemie.'
-              }
-            />
-          </div>
+              <div className="groups-list__section">
+                <h3 className="groups-list__subsection-title">Pozostałe grupy</h3>
+                <GroupsGrid
+                  groups={otherGroups}
+                  emptyMessage={
+                    isFiltering
+                      ? 'Brak pozostałych grup pasujących do wyszukiwania.'
+                      : 'Brak innych grup w systemie.'
+                  }
+                />
+              </div>
+            </>
+          ) : null}
         </>
       )}
     </section>

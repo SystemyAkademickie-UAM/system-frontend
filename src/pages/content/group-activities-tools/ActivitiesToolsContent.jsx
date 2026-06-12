@@ -1,18 +1,30 @@
-import PageAvailable from '../../../components/page/PageAvailable.jsx';
+import { PageHeader, SubNav } from '../../../components/ui/index.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
+import '../../../components/page/PageUnavailable.css';
+import '../group-settings/GroupSettingsForm.css';
+import '../shared/groupSectionPage.css';
+import '../group-members/MembersHomeContent.css';
 import ToolsContent from './ToolsContent.jsx';
 
 export default function ActivitiesToolsContent() {
   const nav = useGroupSubNav('group-activities');
 
   return (
-    <PageAvailable
-      title="Narzędzia"
-      description="Widok pozwalający na wygenerowanie podsumowania, importowanie danych przy użyciu plików CSV oraz eksportowanie danych."
-      subNavAriaLabel={nav.ariaLabel}
-      subNavItems={nav.items}
-    >
+    <section className="page-unavailable members-page group-settings-page" aria-label={nav.sectionTitle}>
+      <PageHeader
+        title={nav.sectionTitle}
+        description="Import danych z plików CSV oraz generowanie raportów i podsumowań."
+      />
+
+      <div className="members-page__nav-row">
+        <SubNav
+          ariaLabel={nav.ariaLabel}
+          items={nav.items}
+          className="members-page__sub-nav"
+        />
+      </div>
+
       <ToolsContent />
-    </PageAvailable>
+    </section>
   );
 }

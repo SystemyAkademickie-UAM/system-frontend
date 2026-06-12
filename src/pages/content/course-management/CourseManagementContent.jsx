@@ -1,8 +1,8 @@
-import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
+import AppSectionPage from '../../../components/page/AppSectionPage.jsx';
 
 export default function CourseManagementContent() {
   return (
-    <PageUnavailable
+    <AppSectionPage
       title="Zarządzanie kursami"
       description="Przeglądaj kursy, szablony grup i konfiguracje grywalizacji w organizacji."
     />

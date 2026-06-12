@@ -1,42 +1,26 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
+import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
-
+import { Button } from '../../../components/ui/index.js';
 import { publicIconPath } from '../../../utils/publicAssetUrl.js';
+import '../group-settings/GroupSettingsForm.css';
+import './ToolsContent.css';
 
-const loadusersicon = publicIconPath('download-01-svgrepo-com.svg');
 const loadresultsicon = publicIconPath('download-02-svgrepo-com.svg');
 const exportusersicon = publicIconPath('upload-02-svgrepo-com.svg');
-import '../shared/LegacyContentLayout.css';
 
-export default function App() {
-
-  const {groupId} = useParams();
+export default function ToolsContent() {
+  const { groupId } = useParams();
   const [errorMessage, setErrorMessage] = useState('');
-  const [groupnamevalue, setGroupnamevalue] = useState('');
-  const [subjectnamevalue, setSubjectnamevalue] = useState('');
-  const [groupnamevalueerror, setGroupnamevalueerror] = useState('');
-  const [subjectnamevalueerror, setSubjectnamevalueerror] = useState('');
-  const [groupdescriptionvalue, setGroupdescriptionvalue] = useState('');
-  const [isVisible, setIsvisible] = useState(true);
-
-  const [bannerFile, setBannerfile] = useState(null);
-  const [bannerPreview, setBannerpreview] = useState(null);
-
   const [stages, setStages] = useState([]);
 
-
-
   async function onFetchStages() {
-
     setErrorMessage('');
 
     try {
-
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
-
       const url = base + '/stages';
 
       const response = await fetch(url, {
@@ -44,19 +28,15 @@ export default function App() {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
+          'X-Browser-ID': browserid,
         },
         body: JSON.stringify({
           method: 'retrieve',
-          groupId: Number(groupId)
-        })
+          groupId: Number(groupId),
+        }),
       });
 
       const responsetext = await response.text();
-
-      console.log('POST /stages retrieve: ', response.status);
-      console.log('POST /stages retrieve: ', responsetext);
-
       let data;
 
       try {
@@ -65,96 +45,82 @@ export default function App() {
         console.log('/stages retrieve not JSON: ' + responsetext);
       }
 
-      console.log('POST /stages retrieve JSON:', data);
-
-      let receiveddata = data;
-
       const receivedstages = [];
-
       let i = 0;
 
-      while (i < receiveddata.stages.length) {
-
+      while (i < data.stages.length) {
         receivedstages.push({
-          id: receiveddata.stages[i].id,
-          name: receiveddata.stages[i].name
+          id: data.stages[i].id,
+          name: data.stages[i].name,
         });
-
-        i = i + 1;
+        i += 1;
       }
 
       setStages(receivedstages);
-
     } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
+      const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
     }
   }
-
-
-
-
 
   useEffect(() => {
     onFetchStages();
   }, []);
 
-
-
-
-
   return (
-    <section className="legacy-content" aria-label="Narzędzia aktywności">
-      {errorMessage ? <p className="legacy-content__error" role="alert">{errorMessage}</p> : null}
+    <div className="activities-tools-page__body">
+      {errorMessage ? (
+        <p className="group-settings-form__error" role="alert">{errorMessage}</p>
+      ) : null}
 
-      <div className="legacy-content__stack">
-        <div className="legacy-content__panel">
-          <h2 className="legacy-content__panel-title">Pliki CSV</h2>
-          <p className="legacy-content__panel-description">Skróty do najważniejszych funkcji:</p>
-          <div className="legacy-content__tool-grid">
-            <button type="button" className="legacy-content__tool-tile">
-              <img src={loadusersicon} alt="" />
-              <span>Wczytaj graczy z pliku</span>
-            </button>
-            <button type="button" className="legacy-content__tool-tile">
+      <div className="group-settings-form">
+        <section className="group-settings-form__panel" aria-labelledby="activities-tools-csv-title">
+          <h2 id="activities-tools-csv-title" className="group-settings-form__panel-title">Pliki CSV</h2>
+          <p className="group-settings-form__hint">Skróty do importu danych i generowania raportów.</p>
+          <div className="activities-tools-page__tool-grid">
+            <button type="button" className="activities-tools-page__tool-btn">
               <img src={loadresultsicon} alt="" />
-              <span>Wczytaj wyniki z pliku</span>
+              <span>Wczytaj aktywności z pliku</span>
             </button>
-            <button type="button" className="legacy-content__tool-tile">
+            <button type="button" className="activities-tools-page__tool-btn">
               <img src={exportusersicon} alt="" />
-              <span>Eksportuj wyniki do pliku</span>
+              <span>Generuj raport GRUPY</span>
+            </button>
+            <button type="button" className="activities-tools-page__tool-btn">
+              <img src={exportusersicon} alt="" />
+              <span>Generuj raport ETAPU</span>
+            </button>
+            <button type="button" className="activities-tools-page__tool-btn">
+              <img src={exportusersicon} alt="" />
+              <span>Generuj raport UCZESTNIKA</span>
             </button>
           </div>
-        </div>
+        </section>
 
-        <div className="legacy-content__panel">
-          <h2 className="legacy-content__panel-title">Kreator podsumowania</h2>
-          <p className="legacy-content__panel-description">Prosimy o zaznaczenie elementów, których podsumowanie zostanie wygenerowane.</p>
+        <section className="group-settings-form__panel" aria-labelledby="activities-tools-summary-title">
+          <h2 id="activities-tools-summary-title" className="group-settings-form__panel-title">Kreator podsumowania</h2>
+          <p className="group-settings-form__hint">
+            Prosimy o zaznaczenie elementów, których podsumowanie zostanie wygenerowane.
+          </p>
 
           {stages.map((stage) => (
-            <label key={`checkbox${stage.id}`} className="legacy-content__checkbox-row" htmlFor={`checkbox-${stage.id}`}>
-              <input type="checkbox" id={`checkbox-${stage.id}`} className="legacy-content__checkbox" />
+            <label
+              key={`checkbox${stage.id}`}
+              className="activities-tools-page__checkbox-row"
+              htmlFor={`checkbox-${stage.id}`}
+            >
+              <input type="checkbox" id={`checkbox-${stage.id}`} className="activities-tools-page__checkbox" />
               <span>{stage.name}</span>
             </label>
           ))}
 
-          <button type="button" className="legacy-content__primary-btn">
-            Wygeneruj podsumowanie
-          </button>
-        </div>
+          <div className="group-settings-form__footer">
+            <Button type="button" variant="primary" size="md">
+              Wygeneruj podsumowanie
+            </Button>
+          </div>
+        </section>
       </div>
-    </section>
+    </div>
   );
 }
-
-
-
-

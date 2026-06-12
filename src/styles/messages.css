@@ -1,0 +1,22 @@
+/**
+ * Spójna typografia komunikatów (toasty, alerty, puste stany, błędy formularzy).
+ * Manrope — bez Comic Sans ani ogólnego fallbacku cursive.
+ */
+:where(
+  [role='alert'],
+  [role='status'],
+  [aria-live='polite'],
+  [aria-live='assertive'],
+  .maq-toast,
+  .maq-toast__emphasis,
+  .maq-toast__detail,
+  .maq-toast__close,
+  .maq-shop-closed-overlay__message,
+  [class*='__error'],
+  [class*='__message'],
+  [class*='__empty'],
+  [class*='__hint'],
+  [class*='field-error']
+) {
+  font-family: var(--font-family-message) !important;
+}

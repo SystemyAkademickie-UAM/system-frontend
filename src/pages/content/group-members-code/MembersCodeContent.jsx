@@ -14,6 +14,7 @@ import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
+import '../shared/groupSectionPage.css';
 import MembersCodeContentWindow from './MembersCodeContentWindow.jsx';
 import './MembersCodeContent.css';
 

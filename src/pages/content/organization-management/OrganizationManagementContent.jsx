@@ -1,8 +1,8 @@
-import PageUnavailable from '../../../components/page/PageUnavailable.jsx';
+import AppSectionPage from '../../../components/page/AppSectionPage.jsx';
 
 export default function OrganizationManagementContent() {
   return (
-    <PageUnavailable
+    <AppSectionPage
       title="Zarządzanie organizacjami"
       description="Twórz i konfiguruj organizacje oraz nadawaj uprawnienia administratorom."
     />

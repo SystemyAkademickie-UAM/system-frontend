@@ -8,11 +8,13 @@ import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
-import { useToast } from '../../../components/ui/index.js';
+import { Button, PageHeader, useToast } from '../../../components/ui/index.js';
 
 import { appHelpPath } from '../../../routes/pathRegistry.js';
-
-
+import '../../../components/page/PageUnavailable.css';
+import '../shared/groupSectionPage.css';
+import '../group-members/MembersHomeContent.css';
+import '../group-settings/GroupSettingsForm.css';
 
 import { publicIconPath } from '../../../utils/publicAssetUrl.js';
 
@@ -350,181 +352,116 @@ export default function SettingsContent() {
 
 
   return (
+    <div className="app-page-layout">
+      <section className="page-unavailable members-page settings-page group-settings-page" aria-labelledby="settings-title">
+        <PageHeader
+          title={settingsLABEL[language]}
+          description={paneldescriptionLABEL[language]}
+        />
 
-    <section className="settings-content" aria-labelledby="settings-title">
+        <div className="settings-page__body">
+        {isLoading ? (
+          <p className="settings-page__message">Ładowanie ustawień…</p>
+        ) : null}
 
-      <header className="settings-content__header">
+        {!isLoading ? (
+          <div className="group-settings-form">
+            <section className="group-settings-form__panel" aria-labelledby="settings-avatar-title">
+              <h2 id="settings-avatar-title" className="group-settings-form__panel-title">
+                {avatarLABEL[language]}
+              </h2>
+              <div className="settings-page__avatar-controls">
+                <button type="button" className="settings-page__avatar-nav" onClick={previousicon} aria-label="Poprzedni awatar">
+                  <img src={lefticon} alt="" />
+                </button>
+                <div className="settings-page__avatar-preview">
+                  {selectedAvatar?.imageUrl ? (
+                    <img
+                      src={selectedAvatar.imageUrl}
+                      alt=""
+                      className={getAvatarImageClassName(selectedAvatar.imageUrl)}
+                    />
+                  ) : null}
+                </div>
+                <button type="button" className="settings-page__avatar-nav" onClick={nexticon} aria-label="Następny awatar">
+                  <img src={righticon} alt="" />
+                </button>
+              </div>
+            </section>
 
-        <h1 id="settings-title" className="settings-content__title">{settingsLABEL[language]}</h1>
-
-        <p className="settings-content__description">{paneldescriptionLABEL[language]}</p>
-
-      </header>
-
-
-
-      {isLoading ? (
-
-        <p className="settings-content__message">Ładowanie ustawień…</p>
-
-      ) : null}
-
-
-
-      {!isLoading ? (
-
-        <>
-
-          <div className="settings-content__panel settings-content__avatar-panel">
-
-            <h2 className="settings-content__panel-title">{avatarLABEL[language]}</h2>
-
-            <div className="settings-content__avatar-controls">
-
-              <button type="button" className="settings-content__avatar-nav" onClick={previousicon} aria-label="Poprzedni awatar">
-
-                <img src={lefticon} alt="" />
-
-              </button>
-
-              <div className="settings-content__avatar-preview">
-
-                {selectedAvatar?.imageUrl ? (
-
-                  <img
-                    src={selectedAvatar.imageUrl}
-                    alt=""
-                    className={getAvatarImageClassName(selectedAvatar.imageUrl)}
-                  />
-
-                ) : null}
-
+            <div className="group-settings-form__grid">
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="settings-language">
+                  {languageLABEL[language]}
+                </label>
+                <select
+                  id="settings-language"
+                  className="group-settings-form__input"
+                  value={divlanguage}
+                  onChange={(event) => setDivlanguage(event.target.value)}
+                >
+                  {['polski', 'English', '日本語', 'にほんご'].map((languagechosen) => (
+                    <option key={languagechosen} value={languagechosen}>{languagechosen}</option>
+                  ))}
+                </select>
               </div>
 
-              <button type="button" className="settings-content__avatar-nav" onClick={nexticon} aria-label="Następny awatar">
-
-                <img src={righticon} alt="" />
-
-              </button>
-
-            </div>
-
-          </div>
-
-
-
-          <div className="settings-content__row">
-
-            <div className="settings-content__panel">
-
-              <div className="settings-content__field-label">{languageLABEL[language]}</div>
-
-              <select
-
-                className="settings-content__select"
-
-                value={divlanguage}
-
-                onChange={(event) => setDivlanguage(event.target.value)}
-
-              >
-
-                {['polski', 'English', '日本語', 'にほんご'].map((languagechosen) => (
-
-                  <option key={languagechosen} value={languagechosen}>{languagechosen}</option>
-
-                ))}
-
-              </select>
-
-            </div>
-
-
-
-            <div className="settings-content__panel">
-
-              <div className="settings-content__field-label">{nicknameLABEL[language]}</div>
-
-              <input
-
-                type="text"
-
-                className="settings-content__input"
-
-                value={nickname}
-
-                maxLength={15}
-
-                onChange={(event) => onNicknamechange(event.target.value)}
-
-              />
-
-            </div>
-
-          </div>
-
-          {role === APP_ROLE.LECTURER ? (
-            <div className="settings-content__panel settings-content__panel--toggle">
-              <label className="settings-content__toggle">
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="settings-nickname">
+                  {nicknameLABEL[language]}
+                </label>
                 <input
-                  type="checkbox"
-                  checked={draftShowNickname}
-                  onChange={(event) => setDraftShowNickname(event.target.checked)}
+                  id="settings-nickname"
+                  type="text"
+                  className="group-settings-form__input"
+                  value={nickname}
+                  maxLength={15}
+                  onChange={(event) => onNicknamechange(event.target.value)}
                 />
-                <span className="settings-content__field-label">{showNicknameLABEL[language]}</span>
-              </label>
-              <p className="settings-content__toggle-description">{showNicknameDescLABEL[language]}</p>
-            </div>
-          ) : null}
-
-          <div className="settings-content__footer">
-
-            <div className="settings-content__help">
-
-              <div className="settings-content__help-inner">
-
-                <Link className="settings-content__help-link" to={appHelpPath()}>
-
-                  {helpcenter0LABEL[language]}
-
-                </Link>
-
-                {' '}
-
-                <span>{helpcenter1LABEL[language]}</span>
-
               </div>
-
             </div>
 
-            <button
+            {role === APP_ROLE.LECTURER ? (
+              <section className="group-settings-form__panel">
+                <label className="settings-page__toggle">
+                  <input
+                    type="checkbox"
+                    checked={draftShowNickname}
+                    onChange={(event) => setDraftShowNickname(event.target.checked)}
+                  />
+                  <span className="group-settings-form__label">{showNicknameLABEL[language]}</span>
+                </label>
+                <p className="group-settings-form__hint">{showNicknameDescLABEL[language]}</p>
+              </section>
+            ) : null}
 
-              type="button"
-
-              className="settings-content__save-btn"
-
-              onClick={savechanges}
-
-              disabled={isSaving}
-
-            >
-
-              {isSaving ? 'Zapisywanie…' : savebuttonLABEL[language]}
-
-            </button>
-
+            <div className="settings-page__footer">
+              <p className="settings-page__help-text">
+                <Link className="settings-page__help-link" to={appHelpPath()}>
+                  {helpcenter0LABEL[language]}
+                </Link>
+                {' '}
+                <span>{helpcenter1LABEL[language]}</span>
+              </p>
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                onClick={savechanges}
+                disabled={isSaving}
+              >
+                {isSaving ? 'Zapisywanie…' : savebuttonLABEL[language]}
+              </Button>
+            </div>
           </div>
+        ) : null}
 
-        </>
-
-      ) : null}
-
-
-
-      {errorMessage ? <p className="settings-content__error" role="alert">{errorMessage}</p> : null}
-
-    </section>
-
+        {errorMessage ? (
+          <p className="group-settings-form__error" role="alert">{errorMessage}</p>
+        ) : null}
+        </div>
+      </section>
+    </div>
   );
 
 }

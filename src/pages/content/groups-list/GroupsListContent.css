@@ -45,13 +45,14 @@
 .groups-list__creator-overlay {
   position: absolute;
   inset: 0;
-  z-index: 50;
+  z-index: var(--z-index-page-overlay);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 1.5rem;
   background: rgba(8, 8, 16, 0.72);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .groups-list__search {

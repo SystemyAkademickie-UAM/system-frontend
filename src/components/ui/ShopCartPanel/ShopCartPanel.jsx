@@ -14,6 +14,7 @@ import './ShopCartPanel.css';
  * @param {Array<{ id: string, name: string, priceAmount: number, imageUrl?: string }>} props.cartItems
  * @param {number} props.cartTotal
  * @param {() => void} props.onBuyAll
+ * @param {(itemId: string) => void} [props.onRemoveFromCart]
  * @param {boolean} [props.disabled=false]
  * @param {string} [props.className]
  */
@@ -22,6 +23,7 @@ export default function ShopCartPanel({
   cartItems,
   cartTotal,
   onBuyAll,
+  onRemoveFromCart,
   disabled = false,
   className = '',
 }) {
@@ -111,7 +113,23 @@ export default function ShopCartPanel({
                       name={item.name}
                       priceAmount={item.priceAmount}
                       imageUrl={item.imageUrl}
+                      className="maq-shop-cart__item-card"
                     />
+                    <button
+                      type="button"
+                      className="maq-shop-cart__remove-btn"
+                      aria-label={`Usuń ${item.name} z koszyka`}
+                      disabled={disabled}
+                      onClick={() => onRemoveFromCart?.(item.id)}
+                    >
+                      <AssetSvg
+                        name={SVG_ICONS.actions.delete}
+                        className="maq-shop-cart__remove-icon"
+                        width={18}
+                        height={18}
+                        alt=""
+                      />
+                    </button>
                   </li>
                 ))}
               </ul>

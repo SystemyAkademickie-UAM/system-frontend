@@ -5,8 +5,12 @@ import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 
+import { Button } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
+import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
 import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
+import '../group-main/shared/groupMainSubpageHeader.css';
+import './GroupMainActivities.css';
 
 const arrowrighticon = PUBLIC_UI_ICONS.arrowRight;
 const arrowlefticon = PUBLIC_UI_ICONS.arrowLeft;
@@ -520,75 +524,131 @@ export default function GroupMainActivities() {
 
 
   return (
-    <div>
-      <div style = {{width: '96%', height: '7%', position: 'absolute', top: '44vh', left: '3%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-        <div style = {{width: '100%', height: '7%', position: 'absolute', top: '1vh', left: '-1%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{currentstagename}</span></div>
-        <div style = {{width: '49%', height: '5%', position: 'absolute', top: '5vh', left: '1%', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>{isstudent == 1 ? (<span>{completedcount} / {totalactivities} aktywności ukończonych</span>) : (<span>{totalactivities} aktywności</span>)}</div>
-        <div style = {{width: '49%', height: '5%', position: 'absolute', top: '5vh', left: '50%', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-end', paddingRight: '1%'}}>{isstudent == 1 ? (<span>Zdobyto: {earnedrewards} / {totalrewards}</span>) : (<span>{totalrewards} możliwych do zdobycia</span>)}</div>
+    <section className="group-main-activities" aria-label="Aktywności">
+      <GroupMainSubpageHeader
+        eyebrow="Kampania"
+        title="Aktywności"
+      />
 
+      {errorMessage ? (
+        <p className="group-main-posts__error" role="alert">{errorMessage}</p>
+      ) : null}
 
-        <div style = {{width: '98%', top: '9vh', position: 'absolute', left: '0%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
-        <div style = {{width: '100%', top: '1%', position: 'relative', left: '0%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
+      <div className="group-main-activities__stage">
+        <header className="group-main-activities__stage-header">
+          <h2 className="group-main-activities__stage-name">{currentstagename}</h2>
+          <div className="group-main-activities__stage-stats">
+            <span>
+              {isstudent === 1
+                ? `${completedcount} / ${totalactivities} aktywności ukończonych`
+                : `${totalactivities} aktywności`}
+            </span>
+            <span>
+              {isstudent === 1
+                ? `Zdobyto: ${earnedrewards} / ${totalrewards}`
+                : `${totalrewards} możliwych do zdobycia`}
+            </span>
+          </div>
+        </header>
 
-
+        <div className="group-main-activities__list">
           {displayactivities.map((activity) => (
-
-            <div key = {'activity' + activity.id} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '4px solid ' + activity.bordercolour, borderRadius: '16px'}}>
-              {islecturer == 1 ? (
-                <img src = {arrowcirclerighticon} style = {{width: '4%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'}}/>
-              ) : (
-                <img src = {activity.unlocked == 1 ? unlockedicon : lockedicon} style = {{width: '4%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center'}}/>
-              )}
-              <div style = {{width: '85%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingLeft: '2%'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{activity.name}</span></div>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{activity.description0}</span></div>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{activity.description1}</span></div>
+            <article
+              key={`activity${activity.id}`}
+              className="group-main-activities__item"
+              style={{ borderLeftColor: activity.bordercolour }}
+            >
+              <img
+                className="group-main-activities__item-icon"
+                src={islecturer === 1 ? arrowcirclerighticon : (activity.unlocked === 1 ? unlockedicon : lockedicon)}
+                alt=""
+              />
+              <div className="group-main-activities__item-body">
+                <h3 className="group-main-activities__item-name">{activity.name}</h3>
+                <p className="group-main-activities__item-desc">{activity.description0}</p>
+                <p className="group-main-activities__item-desc">{activity.description1}</p>
               </div>
-              {islecturer == 1 ? (
-                <div style = {{width: '10%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '5%'}}>
-                  <div onClick = {() => assign(activity.id)} style = {{width: '50%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {editicon} style = {{width: '30%', height: '25%'}}/>
-                  </div>
-                  <div style = {{width: '45%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '21px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{activity.reward}</span></div>
+              {islecturer === 1 ? (
+                <div className="group-main-activities__item-actions">
+                  <button
+                    type="button"
+                    className="group-main-activities__assign-btn"
+                    onClick={() => assign(activity.id)}
+                    aria-label="Przypisz aktywność"
+                  >
+                    <img src={editicon} alt="" />
+                  </button>
+                  <span className="group-main-activities__item-reward">{activity.reward}</span>
                 </div>
               ) : (
-                <div style = {{width: '10%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '21px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{activity.reward}</span></div>
+                <span className="group-main-activities__item-reward">{activity.reward}</span>
               )}
-            </div>
-
+            </article>
           ))}
-
-
         </div>
 
-        <div style = {{width: '100%', height: '10vh', position: 'relative', top: '2%', left: '0%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>
-          <div onClick = {atfirststage == 0 ? firststage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atfirststage == 0 ? 'pointer' : 'default', opacity: atfirststage == 0 ? 1 : 0.5}}>
-            <img src = {leftlefticon} style = {{width: '50%', height: '50%'}}/>
-          </div>
-          <div onClick = {atfirststage == 0 ? previousstage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atfirststage == 0 ? 'pointer' : 'default', opacity: atfirststage == 0 ? 1 : 0.5}}>
-            <img src = {lefticon} style = {{width: '50%', height: '50%'}}/>
-          </div>
-          <div style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'rgb(227, 224, 247)', fontSize: '18px', fontWeight: 900}}><span>{currentpagenumber}</span></div>
-          <div onClick = {atlaststage == 0 ? nextstage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atlaststage == 0 ? 'pointer' : 'default', opacity: atlaststage == 0 ? 1 : 0.5}}>
-            <img src = {righticon} style = {{width: '40%', height: '40%'}}/>
-          </div>
-          <div onClick = {atlaststage == 0 ? laststage : undefined} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '70%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: atlaststage == 0 ? 'pointer' : 'default', opacity: atlaststage == 0 ? 1 : 0.5}}>
-            <img src = {rightrighticon} style = {{width: '50%', height: '50%'}}/>
-          </div>
+        <div className="group-main-activities__pagination">
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? firststage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label="Pierwszy etap"
+          >
+            <img src={leftlefticon} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? previousstage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label="Poprzedni etap"
+          >
+            <img src={lefticon} alt="" />
+          </button>
+          <span className="group-main-activities__page-number">{currentpagenumber}</span>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? nextstage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label="Następny etap"
+          >
+            <img src={righticon} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? laststage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label="Ostatni etap"
+          >
+            <img src={rightrighticon} alt="" />
+          </button>
         </div>
 
-        {isstudent == 1 ? (
-          <div onClick = {togglewhichfirst} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '20%', height: '5vh', position: 'relative', top: '2%', left: '39%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}><span>{whichfirstlabel}</span></div>
+        {isstudent === 1 ? (
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="group-main-activities__sort-toggle"
+            onClick={togglewhichfirst}
+          >
+            {whichfirstlabel}
+          </Button>
         ) : null}
-
-</div>
       </div>
 
-      {windowopen == 1 ? (
-        <GroupMainActivitiesWindow popupclose = {closewindow} groupId = {groupId} stagename = {currentstagename} activityname = {selectedactivityname} activityid = {selectedactivityid} />
+      {windowopen === 1 ? (
+        <GroupMainActivitiesWindow
+          popupclose={closewindow}
+          groupId={groupId}
+          stagename={currentstagename}
+          activityname={selectedactivityname}
+          activityid={selectedactivityid}
+        />
       ) : null}
-    </div>
-  )
+    </section>
+  );
 }
-
-

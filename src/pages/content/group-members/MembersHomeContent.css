@@ -2,27 +2,6 @@
   --members-font-table-emphasis: 18px;
   --members-font-table-primary: 16px;
   --members-font-table-secondary: 14px;
-  font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-}
-
-.members-page__nav-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.members-page__sub-nav {
-  flex: 0 1 auto;
-}
-
-.members-page__search {
-  width: 100%;
-  max-width: 18rem;
-  flex: 0 0 auto;
-  margin-left: auto;
 }
 
 .members-table__position {
@@ -131,16 +110,6 @@
 }
 
 @media (max-width: 768px) {
-  .members-page__nav-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .members-page__search {
-    max-width: none;
-    margin-left: 0;
-  }
-
   .members-table__position {
     font-size: var(--members-font-table-primary);
   }

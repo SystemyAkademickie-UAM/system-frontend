@@ -46,6 +46,7 @@ import ActivitiesHomePage from '../pages/links/groups/activities/ActivitiesHomeP
 import ActivitiesToolsPage from '../pages/links/groups/activities/ActivitiesToolsPage.jsx';
 
 // Posts (Wpisy) - lecturer only
+import PostsLayout from '../pages/links/groups/layouts/PostsLayout.jsx';
 import PostsHomePage from '../pages/links/groups/posts/PostsHomePage.jsx';
 
 // Rewards (Systemy nagród) - lecturer only
@@ -216,7 +217,10 @@ const appRouteTree = [
                   // ----------------------------------------
                   {
                     path: 'posts',
-                    element: withGuard(<PostsHomePage />, { allowedRoles: LECTURER_ONLY }),
+                    element: withGuard(<PostsLayout />, { allowedRoles: LECTURER_ONLY }),
+                    children: [
+                      { index: true, element: <PostsHomePage /> },
+                    ],
                   },
 
                   // ----------------------------------------

@@ -4,6 +4,8 @@ import { DataTable, CurrencyDisplay, PageHeader, SearchBar, SubNav, useToast } f
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
+import '../shared/groupSectionPage.css';
+import '../group-members/MembersHomeContent.css';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useGroupMembers } from './useGroupMembers.js';
 

@@ -102,6 +102,10 @@
   min-width: 1180px;
 }
 
+.rewards-table--shop-items .data-table {
+  min-width: 1240px;
+}
+
 .rewards-table .data-table__cell--truncate {
   overflow: hidden;
   min-width: 0;

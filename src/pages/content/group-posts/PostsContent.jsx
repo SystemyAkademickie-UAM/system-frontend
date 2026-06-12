@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Button, SearchBar } from '../../../components/ui/index.js';
+import { Button, PageHeader, SearchBar } from '../../../components/ui/index.js';
 import { DataTableRowActions } from '../../../components/ui/DataTable/DataTable.jsx';
 import '../../../components/ui/DataTable/DataTable.css';
+import '../../../components/page/PageUnavailable.css';
+import '../shared/groupSectionPage.css';
+import '../group-members/MembersHomeContent.css';
 import { useGroupPosts } from './useGroupPosts.js';
 import PostFormModal from './PostFormModal.jsx';
 import PostDeleteModal from './PostDeleteModal.jsx';
@@ -84,37 +87,41 @@ export default function PostsContent() {
   const modalPost = activeModal?.post ?? null;
 
   return (
-    <div className="posts-page">
+    <section className="page-unavailable members-page posts-page" aria-label="Wpisy">
+      <div className="members-page__header-row">
+        <PageHeader
+          title="Wpisy"
+          description="Edytor wpisów pozwalający tworzyć historie budujące tło fabularne grupy."
+        />
+        <Button
+          variant="primary"
+          size="md"
+          className="members-page__header-action posts-page__add-btn"
+          onClick={() => openModal('create')}
+        >
+          Dodaj wpis
+        </Button>
+      </div>
+
       {error ? (
         <p className="posts-page__error" role="alert">{error}</p>
       ) : null}
 
-      <div className="posts-page__controls">
+      <div className="members-page__nav-row posts-page__controls">
         <span className="posts-page__count">
           Wpisy
           {' '}
           {posts.length}
         </span>
 
-        <div className="posts-page__controls-end">
-          <Button
-            variant="primary"
-            size="md"
-            className="posts-page__add-btn"
-            onClick={() => openModal('create')}
-          >
-            Dodaj wpis
-          </Button>
-
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj wpisów…"
-            name="posts-search"
-            className="posts-page__search"
-            aria-label="Szukaj wpisów"
-          />
-        </div>
+        <SearchBar
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Szukaj wpisów…"
+          name="posts-search"
+          className="members-page__search posts-page__search"
+          aria-label="Szukaj wpisów"
+        />
       </div>
 
       {isLoading ? (
@@ -165,6 +172,6 @@ export default function PostsContent() {
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
       />
-    </div>
+    </section>
   );
 }

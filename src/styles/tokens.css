@@ -182,10 +182,18 @@
   --shell-sidebar-width: 224px;
   --shell-superbar-height: 63px;
   --z-index-shell-header: 10;
+  --z-index-modal: 1000;
+  --z-index-page-overlay: 1100;
+  --z-index-tooltip: 12100;
+  --z-index-toast: 12200;
 
   /* --- Typografia --- */
   /** Minimalny rozmiar czcionki w całej aplikacji */
   --font-size-min: 12px;
+  /** Domyślna czcionka aplikacji (bez Comic Sans / cursive w fallbacku) */
+  --font-family-app: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /** Komunikaty: toasty, alerty, statusy, błędy inline */
+  --font-family-message: var(--font-family-app);
   /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
   --font-size-body: 14px;
   /** Nagłówek strony */
