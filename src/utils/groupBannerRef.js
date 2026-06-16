@@ -52,6 +52,25 @@ export function getPredefinedBannerPreviewUrl(assetPath) {
  * @property {boolean} cleared
  */
 
+/**
+ * Stabilny klucz wartości banera do autozapisu (bez trybu UI zakładek).
+ *
+ * @param {BannerPickerValue} value
+ * @returns {string}
+ */
+export function serializeBannerPickerValue(value) {
+  return JSON.stringify({
+    mode: value.mode,
+    galleryPath: value.galleryPath,
+    color: value.color,
+    cleared: value.cleared,
+    existingDriveRef: value.existingDriveRef,
+    fileName: value.file?.name ?? null,
+    fileSize: value.file?.size ?? null,
+    fileLastModified: value.file?.lastModified ?? null,
+  });
+}
+
 /** @returns {BannerPickerValue} */
 export function createDefaultBannerPickerValue() {
   return {

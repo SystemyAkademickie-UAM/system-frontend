@@ -5,34 +5,10 @@
   width: 100%;
 }
 
-.group-banner-picker__tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.group-banner-picker__tab {
-  padding: 0.45rem 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
-  background: var(--color-bg-elevated);
-  color: var(--color-text-secondary);
-  font: inherit;
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.group-banner-picker__tab:hover {
-  color: var(--color-text-primary);
-  border-color: rgba(66, 243, 125, 0.35);
-}
-
-.group-banner-picker__tab--active {
-  background: var(--color-nav-sub-active-bg);
-  border-color: rgba(66, 243, 125, 0.45);
-  color: var(--color-accent);
+.group-banner-picker__sub-nav {
+  align-self: flex-start;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .group-banner-picker__panel {
@@ -99,28 +75,6 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.group-banner-picker__upload-btn {
-  align-self: flex-start;
-  padding: 0.55rem 0.9rem;
-  border: 0;
-  border-radius: 10px;
-  background: var(--color-accent);
-  color: var(--color-accent-on);
-  font: inherit;
-  font-size: var(--font-size-body);
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.05s ease;
-}
-
-.group-banner-picker__upload-btn:hover {
-  background: var(--color-accent-pressed);
-}
-
-.group-banner-picker__upload-btn:active {
-  transform: translateY(1px);
 }
 
 .group-banner-picker__color {

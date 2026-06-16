@@ -1,0 +1,29 @@
+.super-bar-breadcrumb-mobile {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .super-bar-breadcrumb-mobile {
+    display: block;
+    padding: 0.65rem clamp(1rem, 2.5vw, 1.25rem) 0;
+    background: var(--color-bg-app);
+  }
+
+  .super-bar-breadcrumb-mobile .super-bar-breadcrumb {
+    display: block;
+    padding: 0;
+  }
+
+  .super-bar-breadcrumb-mobile .super-bar-breadcrumb__link,
+  .super-bar-breadcrumb-mobile .super-bar-breadcrumb__current {
+    color: var(--color-text-primary);
+  }
+
+  .super-bar-breadcrumb-mobile .super-bar-breadcrumb__current--group {
+    color: var(--color-text-primary);
+  }
+
+  .super-bar-breadcrumb-mobile .super-bar-breadcrumb__sep {
+    color: var(--color-text-secondary);
+  }
+}

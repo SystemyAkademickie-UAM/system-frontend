@@ -1,29 +1,19 @@
-import { PageHeader, SubNav } from '../../../components/ui/index.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
-import '../shared/groupSectionPage.css';
-import '../group-members/MembersHomeContent.css';
 import Activities from './ActivitiesContent.jsx';
 
 export default function ActivitiesHomeContent() {
   const nav = useGroupSubNav('group-activities');
 
   return (
-    <section className="page-unavailable members-page" aria-label={nav.sectionTitle}>
-      <PageHeader
-        title={nav.sectionTitle}
-        description="Panel pozwalający na tworzenie nowych etapów oraz przypisywanie im aktywności."
-      />
-
-      <div className="members-page__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="members-page__sub-nav"
-        />
-      </div>
-
+    <SectionPageLayout
+      className="page-unavailable activities-section-page"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+    >
       <Activities />
-    </section>
+    </SectionPageLayout>
   );
 }

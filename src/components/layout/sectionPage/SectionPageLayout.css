@@ -1,0 +1,127 @@
+.maq-section-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 2.5vw, 2rem);
+}
+
+.maq-section-page.page-unavailable {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  min-height: 12rem;
+}
+
+.maq-section-page__head {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.maq-section-page__eyebrow {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.maq-section-page__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  width: 100%;
+}
+
+.maq-section-page__title {
+  margin: 0;
+  font-family: inherit;
+  font-size: var(--font-size-section-title, 32px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-text-primary);
+}
+
+.maq-section-page__header-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.maq-section-page__sub-nav {
+  padding: 4px;
+}
+
+.maq-section-page__divider {
+  width: 100%;
+}
+
+.maq-section-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 100%;
+  padding-top: 1rem;
+  min-width: 0;
+}
+
+.maq-section-page__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  width: 100%;
+}
+
+.maq-section-page__toolbar-start,
+.maq-section-page__toolbar-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.maq-section-page__toolbar-end {
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .maq-section-page__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .maq-section-page__toolbar-start,
+  .maq-section-page__toolbar-end {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .maq-section-page__toolbar-end {
+    justify-content: stretch;
+  }
+
+  .maq-section-page__toolbar-end .maq-search-bar,
+  .maq-section-page__toolbar-end .group-shop__search,
+  .maq-section-page__toolbar-end .posts-page__search,
+  .maq-section-page__toolbar-end .rewards-page__search,
+  .maq-section-page__toolbar-end .members-page__search,
+  .maq-section-page__toolbar-end .activities-page__search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .maq-section-page__toolbar-start .maq-btn {
+    width: 100%;
+  }
+}

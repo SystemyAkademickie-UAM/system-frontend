@@ -4,17 +4,16 @@ import { useParams } from 'react-router-dom';
 import {
   Button,
   DataTable,
-  PageHeader,
   SearchBar,
-  SubNav,
   useToast,
 } from '../../../components/ui/index.js';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { DataTableRowActions } from '../../../components/ui/DataTable/DataTable.jsx';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
-import '../shared/groupSectionPage.css';
 import MembersCodeContentWindow from './MembersCodeContentWindow.jsx';
 import './MembersCodeContent.css';
 
@@ -245,6 +244,7 @@ export default function MembersCodeContent() {
       {
         id: 'copy',
         label: 'Skopiuj kod',
+        iconFile: SVG_ICONS.actions.copy,
         ariaLabel: 'Skopiuj kod dostępu',
         onSelect: handleCopyCode,
       },
@@ -263,46 +263,44 @@ export default function MembersCodeContent() {
   }), [handleCopyCode, handleDeleteCode, openEditWindow]);
 
   return (
-    <section className="page-unavailable members-page members-code-page" aria-label={nav.sectionTitle}>
-      <div className="members-code-page__header-row">
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Kody dostępu do grupy"
-        />
-        <Button
-          variant="primary"
-          size="md"
-          className="members-code-page__add-btn"
-          onClick={openGenerateWindow}
-        >
-          Generuj nowy kod
-        </Button>
-      </div>
-
-      <div className="members-page__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="members-page__sub-nav"
-        />
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj kodu…"
-          name="enrollment-code-search"
-          className="members-page__search"
-          aria-label="Szukaj kodu dostępu"
-        />
-      </div>
-
+    <SectionPageLayout
+      className="page-unavailable members-page members-code-page"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+      toolbar={(
+        <>
+          <div className="maq-section-page__toolbar-start">
+            <Button
+              variant="primary"
+              size="md"
+              className="members-code-page__add-btn"
+              onClick={openGenerateWindow}
+            >
+              Generuj nowy kod
+            </Button>
+          </div>
+          <div className="maq-section-page__toolbar-end">
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj kodu…"
+              name="enrollment-code-search"
+              className="members-page__search"
+              aria-label="Szukaj kodu dostępu"
+            />
+          </div>
+        </>
+      )}
+    >
       {errorMessage ? (
         <p className="members-code-page__error" role="alert">{errorMessage}</p>
       ) : null}
 
       {isLoading ? (
-        <p className="members-code-page__loading" role="status">Ładowanie kodów dostępu…</p>
+        <p className="members-code-page__loading page-unavailable__notice" role="status">Ładowanie kodów dostępu…</p>
       ) : codes.length === 0 ? (
-        <p className="members-code-page__empty">
+        <p className="members-code-page__empty page-unavailable__notice">
           Brak kodów dostępu. Kliknij „Generuj nowy kod”, aby utworzyć pierwszy.
         </p>
       ) : (
@@ -331,6 +329,6 @@ export default function MembersCodeContent() {
           onsaved={handleSaved}
         />
       ) : null}
-    </section>
+    </SectionPageLayout>
   );
 }

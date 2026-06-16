@@ -48,6 +48,15 @@
   margin-left: auto;
 }
 
+.rewards-page__loading,
+.rewards-page__empty {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
 .rewards-table__position {
   font-size: var(--rewards-font-table-emphasis);
   font-weight: 700;

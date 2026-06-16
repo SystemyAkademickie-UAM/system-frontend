@@ -297,11 +297,7 @@ export default function RankPathBoard({
             size="lg"
 
             tooltipPlacement="left"
-
-            tooltipAlwaysVisible
-
             tooltipPlain
-
             className="rank-path-board__student-avatar"
 
           />

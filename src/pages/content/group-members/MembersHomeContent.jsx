@@ -1,13 +1,17 @@
 import { useCallback, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
-import { DataTable, CurrencyDisplay, PageHeader, SearchBar, SubNav, useToast } from '../../../components/ui/index.js';
+import { DataTable, CurrencyDisplay, SearchBar, useToast } from '../../../components/ui/index.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
+import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import '../../../components/page/PageUnavailable.css';
 import '../shared/groupSectionPage.css';
 import '../group-members/MembersHomeContent.css';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useGroupMembers } from './useGroupMembers.js';
+import MembersTableRow from './MembersTableRow.jsx';
 
 import MemberBadgesModal from './modals/MemberBadgesModal.jsx';
 import MemberCurrencyModal from './modals/MemberCurrencyModal.jsx';
@@ -164,7 +168,16 @@ export default function MembersHomeContent() {
             />
           </span>
           <div className="members-table__user-info">
-            <span className="members-table__name">{member.name}</span>
+            {!member.isLecturer && groupId && member.accountId ? (
+              <Link
+                className="members-table__profile-link"
+                to={groupStudentProfilePath(groupId, member.accountId)}
+              >
+                <span className="members-table__name">{member.name}</span>
+              </Link>
+            ) : (
+              <span className="members-table__name">{member.name}</span>
+            )}
             {member.nickname && member.nickname !== member.name && (
               <span className="members-table__nickname">({member.nickname})</span>
             )}
@@ -195,7 +208,9 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--badges',
       hiddenBelow: 768,
       render: (member) => (
-        <span className="members-table__stat">{member.badgesCount}</span>
+        <span className="members-table__stat">
+          {member.isLecturer ? '—' : member.badgesCount}
+        </span>
       ),
     },
     {
@@ -208,7 +223,9 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--currency',
       hiddenBelow: 480,
       render: (member) => (
-        <CurrencyDisplay amount={member.currency} size="sm" />
+        member.isLecturer
+          ? <span className="members-table__stat">—</span>
+          : <CurrencyDisplay amount={member.currency} size="sm" />
       ),
     },
     {
@@ -221,10 +238,12 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--total',
       hiddenBelow: 768,
       render: (member) => (
-        <CurrencyDisplay amount={member.totalCurrency} size="sm" />
+        member.isLecturer
+          ? <span className="members-table__stat">—</span>
+          : <CurrencyDisplay amount={member.totalCurrency} size="sm" />
       ),
     },
-  ], [rankNames]);
+  ], [groupId, rankNames]);
 
   const rowActions = useMemo(() => ({
     onDelete: (member) => openModal('delete', member),
@@ -272,43 +291,41 @@ export default function MembersHomeContent() {
 
   if (error) {
     return (
-      <section className="page-unavailable members-page" aria-label={nav.sectionTitle}>
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Zarządzaj uczestnikami kursu — edytuj rangi, odznaki, walutę i postęp."
-        />
+      <SectionPageLayout
+        className="page-unavailable members-page"
+        title={nav.sectionTitle}
+        subNavItems={nav.items}
+        subNavAriaLabel={nav.ariaLabel}
+      >
         <p className="members-page__error" role="alert">{error}</p>
-      </section>
+      </SectionPageLayout>
     );
   }
 
   return (
-    <section className="page-unavailable members-page" aria-label={nav.sectionTitle}>
-      <PageHeader
-        title={nav.sectionTitle}
-        description="Zarządzaj uczestnikami kursu — edytuj rangi, odznaki, walutę i postęp."
-      />
-
-      <div className="members-page__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="members-page__sub-nav"
-        />
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj członka grupy…"
-          name="member-search"
-          className="members-page__search"
-          aria-label="Szukaj członka grupy"
-        />
-      </div>
+    <SectionPageLayout
+      className="page-unavailable members-page"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+      toolbar={(
+        <div className="maq-section-page__toolbar-end">
+          <SearchBar
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Szukaj członka grupy…"
+            name="member-search"
+            className="members-page__search"
+            aria-label="Szukaj członka grupy"
+          />
+        </div>
+      )}
+    >
 
       {isLoading ? (
-        <p className="members-page__loading">Ładowanie członków grupy…</p>
+        <p className="members-page__loading page-unavailable__notice">Ładowanie członków grupy…</p>
       ) : members.length === 0 ? (
-        <p className="members-page__empty">Brak członków w tej grupie.</p>
+        <p className="members-page__empty page-unavailable__notice">Brak członków w tej grupie.</p>
       ) : (
         <DataTable
           columns={memberColumns}
@@ -323,6 +340,7 @@ export default function MembersHomeContent() {
             filter: (member, query) => member.name.toLowerCase().includes(query),
           }}
           rowActions={rowActions}
+          renderRow={MembersTableRow}
         />
       )}
 
@@ -370,6 +388,6 @@ export default function MembersHomeContent() {
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
       />
-    </section>
+    </SectionPageLayout>
   );
 }

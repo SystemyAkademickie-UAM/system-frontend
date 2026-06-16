@@ -3,18 +3,24 @@ import {useParams} from 'react-router-dom';
 import {getApiBaseUrl, getSamlLoginUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
-import {Button, useToast} from '../../../components/ui/index.js';
+import { Button, TexturedSurface, useToast } from '../../../components/ui/index.js';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
+import SmartPostCard from '../../../components/ui/SmartPostCard/SmartPostCard.jsx';
 
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import './shared/groupMainSubpageHeader.css';
+import '../group-main/GroupMainHomeContent.css';
 import './GroupMain.css';
 
 const editicon = PUBLIC_UI_ICONS.edit;
 const deleteicon = PUBLIC_UI_ICONS.delete;
 const accepticon = PUBLIC_UI_ICONS.accept;
 const cancelicon = PUBLIC_UI_ICONS.cancel;
+
+function isPostFormValid(post) {
+  return post.title.trim().length > 0 && post.text.trim().length > 0;
+}
 
 export default function App() {
 
@@ -235,7 +241,7 @@ export default function App() {
 
           if (posts[i].editmode == 0) {
             updatedpost.editmode = 1;
-          } else if (posts[i].editmode == 1) {
+          } else if (posts[i].editmode == 1 && isPostFormValid(posts[i])) {
             updatedpost.editmode = 0;
           }
 
@@ -265,6 +271,10 @@ export default function App() {
         }
 
         i = i + 1;
+      }
+
+      if (!movingPost || !isPostFormValid(movingPost)) {
+        return;
       }
 
       movingPost.editmode = 0;
@@ -405,51 +415,66 @@ export default function App() {
       ) : null}
 
       <div className="group-main-posts__list">
-        {[...tempPosts, ...posts].map((post) => (
-          post.editmode < 1 ? (
-            <article key={`post${post.id}`} className="group-main-posts__card">
-              <div className="group-main-posts__card-body">
-                <h2 className="group-main-posts__card-title">{post.title}</h2>
-                <p className="group-main-posts__card-text">{post.text}</p>
-              </div>
-            </article>
-          ) : (
-            <article key={`post${post.id}`} className="group-main-posts__card">
-              <div className="group-main-posts__edit">
-                <input
-                  className="group-main-posts__input"
-                  onChange={(event) => onPostChange(post.id, 'title', event.target.value)}
-                  value={post.title}
-                  placeholder="Temat wpisu"
-                />
-                <textarea
-                  className="group-main-posts__textarea"
-                  onChange={(event) => onPostChange(post.id, 'text', event.target.value)}
-                  value={post.text}
-                  placeholder="Treść wpisu"
-                />
-              </div>
-              <div className="group-main-posts__edit-actions">
-                <button
-                  type="button"
-                  className="group-main-posts__icon-btn"
-                  onClick={() => onEditpostclick(post.id, post.editmode === 2 ? 1 : 0)}
-                  aria-label="Zapisz wpis"
-                >
-                  <img src={accepticon} alt="" />
-                </button>
-                <button
-                  type="button"
-                  className="group-main-posts__icon-btn"
-                  onClick={() => onCancelpostclick(post.id)}
-                  aria-label="Anuluj edycję"
-                >
-                  <img src={cancelicon} alt="" />
-                </button>
-              </div>
-            </article>
-          )
-        ))}
+        {[...tempPosts, ...posts].length === 0 ? (
+          <p className="group-main-home__empty-notice">Brak wpisów w tej grupie.</p>
+        ) : (
+          [...tempPosts, ...posts].map((post) => {
+            const canSavePost = isPostFormValid(post);
+
+            return post.editmode < 1 ? (
+              <SmartPostCard
+                key={`post${post.id}`}
+                title={post.title}
+                text={post.text}
+                surfaceClassName="group-main-posts__card-surface"
+                innerClassName="group-main-posts__card"
+                bodyClassName="group-main-posts__card-body"
+                titleClassName="group-main-posts__card-title"
+                dividerClassName="group-main-posts__card-divider"
+                textClassName="group-main-posts__card-text"
+                titleTag="h2"
+              />
+            ) : (
+              <TexturedSurface key={`post${post.id}`} className="group-main-posts__card-surface">
+                <article className="group-main-posts__card">
+                  <div className="group-main-posts__edit">
+                    <input
+                      className="group-main-posts__input"
+                      onChange={(event) => onPostChange(post.id, 'title', event.target.value)}
+                      value={post.title}
+                      placeholder="Temat wpisu"
+                    />
+                    <textarea
+                      className="group-main-posts__textarea"
+                      onChange={(event) => onPostChange(post.id, 'text', event.target.value)}
+                      value={post.text}
+                      placeholder="Treść wpisu"
+                    />
+                  </div>
+                  <div className="group-main-posts__edit-actions">
+                    <button
+                      type="button"
+                      className="group-main-posts__icon-btn"
+                      onClick={() => onEditpostclick(post.id, post.editmode === 2 ? 1 : 0)}
+                      disabled={!canSavePost}
+                      aria-label="Zapisz wpis"
+                    >
+                      <img src={accepticon} alt="" />
+                    </button>
+                    <button
+                      type="button"
+                      className="group-main-posts__icon-btn"
+                      onClick={() => onCancelpostclick(post.id)}
+                      aria-label="Anuluj edycję"
+                    >
+                      <img src={cancelicon} alt="" />
+                    </button>
+                  </div>
+                </article>
+              </TexturedSurface>
+            );
+          })
+        )}
       </div>
     </section>
   );

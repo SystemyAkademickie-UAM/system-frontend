@@ -31,6 +31,7 @@ export default function GroupMainLayout() {
         description={group?.description}
         bannerUrl={group?.bannerUrl}
         isLoading={isLoading}
+        showDescription={false}
       />
 
       {errorMessage ? (

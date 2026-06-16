@@ -20,11 +20,15 @@
   /** Podniesiona powierzchnia (np. kafelki wewnątrz karty) */
   --color-bg-elevated: #292839;
 
+  /** Linie rozdzielające — nieco ciemniejsze od tła, subtelnie widoczne */
+  --color-divider: #1c1c26;
+  --color-divider: color-mix(in srgb, var(--color-bg-app) 68%, black);
+
   /* --- Nawigacja --- */
   /** Główny pasek nawigacji (sidebar + superBar) */
-  --color-nav-primary: #226242;
-  /** Przycisk „Twoje grupy” w sidebarze */
-  --color-nav-cta: #34d399;
+  --color-nav-primary: #28452e;
+  /** Przycisk „Twoje grupy” w sidebarze oraz akcent interaktywny */
+  --color-nav-cta: #1ecc38;
   /** Tekst i ikony pozycji w sidebarze */
   --color-nav-link: #d1fae5;
   /** Domyślny kolor ikon SVG (tryb mask) */
@@ -46,17 +50,17 @@
   /** Główny kolor tekstu */
   --color-text-primary: #d9d9d9;
   /** Dodatkowy / pomocniczy tekst */
-  --color-text-secondary: #bbcbb9;
+  --color-text-secondary: #BBCBB9;
 
   /* --- Akcent / przyciski --- */
   /** Kolor przycisku i akcentów interaktywnych */
-  --color-accent: #42f37d;
-  /** Tekst na przycisku akcentowym (Figma: #003915) */
-  --color-accent-on: #003915;
+  --color-accent: #1ecc38;
+  /** Tekst na przycisku akcentowym */
+  --color-accent-on: #002a10;
   /** Przycisk po naciśnięciu / hover — nieco ciemniejszy akcent */
-  --color-accent-pressed: #36d96d;
+  --color-accent-pressed: #17b82f;
   /** Akcent z przezroczystością (tła badge, highlight) */
-  --color-accent-muted: rgba(66, 243, 125, 0.25);
+  --color-accent-muted: rgba(30, 204, 56, 0.25);
 
   /* --- Odznaki — rzadkość (pasek boczny, etykieta, nagłówki sekcji) --- */
   --color-badge-rarity-common: #00eeff;
@@ -160,7 +164,7 @@
   --color-activity-icon-locked-bg: var(--color-bg-elevated);
   --color-activity-icon-locked-border: rgba(255, 255, 255, 0.35);
   --color-activity-icon-unlocked-bg: var(--color-accent);
-  --color-activity-icon-unlocked-glow: rgba(66, 243, 125, 0.45);
+  --color-activity-icon-unlocked-glow: rgba(30, 204, 56, 0.45);
   --color-activity-text: var(--color-badge-text);
   --activity-card-max-width: 420px;
   --activity-icon-size: 36px;
@@ -174,6 +178,14 @@
   --badge-compact-max-width: 533px;
   --size-badge-icon-circle-compact: 48px;
   --size-badge-icon-compact: 22px;
+
+  /** TexturedSurface — odpowiednik Figma Texture (radius 20, size 35) */
+  --texture-radius: 20px;
+  --texture-displacement: 35;
+  --texture-frame-inset: 7px;
+  --texture-noise-frequency: 0.045;
+  --texture-frame-color: var(--color-bg-app);
+  --texture-surface-color: var(--color-bg-surface);
 
   --shadow-nav-sidebar: 10px 0 30px rgba(0, 0, 0, 0.3);
   --shadow-superbar: 0 4px 4px rgba(0, 0, 0, 0.25);
@@ -196,8 +208,10 @@
   --font-family-message: var(--font-family-app);
   /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
   --font-size-body: 14px;
-  /** Nagłówek strony */
+  /** Nagłówek strony (legacy PageHeader) */
   --font-size-page-title: 42px;
+  /** Nagłówek sekcji (SectionPageLayout) */
+  --font-size-section-title: 32px;
   /** Tekst pod nagłówkiem (opis, podtytuł) */
   --font-size-page-description: 14px;
   /** Wartości statystyk na paskach nawigacji (życia, waluta) */

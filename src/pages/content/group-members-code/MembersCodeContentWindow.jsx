@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Modal, useToast } from '../../../components/ui/index.js';
+import { Modal, useToast, CharacterLimitedField } from '../../../components/ui/index.js';
+import { ENROLLMENT_ENTRY_CODE_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
@@ -370,15 +371,19 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
             <label htmlFor="members-code-custom" className="members-code-modal__label">
               Własny kod (opcjonalnie)
             </label>
-            <input
-              id="members-code-custom"
-              type="text"
-              className="members-code-modal__input"
-              value={inputCode}
-              onChange={(event) => setInputCode(event.target.value.slice(0, 6))}
-              placeholder="losowy kod"
-              maxLength={6}
-            />
+            <CharacterLimitedField value={inputCode} maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}>
+              <input
+                id="members-code-custom"
+                type="text"
+                className="members-code-modal__input"
+                value={inputCode}
+                onChange={(event) => setInputCode(
+                  event.target.value.slice(0, ENROLLMENT_ENTRY_CODE_MAX_LENGTH),
+                )}
+                placeholder="losowy kod"
+                maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}
+              />
+            </CharacterLimitedField>
           </div>
         )}
 

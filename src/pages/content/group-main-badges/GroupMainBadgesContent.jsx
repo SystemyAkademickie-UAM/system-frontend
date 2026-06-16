@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   BADGE_RARITY,
   BADGE_RARITY_LABELS,
@@ -14,6 +15,8 @@ import {
   TREASURY_SORT,
 } from './badgeTreasuryModel.js';
 import { useGroupMainBadges } from './useGroupMainBadges.js';
+import { GroupMainEmptyNotice, GROUP_MAIN_EMPTY_LINKS } from '../group-main/GroupMainHomeContent.jsx';
+import '../group-main/GroupMainHomeContent.css';
 import './GroupMainBadgesContent.css';
 
 const RARITY_FILTERS = [
@@ -31,6 +34,7 @@ const UNLOCK_FILTERS = [
 ];
 
 export default function GroupMainBadgesContent() {
+  const { groupId } = useParams();
   const { symbol } = useGroupCurrency();
   const {
     badges,
@@ -76,7 +80,7 @@ export default function GroupMainBadgesContent() {
       <div className="badge-treasury__title-row">
         <header className="badge-treasury__page-header">
           <p className="badge-treasury__eyebrow">Skarbiec</p>
-          <h1 className="badge-treasury__title">Odznaki kursu</h1>
+          <h1 className="badge-treasury__title">Odznaki</h1>
         </header>
       </div>
 
@@ -152,7 +156,11 @@ export default function GroupMainBadgesContent() {
       </div>
 
       {badges.length === 0 ? (
-        <p className="badge-treasury__empty">W tym kursie nie ma jeszcze żadnych odznak.</p>
+        <GroupMainEmptyNotice
+          message={GROUP_MAIN_EMPTY_LINKS.badges.message}
+          linkLabel={GROUP_MAIN_EMPTY_LINKS.badges.linkLabel}
+          linkTo={GROUP_MAIN_EMPTY_LINKS.badges.path(groupId)}
+        />
       ) : visibleBadges.length === 0 ? (
         <p className="badge-treasury__empty">Brak odznak spełniających wybrane filtry.</p>
       ) : (
@@ -172,4 +180,4 @@ export default function GroupMainBadgesContent() {
     </section>
   );
 }
-
+

@@ -114,3 +114,14 @@
     width: calc(100% - var(--shell-sidebar-width));
   }
 }
+
+.app-shell--compact .app-shell__sidebar-wrap--hidden {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .app-shell--compact .app-shell__main-column {
+    margin-left: 0;
+    width: 100%;
+  }
+}

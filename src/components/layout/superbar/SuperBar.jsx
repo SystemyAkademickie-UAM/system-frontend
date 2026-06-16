@@ -1,4 +1,5 @@
 import { IconStar } from './ShellIcons.jsx';
+import SuperBarBreadcrumb from './SuperBarBreadcrumb.jsx';
 import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
 import SuperBarStat from './SuperBarStat.jsx';
@@ -29,6 +30,7 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
  * @param {boolean} [props.menuExpanded]
  * @param {() => void} [props.onMenuToggle]
  * @param {boolean} [props.isLoading] — czy trwa ładowanie sesji
+ * @param {{ groupName: string | null, groupPath: string | null, segments: { label: string, to?: string }[] } | null} [props.breadcrumb]
  */
 export default function SuperBar({
   displayName,
@@ -43,6 +45,7 @@ export default function SuperBar({
   menuExpanded = false,
   onMenuToggle,
   isLoading = false,
+  breadcrumb = null,
 }) {
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
@@ -62,6 +65,13 @@ export default function SuperBar({
           >
             <span className="super-bar__menu-icon" aria-hidden="true" />
           </button>
+        ) : null}
+        {breadcrumb ? (
+          <SuperBarBreadcrumb
+            groupName={breadcrumb.groupName}
+            groupPath={breadcrumb.groupPath}
+            segments={breadcrumb.segments}
+          />
         ) : null}
       </div>
       <div className="super-bar__end">

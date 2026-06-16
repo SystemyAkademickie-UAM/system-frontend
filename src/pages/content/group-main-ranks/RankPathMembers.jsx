@@ -1,11 +1,13 @@
+import { Link, useParams } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
+import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import './RankPathMembers.css';
 
 const DEFAULT_MAX_VISIBLE = 15;
 
-function OverflowBadge({ hiddenStudents, currencySymbol }) {
+function OverflowBadge({ hiddenStudents, currencySymbol, groupId }) {
   const triggerRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -45,7 +47,16 @@ function OverflowBadge({ hiddenStudents, currencySymbol }) {
             <ul className="rank-path-members__overflow-list">
               {hiddenStudents.map((student) => (
                 <li key={student.id}>
-                  <span>{student.nickname}</span>
+                  {groupId && student.accountId ? (
+                    <Link
+                      className="rank-path-members__overflow-link"
+                      to={groupStudentProfilePath(groupId, student.accountId)}
+                    >
+                      {student.nickname}
+                    </Link>
+                  ) : (
+                    <span>{student.nickname}</span>
+                  )}
                   <span className="rank-path-members__overflow-earned">
                     {student.totalEarned}
                     {currencySymbol ? ` ${currencySymbol}` : ''}
@@ -63,17 +74,14 @@ function OverflowBadge({ hiddenStudents, currencySymbol }) {
 
 /**
  * Awatary studentów przypisanych do rangi (prowadzący).
- *
- * @param {Object} props
- * @param {import('../rankPathModel.js').RankPathStudent[]} props.students
- * @param {string} [props.currencySymbol]
- * @param {number} [props.maxVisible]
  */
 export default function RankPathMembers({
   students,
   currencySymbol,
   maxVisible = DEFAULT_MAX_VISIBLE,
 }) {
+  const { groupId } = useParams();
+
   if (!students.length) {
     return <div className="rank-path-members rank-path-members--empty" aria-hidden="true" />;
   }
@@ -92,10 +100,17 @@ export default function RankPathMembers({
           currencySymbol={currencySymbol}
           size="md"
           tooltipPlacement="left"
+          href={groupId && student.accountId
+            ? groupStudentProfilePath(groupId, student.accountId)
+            : undefined}
         />
       ))}
       {hiddenStudents.length > 0 ? (
-        <OverflowBadge hiddenStudents={hiddenStudents} currencySymbol={currencySymbol} />
+        <OverflowBadge
+          hiddenStudents={hiddenStudents}
+          currencySymbol={currencySymbol}
+          groupId={groupId}
+        />
       ) : null}
     </div>
   );

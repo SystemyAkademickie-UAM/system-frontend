@@ -19,6 +19,10 @@
   padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
 }
 
+.app-page-layout > .maq-section-page.page-unavailable {
+  padding: 0;
+}
+
 .members-page {
   font-family: 'Inter', 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
@@ -66,14 +70,27 @@
 .members-page__notice {
   margin: 0;
   width: 100%;
-  padding: 2rem 1.5rem;
-  border-radius: 16px;
-  background: var(--color-bg-surface);
-  font-size: var(--font-size-page-description);
-  font-weight: 400;
-  line-height: 1.45;
-  text-align: center;
+  padding: 0;
+  background: transparent;
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: left;
   color: var(--color-text-secondary);
+}
+
+.members-page__loading,
+.members-page__empty {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
+.group-shop-add-page .maq-section-page__body {
+  width: 100%;
+  max-width: none;
 }
 
 @media (max-width: 768px) {

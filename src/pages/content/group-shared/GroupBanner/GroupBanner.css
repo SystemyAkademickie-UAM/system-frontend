@@ -1,3 +1,12 @@
+.group-banner--compact {
+  --group-banner-min-height: 170px;
+}
+
+.group-banner--compact .group-banner__content {
+  min-height: 170px;
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
+}
+
 .group-banner {
   position: relative;
   width: 100%;
@@ -99,6 +108,13 @@
   color: var(--color-accent);
 }
 
+.group-banner__description-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 42rem;
+}
+
 .group-banner__description {
   margin: 0;
   max-width: 42rem;
@@ -106,6 +122,11 @@
   font-weight: 400;
   line-height: 1.5;
   color: var(--color-text-primary);
+  width: fit-content;
+}
+
+.group-banner__description-divider {
+  width: auto;
 }
 
 @media (max-width: 599px) {

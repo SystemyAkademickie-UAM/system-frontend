@@ -4,12 +4,11 @@ import {
   Button,
   CurrencyDisplay,
   DataTable,
-  PageHeader,
   SearchBar,
   ShopToggleButton,
-  SubNav,
   useToast,
 } from '../../../components/ui/index.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { groupShopAddPath } from '../../../routes/pathRegistry.js';
 import '../../../components/page/PageUnavailable.css';
@@ -234,60 +233,60 @@ export default function RewardsShopItemsContent() {
 
   if (error) {
     return (
-      <section className="page-unavailable rewards-page rewards-shop-items" aria-label={nav.sectionTitle}>
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Zarządzaj katalogiem przedmiotów sklepowych kursu."
-        />
+      <SectionPageLayout
+        className="page-unavailable rewards-page rewards-shop-items"
+        eyebrow="Skarbiec"
+        title={nav.sectionTitle}
+        subNavItems={nav.items}
+        subNavAriaLabel={nav.ariaLabel}
+      >
         <p className="rewards-page__error" role="alert">{error}</p>
-      </section>
+      </SectionPageLayout>
     );
   }
 
   return (
-    <section className="page-unavailable rewards-page rewards-shop-items" aria-label={nav.sectionTitle}>
-      <div className="rewards-page__header-row">
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Zarządzaj katalogiem przedmiotów sklepowych kursu."
-        />
-      </div>
-
-      <div className="rewards-page__nav-row rewards-shop-items__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="rewards-page__sub-nav"
-        />
-        <div className="rewards-shop-items__nav-actions">
-          <ShopToggleButton
-            isShopOpen={isShopOpen}
-            onToggle={handleToggleShopOpen}
-            className="rewards-shop-items__toggle"
-          />
-          <Button
-            variant="primary"
-            size="md"
-            className="rewards-page__add-btn rewards-shop-items__add-btn"
-            onClick={handleAddProduct}
-          >
-            Dodaj produkt
-          </Button>
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj produktu…"
-            name="shop-item-catalog-search"
-            className="rewards-page__search rewards-shop-items__search"
-            aria-label="Szukaj produktu"
-          />
-        </div>
-      </div>
+    <SectionPageLayout
+      className="page-unavailable rewards-page rewards-shop-items"
+      eyebrow="Skarbiec"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+      toolbar={(
+        <>
+          <div className="maq-section-page__toolbar-start rewards-shop-items__toolbar-start">
+            <ShopToggleButton
+              isShopOpen={isShopOpen}
+              onToggle={handleToggleShopOpen}
+              className="rewards-shop-items__toggle"
+            />
+            <Button
+              variant="primary"
+              size="md"
+              className="rewards-page__add-btn rewards-shop-items__add-btn"
+              onClick={handleAddProduct}
+            >
+              Dodaj produkt
+            </Button>
+          </div>
+          <div className="maq-section-page__toolbar-end">
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj produktu…"
+              name="shop-item-catalog-search"
+              className="rewards-page__search rewards-shop-items__search"
+              aria-label="Szukaj produktu"
+            />
+          </div>
+        </>
+      )}
+    >
 
       {isLoading ? (
-        <p className="rewards-page__loading">Ładowanie produktów…</p>
+        <p className="rewards-page__loading page-unavailable__notice">Ładowanie produktów…</p>
       ) : catalogItems.length === 0 ? (
-        <p className="rewards-page__empty">
+        <p className="rewards-page__empty page-unavailable__notice">
           Brak produktów w sklepie. Kliknij „Dodaj produkt”, aby utworzyć pierwszy.
         </p>
       ) : (
@@ -322,6 +321,6 @@ export default function RewardsShopItemsContent() {
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
       />
-    </section>
+    </SectionPageLayout>
   );
 }

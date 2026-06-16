@@ -8,6 +8,8 @@ import { fetchGroupRanks } from '../../../services/ranks.api.js';
 
 import { fetchGroupBadges } from '../../../services/badges.api.js';
 
+import { generateMemberAvatarFallback } from './membersLecturerRow.js';
+
 
 
 /**
@@ -44,16 +46,9 @@ import { fetchGroupBadges } from '../../../services/badges.api.js';
 
 
 
-const AVATAR_BASE = 'https://api.dicebear.com/7.x/adventurer/svg?seed=';
-
-
-
 function generateAvatarFallback(email, nickname) {
-
   const seed = email.split('@')[0] || nickname.replace(/\s+/g, '') || 'default';
-
-  return `${AVATAR_BASE}${encodeURIComponent(seed)}`;
-
+  return generateMemberAvatarFallback(seed);
 }
 
 
@@ -236,8 +231,6 @@ export function useGroupMembers() {
 
       ));
 
-
-
       setMembers(mappedMembers);
 
       return mappedMembers;
@@ -360,7 +353,7 @@ export function useGroupMembers() {
 
   const deleteMember = useCallback(async (member) => {
 
-    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+    if (!groupId || member.isLecturer) return { ok: false, error: 'Brak ID grupy' };
 
 
 

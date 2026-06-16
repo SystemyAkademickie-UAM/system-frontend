@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
-import { Button } from '../../../components/ui/index.js';
+import { Button, Divider } from '../../../components/ui/index.js';
 import { publicIconPath } from '../../../utils/publicAssetUrl.js';
 import '../group-settings/GroupSettingsForm.css';
 import './ToolsContent.css';
@@ -73,7 +73,7 @@ export default function ToolsContent() {
         <p className="group-settings-form__error" role="alert">{errorMessage}</p>
       ) : null}
 
-      <div className="group-settings-form">
+      <div className="group-settings-form group-settings-form--drive-layout">
         <section className="group-settings-form__panel" aria-labelledby="activities-tools-csv-title">
           <h2 id="activities-tools-csv-title" className="group-settings-form__panel-title">Pliki CSV</h2>
           <p className="group-settings-form__hint">Skróty do importu danych i generowania raportów.</p>
@@ -96,6 +96,8 @@ export default function ToolsContent() {
             </button>
           </div>
         </section>
+
+        <Divider />
 
         <section className="group-settings-form__panel" aria-labelledby="activities-tools-summary-title">
           <h2 id="activities-tools-summary-title" className="group-settings-form__panel-title">Kreator podsumowania</h2>

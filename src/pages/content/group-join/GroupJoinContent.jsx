@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, PageHeader } from '../../../components/ui/index.js';
+import { Button, PageHeader, CharacterLimitedField } from '../../../components/ui/index.js';
+import { ENROLLMENT_ENTRY_CODE_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { groupMainPath } from '../../../routes/pathRegistry.js';
@@ -22,7 +23,10 @@ export default function GroupJoinContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isStudent = role === APP_ROLE.STUDENT;
-  const validation = useMemo(() => validateAlphanumericInput(codeInput, 6), [codeInput]);
+  const validation = useMemo(
+    () => validateAlphanumericInput(codeInput, ENROLLMENT_ENTRY_CODE_MAX_LENGTH),
+    [codeInput],
+  );
   const showValidationError = codeInput.trim() !== '' && !validation.valid;
 
   useEffect(() => {
@@ -125,28 +129,34 @@ export default function GroupJoinContent() {
                 Kod dostępu
               </label>
               <div className="group-join__input-row">
-                <input
-                  id="group-join-code"
-                  type="text"
-                  inputMode="text"
-                  autoComplete="off"
-                  spellCheck={false}
-                  className={[
-                    'group-join__input',
-                    showValidationError ? 'group-join__input--error' : '',
-                  ].filter(Boolean).join(' ')}
+                <CharacterLimitedField
                   value={codeInput}
-                  onChange={(event) => {
-                    setCodeInput(event.target.value);
-                    setSubmitError('');
-                  }}
-                  placeholder="Wpisz 6-znakowy kod"
-                  maxLength={6}
-                  aria-invalid={showValidationError}
-                  aria-describedby={
-                    showValidationError || submitError ? 'group-join-code-error' : undefined
-                  }
-                />
+                  maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}
+                  className="group-join__input-field"
+                >
+                  <input
+                    id="group-join-code"
+                    type="text"
+                    inputMode="text"
+                    autoComplete="off"
+                    spellCheck={false}
+                    className={[
+                      'group-join__input',
+                      showValidationError ? 'group-join__input--error' : '',
+                    ].filter(Boolean).join(' ')}
+                    value={codeInput}
+                    onChange={(event) => {
+                      setCodeInput(event.target.value);
+                      setSubmitError('');
+                    }}
+                    placeholder="Wpisz 6-znakowy kod"
+                    maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}
+                    aria-invalid={showValidationError}
+                    aria-describedby={
+                      showValidationError || submitError ? 'group-join-code-error' : undefined
+                    }
+                  />
+                </CharacterLimitedField>
                 <Button
                   type="submit"
                   variant="primary"

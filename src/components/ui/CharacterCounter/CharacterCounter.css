@@ -1,0 +1,27 @@
+.maq-char-counter {
+  font-size: var(--font-size-min);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+  line-height: 1.2;
+}
+
+.maq-char-counter--warn {
+  color: var(--color-accent);
+}
+
+.maq-char-counter--limit {
+  color: var(--color-input-error);
+}
+
+.maq-char-limited-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.maq-char-limited-field__counter {
+  align-self: flex-end;
+}

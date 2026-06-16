@@ -1,12 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Button, SubNav } from '../../../../components/ui/index.js';
 import { fetchPredefinedBanners } from '../../../../services/banners.api.js';
 import {
   getPredefinedBannerPath,
   getPredefinedBannerPreviewUrl,
+  serializeBannerPickerValue,
 } from '../../../../utils/groupBannerRef.js';
 import './GroupBannerPicker.css';
 
 /** @typedef {import('../../../../utils/groupBannerRef.js').BannerPickerValue} BannerPickerValue */
+
+const BANNER_MODE_ITEMS = [
+  { id: 'gallery', label: 'Z galerii' },
+  { id: 'file', label: 'Własny plik' },
+  { id: 'color', label: 'Kolor tła' },
+];
 
 /**
  * @param {Object} props
@@ -17,6 +25,8 @@ import './GroupBannerPicker.css';
 export default function GroupBannerPicker({ value, onChange, className = '' }) {
   const [galleryItems, setGalleryItems] = useState([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
+  const [activeMode, setActiveMode] = useState(value.mode);
+  const persistedSnapshotRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,13 +48,20 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
     };
   }, []);
 
-  const setMode = (mode) => {
-    onChange({
-      ...value,
-      mode,
-      cleared: false,
-    });
-  };
+  useEffect(() => {
+    const snapshot = serializeBannerPickerValue(value);
+
+    if (persistedSnapshotRef.current === null) {
+      persistedSnapshotRef.current = snapshot;
+      setActiveMode(value.mode);
+      return;
+    }
+
+    if (snapshot !== persistedSnapshotRef.current) {
+      persistedSnapshotRef.current = snapshot;
+      setActiveMode(value.mode);
+    }
+  }, [value]);
 
   const onUploadClick = () => {
     const input = document.createElement('input');
@@ -65,6 +82,7 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
           existingDriveRef: null,
           cleared: false,
         });
+        setActiveMode('file');
       };
       reader.readAsDataURL(file);
     };
@@ -81,6 +99,7 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
       existingDriveRef: null,
       cleared: true,
     });
+    setActiveMode('gallery');
   };
 
   const previewForMode = () => {
@@ -120,47 +139,16 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
 
   return (
     <div className={['group-banner-picker', className].filter(Boolean).join(' ')}>
-      <div className="group-banner-picker__tabs" role="tablist" aria-label="Tryb wyboru banera">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={value.mode === 'gallery'}
-          className={[
-            'group-banner-picker__tab',
-            value.mode === 'gallery' ? 'group-banner-picker__tab--active' : '',
-          ].join(' ')}
-          onClick={() => setMode('gallery')}
-        >
-          Z galerii
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={value.mode === 'file'}
-          className={[
-            'group-banner-picker__tab',
-            value.mode === 'file' ? 'group-banner-picker__tab--active' : '',
-          ].join(' ')}
-          onClick={() => setMode('file')}
-        >
-          Własny plik
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={value.mode === 'color'}
-          className={[
-            'group-banner-picker__tab',
-            value.mode === 'color' ? 'group-banner-picker__tab--active' : '',
-          ].join(' ')}
-          onClick={() => setMode('color')}
-        >
-          Kolor tła
-        </button>
-      </div>
+      <SubNav
+        ariaLabel="Tryb wyboru banera"
+        items={BANNER_MODE_ITEMS}
+        activeId={activeMode}
+        onSelect={setActiveMode}
+        className="group-banner-picker__sub-nav"
+      />
 
       <div className="group-banner-picker__panel">
-        {value.mode === 'gallery' ? (
+        {activeMode === 'gallery' ? (
           isGalleryLoading ? (
             <p className="group-banner-picker__hint">Ładowanie galerii banerów…</p>
           ) : galleryItems.length === 0 ? (
@@ -194,6 +182,7 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
                         existingDriveRef: null,
                         cleared: false,
                       });
+                      setActiveMode('gallery');
                     }}
                   >
                     {previewUrl ? (
@@ -208,16 +197,16 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
           )
         ) : null}
 
-        {value.mode === 'file' ? (
+        {activeMode === 'file' ? (
           <div className="group-banner-picker__file">
-            <button type="button" className="group-banner-picker__upload-btn" onClick={onUploadClick}>
-              {value.previewUrl ? 'Zmień plik banera' : 'Wybierz plik banera'}
-            </button>
+            <Button type="button" variant="secondary" size="md" onClick={onUploadClick}>
+              {value.previewUrl && value.mode === 'file' ? 'Zmień plik banera' : 'Wybierz plik banera'}
+            </Button>
             <p className="group-banner-picker__hint">Obsługiwane formaty graficzne (PNG, JPG, WebP…).</p>
           </div>
         ) : null}
 
-        {value.mode === 'color' ? (
+        {activeMode === 'color' ? (
           <div className="group-banner-picker__color">
             <label className="group-banner-picker__color-label" htmlFor="group-banner-color-input">
               Wybierz kolor tła
@@ -235,6 +224,7 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
                     color: event.target.value,
                     cleared: false,
                   });
+                  setActiveMode('color');
                 }}
               />
               <span className="group-banner-picker__color-value">{value.color}</span>

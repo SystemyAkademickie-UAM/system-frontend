@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import './HelpContent.css';
 
 const HELP_LABELS = {
@@ -39,23 +40,22 @@ export default function HelpContent() {
   const labels = HELP_LABELS[language] || HELP_LABELS.polish;
 
   return (
-    <section className="help-content" aria-label={labels.title}>
-      <div className="help-content__card">
-        <h1 className="help-content__title">{labels.title}</h1>
-
-        <div className="help-content__section">
-          <h2 className="help-content__section-title">{labels.emailTitle}</h2>
-          <a className="help-content__link" href="mailto:kontakt@maq.projekt.pl">
-            kontakt@maq.projekt.pl
-          </a>
-        </div>
-
-        <div className="help-content__section">
-          <h2 className="help-content__section-title">{labels.phoneTitle}</h2>
-          <p className="help-content__text">555-maq-projekt</p>
-          <p className="help-content__text help-content__text--muted">555-call-us</p>
-        </div>
+    <SectionPageLayout
+      className="page-unavailable help-content"
+      title={labels.title}
+    >
+      <div className="help-content__section">
+        <h2 className="help-content__section-title">{labels.emailTitle}</h2>
+        <a className="help-content__link" href="mailto:kontakt@maq.projekt.pl">
+          kontakt@maq.projekt.pl
+        </a>
       </div>
-    </section>
+
+      <div className="help-content__section">
+        <h2 className="help-content__section-title">{labels.phoneTitle}</h2>
+        <p className="help-content__text">555-maq-projekt</p>
+        <p className="help-content__text help-content__text--muted">555-call-us</p>
+      </div>
+    </SectionPageLayout>
   );
 }

@@ -1,18 +1,15 @@
-import { PageHeader } from '../../../components/ui/index.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import '../../../components/page/PageUnavailable.css';
-import '../shared/groupSectionPage.css';
-import '../group-members/MembersHomeContent.css';
+import '../group-settings/GroupSettingsForm.css';
 import GroupShopAdd from './GroupShopAddContentContent.jsx';
 
 export default function GroupShopAddContent() {
   return (
-    <section className="page-unavailable members-page group-settings-page" aria-label="Dodawanie przedmiotu">
-      <PageHeader
-        title="Dodawanie przedmiotu do sklepu"
-        description="Formularz tworzenia nowego przedmiotu dostępnego do zakupu w sklepie grupy."
-      />
-
+    <SectionPageLayout
+      className="page-unavailable group-settings-page group-shop-add-page"
+      title="Dodawanie przedmiotu do sklepu"
+    >
       <GroupShopAdd />
-    </section>
+    </SectionPageLayout>
   );
 }
