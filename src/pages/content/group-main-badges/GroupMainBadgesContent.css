@@ -40,7 +40,7 @@
 
 .badge-treasury__title {
   margin: 0;
-  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
   font-weight: 700;
   line-height: 1.15;
   color: var(--color-text-primary);
@@ -146,11 +146,11 @@
 
 .badge-treasury__empty {
   margin: 0;
-  padding: 2rem 1.5rem;
-  border-radius: 16px;
-  background: var(--color-bg-surface);
-  text-align: center;
+  padding: 0;
+  background: transparent;
+  text-align: left;
   color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
 }
 
 .badge-treasury__grid {

@@ -5,12 +5,11 @@ import {
   DataTable,
   AssetSvg,
   InfoTooltip,
-  PageHeader,
   SearchBar,
-  SubNav,
   useToast,
 } from '../../../components/ui/index.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { useGroupRanks } from './useGroupRanks.js';
@@ -205,53 +204,55 @@ export default function RewardsHomeContent() {
 
   if (error) {
     return (
-      <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Zarządzaj rangami kursu — twórz, edytuj i przypisuj je studentom."
-        />
+      <SectionPageLayout
+        className="page-unavailable rewards-page"
+        eyebrow="Skarbiec"
+        title={nav.sectionTitle}
+        subNavItems={nav.items}
+        subNavAriaLabel={nav.ariaLabel}
+      >
         <p className="rewards-page__error" role="alert">{error}</p>
-      </section>
+      </SectionPageLayout>
     );
   }
 
   return (
-    <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
-      <div className="rewards-page__header-row">
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Zarządzaj rangami kursu — twórz, edytuj i przypisuj je studentom."
-        />
-        <Button
-          variant="primary"
-          size="md"
-          className="rewards-page__add-btn"
-          onClick={() => openModal('create')}
-        >
-          Dodaj rangę
-        </Button>
-      </div>
-
-      <div className="rewards-page__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="rewards-page__sub-nav"
-        />
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj rangi…"
-          name="rank-catalog-search"
-          className="rewards-page__search"
-          aria-label="Szukaj rangi"
-        />
-      </div>
+    <SectionPageLayout
+      className="page-unavailable rewards-page"
+      eyebrow="Skarbiec"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+      toolbar={(
+        <>
+          <div className="maq-section-page__toolbar-start">
+            <Button
+              variant="primary"
+              size="md"
+              className="rewards-page__add-btn"
+              onClick={() => openModal('create')}
+            >
+              Dodaj rangę
+            </Button>
+          </div>
+          <div className="maq-section-page__toolbar-end">
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj rangi…"
+              name="rank-catalog-search"
+              className="rewards-page__search"
+              aria-label="Szukaj rangi"
+            />
+          </div>
+        </>
+      )}
+    >
 
       {isLoading ? (
-        <p className="rewards-page__loading">Ładowanie rang…</p>
+        <p className="rewards-page__loading page-unavailable__notice">Ładowanie rang…</p>
       ) : ranks.length === 0 ? (
-        <p className="rewards-page__empty">Brak rang w tej grupie. Kliknij "Dodaj rangę" aby utworzyć pierwszą.</p>
+        <p className="rewards-page__empty page-unavailable__notice">Brak rang w tej grupie. Kliknij „Dodaj rangę”, aby utworzyć pierwszą.</p>
       ) : (
         <DataTable
           columns={RANK_COLUMNS}
@@ -304,6 +305,6 @@ export default function RewardsHomeContent() {
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
       />
-    </section>
+    </SectionPageLayout>
   );
 }

@@ -190,8 +190,8 @@ export default function ActivitiesContent() {
         <p className="activities-page__error" role="alert">{error}</p>
       ) : null}
 
-      <div className="activities-page__controls">
-        <div className="activities-page__controls-start">
+      <div className="maq-section-page__toolbar">
+        <div className="maq-section-page__toolbar-start">
           <div className="activities-page__add-island">
             <input
               type="text"
@@ -212,7 +212,7 @@ export default function ActivitiesContent() {
           </div>
         </div>
 
-        <div className="activities-page__controls-end">
+        <div className="maq-section-page__toolbar-end">
           <span className="activities-page__count">
             Etapy
             {' '}

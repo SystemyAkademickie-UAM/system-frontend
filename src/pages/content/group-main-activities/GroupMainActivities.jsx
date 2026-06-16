@@ -8,6 +8,8 @@ import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 import { Button } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
+import { GroupMainEmptyNotice, GROUP_MAIN_EMPTY_LINKS } from '../group-main/GroupMainHomeContent.jsx';
+import '../group-main/GroupMainHomeContent.css';
 import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
 import '../group-main/shared/groupMainSubpageHeader.css';
 import './GroupMainActivities.css';
@@ -31,6 +33,7 @@ export default function GroupMainActivities() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [stages, setStages] = useState([]);
+  const [hasLoadedStages, setHasLoadedStages] = useState(false);
   const [currentstageindex, setCurrentstageindex] = useState(0);
   const [whichfirst, setWhichfirst] = useState(0);
   const [completedids, setCompletedids] = useState([]);
@@ -102,6 +105,8 @@ export default function GroupMainActivities() {
         i = i + 1;
       }
 
+      setHasLoadedStages(true);
+
     } catch (error) {
 
       let message;
@@ -113,6 +118,7 @@ export default function GroupMainActivities() {
       }
 
       setErrorMessage(message);
+      setHasLoadedStages(true);
     }
   }
 
@@ -534,6 +540,15 @@ export default function GroupMainActivities() {
         <p className="group-main-posts__error" role="alert">{errorMessage}</p>
       ) : null}
 
+      {!hasLoadedStages ? (
+        <p className="group-main-home__message">Ładowanie aktywności…</p>
+      ) : stages.length === 0 ? (
+        <GroupMainEmptyNotice
+          message={GROUP_MAIN_EMPTY_LINKS.activities.message}
+          linkLabel={GROUP_MAIN_EMPTY_LINKS.activities.linkLabel}
+          linkTo={GROUP_MAIN_EMPTY_LINKS.activities.path(groupId)}
+        />
+      ) : (
       <div className="group-main-activities__stage">
         <header className="group-main-activities__stage-header">
           <h2 className="group-main-activities__stage-name">{currentstagename}</h2>
@@ -639,6 +654,7 @@ export default function GroupMainActivities() {
           </Button>
         ) : null}
       </div>
+      )}
 
       {windowopen === 1 ? (
         <GroupMainActivitiesWindow

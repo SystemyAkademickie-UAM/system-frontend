@@ -56,6 +56,21 @@ export function groupMainPath(groupId) {
   return `/groups/${groupId}/main`;
 }
 
+/** Wpisy na ekranie głównym — `/groups/:groupId/main/posts`. */
+export function groupMainPostsPath(groupId) {
+  return `/groups/${groupId}/main/posts`;
+}
+
+/** Uczestnicy (widok studenta) — `/groups/:groupId/main/members`. */
+export function groupMainMembersPath(groupId) {
+  return `/groups/${groupId}/main/members`;
+}
+
+/** Profil innego użytkownika — `/groups/:groupId/studentprofile/:studentId`. */
+export function groupStudentProfilePath(groupId, studentId) {
+  return `/groups/${groupId}/studentprofile/${studentId}`;
+}
+
 /** Lista aktywności — `/groups/:groupId/main/activities`. */
 export function groupMainActivitiesPath(groupId) {
   return `/groups/${groupId}/main/activities`;

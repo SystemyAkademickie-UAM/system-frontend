@@ -1,0 +1,52 @@
+.maq-textured-surface {
+  --texture-radius: 20px;
+  --texture-displacement: 35;
+  --texture-frame-inset: 7px;
+  --texture-noise-frequency: 0.045;
+  --texture-frame-color: var(--color-bg-app);
+  --texture-surface-color: var(--color-bg-surface);
+
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  padding: var(--texture-frame-inset);
+  background: var(--texture-frame-color);
+}
+
+.maq-textured-surface--fill {
+  min-height: 100%;
+  height: 100%;
+}
+
+.maq-textured-surface__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.maq-textured-surface__panel {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+  border-radius: var(--texture-radius);
+  isolation: isolate;
+}
+
+.maq-textured-surface__panel-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--texture-surface-color);
+  pointer-events: none;
+}
+
+.maq-textured-surface__panel-content {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100%;
+}

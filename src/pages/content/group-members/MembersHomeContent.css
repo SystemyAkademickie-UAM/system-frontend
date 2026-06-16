@@ -55,6 +55,18 @@
   overflow-wrap: anywhere;
 }
 
+.members-table__profile-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.members-table__profile-link:hover,
+.members-table__profile-link:focus-visible {
+  color: var(--color-accent);
+  text-decoration: underline;
+  outline: none;
+}
+
 .members-table__nickname {
   font-size: var(--members-font-table-secondary);
   color: var(--color-text-secondary);
@@ -107,6 +119,19 @@
 
 .members-page .data-table__menu-item-description {
   font-size: var(--members-font-table-secondary);
+}
+
+.members-table__row--lecturer > .data-table__cell {
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.members-table__row--lecturer > .data-table__cell:first-child {
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.members-table__row--lecturer .members-table__rank-badge {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-elevated));
 }
 
 @media (max-width: 768px) {

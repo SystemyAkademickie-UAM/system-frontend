@@ -1,0 +1,15 @@
+.smart-post-card {
+  width: auto;
+  max-width: 100%;
+}
+
+.smart-post-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.smart-post-card__trailing {
+  flex-shrink: 0;
+}

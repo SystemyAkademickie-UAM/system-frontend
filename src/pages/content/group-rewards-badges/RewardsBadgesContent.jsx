@@ -6,12 +6,11 @@ import {
   AssetSvg,
   getBadgeRarityConfig,
   InfoTooltip,
-  PageHeader,
   SearchBar,
-  SubNav,
   useToast,
 } from '../../../components/ui/index.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { getBadgeCssVars } from '../../../components/ui/Badge/badgeCssVars.js';
@@ -222,53 +221,55 @@ export default function RewardsBadgesContent() {
 
   if (error) {
     return (
-      <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Zarządzaj odznakami kursu — twórz, edytuj i przyznawaj je studentom."
-        />
+      <SectionPageLayout
+        className="page-unavailable rewards-page"
+        eyebrow="Skarbiec"
+        title={nav.sectionTitle}
+        subNavItems={nav.items}
+        subNavAriaLabel={nav.ariaLabel}
+      >
         <p className="rewards-page__error" role="alert">{error}</p>
-      </section>
+      </SectionPageLayout>
     );
   }
 
   return (
-    <section className="page-unavailable rewards-page" aria-label={nav.sectionTitle}>
-      <div className="rewards-page__header-row">
-        <PageHeader
-          title={nav.sectionTitle}
-          description="Zarządzaj odznakami kursu — twórz, edytuj i przyznawaj je studentom."
-        />
-        <Button
-          variant="primary"
-          size="md"
-          className="rewards-page__add-btn"
-          onClick={() => openModal('create')}
-        >
-          Dodaj odznakę
-        </Button>
-      </div>
-
-      <div className="rewards-page__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="rewards-page__sub-nav"
-        />
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj odznaki…"
-          name="badge-catalog-search"
-          className="rewards-page__search"
-          aria-label="Szukaj odznaki"
-        />
-      </div>
+    <SectionPageLayout
+      className="page-unavailable rewards-page"
+      eyebrow="Skarbiec"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+      toolbar={(
+        <>
+          <div className="maq-section-page__toolbar-start">
+            <Button
+              variant="primary"
+              size="md"
+              className="rewards-page__add-btn"
+              onClick={() => openModal('create')}
+            >
+              Dodaj odznakę
+            </Button>
+          </div>
+          <div className="maq-section-page__toolbar-end">
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj odznaki…"
+              name="badge-catalog-search"
+              className="rewards-page__search"
+              aria-label="Szukaj odznaki"
+            />
+          </div>
+        </>
+      )}
+    >
 
       {isLoading ? (
-        <p className="rewards-page__loading">Ładowanie odznak…</p>
+        <p className="rewards-page__loading page-unavailable__notice">Ładowanie odznak…</p>
       ) : badges.length === 0 ? (
-        <p className="rewards-page__empty">Brak odznak w tej grupie. Kliknij "Dodaj odznakę" aby utworzyć pierwszą.</p>
+        <p className="rewards-page__empty page-unavailable__notice">Brak odznak w tej grupie. Kliknij „Dodaj odznakę”, aby utworzyć pierwszą.</p>
       ) : (
         <DataTable
           columns={BADGE_COLUMNS}
@@ -322,6 +323,6 @@ export default function RewardsBadgesContent() {
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
       />
-    </section>
+    </SectionPageLayout>
   );
 }

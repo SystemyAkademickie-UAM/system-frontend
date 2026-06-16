@@ -74,6 +74,16 @@
   color: var(--color-text-secondary);
 }
 
+.rank-path-members__overflow-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.rank-path-members__overflow-link:hover {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
 .rank-path-members__overflow-earned {
   font-size: var(--font-size-min);
   color: var(--color-text-primary);

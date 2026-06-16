@@ -38,12 +38,16 @@ export const HREF_BUILDERS = {
 
   // Ekran główny + podstrony
   GROUP_MAIN: (ctx) => (ctx.groupId ? paths.groupMainPath(ctx.groupId) : null),
+  GROUP_MAIN_POSTS: (ctx) => (ctx.groupId ? paths.groupMainPostsPath(ctx.groupId) : null),
+  GROUP_MAIN_MEMBERS: (ctx) => (ctx.groupId ? paths.groupMainMembersPath(ctx.groupId) : null),
   GROUP_MAIN_ACTIVITIES: (ctx) => (ctx.groupId ? paths.groupMainActivitiesPath(ctx.groupId) : null),
   GROUP_MAIN_RANKS: (ctx) => (ctx.groupId ? paths.groupMainRanksPath(ctx.groupId) : null),
   GROUP_MAIN_BADGES: (ctx) => (ctx.groupId ? paths.groupMainBadgesPath(ctx.groupId) : null),
 
   // Profil studenta + podstrony
   GROUP_PROFILE: (ctx) => (ctx.groupId ? paths.groupProfilePath(ctx.groupId) : null),
+  GROUP_STUDENT_PROFILE: (ctx) =>
+    ctx.groupId && ctx.studentId ? paths.groupStudentProfilePath(ctx.groupId, ctx.studentId) : null,
   GROUP_PROFILE_LOG: (ctx) => (ctx.groupId ? paths.groupProfileLogPath(ctx.groupId) : null),
   GROUP_PROFILE_EQ: (ctx) => (ctx.groupId ? paths.groupProfileEqPath(ctx.groupId) : null),
 
@@ -113,7 +117,7 @@ const studentView = {
       id: 'ekran-glowny',
       enabled: true,
       kind: 'navlink',
-      label: 'Ekran główny',
+      label: 'Dane grupy',
       iconId: 'nav/home',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
@@ -181,7 +185,7 @@ const lecturerView = {
       id: 'ekran-glowny',
       enabled: true,
       kind: 'navlink',
-      label: 'Ekran główny',
+      label: 'Dane grupy',
       iconId: 'nav/home',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
@@ -355,7 +359,7 @@ export const SHELL_TEMPLATE_BLUEPRINTS = {
  * Klucz = klucz z SUB_NAV_CONFIG.
  */
 export const SUB_NAV_META = {
-  'group-main': { title: 'Ekran główny', ariaLabel: 'Nawigacja sekcji grupy' },
+  'group-main': { title: 'Dane grupy', ariaLabel: 'Nawigacja sekcji grupy' },
   'group-profile': { title: 'Profil', ariaLabel: 'Nawigacja profilu' },
   'group-members': { title: 'Użytkownicy', ariaLabel: 'Nawigacja użytkowników' },
   'group-activities': { title: 'Aktywności', ariaLabel: 'Nawigacja aktywności' },
@@ -372,9 +376,11 @@ export const SUB_NAV_CONFIG = {
   // Ekran główny (student + lecturer)
   'group-main': [
     { id: 'home', label: 'Strona główna', hrefKey: 'GROUP_MAIN', end: true },
+    { id: 'posts', label: 'Wpisy', hrefKey: 'GROUP_MAIN_POSTS' },
     { id: 'activities', label: 'Lista aktywności', hrefKey: 'GROUP_MAIN_ACTIVITIES' },
     { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_MAIN_RANKS' },
     { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_MAIN_BADGES' },
+    { id: 'members', label: 'Uczestnicy', hrefKey: 'GROUP_MAIN_MEMBERS' },
   ],
 
   // Profil studenta

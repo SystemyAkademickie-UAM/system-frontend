@@ -24,6 +24,8 @@ import GroupJoinPage from '../pages/links/groups/GroupJoinPage.jsx';
 // Group Main (Ekran główny) - student + lecturer
 import GroupMainLayout from '../pages/links/groups/layouts/GroupMainLayout.jsx';
 import GroupMainHomePage from '../pages/links/groups/main/GroupMainHomePage.jsx';
+import GroupMainPostsPage from '../pages/links/groups/main/GroupMainPostsPage.jsx';
+import GroupMainMembersPage from '../pages/links/groups/main/GroupMainMembersPage.jsx';
 import GroupMainActivitiesPage from '../pages/links/groups/main/GroupMainActivitiesPage.jsx';
 import GroupMainRanksPage from '../pages/links/groups/main/GroupMainRanksPage.jsx';
 import GroupMainBadgesPage from '../pages/links/groups/main/GroupMainBadgesPage.jsx';
@@ -33,6 +35,10 @@ import ProfileLayout from '../pages/links/groups/layouts/ProfileLayout.jsx';
 import ProfileHomePage from '../pages/links/groups/profile/ProfileHomePage.jsx';
 import ProfileLogPage from '../pages/links/groups/profile/ProfileLogPage.jsx';
 import ProfileEqPage from '../pages/links/groups/profile/ProfileEqPage.jsx';
+import StudentProfileLayout from '../pages/links/groups/layouts/StudentProfileLayout.jsx';
+import StudentProfileHomePage from '../pages/links/groups/student-profile/StudentProfileHomePage.jsx';
+import StudentProfileLogPage from '../pages/links/groups/student-profile/StudentProfileLogPage.jsx';
+import StudentProfileEqPage from '../pages/links/groups/student-profile/StudentProfileEqPage.jsx';
 
 // Members (Użytkownicy) - lecturer only
 import MembersLayout from '../pages/links/groups/layouts/MembersLayout.jsx';
@@ -168,6 +174,8 @@ const appRouteTree = [
                     element: withGuard(<GroupMainLayout />),
                     children: [
                       { index: true, element: <GroupMainHomePage /> },
+                      { path: 'posts', element: <GroupMainPostsPage /> },
+                      { path: 'members', element: <GroupMainMembersPage /> },
                       { path: 'activities', element: <GroupMainActivitiesPage /> },
                       { path: 'ranks', element: <GroupMainRanksPage /> },
                       { path: 'badges', element: <GroupMainBadgesPage /> },
@@ -175,7 +183,20 @@ const appRouteTree = [
                   },
 
                   // ----------------------------------------
-                  // PROFILE - student only
+                  // STUDENT PROFILE (view other user) - any member
+                  // ----------------------------------------
+                  {
+                    path: 'studentprofile/:studentId',
+                    element: withGuard(<StudentProfileLayout />),
+                    children: [
+                      { index: true, element: <StudentProfileHomePage /> },
+                      { path: 'log', element: <StudentProfileLogPage /> },
+                      { path: 'eq', element: <StudentProfileEqPage /> },
+                    ],
+                  },
+
+                  // ----------------------------------------
+                  // PROFILE - student only (own profile)
                   // ----------------------------------------
                   {
                     path: 'profile',

@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { fetchAvatars } from '../../../services/profile.api.js';
+import { PROFILE_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
+import { CharacterLimitedField } from '../../../components/ui/index.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import './AuthCard.css';
 import './RegisterProfile.css';
@@ -136,18 +138,20 @@ export default function RegisterProfile({
       <h1 className="auth-card__title">Jak Cię nazywać?</h1>
 
       <div className="auth-card__input-wrapper">
-        <div className="auth-card__input-container">
-          <SearchIcon className="auth-card__input-icon" />
-          <input
-            type="text"
-            className="auth-card__input"
-            placeholder="MegaKrolik"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            maxLength={100}
-            autoComplete="nickname"
-          />
-        </div>
+        <CharacterLimitedField value={nickname} maxLength={PROFILE_NICKNAME_MAX_LENGTH}>
+          <div className="auth-card__input-container">
+            <SearchIcon className="auth-card__input-icon" />
+            <input
+              type="text"
+              className="auth-card__input"
+              placeholder="MegaKrolik"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              maxLength={PROFILE_NICKNAME_MAX_LENGTH}
+              autoComplete="nickname"
+            />
+          </div>
+        </CharacterLimitedField>
       </div>
 
       <div className="register-profile__avatar-section">

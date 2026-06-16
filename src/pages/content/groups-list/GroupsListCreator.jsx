@@ -2,17 +2,26 @@ import { useState } from 'react';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
 import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
+import { CharacterLimitedField, useToast } from '../../../components/ui/index.js';
+import {
+  GROUP_NAME_MAX_LENGTH,
+  GROUP_SUBJECT_NAME_MAX_LENGTH,
+  GROUP_DESCRIPTION_MAX_LENGTH,
+} from '../../../constants/fieldLimits.js';
 import {
   buildBannerImageRefPayload,
   createDefaultBannerPickerValue,
 } from '../../../utils/groupBannerRef.js';
 import './GroupsListCreator.css';
 
-const GROUP_NAME_MAX = 64;
-const SUBJECT_NAME_MAX = 64;
+const GROUP_NAME_MAX = GROUP_NAME_MAX_LENGTH;
+const SUBJECT_NAME_MAX = GROUP_SUBJECT_NAME_MAX_LENGTH;
+const GROUP_DESCRIPTION_MAX = GROUP_DESCRIPTION_MAX_LENGTH;
 
 export default function GroupsListCreator({ onClose, onCreated }) {
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showError } = useToast();
+  const [step, setStep] = useState(1);
+  const [slideDirection, setSlideDirection] = useState('forward');
   const [groupnamevalue, setGroupnamevalue] = useState('');
   const [subjectnamevalue, setSubjectnamevalue] = useState('');
   const [groupnamevalueerror, setGroupnamevalueerror] = useState('');
@@ -43,26 +52,67 @@ export default function GroupsListCreator({ onClose, onCreated }) {
   }
 
   function onGroupdescriptionchange(value) {
-    setGroupdescriptionvalue(value);
-  }
-
-  function onTemplatesgalleryclick() {
-    setBannerSelection((current) => ({ ...current, mode: 'gallery' }));
+    const trimmed = value.length > GROUP_DESCRIPTION_MAX
+      ? value.slice(0, GROUP_DESCRIPTION_MAX)
+      : value;
+    setGroupdescriptionvalue(trimmed);
   }
 
   function resetForm() {
+    setStep(1);
+    setSlideDirection('forward');
     setGroupnamevalue('');
     setSubjectnamevalue('');
     setGroupdescriptionvalue('');
     setBannerSelection(createDefaultBannerPickerValue());
     setGroupnamevalueerror('');
     setSubjectnamevalueerror('');
-    setErrorMessage('');
   }
 
   function onRejectclick() {
     resetForm();
     onClose?.();
+  }
+
+  function validateStep1() {
+    const validationErrors = [];
+    let hasError = false;
+
+    if (groupnamevalue.trim().length < 1) {
+      setGroupnamevalueerror('musi zawierać minimum 1 znak.');
+      validationErrors.push('Nazwa grupy musi zawierać minimum 1 znak.');
+      hasError = true;
+    }
+
+    if (subjectnamevalue.trim().length < 1) {
+      setSubjectnamevalueerror('musi zawierać minimum 1 znak.');
+      validationErrors.push('Nazwa przedmiotu musi zawierać minimum 1 znak.');
+      hasError = true;
+    }
+
+    if (groupdescriptionvalue.trim().length < 1) {
+      validationErrors.push('Opis grupy jest wymagany.');
+      hasError = true;
+    }
+
+    if (hasError) {
+      showError(validationErrors.join(' '));
+    }
+
+    return !hasError;
+  }
+
+  function onNextStep() {
+    if (!validateStep1()) {
+      return;
+    }
+    setSlideDirection('forward');
+    setStep(2);
+  }
+
+  function onPreviousStep() {
+    setSlideDirection('back');
+    setStep(1);
   }
 
   async function uploadBannerToDrive(url, browserid, file) {
@@ -104,11 +154,11 @@ export default function GroupsListCreator({ onClose, onCreated }) {
   }
 
   async function onSavegroupclick() {
-    if (groupnamevalue.length < 1) {
-      setGroupnamevalueerror('musi zawierać minimum 1 znak.');
+    if (!validateStep1()) {
+      setSlideDirection('back');
+      setStep(1);
       return;
     }
-    setErrorMessage('');
 
     try {
       const base = getApiBaseUrl();
@@ -148,11 +198,11 @@ export default function GroupsListCreator({ onClose, onCreated }) {
         throw new Error('Error ' + response.status + ': ' + responsetext);
       }
       if (data.group === -1 || data.group === 1) {
-        setErrorMessage('Brak uprawnień do tworzenia grup.');
+        showError('Brak uprawnień do tworzenia grup.');
         return;
       }
       if (data.group === -2 || data.group === 0) {
-        setErrorMessage('Nie udało się utworzyć grupy.');
+        showError('Nie udało się utworzyć grupy.');
         return;
       }
 
@@ -161,100 +211,139 @@ export default function GroupsListCreator({ onClose, onCreated }) {
       onClose?.();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      setErrorMessage(message);
+      showError(message);
     }
   }
 
   return (
     <article
-      className="groups-list-creator"
+      className={[
+        'groups-list-creator',
+        step === 2 ? 'groups-list-creator--banner-step' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       role="dialog"
       aria-modal="true"
       aria-labelledby="groups-list-creator-title"
       onClick={(event) => event.stopPropagation()}
     >
       <div className="groups-list-creator__body">
-      <header className="groups-list-creator__header">
-        <div className="groups-list-creator__titles">
-          <h2 id="groups-list-creator-title" className="groups-list-creator__title">
-            Kreator grupy
-          </h2>
-          <p className="groups-list-creator__subtitle">
-            W celu utworzenia nowej grupy wprowadź nazwę i opis.
-          </p>
+        <header className="groups-list-creator__header">
+          <div className="groups-list-creator__titles">
+            <div className="groups-list-creator__heading-row">
+              <h2 id="groups-list-creator-title" className="groups-list-creator__title">
+                Kreator grupy
+              </h2>
+              <span className="groups-list-creator__step-badge" aria-live="polite">
+                {step}/2
+              </span>
+            </div>
+            <p className="groups-list-creator__subtitle">
+              {step === 1
+                ? 'Nazwa, przedmiot i opis na jednej planszy.'
+                : 'Wybierz baner: gotowy wzór, własny plik lub kolor tła.'}
+            </p>
+          </div>
+          {step === 2 ? (
+            <button
+              type="button"
+              className="groups-list-creator__btn groups-list-creator__btn--ghost groups-list-creator__back-btn"
+              onClick={onPreviousStep}
+              aria-label="Wróć do danych grupy"
+            >
+              ← Wróć
+            </button>
+          ) : null}
+        </header>
+
+        <div className="groups-list-creator__steps-viewport">
+          <div
+            className={[
+              'groups-list-creator__steps-track',
+              step === 2 ? 'groups-list-creator__steps-track--step-2' : '',
+              slideDirection === 'back' ? 'groups-list-creator__steps-track--back' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            <section className="groups-list-creator__step" aria-label="Dane grupy" aria-hidden={step !== 1}>
+              <div className="groups-list-creator__panel groups-list-creator__panel--compact">
+                <div className="groups-list-creator__fields">
+                  <div className="groups-list-creator__field">
+                    <label className="groups-list-creator__label" htmlFor="groups-list-creator-name">
+                      Nazwa grupy
+                      {groupnamevalueerror ? (
+                        <span className="groups-list-creator__label-error">{groupnamevalueerror}</span>
+                      ) : null}
+                    </label>
+                    <CharacterLimitedField value={groupnamevalue} maxLength={GROUP_NAME_MAX}>
+                      <input
+                        id="groups-list-creator-name"
+                        className="groups-list-creator__input groups-list-creator__input--compact"
+                        type="text"
+                        value={groupnamevalue}
+                        onChange={(event) => onGroupnamechange(event.target.value)}
+                        maxLength={GROUP_NAME_MAX}
+                        autoComplete="off"
+                      />
+                    </CharacterLimitedField>
+                  </div>
+                  <div className="groups-list-creator__field">
+                    <label className="groups-list-creator__label" htmlFor="groups-list-creator-subject">
+                      Nazwa przedmiotu
+                      {subjectnamevalueerror ? (
+                        <span className="groups-list-creator__label-error">{subjectnamevalueerror}</span>
+                      ) : null}
+                    </label>
+                    <CharacterLimitedField value={subjectnamevalue} maxLength={SUBJECT_NAME_MAX}>
+                      <input
+                        id="groups-list-creator-subject"
+                        className="groups-list-creator__input groups-list-creator__input--compact"
+                        type="text"
+                        value={subjectnamevalue}
+                        onChange={(event) => onSubjectnamechange(event.target.value)}
+                        maxLength={SUBJECT_NAME_MAX}
+                        autoComplete="off"
+                      />
+                    </CharacterLimitedField>
+                  </div>
+                  <div className="groups-list-creator__field">
+                    <label className="groups-list-creator__label" htmlFor="groups-list-creator-description">
+                      Opis grupy
+                    </label>
+                    <CharacterLimitedField value={groupdescriptionvalue} maxLength={GROUP_DESCRIPTION_MAX}>
+                      <textarea
+                        id="groups-list-creator-description"
+                        className="groups-list-creator__textarea groups-list-creator__textarea--compact"
+                        value={groupdescriptionvalue}
+                        maxLength={GROUP_DESCRIPTION_MAX}
+                        onChange={(event) => onGroupdescriptionchange(event.target.value)}
+                        placeholder="Krótko opisz tło fabularne i cele grupy…"
+                        rows={4}
+                      />
+                    </CharacterLimitedField>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section
+              className="groups-list-creator__step groups-list-creator__step--banner"
+              aria-label="Baner grupy"
+              aria-hidden={step !== 2}
+            >
+              <div className="groups-list-creator__panel groups-list-creator__panel--banner">
+                <GroupBannerPicker
+                  value={bannerSelection}
+                  onChange={setBannerSelection}
+                  className="groups-list-creator__banner-picker"
+                />
+              </div>
+            </section>
+          </div>
         </div>
-        <button
-          type="button"
-          className="groups-list-creator__btn groups-list-creator__btn--primary"
-          onClick={onTemplatesgalleryclick}
-        >
-          Gotowy wzór
-        </button>
-      </header>
 
-      <section className="groups-list-creator__panel">
-        <h3 className="groups-list-creator__panel-title">Grupa</h3>
-        <div className="groups-list-creator__grid">
-          <div className="groups-list-creator__field">
-            <label className="groups-list-creator__label" htmlFor="groups-list-creator-name">
-              Nazwa grupy
-              {groupnamevalueerror ? (
-                <span className="groups-list-creator__label-error">{groupnamevalueerror}</span>
-              ) : null}
-            </label>
-            <input
-              id="groups-list-creator-name"
-              className="groups-list-creator__input"
-              type="text"
-              value={groupnamevalue}
-              onChange={(event) => onGroupnamechange(event.target.value)}
-              maxLength={GROUP_NAME_MAX}
-              autoComplete="off"
-            />
-          </div>
-          <div className="groups-list-creator__field">
-            <label className="groups-list-creator__label" htmlFor="groups-list-creator-subject">
-              Nazwa przedmiotu
-              {subjectnamevalueerror ? (
-                <span className="groups-list-creator__label-error">{subjectnamevalueerror}</span>
-              ) : null}
-            </label>
-            <input
-              id="groups-list-creator-subject"
-              className="groups-list-creator__input"
-              type="text"
-              value={subjectnamevalue}
-              onChange={(event) => onSubjectnamechange(event.target.value)}
-              maxLength={SUBJECT_NAME_MAX}
-              autoComplete="off"
-            />
-          </div>
-          <div className="groups-list-creator__field groups-list-creator__field--banner">
-            <span className="groups-list-creator__label">Baner grupy</span>
-            <GroupBannerPicker
-              value={bannerSelection}
-              onChange={setBannerSelection}
-              className="groups-list-creator__banner-picker"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="groups-list-creator__panel">
-        <h3 className="groups-list-creator__panel-title">Opis grupy</h3>
-        <textarea
-          className="groups-list-creator__textarea"
-          value={groupdescriptionvalue}
-          onChange={(event) => onGroupdescriptionchange(event.target.value)}
-          placeholder="Krótko opisz tło fabularne i cele grupy…"
-        />
-      </section>
-
-      {errorMessage ? (
-        <p className="groups-list-creator__error" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
       </div>
 
       <footer className="groups-list-creator__footer groups-list-creator__footer--sticky">
@@ -267,13 +356,23 @@ export default function GroupsListCreator({ onClose, onCreated }) {
           >
             Odrzuć
           </button>
-          <button
-            type="button"
-            className="groups-list-creator__btn groups-list-creator__btn--primary"
-            onClick={onSavegroupclick}
-          >
-            Zapisz
-          </button>
+          {step === 1 ? (
+            <button
+              type="button"
+              className="groups-list-creator__btn groups-list-creator__btn--primary"
+              onClick={onNextStep}
+            >
+              Dalej
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="groups-list-creator__btn groups-list-creator__btn--primary"
+              onClick={onSavegroupclick}
+            >
+              Stwórz
+            </button>
+          )}
         </div>
       </footer>
     </article>

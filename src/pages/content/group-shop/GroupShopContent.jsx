@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
-  PageHeader,
   Pagination,
   ProductCard,
   SearchBar,
@@ -11,6 +10,7 @@ import {
   ShopToggleButton,
   useToast,
 } from '../../../components/ui/index.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
@@ -191,75 +191,74 @@ export default function GroupShopContent() {
     : null;
 
   return (
-    <section className="page-unavailable members-page group-shop-page" aria-label="Sklep">
-      <div className="members-page__header-row group-shop-page__header-row">
-        <PageHeader
-          title="Sklep"
-          description="Przeglądaj i wymieniaj zgromadzoną walutę na bonusy dydaktyczne."
-        />
+    <SectionPageLayout
+      className="page-unavailable group-shop-page"
+      title="Sklep"
+      toolbar={(
+        <>
+          <div className="maq-section-page__toolbar-start">
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj produktu…"
+              name="shop-search"
+              className="group-shop__search"
+              aria-label="Szukaj produktu po nazwie lub opisie"
+            />
+          </div>
+          <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
+            <Button
+              type="button"
+              variant="ghost"
+              size="md"
+              onClick={toggleLivesBlocked}
+              aria-pressed={livesBlocked}
+              className="group-shop__lives-toggle"
+            >
+              System żyć{livesBlocked ? ' (zablokowany)' : ''}
+            </Button>
 
-        <div className="group-shop-page__header-actions">
-          <Button
-            type="button"
-            variant="ghost"
-            size="md"
-            onClick={toggleLivesBlocked}
-            aria-pressed={livesBlocked}
-            className="group-shop__lives-toggle"
-          >
-            System żyć{livesBlocked ? ' (zablokowany)' : ''}
-          </Button>
+            <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
+              <div className="group-shop__lecturer-actions">
+                {groupId ? (
+                  <Button to={groupShopAddPath(groupId)} variant="secondary" size="md">
+                    Dodaj produkt
+                  </Button>
+                ) : null}
+                <ShopToggleButton isShopOpen={isShopOpen} onToggle={handleToggleShopOpen} />
+              </div>
+            </RoleVisibility>
 
-          <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
-            <div className="group-shop__lecturer-actions">
-              {groupId ? (
-                <Button to={groupShopAddPath(groupId)} variant="secondary" size="md">
-                  Dodaj produkt
-                </Button>
-              ) : null}
-              <ShopToggleButton isShopOpen={isShopOpen} onToggle={handleToggleShopOpen} />
-            </div>
-          </RoleVisibility>
+            <ShopCartPanel
+              cartCount={cartCount}
+              cartItems={cartItems.map((item) => ({
+                id: item.id,
+                name: item.name,
+                priceAmount: getShopItemEffectivePrice(item),
+                imageUrl: item.imageUrl,
+              }))}
+              cartTotal={cartTotal}
+              disabled={shopInteractionDisabled}
+              onBuyAll={() => setActiveModal({ type: 'buyAll' })}
+              onRemoveFromCart={removeFromCart}
+              className="group-shop__cart"
+            />
 
-          <ShopCartPanel
-            cartCount={cartCount}
-            cartItems={cartItems.map((item) => ({
-              id: item.id,
-              name: item.name,
-              priceAmount: getShopItemEffectivePrice(item),
-              imageUrl: item.imageUrl,
-            }))}
-            cartTotal={cartTotal}
-            disabled={shopInteractionDisabled}
-            onBuyAll={() => setActiveModal({ type: 'buyAll' })}
-            onRemoveFromCart={removeFromCart}
-            className="group-shop__cart"
-          />
-        </div>
-      </div>
-
-      <div className="group-shop-page__toolbar group-shop__toolbar">
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj produktu…"
-          name="shop-search"
-          className="group-shop__search"
-          aria-label="Szukaj produktu po nazwie lub opisie"
-        />
-
-        <button
-          type="button"
-          className={[
-            'group-shop__filters-toggle',
-            filtersExpanded ? 'group-shop__filters-toggle--active' : '',
-          ].join(' ')}
-          aria-expanded={filtersExpanded}
-          onClick={() => setFiltersExpanded((expanded) => !expanded)}
-        >
-          Filtry i sortowanie
-        </button>
-      </div>
+            <button
+              type="button"
+              className={[
+                'group-shop__filters-toggle',
+                filtersExpanded ? 'group-shop__filters-toggle--active' : '',
+              ].join(' ')}
+              aria-expanded={filtersExpanded}
+              onClick={() => setFiltersExpanded((expanded) => !expanded)}
+            >
+              Filtry i sortowanie
+            </button>
+          </div>
+        </>
+      )}
+    >
 
       {filtersExpanded ? (
         <div className="group-shop__filters">
@@ -321,9 +320,9 @@ export default function GroupShopContent() {
 
         <div className="group-shop__catalog-surface">
           {isLoading ? (
-            <p className="group-shop__empty" role="status">Ładowanie produktów sklepu…</p>
+            <p className="group-shop__empty page-unavailable__notice" role="status">Ładowanie produktów sklepu…</p>
           ) : items.length === 0 ? (
-            <p className="group-shop__empty" role="status">
+            <p className="group-shop__empty page-unavailable__notice" role="status">
               W sklepie nie ma jeszcze żadnych produktów.
               {isLecturerView ? (
                 <>
@@ -335,7 +334,7 @@ export default function GroupShopContent() {
               ) : null}
             </p>
           ) : visibleItems.length === 0 ? (
-            <p className="group-shop__empty" role="status">
+            <p className="group-shop__empty page-unavailable__notice" role="status">
               Brak produktów spełniających wybrane filtry.
             </p>
           ) : (
@@ -398,6 +397,6 @@ export default function GroupShopContent() {
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
       />
-    </section>
+    </SectionPageLayout>
   );
 }

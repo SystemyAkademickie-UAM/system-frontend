@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { Link } from 'react-router-dom';
+
 import { createPortal } from 'react-dom';
 
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
@@ -36,7 +38,7 @@ import './PlayerAvatar.css';
  * @param {string} [props.className]
 
  * @param {string} [props.ariaLabel]
-
+ * @param {string} [props.href]
  */
 
 export default function PlayerAvatar({
@@ -60,6 +62,8 @@ export default function PlayerAvatar({
   className = '',
 
   ariaLabel,
+
+  href,
 
 }) {
 
@@ -184,63 +188,57 @@ export default function PlayerAvatar({
 
 
   const displayName = nickname?.trim() || 'Użytkownik';
-
   const label = ariaLabel ?? `Profil: ${displayName}`;
 
+  const sharedClassName = [
+    'maq-player-avatar',
+    `maq-player-avatar--${size}`,
+    href ? 'maq-player-avatar--link' : '',
+    className,
+  ].filter(Boolean).join(' ');
 
+  const avatarContent = avatarUrl ? (
+    <img
+      src={avatarUrl}
+      alt=""
+      className={getAvatarImageClassName(avatarUrl, 'maq-player-avatar__image')}
+      decoding="async"
+    />
+  ) : (
+    <span className="maq-player-avatar__fallback" aria-hidden="true">
+      {displayName.charAt(0).toUpperCase()}
+    </span>
+  );
 
   return (
-
     <>
-
-      <button
-
-        ref={triggerRef}
-
-        type="button"
-
-        className={[
-
-          'maq-player-avatar',
-
-          `maq-player-avatar--${size}`,
-
-          className,
-
-        ].filter(Boolean).join(' ')}
-
-        aria-label={label}
-
-        onMouseEnter={handleMouseEnter}
-
-        onMouseLeave={handleMouseLeave}
-
-        onFocus={handleMouseEnter}
-
-        onBlur={handleMouseLeave}
-
-      >
-
-        {avatarUrl ? (
-
-          <img
-            src={avatarUrl}
-            alt=""
-            className={getAvatarImageClassName(avatarUrl, 'maq-player-avatar__image')}
-            decoding="async"
-          />
-
-        ) : (
-
-          <span className="maq-player-avatar__fallback" aria-hidden="true">
-
-            {displayName.charAt(0).toUpperCase()}
-
-          </span>
-
-        )}
-
-      </button>
+      {href ? (
+        <Link
+          ref={triggerRef}
+          to={href}
+          className={sharedClassName}
+          aria-label={label}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onFocus={handleMouseEnter}
+          onBlur={handleMouseLeave}
+        >
+          {avatarContent}
+        </Link>
+      ) : (
+        <button
+          ref={triggerRef}
+          type="button"
+          className={sharedClassName}
+          aria-label={label}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onFocus={handleMouseEnter}
+          onBlur={handleMouseLeave}
+        >
+          {avatarContent}
+        </button>
+      )}
 
 
 

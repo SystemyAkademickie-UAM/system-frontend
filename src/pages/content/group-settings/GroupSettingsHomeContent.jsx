@@ -1,30 +1,20 @@
-import { PageHeader, SubNav } from '../../../components/ui/index.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
-import '../shared/groupSectionPage.css';
-import '../group-members/MembersHomeContent.css';
-import './GroupSettingsForm.css';
+import '../group-settings/GroupSettingsForm.css';
 import TemporaryGroupsListCreator from './TemporaryGroupsListCreator.jsx';
 
 export default function GroupSettingsHomeContent() {
   const nav = useGroupSubNav('group-settings');
 
   return (
-    <section className="page-unavailable members-page group-settings-page" aria-label={nav.sectionTitle}>
-      <PageHeader
-        title={nav.sectionTitle}
-        description="Edytuj podstawowe informacje o grupie — nazwę, przedmiot, baner i opis."
-      />
-
-      <div className="members-page__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="members-page__sub-nav"
-        />
-      </div>
-
+    <SectionPageLayout
+      className="page-unavailable group-settings-page"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+    >
       <TemporaryGroupsListCreator />
-    </section>
+    </SectionPageLayout>
   );
 }

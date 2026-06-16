@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
+import ContentWithMeasuredDivider from '../../../../components/ui/ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
 import { isColorBannerRef, parseColorBannerRef } from '../../../../constants/drive.constants.js';
 import { SVG_PLACEHOLDER } from '../../../../constants/svgIcons.js';
 import { splitGroupStoryTitle } from './splitGroupStoryTitle.js';
@@ -13,6 +14,7 @@ import './GroupBanner.css';
  * @param {string | null | undefined} props.description
  * @param {string | null | undefined} props.bannerUrl
  * @param {boolean} [props.isLoading]
+ * @param {boolean} [props.showDescription=true]
  * @param {string} [props.className]
  */
 export default function GroupBanner({
@@ -20,6 +22,7 @@ export default function GroupBanner({
   description,
   bannerUrl,
   isLoading = false,
+  showDescription = true,
   className = '',
 }) {
   const [bannerFailed, setBannerFailed] = useState(!bannerUrl);
@@ -36,7 +39,13 @@ export default function GroupBanner({
 
   return (
     <section
-      className={['group-banner', className].filter(Boolean).join(' ')}
+      className={[
+        'group-banner',
+        showDescription ? '' : 'group-banner--compact',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       aria-label={bannerLabel || 'Grupa'}
     >
       <div className="group-banner__media">
@@ -84,8 +93,15 @@ export default function GroupBanner({
                 </span>
               ))}
             </h1>
-            {trimmedDescription ? (
-              <p className="group-banner__description">{trimmedDescription}</p>
+            {showDescription && trimmedDescription ? (
+              <div className="group-banner__description-block">
+                <ContentWithMeasuredDivider
+                  className="group-banner__description"
+                  dividerClassName="group-banner__description-divider"
+                >
+                  {trimmedDescription}
+                </ContentWithMeasuredDivider>
+              </div>
             ) : null}
           </>
         )}

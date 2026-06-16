@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Button, PageHeader, SearchBar } from '../../../components/ui/index.js';
+import { Button, SearchBar } from '../../../components/ui/index.js';
+import SmartPostCard from '../../../components/ui/SmartPostCard/SmartPostCard.jsx';
 import { DataTableRowActions } from '../../../components/ui/DataTable/DataTable.jsx';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import '../../../components/ui/DataTable/DataTable.css';
 import '../../../components/page/PageUnavailable.css';
-import '../shared/groupSectionPage.css';
-import '../group-members/MembersHomeContent.css';
 import { useGroupPosts } from './useGroupPosts.js';
 import PostFormModal from './PostFormModal.jsx';
 import PostDeleteModal from './PostDeleteModal.jsx';
@@ -87,47 +87,41 @@ export default function PostsContent() {
   const modalPost = activeModal?.post ?? null;
 
   return (
-    <section className="page-unavailable members-page posts-page" aria-label="Wpisy">
-      <div className="members-page__header-row">
-        <PageHeader
-          title="Wpisy"
-          description="Edytor wpisów pozwalający tworzyć historie budujące tło fabularne grupy."
-        />
-        <Button
-          variant="primary"
-          size="md"
-          className="members-page__header-action posts-page__add-btn"
-          onClick={() => openModal('create')}
-        >
-          Dodaj wpis
-        </Button>
-      </div>
-
+    <SectionPageLayout
+      className="page-unavailable posts-page"
+      title="Wpisy"
+      toolbar={(
+        <>
+          <div className="maq-section-page__toolbar-start">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => openModal('create')}
+            >
+              Dodaj wpis
+            </Button>
+          </div>
+          <div className="maq-section-page__toolbar-end">
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj wpisów…"
+              name="posts-search"
+              className="posts-page__search"
+              aria-label="Szukaj wpisów"
+            />
+          </div>
+        </>
+      )}
+    >
       {error ? (
         <p className="posts-page__error" role="alert">{error}</p>
       ) : null}
 
-      <div className="members-page__nav-row posts-page__controls">
-        <span className="posts-page__count">
-          Wpisy
-          {' '}
-          {posts.length}
-        </span>
-
-        <SearchBar
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj wpisów…"
-          name="posts-search"
-          className="members-page__search posts-page__search"
-          aria-label="Szukaj wpisów"
-        />
-      </div>
-
       {isLoading ? (
-        <p className="posts-page__loading">Ładowanie wpisów…</p>
+        <p className="posts-page__loading page-unavailable__notice">Ładowanie wpisów…</p>
       ) : filteredPosts.length === 0 ? (
-        <p className="posts-page__empty">
+        <p className="posts-page__empty page-unavailable__notice">
           {posts.length === 0
             ? 'Brak wpisów w tej grupie. Dodaj pierwszy wpis powyżej.'
             : 'Brak wyników wyszukiwania.'}
@@ -135,19 +129,22 @@ export default function PostsContent() {
       ) : (
         <div className="posts-islands">
           {filteredPosts.map((post) => (
-            <article key={`post-${post.id}`} className="posts-island">
-              <div className="posts-island__content">
-                <h3 className="posts-island__title">
-                  {post.title.trim() || 'Bez tytułu'}
-                </h3>
-                <p className="posts-island__text">
-                  {post.text.trim() || 'Brak treści.'}
-                </p>
-              </div>
-              <div className="posts-island__actions">
-                <DataTableRowActions row={post} rowActions={postRowActions} />
-              </div>
-            </article>
+            <SmartPostCard
+              key={`post-${post.id}`}
+              title={post.title}
+              text={post.text}
+              surfaceClassName="posts-island"
+              innerClassName="posts-island__inner"
+              bodyClassName="posts-island__content"
+              titleClassName="posts-island__title"
+              dividerClassName="posts-island__divider"
+              textClassName="posts-island__text"
+              trailing={(
+                <div className="posts-island__actions">
+                  <DataTableRowActions row={post} rowActions={postRowActions} />
+                </div>
+              )}
+            />
           ))}
         </div>
       )}
@@ -172,6 +169,6 @@ export default function PostsContent() {
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
       />
-    </section>
+    </SectionPageLayout>
   );
 }

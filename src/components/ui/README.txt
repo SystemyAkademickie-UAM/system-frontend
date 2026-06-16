@@ -142,4 +142,18 @@ Import:
   tooltipPlacement: right | left | top
   Po najechaniu: nick + zgromadzona waluta
 
+--- TexturedSurface (tło z postrzępioną krawędzią) ---
+  import { TexturedSurface } from '../../components/ui/index.js';
+
+  <TexturedSurface fill>
+    <PageContent />
+  </TexturedSurface>
+
+  radius — zaokrąglenie panelu (domyślnie 20, jak Figma)
+  textureSize — siła szumu / displacement (domyślnie 7)
+  frameInset — szerokość ramki w px (domyślnie 7)
+  frameColor / surfaceColor — nadpisanie tokenów --texture-frame-color / --texture-surface-color
+
+  Efekt: filtr SVG feTurbulence + feDisplacementMap (brak obrazka PNG).
+
 Kolory: src/styles/tokens.css

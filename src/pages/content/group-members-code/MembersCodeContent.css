@@ -34,13 +34,12 @@
 .members-code-page__loading,
 .members-code-page__empty {
   margin: 0;
-  padding: 2rem 1.5rem;
-  border-radius: 12px;
-  background: var(--color-bg-surface);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  text-align: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  text-align: left;
   color: var(--color-text-secondary);
-  font-size: var(--font-size-page-description);
+  font-size: var(--font-size-body);
 }
 
 .members-code-page .data-table {

@@ -11,6 +11,7 @@ export const SVG_ICONS = {
   },
   actions: {
     add: 'actions/add.svg',
+    copy: 'actions/copy.svg',
     assign: 'actions/assign.svg',
     grant: 'actions/grant.svg',
     delete: 'actions/delete.svg',

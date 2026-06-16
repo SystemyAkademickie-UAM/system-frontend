@@ -1,30 +1,20 @@
-import { PageHeader, SubNav } from '../../../components/ui/index.js';
+import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
-import '../shared/groupSectionPage.css';
-import '../group-members/MembersHomeContent.css';
 
 export default function RankingActivitiesContent() {
   const nav = useGroupSubNav('group-ranking');
 
   return (
-    <section className="page-unavailable members-page" aria-label={nav.sectionTitle}>
-      <PageHeader
-        title={nav.sectionTitle}
-        description="Ranking aktywności — wyniki w poszczególnych zadaniach."
-      />
-
-      <div className="members-page__nav-row">
-        <SubNav
-          ariaLabel={nav.ariaLabel}
-          items={nav.items}
-          className="members-page__sub-nav"
-        />
-      </div>
-
-      <p className="members-page__notice" role="status">
+    <SectionPageLayout
+      className="page-unavailable"
+      title={nav.sectionTitle}
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
+    >
+      <p className="page-unavailable__notice" role="status">
         Ta strona jest obecnie niedostępna. Funkcjonalność zostanie udostępniona w kolejnej wersji aplikacji.
       </p>
-    </section>
+    </SectionPageLayout>
   );
 }

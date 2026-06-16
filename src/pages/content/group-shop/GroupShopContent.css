@@ -179,10 +179,18 @@
   height: 100%;
 }
 
+.group-shop-page__toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .group-shop__empty {
-  margin: 2rem 0 0;
+  margin: 0;
   font-size: var(--font-size-body);
   color: var(--color-text-secondary);
+  text-align: left;
 }
 
 .group-shop__pagination {
