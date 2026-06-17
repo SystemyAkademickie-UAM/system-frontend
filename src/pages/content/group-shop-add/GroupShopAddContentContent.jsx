@@ -1,14 +1,27 @@
-import { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
-import {useToast} from '../../../components/ui/index.js';
+import {useState, useEffect} from 'react';
+import {useParams} from 'react-router-dom';
+import {getApiBaseUrl} from '../../../constants/api.constants.js';
+import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {InfoTooltip, useToast} from '../../../components/ui/index.js';
+import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
 
-import itemicon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
-import infoicon from '../../../../public/assets/icons/info-circle-svgrepo-com.svg';
-import copyicon from '../../../../public/assets/icons/copy-01-svgrepo-com.svg';
+import arrowcirclelefticon from '../../../../public/assets/icons/arrow-circle-left-svgrepo-com.svg';
+import arrowcirclerighticon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
+import skipbackicon from '../../../../public/assets/icons/skip-back-svgrepo-com.svg';
+import skipforwardicon from '../../../../public/assets/icons/skip-forward-svgrepo-com.svg';
+import chevronlefticon from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
+import chevronrighticon from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg';
 import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
 import deleteicon from '../../../../public/assets/icons/trash-01-svgrepo-com.svg';
+import checkicon from '../../../../public/assets/icons/check-svgrepo-com.svg';
+import closeicon from '../../../../public/assets/icons/x-close-svgrepo-com.svg';
+import leftleft from '../../../../public/assets/icons/chevron-left-double-svgrepo-com.svg';
+import left from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
+import rightright from '../../../../public/assets/icons/chevron-right-double-svgrepo-com.svg';
+import right from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg';
+import up from '../../../../public/assets/icons/chevron-up-svgrepo-com.svg';
+import down from '../../../../public/assets/icons/chevron-down-svgrepo-com.svg';
 
 export default function App() {
 
@@ -17,35 +30,163 @@ export default function App() {
   const {groupId} = useParams();
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [stages, setStages] = useState([]);
-  const [stagename, setStageName] = useState('');
+  var itemicons = [
+    {ref: '../icons/alert-circle-svgrepo-com.svg'},
+    {ref: '../icons/arrow-circle-broken-left-svgrepo-com.svg'},
+    {ref: '../icons/arrow-circle-broken-right-svgrepo-com.svg'},
+    {ref: '../icons/arrow-circle-left-svgrepo-com.svg'},
+    {ref: '../icons/arrow-circle-right-svgrepo-com.svg'},
+    {ref: '../icons/arrow-left-svgrepo-com.svg'},
+    {ref: '../icons/arrow-narrow-right-svgrepo-com.svg'},
+    {ref: '../icons/arrow-right-svgrepo-com.svg'},
+    {ref: '../icons/bell-ringing-04-svgrepo-com.svg'},
+    {ref: '../icons/check-circle-broken-svgrepo-com.svg'},
+    {ref: '../icons/check-circle-svgrepo-com.svg'},
+    {ref: '../icons/check-svgrepo-com.svg'},
+    {ref: '../icons/chevron-down-svgrepo-com.svg'},
+    {ref: '../icons/chevron-left-double-svgrepo-com.svg'},
+    {ref: '../icons/chevron-left-svgrepo-com.svg'},
+    {ref: '../icons/chevron-right-double-svgrepo-com.svg'},
+    {ref: '../icons/chevron-right-svgrepo-com.svg'},
+    {ref: '../icons/chevron-up-svgrepo-com.svg'},
+    {ref: '../icons/circle-svgrepo-com.svg'},
+    {ref: '../icons/copy-01-svgrepo-com.svg'},
+    {ref: '../icons/download-01-svgrepo-com.svg'},
+    {ref: '../icons/download-02-svgrepo-com.svg'},
+    {ref: '../icons/edit-02-svgrepo-com.svg'},
+    {ref: '../icons/help-circle-svgrepo-com.svg'},
+    {ref: '../icons/info-circle-svgrepo-com.svg'},
+    {ref: '../icons/lock-01-svgrepo-com.svg'},
+    {ref: '../icons/minus-circle-svgrepo-com.svg'},
+    {ref: '../icons/plus-circle-svgrepo-com.svg'},
+    {ref: '../icons/plus-svgrepo-com.svg'},
+    {ref: '../icons/skip-back-svgrepo-com.svg'},
+    {ref: '../icons/skip-forward-svgrepo-com.svg'},
+    {ref: '../icons/slash-circle-02-svgrepo-com.svg'},
+    {ref: '../icons/trash-01-svgrepo-com.svg'},
+    {ref: '../icons/upload-01-svgrepo-com.svg'},
+    {ref: '../icons/upload-02-svgrepo-com.svg'},
+    {ref: '../icons/x-circle-svgrepo-com.svg'},
+    {ref: '../icons/x-close-svgrepo-com.svg'}
+  ];
 
-  var mockitems = [{id: 1, name: 'a', description0: 'aa', description1: 'aaa', cost: 11}, {id: 2, name: 'b', description0: 'bb', description1: 'bbb', cost: 22}, {id: 3, name: 'c', description0: 'cc', description1: 'ccc', cost: 33}, {id: 4, name: 'd', description0: 'dd', description1: 'ddd', cost: 44}, {id: 5, name: 'e', description0: 'ee', description1: 'eee', cost: 55}];
-  var mockranks = [{id: 1, icon: 'rgb(255, 0, 0)', name: 'A', discount: 0.9}, {id: 2, icon: 'rgb(0, 255, 0)', name: 'B', discount: 0.85}, {id: 3, icon: 'rgb(0, 0, 255)', name: 'C', discount: 0.8}, {id: 4, icon: 'rgb(255, 255, 0)', name: 'D', discount: 0.75}, {id: 5, icon: 'rgb(255, 0, 255)', name: 'E', discount: 0.7}];
-  var mockbadges = [{id: 1, name: 'AA'}, {id: 2, name: 'BB'}, {id: 3, name: 'CC'}, {id: 4, name: 'DD'}, {id: 5, name: 'EE'}];
+  const [currenticonindex, setCurrenticonindex] = useState(0);
 
   const [itemname, setItemname] = useState('');
   const [description0, setDescription0] = useState('');
   const [description1, setDescription1] = useState('');
-  const [cost, setCost] = useState(0);
-  const [grouplimit, setGrouplimit] = useState(0);
-  const [studentlimit, setStudentlimit] = useState(0);
-  const [ranks, setRanks] = useState(function () {
-    const initialranks = [];
-    let i = 0;
-    while (i < mockranks.length) {
-      initialranks.push({id: mockranks[i].id, icon: mockranks[i].icon, name: mockranks[i].name, discount: mockranks[i].discount, costafter: 0});
-      i = i + 1;
-    }
-    return initialranks;
-  });
+  const [cost, setCost] = useState('');
+  const [minprice, setMinprice] = useState('');
+  const [minpriceenabled, setMinpriceenabled] = useState(0);
+  const [grouplimit, setGrouplimit] = useState('');
+  const [grouplimitenabled, setGrouplimitenabled] = useState(0);
+  const [studentlimit, setStudentlimit] = useState('');
+  const [studentlimitenabled, setStudentlimitenabled] = useState(0);
+
+  const [categories, setCategories] = useState([]);
+  const [categoriesopen, setCategoriesopen] = useState(0);
+  const [addingcategory, setAddingcategory] = useState(0);
+  const [newcategoryname, setNewcategoryname] = useState('');
+
+  const [ranks, setRanks] = useState([]);
+  const [ranksfrombackend, setRanksfrombackend] = useState(0);
+
+  const [badges, setBadges] = useState([]);
   const [badgediscounts, setBadgediscounts] = useState([]);
   const [selectedbadge, setSelectedbadge] = useState('Wybierz odznakę');
-  const [pendingdiscounttype, setPendingdiscounttype] = useState('Stała kwota');
   const [pendingdiscountvalue, setPendingdiscountvalue] = useState('');
 
 
-  async function onFetchStages() {
+
+  function geticonatIndex(index) {
+
+    let safeindex = index;
+
+    while (safeindex < 0) {
+      safeindex = safeindex + itemicons.length;
+    }
+
+    while (safeindex >= itemicons.length) {
+      safeindex = safeindex - itemicons.length;
+    }
+
+    return itemicons[safeindex];
+  }
+
+
+
+  function previousicon5() {
+    setCurrenticonindex(currenticonindex - 5);
+  }
+
+
+  function previousicon1() {
+    setCurrenticonindex(currenticonindex - 1);
+  }
+
+
+  function nexticon1() {
+    setCurrenticonindex(currenticonindex + 1);
+  }
+
+
+  function nexticon5() {
+    setCurrenticonindex(currenticonindex + 5);
+  }
+
+
+
+
+
+  function onNumericinput(stringvalue, setterfunction) {
+
+    let filtered = '';
+
+    let i = 0;
+
+    while (i < stringvalue.length) {
+
+      let character = stringvalue[i];
+
+      if (character == '0' || character == '1' || character == '2' || character == '3' || character == '4' || character == '5' || character == '6' || character == '7' || character == '8' || character == '9') {
+        filtered = filtered + character;
+      }
+
+      i = i + 1;
+    }
+
+    setterfunction(filtered);
+  }
+
+
+
+
+
+  function onDiscountinput(stringvalue, setterfunction) {
+
+    let filtered = '';
+
+    let i = 0;
+
+    while (i < stringvalue.length) {
+
+      let character = stringvalue[i];
+
+      if (character == '0' || character == '1' || character == '2' || character == '3' || character == '4' || character == '5' || character == '6' || character == '7' || character == '8' || character == '9' || character == '%') {
+        filtered = filtered + character;
+      }
+
+      i = i + 1;
+    }
+
+    setterfunction(filtered);
+  }
+
+
+
+
+
+  async function onFetchcategories() {
 
     setErrorMessage('');
 
@@ -54,59 +195,50 @@ export default function App() {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/stages';
+      const url = base + '/groups/' + groupId + '/item-categories';
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'retrieve',
-          groupId: Number(groupId)
-        })
+        }
       });
 
       const responsetext = await response.text();
 
-      console.log('POST /stages retrieve: ', response.status);
-      console.log('POST /stages retrieve: ', responsetext);
+      console.log('GET /groups/' + groupId + '/item-categories: ', response.status);
+      console.log('GET /groups/' + groupId + '/item-categories: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/stages retrieve not JSON: ' + responsetext);
+        console.log('/groups/' + groupId + '/item-categories not JSON: ' + responsetext);
       }
 
-      console.log('POST /stages retrieve JSON:', data);
+      console.log('GET /groups/' + groupId + '/item-categories JSON:', data);
 
       let receiveddata = data;
 
-      const receivedstages = [];
+      if (!Array.isArray(receiveddata)) {
+        receiveddata = [];
+      }
+
+      const receivedcategories = [];
 
       let i = 0;
 
-      while (i < receiveddata.stages.length) {
+      while (i < receiveddata.length) {
 
-        receivedstages.push({id: receiveddata.stages[i].id, name: receiveddata.stages[i].name, activities: [], tempactivities: [], editmode: 0, open: 'none'});
-
-        i = i + 1;
-      }
-
-      setStages(receivedstages);
-
-      i = 0;
-
-      while (i < receivedstages.length) {
-
-        onFetchActivities(receivedstages[i].id);
+        receivedcategories.push({id: receiveddata[i].id, name: receiveddata[i].name, checked: 0, editmode: 0, tempname: receiveddata[i].name});
 
         i = i + 1;
       }
+
+      setCategories(receivedcategories);
 
     } catch (error) {
 
@@ -126,7 +258,7 @@ export default function App() {
 
 
 
-  async function onFetchActivities(stageId) {
+  async function createcategory(name) {
 
     setErrorMessage('');
 
@@ -135,7 +267,7 @@ export default function App() {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/activities';
+      const url = base + '/groups/' + groupId + '/item-categories';
 
       const response = await fetch(url, {
         method: 'POST',
@@ -145,121 +277,29 @@ export default function App() {
           'X-Browser-ID': browserid
         },
         body: JSON.stringify({
-          method: 'retrieve',
-          stageId: stageId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities: ', response.status);
-      console.log('POST /activities: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities JSON:', data);
-
-      let receiveddata = data;
-
-      setStages(function (prevStages) {
-
-        const newstages = [];
-
-        let i = 0;
-
-        while (i < prevStages.length) {
-
-          if (prevStages[i].id == stageId) {
-
-            const newactivities = [];
-
-            let j = 0;
-
-            while (j < receiveddata.activities.length) {
-
-              newactivities.push({id: receiveddata.activities[j].id, name: receiveddata.activities[j].name, description0: receiveddata.activities[j].storyDescription, description1: receiveddata.activities[j].educationalDescription, reward: receiveddata.activities[j].currency,  editmode: 0});
-
-              j = j + 1;
-            }
-
-            newstages.push({id: prevStages[i].id, name: prevStages[i].name, activities: newactivities, tempactivities: prevStages[i].tempactivities, editmode: prevStages[i].editmode, open: prevStages[i].open});
-
-          } else {
-
-            newstages.push(prevStages[i]);
-          }
-
-          i = i + 1;
-        }
-
-        return newstages;
-      });
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function createstage(name) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          groupId: Number(groupId),
           name: name
         })
       });
 
       const responsetext = await response.text();
 
-      console.log('POST /stages post: ', response.status);
-      console.log('POST /stages post: ', responsetext);
+      console.log('POST /groups/' + groupId + '/item-categories: ', response.status);
+      console.log('POST /groups/' + groupId + '/item-categories: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/stages post not JSON: ' + responsetext);
+        console.log('/groups/' + groupId + '/item-categories not JSON: ' + responsetext);
       }
 
-      console.log('POST /stages post JSON:', data);
+      console.log('POST /groups/' + groupId + '/item-categories JSON:', data);
 
-      onFetchStages();
+      onFetchcategories();
+      setAddingcategory(0);
+      setNewcategoryname('');
+      showSuccess('Kategoria zostala utworzona.');
 
     } catch (error) {
 
@@ -276,10 +316,7 @@ export default function App() {
   }
 
 
-
-
-
-  async function createactivity(stageId, name, reward, description0, description1) {
+  async function updatecategory(categoryId, name) {
 
     setErrorMessage('');
 
@@ -288,311 +325,36 @@ export default function App() {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/activities';
+      const url = base + '/groups/' + groupId + '/item-categories/' + categoryId;
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: 'PATCH',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           'X-Browser-ID': browserid
         },
         body: JSON.stringify({
-          method: 'post',
-          stageId: stageId,
-          name: name,
-          currency: reward,
-          educationalDescription: description1,
-          storyDescription: description0
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities post: ', response.status);
-      console.log('POST /activities post: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities post not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities post JSON:', data);
-
-      onFetchActivities(stageId);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function updateactivity(activityId, name, reward, description0, description1) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'modify',
-          activityId: activityId,
-          name: name,
-          currency: Number(reward),
-          educationalDescription: description1,
-          storyDescription: description0
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities modify: ', response.status);
-      console.log('POST /activities modify: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities modify not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities modify JSON:', data);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-  async function copystage(stageId) {
-    setErrorMessage('');
-
-    try {
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      let copiedstage = null;
-
-      let i = 0;
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-          copiedstage = stages[i];
-        }
-
-        i = i + 1;
-      }
-
-
-
-      const response = await fetch(base + '/stages', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          groupId: Number(groupId),
-          name: copiedstage.name
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages: ', response.status);
-      console.log('POST /stages: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages JSON:', data);
-
-      if (data.stage > 0) {
-
-        let newstageid = data.stage;
-
-        i = 0;
-        while (i < copiedstage.activities.length) {
-
-          await fetch(base + '/activities', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Browser-ID': browserid
-            },
-            body: JSON.stringify({
-              method: 'post',
-              stageId: newstageid,
-              name: copiedstage.activities[i].name,
-              currency: copiedstage.activities[i].reward,
-              educationalDescription: copiedstage.activities[i].description1,
-              storyDescription: copiedstage.activities[i].description0
-            })
-          });
-
-          i = i + 1;
-        }
-
-        onFetchStages();
-      }
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-  async function deletestage(stageId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'remove',
-          stageId: stageId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages remove: ', response.status);
-      console.log('POST /stages remove: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages remove not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages remove JSON:', data);
-
-      onFetchStages();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function updatestage(stageId, name) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'modify',
-          stageId: stageId,
           name: name
         })
       });
 
       const responsetext = await response.text();
 
-      console.log('POST /stages modify: ', response.status);
-      console.log('POST /stages modify: ', responsetext);
+      console.log('PATCH /groups/' + groupId + '/item-categories/' + categoryId + ': ', response.status);
+      console.log('PATCH /groups/' + groupId + '/item-categories/' + categoryId + ': ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/stages modify not JSON: ' + responsetext);
+        console.log('/groups/' + groupId + '/item-categories/' + categoryId + ' not JSON: ' + responsetext);
       }
 
-      console.log('POST /stages modify JSON:', data);
+      console.log('PATCH /groups/' + groupId + '/item-categories/' + categoryId + ' JSON:', data);
+
+      onFetchcategories();
 
     } catch (error) {
 
@@ -612,40 +374,55 @@ export default function App() {
 
 
 
-  function editstage(stageId) {
+  async function deletecategory(categoryId) {
 
-    let stagenamevalue = null;
+    setErrorMessage('');
 
-    const newstages = [];
+    try {
 
-    let i = 0;
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
 
-    while (i < stages.length) {
+      const url = base + '/groups/' + groupId + '/item-categories/' + categoryId;
 
-      if (stages[i].id == stageId) {
-
-        let updatedstage = {id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open};
-
-        if (stages[i].editmode == 0) {
-          updatedstage.editmode = 1;
-        } else if (stages[i].editmode == 1) {
-          updatedstage.editmode = 0;
-          stagenamevalue = stages[i].name;
+      const response = await fetch(url, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
         }
+      });
 
-        newstages.push(updatedstage);
+      const responsetext = await response.text();
 
-      } else {
-        newstages.push(stages[i]);
+      console.log('DELETE /groups/' + groupId + '/item-categories/' + categoryId + ': ', response.status);
+      console.log('DELETE /groups/' + groupId + '/item-categories/' + categoryId + ': ', responsetext);
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+        console.log('/groups/' + groupId + '/item-categories/' + categoryId + ' not JSON: ' + responsetext);
       }
 
-      i = i + 1;
-    }
+      console.log('DELETE /groups/' + groupId + '/item-categories/' + categoryId + ' JSON:', data);
 
-    setStages(newstages);
+      onFetchcategories();
+      showSuccess('Kategoria zostala usunieta.');
 
-    if (stagenamevalue != null) {
-      updatestage(stageId, stagenamevalue);
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
     }
   }
 
@@ -653,208 +430,276 @@ export default function App() {
 
 
 
-  function onStageChange(stageId, value) {
+  async function onfetchranks() {
 
-    const newstages = [];
+    setErrorMessage('');
 
-    let i = 0;
+    try {
 
-    while (i < stages.length) {
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
 
-      if (stages[i].id == stageId) {
+      const url = base + '/groups/' + groupId + '/ranks';
 
-        let updatedstage = {id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open};
-
-        updatedstage.name = value;
-
-        newstages.push(updatedstage);
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function togglestage(stageId) {
-
-    let newstages = [];
-
-    let i = 0;
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        let newstage = {
-          id: stages[i].id,
-          name: stages[i].name,
-          activities: stages[i].activities,
-          tempactivities: stages[i].tempactivities,
-          editmode: stages[i].editmode,
-          open: ''
-        };
-
-        if (stages[i].open == '') {
-          newstage.open = 'none';
-        } else {
-          newstage.open = '';
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
         }
+      });
 
-        newstages.push(newstage);
-      } else {
+      const responsetext = await response.text();
 
-        newstages.push(stages[i]);
-      }
-      i = i + 1;
-    }
+      console.log('GET /groups/' + groupId + '/ranks: ', response.status);
+      console.log('GET /groups/' + groupId + '/ranks: ', responsetext);
 
-    setStages(newstages);
-  }
+      let data;
 
-
-
-
-
-  function addactivity(stageId) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newtemp = [];
-
-        let j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-          newtemp.push(stages[i].tempactivities[j]);
-          j = j + 1;
-        }
-
-        const newactivity = {id: stages[i].tempactivities.length, name: '', description0: '', description1: '', reward: '', editmode: 2};
-
-        newtemp.push(newactivity);
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+        console.log('/groups/' + groupId + '/ranks not JSON: ' + responsetext);
       }
 
-      i = i + 1;
-    }
+      console.log('GET /groups/' + groupId + '/ranks JSON:', data);
 
-    setStages(newstages);
-  }
+      let receiveddata = data;
 
+      if (!Array.isArray(receiveddata)) {
+        receiveddata = [];
+      }
 
-
-
-
-  function editactivity(stageId, activityId, temporary = 0) {
-
-    if (temporary == 0) {
-
-      let activitytosave = null;
-
-      const newstages = [];
+      const receivedranks = [];
 
       let i = 0;
 
-      while (i < stages.length) {
+      while (i < receiveddata.length) {
 
-        if (stages[i].id == stageId) {
+        let discountvalue = receiveddata[i].storeDiscount;
 
-          const newactivities = [];
-
-          let j = 0;
-
-          while (j < stages[i].activities.length) {
-
-            if (stages[i].activities[j].id == activityId) {
-
-              let updatedactivity = {id: stages[i].activities[j].id, name: stages[i].activities[j].name, description0: stages[i].activities[j].description0, description1: stages[i].activities[j].description1, reward: stages[i].activities[j].reward, editmode: stages[i].activities[j].editmode};
-
-              if (stages[i].activities[j].editmode == 0) {
-                updatedactivity.editmode = 1;
-              } else if (stages[i].activities[j].editmode == 1) {
-                updatedactivity.editmode = 0;
-                activitytosave = updatedactivity;
-              }
-
-              newactivities.push(updatedactivity);
-
-            } else {
-              newactivities.push(stages[i].activities[j]);
-            }
-
-            j = j + 1;
-          }
-
-          newstages.push({id: stages[i].id, name: stages[i].name, activities: newactivities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open});
-
-        } else {
-          newstages.push(stages[i]);
+        if (discountvalue == null) {
+          discountvalue = 0;
         }
+
+        let iconvalue = receiveddata[i].icon;
+
+        if (iconvalue == null) {
+          iconvalue = '';
+        }
+
+        receivedranks.push({id: receiveddata[i].id, icon: iconvalue ? `backend:${iconvalue}` : '', name: receiveddata[i].name, discount: discountvalue, costafter: ''});
 
         i = i + 1;
       }
 
-      setStages(newstages);
+      setRanks(receivedranks);
+      setRanksfrombackend(1);
 
-      if (activitytosave != null) {
-        updateactivity(activitytosave.id, activitytosave.name, activitytosave.reward, activitytosave.description0, activitytosave.description1);
+      if (cost != '') {
+        recalculatediscounts(cost);
       }
 
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+    }
+  }
+
+
+
+
+
+  async function onfetchbadges() {
+
+    setErrorMessage('');
+
+    try {
+
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+
+      const url = base + '/groups/' + groupId + '/badges';
+
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
+        }
+      });
+
+      const responsetext = await response.text();
+
+      console.log('GET /groups/' + groupId + '/badges: ', response.status);
+      console.log('GET /groups/' + groupId + '/badges: ', responsetext);
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+        console.log('/groups/' + groupId + '/badges not JSON: ' + responsetext);
+      }
+
+      console.log('GET /groups/' + groupId + '/badges JSON:', data);
+
+      let receiveddata = data;
+
+      if (!Array.isArray(receiveddata)) {
+        receiveddata = [];
+      }
+
+      const receivedbadges = [];
+
+      let i = 0;
+
+      while (i < receiveddata.length) {
+
+        receivedbadges.push({id: receiveddata[i].id, name: receiveddata[i].name});
+
+        i = i + 1;
+      }
+
+      setBadges(receivedbadges);
+
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+    }
+  }
+
+
+
+
+
+  function editcategory(categoryId) {
+
+    let categorynamevalue = null;
+
+    const newcategories = [];
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == categoryId) {
+
+        let updatedcategory = {id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: categories[i].editmode, tempname: categories[i].tempname};
+
+        if (categories[i].editmode == 0) {
+          updatedcategory.editmode = 1;
+          updatedcategory.tempname = categories[i].name;
+        } else if (categories[i].editmode == 1) {
+          updatedcategory.editmode = 0;
+          updatedcategory.name = categories[i].tempname;
+          categorynamevalue = categories[i].tempname;
+        }
+
+        newcategories.push(updatedcategory);
+
+      } else {
+        newcategories.push(categories[i]);
+      }
+
+      i = i + 1;
+    }
+
+    setCategories(newcategories);
+
+    if (categorynamevalue != null) {
+      updatecategory(categoryId, categorynamevalue);
+    }
+  }
+
+
+
+
+
+  function oncategorynamechange(categoryId, value) {
+
+    const newcategories = [];
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == categoryId) {
+
+        let updatedcategory = {id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: categories[i].editmode, tempname: value};
+
+        newcategories.push(updatedcategory);
+
+      } else {
+        newcategories.push(categories[i]);
+      }
+
+      i = i + 1;
+    }
+
+    setCategories(newcategories);
+  }
+
+
+
+
+
+  function oncategorycheckchange(categoryId) {
+
+    const newcategories = [];
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == categoryId) {
+
+        let newchecked = 1;
+
+        if (categories[i].checked == 1) {
+          newchecked = 0;
+        }
+
+        newcategories.push({id: categories[i].id, name: categories[i].name, checked: newchecked, editmode: categories[i].editmode, tempname: categories[i].tempname});
+
+      } else {
+        newcategories.push(categories[i]);
+      }
+
+      i = i + 1;
+    }
+
+    setCategories(newcategories);
+  }
+
+
+
+
+
+  function togglecategoriesopen() {
+
+    if (categoriesopen == 0) {
+      setCategoriesopen(1);
     } else {
-
-      let movingactivity = null;
-
-      const newstages = [];
-
-      let i = 0;
-
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-
-          const newtemp = [];
-
-          let j = 0;
-
-          while (j < stages[i].tempactivities.length) {
-
-            if (stages[i].tempactivities[j].id == activityId) {
-              movingactivity = stages[i].tempactivities[j];
-            } else {
-              newtemp.push(stages[i].tempactivities[j]);
-            }
-
-            j = j + 1;
-          }
-
-          newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-        } else {
-          newstages.push(stages[i]);
-        }
-
-        i = i + 1;
-      }
-
-      setStages(newstages);
-
-      createactivity(stageId, movingactivity.name, movingactivity.reward, movingactivity.description0, movingactivity.description1);
+      setCategoriesopen(0);
     }
   }
 
@@ -862,182 +707,23 @@ export default function App() {
 
 
 
-  function onActivityChange(stageId, activityId, field, value) {
+  function confirmaddcategory() {
 
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newactivities = [];
-
-        let j = 0;
-
-        while (j < stages[i].activities.length) {
-
-          if (stages[i].activities[j].id == activityId) {
-
-            let updatedactivity = {id: stages[i].activities[j].id, name: stages[i].activities[j].name, description0: stages[i].activities[j].description0, description1: stages[i].activities[j].description1, reward: stages[i].activities[j].reward, editmode: stages[i].activities[j].editmode};
-
-            if (field == 'name') {
-              updatedactivity.name = value;
-            } else if (field == 'description0') {
-              updatedactivity.description0 = value;
-            } else if (field == 'description1') {
-              updatedactivity.description1 = value;
-            } else if (field == 'reward') {
-              updatedactivity.reward = value;
-            }
-
-            newactivities.push(updatedactivity);
-
-          } else {
-            newactivities.push(stages[i].activities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        const newtemp = [];
-
-        j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-
-          if (stages[i].tempactivities[j].id == activityId) {
-
-            let updatedactivity = {id: stages[i].tempactivities[j].id, name: stages[i].tempactivities[j].name, description0: stages[i].tempactivities[j].description0, description1: stages[i].tempactivities[j].description1, reward: stages[i].tempactivities[j].reward, editmode: stages[i].tempactivities[j].editmode};
-
-            if (field == 'name') {
-              updatedactivity.name = value;
-            } else if (field == 'description0') {
-              updatedactivity.description0 = value;
-            } else if (field == 'description1') {
-              updatedactivity.description1 = value;
-            } else if (field == 'reward') {
-              updatedactivity.reward = value;
-            }
-
-            newtemp.push(updatedactivity);
-
-          } else {
-            newtemp.push(stages[i].tempactivities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: newactivities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
+    if (newcategoryname.trim().length == 0) {
+      showError('Prosze wpisac nazwe kategorii.');
+      return;
     }
 
-    setStages(newstages);
+    createcategory(newcategoryname.trim());
   }
 
 
 
 
 
-  function deletetempactivity(stageId, activityId) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newtemp = [];
-
-        let j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-
-          if (stages[i].tempactivities[j].id != activityId) {
-            newtemp.push(stages[i].tempactivities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  async function deleteactivity(stageId, activityId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'remove',
-          activityId: activityId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities remove: ', response.status);
-      console.log('POST /activities remove: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities remove not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities remove JSON:', data);
-
-      onFetchStages();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
+  function canceladdcategory() {
+    setAddingcategory(0);
+    setNewcategoryname('');
   }
 
 
@@ -1046,7 +732,7 @@ export default function App() {
 
   function recalculatediscounts(basecostvalue) {
 
-    const basecost = basecostvalue;
+    const basecost = Number(basecostvalue);
 
     const newranks = [];
 
@@ -1056,8 +742,15 @@ export default function App() {
 
       let newcostafter = '';
 
-      if (basecostvalue != '' && basecost.length > 0) {
-        newcostafter = Math.round(basecost * ranks[i].discount);
+      if (basecostvalue != '' && basecost > 0) {
+
+        let discounted = basecost - Math.round(basecost * ranks[i].discount / 100);
+
+        if (discounted < 0) {
+          discounted = 0;
+        }
+
+        newcostafter = discounted;
       }
 
       newranks.push({id: ranks[i].id, icon: ranks[i].icon, name: ranks[i].name, discount: ranks[i].discount, costafter: newcostafter});
@@ -1096,51 +789,6 @@ export default function App() {
 
 
 
-  function togglependingdiscounttype() {
-
-    if (pendingdiscounttype == 'Stała kwota') {
-      setPendingdiscounttype('Zniżka procentowa');
-    } else {
-      setPendingdiscounttype('Stała kwota');
-    }
-  }
-
-
-
-
-
-  function togglebadgediscounttype(discountId) {
-
-    const newdiscounts = [];
-
-    let i = 0;
-
-    while (i < badgediscounts.length) {
-
-      if (badgediscounts[i].id == discountId) {
-
-        let newtype = 'Stała kwota';
-
-        if (badgediscounts[i].type == 'Stała kwota') {
-          newtype = 'Zniżka procentowa';
-        }
-
-        newdiscounts.push({id: badgediscounts[i].id, badgeid: badgediscounts[i].badgeid, badgename: badgediscounts[i].badgename, type: newtype, value: badgediscounts[i].value});
-
-      } else {
-        newdiscounts.push(badgediscounts[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setBadgediscounts(newdiscounts);
-  }
-
-
-
-
-
   function onbadgediscountchange(discountId, value) {
 
     const newdiscounts = [];
@@ -1150,7 +798,7 @@ export default function App() {
     while (i < badgediscounts.length) {
 
       if (badgediscounts[i].id == discountId) {
-        newdiscounts.push({id: badgediscounts[i].id, badgeid: badgediscounts[i].badgeid, badgename: badgediscounts[i].badgename, type: badgediscounts[i].type, value: value});
+        newdiscounts.push({id: badgediscounts[i].id, badgeid: badgediscounts[i].badgeid, badgename: badgediscounts[i].badgename, value: value});
       } else {
         newdiscounts.push(badgediscounts[i]);
       }
@@ -1199,10 +847,10 @@ export default function App() {
 
     i = 0;
 
-    while (i < mockbadges.length) {
+    while (i < badges.length) {
 
-      if (mockbadges[i].name == selectedbadge) {
-        badgeid = mockbadges[i].id;
+      if (badges[i].name == selectedbadge) {
+        badgeid = badges[i].id;
       }
 
       i = i + 1;
@@ -1217,13 +865,12 @@ export default function App() {
       i = i + 1;
     }
 
-    newdiscounts.push({id: badgediscounts.length, badgeid: badgeid, badgename: selectedbadge, type: pendingdiscounttype, value: pendingdiscountvalue});
+    newdiscounts.push({id: badgediscounts.length, badgeid: badgeid, badgename: selectedbadge, value: pendingdiscountvalue});
 
     setBadgediscounts(newdiscounts);
     setSelectedbadge('Wybierz odznakę');
     setPendingdiscountvalue('');
-    setPendingdiscounttype('Stała kwota');
-    showSuccess('Znizka dla odznaki zostala utworzona.');
+    showSuccess('Znizka dla odznaki zostala utworzona (lokalnie).');
   }
 
 
@@ -1246,10 +893,8 @@ export default function App() {
     }
 
     setBadgediscounts(newdiscounts);
-    showSuccess('Znizka za odznake zostala usunieta.');
+    showSuccess('Znizka za odznake zostala usunieta (lokalnie).');
   }
-
-
 
 
 
@@ -1260,14 +905,156 @@ export default function App() {
 
 
 
+  async function createitem() {
 
+    if (itemname.trim().length == 0) {
+      showError('Prosze wpisac nazwe przedmiotu.');
+      return;
+    }
 
-  function createitem() {
-    showSuccess('Przedmiot został utworzony!');
-    console.log('OK');
+    if (cost == '' || Number(cost) < 0) {
+      showError('Prosze wpisac poprawny koszt przedmiotu.');
+      return;
+    }
+
+    if (grouplimitenabled == 1 && grouplimit == '') {
+      showError('Prosze wpisac limit sztuk na grupe lub odznaczyc limit.');
+      return;
+    }
+
+    if (studentlimitenabled == 1 && studentlimit == '') {
+      showError('Prosze wpisac limit sztuk na studenta lub odznaczyc limit.');
+      return;
+    }
+
+    setErrorMessage('');
+
+    try {
+
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+
+      const url = base + '/groups/' + groupId + '/shop-items';
+
+      let safeiconindex = currenticonindex;
+
+      while (safeiconindex < 0) {
+        safeiconindex = safeiconindex + itemicons.length;
+      }
+
+      while (safeiconindex >= itemicons.length) {
+        safeiconindex = safeiconindex - itemicons.length;
+      }
+
+      const payload = {
+        name: itemname.trim(),
+        basePrice: Number(cost),
+        imageRef: itemicons[safeiconindex].ref
+      };
+
+      if (description0.trim().length > 0) {
+        payload.storyDescription = description0.trim();
+      }
+
+      if (description1.trim().length > 0) {
+        payload.educationalDescription = description1.trim();
+      }
+
+      let categoryid = null;
+
+      let i = 0;
+
+      while (i < categories.length) {
+
+        if (categories[i].checked == 1 && categoryid == null) {
+          categoryid = categories[i].id;
+        }
+
+        i = i + 1;
+      }
+
+      if (categoryid != null) {
+        payload.categoryId = categoryid;
+      }
+
+      if (grouplimitenabled == 1) {
+        payload.stockQuantity = Number(grouplimit);
+      }
+
+      if (studentlimitenabled == 1) {
+        payload.perStudentLimit = Number(studentlimit);
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const responsetext = await response.text();
+
+      console.log('POST /groups/' + groupId + '/shop-items: ', response.status);
+      console.log('POST /groups/' + groupId + '/shop-items: ', responsetext);
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+        console.log('/groups/' + groupId + '/shop-items not JSON: ' + responsetext);
+      }
+
+      console.log('POST /groups/' + groupId + '/shop-items JSON:', data);
+
+      if (!response.ok) {
+        showError('Nie udalo sie utworzyc przedmiotu.');
+        return;
+      }
+
+      showSuccess('Przedmiot został utworzony!');
+      window.location.href = '/groups/' + groupId + '/shop';
+
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+      showError(message);
+    }
   }
 
 
+
+
+
+  useEffect(() => {
+
+    let randomindex = Math.floor(Math.random() * itemicons.length);
+
+    setCurrenticonindex(randomindex);
+
+    onFetchcategories();
+    onfetchranks();
+    onfetchbadges();
+
+  }, []);
+
+
+  let currenticon = geticonatIndex(currenticonindex);
+  let iconminus2 = geticonatIndex(currenticonindex - 2);
+  let iconminus1 = geticonatIndex(currenticonindex - 1);
+  let iconplus1 = geticonatIndex(currenticonindex + 1);
+  let iconplus2 = geticonatIndex(currenticonindex + 2);
 
 
 
@@ -1276,85 +1063,195 @@ export default function App() {
       <div>
         <div style = {{width: '75vw', height: '100%', position: 'relative', top: '0%', left: '0%'}}>
 
+          <div style = {{width: '98%', position: 'relative', top: '0%', left: '1%', display: 'flex', flexDirection: 'row', gap: '2%', paddingBottom: '4vh'}}>
 
-          <div style = {{width: '98%', position: 'relative', top: '0%', left: '1%', display: 'flex', flexDirection: 'column', gap: '2vh', paddingBottom: '4vh'}}>
+            <div style = {{width: '66%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '2vh'}}>
 
-            <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                <div style = {{width: '35%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Nazwa przedmiotu</div>
-                <input onChange = {(event) => setItemname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '63%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {itemname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-              </div>
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '2%'}}>
-                <div style = {{width: '35%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingTop: '1vh'}}>Opis fabularny</div>
-                <textarea onChange = {(event) => setDescription0(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '63%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description0} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></textarea>
-              </div>
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: '2%'}}>
-                <div style = {{width: '35%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingTop: '1vh'}}>Opis dydaktyczny</div>
-                <textarea onChange = {(event) => setDescription1(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '63%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description1} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></textarea>
-              </div>
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                <div style = {{width: '35%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Koszt</div>
-                <input type = 'number' onInput = {(event) => {setCost(event.target.value); recalculatediscounts(event.target.value);}} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '63%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'center'}} value = {cost} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-              </div>
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                <div style = {{width: '35%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Limit sztuk na grupę (0 = bez limitu)</div>
-                <input type = 'number' onChange = {(event) => setGrouplimit(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '63%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'center'}} value = {grouplimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-              </div>
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                <div style = {{width: '35%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Limit sztuk na studenta (0 = bez limitu)</div>
-                <input type = 'number' onChange = {(event) => setStudentlimit(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '63%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'center'}} value = {studentlimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-              </div>
-            </div>
+              <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
 
-            <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-              <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh'}}>Zniżki za rangi</div>
-              {ranks.map((rank) => (
-                <div key = {'rank' + rank.id} style = {{backgroundColor: 'rgb(41, 40, 57)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '2.5%', paddingRight: '1%', borderRadius: '16px', gap: '2%'}}>
-                  <div style = {{backgroundColor: rank.icon, width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', borderRadius: '50%'}}></div>
-                  <div style = {{width: '25%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{rank.name}</span></div>
-                  <div style = {{width: '20%', position: 'relative', left: '2.5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{rank.discount}</span></div>
-                  <input type = 'number' onChange = {(event) => onrankcostchange(rank.id, event.target.value)} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '20%', height: '5vh', position: 'relative', left: '22.5%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'center'}} value = {rank.costafter} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-                </div>
-              ))}
-            </div>
-
-            <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-              <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh'}}>Zniżki za odznaki</div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                <select onChange = {(event) => setSelectedbadge(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '40%', height: '5vh', position: 'relative', color: 'rgb(66, 243, 125)', fontSize: '14px', fontWeight: 900, paddingLeft: '2%', border: 'none', outline: 'none', borderRadius: '8px', cursor: 'pointer'}} value = {selectedbadge}>
-                  <option value = 'Wybierz odznakę'>Wybierz odznakę</option>
-                  {mockbadges.map((badge) => (
-                    <option key = {'badgeoption' + badge.id} value = {badge.name}>{badge.name}</option>
-                  ))}
-                </select>
-                <div onClick = {() => togglependingdiscounttype()} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '20%', height: '5vh', position: 'relative', borderRadius: '8px', color: 'rgb(66, 243, 125)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>{pendingdiscounttype}</div>
-                <input onChange = {(event) => setPendingdiscountvalue(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '35%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', textAlign: 'center'}} value = {pendingdiscountvalue} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-                <div onClick = {() => addbadgediscount()} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj zniżkę</div>
-              </div>
-              {badgediscounts.map((discount) => (
-                <div key = {'badgediscount' + discount.id} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                  <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '40%', height: '5vh', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', paddingLeft: '2%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{discount.badgename}</span></div>
-                  <div onClick = {() => togglebadgediscounttype(discount.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '20%', height: '5vh', position: 'relative', borderRadius: '8px', color: 'rgb(66, 243, 125)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>{discount.type}</div>
-                  <input onChange = {(event) => onbadgediscountchange(discount.id, event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', textAlign: 'center'}} value = {discount.value} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-                  <div onClick = {() => deletebadgediscount(discount.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {deleteicon} style = {{width: '35%', height: '35%'}}/>
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
+                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Ikona przedmiotu</div>
+                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1%'}}>
+                    <div onClick = {() => previousicon5()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                      <img src = {leftleft} style = {{width: '55%', height: '55%'}}/>
+                    </div>
+                    <div onClick = {() => previousicon1()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                      <img src = {left} style = {{width: '55%', height: '55%'}}/>
+                    </div>
+                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '8vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.5}}>
+                      <AssetSvg key = {iconminus2.ref} name = {resolveSvgAssetName(iconminus2.ref)} width = {24} height = {24}/>
+                    </div>
+                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '10vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.75}}>
+                      <AssetSvg key = {iconminus1.ref} name = {resolveSvgAssetName(iconminus1.ref)} width = {28} height = {28}/>
+                    </div>
+                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%'}}>
+                      <AssetSvg key = {currenticon.ref} name = {resolveSvgAssetName(currenticon.ref)} width = {40} height = {40}/>
+                    </div>
+                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '10vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.75}}>
+                      <AssetSvg key = {iconplus1.ref} name = {resolveSvgAssetName(iconplus1.ref)} width = {28} height = {28}/>
+                    </div>
+                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '8vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.5}}>
+                      <AssetSvg key = {iconplus2.ref} name = {resolveSvgAssetName(iconplus2.ref)} width = {24} height = {24}/>
+                    </div>
+                    <div onClick = {() => nexticon1()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                      <img src = {right} style = {{width: '55%', height: '55%'}}/>
+                    </div>
+                    <div onClick = {() => nexticon5()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                      <img src = {rightright} style = {{width: '55%', height: '55%'}}/>
+                    </div>
                   </div>
                 </div>
-              ))}
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', gap: '0.5vw'}}>Nazwa przedmiotu</div>
+                  <input onChange = {(event) => setItemname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {itemname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Opis fabularny</div>
+                  <textarea onChange = {(event) => setDescription0(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description0} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></textarea>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Opis dydaktyczny</div>
+                  <textarea onChange = {(event) => setDescription1(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description1} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></textarea>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Cena</div>
+                  <input onInput = {(event) => {onNumericinput(event.target.value, setCost); recalculatediscounts(event.target.value);}} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left'}} value = {cost} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+                    <input type = "checkbox" checked = {minpriceenabled == 1} onChange = {() => {if (minpriceenabled == 0) {setMinpriceenabled(1);} else {setMinpriceenabled(0); setMinprice('');}}} style = {{cursor: 'pointer'}}/>
+                    <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Cena minimalna*<InfoTooltip text = "Backend nie obsluguje jeszcze ceny minimalnej." /></div>
+                  </div>
+                  <input onInput = {(event) => onNumericinput(event.target.value, setMinprice)} disabled = {minpriceenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: minpriceenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: minpriceenabled == 1 ? 1 : 0.5}} value = {minpriceenabled == 1 ? minprice : ''} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+                    <input type = "checkbox" checked = {grouplimitenabled == 1} onChange = {() => {if (grouplimitenabled == 0) {setGrouplimitenabled(1);} else {setGrouplimitenabled(0); setGrouplimit('');}}} style = {{cursor: 'pointer'}}/>
+                    <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na grupę<InfoTooltip text = "Ogranicza laczna liczbe sztuk dostepnych w sklepie." /></div>
+                  </div>
+                  <input onInput = {(event) => onNumericinput(event.target.value, setGrouplimit)} disabled = {grouplimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: grouplimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: grouplimitenabled == 1 ? 1 : 0.5}} value = {grouplimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+                    <input type = "checkbox" checked = {studentlimitenabled == 1} onChange = {() => {if (studentlimitenabled == 0) {setStudentlimitenabled(1);} else {setStudentlimitenabled(0); setStudentlimit('');}}} style = {{cursor: 'pointer'}}/>
+                    <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na studenta<InfoTooltip text = "Ogranicza ile razy kazdy z uzytkownikow moze kupic ten przedmiot." /></div>
+                  </div>
+                  <input onInput = {(event) => onNumericinput(event.target.value, setStudentlimit)} disabled = {studentlimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: studentlimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: studentlimitenabled == 1 ? 1 : 0.5}} value = {studentlimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingTop: '1vh'}}>
+                  <div onClick = {() => togglecategoriesopen()} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', paddingLeft: '1%', paddingRight: '1%'}}>
+                    <div style = {{color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', gap: '0.5vw'}}>Kategorie<InfoTooltip text = "Backend przyjmuje jedna kategorie na przedmiot - wysylana jest pierwsza z zaznaczonych." /></div>
+                    <img src = {categoriesopen == 1 ? up : down} style = {{width: '20px', height: '20px'}}/>
+                  </div>
+
+                  {categoriesopen == 1 ? (
+                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingTop: '0.5vh'}}>
+                      {categories.map((category) => (
+                        <div key = {'category' + category.id} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%', paddingTop: '0.5vh', paddingBottom: '0.5vh', paddingLeft: '1%'}}>
+                          <input type = "checkbox" checked = {category.checked == 1} onChange = {() => oncategorycheckchange(category.id)} style = {{cursor: 'pointer'}}/>
+                          {category.editmode == 1 ? (
+                            <input onChange = {(event) => oncategorynamechange(category.id, event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '50%', height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {category.tempname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                          ) : (
+                            <div style = {{width: '90%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{category.name}</div>
+                          )}
+                          <div onClick = {() => editcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                            <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
+                          </div>
+                          <div onClick = {() => deletecategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                            <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
+                          </div>
+                        </div>
+                      ))}
+
+                      {addingcategory == 1 ? (
+                        <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%', paddingTop: '0.5vh', paddingBottom: '0.5vh', paddingLeft: '1%'}}>
+                          <input onChange = {(event) => setNewcategoryname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '90%', height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {newcategoryname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                          <div onClick = {() => confirmaddcategory()} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                            <img src = {checkicon} style = {{width: '50%', height: '50%'}}/>
+                          </div>
+                          <div onClick = {() => canceladdcategory()} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                            <img src = {closeicon} style = {{width: '50%', height: '50%'}}/>
+                          </div>
+                        </div>
+                      ) : (
+                        <div onClick = {() => setAddingcategory(1)} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj kategorię</div>
+                        
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+
+              </div>
+
+              <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za odznaki*<InfoTooltip text = "Lista odznak pochodzi z backendu, ale znizki nie sa jeszcze zapisywane przy tworzeniu. Wpisanie znaku '%' w wartosci sprawia, ze znizka staje sie procentowa." /></div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%', flexWrap: 'wrap'}}>
+                  <select onChange = {(event) => setSelectedbadge(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '40%', height: '5vh', position: 'relative', color: 'rgb(66, 243, 125)', fontSize: '14px', fontWeight: 900, paddingLeft: '2%', border: 'none', outline: 'none', borderRadius: '8px', cursor: 'pointer'}} value = {selectedbadge}>
+                    <option value = 'Wybierz odznakę'>Wybierz odznakę</option>
+                    {badges.map((badge) => (
+                      <option key = {'badgeoption' + badge.id} value = {badge.name}>{badge.name}</option>
+                    ))}
+                  </select>
+                  <input onInput = {(event) => onDiscountinput(event.target.value, setPendingdiscountvalue)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', textAlign: 'center'}} value = {pendingdiscountvalue} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                  <div onClick = {() => addbadgediscount()} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj zniżkę</div>
+                </div>
+                {badgediscounts.map((discount) => (
+                  <div key = {'badgediscount' + discount.id} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
+                    <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '40%', height: '5vh', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', paddingLeft: '2%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{discount.badgename}</span></div>
+                    <input onInput = {(event) => onDiscountinput(event.target.value, (value) => onbadgediscountchange(discount.id, value))} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '50%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', textAlign: 'center'}} value = {discount.value} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                    <div onClick = {() => deletebadgediscount(discount.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                      <img src = {deleteicon} style = {{width: '35%', height: '35%'}}/>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
+                <div onClick = {() => goback()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '15%', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij</div>
+                <div onClick = {() => createitem()} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '20%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Stwórz przedmiot</div>
+              </div>
+
             </div>
 
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
-              <div onClick = {() => goback()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '15%', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij</div>
-              <div onClick = {() => createitem()} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '20%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Stwórz przedmiot</div>
+            <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '2vh'}}>
+
+              <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za rangi{ranksfrombackend == 0 ? '*' : ''}<InfoTooltip text = "Zniżki pochodzą z wartosci przechowywanych w odznakach, lecz nie zostaja zapisane." /></div>
+                {ranks.length == 0 ? (
+                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Brak rang w grupie.</div>
+                ) : (
+                  ranks.map((rank) => (
+                    <div key = {'rank' + rank.id} style = {{backgroundColor: 'rgb(41, 40, 57)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '3%', paddingBottom: '3%', paddingLeft: '2.5%', paddingRight: '2.5%', borderRadius: '16px'}}>
+                      <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
+                        <div style = {{backgroundColor: 'rgb(40, 40, 52)', width: '10%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%'}}>
+                          <AssetSvg name = {resolveSvgAssetName(rank.icon)} width = {32} height = {32}/>
+                        </div>
+                        <div style = {{width: '55%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', left: '2.5%', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{rank.name}</span></div>
+                        <div style = {{width: '30%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>{rank.discount}%</div>
+                      </div>
+                      <input onInput = {(event) => onNumericinput(event.target.value, (value) => onrankcostchange(rank.id, value))} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'center'}} value = {rank.costafter} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                    </div>
+                  ))
+                )}
+              </div>
+
             </div>
 
           </div>
+
         </div>
       </div>
     </div>
   )
 }
-
 
 
