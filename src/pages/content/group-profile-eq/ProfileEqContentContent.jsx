@@ -1,24 +1,24 @@
-import { useCallback, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getApiBaseUrl, getSamlLoginUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
-
-import itemicon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
-import infoicon from '../../../../public/assets/icons/info-circle-svgrepo-com.svg';
-import copyicon from '../../../../public/assets/icons/copy-01-svgrepo-com.svg';
-import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
-import deleteicon from '../../../../public/assets/icons/trash-01-svgrepo-com.svg';
+import {useState, useEffect} from 'react';
+import {useParams} from 'react-router-dom';
+import {getApiBaseUrl} from '../../../constants/api.constants.js';
+import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
 
 export default function App() {
 
   const {groupId} = useParams();
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [stages, setStages] = useState([]);
-  const [stagename, setStageName] = useState('');
+  const [items, setItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [totalpurchased, setTotalpurchased] = useState(0);
+  const [uniquecount, setUniquecount] = useState(0);
+  const [togglealllabel, setTogglealllabel] = useState('Odznacz wszystkie');
 
 
-  async function onFetchStages() {
+
+  async function onfetchinventory() {
 
     setErrorMessage('');
 
@@ -27,977 +27,268 @@ export default function App() {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/stages';
+      const url = base + '/groups/' + groupId + '/inventory';
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
           'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'retrieve',
-          groupId: Number(groupId)
-        })
+        }
       });
 
       const responsetext = await response.text();
 
-      console.log('POST /stages retrieve: ', response.status);
-      console.log('POST /stages retrieve: ', responsetext);
+      console.log('GET /groups/' + groupId + '/inventory: ', response.status);
+      console.log('GET /groups/' + groupId + '/inventory: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/stages retrieve not JSON: ' + responsetext);
+        console.log('/groups/' + groupId + '/inventory not JSON: ' + responsetext);
       }
 
-      console.log('POST /stages retrieve JSON:', data);
+      console.log('GET /groups/' + groupId + '/inventory JSON:', data);
 
       let receiveddata = data;
 
-      const receivedstages = [];
+      if (!Array.isArray(receiveddata)) {
+        receiveddata = [];
+      }
+
+      const receivedentries = [];
+      const uniqueitemids = [];
 
       let i = 0;
 
-      while (i < receiveddata.stages.length) {
+      while (i < receiveddata.length) {
 
-        receivedstages.push({id: receiveddata.stages[i].id, name: receiveddata.stages[i].name, activities: [], tempactivities: [], editmode: 0, open: 'none'});
+        let entryitem = receiveddata[i].item;
+
+        let categoryid = entryitem.categoryId;
+
+        if (categoryid == null) {
+          categoryid = 0;
+        }
+
+        let imageref = entryitem.imageRef;
+
+        let imageissvg = 0;
+
+        if (imageref != null && imageref.trim().endsWith('.svg')) {
+          imageissvg = 1;
+        }
+
+
+
+        let storydescription = entryitem.storyDescription;
+
+        if (storydescription == null) {
+          storydescription = '';
+        }
+
+        let educationaldescription = entryitem.educationalDescription;
+
+        if (educationaldescription == null) {
+          educationaldescription = '';
+        }
+
+        let entryname = entryitem.name;
+
+        if (entryname == null) {
+          entryname = '';
+        }
+
+        let quantity = receiveddata[i].quantity;
+
+        if (quantity == null) {
+          quantity = 0;
+        }
+
+        let itemid = receiveddata[i].itemId;
+
+        if (itemid == null) {
+          itemid = entryitem.id;
+        }
+
+        let entryid = receiveddata[i].id;
+
+        if (entryid == null) {
+          entryid = 0;
+        }
+
+        let j = 0;
+
+        while (j < quantity) {
+
+          receivedentries.push({
+            uniquekey: entryid + '_' + itemid + '_' + j,
+            entryid: entryid,
+            itemid: itemid,
+            name: entryname,
+            storydescription: storydescription,
+            educationaldescription: educationaldescription,
+            imageissvg: imageissvg,
+            imageref: imageref,
+            categoryid: categoryid,
+            purchaseprice: 99
+          });
+
+          j = j + 1;
+        }
+
+        let alreadyunique = 0;
+
+        let k = 0;
+
+        while (k < uniqueitemids.length) {
+
+          if (uniqueitemids[k] == itemid) {
+            alreadyunique = 1;
+          }
+
+          k = k + 1;
+        }
+
+        if (alreadyunique == 0 && quantity > 0) {
+          uniqueitemids.push(itemid);
+        }
 
         i = i + 1;
       }
 
-      setStages(receivedstages);
+      setItems(receivedentries);
+      setTotalpurchased(receivedentries.length);
+      setUniquecount(uniqueitemids.length);
+
+      onfetchcategories(receivedentries);
+
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+    }
+  }
+
+
+
+
+
+  async function onfetchcategories(receivedentries) {
+
+    setErrorMessage('');
+
+    try {
+
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+
+      const url = base + '/groups/' + groupId + '/item-categories';
+
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
+        }
+      });
+
+      const responsetext = await response.text();
+
+      console.log('GET /groups/' + groupId + '/item-categories: ', response.status);
+      console.log('GET /groups/' + groupId + '/item-categories: ', responsetext);
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+        console.log('/groups/' + groupId + '/item-categories not JSON: ' + responsetext);
+      }
+
+      console.log('GET /groups/' + groupId + '/item-categories JSON:', data);
+
+      let receivedcategories = data;
+
+      if (!Array.isArray(receivedcategories)) {
+        receivedcategories = [];
+      }
+
+      const usedcategoryids = [];
+
+      let i = 0;
+
+      while (i < receivedentries.length) {
+
+        let alreadyused = 0;
+
+        let j = 0;
+
+        while (j < usedcategoryids.length) {
+
+          if (usedcategoryids[j] == receivedentries[i].categoryid) {
+            alreadyused = 1;
+          }
+
+          j = j + 1;
+        }
+
+        if (alreadyused == 0) {
+          usedcategoryids.push(receivedentries[i].categoryid);
+        }
+
+        i = i + 1;
+      }
+
+      const filtercategories = [];
 
       i = 0;
 
-      while (i < receivedstages.length) {
+      while (i < usedcategoryids.length) {
 
-        onFetchActivities(receivedstages[i].id);
+        if (usedcategoryids[i] == 0) {
 
-        i = i + 1;
-      }
+          filtercategories.push({id: 0, name: '- - -', checked: 1});
 
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function onFetchActivities(stageId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'retrieve',
-          stageId: stageId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities: ', response.status);
-      console.log('POST /activities: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities JSON:', data);
-
-      let receiveddata = data;
-
-      setStages(function (prevStages) {
-
-        const newstages = [];
-
-        let i = 0;
-
-        while (i < prevStages.length) {
-
-          if (prevStages[i].id == stageId) {
-
-            const newactivities = [];
-
-            let j = 0;
-
-            while (j < receiveddata.activities.length) {
-
-              newactivities.push({id: receiveddata.activities[j].id, name: receiveddata.activities[j].name, description0: receiveddata.activities[j].storyDescription, description1: receiveddata.activities[j].educationalDescription, reward: receiveddata.activities[j].currency,  editmode: 0});
-
-              j = j + 1;
-            }
-
-            newstages.push({id: prevStages[i].id, name: prevStages[i].name, activities: newactivities, tempactivities: prevStages[i].tempactivities, editmode: prevStages[i].editmode, open: prevStages[i].open});
-
-          } else {
-
-            newstages.push(prevStages[i]);
-          }
-
-          i = i + 1;
-        }
-
-        return newstages;
-      });
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function createstage(name) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          groupId: Number(groupId),
-          name: name
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages post: ', response.status);
-      console.log('POST /stages post: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages post not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages post JSON:', data);
-
-      onFetchStages();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function createactivity(stageId, name, reward, description0, description1) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          stageId: stageId,
-          name: name,
-          currency: reward,
-          educationalDescription: description1,
-          storyDescription: description0
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities post: ', response.status);
-      console.log('POST /activities post: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities post not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities post JSON:', data);
-
-      onFetchActivities(stageId);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function updateactivity(activityId, name, reward, description0, description1) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'modify',
-          activityId: activityId,
-          name: name,
-          currency: Number(reward),
-          educationalDescription: description1,
-          storyDescription: description0
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities modify: ', response.status);
-      console.log('POST /activities modify: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities modify not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities modify JSON:', data);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-  async function copystage(stageId) {
-    setErrorMessage('');
-
-    try {
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      let copiedstage = null;
-
-      let i = 0;
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-          copiedstage = stages[i];
-        }
-
-        i = i + 1;
-      }
-
-
-
-      const response = await fetch(base + '/stages', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'post',
-          groupId: Number(groupId),
-          name: copiedstage.name
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages: ', response.status);
-      console.log('POST /stages: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages JSON:', data);
-
-      if (data.stage > 0) {
-
-        let newstageid = data.stage;
-
-        i = 0;
-        while (i < copiedstage.activities.length) {
-
-          await fetch(base + '/activities', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Browser-ID': browserid
-            },
-            body: JSON.stringify({
-              method: 'post',
-              stageId: newstageid,
-              name: copiedstage.activities[i].name,
-              currency: copiedstage.activities[i].reward,
-              educationalDescription: copiedstage.activities[i].description1,
-              storyDescription: copiedstage.activities[i].description0
-            })
-          });
-
-          i = i + 1;
-        }
-
-        onFetchStages();
-      }
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-  async function deletestage(stageId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'remove',
-          stageId: stageId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages remove: ', response.status);
-      console.log('POST /stages remove: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages remove not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages remove JSON:', data);
-
-      onFetchStages();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  async function updatestage(stageId, name) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/stages';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'modify',
-          stageId: stageId,
-          name: name
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /stages modify: ', response.status);
-      console.log('POST /stages modify: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/stages modify not JSON: ' + responsetext);
-      }
-
-      console.log('POST /stages modify JSON:', data);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  function editstage(stageId) {
-
-    let stagenamevalue = null;
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        let updatedstage = {id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open};
-
-        if (stages[i].editmode == 0) {
-          updatedstage.editmode = 1;
-        } else if (stages[i].editmode == 1) {
-          updatedstage.editmode = 0;
-          stagenamevalue = stages[i].name;
-        }
-
-        newstages.push(updatedstage);
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-
-    if (stagenamevalue != null) {
-      updatestage(stageId, stagenamevalue);
-    }
-  }
-
-
-
-
-
-  function onStageChange(stageId, value) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        let updatedstage = {id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open};
-
-        updatedstage.name = value;
-
-        newstages.push(updatedstage);
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function togglestage(stageId) {
-
-    let newstages = [];
-
-    let i = 0;
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        let newstage = {
-          id: stages[i].id,
-          name: stages[i].name,
-          activities: stages[i].activities,
-          tempactivities: stages[i].tempactivities,
-          editmode: stages[i].editmode,
-          open: ''
-        };
-
-        if (stages[i].open == '') {
-          newstage.open = 'none';
         } else {
-          newstage.open = '';
-        }
 
-        newstages.push(newstage);
-      } else {
-
-        newstages.push(stages[i]);
-      }
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function addactivity(stageId) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newtemp = [];
-
-        let j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-          newtemp.push(stages[i].tempactivities[j]);
-          j = j + 1;
-        }
-
-        const newactivity = {id: stages[i].tempactivities.length, name: '', description0: '', description1: '', reward: '', editmode: 2};
-
-        newtemp.push(newactivity);
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function editactivity(stageId, activityId, temporary = 0) {
-
-    if (temporary == 0) {
-
-      let activitytosave = null;
-
-      const newstages = [];
-
-      let i = 0;
-
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-
-          const newactivities = [];
+          let categoryname = 'Kategoria ' + usedcategoryids[i];
 
           let j = 0;
 
-          while (j < stages[i].activities.length) {
+          while (j < receivedcategories.length) {
 
-            if (stages[i].activities[j].id == activityId) {
+            if (receivedcategories[j].id == usedcategoryids[i]) {
 
-              let updatedactivity = {id: stages[i].activities[j].id, name: stages[i].activities[j].name, description0: stages[i].activities[j].description0, description1: stages[i].activities[j].description1, reward: stages[i].activities[j].reward, editmode: stages[i].activities[j].editmode};
-
-              if (stages[i].activities[j].editmode == 0) {
-                updatedactivity.editmode = 1;
-              } else if (stages[i].activities[j].editmode == 1) {
-                updatedactivity.editmode = 0;
-                activitytosave = updatedactivity;
+              if (receivedcategories[j].name != null) {
+                categoryname = receivedcategories[j].name;
               }
 
-              newactivities.push(updatedactivity);
-
-            } else {
-              newactivities.push(stages[i].activities[j]);
             }
 
             j = j + 1;
           }
 
-          newstages.push({id: stages[i].id, name: stages[i].name, activities: newactivities, tempactivities: stages[i].tempactivities, editmode: stages[i].editmode, open: stages[i].open});
+          filtercategories.push({id: usedcategoryids[i], name: categoryname, checked: 1});
 
-        } else {
-          newstages.push(stages[i]);
         }
 
         i = i + 1;
       }
 
-      setStages(newstages);
-
-      if (activitytosave != null) {
-        updateactivity(activitytosave.id, activitytosave.name, activitytosave.reward, activitytosave.description0, activitytosave.description1);
-      }
-
-    } else {
-
-      let movingactivity = null;
-
-      const newstages = [];
-
-      let i = 0;
-
-      while (i < stages.length) {
-
-        if (stages[i].id == stageId) {
-
-          const newtemp = [];
-
-          let j = 0;
-
-          while (j < stages[i].tempactivities.length) {
-
-            if (stages[i].tempactivities[j].id == activityId) {
-              movingactivity = stages[i].tempactivities[j];
-            } else {
-              newtemp.push(stages[i].tempactivities[j]);
-            }
-
-            j = j + 1;
-          }
-
-          newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-        } else {
-          newstages.push(stages[i]);
-        }
-
-        i = i + 1;
-      }
-
-      setStages(newstages);
-
-      createactivity(stageId, movingactivity.name, movingactivity.reward, movingactivity.description0, movingactivity.description1);
-    }
-  }
-
-
-
-
-
-  function onActivityChange(stageId, activityId, field, value) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newactivities = [];
-
-        let j = 0;
-
-        while (j < stages[i].activities.length) {
-
-          if (stages[i].activities[j].id == activityId) {
-
-            let updatedactivity = {id: stages[i].activities[j].id, name: stages[i].activities[j].name, description0: stages[i].activities[j].description0, description1: stages[i].activities[j].description1, reward: stages[i].activities[j].reward, editmode: stages[i].activities[j].editmode};
-
-            if (field == 'name') {
-              updatedactivity.name = value;
-            } else if (field == 'description0') {
-              updatedactivity.description0 = value;
-            } else if (field == 'description1') {
-              updatedactivity.description1 = value;
-            } else if (field == 'reward') {
-              updatedactivity.reward = value;
-            }
-
-            newactivities.push(updatedactivity);
-
-          } else {
-            newactivities.push(stages[i].activities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        const newtemp = [];
-
-        j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-
-          if (stages[i].tempactivities[j].id == activityId) {
-
-            let updatedactivity = {id: stages[i].tempactivities[j].id, name: stages[i].tempactivities[j].name, description0: stages[i].tempactivities[j].description0, description1: stages[i].tempactivities[j].description1, reward: stages[i].tempactivities[j].reward, editmode: stages[i].tempactivities[j].editmode};
-
-            if (field == 'name') {
-              updatedactivity.name = value;
-            } else if (field == 'description0') {
-              updatedactivity.description0 = value;
-            } else if (field == 'description1') {
-              updatedactivity.description1 = value;
-            } else if (field == 'reward') {
-              updatedactivity.reward = value;
-            }
-
-            newtemp.push(updatedactivity);
-
-          } else {
-            newtemp.push(stages[i].tempactivities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: newactivities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  function deletetempactivity(stageId, activityId) {
-
-    const newstages = [];
-
-    let i = 0;
-
-    while (i < stages.length) {
-
-      if (stages[i].id == stageId) {
-
-        const newtemp = [];
-
-        let j = 0;
-
-        while (j < stages[i].tempactivities.length) {
-
-          if (stages[i].tempactivities[j].id != activityId) {
-            newtemp.push(stages[i].tempactivities[j]);
-          }
-
-          j = j + 1;
-        }
-
-        newstages.push({id: stages[i].id, name: stages[i].name, activities: stages[i].activities, tempactivities: newtemp, editmode: stages[i].editmode, open: stages[i].open});
-
-      } else {
-        newstages.push(stages[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setStages(newstages);
-  }
-
-
-
-
-
-  async function deleteactivity(stageId, activityId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/activities';
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          method: 'remove',
-          activityId: activityId
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /activities remove: ', response.status);
-      console.log('POST /activities remove: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/activities remove not JSON: ' + responsetext);
-      }
-
-      console.log('POST /activities remove JSON:', data);
-
-      onFetchStages();
+      setCategories(filtercategories);
+      setTogglealllabel('Odznacz wszystkie');
 
     } catch (error) {
 
@@ -1011,6 +302,153 @@ export default function App() {
 
       setErrorMessage(message);
     }
+  }
+
+
+
+
+
+  function oncategorychange(categoryId) {
+
+    const newcategories = [];
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == categoryId) {
+
+        let newchecked = 1;
+
+        if (categories[i].checked == 1) {
+          newchecked = 0;
+        }
+
+        newcategories.push({id: categories[i].id, name: categories[i].name, checked: newchecked});
+
+      } else {
+        newcategories.push(categories[i]);
+      }
+
+      i = i + 1;
+    }
+
+    setCategories(newcategories);
+
+    updatetogglealllabel(newcategories);
+  }
+
+
+
+
+
+  function updatetogglealllabel(categorylist) {
+
+    let allchecked = 1;
+
+    let i = 0;
+
+    while (i < categorylist.length) {
+
+      if (categorylist[i].checked == 0) {
+        allchecked = 0;
+      }
+
+      i = i + 1;
+    }
+
+    if (allchecked == 1) {
+      setTogglealllabel('Odznacz wszystkie');
+    } else {
+      setTogglealllabel('Zaznacz wszystkie');
+    }
+  }
+
+
+
+
+
+  function ontoggleallcategories() {
+
+    let allchecked = 1;
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].checked == 0) {
+        allchecked = 0;
+      }
+
+      i = i + 1;
+    }
+
+    const newcategories = [];
+
+    i = 0;
+
+    while (i < categories.length) {
+
+      let newchecked = 1;
+
+      if (allchecked == 1) {
+        newchecked = 0;
+      }
+
+      newcategories.push({id: categories[i].id, name: categories[i].name, checked: newchecked});
+
+      i = i + 1;
+    }
+
+    setCategories(newcategories);
+
+    updatetogglealllabel(newcategories);
+  }
+
+
+
+
+
+  function isitemvisible(item) {
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == item.categoryid) {
+
+        if (categories[i].checked == 1) {
+          return 1;
+        } else {
+          return 0;
+        }
+
+      }
+
+      i = i + 1;
+    }
+
+    return 1;
+  }
+
+
+
+
+
+  function getcategorynameforitem(item) {
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == item.categoryid) {
+        return categories[i].name;
+      }
+
+      i = i + 1;
+    }
+
+    return '';
   }
 
 
@@ -1018,7 +456,7 @@ export default function App() {
 
 
   useEffect(() => {
-    onFetchStages();
+    onfetchinventory();
   }, []);
 
 
@@ -1030,22 +468,83 @@ export default function App() {
       <div>
         <div style = {{width: '100%', height: '100%', position: 'relative', top: '0%', left: '0%', display: 'flex', flexDirection: 'column', gap: '1rem'}}>
           <div style = {{width: '100%', position: 'relative', top: '0%', left: '0%', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '1rem'}}>
-            <div style = {{margin: '0', color: 'rgb(227, 224, 247)', fontSize: '1.75rem', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Ekwipunek</div>
+            <div style = {{color: 'rgb(227, 224, 247)', fontSize: '1.75rem', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Ekwipunek</div>
           </div>
-          <div style = {{margin: '0', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Brak zakupionych przedmiotów.</div>
+
+          <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5%', flexWrap: 'wrap'}}>
+            <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+              <div style = {{width: '100%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Zakupione przedmioty:</div>
+              <div style = {{width: '5vw', height: '5vh', borderRadius: '16px', backgroundColor: 'rgba(66, 243, 125, 0.1)', border: '2px solid rgba(66, 243, 125, 0.2)', color: 'rgb(227, 224, 247)', fontSize: '21px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}>{totalpurchased}</div>
+            </div>
+            <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+              <div style = {{width: '100%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Unikatowe przedmioty:</div>
+              <div style = {{width: '5vw', height: '5vh', borderRadius: '16px', backgroundColor: 'rgba(66, 243, 125, 0.1)', border: '2px solid rgba(66, 243, 125, 0.2)', color: 'rgb(227, 224, 247)', fontSize: '21px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}>{uniquecount}</div>
+            </div>
+          </div>
+
+
+
+          {categories.length > 0 ? (
+            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '2.5vh', paddingTop: '0.5vh', paddingBottom: '0.5vh'}}>
+              <div style = {{color: 'rgb(227, 224, 247)', fontSize: '21px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingTop: '1vh'}}>Kategorie</div>
+              <div onClick = {() => ontoggleallcategories()} style = {{backgroundColor: 'rgba(66, 243, 125)', width: 'fit-content', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingLeft: '1.5vw', paddingRight: '1.5vw', paddingTop: '0.5vh', paddingBottom: '0.5vh', cursor: 'pointer'}}>{togglealllabel}</div>
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2vw'}}>
+                {categories.map((category) => (
+                  <div key = {'filter' + category.id} style = {{backgroundColor: category.checked == 1 ? 'rgba(26, 26, 42, 0.5)' : 'rgba(26, 26, 42, 0.5)', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingTop: '0.5vh', paddingBottom: '0.5vh', paddingLeft: '1%', paddingRight: '1%', borderRadius: '16px'}}>
+
+                    <input type = "checkbox" checked = {category.checked == 1} onChange = {() => oncategorychange(category.id)} style = {{cursor: 'pointer'}}/>
+                    <div style = {{color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, paddingLeft: '0.5vw', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{category.name}</div>
+                  </div>
+                ))}
+              </div>
+              
+            </div>
+          ) : null}
+
+          {items.length == 0 ? (
+            <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Brak zakupionych przedmiotów.</div>
+          ) : (
+            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2vh', paddingTop: '0.5vh', paddingBottom: '1vh'}}>
+              {items.map((item) => (
+                isitemvisible(item) == 1 ? (
+                  <div key = {item.uniquekey} style = {{flex: '0 calc(94% / 5)', display: 'flex', flexDirection: 'column', borderRadius: '16px', backgroundColor: 'rgb(41, 40, 57)', overflow: 'hidden'}}>
+                    <div style = {{position: 'relative', aspectRatio: '2 / 1', width: '100%', overflow: 'hidden'}}>
+                      {item.imageissvg == 1 ? (
+                        <div style = {{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', backgroundColor: 'rgb(26, 26, 42)'}}>
+                          <AssetSvg name = {resolveSvgAssetName(item.imageref)} width = {48} height = {48}/>
+                        </div>
+                      ) : (
+                        <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5%', width: '100%', height: '100%', backgroundColor: 'rgb(26, 26, 42)'}}></div>
+                      )}
+                      {getcategorynameforitem(item) != '' ? (
+                        <div style = {{position: 'absolute', top: '1vh', left: '0.5vw', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5%'}}>
+                          <div style = {{display: 'flex', paddingTop: '0.5vh', paddingBottom: '0.25vh', paddingLeft: '0.5vw', paddingRight: '0.5vw', borderRadius: '16px', backgroundColor: 'rgba(66, 243, 125, 0.2)', color: 'rgb(66, 243, 125)', fontSize: '14px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{getcategorynameforitem(item)}</div>
+                        </div>
+                      ) : null}
+                    </div>
+                    <div style = {{display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingTop: '0.75vh', paddingLeft: '1vw', paddingRight: '1vw', paddingBottom: '0.75vh'}}>
+                      <div style = {{fontSize: '18px', fontWeight: 700, color: 'rgb(227, 224, 247)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 1, overflow: 'hidden'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{item.name}</span></div>
+                      <div style = {{fontSize: '14px', fontStyle: 'italic', fontWeight: 500, color: 'rgb(187, 203, 185)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden', marginBottom: '1vh'}}>{item.storydescription != '' ? item.storydescription : ' '}</div>
+                      <div style = {{display: 'flex', flexDirection: 'column', gap: '0.25vh', paddingTop: '0.5vh', paddingBottom: '0.5vh', paddingLeft: '0.5vw', paddingRight: '0.5vw', borderRadius: '14px', backgroundColor: 'rgb(26, 26, 42)'}}>
+                        <div style = {{fontSize: '14px', fontWeight: 700, textTransform: 'uppercase', color: 'rgb(66, 243, 125)'}}>Opis dydaktyczny</div>
+                        <div style = {{fontSize: '14px', fontWeight: 500, color: 'rgb(227, 224, 247)', display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{item.educationaldescription != '' ? item.educationaldescription : ' '}</div>
+                      </div>
+                    </div>
+                    <div style = {{marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: '0.75vh', paddingTop: '1vh', paddingLeft: '1vh', paddingRight: '1vw', paddingBottom: '1vw', borderTop: '1px solid rgba(255, 255, 255, 0.1)'}}>
+                      <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.25vw', color: 'rgb(66, 243, 125)'}}>
+                        <div style = {{fontSize: '16px', fontWeight: 700}}>{item.purchaseprice}*</div>
+                      </div>
+                    </div>
+                  </div>
+                ) : null
+              ))}
+            </div>
+          )}
 
         </div>
 
 
-
-
-
       </div>
-
-
-
-
-
     </div>
   )
 }
