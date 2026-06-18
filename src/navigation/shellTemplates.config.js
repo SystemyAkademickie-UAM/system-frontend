@@ -11,7 +11,7 @@
  * - enabled: false — przycisk ukryty bez usuwania konfiguracji.
  * - requiresGroup: true — widoczny dopiero po wyborze grupy (ścieżka /groups/:groupId/...).
  * - hrefKey: klucz z HREF_BUILDERS (oprócz kind === 'logout').
- * - kind: 'navlink' | 'cta' | 'logout'
+ * - kind: 'navlink' | 'cta' | 'logout' | 'spacer' | 'unavailable' | 'tree-item' | 'tree-group' | 'tree-expandable'
  * - matchEnd: przekazywane do NavLink `end` (np. lista grup).
  * - visibleFor: tablica ról dla których element jest widoczny (puste = wszystkie)
  */
@@ -43,6 +43,15 @@ export const HREF_BUILDERS = {
   GROUP_MAIN_ACTIVITIES: (ctx) => (ctx.groupId ? paths.groupMainActivitiesPath(ctx.groupId) : null),
   GROUP_MAIN_RANKS: (ctx) => (ctx.groupId ? paths.groupMainRanksPath(ctx.groupId) : null),
   GROUP_MAIN_BADGES: (ctx) => (ctx.groupId ? paths.groupMainBadgesPath(ctx.groupId) : null),
+
+  // Student — płaskie trasy (poza /home)
+  GROUP_STUDENT_FEED: (ctx) => (ctx.groupId ? paths.groupStudentFeedPath(ctx.groupId) : null),
+  GROUP_STUDENT_PARTICIPANTS: (ctx) =>
+    ctx.groupId ? paths.groupStudentParticipantsPath(ctx.groupId) : null,
+  GROUP_STUDENT_ACTIVITY_LIST: (ctx) =>
+    ctx.groupId ? paths.groupStudentActivityListPath(ctx.groupId) : null,
+  GROUP_STUDENT_RANKS: (ctx) => (ctx.groupId ? paths.groupStudentRanksPath(ctx.groupId) : null),
+  GROUP_STUDENT_BADGES: (ctx) => (ctx.groupId ? paths.groupStudentBadgesPath(ctx.groupId) : null),
 
   // Profil studenta + podstrony
   GROUP_PROFILE: (ctx) => (ctx.groupId ? paths.groupProfilePath(ctx.groupId) : null),
@@ -79,6 +88,7 @@ export const HREF_BUILDERS = {
   // Sklep
   GROUP_SHOP: (ctx) => (ctx.groupId ? paths.groupShopPath(ctx.groupId) : null),
   GROUP_SHOP_ADD: (ctx) => (ctx.groupId ? paths.groupShopAddPath(ctx.groupId) : null),
+  GROUP_SHOP_PREVIEW: (ctx) => (ctx.groupId ? paths.groupShopPreviewPath(ctx.groupId) : null),
 
   // Ranking + podstrony
   GROUP_RANKING: (ctx) => (ctx.groupId ? paths.groupRankingPath(ctx.groupId) : null),
@@ -114,22 +124,94 @@ const studentView = {
   ],
   primaryNavItems: [
     {
-      id: 'ekran-glowny',
+      id: 'strona-glowna',
       enabled: true,
       kind: 'navlink',
-      label: 'Dane grupy',
+      label: 'Strona Główna',
       iconId: 'nav/home',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
+      matchEnd: true,
+    },
+    {
+      id: 'wpisy',
+      enabled: true,
+      kind: 'navlink',
+      label: 'Wpisy',
+      iconId: 'nav/posts',
+      hrefKey: 'GROUP_STUDENT_FEED',
+      requiresGroup: true,
+      matchEnd: true,
     },
     {
       id: 'profil',
       enabled: true,
-      kind: 'navlink',
+      kind: 'tree-group',
       label: 'Profil',
       iconId: 'nav/profile',
-      hrefKey: 'GROUP_PROFILE',
       requiresGroup: true,
+      children: [
+        {
+          id: 'profil-odznaki',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Zdobyte odznaki',
+          iconId: 'nav/profile',
+          hrefKey: 'GROUP_PROFILE',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'profil-aktywnosci',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Aktywności',
+          iconId: 'nav/activity',
+          hrefKey: 'GROUP_PROFILE_LOG',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'profil-ekwipunek',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Ekwipunek',
+          iconId: 'nav/profile',
+          hrefKey: 'GROUP_PROFILE_EQ',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+      ],
+    },
+    {
+      id: 'lista-aktywnosci',
+      enabled: true,
+      kind: 'navlink',
+      label: 'Lista aktywności',
+      iconId: 'nav/activity',
+      hrefKey: 'GROUP_STUDENT_ACTIVITY_LIST',
+      requiresGroup: true,
+      matchEnd: true,
+    },
+    {
+      id: 'odznaki',
+      enabled: true,
+      kind: 'navlink',
+      label: 'Odznaki',
+      iconId: 'nav/rewards',
+      hrefKey: 'GROUP_STUDENT_BADGES',
+      requiresGroup: true,
+      matchEnd: true,
+    },
+    {
+      id: 'rangi',
+      enabled: true,
+      kind: 'navlink',
+      label: 'Rangi',
+      iconId: 'nav/rewards',
+      hrefKey: 'GROUP_STUDENT_RANKS',
+      requiresGroup: true,
+      matchEnd: true,
     },
     {
       id: 'sklep',
@@ -139,15 +221,43 @@ const studentView = {
       iconId: 'nav/shop',
       hrefKey: 'GROUP_SHOP',
       requiresGroup: true,
+      matchEnd: true,
+    },
+    {
+      id: 'student-nav-spacer-1',
+      enabled: true,
+      kind: 'spacer',
+    },
+    {
+      id: 'uczestnicy',
+      enabled: true,
+      kind: 'navlink',
+      label: 'Uczestnicy',
+      iconId: 'nav/users',
+      hrefKey: 'GROUP_STUDENT_PARTICIPANTS',
+      requiresGroup: true,
+      matchEnd: true,
+    },
+    {
+      id: 'student-nav-spacer-2',
+      enabled: true,
+      kind: 'spacer',
+    },
+    {
+      id: 'student-nav-spacer-3',
+      enabled: true,
+      kind: 'spacer',
     },
     {
       id: 'ranking',
       enabled: true,
-      kind: 'navlink',
+      kind: 'unavailable',
       label: 'Ranking',
       iconId: 'nav/ranking',
       hrefKey: 'GROUP_RANKING',
       requiresGroup: true,
+      clickable: true,
+      hint: 'Ranking — funkcja w przygotowaniu.',
     },
   ],
   footerItems: [
@@ -182,58 +292,134 @@ const lecturerView = {
   ],
   primaryNavItems: [
     {
-      id: 'ekran-glowny',
+      id: 'strona-glowna',
       enabled: true,
       kind: 'navlink',
-      label: 'Dane grupy',
+      label: 'Strona Główna',
       iconId: 'nav/home',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
+      matchEnd: true,
     },
     {
       id: 'uzytkownicy',
       enabled: true,
-      kind: 'navlink',
+      kind: 'tree-group',
       label: 'Użytkownicy',
       iconId: 'nav/users',
-      hrefKey: 'GROUP_MEMBERS',
       requiresGroup: true,
+      children: [
+        {
+          id: 'uzytkownicy-uczestnicy',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Uczestnicy',
+          iconId: 'nav/users',
+          hrefKey: 'GROUP_MEMBERS',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'uzytkownicy-log',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Log aktywności',
+          iconId: 'nav/activity',
+          hrefKey: 'GROUP_MEMBERS_LOG',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'uzytkownicy-kody',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Kody dostępu',
+          iconId: 'nav/users',
+          hrefKey: 'GROUP_MEMBERS_CODE',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+      ],
     },
     {
       id: 'aktywnosci',
       enabled: true,
-      kind: 'navlink',
+      kind: 'tree-group',
       label: 'Aktywności',
       iconId: 'nav/activity',
-      hrefKey: 'GROUP_ACTIVITIES',
       requiresGroup: true,
-    },
-    {
-      id: 'wpisy',
-      enabled: true,
-      kind: 'navlink',
-      label: 'Wpisy',
-      iconId: 'nav/posts',
-      hrefKey: 'GROUP_POSTS',
-      requiresGroup: true,
+      children: [
+        {
+          id: 'aktywnosci-etapy',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Etapy',
+          iconId: 'nav/activity',
+          hrefKey: 'GROUP_ACTIVITIES',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'aktywnosci-wpisy',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Wpisy',
+          iconId: 'nav/posts',
+          hrefKey: 'GROUP_POSTS',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'aktywnosci-narzedzia',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Narzędzia',
+          iconId: 'nav/activity',
+          hrefKey: 'GROUP_ACTIVITIES_TOOLS',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+      ],
     },
     {
       id: 'systemy-nagrod',
       enabled: true,
-      kind: 'navlink',
+      kind: 'tree-group',
       label: 'Systemy nagród',
       iconId: 'nav/rewards',
-      hrefKey: 'GROUP_REWARDS',
       requiresGroup: true,
-    },
-    {
-      id: 'ustawienia-grupy',
-      enabled: true,
-      kind: 'navlink',
-      label: 'Ustawienia grupy',
-      iconId: 'nav/group-settings',
-      hrefKey: 'GROUP_SETTINGS',
-      requiresGroup: true,
+      children: [
+        {
+          id: 'nagrody-odznaki',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Odznaki',
+          iconId: 'nav/rewards',
+          hrefKey: 'GROUP_REWARDS_BADGES',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'nagrody-rangi',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Rangi',
+          iconId: 'nav/rewards',
+          hrefKey: 'GROUP_REWARDS',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'nagrody-przedmioty',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Przedmioty sklepowe',
+          iconId: 'nav/shop',
+          hrefKey: 'GROUP_SHOP_ITEMS',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+      ],
     },
     {
       id: 'sklep',
@@ -243,15 +429,109 @@ const lecturerView = {
       iconId: 'nav/shop',
       hrefKey: 'GROUP_SHOP',
       requiresGroup: true,
+      matchEnd: true,
+    },
+    {
+      id: 'ustawienia-grupy',
+      enabled: true,
+      kind: 'tree-group',
+      label: 'Ustawienia grupy',
+      iconId: 'nav/group-settings',
+      requiresGroup: true,
+      children: [
+        {
+          id: 'ustawienia-edytor',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Edytor',
+          iconId: 'nav/group-settings',
+          hrefKey: 'GROUP_SETTINGS',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'ustawienia-waluta',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Waluta',
+          iconId: 'nav/group-settings',
+          hrefKey: 'GROUP_SETTINGS_CURRENCY',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'ustawienia-zycia',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'System żyć',
+          iconId: 'nav/group-settings',
+          hrefKey: 'GROUP_SETTINGS_HEALTH',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+      ],
+    },
+    {
+      id: 'lecturer-nav-spacer-1',
+      enabled: true,
+      kind: 'spacer',
+    },
+    {
+      id: 'podglad',
+      enabled: true,
+      kind: 'tree-expandable',
+      label: 'Podgląd',
+      iconId: 'nav/profile',
+      requiresGroup: true,
+      defaultExpanded: false,
+      children: [
+        {
+          id: 'podglad-rangi',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Rangi',
+          iconId: 'nav/rewards',
+          hrefKey: 'GROUP_MAIN_RANKS',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'podglad-odznaki',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Odznaki',
+          iconId: 'nav/rewards',
+          hrefKey: 'GROUP_MAIN_BADGES',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'podglad-sklep',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Sklep',
+          iconId: 'nav/shop',
+          hrefKey: 'GROUP_SHOP_PREVIEW',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+      ],
+    },
+    {
+      id: 'lecturer-nav-spacer-2',
+      enabled: true,
+      kind: 'spacer',
     },
     {
       id: 'ranking',
       enabled: true,
-      kind: 'navlink',
+      kind: 'unavailable',
       label: 'Ranking',
       iconId: 'nav/ranking',
       hrefKey: 'GROUP_RANKING',
       requiresGroup: true,
+      clickable: true,
+      hint: 'Ranking — funkcja w przygotowaniu.',
     },
   ],
   footerItems: [
@@ -359,7 +639,8 @@ export const SHELL_TEMPLATE_BLUEPRINTS = {
  * Klucz = klucz z SUB_NAV_CONFIG.
  */
 export const SUB_NAV_META = {
-  'group-main': { title: 'Dane grupy', ariaLabel: 'Nawigacja sekcji grupy' },
+  'group-main': { title: 'Strona główna', ariaLabel: 'Nawigacja strony głównej' },
+  'group-preview': { title: 'Podgląd', ariaLabel: 'Nawigacja podglądu studenta' },
   'group-profile': { title: 'Profil', ariaLabel: 'Nawigacja profilu' },
   'group-members': { title: 'Użytkownicy', ariaLabel: 'Nawigacja użytkowników' },
   'group-activities': { title: 'Aktywności', ariaLabel: 'Nawigacja aktywności' },
@@ -376,16 +657,17 @@ export const SUB_NAV_CONFIG = {
   // Ekran główny (student + lecturer)
   'group-main': [
     { id: 'home', label: 'Strona główna', hrefKey: 'GROUP_MAIN', end: true },
-    { id: 'posts', label: 'Wpisy', hrefKey: 'GROUP_MAIN_POSTS' },
-    { id: 'activities', label: 'Lista aktywności', hrefKey: 'GROUP_MAIN_ACTIVITIES' },
-    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_MAIN_RANKS' },
+  ],
+
+  'group-preview': [
+    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_MAIN_RANKS', end: true },
     { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_MAIN_BADGES' },
-    { id: 'members', label: 'Uczestnicy', hrefKey: 'GROUP_MAIN_MEMBERS' },
+    { id: 'shop', label: 'Sklep', hrefKey: 'GROUP_SHOP_PREVIEW' },
   ],
 
   // Profil studenta
   'group-profile': [
-    { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_PROFILE', end: true },
+    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE', end: true },
     { id: 'log', label: 'Aktywności', hrefKey: 'GROUP_PROFILE_LOG' },
     { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_PROFILE_EQ' },
   ],
@@ -393,26 +675,27 @@ export const SUB_NAV_CONFIG = {
   // Użytkownicy (lecturer)
   'group-members': [
     { id: 'list', label: 'Uczestnicy', hrefKey: 'GROUP_MEMBERS', end: true },
-    { id: 'code', label: 'Kody dostępu', hrefKey: 'GROUP_MEMBERS_CODE' },
     { id: 'log', label: 'Log aktywności', hrefKey: 'GROUP_MEMBERS_LOG' },
+    { id: 'code', label: 'Kody dostępu', hrefKey: 'GROUP_MEMBERS_CODE' },
   ],
 
   // Aktywności (lecturer)
   'group-activities': [
     { id: 'stages', label: 'Etapy', hrefKey: 'GROUP_ACTIVITIES', end: true },
+    { id: 'posts', label: 'Wpisy', hrefKey: 'GROUP_POSTS' },
     { id: 'tools', label: 'Narzędzia', hrefKey: 'GROUP_ACTIVITIES_TOOLS' },
   ],
 
   // Systemy nagród (lecturer)
   'group-rewards': [
-    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_REWARDS', end: true },
-    { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_REWARDS_BADGES' },
+    { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_REWARDS_BADGES', end: true },
+    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_REWARDS' },
     { id: 'shopitems', label: 'Przedmioty sklepowe', hrefKey: 'GROUP_SHOP_ITEMS' },
   ],
 
   // Ustawienia grupy (lecturer)
   'group-settings': [
-    { id: 'creator', label: 'Edytor grupy', hrefKey: 'GROUP_SETTINGS', end: true },
+    { id: 'creator', label: 'Edytor', hrefKey: 'GROUP_SETTINGS', end: true },
     { id: 'currency', label: 'Waluta', hrefKey: 'GROUP_SETTINGS_CURRENCY' },
     { id: 'health', label: 'System żyć', hrefKey: 'GROUP_SETTINGS_HEALTH' },
   ],
@@ -447,6 +730,63 @@ export function buildSubNavItems(configKey, context) {
 }
 
 /**
+ * @param {Object} item
+ * @param {{ groupId: string | null }} context
+ */
+function resolveNavItem(item, context) {
+  if (!item.enabled) {
+    return null;
+  }
+
+  if (item.kind === 'spacer') {
+    return { ...item };
+  }
+
+  if (item.kind === 'unavailable') {
+    let to = null;
+    if (item.clickable && item.hrefKey) {
+      if (!item.requiresGroup || context.groupId) {
+        to = HREF_BUILDERS[item.hrefKey]?.(context) ?? null;
+      }
+    }
+    return { ...item, to };
+  }
+
+  if (item.kind === 'logout') {
+    return { ...item, to: null };
+  }
+
+  if (item.kind === 'tree-group' || item.kind === 'tree-expandable') {
+    const children = (item.children ?? [])
+      .map((child) => resolveNavItem(child, context))
+      .filter(Boolean);
+
+    if (children.length === 0) {
+      return null;
+    }
+
+    return {
+      ...item,
+      to: null,
+      children,
+    };
+  }
+
+  if (item.requiresGroup && !context.groupId) {
+    return null;
+  }
+
+  const builder = HREF_BUILDERS[item.hrefKey];
+  const to = builder ? builder(context) : null;
+
+  if (!to) {
+    return null;
+  }
+
+  return { ...item, to };
+}
+
+/**
  * @param {string} role
  * @param {{ groupId: string | null }} context
  */
@@ -455,21 +795,7 @@ export function resolveShellView(role, context) {
 
   const mapSection = (items) => {
     return items
-      .filter((item) => item.enabled)
-      .map((item) => {
-        if (item.kind === 'logout') {
-          return { ...item, to: null };
-        }
-        if (item.requiresGroup && !context.groupId) {
-          return null;
-        }
-        const builder = HREF_BUILDERS[item.hrefKey];
-        const to = builder ? builder(context) : null;
-        if (!to) {
-          return null;
-        }
-        return { ...item, to };
-      })
+      .map((item) => resolveNavItem(item, context))
       .filter(Boolean);
   };
 

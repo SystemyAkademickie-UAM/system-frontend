@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
   Pagination,
@@ -8,12 +8,16 @@ import {
   ShopCartPanel,
   ShopClosedOverlay,
   ShopToggleButton,
+  SubNav,
   useToast,
 } from '../../../components/ui/index.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
+import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
+import '../group-main/shared/groupMainSubpageHeader.css';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { groupShopAddPath } from '../../../routes/pathRegistry.js';
 import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.js';
 import { resolveShopCategoryLabels } from './shopCategories.js';
@@ -45,11 +49,14 @@ const ITEMS_PER_PAGE = 10;
 
 export default function GroupShopContent() {
   const { groupId } = useParams();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { role } = useAppRole();
   const { showSuccess, showError, showToast } = useToast();
-  const isStudentView = role === APP_ROLE.STUDENT;
-  const isLecturerView = !isStudentView;
+  const isShopPreview = pathname.includes('/preview/shop');
+  const isStudentView = role === APP_ROLE.STUDENT || isShopPreview;
+  const isLecturerView = role !== APP_ROLE.STUDENT && !isShopPreview;
+  const previewNav = useGroupSubNav('group-preview');
 
   const {
     items,
@@ -102,6 +109,7 @@ export default function GroupShopContent() {
   }, [page, pagination.totalPages]);
 
   const shopInteractionDisabled = !isShopOpen || livesBlocked;
+  const purchaseDisabled = shopInteractionDisabled || isLecturerView;
 
   const refreshAfterPurchase = useCallback(async () => {
     await refetch();
@@ -190,76 +198,73 @@ export default function GroupShopContent() {
     ? activeModal.item
     : null;
 
-  return (
-    <SectionPageLayout
-      className="page-unavailable group-shop-page"
-      title="Sklep"
-      toolbar={(
-        <>
-          <div className="maq-section-page__toolbar-start">
-            <SearchBar
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Szukaj produktu…"
-              name="shop-search"
-              className="group-shop__search"
-              aria-label="Szukaj produktu po nazwie lub opisie"
-            />
+  const toolbar = (
+    <>
+      <div className="maq-section-page__toolbar-start">
+        <SearchBar
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Szukaj produktu…"
+          name="shop-search"
+          className="group-shop__search"
+          aria-label="Szukaj produktu po nazwie lub opisie"
+        />
+      </div>
+      <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
+        <Button
+          type="button"
+          variant="ghost"
+          size="md"
+          onClick={toggleLivesBlocked}
+          aria-pressed={livesBlocked}
+          className="group-shop__lives-toggle"
+        >
+          System żyć{livesBlocked ? ' (zablokowany)' : ''}
+        </Button>
+
+        <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
+          <div className="group-shop__lecturer-actions">
+            {groupId ? (
+              <Button to={groupShopAddPath(groupId)} variant="secondary" size="md">
+                Dodaj produkt
+              </Button>
+            ) : null}
+            <ShopToggleButton isShopOpen={isShopOpen} onToggle={handleToggleShopOpen} />
           </div>
-          <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
-            <Button
-              type="button"
-              variant="ghost"
-              size="md"
-              onClick={toggleLivesBlocked}
-              aria-pressed={livesBlocked}
-              className="group-shop__lives-toggle"
-            >
-              System żyć{livesBlocked ? ' (zablokowany)' : ''}
-            </Button>
+        </RoleVisibility>
 
-            <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
-              <div className="group-shop__lecturer-actions">
-                {groupId ? (
-                  <Button to={groupShopAddPath(groupId)} variant="secondary" size="md">
-                    Dodaj produkt
-                  </Button>
-                ) : null}
-                <ShopToggleButton isShopOpen={isShopOpen} onToggle={handleToggleShopOpen} />
-              </div>
-            </RoleVisibility>
+        <ShopCartPanel
+          cartCount={cartCount}
+          cartItems={cartItems.map((item) => ({
+            id: item.id,
+            name: item.name,
+            priceAmount: getShopItemEffectivePrice(item),
+            imageUrl: item.imageUrl,
+          }))}
+          cartTotal={cartTotal}
+          disabled={purchaseDisabled}
+          onBuyAll={() => setActiveModal({ type: 'buyAll' })}
+          onRemoveFromCart={removeFromCart}
+          className="group-shop__cart"
+        />
 
-            <ShopCartPanel
-              cartCount={cartCount}
-              cartItems={cartItems.map((item) => ({
-                id: item.id,
-                name: item.name,
-                priceAmount: getShopItemEffectivePrice(item),
-                imageUrl: item.imageUrl,
-              }))}
-              cartTotal={cartTotal}
-              disabled={shopInteractionDisabled}
-              onBuyAll={() => setActiveModal({ type: 'buyAll' })}
-              onRemoveFromCart={removeFromCart}
-              className="group-shop__cart"
-            />
+        <button
+          type="button"
+          className={[
+            'group-shop__filters-toggle',
+            filtersExpanded ? 'group-shop__filters-toggle--active' : '',
+          ].join(' ')}
+          aria-expanded={filtersExpanded}
+          onClick={() => setFiltersExpanded((expanded) => !expanded)}
+        >
+          Filtry i sortowanie
+        </button>
+      </div>
+    </>
+  );
 
-            <button
-              type="button"
-              className={[
-                'group-shop__filters-toggle',
-                filtersExpanded ? 'group-shop__filters-toggle--active' : '',
-              ].join(' ')}
-              aria-expanded={filtersExpanded}
-              onClick={() => setFiltersExpanded((expanded) => !expanded)}
-            >
-              Filtry i sortowanie
-            </button>
-          </div>
-        </>
-      )}
-    >
-
+  const shopBody = (
+    <>
       {filtersExpanded ? (
         <div className="group-shop__filters">
           <div
@@ -351,7 +356,7 @@ export default function GroupShopContent() {
                     imageUrl={item.imageUrl}
                     categories={resolveShopCategoryLabels(item.categories)}
                     showLecturerActions={isLecturerView}
-                    disabled={shopInteractionDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0)}
+                    disabled={purchaseDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0)}
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
@@ -397,6 +402,35 @@ export default function GroupShopContent() {
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
       />
+    </>
+  );
+
+  if (isStudentView) {
+    return (
+      <section className="page-unavailable group-shop-page group-shop-page--student">
+        <GroupMainSubpageHeader eyebrow="Targowisko" title="Sklep" />
+        {isShopPreview ? (
+          <SubNav
+            ariaLabel={previewNav.ariaLabel}
+            items={previewNav.items}
+            className="group-shop-page__preview-sub-nav"
+          />
+        ) : null}
+        <div className="group-shop-page__student-toolbar maq-section-page__toolbar">
+          {toolbar}
+        </div>
+        {shopBody}
+      </section>
+    );
+  }
+
+  return (
+    <SectionPageLayout
+      className="page-unavailable group-shop-page"
+      title="Sklep"
+      toolbar={toolbar}
+    >
+      {shopBody}
     </SectionPageLayout>
   );
 }

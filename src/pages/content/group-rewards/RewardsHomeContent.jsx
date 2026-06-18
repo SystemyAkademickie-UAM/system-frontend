@@ -206,7 +206,6 @@ export default function RewardsHomeContent() {
     return (
       <SectionPageLayout
         className="page-unavailable rewards-page"
-        eyebrow="Skarbiec"
         title={nav.sectionTitle}
         subNavItems={nav.items}
         subNavAriaLabel={nav.ariaLabel}
@@ -219,7 +218,6 @@ export default function RewardsHomeContent() {
   return (
     <SectionPageLayout
       className="page-unavailable rewards-page"
-      eyebrow="Skarbiec"
       title={nav.sectionTitle}
       subNavItems={nav.items}
       subNavAriaLabel={nav.ariaLabel}

@@ -67,6 +67,34 @@
   color: var(--color-nav-user-name);
 }
 
+.super-bar-breadcrumb__home-link,
+.super-bar-breadcrumb__home-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-nav-link);
+  text-decoration: none;
+}
+
+.super-bar-breadcrumb__home-link:hover {
+  color: var(--color-nav-user-name);
+}
+
+.super-bar-breadcrumb__home-link:focus-visible {
+  outline: 2px solid var(--color-nav-link);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.super-bar-breadcrumb__home-current {
+  color: var(--color-nav-user-name);
+}
+
+.super-bar-breadcrumb__home-icon {
+  display: block;
+}
+
 @media (max-width: 899px) {
   .super-bar-breadcrumb {
     display: none;

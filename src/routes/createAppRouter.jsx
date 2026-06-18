@@ -1,7 +1,8 @@
-import { Navigate, createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter, useParams } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
 import { HomeRedirect, RouteGuard, GroupAccessGuard } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
+import { useAppRole } from '../context/AppRoleContext.jsx';
 
 // Login/Auth pages
 import AuthShell from '../components/layout/AuthShell.jsx';
@@ -78,7 +79,23 @@ import RankingHomePage from '../pages/links/groups/ranking/RankingHomePage.jsx';
 import RankingGroupPage from '../pages/links/groups/ranking/RankingGroupPage.jsx';
 import RankingActivitiesPage from '../pages/links/groups/ranking/RankingActivitiesPage.jsx';
 
-import { devApiTestPath, homePath, loginPath } from './pathRegistry.js';
+import {
+  devApiTestPath,
+  groupActivitiesPath,
+  groupMainBadgesPath,
+  groupMainPath,
+  groupMainRanksPath,
+  groupMembersPath,
+  groupPostsPath,
+  groupSettingsHealthPath,
+  groupStudentActivityListPath,
+  groupStudentBadgesPath,
+  groupStudentFeedPath,
+  groupStudentParticipantsPath,
+  groupStudentRanksPath,
+  homePath,
+  loginPath,
+} from './pathRegistry.js';
 
 // Helper: wraps element with RouteGuard
 function withGuard(element, { requireAuth = true, allowedRoles, redirectTo } = {}) {
@@ -88,6 +105,45 @@ function withGuard(element, { requireAuth = true, allowedRoles, redirectTo } = {
     </RouteGuard>
   );
 }
+
+/** Przekierowanie ze starszych ścieżek grupowych. */
+function GroupLegacyPathRedirect({ buildPath }) {
+  const { groupId } = useParams();
+  return <Navigate to={buildPath(groupId)} replace />;
+}
+
+/** Na `/home/*` student trafia na płaską trasę; prowadzący — na docelową sekcję. */
+function withMainSubpageRedirect(buildFlatPath, PageComponent, buildLecturerPath = null) {
+  return function MainSubpageRoute() {
+    const { role } = useAppRole();
+    const { groupId } = useParams();
+    if (role === APP_ROLE.STUDENT) {
+      return <Navigate to={buildFlatPath(groupId)} replace />;
+    }
+    if (buildLecturerPath) {
+      return <Navigate to={buildLecturerPath(groupId)} replace />;
+    }
+    return <PageComponent />;
+  };
+}
+
+const LecturerMainPostsPage = withMainSubpageRedirect(
+  groupStudentFeedPath,
+  GroupMainPostsPage,
+  groupPostsPath,
+);
+const LecturerMainMembersPage = withMainSubpageRedirect(
+  groupStudentParticipantsPath,
+  GroupMainMembersPage,
+  groupMembersPath,
+);
+const LecturerMainActivitiesPage = withMainSubpageRedirect(
+  groupStudentActivityListPath,
+  GroupMainActivitiesPage,
+  groupActivitiesPath,
+);
+const LecturerMainRanksPage = withMainSubpageRedirect(groupStudentRanksPath, GroupMainRanksPage);
+const LecturerMainBadgesPage = withMainSubpageRedirect(groupStudentBadgesPath, GroupMainBadgesPage);
 
 // Role constants for guards
 const LECTURER_ONLY = [APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN];
@@ -162,21 +218,48 @@ const appRouteTree = [
                   // Landing — join code / brak dostępu (bez nawigacji grupowej w sidebarze)
                   { index: true, element: withGuard(<GroupJoinPage />) },
 
+                  // Legacy — `/activity` → `/activity-list`
+                  {
+                    path: 'activity',
+                    element: <GroupLegacyPathRedirect buildPath={groupStudentActivityListPath} />,
+                  },
+
                   // Podstrony grupy — wymagają dostępu (właściciel lub zapisany student)
                   {
                     element: withGuard(<GroupAccessGuard />),
                     children: [
                   // ----------------------------------------
-                  // MAIN (Ekran główny) - student + lecturer
+                  // HOME + student flat routes (wspólny layout)
                   // ----------------------------------------
                   {
-                    path: 'main',
                     element: withGuard(<GroupMainLayout />),
                     children: [
-                      { index: true, element: <GroupMainHomePage /> },
-                      { path: 'posts', element: <GroupMainPostsPage /> },
-                      { path: 'members', element: <GroupMainMembersPage /> },
-                      { path: 'activities', element: <GroupMainActivitiesPage /> },
+                      {
+                        path: 'home',
+                        children: [
+                          { index: true, element: <GroupMainHomePage /> },
+                          { path: 'posts', element: <LecturerMainPostsPage /> },
+                          { path: 'members', element: <LecturerMainMembersPage /> },
+                          { path: 'activities', element: <LecturerMainActivitiesPage /> },
+                          { path: 'ranks', element: <LecturerMainRanksPage /> },
+                          { path: 'badges', element: <LecturerMainBadgesPage /> },
+                        ],
+                      },
+                      // Legacy — `/main` → `/home`
+                      {
+                        path: 'main',
+                        children: [
+                          { index: true, element: <GroupLegacyPathRedirect buildPath={groupMainPath} /> },
+                          { path: 'posts', element: <GroupLegacyPathRedirect buildPath={groupPostsPath} /> },
+                          { path: 'members', element: <GroupLegacyPathRedirect buildPath={groupMembersPath} /> },
+                          { path: 'activities', element: <GroupLegacyPathRedirect buildPath={groupActivitiesPath} /> },
+                          { path: 'ranks', element: <GroupLegacyPathRedirect buildPath={groupMainRanksPath} /> },
+                          { path: 'badges', element: <GroupLegacyPathRedirect buildPath={groupMainBadgesPath} /> },
+                        ],
+                      },
+                      { path: 'feed', element: <GroupMainPostsPage /> },
+                      { path: 'participants', element: <GroupMainMembersPage /> },
+                      { path: 'activity-list', element: <GroupMainActivitiesPage /> },
                       { path: 'ranks', element: <GroupMainRanksPage /> },
                       { path: 'badges', element: <GroupMainBadgesPage /> },
                     ],
@@ -266,7 +349,22 @@ const appRouteTree = [
                     children: [
                       { index: true, element: <GroupSettingsHomePage /> },
                       { path: 'currency', element: <GroupSettingsCurrencyPage /> },
-                      { path: 'health', element: <GroupSettingsHealthPage /> },
+                      { path: 'lives', element: <GroupSettingsHealthPage /> },
+                      { path: 'health', element: <GroupLegacyPathRedirect buildPath={groupSettingsHealthPath} /> },
+                    ],
+                  },
+
+                  // ----------------------------------------
+                  // SHOP PREVIEW (lecturer — widok studenta)
+                  // ----------------------------------------
+                  {
+                    path: 'preview',
+                    children: [
+                      {
+                        path: 'shop',
+                        element: withGuard(<ShopLayout />, { allowedRoles: LECTURER_ONLY }),
+                        children: [{ index: true, element: <ShopHomePage /> }],
+                      },
                     ],
                   },
 

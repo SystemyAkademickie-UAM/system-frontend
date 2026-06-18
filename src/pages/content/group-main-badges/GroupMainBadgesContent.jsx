@@ -15,7 +15,7 @@ import {
   TREASURY_SORT,
 } from './badgeTreasuryModel.js';
 import { useGroupMainBadges } from './useGroupMainBadges.js';
-import { GroupMainEmptyNotice, GROUP_MAIN_EMPTY_LINKS } from '../group-main/GroupMainHomeContent.jsx';
+import { GroupMainEmptyNotice, useGroupMainEmptyLink } from '../group-main/GroupMainHomeContent.jsx';
 import '../group-main/GroupMainHomeContent.css';
 import './GroupMainBadgesContent.css';
 
@@ -44,6 +44,7 @@ export default function GroupMainBadgesContent() {
     error,
     isStudentView,
   } = useGroupMainBadges();
+  const emptyLink = useGroupMainEmptyLink('badges', groupId);
 
   const defaultSort = isStudentView ? TREASURY_SORT.unlockFirst : TREASURY_SORT.qualityDesc;
   const sortOptions = isStudentView ? STUDENT_SORT_OPTIONS : LECTURER_SORT_OPTIONS;
@@ -157,9 +158,9 @@ export default function GroupMainBadgesContent() {
 
       {badges.length === 0 ? (
         <GroupMainEmptyNotice
-          message={GROUP_MAIN_EMPTY_LINKS.badges.message}
-          linkLabel={GROUP_MAIN_EMPTY_LINKS.badges.linkLabel}
-          linkTo={GROUP_MAIN_EMPTY_LINKS.badges.path(groupId)}
+          message={emptyLink.message}
+          linkLabel={emptyLink.linkLabel}
+          linkTo={emptyLink.linkTo}
         />
       ) : visibleBadges.length === 0 ? (
         <p className="badge-treasury__empty">Brak odznak spełniających wybrane filtry.</p>

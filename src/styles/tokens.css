@@ -27,6 +27,10 @@
   /* --- Nawigacja --- */
   /** Główny pasek nawigacji (sidebar + superBar) */
   --color-nav-primary: #28452e;
+  /** Ciemniejsze odcienie paska bocznego (scrollbar). */
+  --color-nav-scrollbar-track: color-mix(in srgb, var(--color-nav-primary) 80%, #000);
+  --color-nav-scrollbar-thumb: color-mix(in srgb, var(--color-nav-primary) 58%, #000);
+  --color-nav-scrollbar-thumb-hover: color-mix(in srgb, var(--color-nav-primary) 48%, #000);
   /** Przycisk „Twoje grupy” w sidebarze oraz akcent interaktywny */
   --color-nav-cta: #1ecc38;
   /** Tekst i ikony pozycji w sidebarze */
@@ -191,7 +195,8 @@
   --shadow-superbar: 0 4px 4px rgba(0, 0, 0, 0.25);
   --shadow-stat-badge: 0 4px 4px rgba(0, 0, 0, 0.25);
 
-  --shell-sidebar-width: 224px;
+  --shell-sidebar-scrollbar-width: 10px;
+  --shell-sidebar-width: calc(224px + var(--shell-sidebar-scrollbar-width));
   --shell-superbar-height: 63px;
   --z-index-shell-header: 10;
   --z-index-modal: 1000;

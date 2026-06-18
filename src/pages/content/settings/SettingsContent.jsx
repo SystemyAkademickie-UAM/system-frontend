@@ -6,7 +6,7 @@ import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
-import { useDebouncedAutoSave } from '../../../hooks/useDebouncedAutoSave.js';
+import { useAutoSaveForm } from '../../../hooks/useAutoSaveForm.js';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { Divider, CharacterLimitedField, useToast } from '../../../components/ui/index.js';
@@ -173,9 +173,15 @@ export default function SettingsContent() {
     showSuccess,
   ]);
 
-  useDebouncedAutoSave({
-    enabled: !isLoading && !isSaving,
-    values: [nickname, selectedAvatarIndex, divlanguage, draftShowNickname],
+  const { commitSave, handleTextFieldKeyDown } = useAutoSaveForm({
+    ready: !isLoading && !isSaving,
+    watchValues: [selectedAvatarIndex, divlanguage, draftShowNickname],
+    getFingerprint: () => JSON.stringify([
+      nickname.trim(),
+      selectedAvatarIndex,
+      divlanguage,
+      draftShowNickname,
+    ]),
     onSave: persistSettings,
   });
 
@@ -273,6 +279,8 @@ export default function SettingsContent() {
                     value={nickname}
                     maxLength={SETTINGS_NICKNAME_MAX_LENGTH}
                     onChange={(event) => onNicknamechange(event.target.value)}
+                    onBlur={commitSave}
+                    onKeyDown={handleTextFieldKeyDown}
                     disabled={isSaving}
                   />
                 </CharacterLimitedField>

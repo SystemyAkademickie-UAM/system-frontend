@@ -1,4 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { TexturedSurface } from '../../../components/ui/index.js';
 import ContentWithMeasuredDivider from '../../../components/ui/ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
 import { groupActivitiesPath, groupRewardsBadgesPath, groupRewardsPath } from '../../../routes/pathRegistry.js';
@@ -76,8 +78,45 @@ export function GroupMainEmptyNotice({ message, linkLabel, linkTo }) {
   );
 }
 
+function resolveEmptyLinkForRole(role, linkConfig, groupId) {
+  if (role === APP_ROLE.STUDENT) {
+    return {
+      message: linkConfig.studentMessage ?? linkConfig.message,
+      linkLabel: null,
+      linkTo: null,
+    };
+  }
+
+  return {
+    message: linkConfig.message,
+    linkLabel: linkConfig.linkLabel,
+    linkTo: linkConfig.path(groupId),
+  };
+}
+
+export function useGroupMainEmptyLink(key, groupId) {
+  const { role } = useAppRole();
+  const linkConfig = GROUP_MAIN_EMPTY_LINKS[key];
+  return resolveEmptyLinkForRole(role, linkConfig, groupId);
+}
+
 export const GROUP_MAIN_EMPTY_LINKS = {
-  ranks: { message: 'Nie dodano jeszcze rang.', linkLabel: 'Dodaj je w systemie nagród', path: groupRewardsPath },
-  badges: { message: 'Nie dodano jeszcze odznak.', linkLabel: 'Dodaj je w systemie nagród', path: groupRewardsBadgesPath },
-  activities: { message: 'Nie dodano jeszcze aktywności.', linkLabel: 'Dodaj je w module aktywności', path: groupActivitiesPath },
+  ranks: {
+    message: 'Nie dodano jeszcze rang.',
+    studentMessage: 'Nie dodano jeszcze rang w tej grupie.',
+    linkLabel: 'Dodaj je w systemie nagród',
+    path: groupRewardsPath,
+  },
+  badges: {
+    message: 'Nie dodano jeszcze odznak.',
+    studentMessage: 'Nie dodano jeszcze odznak w tej grupie.',
+    linkLabel: 'Dodaj je w systemie nagród',
+    path: groupRewardsBadgesPath,
+  },
+  activities: {
+    message: 'Nie dodano jeszcze aktywności.',
+    studentMessage: 'Nie dodano jeszcze aktywności w tej grupie.',
+    linkLabel: 'Dodaj je w module aktywności',
+    path: groupActivitiesPath,
+  },
 };

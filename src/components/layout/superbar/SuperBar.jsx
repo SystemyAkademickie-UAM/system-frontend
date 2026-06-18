@@ -68,6 +68,7 @@ export default function SuperBar({
         ) : null}
         {breadcrumb ? (
           <SuperBarBreadcrumb
+            homePath={breadcrumb.homePath}
             groupName={breadcrumb.groupName}
             groupPath={breadcrumb.groupPath}
             segments={breadcrumb.segments}

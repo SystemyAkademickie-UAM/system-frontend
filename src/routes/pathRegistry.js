@@ -48,22 +48,22 @@ export function groupRootPath(groupId) {
 }
 
 // ============================================================================
-// GROUP MAIN (Ekran główny) - student + lecturer
+// GROUP HOME (Strona główna) - student + lecturer
 // ============================================================================
 
-/** Ekran główny grupy — `/groups/:groupId/main`. */
+/** Strona główna grupy — `/groups/:groupId/home`. */
 export function groupMainPath(groupId) {
-  return `/groups/${groupId}/main`;
+  return `/groups/${groupId}/home`;
 }
 
-/** Wpisy na ekranie głównym — `/groups/:groupId/main/posts`. */
+/** Wpisy na stronie głównej (legacy redirect) — `/groups/:groupId/home/posts`. */
 export function groupMainPostsPath(groupId) {
-  return `/groups/${groupId}/main/posts`;
+  return `/groups/${groupId}/home/posts`;
 }
 
-/** Uczestnicy (widok studenta) — `/groups/:groupId/main/members`. */
+/** Uczestnicy na stronie głównej (legacy redirect) — `/groups/:groupId/home/members`. */
 export function groupMainMembersPath(groupId) {
-  return `/groups/${groupId}/main/members`;
+  return `/groups/${groupId}/home/members`;
 }
 
 /** Profil innego użytkownika — `/groups/:groupId/studentprofile/:studentId`. */
@@ -71,19 +71,48 @@ export function groupStudentProfilePath(groupId, studentId) {
   return `/groups/${groupId}/studentprofile/${studentId}`;
 }
 
-/** Lista aktywności — `/groups/:groupId/main/activities`. */
+/** Lista aktywności na stronie głównej (legacy redirect) — `/groups/:groupId/home/activities`. */
 export function groupMainActivitiesPath(groupId) {
-  return `/groups/${groupId}/main/activities`;
+  return `/groups/${groupId}/home/activities`;
 }
 
-/** Rangi — `/groups/:groupId/main/ranks`. */
+/** Rangi w podglądzie studenta (prowadzący) — `/groups/:groupId/home/ranks`. */
 export function groupMainRanksPath(groupId) {
-  return `/groups/${groupId}/main/ranks`;
+  return `/groups/${groupId}/home/ranks`;
 }
 
-/** Odznaki — `/groups/:groupId/main/badges`. */
+/** Odznaki w podglądzie studenta (prowadzący) — `/groups/:groupId/home/badges`. */
 export function groupMainBadgesPath(groupId) {
-  return `/groups/${groupId}/main/badges`;
+  return `/groups/${groupId}/home/badges`;
+}
+
+// ============================================================================
+// STUDENT FLAT ROUTES (poza /home — osobne pozycje w sidebarze)
+// ============================================================================
+
+/** Wpisy studenta — `/groups/:groupId/feed` (`/posts` zajęte przez panel prowadzącego). */
+export function groupStudentFeedPath(groupId) {
+  return `/groups/${groupId}/feed`;
+}
+
+/** Uczestnicy studenta — `/groups/:groupId/participants` (`/members` zajęte). */
+export function groupStudentParticipantsPath(groupId) {
+  return `/groups/${groupId}/participants`;
+}
+
+/** Lista aktywności studenta — `/groups/:groupId/activity-list` (`/activities` zajęte). */
+export function groupStudentActivityListPath(groupId) {
+  return `/groups/${groupId}/activity-list`;
+}
+
+/** Rangi studenta — `/groups/:groupId/ranks`. */
+export function groupStudentRanksPath(groupId) {
+  return `/groups/${groupId}/ranks`;
+}
+
+/** Odznaki studenta — `/groups/:groupId/badges`. */
+export function groupStudentBadgesPath(groupId) {
+  return `/groups/${groupId}/badges`;
 }
 
 // ============================================================================
@@ -180,9 +209,9 @@ export function groupSettingsCurrencyPath(groupId) {
   return `/groups/${groupId}/groupsettings/currency`;
 }
 
-/** System żyć — `/groups/:groupId/groupsettings/health`. */
+/** System żyć — `/groups/:groupId/groupsettings/lives`. */
 export function groupSettingsHealthPath(groupId) {
-  return `/groups/${groupId}/groupsettings/health`;
+  return `/groups/${groupId}/groupsettings/lives`;
 }
 
 // ============================================================================
@@ -197,6 +226,11 @@ export function groupShopPath(groupId) {
 /** Dodaj produkt (lecturer) — `/groups/:groupId/shop/add`. */
 export function groupShopAddPath(groupId) {
   return `/groups/${groupId}/shop/add`;
+}
+
+/** Podgląd sklepu studenta (lecturer) — `/groups/:groupId/preview/shop`. */
+export function groupShopPreviewPath(groupId) {
+  return `/groups/${groupId}/preview/shop`;
 }
 
 // ============================================================================
@@ -269,7 +303,7 @@ export function groupActivityPath(groupId) {
   return `/groups/${groupId}/activity`;
 }
 
-/** @deprecated Use groupMainRanksPath instead */
+/** @deprecated Use groupStudentRanksPath for student, groupMainRanksPath for lecturer */
 export function groupRanksPath(groupId) {
   return `/groups/${groupId}/ranks`;
 }
