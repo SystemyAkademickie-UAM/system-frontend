@@ -128,12 +128,12 @@ export const ROUTE_TABLE = [
   },
 
   // ===========================================================================
-  // GROUP — Ekran główny (/main)
+  // GROUP — Strona główna (/home)
   // ===========================================================================
   {
     id: 'group.main.home',
     section: 'group',
-    pathPattern: '/groups/:groupId/main',
+    pathPattern: '/groups/:groupId/home',
     pageTitle: 'Ekran główny',
     pageModule: 'pages/links/groups/main/GroupMainHomePage.jsx',
     contentModule: 'pages/content/group-main/GroupMainHomeContent.jsx',
@@ -141,42 +141,96 @@ export const ROUTE_TABLE = [
   {
     id: 'group.main.posts',
     section: 'group',
-    pathPattern: '/groups/:groupId/main/posts',
-    pageTitle: 'Ekran główny — wpisy',
+    pathPattern: '/groups/:groupId/home/posts',
+    pageTitle: 'Aktywności — wpisy (legacy redirect)',
     pageModule: 'pages/links/groups/main/GroupMainPostsPage.jsx',
     contentModule: 'pages/content/group-main/GroupMainPostsContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
     id: 'group.main.members',
     section: 'group',
-    pathPattern: '/groups/:groupId/main/members',
-    pageTitle: 'Ekran główny — uczestnicy',
+    pathPattern: '/groups/:groupId/home/members',
+    pageTitle: 'Użytkownicy — uczestnicy (legacy redirect)',
     pageModule: 'pages/links/groups/main/GroupMainMembersPage.jsx',
-    contentModule: 'pages/content/group-main/GroupMainMembersContent.jsx',
+    contentModule: 'pages/content/group-main-members/GroupMainMembersContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
     id: 'group.main.activities',
     section: 'group',
-    pathPattern: '/groups/:groupId/main/activities',
-    pageTitle: 'Ekran główny — lista aktywności',
+    pathPattern: '/groups/:groupId/home/activities',
+    pageTitle: 'Aktywności — etapy (legacy redirect)',
     pageModule: 'pages/links/groups/main/GroupMainActivitiesPage.jsx',
     contentModule: 'pages/content/group-main-activities/GroupMainActivitiesContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
     id: 'group.main.ranks',
     section: 'group',
-    pathPattern: '/groups/:groupId/main/ranks',
-    pageTitle: 'Ekran główny — rangi',
+    pathPattern: '/groups/:groupId/home/ranks',
+    pageTitle: 'Podgląd — rangi',
     pageModule: 'pages/links/groups/main/GroupMainRanksPage.jsx',
     contentModule: 'pages/content/group-main-ranks/GroupMainRanksContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
     id: 'group.main.badges',
     section: 'group',
-    pathPattern: '/groups/:groupId/main/badges',
-    pageTitle: 'Ekran główny — odznaki',
+    pathPattern: '/groups/:groupId/home/badges',
+    pageTitle: 'Podgląd — odznaki',
     pageModule: 'pages/links/groups/main/GroupMainBadgesPage.jsx',
     contentModule: 'pages/content/group-main-badges/GroupMainBadgesContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
+  },
+
+  // ===========================================================================
+  // GROUP — Student flat routes (poza /home)
+  // ===========================================================================
+  {
+    id: 'group.student.feed',
+    section: 'group',
+    pathPattern: '/groups/:groupId/feed',
+    pageTitle: 'Wpisy',
+    pageModule: 'pages/links/groups/main/GroupMainPostsPage.jsx',
+    contentModule: 'pages/content/group-main/GroupMainPostsContent.jsx',
+    roles: ['student'],
+  },
+  {
+    id: 'group.student.participants',
+    section: 'group',
+    pathPattern: '/groups/:groupId/participants',
+    pageTitle: 'Uczestnicy',
+    pageModule: 'pages/links/groups/main/GroupMainMembersPage.jsx',
+    contentModule: 'pages/content/group-main-members/GroupMainMembersContent.jsx',
+    roles: ['student'],
+  },
+  {
+    id: 'group.student.activityList',
+    section: 'group',
+    pathPattern: '/groups/:groupId/activity-list',
+    pageTitle: 'Lista aktywności',
+    pageModule: 'pages/links/groups/main/GroupMainActivitiesPage.jsx',
+    contentModule: 'pages/content/group-main-activities/GroupMainActivitiesContent.jsx',
+    roles: ['student'],
+  },
+  {
+    id: 'group.student.ranks',
+    section: 'group',
+    pathPattern: '/groups/:groupId/ranks',
+    pageTitle: 'Rangi',
+    pageModule: 'pages/links/groups/main/GroupMainRanksPage.jsx',
+    contentModule: 'pages/content/group-main-ranks/GroupMainRanksContent.jsx',
+    roles: ['student'],
+  },
+  {
+    id: 'group.student.badges',
+    section: 'group',
+    pathPattern: '/groups/:groupId/badges',
+    pageTitle: 'Odznaki',
+    pageModule: 'pages/links/groups/main/GroupMainBadgesPage.jsx',
+    contentModule: 'pages/content/group-main-badges/GroupMainBadgesContent.jsx',
+    roles: ['student'],
   },
 
   // ===========================================================================
@@ -297,7 +351,7 @@ export const ROUTE_TABLE = [
     id: 'group.posts.home',
     section: 'group',
     pathPattern: '/groups/:groupId/posts',
-    pageTitle: 'Wpisy',
+    pageTitle: 'Aktywności — wpisy',
     pageModule: 'pages/links/groups/posts/PostsHomePage.jsx',
     contentModule: 'pages/content/group-posts/PostsHomeContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
@@ -356,12 +410,25 @@ export const ROUTE_TABLE = [
     roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
-    id: 'group.settings.health',
+    id: 'group.settings.lives',
     section: 'group',
-    pathPattern: '/groups/:groupId/groupsettings/health',
+    pathPattern: '/groups/:groupId/groupsettings/lives',
     pageTitle: 'Ustawienia grupy — system żyć',
     pageModule: 'pages/links/groups/group-settings/GroupSettingsHealthPage.jsx',
     contentModule: 'pages/content/group-settings-health/GroupSettingsHealthContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
+  },
+
+  // ===========================================================================
+  // GROUP — Podgląd (/preview) — lecturer
+  // ===========================================================================
+  {
+    id: 'group.preview.shop',
+    section: 'group',
+    pathPattern: '/groups/:groupId/preview/shop',
+    pageTitle: 'Podgląd — sklep',
+    pageModule: 'pages/links/groups/shop/ShopHomePage.jsx',
+    contentModule: 'pages/content/group-shop/GroupShopContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
   },
 

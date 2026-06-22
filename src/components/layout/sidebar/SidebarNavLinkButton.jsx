@@ -16,7 +16,7 @@ export default function SidebarNavLinkButton({ to, label, iconId, enabled, match
     <li className="sidebar-nav__item">
       <NavLink to={to} end={matchEnd} className={navClassName} onClick={onNavigate}>
         <NavGlyph id={iconId} />
-        <span>{label}</span>
+        <span className="sidebar-nav__label">{label}</span>
       </NavLink>
     </li>
   );

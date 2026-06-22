@@ -14,7 +14,7 @@ export default function ProfileBadgesSection() {
   return (
     <div className="profile-badges-section">
       <div className="profile-badges-section__header">
-        <h2 className="profile-badges-section__title">Odznaki</h2>
+        <h2 className="profile-badges-section__title">Zdobyte odznaki</h2>
         <span className="profile-badges-section__count">
           {earnedBadges.length}
           {' '}

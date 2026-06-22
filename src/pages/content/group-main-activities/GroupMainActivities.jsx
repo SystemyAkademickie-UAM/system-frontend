@@ -8,7 +8,7 @@ import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 import { Button } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
-import { GroupMainEmptyNotice, GROUP_MAIN_EMPTY_LINKS } from '../group-main/GroupMainHomeContent.jsx';
+import { GroupMainEmptyNotice, useGroupMainEmptyLink } from '../group-main/GroupMainHomeContent.jsx';
 import '../group-main/GroupMainHomeContent.css';
 import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
 import '../group-main/shared/groupMainSubpageHeader.css';
@@ -30,6 +30,7 @@ export default function GroupMainActivities() {
 
   const {groupId} = useParams();
   const {role} = useAppRole();
+  const emptyLink = useGroupMainEmptyLink('activities', groupId);
   const [errorMessage, setErrorMessage] = useState('');
 
   const [stages, setStages] = useState([]);
@@ -544,9 +545,9 @@ export default function GroupMainActivities() {
         <p className="group-main-home__message">Ładowanie aktywności…</p>
       ) : stages.length === 0 ? (
         <GroupMainEmptyNotice
-          message={GROUP_MAIN_EMPTY_LINKS.activities.message}
-          linkLabel={GROUP_MAIN_EMPTY_LINKS.activities.linkLabel}
-          linkTo={GROUP_MAIN_EMPTY_LINKS.activities.path(groupId)}
+          message={emptyLink.message}
+          linkLabel={emptyLink.linkLabel}
+          linkTo={emptyLink.linkTo}
         />
       ) : (
       <div className="group-main-activities__stage">

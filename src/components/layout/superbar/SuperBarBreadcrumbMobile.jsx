@@ -14,6 +14,7 @@ export default function SuperBarBreadcrumbMobile({ breadcrumb }) {
   return (
     <div className="super-bar-breadcrumb-mobile">
       <SuperBarBreadcrumb
+        homePath={breadcrumb.homePath}
         groupName={breadcrumb.groupName}
         groupPath={breadcrumb.groupPath}
         segments={breadcrumb.segments}

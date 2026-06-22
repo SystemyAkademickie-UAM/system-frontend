@@ -235,7 +235,6 @@ export default function RewardsShopItemsContent() {
     return (
       <SectionPageLayout
         className="page-unavailable rewards-page rewards-shop-items"
-        eyebrow="Skarbiec"
         title={nav.sectionTitle}
         subNavItems={nav.items}
         subNavAriaLabel={nav.ariaLabel}
@@ -248,7 +247,6 @@ export default function RewardsShopItemsContent() {
   return (
     <SectionPageLayout
       className="page-unavailable rewards-page rewards-shop-items"
-      eyebrow="Skarbiec"
       title={nav.sectionTitle}
       subNavItems={nav.items}
       subNavAriaLabel={nav.ariaLabel}

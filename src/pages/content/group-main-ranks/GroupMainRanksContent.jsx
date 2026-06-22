@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useGroupCurrency } from '../../../context/GroupCurrencyContext.jsx';
 import RankPathBoard from './RankPathBoard.jsx';
 import { useGroupMainRanks } from './useGroupMainRanks.js';
-import { GroupMainEmptyNotice, GROUP_MAIN_EMPTY_LINKS } from '../group-main/GroupMainHomeContent.jsx';
+import { GroupMainEmptyNotice, useGroupMainEmptyLink } from '../group-main/GroupMainHomeContent.jsx';
 import '../group-main/GroupMainHomeContent.css';
 import './GroupMainRanksContent.css';
 
@@ -30,7 +30,7 @@ export default function GroupMainRanksContent() {
     );
   }
 
-  const emptyLink = GROUP_MAIN_EMPTY_LINKS.ranks;
+  const emptyLink = useGroupMainEmptyLink('ranks', groupId);
 
   return (
     <section className="group-main-ranks" aria-label="Ścieżka rozwoju">
@@ -45,7 +45,7 @@ export default function GroupMainRanksContent() {
         <GroupMainEmptyNotice
           message={emptyLink.message}
           linkLabel={emptyLink.linkLabel}
-          linkTo={emptyLink.path(groupId)}
+          linkTo={emptyLink.linkTo}
         />
       ) : (
         <RankPathBoard

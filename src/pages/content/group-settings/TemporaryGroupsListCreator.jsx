@@ -7,7 +7,7 @@ import {
   GROUP_DESCRIPTION_MAX_LENGTH,
 } from '../../../constants/fieldLimits.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
-import { useDebouncedAutoSave } from '../../../hooks/useDebouncedAutoSave.js';
+import { useAutoSaveForm } from '../../../hooks/useAutoSaveForm.js';
 import {
   buildBannerImageRefPayload,
   createDefaultBannerPickerValue,
@@ -191,16 +191,18 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
     subjectnamevalue,
   ]);
 
-  useDebouncedAutoSave({
-    enabled: Boolean(groupId) && !isLoadingGroup && !isSaving,
-    values: [
-      groupnamevalue,
-      subjectnamevalue,
-      groupdescriptionvalue,
-      serializeBannerPickerValue(bannerSelection),
-    ],
+  const bannerFingerprint = serializeBannerPickerValue(bannerSelection);
+
+  const { commitSave, handleTextFieldKeyDown } = useAutoSaveForm({
+    ready: Boolean(groupId) && !isLoadingGroup && !isSaving,
+    watchValues: [bannerFingerprint],
+    getFingerprint: () => JSON.stringify([
+      groupnamevalue.trim(),
+      subjectnamevalue.trim(),
+      groupdescriptionvalue.trim(),
+      bannerFingerprint,
+    ]),
     onSave: persistGroupSettings,
-    delay: 600,
   });
 
   function onRejectclick() {
@@ -241,6 +243,8 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
                 value={groupnamevalue}
                 maxLength={GROUP_NAME_MAX}
                 onChange={(event) => onGroupnamechange(event.target.value)}
+                onBlur={commitSave}
+                onKeyDown={handleTextFieldKeyDown}
                 disabled={isSaving || isLoadingGroup}
               />
             </CharacterLimitedField>
@@ -260,6 +264,8 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
                 value={subjectnamevalue}
                 maxLength={SUBJECT_NAME_MAX}
                 onChange={(event) => onSubjectnamechange(event.target.value)}
+                onBlur={commitSave}
+                onKeyDown={handleTextFieldKeyDown}
                 disabled={isSaving || isLoadingGroup}
               />
             </CharacterLimitedField>
@@ -276,6 +282,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
                 value={groupdescriptionvalue}
                 maxLength={GROUP_DESCRIPTION_MAX}
                 onChange={(event) => onGroupdescriptionchange(event.target.value)}
+                onBlur={commitSave}
                 placeholder="Krótko opisz tło fabularne i cele grupy…"
                 disabled={isSaving || isLoadingGroup}
               />

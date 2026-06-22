@@ -3,6 +3,7 @@ import { Button, SearchBar } from '../../../components/ui/index.js';
 import SmartPostCard from '../../../components/ui/SmartPostCard/SmartPostCard.jsx';
 import { DataTableRowActions } from '../../../components/ui/DataTable/DataTable.jsx';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
+import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/ui/DataTable/DataTable.css';
 import '../../../components/page/PageUnavailable.css';
 import { useGroupPosts } from './useGroupPosts.js';
@@ -21,6 +22,7 @@ function filterPosts(posts, query) {
 }
 
 export default function PostsContent() {
+  const nav = useGroupSubNav('group-activities');
   const {
     posts,
     isLoading,
@@ -90,6 +92,8 @@ export default function PostsContent() {
     <SectionPageLayout
       className="page-unavailable posts-page"
       title="Wpisy"
+      subNavItems={nav.items}
+      subNavAriaLabel={nav.ariaLabel}
       toolbar={(
         <>
           <div className="maq-section-page__toolbar-start">

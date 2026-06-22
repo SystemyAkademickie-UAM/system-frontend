@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useOptionalGroupId } from './useOptionalGroupId.js';
 import { useGroupDetails } from '../pages/content/group-shared/useGroupDetails.js';
 import { resolveAppBreadcrumb } from '../navigation/breadcrumb.config.js';
+import { groupMainPath, groupsListPath } from '../routes/pathRegistry.js';
 
 /**
  * Buduje klikalną ścieżkę nawigacji dla SuperBar.
@@ -13,25 +14,42 @@ export function useAppBreadcrumb() {
   const { group } = useGroupDetails(groupId);
 
   return useMemo(() => {
-    const groupName = group?.name?.trim() || group?.storyName?.trim() || (groupId ? `Grupa ${groupId}` : null);
+    const homePath = groupsListPath();
     const tailSegments = resolveAppBreadcrumb(pathname, groupId) ?? [];
+    const groupName = group?.name?.trim() || group?.storyName?.trim() || (groupId ? `Grupa ${groupId}` : null);
+
+    if (pathname === homePath || pathname === `${homePath}/`) {
+      return {
+        homePath,
+        groupName: null,
+        groupPath: null,
+        segments: [{ label: 'Grupy' }],
+      };
+    }
 
     if (groupId && groupName) {
       return {
+        homePath,
         groupName,
-        groupPath: `/groups/${groupId}/main`,
+        groupPath: groupMainPath(groupId),
         segments: tailSegments,
       };
     }
 
     if (tailSegments.length > 0) {
       return {
+        homePath,
         groupName: null,
         groupPath: null,
         segments: tailSegments,
       };
     }
 
-    return null;
+    return {
+      homePath,
+      groupName: null,
+      groupPath: null,
+      segments: [],
+    };
   }, [pathname, groupId, group?.name, group?.storyName]);
 }

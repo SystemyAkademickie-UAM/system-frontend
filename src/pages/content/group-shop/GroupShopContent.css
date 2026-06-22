@@ -18,6 +18,16 @@
   width: 100%;
 }
 
+.group-shop-page--student .group-shop-page__student-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
 .group-shop__header {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

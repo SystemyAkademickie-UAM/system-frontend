@@ -4,7 +4,7 @@ import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { groupsListPath } from '../../routes/pathRegistry.js';
 import SidebarBrand from './sidebar/SidebarBrand.jsx';
 import SidebarGroupsCtaButton from './sidebar/SidebarGroupsCtaButton.jsx';
-import SidebarNavLinkButton from './sidebar/SidebarNavLinkButton.jsx';
+import SidebarNavItem from './sidebar/SidebarNavItem.jsx';
 import SidebarNavRail from './sidebar/SidebarNavRail.jsx';
 import './navigation-shell.css';
 
@@ -31,19 +31,13 @@ export default function Sidebar({ onNavigate }) {
         ))}
       </div>
 
-      <SidebarNavRail aria-label="Główne sekcje">
-        {shell.primaryNavItems.map((item) => (
-          <SidebarNavLinkButton
-            key={item.id}
-            to={item.to}
-            label={item.label}
-            iconId={item.iconId}
-            enabled={item.enabled}
-            matchEnd={item.matchEnd}
-            onNavigate={handleNav}
-          />
-        ))}
-      </SidebarNavRail>
+      <div className="sidebar__nav-scroll">
+        <SidebarNavRail aria-label="Główne sekcje">
+          {shell.primaryNavItems.map((item) => (
+            <SidebarNavItem key={item.id} item={item} onNavigate={handleNav} />
+          ))}
+        </SidebarNavRail>
+      </div>
     </aside>
   );
 }
