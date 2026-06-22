@@ -5,6 +5,7 @@ import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import {InfoTooltip, useToast} from '../../../components/ui/index.js';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
+import {Divider} from '../../../components/ui';
 
 import arrowcirclelefticon from '../../../../public/assets/icons/arrow-circle-left-svgrepo-com.svg';
 import arrowcirclerighticon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
@@ -30,47 +31,12 @@ export default function App() {
   const {groupId} = useParams();
   const [errorMessage, setErrorMessage] = useState('');
 
-  var itemicons = [
-    {ref: '../icons/alert-circle-svgrepo-com.svg'},
-    {ref: '../icons/arrow-circle-broken-left-svgrepo-com.svg'},
-    {ref: '../icons/arrow-circle-broken-right-svgrepo-com.svg'},
-    {ref: '../icons/arrow-circle-left-svgrepo-com.svg'},
-    {ref: '../icons/arrow-circle-right-svgrepo-com.svg'},
-    {ref: '../icons/arrow-left-svgrepo-com.svg'},
-    {ref: '../icons/arrow-narrow-right-svgrepo-com.svg'},
-    {ref: '../icons/arrow-right-svgrepo-com.svg'},
-    {ref: '../icons/bell-ringing-04-svgrepo-com.svg'},
-    {ref: '../icons/check-circle-broken-svgrepo-com.svg'},
-    {ref: '../icons/check-circle-svgrepo-com.svg'},
-    {ref: '../icons/check-svgrepo-com.svg'},
-    {ref: '../icons/chevron-down-svgrepo-com.svg'},
-    {ref: '../icons/chevron-left-double-svgrepo-com.svg'},
-    {ref: '../icons/chevron-left-svgrepo-com.svg'},
-    {ref: '../icons/chevron-right-double-svgrepo-com.svg'},
-    {ref: '../icons/chevron-right-svgrepo-com.svg'},
-    {ref: '../icons/chevron-up-svgrepo-com.svg'},
-    {ref: '../icons/circle-svgrepo-com.svg'},
-    {ref: '../icons/copy-01-svgrepo-com.svg'},
-    {ref: '../icons/download-01-svgrepo-com.svg'},
-    {ref: '../icons/download-02-svgrepo-com.svg'},
-    {ref: '../icons/edit-02-svgrepo-com.svg'},
-    {ref: '../icons/help-circle-svgrepo-com.svg'},
-    {ref: '../icons/info-circle-svgrepo-com.svg'},
-    {ref: '../icons/lock-01-svgrepo-com.svg'},
-    {ref: '../icons/minus-circle-svgrepo-com.svg'},
-    {ref: '../icons/plus-circle-svgrepo-com.svg'},
-    {ref: '../icons/plus-svgrepo-com.svg'},
-    {ref: '../icons/skip-back-svgrepo-com.svg'},
-    {ref: '../icons/skip-forward-svgrepo-com.svg'},
-    {ref: '../icons/slash-circle-02-svgrepo-com.svg'},
-    {ref: '../icons/trash-01-svgrepo-com.svg'},
-    {ref: '../icons/upload-01-svgrepo-com.svg'},
-    {ref: '../icons/upload-02-svgrepo-com.svg'},
-    {ref: '../icons/x-circle-svgrepo-com.svg'},
-    {ref: '../icons/x-close-svgrepo-com.svg'}
-  ];
+  const [itemicons, setItemicons] = useState([]);
 
   const [currenticonindex, setCurrenticonindex] = useState(0);
+
+  const [iconcolour, setIconcolour] = useState('rgb(255,255,255)');
+  const [iconbackground, setIconbackground] = useState('rgb(40,40,52)');
 
   const [itemname, setItemname] = useState('');
   const [description0, setDescription0] = useState('');
@@ -98,25 +64,106 @@ export default function App() {
 
 
 
-  function geticonatIndex(index) {
+  function geticonatindex(index) {
 
-    let safeindex = index;
-
-    while (safeindex < 0) {
-      safeindex = safeindex + itemicons.length;
+    if (itemicons.length == 0) {
+      return {ref: ''};
     }
 
-    while (safeindex >= itemicons.length) {
-      safeindex = safeindex - itemicons.length;
+    while (index < 0) {
+      index = index + itemicons.length;
     }
 
-    return itemicons[safeindex];
+    while (index >= itemicons.length) {
+      index = index - itemicons.length;
+    }
+
+    return itemicons[index];
   }
 
 
 
-  function previousicon5() {
-    setCurrenticonindex(currenticonindex - 5);
+  function geticonindex(index) {
+
+    if (itemicons.length == 0) {
+      return 0;
+    }
+
+    while (index < 0) {
+      index = index + itemicons.length;
+    }
+
+    while (index >= itemicons.length) {
+      index = index - itemicons.length;
+    }
+
+    return index;
+  }
+
+
+
+  function rgbstringtohex(rgbvalue) {
+
+    let cleaned = rgbvalue.replace('rgb(', '').replace(')', '').replace(' ', '');
+    let parts = cleaned.split(',');
+
+    let red = Number(parts[0]);
+    let green = Number(parts[1]);
+    let blue = Number(parts[2]);
+
+    let redhex = red.toString(16);
+    let greenhex = green.toString(16);
+    let bluehex = blue.toString(16);
+
+    if (redhex.length == 1) {
+      redhex = '0' + redhex;
+    }
+
+    if (greenhex.length == 1) {
+      greenhex = '0' + greenhex;
+    }
+
+    if (bluehex.length == 1) {
+      bluehex = '0' + bluehex;
+    }
+
+    return '#' + redhex + greenhex + bluehex;
+  }
+
+
+
+  function hextorgbstring(hexvalue) {
+
+    let cleanhex = hexvalue.replace('#', '');
+
+    let red = parseInt(cleanhex.substring(0, 2), 16);
+    let green = parseInt(cleanhex.substring(2, 4), 16);
+    let blue = parseInt(cleanhex.substring(4, 6), 16);
+
+    return 'rgb(' + red + ',' + green + ',' + blue + ')';
+  }
+
+
+
+  function getcategoryinputwidth(tempname) {
+
+    let widthvalue = 10 + tempname.length * 1.5;
+
+    if (widthvalue < 10) {
+      widthvalue = 10;
+    }
+
+    if (widthvalue > 90) {
+      widthvalue = 90;
+    }
+
+    return widthvalue + '%';
+  }
+
+
+
+  function previousicon3() {
+    setCurrenticonindex(currenticonindex - 3);
   }
 
 
@@ -130,8 +177,8 @@ export default function App() {
   }
 
 
-  function nexticon5() {
-    setCurrenticonindex(currenticonindex + 5);
+  function nexticon3() {
+    setCurrenticonindex(currenticonindex + 3);
   }
 
 
@@ -180,6 +227,89 @@ export default function App() {
     }
 
     setterfunction(filtered);
+  }
+
+
+
+
+
+  async function onfetchicons() {
+
+    setErrorMessage('');
+
+    try {
+
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+
+      const url = base + '/gamification/icons';
+
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
+        }
+      });
+
+      const responsetext = await response.text();
+
+      console.log('GET /gamification/icons: ', response.status);
+      console.log('GET /gamification/icons: ', responsetext);
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+        console.log('/gamification/icons not JSON: ' + responsetext);
+      }
+
+      console.log('GET /gamification/icons JSON:', data);
+
+      let receiveddata = data;
+
+      if (!Array.isArray(receiveddata)) {
+        receiveddata = [];
+      }
+
+      const receivedicons = [];
+
+      let i = 0;
+
+      while (i < receiveddata.length) {
+
+        let filenamevalue = receiveddata[i].filename;
+
+        if (filenamevalue == null) {
+          filenamevalue = '';
+        }
+
+        receivedicons.push({ref: 'backend:' + filenamevalue});
+
+        i = i + 1;
+      }
+
+      setItemicons(receivedicons);
+
+      if (receivedicons.length > 0) {
+        let randomindex = Math.floor(Math.random() * receivedicons.length);
+        setCurrenticonindex(randomindex);
+      }
+
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+    }
   }
 
 
@@ -477,7 +607,7 @@ export default function App() {
 
       while (i < receiveddata.length) {
 
-        let discountvalue = receiveddata[i].storeDiscount;
+        let discountvalue = receiveddata[i].discount;
 
         if (discountvalue == null) {
           discountvalue = 0;
@@ -591,7 +721,33 @@ export default function App() {
 
 
 
-  function editcategory(categoryId) {
+  function starteditcategory(categoryId) {
+
+    const newcategories = [];
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == categoryId) {
+
+        newcategories.push({id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: 1, tempname: categories[i].name});
+
+      } else {
+        newcategories.push(categories[i]);
+      }
+
+      i = i + 1;
+    }
+
+    setCategories(newcategories);
+  }
+
+
+
+
+
+  function saveeditcategory(categoryId) {
 
     let categorynamevalue = null;
 
@@ -603,18 +759,8 @@ export default function App() {
 
       if (categories[i].id == categoryId) {
 
-        let updatedcategory = {id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: categories[i].editmode, tempname: categories[i].tempname};
-
-        if (categories[i].editmode == 0) {
-          updatedcategory.editmode = 1;
-          updatedcategory.tempname = categories[i].name;
-        } else if (categories[i].editmode == 1) {
-          updatedcategory.editmode = 0;
-          updatedcategory.name = categories[i].tempname;
-          categorynamevalue = categories[i].tempname;
-        }
-
-        newcategories.push(updatedcategory);
+        newcategories.push({id: categories[i].id, name: categories[i].tempname, checked: categories[i].checked, editmode: 0, tempname: categories[i].tempname});
+        categorynamevalue = categories[i].tempname;
 
       } else {
         newcategories.push(categories[i]);
@@ -628,6 +774,32 @@ export default function App() {
     if (categorynamevalue != null) {
       updatecategory(categoryId, categorynamevalue);
     }
+  }
+
+
+
+
+
+  function canceleditcategory(categoryId) {
+
+    const newcategories = [];
+
+    let i = 0;
+
+    while (i < categories.length) {
+
+      if (categories[i].id == categoryId) {
+
+        newcategories.push({id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: 0, tempname: categories[i].name});
+
+      } else {
+        newcategories.push(categories[i]);
+      }
+
+      i = i + 1;
+    }
+
+    setCategories(newcategories);
   }
 
 
@@ -917,6 +1089,11 @@ export default function App() {
       return;
     }
 
+    if (itemicons.length == 0) {
+      showError('Brak ikon z backendu.');
+      return;
+    }
+
     if (grouplimitenabled == 1 && grouplimit == '') {
       showError('Prosze wpisac limit sztuk na grupe lub odznaczyc limit.');
       return;
@@ -936,20 +1113,14 @@ export default function App() {
 
       const url = base + '/groups/' + groupId + '/shop-items';
 
-      let safeiconindex = currenticonindex;
+      let currentcurrenticonindex = geticonindex(currenticonindex);
 
-      while (safeiconindex < 0) {
-        safeiconindex = safeiconindex + itemicons.length;
-      }
-
-      while (safeiconindex >= itemicons.length) {
-        safeiconindex = safeiconindex - itemicons.length;
-      }
+      let svgfilename = itemicons[currentcurrenticonindex].ref.replace('backend:', '');
 
       const payload = {
         name: itemname.trim(),
         basePrice: Number(cost),
-        imageRef: itemicons[safeiconindex].ref
+        imageRef: svgfilename + '*' + iconcolour + '*' + iconbackground
       };
 
       if (description0.trim().length > 0) {
@@ -1039,10 +1210,7 @@ export default function App() {
 
   useEffect(() => {
 
-    let randomindex = Math.floor(Math.random() * itemicons.length);
-
-    setCurrenticonindex(randomindex);
-
+    onfetchicons();
     onFetchcategories();
     onfetchranks();
     onfetchbadges();
@@ -1050,17 +1218,20 @@ export default function App() {
   }, []);
 
 
-  let currenticon = geticonatIndex(currenticonindex);
-  let iconminus2 = geticonatIndex(currenticonindex - 2);
-  let iconminus1 = geticonatIndex(currenticonindex - 1);
-  let iconplus1 = geticonatIndex(currenticonindex + 1);
-  let iconplus2 = geticonatIndex(currenticonindex + 2);
+  let currenticon = geticonatindex(currenticonindex);
+  let iconminus2 = geticonatindex(currenticonindex - 2);
+  let iconminus1 = geticonatindex(currenticonindex - 1);
+  let iconplus1 = geticonatindex(currenticonindex + 1);
+  let iconplus2 = geticonatindex(currenticonindex + 2);
+
+  let indexforbar = geticonindex(currenticonindex);
 
 
 
   return (
     <div>
       <div>
+
         <div style = {{width: '75vw', height: '100%', position: 'relative', top: '0%', left: '0%'}}>
 
           <div style = {{width: '98%', position: 'relative', top: '0%', left: '1%', display: 'flex', flexDirection: 'row', gap: '2%', paddingBottom: '4vh'}}>
@@ -1072,39 +1243,66 @@ export default function App() {
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
                   <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Ikona przedmiotu</div>
                   <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1%'}}>
-                    <div onClick = {() => previousicon5()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                    <div onClick = {() => previousicon3()} style = {{backgroundColor: 'rgb(30, 204, 56)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', left: '-5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
                       <img src = {leftleft} style = {{width: '55%', height: '55%'}}/>
                     </div>
-                    <div onClick = {() => previousicon1()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                    <div onClick = {() => previousicon1()} style = {{backgroundColor: 'rgb(30, 204, 56)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', left: '-5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
                       <img src = {left} style = {{width: '55%', height: '55%'}}/>
                     </div>
-                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '8vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.5}}>
-                      <AssetSvg key = {iconminus2.ref} name = {resolveSvgAssetName(iconminus2.ref)} width = {24} height = {24}/>
+                    <div style = {{color: iconcolour, backgroundColor: iconbackground, height: '10vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.5}}>
+                      <AssetSvg key = {iconminus1.ref} name = {resolveSvgAssetName(iconminus1.ref)} width = {32} height = {32}/>
                     </div>
-                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '10vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.75}}>
-                      <AssetSvg key = {iconminus1.ref} name = {resolveSvgAssetName(iconminus1.ref)} width = {28} height = {28}/>
+                    <div style = {{color: iconcolour, backgroundColor: iconbackground, height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%'}}>
+                      <AssetSvg key = {currenticon.ref} name = {resolveSvgAssetName(currenticon.ref)} width = {48} height = {48}/>
                     </div>
-                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%'}}>
-                      <AssetSvg key = {currenticon.ref} name = {resolveSvgAssetName(currenticon.ref)} width = {40} height = {40}/>
+                    <div style = {{color: iconcolour, backgroundColor: iconbackground, height: '10vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.5}}>
+                      <AssetSvg key = {iconplus1.ref} name = {resolveSvgAssetName(iconplus1.ref)} width = {32} height = {32}/>
                     </div>
-                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '10vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.75}}>
-                      <AssetSvg key = {iconplus1.ref} name = {resolveSvgAssetName(iconplus1.ref)} width = {28} height = {28}/>
-                    </div>
-                    <div style = {{backgroundColor: 'rgb(40, 40, 52)', height: '8vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', opacity: 0.5}}>
-                      <AssetSvg key = {iconplus2.ref} name = {resolveSvgAssetName(iconplus2.ref)} width = {24} height = {24}/>
-                    </div>
-                    <div onClick = {() => nexticon1()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                    <div onClick = {() => nexticon1()} style = {{backgroundColor: 'rgb(30, 204, 56)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', left: '5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
                       <img src = {right} style = {{width: '55%', height: '55%'}}/>
                     </div>
-                    <div onClick = {() => nexticon5()} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                    <div onClick = {() => nexticon3()} style = {{backgroundColor: 'rgb(30, 204, 56)', height: '6vh', aspectRatio: '1 / 1', position: 'relative', left: '5%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
                       <img src = {rightright} style = {{width: '55%', height: '55%'}}/>
                     </div>
                   </div>
+                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'flex-start', gap: '4%'}}>
+                    <div style = {{position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5vh'}}>
+                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>Kolor ikony</div>
+                      <div style = {{position: 'relative', width: '6vh', height: '6vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <div style = {{width: '100%', height: '100%', backgroundColor: iconcolour, borderRadius: '8px', border: '2px solid rgb(66, 243, 125)', cursor: 'pointer'}}></div>
+                        <input type = "color" onChange = {(event) => setIconcolour(hextorgbstring(event.target.value))} value = {rgbstringtohex(iconcolour)} style = {{position: 'absolute', top: '0%', left: '0%', width: '100%', height: '100%', opacity: 0, cursor: 'pointer'}}/>
+                      </div>
+                    </div>
+                    <div style = {{position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5vh'}}>
+                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>Kolor tła</div>
+                      <div style = {{position: 'relative', width: '6vh', height: '6vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <div style = {{width: '100%', height: '100%', backgroundColor: iconbackground, borderRadius: '8px', border: '2px solid rgb(66, 243, 125)', cursor: 'pointer'}}></div>
+                        <input type = "color" onChange = {(event) => setIconbackground(hextorgbstring(event.target.value))} value = {rgbstringtohex(iconbackground)} style = {{position: 'absolute', top: '0%', left: '0%', width: '100%', height: '100%', opacity: 0, cursor: 'pointer'}}/>
+                      </div>
+                    </div>
+                  </div>
+                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgb(26, 26, 42)', borderRadius: '8px', overflow: 'hidden', height: '1vh', marginTop: '0.5vh'}}>
+                    {itemicons.map((iconentry, iconindex) => (
+                      <div key = {'iconbar' + iconindex} onClick = {() => setCurrenticonindex(iconindex)} style = {{flex: 1, height: '100%', backgroundColor: iconindex == indexforbar ? 'rgb(66, 243, 125)' : 'rgb(60, 60, 78)', cursor: 'pointer'}}></div>
+                    ))}
+                  </div>
                 </div>
 
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', gap: '0.5vw'}}>Nazwa przedmiotu</div>
-                  <input onChange = {(event) => setItemname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {itemname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+
+
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', gap: '2%'}}>
+                
+                  <div style = {{width: '66%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+
+                    <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', gap: '0.5vw'}}>Nazwa przedmiotu</div>
+
+                    <input onChange = {(event) => setItemname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {itemname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                  </div>
+                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                    <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Cena</div>
+                    <input onInput = {(event) => {onNumericinput(event.target.value, setCost); recalculatediscounts(event.target.value);}} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left'}} value = {cost} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                  </div>
                 </div>
 
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
@@ -1117,38 +1315,33 @@ export default function App() {
                   <textarea onChange = {(event) => setDescription1(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description1} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></textarea>
                 </div>
 
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Cena</div>
-                  <input onInput = {(event) => {onNumericinput(event.target.value, setCost); recalculatediscounts(event.target.value);}} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left'}} value = {cost} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-                </div>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                    <input type = "checkbox" checked = {minpriceenabled == 1} onChange = {() => {if (minpriceenabled == 0) {setMinpriceenabled(1);} else {setMinpriceenabled(0); setMinprice('');}}} style = {{cursor: 'pointer'}}/>
-                    <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Cena minimalna*<InfoTooltip text = "Backend nie obsluguje jeszcze ceny minimalnej." /></div>
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', gap: '2%'}}>
+                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+                      <input type = "checkbox" checked = {minpriceenabled == 1} onChange = {() => {if (minpriceenabled == 0) {setMinpriceenabled(1);} else {setMinpriceenabled(0); setMinprice('');}}} style = {{cursor: 'pointer'}}/>
+                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Cena minimalna*<InfoTooltip text = "Prog cenowy, ponizej ktorego nie zejdzie cena przedmiotu po obnizkach." /></div>
+                    </div>
+                    <input onInput = {(event) => onNumericinput(event.target.value, setMinprice)} disabled = {minpriceenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: minpriceenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: minpriceenabled == 1 ? 1 : 0.5}} value = {minpriceenabled == 1 ? minprice : ''} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
                   </div>
-                  <input onInput = {(event) => onNumericinput(event.target.value, setMinprice)} disabled = {minpriceenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: minpriceenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: minpriceenabled == 1 ? 1 : 0.5}} value = {minpriceenabled == 1 ? minprice : ''} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-                </div>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                    <input type = "checkbox" checked = {grouplimitenabled == 1} onChange = {() => {if (grouplimitenabled == 0) {setGrouplimitenabled(1);} else {setGrouplimitenabled(0); setGrouplimit('');}}} style = {{cursor: 'pointer'}}/>
-                    <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na grupę<InfoTooltip text = "Ogranicza laczna liczbe sztuk dostepnych w sklepie." /></div>
+                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+                      <input type = "checkbox" checked = {grouplimitenabled == 1} onChange = {() => {if (grouplimitenabled == 0) {setGrouplimitenabled(1);} else {setGrouplimitenabled(0); setGrouplimit('');}}} style = {{cursor: 'pointer'}}/>
+                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na grupę<InfoTooltip text = "Ogranicza laczna liczbe sztuk dostepnych w sklepie." /></div>
+                    </div>
+                    <input onInput = {(event) => onNumericinput(event.target.value, setGrouplimit)} disabled = {grouplimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: grouplimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: grouplimitenabled == 1 ? 1 : 0.5}} value = {grouplimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
                   </div>
-                  <input onInput = {(event) => onNumericinput(event.target.value, setGrouplimit)} disabled = {grouplimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: grouplimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: grouplimitenabled == 1 ? 1 : 0.5}} value = {grouplimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-                </div>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                    <input type = "checkbox" checked = {studentlimitenabled == 1} onChange = {() => {if (studentlimitenabled == 0) {setStudentlimitenabled(1);} else {setStudentlimitenabled(0); setStudentlimit('');}}} style = {{cursor: 'pointer'}}/>
-                    <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na studenta<InfoTooltip text = "Ogranicza ile razy kazdy z uzytkownikow moze kupic ten przedmiot." /></div>
+                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
+                      <input type = "checkbox" checked = {studentlimitenabled == 1} onChange = {() => {if (studentlimitenabled == 0) {setStudentlimitenabled(1);} else {setStudentlimitenabled(0); setStudentlimit('');}}} style = {{cursor: 'pointer'}}/>
+                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na studenta<InfoTooltip text = "Ogranicza ile razy kazdy z uzytkownikow moze kupic ten przedmiot." /></div>
+                    </div>
+                    <input onInput = {(event) => onNumericinput(event.target.value, setStudentlimit)} disabled = {studentlimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: studentlimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: studentlimitenabled == 1 ? 1 : 0.5}} value = {studentlimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
                   </div>
-                  <input onInput = {(event) => onNumericinput(event.target.value, setStudentlimit)} disabled = {studentlimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '100%', height: '5vh', position: 'relative', color: studentlimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: studentlimitenabled == 1 ? 1 : 0.5}} value = {studentlimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
                 </div>
 
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingTop: '1vh'}}>
                   <div onClick = {() => togglecategoriesopen()} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', paddingLeft: '1%', paddingRight: '1%'}}>
-                    <div style = {{color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', gap: '0.5vw'}}>Kategorie<InfoTooltip text = "Backend przyjmuje jedna kategorie na przedmiot - wysylana jest pierwsza z zaznaczonych." /></div>
+                    <div style = {{color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', gap: '0.5vw'}}>Kategorie<InfoTooltip text = "Kazdy z przedmiotow moze zostac zaklasyfikowany do jednej z wybranych kategorii w celu ulatwienia filtrowania przedmiotow." /></div>
                     <img src = {categoriesopen == 1 ? up : down} style = {{width: '20px', height: '20px'}}/>
                   </div>
 
@@ -1158,16 +1351,28 @@ export default function App() {
                         <div key = {'category' + category.id} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%', paddingTop: '0.5vh', paddingBottom: '0.5vh', paddingLeft: '1%'}}>
                           <input type = "checkbox" checked = {category.checked == 1} onChange = {() => oncategorycheckchange(category.id)} style = {{cursor: 'pointer'}}/>
                           {category.editmode == 1 ? (
-                            <input onChange = {(event) => oncategorynamechange(category.id, event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '50%', height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {category.tempname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                            <input onChange = {(event) => oncategorynamechange(category.id, event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: getcategoryinputwidth(category.tempname), height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {category.tempname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
                           ) : (
                             <div style = {{width: '90%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{category.name}</div>
                           )}
-                          <div onClick = {() => editcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                            <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
-                          </div>
-                          <div onClick = {() => deletecategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                            <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
-                          </div>
+                          {category.editmode == 1 ? (
+                            <div onClick = {() => saveeditcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                              <img src = {checkicon} style = {{width: '50%', height: '50%'}}/>
+                            </div>
+                          ) : (
+                            <div onClick = {() => starteditcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                              <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
+                            </div>
+                          )}
+                          {category.editmode == 1 ? (
+                            <div onClick = {() => canceleditcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                              <img src = {closeicon} style = {{width: '50%', height: '50%'}}/>
+                            </div>
+                          ) : (
+                            <div onClick = {() => deletecategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                              <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
+                            </div>
+                          )}
                         </div>
                       ))}
 
@@ -1182,7 +1387,7 @@ export default function App() {
                           </div>
                         </div>
                       ) : (
-                        <div onClick = {() => setAddingcategory(1)} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj kategorię</div>
+                        <div onClick = {() => setAddingcategory(1)} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj kategorię</div>
                         
                       )}
                     </div>
@@ -1192,7 +1397,7 @@ export default function App() {
               </div>
 
               <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za odznaki*<InfoTooltip text = "Lista odznak pochodzi z backendu, ale znizki nie sa jeszcze zapisywane przy tworzeniu. Wpisanie znaku '%' w wartosci sprawia, ze znizka staje sie procentowa." /></div>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za odznaki*<InfoTooltip text = "Wpisanie znaku '%' w wartosci sprawia, ze znizka staje sie procentowa." /></div>
 
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%', flexWrap: 'wrap'}}>
                   <select onChange = {(event) => setSelectedbadge(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '40%', height: '5vh', position: 'relative', color: 'rgb(66, 243, 125)', fontSize: '14px', fontWeight: 900, paddingLeft: '2%', border: 'none', outline: 'none', borderRadius: '8px', cursor: 'pointer'}} value = {selectedbadge}>
@@ -1202,7 +1407,7 @@ export default function App() {
                     ))}
                   </select>
                   <input onInput = {(event) => onDiscountinput(event.target.value, setPendingdiscountvalue)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', textAlign: 'center'}} value = {pendingdiscountvalue} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-                  <div onClick = {() => addbadgediscount()} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj zniżkę</div>
+                  <div onClick = {() => addbadgediscount()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj zniżkę</div>
                 </div>
                 {badgediscounts.map((discount) => (
                   <div key = {'badgediscount' + discount.id} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
@@ -1217,7 +1422,7 @@ export default function App() {
 
               <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
                 <div onClick = {() => goback()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '15%', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij</div>
-                <div onClick = {() => createitem()} style = {{backgroundColor: 'rgba(66, 243, 125)', width: '20%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Stwórz przedmiot</div>
+                <div onClick = {() => createitem()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '20%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Stwórz przedmiot</div>
               </div>
 
             </div>
@@ -1225,7 +1430,7 @@ export default function App() {
             <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '2vh'}}>
 
               <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za rangi{ranksfrombackend == 0 ? '*' : ''}<InfoTooltip text = "Zniżki pochodzą z wartosci przechowywanych w odznakach, lecz nie zostaja zapisane." /></div>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za rangi{ranksfrombackend == 0 ? '*' : ''}</div>
                 {ranks.length == 0 ? (
                   <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Brak rang w grupie.</div>
                 ) : (
