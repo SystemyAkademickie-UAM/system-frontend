@@ -56,6 +56,7 @@ export default function RegisterProfile({
   onBack,
   initialNickname = '',
   initialAvatarId = 1,
+  errorMessage = null,
 }) {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
@@ -136,6 +137,10 @@ export default function RegisterProfile({
       </button>
 
       <h1 className="auth-card__title">Jak Cię nazywać?</h1>
+
+      {errorMessage ? (
+        <p className="login-institution__error" role="alert">{errorMessage}</p>
+      ) : null}
 
       <div className="auth-card__input-wrapper">
         <CharacterLimitedField value={nickname} maxLength={PROFILE_NICKNAME_MAX_LENGTH}>

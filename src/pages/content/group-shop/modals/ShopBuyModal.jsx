@@ -8,11 +8,6 @@ export default function ShopBuyModal({
   onClose,
   onConfirm,
 }) {
-  const handleConfirm = () => {
-    onConfirm?.();
-    onClose();
-  };
-
   if (!item) {
     return null;
   }
@@ -24,7 +19,7 @@ export default function ShopBuyModal({
       isOpen={isOpen}
       onClose={onClose}
       title="Potwierdź zakup"
-      onConfirm={handleConfirm}
+      onConfirm={onConfirm}
       confirmLabel="Kup teraz"
       size="md"
       className="shop-modal"

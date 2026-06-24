@@ -333,6 +333,8 @@ export default function RankPathBoard({
 
               shopItems={rank.shopItems}
 
+              discountPercent={rank.discount ?? 0}
+
               iconFile={rank.iconFile}
 
               accentColor={rank.accentColor}

@@ -17,6 +17,7 @@ import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/studen
  * @property {string} storyDescription
  * @property {string[]} shopItems
  * @property {number} storeDiscount
+ * @property {number} discount
  */
 
 /**
@@ -38,6 +39,7 @@ function mapRank(rank, index) {
     storyDescription: rank.storyDescription || '',
     shopItems: rank.uniqueStoreItems || [],
     storeDiscount: rank.storeDiscount || 0,
+    discount: Number(rank.discount ?? 0),
   };
 }
 
@@ -98,6 +100,7 @@ export function useGroupRanks() {
       requiredPoints: values.costAmount || 0,
       storyDescription: values.storyDescription || '',
       storeDiscount: values.storeDiscount || 0,
+      discount: values.discount ?? 0,
       uniqueStoreItems: values.shopItems || [],
     });
 
@@ -123,6 +126,7 @@ export function useGroupRanks() {
       requiredPoints: values.costAmount,
       storyDescription: values.storyDescription,
       storeDiscount: values.storeDiscount,
+      discount: values.discount ?? 0,
       uniqueStoreItems: values.shopItems,
     });
 

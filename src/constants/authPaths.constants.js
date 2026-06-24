@@ -27,8 +27,11 @@ export const AUTH_LOGIN_PATH = '/login';
 /** Clears `maq_auth` + SAML session cookies. */
 export const AUTH_LOGOUT_PATH = '/logout';
 
-/** Session check from `maq_auth` cookie + `X-Browser-ID` (same shape as `/auth/saml/me`). */
+/** Session check from HTTP-only session cookie (`maq_session`). */
 export const AUTH_LOGIN_ME_PATH = '/login/me';
+
+/** Login organizations for institution pickers (`?loginMethod=saml|email`). */
+export const AUTH_LOGIN_ORGANIZATIONS_PATH = '/login/organizations';
 
 /** Registration progress during the `/login` wizard. */
 export const AUTH_LOGIN_REGISTRATION_STATUS_PATH = '/login/registration-status';
@@ -38,3 +41,9 @@ export const AUTH_LOGIN_PROFILE_PATH = '/login/profile';
 
 /** Accept EULA and complete registration during the `/login` wizard. */
 export const AUTH_LOGIN_ACCEPT_EULA_PATH = '/login/accept-eula';
+
+/** Request email magic link (non-PIONIER login). */
+export const AUTH_LOGIN_MAGIC_LINK_REQUEST_PATH = '/login/magic-link/request';
+
+/** Verify email magic link token from the email URL. */
+export const AUTH_LOGIN_MAGIC_LINK_VERIFY_PATH = '/login/magic-link/verify';

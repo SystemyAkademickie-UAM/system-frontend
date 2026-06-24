@@ -1,9 +1,8 @@
 /**
- * TYMCZASOWE — generator produktów sklepu do localStorage (do usunięcia wraz z panelem dev).
+ * TYMCZASOWE — generator produktów sklepu przez API backendu.
  */
 
-import { appendShopItems } from './shopItemsStorage.js';
-import { pickRandomShopCategoryIds } from './shopCategories.js';
+import { createGroupShopItem } from '../../../services/shop.api.js';
 
 const PRODUCT_NAMES = [
   'Konsultacja z Mistrzem',
@@ -33,55 +32,35 @@ const DIDACTIC_SNIPPETS = [
 ];
 
 /**
- * @param {number} basePrice
- * @returns {number | undefined}
- */
-function pickRandomSalePrice(basePrice) {
-  if (Math.random() >= 0.4) {
-    return undefined;
-  }
-
-  const discountFactor = 0.55 + Math.random() * 0.35;
-  const salePrice = Math.round(basePrice * discountFactor);
-  if (salePrice >= basePrice || salePrice < 1) {
-    return undefined;
-  }
-
-  return salePrice;
-}
-
-/**
- * @param {number} count
- * @returns {import('./shopItem.types.js').ShopItem[]}
- */
-export function generateTemporaryShopItems(count = 10) {
-  const timestamp = Date.now();
-
-  return Array.from({ length: count }, (_, index) => {
-    const nameBase = PRODUCT_NAMES[index % PRODUCT_NAMES.length];
-    const priceAmount = 100 + index * 75;
-    const salePriceAmount = pickRandomSalePrice(priceAmount);
-
-    return {
-      id: `dev-shop-${timestamp}-${index}`,
-      name: `${nameBase} #${index + 1}`,
-      storyDescription: STORY_SNIPPETS[index % STORY_SNIPPETS.length],
-      didacticDescription: DIDACTIC_SNIPPETS[index % DIDACTIC_SNIPPETS.length],
-      priceAmount,
-      ...(salePriceAmount != null ? { salePriceAmount } : {}),
-      categories: pickRandomShopCategoryIds(4),
-    };
-  });
-}
-
-/**
  * @param {Object} options
  * @param {string | number} options.groupId
  * @param {number} [options.count=10]
  * @param {(line: string) => void} [options.onLog]
  */
 export async function seedTemporaryShopItems({ groupId, count = 10, onLog }) {
-  const items = generateTemporaryShopItems(count);
-  appendShopItems(groupId, items);
-  onLog?.(`Dodano ${items.length} produktów sklepowych (localStorage).`);
+  let created = 0;
+
+  for (let index = 0; index < count; index += 1) {
+    const nameBase = PRODUCT_NAMES[index % PRODUCT_NAMES.length];
+    const basePrice = 100 + index * 75;
+
+    const payload = {
+      name: `${nameBase} #${index + 1}`,
+      basePrice,
+      storyDescription: STORY_SNIPPETS[index % STORY_SNIPPETS.length],
+      educationalDescription: DIDACTIC_SNIPPETS[index % DIDACTIC_SNIPPETS.length],
+      stockQuantity: 20 + index,
+      perStudentLimit: 2,
+    };
+
+    const result = await createGroupShopItem(groupId, payload);
+    if (result.ok) {
+      created += 1;
+      onLog?.(`✓ ${payload.name} → itemId=${result.item?.id ?? '?'}`);
+    } else {
+      onLog?.(`✗ ${payload.name}: ${result.error ?? 'błąd tworzenia'}`);
+    }
+  }
+
+  onLog?.(`Dodano ${created}/${count} produktów sklepowych (API).`);
 }

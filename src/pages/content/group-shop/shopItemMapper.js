@@ -26,6 +26,8 @@ export function mapBackendShopItem(raw) {
       ? null
       : Number(listing.perStudentLimit),
     categories: categoryId !== null && categoryId !== undefined ? [String(categoryId)] : [],
+    imageRef: typeof item.imageRef === 'string' ? item.imageRef : null,
+    isPublished: typeof item.isPublished === 'boolean' ? item.isPublished : true,
   };
 }
 

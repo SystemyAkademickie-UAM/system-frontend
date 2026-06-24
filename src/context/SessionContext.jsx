@@ -1,26 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { clearPendingSamlBrowserId, hasPendingSamlBrowserId } from '../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../constants/api.constants.js';
-import { AUTH_LOGIN_ME_PATH, AUTH_SAML_ME_PATH } from '../constants/authPaths.constants.js';
+import { AUTH_LOGIN_ME_PATH } from '../constants/authPaths.constants.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 import { getJson } from '../services/api-client.js';
-import { exchangeSamlSessionForAuthToken } from '../services/exchangeAuthToken.js';
 
 const SessionContext = createContext(null);
 
-/** Retry delays after SAML redirect — cookies may not be visible to fetch on the first tick. */
-const SESSION_CHECK_RETRY_DELAYS_MS = [0, 100, 250, 500, 1000];
-const SESSION_CHECK_SAML_EXTRA_RETRY_DELAYS_MS = [2000, 3000];
-
-/**
- * @returns {number[]}
- */
-function getSessionCheckRetryDelaysMs() {
-  if (hasPendingSamlBrowserId()) {
-    return [...SESSION_CHECK_RETRY_DELAYS_MS, ...SESSION_CHECK_SAML_EXTRA_RETRY_DELAYS_MS];
-  }
-  return SESSION_CHECK_RETRY_DELAYS_MS;
-}
+/** Retry delays after redirect — cookies may not be visible to fetch on the first tick. */
+const SESSION_CHECK_RETRY_DELAYS_MS = [0, 100, 250, 500];
 
 /**
  * Mapuje rolę z backendu na APP_ROLE.
@@ -59,28 +46,10 @@ function delay(ms) {
 }
 
 /**
- * @param {string} base
  * @returns {Promise<Record<string, unknown> | null>}
  */
-async function loadSamlSessionUser(base) {
-  const response = await fetch(`${base}${AUTH_SAML_ME_PATH}`, {
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    return null;
-  }
-  const data = await response.json();
-  if (data.authenticated && data.user) {
-    return data.user;
-  }
-  return null;
-}
-
-/**
- * @returns {Promise<Record<string, unknown> | null>}
- */
-async function loadApiTokenSessionUser() {
-  const result = await getJson(AUTH_LOGIN_ME_PATH, { includeBrowserId: true });
+async function loadSessionUser() {
+  const result = await getJson(AUTH_LOGIN_ME_PATH, {});
   if (result.ok && result.data?.authenticated && result.data?.user) {
     return result.data.user;
   }
@@ -89,15 +58,7 @@ async function loadApiTokenSessionUser() {
 
 /**
  * Kontekst sesji użytkownika.
- * Preferuje GET /login/me (`maq_auth`), potem GET /auth/saml/me + POST /login.
- *
- * Dostarcza:
- * - user: obiekt użytkownika z backendu (lub null)
- * - role: APP_ROLE zmapowana z user.role
- * - isAuthenticated: czy sesja jest aktywna
- * - isLoading: czy trwa sprawdzanie sesji
- * - sessionError: błąd sieci (lub null)
- * - refetchSession: funkcja do ręcznego odświeżenia sesji
+ * Sprawdza GET /login/me (session cookie maq_session).
  */
 export function SessionProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -105,16 +66,20 @@ export function SessionProvider({ children }) {
   const [sessionError, setSessionError] = useState(null);
   const sessionCheckInFlightRef = useRef(false);
 
-  const checkSession = useCallback(async () => {
+  const checkSession = useCallback(async (options = {}) => {
+    const force = options.force === true;
     if (sessionCheckInFlightRef.current) {
-      return;
+      if (!force) {
+        return;
+      }
+      while (sessionCheckInFlightRef.current) {
+        await delay(25);
+      }
     }
 
     sessionCheckInFlightRef.current = true;
     setIsLoading(true);
     setSessionError(null);
-
-    const retryDelaysMs = getSessionCheckRetryDelaysMs();
 
     try {
       const base = getApiBaseUrl();
@@ -123,48 +88,14 @@ export function SessionProvider({ children }) {
         return;
       }
 
-      for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
+      for (let attempt = 0; attempt < SESSION_CHECK_RETRY_DELAYS_MS.length; attempt += 1) {
         if (attempt > 0) {
-          await delay(retryDelaysMs[attempt]);
+          await delay(SESSION_CHECK_RETRY_DELAYS_MS[attempt]);
         }
 
-        const apiUser = await loadApiTokenSessionUser();
-        if (apiUser) {
-          clearPendingSamlBrowserId();
-          setUser(apiUser);
-          return;
-        }
-
-        const samlUser = await loadSamlSessionUser(base);
-        if (!samlUser) {
-          continue;
-        }
-
-        const apiUserAfterSamlOnly = await loadApiTokenSessionUser();
-        if (apiUserAfterSamlOnly) {
-          clearPendingSamlBrowserId();
-          setUser(apiUserAfterSamlOnly);
-          return;
-        }
-
-        const tokenExchange = await exchangeSamlSessionForAuthToken();
-        if (tokenExchange.ok) {
-          clearPendingSamlBrowserId();
-          const apiUserAfterExchange = await loadApiTokenSessionUser();
-          setUser(apiUserAfterExchange ?? samlUser);
-          return;
-        }
-
-        const apiUserAfterExchangeFailure = await loadApiTokenSessionUser();
-        if (apiUserAfterExchangeFailure) {
-          clearPendingSamlBrowserId();
-          setUser(apiUserAfterExchangeFailure);
-          return;
-        }
-
-        if (attempt === retryDelaysMs.length - 1) {
-          setUser(null);
-          setSessionError(tokenExchange.message);
+        const sessionUser = await loadSessionUser();
+        if (sessionUser) {
+          setUser(sessionUser);
           return;
         }
       }

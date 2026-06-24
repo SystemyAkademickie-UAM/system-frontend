@@ -1,7 +1,7 @@
 import './AuthCard.css';
 import './LoginPionierId.css';
 
-export default function LoginPionierId({ onContinue }) {
+export default function LoginPionierId({ onContinue, onEmailLogin }) {
   return (
     <div className="auth-card auth-card--wizard-panel login-pionierid">
       <div className="login-pionierid__body">
@@ -20,9 +20,13 @@ export default function LoginPionierId({ onContinue }) {
             Zaloguj się przez PIONIER.ID
           </button>
 
-          <a href="#" className="auth-card__secondary-link login-pionierid__email-link">
+          <button
+            type="button"
+            className="auth-card__secondary-link login-pionierid__email-link"
+            onClick={onEmailLogin}
+          >
             Zaloguj się przez e-mail
-          </a>
+          </button>
         </div>
       </div>
     </div>

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { getBrowserIdForAuth } from '../../auth/browserIdStorage.js';
-import { getApiBaseUrl } from '../../constants/api.constants.js';
-import { AUTH_LOGIN_REGISTRATION_STATUS_PATH } from '../../constants/authPaths.constants.js';
 import { useSession } from '../../context/SessionContext.jsx';
+import {
+  fetchRegistrationStatus,
+  isRegistrationComplete,
+} from '../../services/registrationStatus.api.js';
 import { groupsListPath, loginPath, registerPath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
@@ -35,40 +36,19 @@ export default function HomeRedirect() {
     let cancelled = false;
 
     async function resolveRegistrationState() {
-      const baseUrl = getApiBaseUrl();
-      if (baseUrl.length === 0) {
-        if (!cancelled) {
-          setRegistrationState(REGISTRATION_STATE.INCOMPLETE);
-        }
+      const status = await fetchRegistrationStatus();
+      if (cancelled) {
         return;
       }
-
-      const browserId = getBrowserIdForAuth();
-      try {
-        const response = await fetch(`${baseUrl}${AUTH_LOGIN_REGISTRATION_STATUS_PATH}`, {
-          credentials: 'include',
-          headers: { 'X-Browser-ID': browserId },
-        });
-        if (!response.ok) {
-          if (!cancelled) {
-            setRegistrationState(REGISTRATION_STATE.INCOMPLETE);
-          }
-          return;
-        }
-        const status = await response.json();
-        if (!cancelled) {
-          const isComplete = status.registrationCompleted === true && status.eulaAccepted === true;
-          setRegistrationState(isComplete ? REGISTRATION_STATE.COMPLETE : REGISTRATION_STATE.INCOMPLETE);
-        }
-      } catch {
-        if (!cancelled) {
-          setRegistrationState(REGISTRATION_STATE.INCOMPLETE);
-        }
-      }
+      setRegistrationState(
+        isRegistrationComplete(status)
+          ? REGISTRATION_STATE.COMPLETE
+          : REGISTRATION_STATE.INCOMPLETE,
+      );
     }
 
     setRegistrationState(REGISTRATION_STATE.PENDING);
-    resolveRegistrationState();
+    void resolveRegistrationState();
 
     return () => {
       cancelled = true;

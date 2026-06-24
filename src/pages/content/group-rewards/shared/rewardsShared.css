@@ -88,6 +88,11 @@
   color: var(--color-text-secondary);
 }
 
+.rewards-table__cell-text--discount {
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
 .rewards-table__reward {
   font-size: var(--rewards-font-table-secondary);
   font-weight: 600;

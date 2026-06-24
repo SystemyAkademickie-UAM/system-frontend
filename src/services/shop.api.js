@@ -42,6 +42,24 @@ export async function fetchGroupShopItems(groupId) {
 }
 
 /**
+ * @param {string | number} groupId
+ * @param {string | number} itemId
+ */
+export async function fetchGroupShopItem(groupId, itemId) {
+  const result = await fetchGroupShopItems(groupId);
+  if (!result.ok) {
+    return { ok: false, item: null, error: result.error };
+  }
+
+  const item = result.items.find((entry) => entry.id === String(itemId)) ?? null;
+  if (!item) {
+    return { ok: false, item: null, error: 'Nie znaleziono produktu' };
+  }
+
+  return { ok: true, item };
+}
+
+/**
  * @returns {Promise<{ ok: boolean, templates: import('../pages/content/group-shop/shopItem.types.js').ShopItemTemplate[], error?: string }>}
  */
 export async function fetchShopTemplates() {
@@ -61,7 +79,16 @@ export async function createGroupShopItem(groupId, payload) {
   if (!result.ok) {
     return { ok: false, error: extractApiError(result.data) };
   }
-  return { ok: true, item: mapBackendShopItem(result.data) };
+
+  const item = mapBackendShopItem(result.data);
+  if (item.isPublished === false) {
+    const publishResult = await updateGroupShopItem(groupId, item.id, { isPublished: true });
+    if (publishResult.ok && publishResult.item) {
+      return { ok: true, item: publishResult.item };
+    }
+  }
+
+  return { ok: true, item };
 }
 
 /**
@@ -102,13 +129,29 @@ export async function deleteGroupShopItem(groupId, itemId) {
 }
 
 /**
+ * @param {string} message
+ * @returns {string}
+ */
+function mapShopBuyError(message) {
+  const normalized = message.trim();
+  const translations = {
+    'Not enough currency': 'Niewystarczająca ilość waluty.',
+    'Sklep grupy jest obecnie zamknięty.': 'Sklep grupy jest obecnie zamknięty.',
+    'Student is not enrolled in this group': 'Nie jesteś zapisany do tej grupy.',
+    'Przedmiot wyprzedany. Brak sztuk na magazynie.': 'Przedmiot wyprzedany. Brak sztuk na magazynie.',
+  };
+
+  return translations[normalized] ?? normalized;
+}
+
+/**
  * @param {string | number} groupId
  * @param {string | number} itemId
  */
 export async function buyGroupShopItem(groupId, itemId) {
   const result = await postJson(`/groups/${groupId}/shop-items/${itemId}/buy`, {}, { includeBrowserId: true });
   if (!result.ok) {
-    return { ok: false, error: extractApiError(result.data) };
+    return { ok: false, error: mapShopBuyError(extractApiError(result.data)) };
   }
   return { ok: true };
 }

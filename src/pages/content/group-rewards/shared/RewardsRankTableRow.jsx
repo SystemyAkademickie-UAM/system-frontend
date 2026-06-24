@@ -62,6 +62,7 @@ export default function RewardsRankTableRow({ row, columns, rowActions }) {
               costEmoji={row.costEmoji ?? '🥕'}
               storyDescription={row.storyDescription}
               shopItems={row.shopItems ?? []}
+              discountPercent={row.discount ?? 0}
               iconFile={row.iconFile}
             />
           </div>,

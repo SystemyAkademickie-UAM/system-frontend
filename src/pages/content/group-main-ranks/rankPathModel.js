@@ -12,6 +12,7 @@ import { getRankGradientColor, RANK_LOCKED_COLOR } from '../../../utils/rankGrad
  * @property {string} storyDescription
  * @property {string[]} shopItems
  * @property {number} storeDiscount
+ * @property {number} discount
  * @property {string} accentColor
  * @property {boolean} isUnlocked
  */
@@ -44,6 +45,7 @@ export function mapRankForPath(rank, index) {
     storyDescription: rank.storyDescription || '',
     shopItems: rank.uniqueStoreItems || [],
     storeDiscount: rank.storeDiscount || 0,
+    discount: Number(rank.discount ?? 0),
   };
 }
 

@@ -73,6 +73,17 @@ const RANK_COLUMNS = [
     ),
   },
   {
+    key: 'discount',
+    label: 'Zniżka',
+    sort: 'number',
+    width: '100px',
+    render: (rank) => (
+      <span className="rewards-table__cell-text rewards-table__cell-text--discount">
+        {Number(rank.discount ?? 0)}%
+      </span>
+    ),
+  },
+  {
     key: 'storyDescription',
     label: 'Status fabularny',
     sort: 'text',
@@ -267,6 +278,7 @@ export default function RewardsHomeContent() {
               rank.name.toLowerCase().includes(query)
               || rank.iconFile.toLowerCase().includes(query)
               || rank.storyDescription.toLowerCase().includes(query)
+              || String(rank.discount ?? '').includes(query)
               || (rank.shopItems || []).some((item) => item.toLowerCase().includes(query))
             ),
           }}
@@ -277,6 +289,7 @@ export default function RewardsHomeContent() {
 
       <RankFormModal
         isOpen={activeModal?.type === 'create'}
+        existingRanks={ranks}
         onClose={closeModal}
         onConfirm={handleCreateConfirm}
         isLoading={modalLoading}

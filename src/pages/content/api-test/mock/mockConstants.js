@@ -1,4 +1,5 @@
-export { BROWSER_ID_LOCAL_STORAGE_KEY } from '../../../../constants/browserId.constants.js';
+/** @deprecated X-Browser-ID has been removed from authentication */
+export const BROWSER_ID_LOCAL_STORAGE_KEY = 'maq_browser_id_deprecated';
 
 /** Default icon ids aligned with backend API examples (docs/api.md). */
 export const SMOKE_TEST_DEFAULT_CURRENCY_ICON = 21;
