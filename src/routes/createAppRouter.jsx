@@ -8,6 +8,7 @@ import { useAppRole } from '../context/AppRoleContext.jsx';
 import AuthShell from '../components/layout/AuthShell.jsx';
 import LoginShell from '../components/layout/LoginShell.jsx';
 import LoginPage from '../pages/links/auth/LoginPage.jsx';
+import LoginMagicPage from '../pages/links/auth/LoginMagicPage.jsx';
 import DevApiTestPage from '../pages/links/dev/DevApiTestPage.jsx';
 
 // App-level pages
@@ -168,6 +169,7 @@ const appRouteTree = [
         element: <AuthShell />,
         children: [
           { path: 'login', element: <LoginPage /> },
+          { path: 'login/magic', element: <LoginMagicPage /> },
           { path: 'login/institution', element: <Navigate to={loginPath()} replace /> },
           { path: 'login/register/eula', element: <Navigate to={loginPath()} replace /> },
           { path: 'login/register', element: <Navigate to={loginPath()} replace /> },

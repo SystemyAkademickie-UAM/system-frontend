@@ -87,6 +87,16 @@
   color: #ff8a8a;
 }
 
+.login-institution__success {
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  margin: 0 0 var(--auth-card-field-to-button-gap);
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: #6ee7a0;
+}
+
 @media (max-width: 640px) {
   .login-institution {
     padding: 1rem 20px 1.75rem;

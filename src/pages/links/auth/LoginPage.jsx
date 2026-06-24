@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthStepTransition from '../../../components/layout/AuthStepTransition.jsx';
-import { getBrowserIdForAuth, hasPendingSamlBrowserId } from '../../../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import {
   AUTH_LOGIN_ACCEPT_EULA_PATH,
   AUTH_LOGIN_PROFILE_PATH,
-  AUTH_LOGIN_REGISTRATION_STATUS_PATH,
 } from '../../../constants/authPaths.constants.js';
 import {
+  fetchRegistrationStatus,
+  isRegistrationComplete,
+  resolveRegistrationWizardStep,
+} from '../../../services/registrationStatus.api.js';
+import {
   LOGIN_FLOW_STEP_EULA,
+  LOGIN_FLOW_STEP_EMAIL,
   LOGIN_FLOW_STEP_INSTITUTION,
   LOGIN_FLOW_STEP_ORDER,
   LOGIN_FLOW_STEP_PIONIER,
@@ -22,6 +26,7 @@ import { homePath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
 import {
   LoginInstitution,
+  LoginEmail,
   LoginPionierId,
   RegisterEula,
   RegisterProfile,
@@ -34,6 +39,7 @@ export default function LoginPage() {
   const [step, setStep] = useState(LOGIN_FLOW_STEP_PIONIER);
   const [profileData, setProfileData] = useState({ nickname: '', avatarId: 1 });
   const [eulaError, setEulaError] = useState(null);
+  const [profileError, setProfileError] = useState(null);
   const [isEulaSubmitting, setIsEulaSubmitting] = useState(false);
   const [registrationCheckDone, setRegistrationCheckDone] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
@@ -42,7 +48,7 @@ export default function LoginPage() {
   const samlRecoveryAttemptedRef = useRef(false);
 
   useEffect(() => {
-    if (session?.isLoading || session?.isAuthenticated || !hasPendingSamlBrowserId()) {
+    if (session?.isLoading || session?.isAuthenticated) {
       return;
     }
     if (samlRecoveryAttemptedRef.current) {
@@ -75,28 +81,18 @@ export default function LoginPage() {
         return;
       }
 
-      const browserId = getBrowserIdForAuth();
       try {
-        const response = await fetch(`${baseUrl}${AUTH_LOGIN_REGISTRATION_STATUS_PATH}`, {
-          credentials: 'include',
-          headers: { 'X-Browser-ID': browserId },
-        });
-        if (!response.ok) {
-          if (!cancelled) {
-            setStep(LOGIN_FLOW_STEP_REGISTER);
-            setRegistrationCheckDone(true);
-          }
-          return;
-        }
-
-        const status = await response.json();
+        const status = await fetchRegistrationStatus();
         if (!cancelled) {
-          const isComplete = status.registrationCompleted === true && status.eulaAccepted === true;
-          if (isComplete) {
+          if (isRegistrationComplete(status)) {
             navigate(homePath(), { replace: true });
             return;
           }
-          setStep(LOGIN_FLOW_STEP_REGISTER);
+          setProfileData({
+            nickname: typeof status?.nickname === 'string' ? status.nickname : '',
+            avatarId: typeof status?.avatarId === 'number' ? status.avatarId : 1,
+          });
+          setStep(resolveRegistrationWizardStep(status));
           setRegistrationCheckDone(true);
         }
       } catch {
@@ -117,6 +113,14 @@ export default function LoginPage() {
 
   const handlePionierContinue = useCallback(() => {
     setStep(LOGIN_FLOW_STEP_INSTITUTION);
+  }, []);
+
+  const handleEmailLogin = useCallback(() => {
+    setStep(LOGIN_FLOW_STEP_EMAIL);
+  }, []);
+
+  const handleEmailBack = useCallback(() => {
+    setStep(LOGIN_FLOW_STEP_PIONIER);
   }, []);
 
   const handleInstitutionBack = useCallback(() => {
@@ -143,6 +147,7 @@ export default function LoginPage() {
   const resetLoginWizardAfterLogout = useCallback(() => {
     setProfileData({ nickname: '', avatarId: 1 });
     setEulaError(null);
+    setProfileError(null);
     setStep(LOGIN_FLOW_STEP_PIONIER);
     setRegistrationCheckDone(true);
     setIsLogoutConfirmOpen(false);
@@ -166,10 +171,31 @@ export default function LoginPage() {
     });
   }, [handleLogoutFailed]);
 
-  const handleProfileContinue = useCallback(({ nickname, avatarId }) => {
-    setProfileData({ nickname, avatarId });
-    setStep(LOGIN_FLOW_STEP_EULA);
-    setEulaError(null);
+  const handleProfileContinue = useCallback(async ({ nickname, avatarId }) => {
+    setProfileError(null);
+    const baseUrl = getApiBaseUrl();
+    if (baseUrl.length === 0) {
+      setProfileData({ nickname, avatarId });
+      setStep(LOGIN_FLOW_STEP_EULA);
+      return;
+    }
+    try {
+      const profileResponse = await fetch(`${baseUrl}${AUTH_LOGIN_PROFILE_PATH}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ nickname, avatarId }),
+      });
+      if (!profileResponse.ok) {
+        throw new Error('Nie udało się zapisać profilu.');
+      }
+      setProfileData({ nickname, avatarId });
+      setStep(LOGIN_FLOW_STEP_EULA);
+      setEulaError(null);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Nie udało się zapisać profilu.';
+      setProfileError(message);
+    }
   }, []);
 
   const handleEulaBack = useCallback(() => {
@@ -180,39 +206,18 @@ export default function LoginPage() {
   const handleEulaAccept = useCallback(async () => {
     setIsEulaSubmitting(true);
     setEulaError(null);
-    const browserId = getBrowserIdForAuth();
     const baseUrl = getApiBaseUrl();
     try {
-      const profileResponse = await fetch(`${baseUrl}${AUTH_LOGIN_PROFILE_PATH}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserId,
-        },
-        credentials: 'include',
-        body: JSON.stringify(profileData),
-      });
-      if (!profileResponse.ok) {
-        throw new Error('Nie udało się zapisać profilu.');
-      }
-
       const eulaResponse = await fetch(`${baseUrl}${AUTH_LOGIN_ACCEPT_EULA_PATH}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserId,
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
       if (!eulaResponse.ok) {
         throw new Error('Nie udało się utworzyć konta.');
       }
 
-      await session?.refetchSession?.();
-      // Wymuś świeży fetch profilu z backendu — `UserProfileContext` był
-      // załadowany przed zapisem wizarda i trzyma stary nick / avatarId,
-      // więc bez tego SuperBar pokazywałby zaseedowane wartości do czasu
-      // ręcznego zapisu w /settings.
+      await session?.refetchSession?.({ force: true });
       await refetchProfile?.();
       navigate(homePath());
     } catch (err) {
@@ -221,7 +226,7 @@ export default function LoginPage() {
     } finally {
       setIsEulaSubmitting(false);
     }
-  }, [navigate, profileData, refetchProfile, session]);
+  }, [navigate, refetchProfile, session]);
 
   const stepContent = useMemo(() => {
     if (session?.isAuthenticated && !registrationCheckDone) {
@@ -230,6 +235,10 @@ export default function LoginPage() {
 
     if (step === LOGIN_FLOW_STEP_INSTITUTION) {
       return <LoginInstitution onBack={handleInstitutionBack} />;
+    }
+
+    if (step === LOGIN_FLOW_STEP_EMAIL) {
+      return <LoginEmail onBack={handleEmailBack} />;
     }
 
     if (step === LOGIN_FLOW_STEP_EULA) {
@@ -250,16 +259,19 @@ export default function LoginPage() {
           onBack={handleRegisterBack}
           initialNickname={profileData.nickname}
           initialAvatarId={profileData.avatarId}
+          errorMessage={profileError}
         />
       );
     }
 
-    return <LoginPionierId onContinue={handlePionierContinue} />;
+    return <LoginPionierId onContinue={handlePionierContinue} onEmailLogin={handleEmailLogin} />;
   }, [
     step,
     session?.isAuthenticated,
     registrationCheckDone,
     handlePionierContinue,
+    handleEmailLogin,
+    handleEmailBack,
     handleInstitutionBack,
     handleRegisterBack,
     handleProfileContinue,
@@ -269,6 +281,7 @@ export default function LoginPage() {
     eulaError,
     profileData.nickname,
     profileData.avatarId,
+    profileError,
   ]);
 
   return (

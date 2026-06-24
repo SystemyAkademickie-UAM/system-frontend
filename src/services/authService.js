@@ -1,4 +1,3 @@
-import { clearPendingSamlBrowserId } from '../auth/browserIdStorage.js';
 import { getApiBaseUrl, getSamlLogoutUrl } from '../constants/api.constants.js';
 import { AUTH_LOGOUT_PATH } from '../constants/authPaths.constants.js';
 
@@ -23,8 +22,6 @@ export function logoutUser(onNavigationFailed) {
   if (samlLogoutUrl.length === 0) {
     return false;
   }
-
-  clearPendingSamlBrowserId();
 
   const baseUrl = getApiBaseUrl();
   if (baseUrl.length > 0) {

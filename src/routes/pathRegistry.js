@@ -15,6 +15,11 @@ export function loginPath() {
   return '/login';
 }
 
+/** Magic link landing route (`?token=` from email). */
+export function loginMagicPath() {
+  return '/login/magic';
+}
+
 /** @deprecated All auth wizard steps live on `/login` (in-page state). */
 export function loginInstitutionPath() {
   return loginPath();

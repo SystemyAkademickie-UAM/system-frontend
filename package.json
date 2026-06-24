@@ -22,7 +22,9 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.15.0"
+    "react-router-dom": "^7.15.0",
+    "sortablejs": "^1.15.7",
+    "unicode-emoji-picker": "^1.6.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

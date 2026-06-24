@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSamlLoginUrl } from '../../../constants/api.constants.js';
-import { AUTH_SAML_ORGANIZATIONS_PATH, AUTH_SAML_STATUS_PATH } from '../../../constants/authPaths.constants.js';
+import {
+  AUTH_LOGIN_MAGIC_LINK_REQUEST_PATH,
+  AUTH_LOGIN_ORGANIZATIONS_PATH,
+} from '../../../constants/authPaths.constants.js';
 import { loginPath } from '../../../routes/pathRegistry.js';
-import { getJson } from '../../../services/api-client.js';
+import { getJson, postJson } from '../../../services/api-client.js';
 import './AuthCard.css';
 import './LoginInstitution.css';
 
-/** @typedef {{ id: number, name: string }} SamlOrganizationOption */
+/** @typedef {{ id: number, name: string }} LoginOrganizationOption */
 
 function BackIcon({ className }) {
   return (
@@ -17,18 +19,20 @@ function BackIcon({ className }) {
   );
 }
 
-export default function LoginInstitution({ onBack }) {
+export default function LoginEmail({ onBack }) {
   const navigate = useNavigate();
-  const [organizations, setOrganizations] = useState(/** @type {SamlOrganizationOption[]} */ ([]));
+  const [organizations, setOrganizations] = useState(/** @type {LoginOrganizationOption[]} */ ([]));
   const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
+  const [email, setEmail] = useState('');
   const [isOrganizationsLoading, setIsOrganizationsLoading] = useState(true);
   const [isBusy, setIsBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const result = await getJson(AUTH_SAML_ORGANIZATIONS_PATH);
+      const result = await getJson(`${AUTH_LOGIN_ORGANIZATIONS_PATH}?loginMethod=email`);
       if (cancelled) {
         return;
       }
@@ -54,33 +58,37 @@ export default function LoginInstitution({ onBack }) {
     navigate(loginPath());
   }, [navigate, onBack]);
 
-  const handleContinue = useCallback(async () => {
+  const handleSubmit = useCallback(async () => {
     setErrorMessage(null);
+    setSuccessMessage(null);
+
     const organizationId = Number.parseInt(selectedOrganizationId, 10);
+    const normalizedEmail = email.trim();
+
     if (!Number.isFinite(organizationId) || organizationId <= 0) {
       setErrorMessage('Wybierz uczelnię z listy.');
       return;
     }
+    if (!normalizedEmail.includes('@')) {
+      setErrorMessage('Podaj prawidłowy adres e-mail.');
+      return;
+    }
+
     setIsBusy(true);
-    const statusResult = await getJson(AUTH_SAML_STATUS_PATH);
-    if (
-      !statusResult.ok ||
-      !statusResult.data ||
-      typeof statusResult.data !== 'object' ||
-      statusResult.data.configured !== true
-    ) {
-      setIsBusy(false);
-      setErrorMessage('Logowanie SAML nie jest skonfigurowane (brak certyfikatów SP w backendzie).');
+    const result = await postJson(AUTH_LOGIN_MAGIC_LINK_REQUEST_PATH, {
+      email: normalizedEmail,
+      organizationId,
+    });
+    setIsBusy(false);
+
+    if (!result.ok) {
+      const data = /** @type {{ message?: string, error?: string }} */ (result.data);
+      setErrorMessage(data?.message || data?.error || 'Nie udało się wysłać linku logowania.');
       return;
     }
-    const samlLoginUrl = getSamlLoginUrl(organizationId);
-    if (samlLoginUrl.length === 0) {
-      setIsBusy(false);
-      setErrorMessage('Brak adresu logowania SAML.');
-      return;
-    }
-    window.location.assign(samlLoginUrl);
-  }, [selectedOrganizationId]);
+
+    setSuccessMessage('Link logowania został wysłany na podany adres e-mail.');
+  }, [email, selectedOrganizationId]);
 
   const isSelectDisabled = isOrganizationsLoading || organizations.length === 0 || isBusy;
 
@@ -95,19 +103,15 @@ export default function LoginInstitution({ onBack }) {
         <BackIcon className="auth-card__back-icon" />
       </button>
 
-      <img
-        src="/images/pionierid-logo.png"
-        alt="PIONIER.id"
-        className="login-institution__logo auth-logo--pionier"
-      />
+      <h1 className="auth-card__title">Zaloguj się przez e-mail</h1>
 
       <div className="login-institution__field">
-        <label className="auth-card__title" htmlFor="institution-select">
+        <label className="auth-card__title" htmlFor="email-institution-select">
           Wybierz uczelnię
         </label>
         <div className="login-institution__select-wrap">
           <select
-            id="institution-select"
+            id="email-institution-select"
             className="login-institution__select"
             value={selectedOrganizationId}
             disabled={isSelectDisabled}
@@ -128,19 +132,41 @@ export default function LoginInstitution({ onBack }) {
         </div>
       </div>
 
-      {errorMessage && (
+      <div className="login-institution__field">
+        <label className="auth-card__title" htmlFor="email-login-input">
+          Adres e-mail
+        </label>
+        <input
+          id="email-login-input"
+          type="email"
+          className="auth-card__input"
+          value={email}
+          disabled={isBusy}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="twoj.email@uczelnia.pl"
+          autoComplete="email"
+        />
+      </div>
+
+      {errorMessage ? (
         <p className="login-institution__error" role="alert">
           {errorMessage}
         </p>
-      )}
+      ) : null}
+
+      {successMessage ? (
+        <p className="login-institution__success" role="status">
+          {successMessage}
+        </p>
+      ) : null}
 
       <button
         type="button"
         className="auth-card__primary-btn login-institution__continue"
-        onClick={handleContinue}
+        onClick={handleSubmit}
         disabled={isBusy || isOrganizationsLoading || organizations.length === 0}
       >
-        Kontynuuj
+        Wyślij link logowania
       </button>
     </div>
   );
