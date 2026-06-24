@@ -2,8 +2,8 @@ import {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
-import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
-import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
+
+
 
 export default function App() {
 
@@ -76,9 +76,8 @@ export default function App() {
 
         let imageref = entryitem.imageRef;
 
-        let iconcolour = 'rgb(255,255,255)';
         let iconbackground = 'rgb(40,40,52)';
-        let imageissvg = 0;
+        let imageisemoji = 0;
 
         if (imageref != null && imageref.indexOf('*') >= 0) {
 
@@ -87,18 +86,13 @@ export default function App() {
           imageref = imageparts[0];
 
           if (imageparts.length > 1) {
-            iconcolour = imageparts[1];
-          }
-
-          if (imageparts.length > 2) {
-            iconbackground = imageparts[2];
+            iconbackground = imageparts[1];
           }
 
         }
 
-        if (imageref != null && imageref.trim().endsWith('.svg')) {
-          imageissvg = 1;
-          imageref = 'backend:' + imageref.trim();
+        if (imageref != null && imageref.trim().length > 0) {
+          imageisemoji = 1;
         }
 
 
@@ -156,9 +150,8 @@ export default function App() {
             name: entryname,
             storydescription: storydescription,
             educationaldescription: educationaldescription,
-            imageissvg: imageissvg,
+            imageisemoji: imageisemoji,
             imageref: imageref,
-            iconcolour: iconcolour,
             iconbackground: iconbackground,
             categoryid: categoryid,
             purchaseprice: 99,
@@ -593,9 +586,9 @@ export default function App() {
                 isitemvisible(item) == 1 ? (
                   <div key = {item.uniquekey} style = {{flex: '0 calc(94% / 5)', display: 'flex', flexDirection: 'column', borderRadius: '16px', backgroundColor: 'rgb(26, 26, 42)', overflow: 'hidden', opacity: item.itemused == 1 ? 0.5 : 1}}>
                     <div style = {{position: 'relative', aspectRatio: '2 / 1', width: '100%', overflow: 'hidden'}}>
-                      {item.imageissvg == 1 ? (
-                        <div style = {{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', backgroundColor: item.iconbackground, color: item.iconcolour}}>
-                          <AssetSvg name = {resolveSvgAssetName(item.imageref)} width = {48} height = {48}/>
+                      {item.imageisemoji == 1 ? (
+                        <div style = {{display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', backgroundColor: item.iconbackground}}>
+                          <div style = {{color: 'rgb(227, 224, 247)', fontSize: '48px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>{item.imageref}</div>
                         </div>
                       ) : (
                         <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5%', width: '100%', height: '100%', backgroundColor: 'rgb(26, 26, 42)'}}></div>
