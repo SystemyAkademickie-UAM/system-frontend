@@ -1,11 +1,12 @@
 import {useState, useEffect} from 'react';
-import {useParams} from 'react-router-dom';
+import {useParams, useSearchParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import {InfoTooltip, useToast} from '../../../components/ui/index.js';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
 import {Divider} from '../../../components/ui';
+import { fetchGroupShopItem } from '../../../services/shop.api.js';
 
 import arrowcirclelefticon from '../../../../public/assets/icons/arrow-circle-left-svgrepo-com.svg';
 import arrowcirclerighticon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
@@ -29,6 +30,11 @@ export default function App() {
   const {showSuccess, showError} = useToast();
 
   const {groupId} = useParams();
+  const [searchParams] = useSearchParams();
+  const editItemId = searchParams.get('itemId');
+  const isEditMode = Boolean(editItemId);
+  const [isLoadingItem, setIsLoadingItem] = useState(false);
+  const [itemLoaded, setItemLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const [itemicons, setItemicons] = useState([]);
@@ -1072,7 +1078,83 @@ export default function App() {
 
   function goback() {
     window.location.href = '/groups/' + groupId + '/shop';
-    showSuccess('Anulowano tworzenie przedmiotu.');
+    showSuccess(isEditMode ? 'Anulowano edycję produktu.' : 'Anulowano tworzenie przedmiotu.');
+  }
+
+
+
+  function parseImageRef(imageRef) {
+    if (!imageRef || typeof imageRef !== 'string') {
+      return { filename: '', color: 'rgb(255,255,255)', background: 'rgb(40,40,52)' };
+    }
+
+    const parts = imageRef.split('*');
+    return {
+      filename: parts[0] || '',
+      color: parts[1] || 'rgb(255,255,255)',
+      background: parts[2] || 'rgb(40,40,52)',
+    };
+  }
+
+
+
+  async function loadItemForEdit() {
+    if (!groupId || !editItemId || itemLoaded) {
+      return;
+    }
+
+    setIsLoadingItem(true);
+
+    const result = await fetchGroupShopItem(groupId, editItemId);
+
+    setIsLoadingItem(false);
+
+    if (!result.ok || !result.item) {
+      showError(result.error || 'Nie udalo sie wczytac produktu.');
+      return;
+    }
+
+    const item = result.item;
+
+    setItemname(item.name || '');
+    setDescription0(item.storyDescription || '');
+    setDescription1(item.didacticDescription || '');
+    setCost(String(item.priceAmount ?? ''));
+
+    if (item.stockQuantity !== null && item.stockQuantity !== undefined) {
+      setGrouplimitenabled(1);
+      setGrouplimit(String(item.stockQuantity));
+    } else {
+      setGrouplimitenabled(0);
+      setGrouplimit('');
+    }
+
+    if (item.perStudentLimit !== null && item.perStudentLimit !== undefined) {
+      setStudentlimitenabled(1);
+      setStudentlimit(String(item.perStudentLimit));
+    } else {
+      setStudentlimitenabled(0);
+      setStudentlimit('');
+    }
+
+    if (item.imageRef) {
+      const { filename, color, background } = parseImageRef(item.imageRef);
+      setIconcolour(color);
+      setIconbackground(background);
+
+      const iconIndex = itemicons.findIndex((icon) => icon.ref === ('backend:' + filename));
+
+      if (iconIndex >= 0) {
+        setCurrenticonindex(iconIndex);
+      }
+    }
+
+    setCategories((current) => current.map((category) => ({
+      ...category,
+      checked: item.categoryId != null && category.id === item.categoryId ? 1 : 0,
+    })));
+
+    setItemLoaded(true);
   }
 
 
@@ -1111,7 +1193,9 @@ export default function App() {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/groups/' + groupId + '/shop-items';
+      const url = isEditMode
+        ? base + '/groups/' + groupId + '/shop-items/' + editItemId
+        : base + '/groups/' + groupId + '/shop-items';
 
       let currentcurrenticonindex = geticonindex(currenticonindex);
 
@@ -1157,7 +1241,7 @@ export default function App() {
       }
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: isEditMode ? 'PATCH' : 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
@@ -1168,7 +1252,7 @@ export default function App() {
 
       const responsetext = await response.text();
 
-      console.log('POST /groups/' + groupId + '/shop-items: ', response.status);
+      console.log((isEditMode ? 'PATCH' : 'POST') + ' /groups/' + groupId + '/shop-items: ', response.status);
       console.log('POST /groups/' + groupId + '/shop-items: ', responsetext);
 
       let data;
@@ -1182,11 +1266,11 @@ export default function App() {
       console.log('POST /groups/' + groupId + '/shop-items JSON:', data);
 
       if (!response.ok) {
-        showError('Nie udalo sie utworzyc przedmiotu.');
+        showError(isEditMode ? 'Nie udalo sie zapisac produktu.' : 'Nie udalo sie utworzyc przedmiotu.');
         return;
       }
 
-      showSuccess('Przedmiot został utworzony!');
+      showSuccess(isEditMode ? 'Produkt został zaktualizowany!' : 'Przedmiot został utworzony!');
       window.location.href = '/groups/' + groupId + '/shop';
 
     } catch (error) {
@@ -1216,6 +1300,18 @@ export default function App() {
     onfetchbadges();
 
   }, []);
+
+
+
+  useEffect(() => {
+
+    if (!editItemId || itemLoaded || itemicons.length === 0) {
+      return;
+    }
+
+    loadItemForEdit();
+
+  }, [editItemId, itemicons.length, categories.length, itemLoaded]);
 
 
   let currenticon = geticonatindex(currenticonindex);
@@ -1422,7 +1518,7 @@ export default function App() {
 
               <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
                 <div onClick = {() => goback()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '15%', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij</div>
-                <div onClick = {() => createitem()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '20%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Stwórz przedmiot</div>
+                <div onClick = {() => createitem()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '20%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>{isEditMode ? 'Zapisz zmiany' : 'Stwórz przedmiot'}</div>
               </div>
 
             </div>

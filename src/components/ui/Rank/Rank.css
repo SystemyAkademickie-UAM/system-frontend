@@ -123,9 +123,25 @@
   color: #bbcbb9;
 }
 
+.maq-rank__shop-item--discount {
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(30, 204, 56, 0.12);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
 .maq-rank__check-icon {
   flex-shrink: 0;
   color: var(--rank-check-color, var(--color-accent));
+}
+
+.maq-rank__check-icon--discount {
+  color: var(--color-accent);
+}
+
+.maq-rank__text--shop-extra {
+  margin-top: 0.25rem;
 }
 
 .maq-rank--locked {

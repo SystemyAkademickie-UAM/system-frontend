@@ -325,10 +325,13 @@ export async function seedGroupData({
 
   if (seedRanks) {
     log('— Rangi —');
+    /** @type {number[]} */
+    const seededDiscounts = [];
     for (let index = 0; index < count; index += 1) {
       const title = pickRandom(RANK_TITLES);
       const name = `${title} ${uniqueLabel('Ranga')}`;
       const requiredPoints = (index + 1) * randomInt(80, 120);
+      const discount = 5 + seededDiscounts.reduce((max, value) => Math.max(max, value), 0);
 
       const { ok, status, data } = await postJson(`${baseUrl}${getGroupRanksPath(publicGroupId)}`, {
         name,
@@ -336,6 +339,7 @@ export async function seedGroupData({
         requiredPoints,
         storyDescription: `Opowieść rangi „${name}” — kamień milowy na ścieżce rozwoju.`,
         storeDiscount: randomInt(0, 15),
+        discount,
         uniqueStoreItems: [
           pickRandom(STORE_ITEMS),
           pickRandom(STORE_ITEMS),
@@ -348,7 +352,8 @@ export async function seedGroupData({
 
       if (ok && Number.isFinite(rankId) && rankId > 0) {
         summary.ranks.push(rankId);
-        log(`✓ ${name} → rankId=${rankId} (${requiredPoints} pkt)`);
+        seededDiscounts.push(discount);
+        log(`✓ ${name} → rankId=${rankId} (${requiredPoints} pkt, zniżka ${discount}%)`);
       } else {
         const message = `Ranga ${index + 1} nieudana (HTTP ${status}): ${JSON.stringify(data)}`;
         summary.errors.push(message);

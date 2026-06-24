@@ -9,6 +9,7 @@ import { getJson, postJson, patchJson, deleteJson } from './api-client.js';
  * @property {number} requiredPoints
  * @property {string | null} storyDescription
  * @property {number | null} storeDiscount
+ * @property {number | null} discount — zniżka procentowa w sklepie (0–100)
  * @property {string[] | null} uniqueStoreItems
  */
 

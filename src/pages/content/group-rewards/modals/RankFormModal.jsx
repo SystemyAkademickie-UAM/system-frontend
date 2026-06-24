@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
 import IconPicker from '../../../../components/ui/IconPicker/IconPicker.jsx';
 import { fetchIconCatalog } from '../../../../services/icons.api.js';
-import { validateWholeNumberInput } from '../shared/rewardsNumericValidation.js';
+import { calculateDefaultRankDiscount } from '../shared/rankDiscountUtils.js';
+import { validateDiscountPercentInput, validateWholeNumberInput } from '../shared/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
 function formatShopItems(items) {
@@ -19,6 +20,7 @@ const EMPTY_FORM = {
   name: '',
   iconFile: '',
   costAmount: '',
+  discount: '',
   storyDescription: '',
   shopItems: '',
 };
@@ -26,6 +28,7 @@ const EMPTY_FORM = {
 export default function RankFormModal({
   isOpen,
   rank,
+  existingRanks = [],
   onClose,
   onConfirm,
 }) {
@@ -51,18 +54,27 @@ export default function RankFormModal({
         name: rank.name,
         iconFile: rank.iconFile,
         costAmount: String(rank.costAmount),
+        discount: rank.discount === 0 || rank.discount ? String(rank.discount) : '',
         storyDescription: rank.storyDescription,
         shopItems: formatShopItems(rank.shopItems),
       });
       return;
     }
 
-    setForm(EMPTY_FORM);
-  }, [isOpen, rank]);
+    setForm({
+      ...EMPTY_FORM,
+      discount: String(calculateDefaultRankDiscount(existingRanks)),
+    });
+  }, [isOpen, rank, existingRanks]);
 
   const costValidation = useMemo(
     () => validateWholeNumberInput(form.costAmount),
     [form.costAmount],
+  );
+
+  const discountValidation = useMemo(
+    () => validateDiscountPercentInput(form.discount),
+    [form.discount],
   );
 
   const isValid = useMemo(() => (
@@ -70,9 +82,11 @@ export default function RankFormModal({
     && form.iconFile.trim()
     && form.storyDescription.trim()
     && costValidation.valid
-  ), [form, costValidation.valid]);
+    && discountValidation.valid
+  ), [form, costValidation.valid, discountValidation.valid]);
 
   const showCostError = form.costAmount.trim() !== '' && !costValidation.valid;
+  const showDiscountError = form.discount.trim() !== '' && !discountValidation.valid;
 
   const handleChange = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
@@ -85,6 +99,7 @@ export default function RankFormModal({
       name: form.name.trim(),
       iconFile: form.iconFile.trim(),
       costAmount: costValidation.value,
+      discount: discountValidation.value,
       storyDescription: form.storyDescription.trim(),
       shopItems: parseShopItems(form.shopItems),
     });
@@ -141,6 +156,32 @@ export default function RankFormModal({
           {showCostError ? (
             <p id="rank-cost-error" className="rewards-modal__field-error" role="alert">
               {costValidation.error}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="rewards-modal__field">
+          <label htmlFor="rank-discount" className="rewards-modal__label">Zniżka w sklepie (%)</label>
+          <input
+            id="rank-discount"
+            type="text"
+            inputMode="decimal"
+            className={[
+              'rewards-modal__input',
+              showDiscountError ? 'rewards-modal__input--error' : '',
+            ].filter(Boolean).join(' ')}
+            value={form.discount}
+            onChange={handleChange('discount')}
+            placeholder="np. 15"
+            aria-invalid={showDiscountError}
+            aria-describedby={showDiscountError ? 'rank-discount-error' : 'rank-discount-hint'}
+          />
+          <p id="rank-discount-hint" className="rewards-modal__field-hint">
+            Domyślnie: 5% + zniżka najwyższej rangi. Możesz wyczyścić pole.
+          </p>
+          {showDiscountError ? (
+            <p id="rank-discount-error" className="rewards-modal__field-error" role="alert">
+              {discountValidation.error}
             </p>
           ) : null}
         </div>

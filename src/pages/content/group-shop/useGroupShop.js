@@ -170,8 +170,10 @@ export function useGroupShopCart(groupId, items = []) {
 
 /**
  * @param {string | number | null | undefined} groupId
+ * @param {{ pollIntervalMs?: number }} [options]
  */
-export function useGroupShopOpen(groupId) {
+export function useGroupShopOpen(groupId, options = {}) {
+  const { pollIntervalMs = 0 } = options;
   const [isShopOpen, setIsShopOpenState] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -193,6 +195,31 @@ export function useGroupShopOpen(groupId) {
   useEffect(() => {
     refetch();
   }, [refetch]);
+
+  useEffect(() => {
+    if (!pollIntervalMs || !groupId) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      refetch();
+    }, pollIntervalMs);
+
+    const refreshOnVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refetch();
+      }
+    };
+
+    window.addEventListener('focus', refreshOnVisible);
+    document.addEventListener('visibilitychange', refreshOnVisible);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', refreshOnVisible);
+      document.removeEventListener('visibilitychange', refreshOnVisible);
+    };
+  }, [pollIntervalMs, groupId, refetch]);
 
   const toggleShopOpen = useCallback(async () => {
     if (!groupId) {

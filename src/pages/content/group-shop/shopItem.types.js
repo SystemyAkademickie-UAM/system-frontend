@@ -11,6 +11,8 @@
  * @property {number | null} [categoryId]
  * @property {number | null} [stockQuantity]
  * @property {number | null} [perStudentLimit]
+ * @property {string | null} [imageRef]
+ * @property {boolean} [isPublished]
  * @property {boolean} [isExtraLife]
  */
 

@@ -4,6 +4,10 @@ import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
+import {
+  GROUP_INVENTORY_INVALIDATED,
+  subscribeGroupScopedEvent,
+} from '../../../services/studentProfileEvents.js';
 
 export default function App() {
 
@@ -542,6 +546,18 @@ export default function App() {
   useEffect(() => {
     onfetchinventory();
   }, []);
+
+  useEffect(() => {
+    if (!groupId) {
+      return undefined;
+    }
+
+    return subscribeGroupScopedEvent(GROUP_INVENTORY_INVALIDATED, (eventGroupId) => {
+      if (eventGroupId === String(groupId)) {
+        onfetchinventory();
+      }
+    });
+  }, [groupId]);
 
 
 

@@ -19,7 +19,10 @@ import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { groupShopAddPath } from '../../../routes/pathRegistry.js';
-import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.js';
+import {
+  invalidateGroupInventory,
+  invalidateStudentProfile,
+} from '../../../services/studentProfileEvents.js';
 import { resolveShopCategoryLabels } from './shopCategories.js';
 import { getShopItemEffectivePrice } from './shopPricing.js';
 import { EXTRA_LIFE_PRODUCT, EXTRA_LIFE_PRODUCT_ID } from './shopExtraLife.js';
@@ -46,6 +49,7 @@ import '../group-members/MembersHomeContent.css';
 import './GroupShopContent.css';
 
 const ITEMS_PER_PAGE = 10;
+const STUDENT_SHOP_OPEN_POLL_MS = 15000;
 
 export default function GroupShopContent() {
   const { groupId } = useParams();
@@ -66,6 +70,14 @@ export default function GroupShopContent() {
     deleteItem,
     buyItem,
   } = useGroupShopItems(groupId);
+
+  const catalogItems = useMemo(() => {
+    if (!isStudentView) {
+      return items;
+    }
+    return items.filter((item) => item.isPublished !== false);
+  }, [items, isStudentView]);
+
   const {
     cartItems,
     cartCount,
@@ -74,9 +86,12 @@ export default function GroupShopContent() {
     addToCart,
     removeFromCart,
     clearCart,
-  } = useGroupShopCart(groupId, items);
-  const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
+  } = useGroupShopCart(groupId, catalogItems);
+  const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId, {
+    pollIntervalMs: isStudentView ? STUDENT_SHOP_OPEN_POLL_MS : 0,
+  });
   const { livesBlocked, toggleLivesBlocked, unblockLives } = useGroupShopLives(groupId);
+  const livesBlockedForView = isLecturerView ? livesBlocked : false;
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -89,9 +104,9 @@ export default function GroupShopContent() {
   const closeModal = useCallback(() => setActiveModal(null), []);
 
   const visibleItems = useMemo(() => {
-    const filtered = filterShopItems(items, { searchQuery, categoryFilter });
+    const filtered = filterShopItems(catalogItems, { searchQuery, categoryFilter });
     return sortShopItems(filtered, sortBy);
-  }, [items, searchQuery, categoryFilter, sortBy]);
+  }, [catalogItems, searchQuery, categoryFilter, sortBy]);
 
   const pagination = useMemo(
     () => paginateShopItems(visibleItems, page, ITEMS_PER_PAGE),
@@ -108,13 +123,36 @@ export default function GroupShopContent() {
     }
   }, [page, pagination.totalPages]);
 
-  const shopInteractionDisabled = !isShopOpen || livesBlocked;
+  useEffect(() => {
+    if (!isStudentView || !groupId) {
+      return undefined;
+    }
+
+    const refreshCatalog = () => {
+      if (document.visibilityState === 'visible') {
+        refetch();
+      }
+    };
+
+    const intervalId = window.setInterval(refreshCatalog, STUDENT_SHOP_OPEN_POLL_MS);
+    window.addEventListener('focus', refreshCatalog);
+    document.addEventListener('visibilitychange', refreshCatalog);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', refreshCatalog);
+      document.removeEventListener('visibilitychange', refreshCatalog);
+    };
+  }, [isStudentView, groupId, refetch]);
+
+  const shopInteractionDisabled = !isShopOpen || livesBlockedForView;
   const purchaseDisabled = shopInteractionDisabled || isLecturerView;
 
   const refreshAfterPurchase = useCallback(async () => {
     await refetch();
     if (isStudentView && groupId) {
-      await fetchGroupStudentProfile(groupId);
+      invalidateStudentProfile(groupId);
+      invalidateGroupInventory(groupId);
     }
   }, [refetch, isStudentView, groupId]);
 
@@ -211,16 +249,18 @@ export default function GroupShopContent() {
         />
       </div>
       <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
-        <Button
-          type="button"
-          variant="ghost"
-          size="md"
-          onClick={toggleLivesBlocked}
-          aria-pressed={livesBlocked}
-          className="group-shop__lives-toggle"
-        >
-          System żyć{livesBlocked ? ' (zablokowany)' : ''}
-        </Button>
+        <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="md"
+            onClick={toggleLivesBlocked}
+            aria-pressed={livesBlocked}
+            className="group-shop__lives-toggle"
+          >
+            System żyć{livesBlocked ? ' (zablokowany)' : ''}
+          </Button>
+        </RoleVisibility>
 
         <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
           <div className="group-shop__lecturer-actions">
@@ -318,7 +358,7 @@ export default function GroupShopContent() {
       >
         <ShopClosedOverlay
           isClosed={!isShopOpen}
-          isGameOver={isShopOpen && livesBlocked}
+          isGameOver={isShopOpen && livesBlockedForView}
           extraLifeProduct={EXTRA_LIFE_PRODUCT}
           onExtraLifeBuy={() => setActiveModal({ type: 'buy', item: EXTRA_LIFE_PRODUCT })}
         />
@@ -326,9 +366,11 @@ export default function GroupShopContent() {
         <div className="group-shop__catalog-surface">
           {isLoading ? (
             <p className="group-shop__empty page-unavailable__notice" role="status">Ładowanie produktów sklepu…</p>
-          ) : items.length === 0 ? (
+          ) : catalogItems.length === 0 ? (
             <p className="group-shop__empty page-unavailable__notice" role="status">
-              W sklepie nie ma jeszcze żadnych produktów.
+              {isStudentView
+                ? 'Sklep jest pusty — prowadzący nie dodał jeszcze żadnych produktów.'
+                : 'W sklepie nie ma jeszcze żadnych produktów.'}
               {isLecturerView ? (
                 <>
                   {' '}
@@ -360,7 +402,7 @@ export default function GroupShopContent() {
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
-                    onEdit={() => showToast({ message: 'Edycja produktu będzie dostępna w kolejnej wersji.' })}
+                    onEdit={() => navigate(`${groupShopAddPath(groupId)}?itemId=${encodeURIComponent(item.id)}`)}
                     onDelete={() => setActiveModal({ type: 'delete', item })}
                     className="group-shop__card"
                   />

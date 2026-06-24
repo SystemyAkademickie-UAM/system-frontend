@@ -66,6 +66,13 @@
   color: var(--color-input-error);
 }
 
+.rewards-modal__field-hint {
+  margin: 0;
+  font-size: var(--font-size-min);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
 .rewards-modal__row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

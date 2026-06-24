@@ -2,6 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 import { useAppRole } from '../context/AppRoleContext.jsx';
 import { fetchGroupStudentProfile, formatProfileNumber } from '../services/studentProfile.api.js';
+import {
+  STUDENT_PROFILE_INVALIDATED,
+  subscribeGroupScopedEvent,
+} from '../services/studentProfileEvents.js';
 import { useOptionalGroupId } from './useOptionalGroupId.js';
 
 /**
@@ -39,6 +43,18 @@ export function useStudentSuperBarStats() {
   useEffect(() => {
     loadStats();
   }, [loadStats]);
+
+  useEffect(() => {
+    if (role !== APP_ROLE.STUDENT || !groupId) {
+      return undefined;
+    }
+
+    return subscribeGroupScopedEvent(STUDENT_PROFILE_INVALIDATED, (eventGroupId) => {
+      if (eventGroupId === String(groupId)) {
+        loadStats();
+      }
+    });
+  }, [role, groupId, loadStats]);
 
   return {
     livesDisplay,
