@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
-import IconPicker from '../../../../components/ui/IconPicker/IconPicker.jsx';
-import { fetchIconCatalog } from '../../../../services/icons.api.js';
+import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import { DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { calculateDefaultRankDiscount } from '../../../../utils/ranks/rankDiscount.js';
 import { validateDiscountPercentInput, validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import RankUnlockItemChecklist from '../shared/RankUnlockItemChecklist.jsx';
@@ -9,7 +9,7 @@ import '../../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = {
   name: '',
-  iconFile: '',
+  icon: DEFAULT_RANK_EMOJI,
   costAmount: '',
   discount: '',
   storyDescription: '',
@@ -29,7 +29,6 @@ export default function RankFormModal({
   onConfirm,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
-  const [iconCatalog, setIconCatalog] = useState([]);
   const isEdit = Boolean(rank);
 
   const rankRefs = useMemo(
@@ -52,20 +51,10 @@ export default function RankFormModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    let cancelled = false;
-    fetchIconCatalog().then((catalog) => {
-      if (!cancelled) setIconCatalog(catalog);
-    });
-    return () => { cancelled = true; };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
     if (rank) {
       setForm({
         name: rank.name,
-        iconFile: rank.iconFile,
+        icon: rank.icon || rank.iconFile || DEFAULT_RANK_EMOJI,
         costAmount: String(rank.costAmount),
         discount: rank.discount === 0 || rank.discount ? String(rank.discount) : '',
         storyDescription: rank.storyDescription,
@@ -92,7 +81,7 @@ export default function RankFormModal({
 
   const isValid = useMemo(() => (
     form.name.trim()
-    && form.iconFile.trim()
+    && form.icon.trim()
     && form.storyDescription.trim()
     && costValidation.valid
     && discountValidation.valid
@@ -125,7 +114,8 @@ export default function RankFormModal({
 
     onConfirm?.({
       name: form.name.trim(),
-      iconFile: form.iconFile.trim(),
+      icon: form.icon.trim(),
+      iconFile: form.icon.trim(),
       costAmount: costValidation.value,
       discount: discountValidation.value,
       storyDescription: form.storyDescription.trim(),
@@ -155,15 +145,14 @@ export default function RankFormModal({
           />
         </div>
 
-        <div className="rewards-modal__field">
-          <label className="rewards-modal__label">Ikona</label>
-          <IconPicker
-            icons={iconCatalog}
-            value={form.iconFile}
-            onChange={(iconId) => setForm((prev) => ({ ...prev, iconFile: iconId }))}
-            name="rank-icon"
-          />
-        </div>
+        <EmojiPickerField
+          className="rewards-modal__field"
+          label="Ikona"
+          value={form.icon}
+          defaultEmoji={DEFAULT_RANK_EMOJI}
+          onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
+          ariaLabel="Wybierz emoji rangi"
+        />
 
         <div className="rewards-modal__field">
           <label htmlFor="rank-cost" className="rewards-modal__label">Koszt</label>

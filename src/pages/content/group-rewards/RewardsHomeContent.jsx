@@ -56,15 +56,15 @@ const RANK_COLUMNS = [
     render: () => '\u00A0',
   },
   {
-    key: 'iconFile',
+    key: 'icon',
     label: 'Ikona',
     sort: 'text',
     width: '140px',
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
     render: (rank) => (
-      rank.iconFile ? (
-        <AssetSvg name={rank.iconFile} className="rewards-table__icon-preview" width={28} height={28} alt="" />
+      rank.icon ? (
+        <span className="rewards-table__icon-emoji" aria-hidden="true">{rank.icon}</span>
       ) : (
         <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
       )
@@ -269,7 +269,7 @@ export default function RewardsHomeContent() {
 
   return (
     <SectionPageLayout
-      className="page-unavailable rewards-page"
+      className="page-unavailable rewards-page rewards-page--ranks"
       title={nav.sectionTitle}
       subNavItems={nav.items}
       subNavAriaLabel={nav.ariaLabel}
@@ -286,7 +286,7 @@ export default function RewardsHomeContent() {
               Dodaj rangę
             </Button>
           </div>
-          <div className="maq-section-page__toolbar-end rewards-page__toolbar-end">
+          <div className="maq-section-page__toolbar-end rewards-page__toolbar-end rewards-page__toolbar-end--ranks">
             <div className="rewards-ranks__members-toggle-wrap">
               <Button
                 type="button"
@@ -332,7 +332,6 @@ export default function RewardsHomeContent() {
             value: searchQuery,
             filter: (rank, query) => (
               rank.name.toLowerCase().includes(query)
-              || rank.iconFile.toLowerCase().includes(query)
               || rank.storyDescription.toLowerCase().includes(query)
               || String(rank.discount ?? '').includes(query)
               || resolveShopItemNames(rank.shopItems).some((item) => item.toLowerCase().includes(query))

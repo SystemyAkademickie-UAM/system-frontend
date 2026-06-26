@@ -290,17 +290,16 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
       ) : null}
 
       {groupId ? (
-        <div className="group-settings-form__footer">
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            onClick={persistGroupSettings}
-            disabled={isSaving || isLoadingGroup}
-          >
-            Zapisz zmiany
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="primary"
+          size="md"
+          className="group-settings-form__save-fab"
+          onClick={persistGroupSettings}
+          disabled={isSaving || isLoadingGroup}
+        >
+          Zapisz zmiany
+        </Button>
       ) : null}
 
       {popupclose ? (

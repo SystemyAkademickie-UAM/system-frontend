@@ -49,6 +49,11 @@
   color: var(--badge-icon-color);
 }
 
+.maq-badge__icon-emoji {
+  font-size: var(--size-badge-icon);
+  line-height: 1;
+}
+
 .maq-badge__icon-svg {
   width: var(--size-badge-icon);
   height: var(--size-badge-icon);

@@ -92,6 +92,28 @@ export async function patchJson(resourcePath, body, _options = {}) {
 }
 
 /**
+ * Sends a JSON PUT request to the given resource path.
+ * @param {string} resourcePath
+ * @param {Record<string, unknown>} body
+ * @param {object} [_options] - Unused, kept for backward compatibility
+ * @returns {Promise<{ ok: boolean, status: number, data: unknown }>}
+ */
+export async function putJson(resourcePath, body, _options = {}) {
+  const base = getApiBaseUrl();
+  const url = `${base}${resourcePath}`;
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(body),
+  });
+
+  const data = await parseResponseBody(response);
+  return { ok: response.ok, status: response.status, data };
+}
+
+/**
  * Sends a DELETE request to the given resource path.
  * @param {string} resourcePath
  * @param {object} [_options] - Unused, kept for backward compatibility

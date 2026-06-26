@@ -1,4 +1,5 @@
 import { BADGE_RARITY } from '../../../components/ui/Badge/badgeRarity.js';
+import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
 /** Kolejność jakości od najniższej do najwyższej. */
 export const BADGE_RARITY_ORDER = {
@@ -72,13 +73,15 @@ export const STUDENT_SORT_OPTIONS = [
 export function mapBadgeForTreasury(badge, index, earnedBadgeIds = null) {
   const dbId = badge.id;
   const isUnlocked = earnedBadgeIds ? earnedBadgeIds.has(dbId) : true;
+  const icon = normalizeRankBadgeIcon(badge.icon, DEFAULT_BADGE_EMOJI);
 
   return {
     id: `badge-${dbId}`,
     dbId,
     position: index + 1,
     name: badge.name || 'Nieznana odznaka',
-    iconFile: badge.icon ? `backend:${badge.icon}` : '🏅',
+    icon,
+    iconFile: icon,
     rarity: badge.rarity || BADGE_RARITY.common,
     storyDescription: badge.storyDescription || '',
     didacticDescription: badge.educationalDescription || '',

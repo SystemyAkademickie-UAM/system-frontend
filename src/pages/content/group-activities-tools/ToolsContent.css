@@ -42,8 +42,13 @@
   outline-offset: 2px;
 }
 
-.activities-tools-page__tool-btn:hover {
+.activities-tools-page__tool-btn:hover:not(:disabled) {
   color: var(--color-accent);
+}
+
+.activities-tools-page__tool-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .activities-tools-page__checkbox-row {

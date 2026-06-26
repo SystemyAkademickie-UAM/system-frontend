@@ -140,7 +140,11 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
         <button
           key={item.id}
           type="button"
-          className="data-table__action-btn data-table__action-btn--inline"
+          className={[
+            'data-table__action-btn',
+            'data-table__action-btn--inline',
+            item.className,
+          ].filter(Boolean).join(' ')}
           aria-label={item.ariaLabel ?? item.label}
           title={item.label}
           onClick={() => item.onSelect?.(row)}
@@ -148,8 +152,9 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
           {item.iconFile ? (
             <AssetSvg
               name={item.iconFile}
-              width={INLINE_ACTION_ICON_SIZE}
-              height={INLINE_ACTION_ICON_SIZE}
+              className={item.iconClassName}
+              width={item.iconSize ?? INLINE_ACTION_ICON_SIZE}
+              height={item.iconSize ?? INLINE_ACTION_ICON_SIZE}
               alt=""
             />
           ) : (

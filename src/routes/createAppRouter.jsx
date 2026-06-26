@@ -19,6 +19,11 @@ import SettingsPage from '../pages/links/app/SettingsPage.jsx';
 import StatisticsPage from '../pages/links/app/StatisticsPage.jsx';
 import UserManagementPage from '../pages/links/app/UserManagementPage.jsx';
 
+// Templates gallery - lecturer only
+import TemplatesLayout from '../pages/links/templates/TemplatesLayout.jsx';
+import TemplatesMyPage from '../pages/links/templates/TemplatesMyPage.jsx';
+import TemplatesGalleryPage from '../pages/links/templates/TemplatesGalleryPage.jsx';
+
 // Groups list
 import GroupsListPage from '../pages/links/groups/groups-list/GroupsListPage.jsx';
 import GroupJoinPage from '../pages/links/groups/GroupJoinPage.jsx';
@@ -71,7 +76,7 @@ import GroupSettingsHealthPage from '../pages/links/groups/group-settings/GroupS
 // Shop (Sklep) - student + lecturer
 import ShopLayout from '../pages/links/groups/shop/ShopLayout.jsx';
 import ShopHomePage from '../pages/links/groups/shop/ShopHomePage.jsx';
-import ShopAddPage from '../pages/links/groups/shop/ShopAddPage.jsx';
+import ShopAddRedirect from '../pages/links/groups/shop/ShopAddRedirect.jsx';
 
 // Ranking - student + lecturer
 import RankingLayout from '../pages/links/groups/layouts/RankingLayout.jsx';
@@ -150,6 +155,15 @@ const appRouteTree = [
           { path: 'courseManagement', element: withGuard(<CourseManagementPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
           { path: 'statistics', element: withGuard(<StatisticsPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
           { path: 'organizations', element: withGuard(<OrganizationManagementPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
+
+          {
+            path: 'templates',
+            element: withGuard(<TemplatesLayout />, { allowedRoles: LECTURER_ONLY }),
+            children: [
+              { index: true, element: <TemplatesMyPage /> },
+              { path: 'gallery', element: <TemplatesGalleryPage /> },
+            ],
+          },
 
           // ========================================
           // GROUPS
@@ -254,7 +268,8 @@ const appRouteTree = [
                     children: [
                       { index: true, element: <RewardsBadgesPage /> },
                       { path: 'ranks', element: <RewardsHomePage /> },
-                      { path: 'shopitems', element: <ShopItemsPage /> },
+                      { path: 'shop-items', element: <ShopItemsPage /> },
+                      { path: 'shopitems', element: <Navigate to="shop-items" replace /> },
                     ],
                   },
 
@@ -262,7 +277,7 @@ const appRouteTree = [
                   // GROUP SETTINGS (Ustawienia grupy) - lecturer only
                   // ----------------------------------------
                   {
-                    path: 'groupsettings',
+                    path: 'group-settings',
                     element: withGuard(<GroupSettingsLayout />, { allowedRoles: LECTURER_ONLY }),
                     children: [
                       { index: true, element: <GroupSettingsHomePage /> },
@@ -276,14 +291,14 @@ const appRouteTree = [
                   // ----------------------------------------
                   {
                     path: 'shop',
-                    element: withGuard(<ShopLayout />, { allowedRoles: STUDENT_ONLY }),
+                    element: withGuard(<ShopLayout />),
                     children: [
                       { index: true, element: <ShopHomePage /> },
                     ],
                   },
                   {
                     path: 'shop/add',
-                    element: withGuard(<ShopAddPage />, { allowedRoles: LECTURER_ONLY }),
+                    element: withGuard(<ShopAddRedirect />, { allowedRoles: LECTURER_ONLY }),
                   },
 
                   // ----------------------------------------

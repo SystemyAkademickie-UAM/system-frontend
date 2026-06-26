@@ -9,6 +9,8 @@ import {
   groupsListPath,
   organizationsPath,
   statisticsPath,
+  templatesGalleryPath,
+  templatesPath,
   userManagementPath,
 } from '../routes/pathRegistry.js';
 
@@ -28,6 +30,9 @@ export const BREADCRUMB_BY_PATH = {
   [courseManagementPath()]: [{ label: 'Zarządzanie grupami' }],
   [statisticsPath()]: [{ label: 'Statystyki' }],
   [organizationsPath()]: [{ label: 'Zarządzanie organizacjami' }],
+
+  [templatesPath()]: [{ label: 'Szablony' }, { label: 'Moje szablony' }],
+  [templatesGalleryPath()]: [{ label: 'Szablony' }, { label: 'Galeria szablonów' }],
 };
 
 /** Ścieżki grupowe — dopasowanie po regex (kolejność ma znaczenie). */
@@ -109,7 +114,7 @@ export const GROUP_BREADCRUMB_RULES = [
     segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Rangi' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/rewards\/shopitems\/?$/u,
+    pattern: /^\/groups\/[^/]+\/rewards\/shop-items\/?$/u,
     segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Sklep' }],
   },
   {
@@ -117,15 +122,15 @@ export const GROUP_BREADCRUMB_RULES = [
     segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Odznaki' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/groupsettings\/currency\/?$/u,
+    pattern: /^\/groups\/[^/]+\/group-settings\/currency\/?$/u,
     segments: [{ label: 'Ustawienia grupy', path: groupSettingsPath }, { label: 'Waluta' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/groupsettings\/lives\/?$/u,
+    pattern: /^\/groups\/[^/]+\/group-settings\/lives\/?$/u,
     segments: [{ label: 'Ustawienia grupy', path: groupSettingsPath }, { label: 'System żyć' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/groupsettings\/?$/u,
+    pattern: /^\/groups\/[^/]+\/group-settings\/?$/u,
     segments: [{ label: 'Ustawienia grupy' }],
   },
   {

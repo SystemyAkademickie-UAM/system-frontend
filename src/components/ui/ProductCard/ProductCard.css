@@ -1,6 +1,7 @@
 .maq-product-card {
   --product-card-accent-color: var(--color-product-card-accent, #b45309);
 
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -302,6 +303,14 @@
 }
 
 
+
+.maq-product-card__price-row--rank {
+  align-items: center;
+}
+
+.maq-product-card__price-tooltip {
+  flex-shrink: 0;
+}
 
 .maq-product-card__price-value {
 

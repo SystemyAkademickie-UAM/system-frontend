@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { isNodeProduction } from '../../../utils/nodeEnv.js';
 import { seedTemporaryShopItems } from '../group-shop/temporarySeedShopItems.js';
 import { seedGroupData } from './temporarySeedGroupData.js';
+import { seedTemporaryGroupTemplates } from './temporarySeedGroupTemplates.js';
 import './TemporaryDevSeedPanel.css';
 
 const SEED_COUNT = 10;
@@ -37,6 +38,17 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
     try {
       if (options.seedShopItems) {
         await seedTemporaryShopItems({
+          groupId,
+          count: SEED_COUNT,
+          onLog: (line) => {
+            lines.push(line);
+            setLogText(lines.join('\n'));
+          },
+        });
+      }
+
+      if (options.seedTemplates) {
+        await seedTemporaryGroupTemplates({
           groupId,
           count: SEED_COUNT,
           onLog: (line) => {
@@ -145,6 +157,14 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
           onClick={() => runSeed({ seedShopItems: true })}
         >
           Produkty sklepu
+        </button>
+        <button
+          type="button"
+          className="temporary-dev-seed__btn"
+          disabled={isBusy}
+          onClick={() => runSeed({ seedTemplates: true })}
+        >
+          Szablony grup
         </button>
       </div>
 

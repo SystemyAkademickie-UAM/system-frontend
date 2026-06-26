@@ -57,6 +57,11 @@ export function groupRootPath(groupId) {
   return `/groups/${groupId}`;
 }
 
+/** Czy ścieżka to ekran dołączania do grupy (wpisanie kodu) — bez podstron. */
+export function isGroupJoinPath(pathname) {
+  return /^\/groups\/[^/]+\/?$/.test(pathname);
+}
+
 // ============================================================================
 // GROUP HOME (Strona główna) - student + lecturer
 // ============================================================================
@@ -175,28 +180,28 @@ export function groupRewardsRanksPath(groupId) {
   return `/groups/${groupId}/rewards/ranks`;
 }
 
-/** Przedmioty sklepowe — `/groups/:groupId/rewards/shopitems`. */
+/** Przedmioty sklepowe — `/groups/:groupId/rewards/shop-items`. */
 export function groupShopItemsPath(groupId) {
-  return `/groups/${groupId}/rewards/shopitems`;
+  return `/groups/${groupId}/rewards/shop-items`;
 }
 
 // ============================================================================
 // GROUP SETTINGS (Ustawienia grupy) - lecturer only
 // ============================================================================
 
-/** Ustawienia grupy / Kreator — `/groups/:groupId/groupsettings`. */
+/** Ustawienia grupy / Kreator — `/groups/:groupId/group-settings`. */
 export function groupSettingsPath(groupId) {
-  return `/groups/${groupId}/groupsettings`;
+  return `/groups/${groupId}/group-settings`;
 }
 
-/** Waluta — `/groups/:groupId/groupsettings/currency`. */
+/** Waluta — `/groups/:groupId/group-settings/currency`. */
 export function groupSettingsCurrencyPath(groupId) {
-  return `/groups/${groupId}/groupsettings/currency`;
+  return `/groups/${groupId}/group-settings/currency`;
 }
 
-/** System żyć — `/groups/:groupId/groupsettings/lives`. */
+/** System żyć — `/groups/:groupId/group-settings/lives`. */
 export function groupSettingsHealthPath(groupId) {
-  return `/groups/${groupId}/groupsettings/lives`;
+  return `/groups/${groupId}/group-settings/lives`;
 }
 
 // ============================================================================
@@ -258,6 +263,16 @@ export function statisticsPath() {
 
 export function organizationsPath() {
   return '/organizations';
+}
+
+/** Galeria szablonów — `/templates`. */
+export function templatesPath() {
+  return '/templates';
+}
+
+/** Publiczna galeria szablonów — `/templates/gallery`. */
+export function templatesGalleryPath() {
+  return '/templates/gallery';
 }
 
 // ============================================================================

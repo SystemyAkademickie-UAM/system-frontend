@@ -5,7 +5,8 @@
  * @property {string} storyDescription
  * @property {string} didacticDescription
  * @property {number} priceAmount
- * @property {number} [salePriceAmount] — cena po zniżce (mniejsza od priceAmount)
+ * @property {number} [salePriceAmount] — cena końcowa po wszystkich zniżkach
+ * @property {number} [rankDiscountedPrice] — cena po zniżce rangi (bez odznak)
  * @property {string} [imageUrl]
  * @property {string[]} [categories]
  * @property {number | null} [categoryId]

@@ -175,9 +175,6 @@ export default function MembersHomeContent() {
             ) : (
               <span className="members-table__name">{member.name}</span>
             )}
-            {member.nickname && member.nickname !== member.name && (
-              <span className="members-table__nickname">({member.nickname})</span>
-            )}
           </div>
         </div>
       ),
@@ -254,9 +251,11 @@ export default function MembersHomeContent() {
     inlineActions: [
       {
         id: 'badges',
-        label: 'Edytuj odznaki',
+        label: 'Przydziel odznakę',
         iconFile: SVG_ICONS.nav.profileBadges,
-        ariaLabel: 'Edytuj odznaki uczestnika',
+        iconClassName: 'data-table__inline-icon--badge-award',
+        iconSize: 40,
+        ariaLabel: 'Przydziel odznakę uczestnikowi',
         onSelect: (member) => openModal('badges', member),
       },
       {
@@ -339,7 +338,10 @@ export default function MembersHomeContent() {
           search={{
             external: true,
             value: searchQuery,
-            filter: (member, query) => member.name.toLowerCase().includes(query),
+            filter: (member, query) => (
+              member.name.toLowerCase().includes(query)
+              || member.nickname?.toLowerCase().includes(query)
+            ),
           }}
           rowActions={rowActions}
           renderRow={MembersTableRow}

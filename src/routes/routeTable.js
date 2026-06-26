@@ -334,9 +334,9 @@ export const ROUTE_TABLE = [
     roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
-    id: 'group.rewards.shopitems',
+    id: 'group.rewards.shop-items',
     section: 'group',
-    pathPattern: '/groups/:groupId/rewards/shopitems',
+    pathPattern: '/groups/:groupId/rewards/shop-items',
     pageTitle: 'Systemy nagród — przedmioty sklepowe',
     pageModule: 'pages/links/groups/rewards/ShopItemsPage.jsx',
     contentModule: 'pages/content/group-rewards-shopitems/RewardsShopItemsContent.jsx',
@@ -344,12 +344,12 @@ export const ROUTE_TABLE = [
   },
 
   // ===========================================================================
-  // GROUP — Ustawienia grupy (/groupsettings) — lecturer
+  // GROUP — Ustawienia grupy (/group-settings) — lecturer
   // ===========================================================================
   {
     id: 'group.settings.home',
     section: 'group',
-    pathPattern: '/groups/:groupId/groupsettings',
+    pathPattern: '/groups/:groupId/group-settings',
     pageTitle: 'Ustawienia grupy — kreator',
     pageModule: 'pages/links/groups/group-settings/GroupSettingsHomePage.jsx',
     contentModule: 'pages/content/group-settings/GroupSettingsHomeContent.jsx',
@@ -358,7 +358,7 @@ export const ROUTE_TABLE = [
   {
     id: 'group.settings.currency',
     section: 'group',
-    pathPattern: '/groups/:groupId/groupsettings/currency',
+    pathPattern: '/groups/:groupId/group-settings/currency',
     pageTitle: 'Ustawienia grupy — waluta',
     pageModule: 'pages/links/groups/group-settings/GroupSettingsCurrencyPage.jsx',
     contentModule: 'pages/content/group-settings-currency/GroupSettingsCurrencyContent.jsx',
@@ -367,7 +367,7 @@ export const ROUTE_TABLE = [
   {
     id: 'group.settings.lives',
     section: 'group',
-    pathPattern: '/groups/:groupId/groupsettings/lives',
+    pathPattern: '/groups/:groupId/group-settings/lives',
     pageTitle: 'Ustawienia grupy — system żyć',
     pageModule: 'pages/links/groups/group-settings/GroupSettingsHealthPage.jsx',
     contentModule: 'pages/content/group-settings-health/GroupSettingsHealthContent.jsx',
@@ -393,6 +393,25 @@ export const ROUTE_TABLE = [
     pageTitle: 'Sklep — dodawanie przedmiotu',
     pageModule: 'pages/links/groups/shop/ShopAddPage.jsx',
     contentModule: 'pages/content/group-shop-add/GroupShopAddContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
+  },
+
+  {
+    id: 'app.templates.my',
+    section: 'app',
+    pathPattern: '/templates',
+    pageTitle: 'Szablony — moje szablony',
+    pageModule: 'pages/links/templates/TemplatesMyPage.jsx',
+    contentModule: 'pages/content/templates/TemplatesMyContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
+  },
+  {
+    id: 'app.templates.gallery',
+    section: 'app',
+    pathPattern: '/templates/gallery',
+    pageTitle: 'Szablony — galeria publiczna',
+    pageModule: 'pages/links/templates/TemplatesGalleryPage.jsx',
+    contentModule: 'pages/content/templates/TemplatesGalleryContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
   },
 

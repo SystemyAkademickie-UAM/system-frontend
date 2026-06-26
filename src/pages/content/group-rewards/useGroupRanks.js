@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
+import { formatStudentDisplayName } from '../../../utils/members/studentDisplayName.js';
 import { useParams } from 'react-router-dom';
 import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidation.js';
 import { fetchGroupRanks, createRank, updateRank, deleteRank } from '../../../services/ranks.api.js';
 import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/students.api.js';
 import { normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
+import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
 /**
  * @typedef {Object} RankData
@@ -27,19 +29,30 @@ import { normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js'
  * @param {number} index
  * @returns {RankData}
  */
+function mapRankDiscount(rank) {
+  if (rank.globalDiscountType === 'percent') {
+    return Number(rank.globalDiscountValue ?? 0);
+  }
+  if (rank.globalDiscountType === 'fixed') {
+    return Number(rank.globalDiscountValue ?? 0);
+  }
+  return Number(rank.discount ?? 0);
+}
+
 function mapRank(rank, index) {
+  const icon = normalizeRankBadgeIcon(rank.icon, DEFAULT_RANK_EMOJI);
   return {
     id: `rank-${rank.id}`,
     dbId: rank.id,
     position: index + 1,
     name: rank.name || 'Nieznana ranga',
-    icon: rank.icon || '⭐',
-    iconFile: rank.icon ? `backend:${rank.icon}` : '⭐',
+    icon,
+    iconFile: icon,
     costAmount: rank.requiredPoints || 0,
     storyDescription: rank.storyDescription || '',
     shopItems: (rank.uniqueStoreItems || []).map(normalizeShopItemId),
-    storeDiscount: rank.storeDiscount || 0,
-    discount: Number(rank.discount ?? 0),
+    storeDiscount: rank.globalDiscountValue ?? rank.storeDiscount ?? 0,
+    discount: mapRankDiscount(rank),
   };
 }
 
@@ -74,7 +87,7 @@ export function useGroupRanks() {
         id: `student-${s.accountId}`,
         accountId: s.accountId,
         enrollmentId: s.enrollmentId,
-        name: `${s.name} ${s.surname}`.trim() || s.nickname,
+        name: formatStudentDisplayName(s),
         rankId: s.rankId ? `rank-${s.rankId}` : null,
         dbRankId: s.rankId,
       })));
@@ -93,13 +106,12 @@ export function useGroupRanks() {
   const handleCreate = useCallback(async (values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
-    const iconVal = values.iconFile || '⭐';
+    const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_RANK_EMOJI);
     const result = await createRank(groupId, {
       name: values.name,
-      icon: iconVal.replace('backend:', ''),
+      icon,
       requiredPoints: values.costAmount || 0,
       storyDescription: values.storyDescription || '',
-      storeDiscount: values.storeDiscount || 0,
       discount: values.discount ?? 0,
       uniqueStoreItems: (values.shopItems || []).map(normalizeShopItemId),
     });
@@ -119,13 +131,12 @@ export function useGroupRanks() {
     const rank = ranks.find((r) => r.id === rankId);
     if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
 
-    const iconVal = values.iconFile || values.icon;
+    const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_RANK_EMOJI);
     const result = await updateRank(groupId, rank.dbId, {
       name: values.name,
-      icon: iconVal.replace('backend:', ''),
+      icon,
       requiredPoints: values.costAmount,
       storyDescription: values.storyDescription,
-      storeDiscount: values.storeDiscount,
       discount: values.discount ?? 0,
       uniqueStoreItems: (values.shopItems || []).map(normalizeShopItemId),
     });

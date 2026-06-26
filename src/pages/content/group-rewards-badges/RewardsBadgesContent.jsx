@@ -20,6 +20,7 @@ import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { getBadgeCssVars } from '../../../components/ui/Badge/badgeCssVars.js';
 import { useGroupBadges } from './useGroupBadges.js';
+import { getVisibilityStatusLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
 import RewardsBadgeTableRow from '../group-rewards/shared/RewardsBadgeTableRow.jsx';
 import '../group-rewards/shared/rewardsShared.css';
 import '../group-rewards/shared/rewardsTablePreview.css';
@@ -60,6 +61,25 @@ const BADGE_COLUMNS = [
     ),
   },
   {
+    key: 'visibility',
+    label: 'Widoczność',
+    sort: 'text',
+    width: '110px',
+    accessor: (badge) => getVisibilityStatusLabel(badge.isPublished),
+    render: (badge) => (
+      <span
+        className={[
+          'rewards-table__visibility',
+          badge.isPublished === false
+            ? 'rewards-table__visibility--hidden'
+            : 'rewards-table__visibility--public',
+        ].join(' ')}
+      >
+        {getVisibilityStatusLabel(badge.isPublished)}
+      </span>
+    ),
+  },
+  {
     key: '_spacer',
     label: '',
     sort: false,
@@ -69,15 +89,15 @@ const BADGE_COLUMNS = [
     render: () => '\u00A0',
   },
   {
-    key: 'iconFile',
+    key: 'icon',
     label: 'Ikona',
     sort: 'text',
     width: '140px',
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
     render: (badge) => (
-      badge.iconFile ? (
-        <AssetSvg name={badge.iconFile} className="rewards-table__icon-preview" width={28} height={28} alt="" />
+      badge.icon ? (
+        <span className="rewards-table__icon-emoji" aria-hidden="true">{badge.icon}</span>
       ) : (
         <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
       )
@@ -225,7 +245,7 @@ export default function RewardsBadgesContent() {
         id: 'give',
         label: 'Przydziel odznakę',
         iconFile: SVG_ICONS.actions.assign,
-        ariaLabel: 'Daj odznakę studentom',
+        ariaLabel: 'Przydziel odznakę studentom',
         onSelect: (badge) => openModal('give', badge),
       },
     ],
@@ -293,39 +313,24 @@ export default function RewardsBadgesContent() {
           <div className={[
             'maq-section-page__toolbar-end',
             'rewards-page__toolbar-end',
-          ].join(' ')}>
+            isTileView ? 'rewards-page__toolbar-end--stacked' : '',
+          ].filter(Boolean).join(' ')}>
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Szukaj odznaki…"
+              name="badge-catalog-search"
+              className="rewards-page__search"
+              aria-label="Szukaj odznaki"
+            />
             {isTileView ? (
-              <>
-                <CatalogSortSelect
-                  selectId="rewards-badges-sort"
-                  variant="toolbar"
-                  value={sortBy}
-                  onChange={setSortBy}
-                  options={LECTURER_SORT_OPTIONS}
-                />
-                <SearchBar
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Szukaj odznaki…"
-                  name="badge-catalog-search"
-                  className="rewards-page__search"
-                  aria-label="Szukaj odznaki"
-                />
+              <div className="rewards-page__toolbar-filters-row">
                 <CatalogFiltersToggle
                   expanded={filtersExpanded}
                   onToggle={() => setFiltersExpanded((expanded) => !expanded)}
                 />
-              </>
-            ) : (
-              <SearchBar
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Szukaj odznaki…"
-                name="badge-catalog-search"
-                className="rewards-page__search"
-                aria-label="Szukaj odznaki"
-              />
-            )}
+              </div>
+            ) : null}
           </div>
         </>
       )}
@@ -344,6 +349,12 @@ export default function RewardsBadgesContent() {
                 filters={RARITY_FILTERS}
                 activeId={rarityFilter}
                 onSelect={setRarityFilter}
+              />
+              <CatalogSortSelect
+                selectId="rewards-badges-sort"
+                value={sortBy}
+                onChange={setSortBy}
+                options={LECTURER_SORT_OPTIONS}
               />
             </CatalogFiltersPanel>
           ) : null}
@@ -370,7 +381,6 @@ export default function RewardsBadgesContent() {
             value: searchQuery,
             filter: (badge, query) => (
               badge.name.toLowerCase().includes(query)
-              || badge.iconFile.toLowerCase().includes(query)
               || badge.storyDescription.toLowerCase().includes(query)
               || badge.didacticDescription.toLowerCase().includes(query)
             ),

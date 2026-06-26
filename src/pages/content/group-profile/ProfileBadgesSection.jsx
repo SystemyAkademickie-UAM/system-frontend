@@ -1,4 +1,5 @@
 import { Badge } from '../../../components/ui/index.js';
+import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 import { useProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
 import './ProfileBadgesSection.css';
 
@@ -34,7 +35,7 @@ export default function ProfileBadgesSection() {
               storyDescription={badge.storyDescription || '—'}
               didacticDescription={badge.educationalDescription || '—'}
               rewardAmount={badge.rewardAmount ?? 0}
-              iconFile={badge.icon ? `backend:${badge.icon}` : '🏅'}
+              iconFile={normalizeRankBadgeIcon(badge.icon, DEFAULT_BADGE_EMOJI)}
               showEarnedAt={false}
               className="maq-badge--grid-fit"
             />

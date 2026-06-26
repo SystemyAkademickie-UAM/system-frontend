@@ -5,84 +5,81 @@ import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import Button from '../Button/Button.jsx';
 
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
+import InfoTooltip from '../InfoTooltip/InfoTooltip.jsx';
+import ProductCategoryStrip from '../ProductCategoryStrip/ProductCategoryStrip.jsx';
 
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 
 import { parseShopItemImageRef } from '../../../utils/shop/shopItemIcon.js';
 import { getShopItemAccentColor } from '../../../utils/shop/shopItemAccentColor.js';
+import { getShopItemPriceDisplay } from '../../../utils/shop/shopPricing.js';
 
 import './ProductCard.css';
 
 
 
-function ProductCardPrice({ priceAmount, salePriceAmount, priceEmoji, size = 'md' }) {
+function ProductCardPrice({
+  priceAmount,
+  salePriceAmount,
+  rankDiscountedPrice,
+  priceEmoji,
+  size = 'md',
+}) {
+  const display = getShopItemPriceDisplay({
+    priceAmount,
+    salePriceAmount,
+    rankDiscountedPrice,
+  });
 
-  const hasDiscount = typeof salePriceAmount === 'number'
-
-    && salePriceAmount >= 0
-
-    && salePriceAmount < priceAmount;
-
-
-
-  if (!hasDiscount) {
-
+  if (display.mode === 'badge') {
     return (
-
-      <CurrencyDisplay
-
-        amount={priceAmount}
-
-        symbol={priceEmoji}
-
-        size={size}
-
-        className="maq-product-card__price-value"
-
-      />
-
+      <div
+        className="maq-product-card__price-row"
+        aria-label={`Cena ${display.displayPrice}, poprzednio ${display.strikePrice}`}
+      >
+        <CurrencyDisplay
+          amount={display.strikePrice}
+          symbol={priceEmoji}
+          size={size}
+          className="maq-product-card__price-value maq-product-card__price-value--original"
+        />
+        <div className="maq-product-card__sale-tag">
+          <CurrencyDisplay
+            amount={display.displayPrice}
+            symbol={priceEmoji}
+            size="md"
+            className="maq-product-card__price-value maq-product-card__price-value--sale"
+          />
+        </div>
+      </div>
     );
-
   }
 
-
+  if (display.mode === 'rank') {
+    return (
+      <div className="maq-product-card__price-row maq-product-card__price-row--rank">
+        <CurrencyDisplay
+          amount={display.displayPrice}
+          symbol={priceEmoji}
+          size={size}
+          className="maq-product-card__price-value"
+        />
+        <InfoTooltip
+          text={`Cena katalogowa: ${display.tooltipBasePrice}`}
+          className="maq-product-card__price-tooltip"
+        />
+      </div>
+    );
+  }
 
   return (
-
-    <div className="maq-product-card__price-row" aria-label={`Cena ${salePriceAmount}, poprzednio ${priceAmount}`}>
-
-      <CurrencyDisplay
-
-        amount={priceAmount}
-
-        symbol={priceEmoji}
-
-        size={size}
-
-        className="maq-product-card__price-value maq-product-card__price-value--original"
-
-      />
-
-      <div className="maq-product-card__sale-tag">
-
-        <CurrencyDisplay
-
-          amount={salePriceAmount}
-
-          symbol={priceEmoji}
-
-          size="md"
-
-          className="maq-product-card__price-value maq-product-card__price-value--sale"
-
-        />
-
-      </div>
-
-    </div>
-
+    <CurrencyDisplay
+      amount={display.displayPrice}
+      symbol={priceEmoji}
+      size={size}
+      className="maq-product-card__price-value"
+    />
   );
-
 }
 
 
@@ -106,48 +103,6 @@ function EditIcon() {
       />
 
     </svg>
-
-  );
-
-}
-
-
-
-function CategorySubtitle({ categories = [] }) {
-
-  if (categories.length === 0) {
-
-    return null;
-
-  }
-
-
-
-  const visible = categories.slice(0, 2);
-
-  const hiddenCount = categories.length - visible.length;
-
-  const label = hiddenCount > 0
-
-    ? `${visible.join(', ')}…`
-
-    : visible.join(', ');
-
-
-
-  return (
-
-    <span
-
-      className="maq-product-card__meta"
-
-      title={hiddenCount > 0 ? categories.join(', ') : undefined}
-
-    >
-
-      {label}
-
-    </span>
 
   );
 
@@ -235,6 +190,8 @@ export default function ProductCard({
 
   salePriceAmount,
 
+  rankDiscountedPrice,
+
   priceEmoji,
 
   imageRef,
@@ -246,6 +203,8 @@ export default function ProductCard({
   itemId,
 
   categories = [],
+
+  categoryDetails = [],
 
   variant = 'grid',
 
@@ -295,6 +254,14 @@ export default function ProductCard({
 
   const showFooter = !hideActions || isPreview;
 
+  const resolvedCategories = categoryDetails.length > 0
+    ? categoryDetails
+    : categories.map((name, index) => ({
+      id: `label-${index}`,
+      name,
+      color: null,
+    }));
+
   const cardStyle = useMemo(
     () => ({
       '--product-card-accent-color': getShopItemAccentColor(itemId ?? name),
@@ -331,6 +298,8 @@ export default function ProductCard({
 
     >
 
+      <ProductCategoryStrip categories={resolvedCategories} />
+
       <div className="maq-product-card__main">
 
         <header className="maq-product-card__header">
@@ -360,8 +329,6 @@ export default function ProductCard({
               {name}
 
             </h3>
-
-            <CategorySubtitle categories={categories} />
 
           </div>
 
@@ -494,6 +461,8 @@ export default function ProductCard({
               priceAmount={priceAmount}
 
               salePriceAmount={salePriceAmount}
+
+              rankDiscountedPrice={rankDiscountedPrice}
 
               priceEmoji={priceEmoji}
 

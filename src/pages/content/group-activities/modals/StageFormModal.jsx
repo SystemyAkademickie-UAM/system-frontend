@@ -1,8 +1,36 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, TextField } from '../../../../components/ui/index.js';
+import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = { name: '', visibilityStatus: 1 };
+
+function StageVisibilityCheckbox({ checked, onChange }) {
+  return (
+    <label className="rewards-modal__option-label" htmlFor="stage-visibility">
+      <input
+        id="stage-visibility"
+        type="checkbox"
+        className="rewards-modal__option-input"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span
+        className={[
+          'rewards-modal__option-checkbox',
+          checked ? 'rewards-modal__option-checkbox--checked' : '',
+        ].filter(Boolean).join(' ')}
+        aria-hidden="true"
+      >
+        {checked ? (
+          <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+        ) : null}
+      </span>
+      <span className="rewards-modal__option-text">Etap widoczny dla studentów</span>
+    </label>
+  );
+}
 
 export default function StageFormModal({
   isOpen,
@@ -53,7 +81,7 @@ export default function StageFormModal({
         <TextField
           id="stage-name"
           label="Nazwa etapu"
-          fieldKind="name"
+          fieldKind="stageName"
           value={form.name}
           onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
           placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne"
@@ -61,17 +89,13 @@ export default function StageFormModal({
           inputClassName="rewards-modal__input"
         />
         <div className="rewards-modal__field">
-          <label className="rewards-modal__checkbox-label">
-            <input
-              type="checkbox"
-              checked={form.visibilityStatus === 1}
-              onChange={(event) => setForm((prev) => ({
-                ...prev,
-                visibilityStatus: event.target.checked ? 1 : 0,
-              }))}
-            />
-            <span>Etapy widoczny dla studentów</span>
-          </label>
+          <StageVisibilityCheckbox
+            checked={form.visibilityStatus === 1}
+            onChange={(checked) => setForm((prev) => ({
+              ...prev,
+              visibilityStatus: checked ? 1 : 0,
+            }))}
+          />
         </div>
       </div>
     </Modal>

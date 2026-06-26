@@ -1,33 +1,11 @@
 import { deleteJson, getJson, patchJson, postJson } from './api-client.js';
+import { extractApiError } from './apiErrors.js';
 import {
   mapBackendInventory,
   mapBackendShopItem,
   mapBackendShopItems,
   mapBackendShopTemplates,
 } from '../utils/shop/shopItemMapper.js';
-
-/**
- * @param {unknown} data
- * @returns {string}
- */
-function extractApiError(data) {
-  if (typeof data === 'string' && data.trim()) {
-    return data.trim();
-  }
-  if (typeof data === 'object' && data !== null) {
-    const record = /** @type {{ message?: string | string[], error?: string }} */ (data);
-    if (Array.isArray(record.message)) {
-      return record.message.join(', ');
-    }
-    if (typeof record.message === 'string' && record.message.trim()) {
-      return record.message.trim();
-    }
-    if (typeof record.error === 'string' && record.error.trim()) {
-      return record.error.trim();
-    }
-  }
-  return 'Operacja nie powiodła się';
-}
 
 /**
  * @param {string | number} groupId

@@ -9,10 +9,13 @@ export function mapBackendShopItem(raw) {
   const listing = /** @type {Record<string, unknown>} */ (item.listing ?? {});
   const basePrice = Number(listing.basePrice ?? 0);
   const discountedPrice = listing.discountedPrice;
+  const rankDiscountedPrice = listing.rankDiscountedPrice;
 
   const categoryId = item.categoryId ?? null;
   const imageRef = typeof item.imageRef === 'string' ? item.imageRef : null;
   const icon = parseShopItemImageRef(imageRef);
+  const badgePromotions = Array.isArray(listing.badgePromotions) ? listing.badgePromotions : [];
+  const rankPromotions = Array.isArray(listing.rankPromotions) ? listing.rankPromotions : [];
 
   return {
     id: String(item.id ?? ''),
@@ -23,6 +26,9 @@ export function mapBackendShopItem(raw) {
     salePriceAmount: discountedPrice === null || discountedPrice === undefined
       ? undefined
       : Number(discountedPrice),
+    rankDiscountedPrice: rankDiscountedPrice === null || rankDiscountedPrice === undefined
+      ? undefined
+      : Number(rankDiscountedPrice),
     imageUrl: icon.imageUrl ?? undefined,
     categoryId: categoryId === null || categoryId === undefined ? null : Number(categoryId),
     stockQuantity: listing.stockQuantity === null || listing.stockQuantity === undefined
@@ -35,6 +41,8 @@ export function mapBackendShopItem(raw) {
     imageRef: typeof item.imageRef === 'string' ? item.imageRef : null,
     isPublished: typeof item.isPublished === 'boolean' ? item.isPublished : true,
     isLocked: listing.isLocked === true,
+    badgePromotions,
+    rankPromotions,
   };
 }
 

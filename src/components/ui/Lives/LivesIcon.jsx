@@ -2,7 +2,7 @@ import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
 import '../Currency/CurrencyDisplay.css';
 
 /**
- * Ikona żyć grupy — emoji z konfiguracji /groupsettings/lives.
+ * Ikona żyć grupy — emoji z konfiguracji /group-settings/lives.
  *
  * @param {Object} props
  * @param {string} [props.symbol] — nadpisanie emoji (np. ❤️)

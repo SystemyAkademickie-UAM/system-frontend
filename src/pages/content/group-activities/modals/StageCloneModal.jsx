@@ -42,7 +42,7 @@ export default function StageCloneModal({
       <TextField
         id="stage-clone-name"
         label="Nazwa sklonowanego etapu"
-        fieldKind="name"
+        fieldKind="stageName"
         value={name}
         onChange={(event) => setName(event.target.value)}
         placeholder="np. Kopia (Laboratorium nr 1)"

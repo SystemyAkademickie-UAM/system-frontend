@@ -5,7 +5,7 @@ import { validateWholeNumberInput } from '../../../utils/validation/rewardsNumer
 import './TextField.css';
 
 /**
- * @typedef {'name' | 'shortDescription' | 'groupDescription' | 'postContent' | 'postTitle'} TextFieldPreset
+ * @typedef {'name' | 'stageName' | 'shortDescription' | 'groupDescription' | 'postContent' | 'postTitle'} TextFieldPreset
  */
 
 /**

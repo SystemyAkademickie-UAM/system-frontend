@@ -1,0 +1,120 @@
+.create-template-modal .maq-modal__footer {
+  display: none;
+}
+
+.create-template-modal .maq-modal__dialog--xl {
+  max-width: min(1120px, 96vw);
+  max-height: min(92vh, 880px);
+}
+
+.create-template-modal__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 1rem;
+  align-items: stretch;
+  min-height: min(68vh, 620px);
+}
+
+.create-template-modal__left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  min-height: 0;
+}
+
+.create-template-modal__search {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.create-template-modal__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  max-height: 200px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: auto;
+  flex-shrink: 0;
+}
+
+.create-template-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.25rem;
+}
+
+.create-template-modal__preview {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.create-template-modal__preview-title {
+  margin: 0 0 0.5rem;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.create-template-modal__preview .maq-template-detail-panel--expanded {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+}
+
+.create-template-modal__checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+}
+
+.create-template-modal__message,
+.create-template-modal__error {
+  margin: 0.75rem 0 0;
+  color: var(--color-text-secondary);
+}
+
+.create-template-modal__error {
+  color: #f87171;
+}
+
+.create-template-modal__footer-extra {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 899px) {
+  .create-template-modal__body {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .create-template-modal__preview .maq-template-detail-panel--expanded {
+    min-height: 320px;
+    max-height: 50vh;
+  }
+
+  .create-template-modal__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 539px) {
+  .create-template-modal__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,17 +1,16 @@
-import AssetSvg from '../AssetSvg/AssetSvg.jsx';
-import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
-import { resolveSvgAssetName } from '../../../utils/svgAssetPath.js';
+import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
-export default function BadgeIcon({ iconFile }) {
-  const assetName = resolveSvgAssetName(iconFile || SVG_PLACEHOLDER);
+/**
+ * @param {Object} props
+ * @param {string} [props.iconFile]
+ * @param {string} [props.icon]
+ */
+export default function BadgeIcon({ iconFile, icon }) {
+  const emoji = normalizeRankBadgeIcon(icon ?? iconFile, DEFAULT_BADGE_EMOJI);
 
   return (
     <div className="maq-badge__icon-circle">
-      <AssetSvg
-        name={assetName}
-        className="maq-badge__icon-svg"
-        alt=""
-      />
+      <span className="maq-badge__icon-emoji" aria-hidden="true">{emoji}</span>
     </div>
   );
 }

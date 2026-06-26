@@ -1,0 +1,113 @@
+.shop-categories-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.shop-categories-modal__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shop-categories-modal__item,
+.shop-categories-modal__empty {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  background: var(--color-surface-elevated, rgb(40, 40, 52));
+}
+
+.shop-categories-modal__empty {
+  color: var(--color-text-secondary);
+}
+
+.shop-categories-modal__swatch {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.shop-categories-modal__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.shop-categories-modal__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.shop-categories-modal__btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  background: rgb(26, 26, 42);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.shop-categories-modal__btn--primary {
+  background: rgba(30, 204, 56, 0.9);
+  color: rgb(0, 57, 21);
+  font-weight: 700;
+}
+
+.shop-categories-modal__btn--danger {
+  color: #ff8f8f;
+}
+
+.shop-categories-modal__editor {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: rgb(26, 26, 42);
+}
+
+.shop-categories-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.shop-categories-modal__field input[type='text'] {
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  background: rgb(40, 40, 52);
+  color: var(--color-text-primary);
+}
+
+.shop-categories-modal__field--color input[type='color'] {
+  width: 3rem;
+  height: 2.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.shop-categories-modal__editor-actions,
+.shop-categories-modal__add {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.shop-categories-modal__add {
+  align-self: flex-start;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  background: rgba(30, 204, 56, 0.9);
+  color: rgb(0, 57, 21);
+  font-weight: 700;
+  cursor: pointer;
+}

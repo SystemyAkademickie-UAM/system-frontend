@@ -1,7 +1,4 @@
-import { SHOP_CATEGORY_FILTERS } from './shopCategories.js';
 import { compareShopItemsByEffectivePrice } from './shopPricing.js';
-
-export { SHOP_CATEGORY_FILTERS };
 
 export const SHOP_SORT = {
   nameAsc: 'nameAsc',

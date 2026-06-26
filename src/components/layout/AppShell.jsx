@@ -135,7 +135,7 @@ export default function AppShell() {
             totalEarnedDisplay={totalEarnedDisplay}
             currencyLabel={currencyLabel}
             onNavigate={closeMobileNav}
-            showMenuButton
+            showMenuButton={!isCompactLayout}
             menuExpanded={isMobileNavOpen}
             onMenuToggle={() => setIsMobileNavOpen((open) => !open)}
             isLoading={isHeaderLoading}

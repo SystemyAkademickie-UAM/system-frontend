@@ -77,16 +77,41 @@ export default function ActivityFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        <TextField
-          id="activity-name"
-          label="Nazwa aktywności"
-          fieldKind="name"
-          value={form.name}
-          onChange={handleChange('name')}
-          placeholder="np. Zadanie wprowadzające"
-          className="rewards-modal__field"
-          inputClassName="rewards-modal__input"
-        />
+        {isEdit ? (
+          <TextField
+            id="activity-name"
+            label="Nazwa aktywności"
+            fieldKind="name"
+            value={form.name}
+            onChange={handleChange('name')}
+            placeholder="np. Zadanie wprowadzające"
+            className="rewards-modal__field"
+            inputClassName="rewards-modal__input"
+          />
+        ) : (
+          <div className="rewards-modal__row rewards-modal__row--name-reward">
+            <TextField
+              id="activity-name"
+              label="Nazwa aktywności"
+              fieldKind="name"
+              value={form.name}
+              onChange={handleChange('name')}
+              placeholder="np. Zadanie wprowadzające"
+              className="rewards-modal__field"
+              inputClassName="rewards-modal__input"
+            />
+            <TextField
+              id="activity-reward"
+              label="Nagroda"
+              type="number"
+              value={form.reward}
+              onChange={handleChange('reward')}
+              placeholder="np. 10"
+              className="rewards-modal__field"
+              inputClassName="rewards-modal__input"
+            />
+          </div>
+        )}
 
         <TextField
           id="activity-story"
@@ -110,16 +135,18 @@ export default function ActivityFormModal({
           inputClassName="rewards-modal__textarea"
         />
 
-        <TextField
-          id="activity-reward"
-          label="Nagroda (waluta)"
-          type="number"
-          value={form.reward}
-          onChange={handleChange('reward')}
-          placeholder="np. 10"
-          className="rewards-modal__field"
-          inputClassName="rewards-modal__input"
-        />
+        {isEdit ? (
+          <TextField
+            id="activity-reward"
+            label="Nagroda"
+            type="number"
+            value={form.reward}
+            onChange={handleChange('reward')}
+            placeholder="np. 10"
+            className="rewards-modal__field"
+            inputClassName="rewards-modal__input"
+          />
+        ) : null}
       </div>
     </Modal>
   );

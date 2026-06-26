@@ -1,0 +1,71 @@
+.maq-select-group-mini-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: var(--color-bg-surface);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.maq-select-group-mini-card:hover,
+.maq-select-group-mini-card--hovered,
+.maq-select-group-mini-card:focus-visible {
+  border-color: rgba(66, 243, 125, 0.45);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.maq-select-group-mini-card--selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.maq-select-group-mini-card__banner-wrap {
+  aspect-ratio: 16 / 9;
+  background: var(--color-bg-elevated);
+}
+
+.maq-select-group-mini-card__banner,
+.maq-select-group-mini-card__banner--color,
+.maq-select-group-mini-card__banner-fallback {
+  width: 100%;
+  height: 100%;
+}
+
+.maq-select-group-mini-card__banner {
+  display: block;
+  object-fit: cover;
+}
+
+.maq-select-group-mini-card__banner-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+}
+
+.maq-select-group-mini-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.65rem 0.7rem;
+}
+
+.maq-select-group-mini-card__title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.maq-select-group-mini-card__subject {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}

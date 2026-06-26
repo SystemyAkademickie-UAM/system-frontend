@@ -1,30 +1,32 @@
-.rewards-shop-items__nav-row {
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-.rewards-shop-items__nav-row .rewards-page__sub-nav {
-  flex: 0 1 auto;
-  min-width: 0;
-}
-
-.rewards-shop-items__nav-actions {
+.rewards-shop-items__toolbar-end {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.rewards-shop-items__toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.75rem;
-  flex-wrap: nowrap;
-  margin-left: auto;
-  flex: 0 0 auto;
+  gap: 0.625rem;
+  width: 100%;
 }
 
-.rewards-shop-items__toggle,
-.rewards-shop-items__add-btn {
+.rewards-shop-items__toolbar-row--filters {
+  justify-content: flex-end;
+}
+
+.rewards-shop-items__access-btn {
   flex-shrink: 0;
   white-space: nowrap;
 }
 
 .rewards-shop-items__add-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
   min-width: 9.5rem;
 }
 
@@ -36,20 +38,17 @@
 }
 
 @media (max-width: 768px) {
-  .rewards-shop-items__nav-row {
-    flex-wrap: wrap;
-  }
-
-  .rewards-shop-items__nav-actions {
+  .rewards-shop-items__toolbar-end {
     width: 100%;
-    flex-wrap: wrap;
-    margin-left: 0;
+    align-items: stretch;
   }
 
-  .rewards-shop-items__toggle,
-  .rewards-shop-items__add-btn {
-    flex: 1 1 auto;
-    min-width: 0;
+  .rewards-shop-items__toolbar-row {
+    justify-content: stretch;
+  }
+
+  .rewards-shop-items__toolbar-row--filters {
+    justify-content: flex-end;
   }
 
   .rewards-shop-items__search {

@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, SearchBar } from '../../../components/ui/index.js';
-import { NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
+import { STAGE_NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { useGroupActivities } from './useGroupActivities.js';
 import ActivitiesTreeTable from './shared/ActivitiesTreeTable.jsx';
@@ -226,7 +226,7 @@ export default function ActivitiesContent() {
               onChange={(event) => setNewStageName(event.target.value)}
               placeholder="Nazwa nowego etapu"
               aria-label="Nazwa nowego etapu"
-              maxLength={NAME_MAX_LENGTH}
+              maxLength={STAGE_NAME_MAX_LENGTH}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
                   handleAddStage();

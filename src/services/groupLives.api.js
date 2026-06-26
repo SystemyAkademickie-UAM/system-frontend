@@ -3,8 +3,12 @@ import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../constants/lives.co
 
 /**
  * @typedef {Object} GroupLivesConfig
+ * @property {boolean} livesEnabled
+ * @property {number | null} livesMax
+ * @property {number | null} [startingLives]
  * @property {string} livesLabel
  * @property {string} livesIcon
+ * @property {boolean} livesShopEnabled
  */
 
 /**
@@ -24,13 +28,24 @@ export async function fetchGroupLivesConfig(groupId) {
     return { ok: false };
   }
 
-  const data = /** @type {{ livesLabel?: string | null, livesIcon?: string | null }} */ (result.data);
+  const data = /** @type {{
+    livesEnabled?: boolean,
+    livesMax?: number | null,
+    startingLives?: number | null,
+    livesLabel?: string | null,
+    livesIcon?: string | null,
+    livesShopEnabled?: boolean,
+  }} */ (result.data);
 
   return {
     ok: true,
     config: {
+      livesEnabled: Boolean(data.livesEnabled),
+      livesMax: data.livesMax == null ? null : Number(data.livesMax),
+      startingLives: data.startingLives == null ? null : Number(data.startingLives),
       livesLabel: data.livesLabel?.trim() || DEFAULT_LIVES_LABEL,
       livesIcon: data.livesIcon?.trim() || DEFAULT_LIVES_SYMBOL,
+      livesShopEnabled: Boolean(data.livesShopEnabled),
     },
   };
 }

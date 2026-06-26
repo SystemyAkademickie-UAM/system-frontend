@@ -121,6 +121,12 @@
   font-size: var(--members-font-table-secondary);
 }
 
+/* Ikona odznak ma cieńsze kreski — powiększamy ją do wizualnego rozmiaru ikony postępu. */
+.members-page .data-table__action-btn .data-table__inline-icon--badge-award {
+  width: 40px;
+  height: 40px;
+}
+
 .members-table__row--lecturer > .data-table__cell {
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }

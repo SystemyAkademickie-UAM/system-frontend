@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BADGE_RARITY, BADGE_RARITY_LABELS, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
-import IconPicker from '../../../../components/ui/IconPicker/IconPicker.jsx';
-import { fetchIconCatalog } from '../../../../services/icons.api.js';
+import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import { DEFAULT_BADGE_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = {
   name: '',
-  iconFile: '',
+  icon: DEFAULT_BADGE_EMOJI,
   rarity: BADGE_RARITY.common,
   storyDescription: '',
   didacticDescription: '',
@@ -21,18 +21,7 @@ export default function BadgeFormModal({
   onConfirm,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
-  const [iconCatalog, setIconCatalog] = useState([]);
   const isEdit = Boolean(badge);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    let cancelled = false;
-    fetchIconCatalog().then((catalog) => {
-      if (!cancelled) setIconCatalog(catalog);
-    });
-    return () => { cancelled = true; };
-  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -40,7 +29,7 @@ export default function BadgeFormModal({
     if (badge) {
       setForm({
         name: badge.name,
-        iconFile: badge.iconFile,
+        icon: badge.icon || badge.iconFile || DEFAULT_BADGE_EMOJI,
         rarity: badge.rarity,
         storyDescription: badge.storyDescription,
         didacticDescription: badge.didacticDescription,
@@ -59,7 +48,7 @@ export default function BadgeFormModal({
 
   const isValid = useMemo(() => (
     form.name.trim()
-    && form.iconFile.trim()
+    && form.icon.trim()
     && form.storyDescription.trim()
     && form.didacticDescription.trim()
     && rewardValidation.valid
@@ -74,7 +63,8 @@ export default function BadgeFormModal({
 
     onConfirm?.({
       name: form.name.trim(),
-      iconFile: form.iconFile.trim(),
+      icon: form.icon.trim(),
+      iconFile: form.icon.trim(),
       rarity: form.rarity,
       storyDescription: form.storyDescription.trim(),
       didacticDescription: form.didacticDescription.trim(),
@@ -93,25 +83,35 @@ export default function BadgeFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        <TextField
-          id="badge-name"
-          label="Nazwa"
-          fieldKind="name"
-          value={form.name}
-          onChange={handleChange('name')}
-          className="rewards-modal__field"
-          inputClassName="rewards-modal__input"
-        />
-
-        <div className="rewards-modal__field">
-          <label className="rewards-modal__label">Ikona</label>
-          <IconPicker
-            icons={iconCatalog}
-            value={form.iconFile}
-            onChange={(iconId) => setForm((prev) => ({ ...prev, iconFile: iconId }))}
-            name="badge-icon"
+        <div className="rewards-modal__row rewards-modal__row--name-reward">
+          <TextField
+            id="badge-name"
+            label="Nazwa"
+            fieldKind="name"
+            value={form.name}
+            onChange={handleChange('name')}
+            className="rewards-modal__field"
+            inputClassName="rewards-modal__input"
+          />
+          <TextField
+            id="badge-reward"
+            label="Nagroda"
+            type="number"
+            value={form.rewardAmount}
+            onChange={handleChange('rewardAmount')}
+            className="rewards-modal__field"
+            inputClassName="rewards-modal__input"
           />
         </div>
+
+        <EmojiPickerField
+          className="rewards-modal__field"
+          label="Ikona"
+          value={form.icon}
+          defaultEmoji={DEFAULT_BADGE_EMOJI}
+          onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
+          ariaLabel="Wybierz emoji odznaki"
+        />
 
         <div className="rewards-modal__field">
           <label htmlFor="badge-rarity" className="rewards-modal__label">
@@ -148,16 +148,6 @@ export default function BadgeFormModal({
           onChange={handleChange('didacticDescription')}
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
-        />
-
-        <TextField
-          id="badge-reward"
-          label="Nagroda (waluta)"
-          type="number"
-          value={form.rewardAmount}
-          onChange={handleChange('rewardAmount')}
-          className="rewards-modal__field"
-          inputClassName="rewards-modal__input"
         />
       </div>
     </Modal>

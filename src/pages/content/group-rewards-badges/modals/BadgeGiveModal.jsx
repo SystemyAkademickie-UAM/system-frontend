@@ -110,7 +110,7 @@ export default function BadgeGiveModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Daj odznakę"
+      title="Przydziel odznakę"
       subtitle={badge.name}
       onConfirm={handleConfirm}
       confirmDisabled={busy}

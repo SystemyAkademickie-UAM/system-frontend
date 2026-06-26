@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, TextField } from '../../../components/ui/index.js';
+import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import '../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = {
@@ -9,6 +11,45 @@ const EMPTY_FORM = {
   schedulePublish: false,
   publishAt: '',
 };
+
+function PostOptionCheckbox({
+  id,
+  checked,
+  onChange,
+  disabled = false,
+  children,
+}) {
+  return (
+    <label
+      className={[
+        'rewards-modal__option-label',
+        disabled ? 'rewards-modal__option-label--disabled' : '',
+      ].filter(Boolean).join(' ')}
+      htmlFor={id}
+    >
+      <input
+        id={id}
+        type="checkbox"
+        className="rewards-modal__option-input"
+        checked={checked}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span
+        className={[
+          'rewards-modal__option-checkbox',
+          checked ? 'rewards-modal__option-checkbox--checked' : '',
+        ].filter(Boolean).join(' ')}
+        aria-hidden="true"
+      >
+        {checked ? (
+          <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+        ) : null}
+      </span>
+      <span className="rewards-modal__option-text">{children}</span>
+    </label>
+  );
+}
 
 export default function PostFormModal({
   isOpen,
@@ -92,32 +133,30 @@ export default function PostFormModal({
           inputClassName="rewards-modal__textarea"
         />
         <div className="rewards-modal__field">
-          <label className="rewards-modal__checkbox-label">
-            <input
-              type="checkbox"
-              checked={form.startHidden}
-              onChange={(event) => setForm((prev) => ({
-                ...prev,
-                startHidden: event.target.checked,
-                schedulePublish: event.target.checked ? false : prev.schedulePublish,
-              }))}
-            />
-            <span>Ukryj wpis (niepublikowany)</span>
-          </label>
+          <PostOptionCheckbox
+            id="post-start-hidden"
+            checked={form.startHidden}
+            onChange={(checked) => setForm((prev) => ({
+              ...prev,
+              startHidden: checked,
+              schedulePublish: checked ? false : prev.schedulePublish,
+            }))}
+          >
+            Ukryj wpis (niepublikowany)
+          </PostOptionCheckbox>
         </div>
         <div className="rewards-modal__field">
-          <label className="rewards-modal__checkbox-label">
-            <input
-              type="checkbox"
-              checked={form.schedulePublish}
-              disabled={form.startHidden}
-              onChange={(event) => setForm((prev) => ({
-                ...prev,
-                schedulePublish: event.target.checked,
-              }))}
-            />
-            <span>Opublikuj o wybranej dacie</span>
-          </label>
+          <PostOptionCheckbox
+            id="post-schedule-publish"
+            checked={form.schedulePublish}
+            disabled={form.startHidden}
+            onChange={(checked) => setForm((prev) => ({
+              ...prev,
+              schedulePublish: checked,
+            }))}
+          >
+            Opublikuj o wybranej dacie
+          </PostOptionCheckbox>
         </div>
         {form.schedulePublish && !form.startHidden ? (
           <div className="rewards-modal__field">

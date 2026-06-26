@@ -9,6 +9,7 @@ import { fetchGroupRanks } from '../../../services/ranks.api.js';
 import { fetchGroupBadges } from '../../../services/badges.api.js';
 
 import { generateMemberAvatarFallback } from '../../../utils/members/membersLecturerRow.js';
+import { formatStudentDisplayName } from '../../../utils/members/studentDisplayName.js';
 import { detectRankPromotion } from '../../../utils/ranks/rankPromotion.js';
 import {
   AUTO_RANK_OPTION,
@@ -90,7 +91,7 @@ function mapStudentToMember(student, index, ranksMap, badgesCount) {
 
     position: index + 1,
 
-    name: `${student.name} ${student.surname}`.trim() || student.nickname || student.email,
+    name: formatStudentDisplayName(student),
 
     nickname: student.nickname,
 

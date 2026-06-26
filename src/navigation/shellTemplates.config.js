@@ -96,6 +96,8 @@ export const HREF_BUILDERS = {
   COURSE_MANAGEMENT: () => paths.courseManagementPath(),
   STATISTICS: () => paths.statisticsPath(),
   ORG_MANAGEMENT: () => paths.organizationsPath(),
+  TEMPLATES_MY: () => paths.templatesPath(),
+  TEMPLATES_GALLERY: () => paths.templatesGalleryPath(),
 
   // Legacy
   GROUP_CONTROL_PANEL: (ctx) => (ctx.groupId ? paths.groupControlPath(ctx.groupId) : null),
@@ -590,6 +592,7 @@ export const SUB_NAV_META = {
   'group-rewards': { title: 'Systemy nagród', ariaLabel: 'Nawigacja systemów nagród' },
   'group-settings': { title: 'Ustawienia grupy', ariaLabel: 'Nawigacja ustawień grupy' },
   'group-ranking': { title: 'Ranking', ariaLabel: 'Nawigacja rankingu' },
+  'app-templates': { title: 'Szablony', ariaLabel: 'Nawigacja szablonów' },
 };
 
 /**
@@ -627,7 +630,7 @@ export const SUB_NAV_CONFIG = {
   'group-rewards': [
     { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_REWARDS', end: true },
     { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_REWARDS_RANKS', end: true },
-    { id: 'shopitems', label: 'Sklep', hrefKey: 'GROUP_SHOP_ITEMS', end: true },
+    { id: 'shop-items', label: 'Sklep', hrefKey: 'GROUP_SHOP_ITEMS', end: true },
   ],
 
   // Ustawienia grupy (lecturer)
@@ -642,6 +645,11 @@ export const SUB_NAV_CONFIG = {
     { id: 'info', label: 'Twoje informacje', hrefKey: 'GROUP_RANKING', end: true },
     { id: 'group', label: 'Ranking grupy', hrefKey: 'GROUP_RANKING_GROUP' },
     { id: 'activities', label: 'Ranking aktywności', hrefKey: 'GROUP_RANKING_ACTIVITIES' },
+  ],
+
+  'app-templates': [
+    { id: 'mine', label: 'Moje szablony', hrefKey: 'TEMPLATES_MY', end: true },
+    { id: 'gallery', label: 'Galeria szablonów', hrefKey: 'TEMPLATES_GALLERY', end: true },
   ],
 };
 

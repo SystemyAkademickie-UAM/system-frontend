@@ -37,6 +37,11 @@
   color: var(--rank-icon-color);
 }
 
+.maq-rank__icon-emoji {
+  font-size: var(--size-rank-icon);
+  line-height: 1;
+}
+
 .maq-rank__icon-svg {
   width: var(--size-rank-icon);
   height: var(--size-rank-icon);
