@@ -104,30 +104,32 @@ export default function BadgeFormModal({
           />
         </div>
 
-        <EmojiPickerField
-          className="rewards-modal__field"
-          label="Ikona"
-          value={form.icon}
-          defaultEmoji={DEFAULT_BADGE_EMOJI}
-          onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
-          ariaLabel="Wybierz emoji odznaki"
-        />
+        <div className="rewards-modal__row rewards-modal__row--icon-rarity">
+          <EmojiPickerField
+            className="rewards-modal__field rewards-modal__field--icon"
+            label="Ikona"
+            value={form.icon}
+            defaultEmoji={DEFAULT_BADGE_EMOJI}
+            onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
+            ariaLabel="Wybierz emoji odznaki"
+          />
 
-        <div className="rewards-modal__field">
-          <label htmlFor="badge-rarity" className="rewards-modal__label">
-            Jakość
-            <InfoTooltip text="Wpływa na rzadkość odznaki w skarbcu." />
-          </label>
-          <select
-            id="badge-rarity"
-            className="rewards-modal__input"
-            value={form.rarity}
-            onChange={handleChange('rarity')}
-          >
-            {Object.entries(BADGE_RARITY_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
+          <div className="rewards-modal__field">
+            <label htmlFor="badge-rarity" className="rewards-modal__label">
+              Jakość
+              <InfoTooltip text="Wpływa na rzadkość odznaki w skarbcu." />
+            </label>
+            <select
+              id="badge-rarity"
+              className="rewards-modal__input"
+              value={form.rarity}
+              onChange={handleChange('rarity')}
+            >
+              {Object.entries(BADGE_RARITY_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <TextField

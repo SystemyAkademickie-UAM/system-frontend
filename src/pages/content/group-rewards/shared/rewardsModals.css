@@ -83,6 +83,15 @@
   grid-template-columns: minmax(0, 5fr) minmax(0, 1fr);
 }
 
+.rewards-modal__row--icon-rarity {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+}
+
+.rewards-modal__field--icon {
+  flex-shrink: 0;
+}
+
 .rewards-modal__option-label {
   display: flex;
   align-items: center;
@@ -261,7 +270,8 @@
 
 @media (max-width: 640px) {
   .rewards-modal__row,
-  .rewards-modal__row--name-reward {
+  .rewards-modal__row--name-reward,
+  .rewards-modal__row--icon-rarity {
     grid-template-columns: 1fr;
   }
 }

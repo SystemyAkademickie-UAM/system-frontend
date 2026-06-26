@@ -57,6 +57,7 @@ export function buildLecturerMemberRow({
     position,
     name: lecturerDisplayName.trim(),
     nickname: '',
+    legalName: '',
     email: '',
     avatar,
     rankId: null,

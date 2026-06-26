@@ -1418,23 +1418,19 @@ export default function ShopItemFormContent({
               <div className="shop-item-form__rank-list">
                 {ranks.map((rank) => (
                   <div key={`rank-${rank.id}`} className="shop-item-form__rank-card">
-                    <div className="shop-item-form__rank-head">
-                      <span className="shop-item-form__rank-icon" aria-hidden="true">
-                        {rank.icon || '⭐'}
-                      </span>
-                      <span className="shop-item-form__rank-name">{rank.name}</span>
-                    </div>
-                    <div className="shop-item-form__rank-price-row">
-                      <input
-                        className="shop-item-form__input shop-item-form__rank-price-input"
-                        value={rank.costafter}
-                        onInput={(event) => onNumericinput(
-                          event.target.value,
-                          (value) => onrankcostchange(rank.id, value),
-                        )}
-                      />
-                      <span className="shop-item-form__rank-discount">{rank.discount}%</span>
-                    </div>
+                    <span className="shop-item-form__rank-icon" aria-hidden="true">
+                      {rank.icon || '⭐'}
+                    </span>
+                    <span className="shop-item-form__rank-name">{rank.name}</span>
+                    <input
+                      className="shop-item-form__input shop-item-form__rank-price-input"
+                      value={rank.costafter}
+                      onInput={(event) => onNumericinput(
+                        event.target.value,
+                        (value) => onrankcostchange(rank.id, value),
+                      )}
+                    />
+                    <span className="shop-item-form__rank-discount">{rank.discount}%</span>
                   </div>
                 ))}
               </div>

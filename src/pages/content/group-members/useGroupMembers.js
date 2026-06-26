@@ -9,7 +9,7 @@ import { fetchGroupRanks } from '../../../services/ranks.api.js';
 import { fetchGroupBadges } from '../../../services/badges.api.js';
 
 import { generateMemberAvatarFallback } from '../../../utils/members/membersLecturerRow.js';
-import { formatStudentDisplayName } from '../../../utils/members/studentDisplayName.js';
+import { formatStudentDisplayName, getStudentLegalName } from '../../../utils/members/studentDisplayName.js';
 import { detectRankPromotion } from '../../../utils/ranks/rankPromotion.js';
 import {
   AUTO_RANK_OPTION,
@@ -32,9 +32,11 @@ import {
 
  * @property {number} position
 
- * @property {string} name - Full name (name + surname)
+ * @property {string} name - Etykieta do wyszukiwania i modali (nick + imię i nazwisko)
 
  * @property {string} nickname
+
+ * @property {string} legalName - Imię i nazwisko
 
  * @property {string} email
 
@@ -94,6 +96,8 @@ function mapStudentToMember(student, index, ranksMap, badgesCount) {
     name: formatStudentDisplayName(student),
 
     nickname: student.nickname,
+
+    legalName: getStudentLegalName(student),
 
     email: student.email,
 

@@ -22,6 +22,22 @@ import MemberRankModal from './modals/MemberRankModal.jsx';
 
 import './MembersHomeContent.css';
 
+function renderMemberNameLines(member) {
+  const nickname = member.nickname?.trim() || '';
+  const legalName = member.legalName?.trim() || '';
+  const primary = nickname || legalName || member.email || member.name;
+  const legalLine = nickname && legalName && nickname !== legalName
+    ? `(${legalName})`
+    : null;
+
+  return (
+    <>
+      <span className="members-table__name">{primary}</span>
+      {legalLine ? <span className="members-table__nickname">{legalLine}</span> : null}
+    </>
+  );
+}
+
 export default function MembersHomeContent() {
   const nav = useGroupSubNav('group-members');
   const { showSuccess } = useToast();
@@ -170,10 +186,10 @@ export default function MembersHomeContent() {
                 className="members-table__profile-link"
                 to={groupStudentProfilePath(groupId, member.accountId)}
               >
-                <span className="members-table__name">{member.name}</span>
+                {renderMemberNameLines(member)}
               </Link>
             ) : (
-              <span className="members-table__name">{member.name}</span>
+              renderMemberNameLines(member)
             )}
           </div>
         </div>
@@ -341,6 +357,7 @@ export default function MembersHomeContent() {
             filter: (member, query) => (
               member.name.toLowerCase().includes(query)
               || member.nickname?.toLowerCase().includes(query)
+              || member.legalName?.toLowerCase().includes(query)
             ),
           }}
           rowActions={rowActions}

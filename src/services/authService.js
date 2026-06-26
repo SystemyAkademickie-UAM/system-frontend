@@ -1,5 +1,5 @@
+import { clearClientAuthState } from '../auth/clientAuthState.js';
 import { getApiBaseUrl, getSamlLogoutUrl } from '../constants/api.constants.js';
-import { AUTH_LOGOUT_PATH } from '../constants/authPaths.constants.js';
 import { welcomePath } from '../routes/pathRegistry.js';
 
 /** If the page is still active after redirect, treat logout navigation as failed. */
@@ -31,50 +31,39 @@ export function isLogoutAvailable() {
 }
 
 /**
- * Wylogowuje użytkownika — czyści sesję API, potem przekierowuje na SAML Single Logout (IdP + lokalne ciastka).
+ * Wylogowuje użytkownika — czyści lokalny stan SPA, potem przekierowuje na endpoint
+ * SAML Single Logout (unieważnia sesję, czyści ciasteczka, opcjonalnie IdP).
  *
  * @param {() => void} [onNavigationFailed] Wywoływane, gdy przekierowanie nie nastąpiło (np. zablokowane).
  * @returns {Promise<boolean>} true jeśli zaplanowano przekierowanie
  */
 export async function logoutUser(onNavigationFailed) {
+  clearClientAuthState();
+
   const welcomeUrl = buildWelcomeAfterLogoutUrl();
   const postLogoutRedirect = encodeURIComponent(buildWelcomeAfterLogoutPath());
-
-  const baseUrl = getApiBaseUrl();
-  if (baseUrl.length > 0) {
-    try {
-      await fetch(`${baseUrl}${AUTH_LOGOUT_PATH}`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch {
-      // continue — SAML logout still clears browser cookies when configured
-    }
-  }
-
   const samlLogoutBase = getSamlLogoutUrl();
+
   if (samlLogoutBase.length === 0) {
-    window.location.assign(welcomeUrl);
+    window.location.replace(welcomeUrl);
     return true;
   }
 
   const separator = samlLogoutBase.includes('?') ? '&' : '?';
   const samlLogoutUrl = `${samlLogoutBase}${separator}postLogoutRedirect=${postLogoutRedirect}`;
 
-  window.setTimeout(() => {
-    window.location.assign(samlLogoutUrl);
+  window.location.replace(samlLogoutUrl);
 
-    if (typeof onNavigationFailed === 'function') {
-      const timeoutId = window.setTimeout(onNavigationFailed, LOGOUT_NAVIGATION_FALLBACK_MS);
-      window.addEventListener(
-        'pagehide',
-        () => {
-          window.clearTimeout(timeoutId);
-        },
-        { once: true },
-      );
-    }
-  }, 0);
+  if (typeof onNavigationFailed === 'function') {
+    const timeoutId = window.setTimeout(onNavigationFailed, LOGOUT_NAVIGATION_FALLBACK_MS);
+    window.addEventListener(
+      'pagehide',
+      () => {
+        window.clearTimeout(timeoutId);
+      },
+      { once: true },
+    );
+  }
 
   return true;
 }

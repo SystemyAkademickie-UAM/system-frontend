@@ -65,7 +65,7 @@ const BADGE_COLUMNS = [
     label: 'Widoczność',
     sort: 'text',
     width: '110px',
-    accessor: (badge) => getVisibilityStatusLabel(badge.isPublished),
+    accessor: (badge) => getVisibilityStatusLabel(badge.isPublished, 'badge'),
     render: (badge) => (
       <span
         className={[
@@ -75,7 +75,7 @@ const BADGE_COLUMNS = [
             : 'rewards-table__visibility--public',
         ].join(' ')}
       >
-        {getVisibilityStatusLabel(badge.isPublished)}
+        {getVisibilityStatusLabel(badge.isPublished, 'badge')}
       </span>
     ),
   },
@@ -258,15 +258,15 @@ export default function RewardsBadgesContent() {
       },
       {
         id: 'visibility',
-        label: 'Ukryj / pokaż na liście /badges',
-        description: 'Kontroluje widoczność odznaki na globalnej liście studenta.',
+        label: 'Ukryj / Pokaż odznakę',
+        description: 'Zmienia widoczność odznaki dla studenta.',
         onSelect: async (badge) => {
           const result = await handleTogglePublished(badge.id);
           if (result.ok) {
             showSuccess(
               badge.isPublished === false
-                ? 'Odznaka jest widoczna na liście /badges.'
-                : 'Odznaka została ukryta na liście /badges.',
+                ? 'Odznaka jest teraz widoczna dla studentów.'
+                : 'Odznaka jest teraz ukryta przed studentami.',
             );
           } else {
             showError(result.error || 'Nie udało się zmienić widoczności odznaki.');

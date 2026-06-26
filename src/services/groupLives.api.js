@@ -1,4 +1,4 @@
-import { getJson } from './api-client.js';
+import { getJson, patchJson } from './api-client.js';
 import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../constants/lives.constants.js';
 
 /**
@@ -48,4 +48,17 @@ export async function fetchGroupLivesConfig(groupId) {
       livesShopEnabled: Boolean(data.livesShopEnabled),
     },
   };
+}
+
+/**
+ * Zapisuje konfigurację systemu żyć grupy.
+ * PATCH /groups/:groupId/lives-config
+ *
+ * @param {string | number} groupId
+ * @param {Record<string, unknown>} payload
+ * @returns {Promise<{ ok: boolean, config?: GroupLivesConfig }>}
+ */
+export async function updateGroupLivesConfig(groupId, payload) {
+  const result = await patchJson(`/groups/${groupId}/lives-config`, payload);
+  return { ok: result.ok };
 }
