@@ -33,18 +33,34 @@ export default function LoginEmail({ onBack }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const result = await getJson(`${AUTH_LOGIN_ORGANIZATIONS_PATH}?loginMethod=email`);
-      if (cancelled) {
-        return;
-      }
-      if (result.ok && result.data && typeof result.data === 'object' && Array.isArray(result.data.organizations)) {
-        const rows = result.data.organizations;
-        setOrganizations(rows);
-        if (rows.length > 0) {
-          setSelectedOrganizationId(String(rows[0].id));
+      try {
+        const result = await getJson(`${AUTH_LOGIN_ORGANIZATIONS_PATH}?loginMethod=email`);
+        if (cancelled) {
+          return;
+        }
+        if (
+          result.ok &&
+          result.data &&
+          typeof result.data === 'object' &&
+          Array.isArray(result.data.organizations)
+        ) {
+          const rows = result.data.organizations;
+          setOrganizations(rows);
+          if (rows.length > 0) {
+            setSelectedOrganizationId(String(rows[0].id));
+          }
+          return;
+        }
+        setErrorMessage('Nie udało się załadować listy uczelni.');
+      } catch {
+        if (!cancelled) {
+          setErrorMessage('Nie udało się załadować listy uczelni.');
+        }
+      } finally {
+        if (!cancelled) {
+          setIsOrganizationsLoading(false);
         }
       }
-      setIsOrganizationsLoading(false);
     })();
     return () => {
       cancelled = true;
@@ -76,20 +92,36 @@ export default function LoginEmail({ onBack }) {
     }
 
     setIsBusy(true);
-    const result = await postJson(AUTH_LOGIN_MAGIC_LINK_REQUEST_PATH, {
-      email: normalizedEmail,
-      organizationId,
-    });
-    setIsBusy(false);
+    try {
+      const result = await postJson(AUTH_LOGIN_MAGIC_LINK_REQUEST_PATH, {
+        email: normalizedEmail,
+        organizationId,
+      });
 
-    if (!result.ok) {
-      setErrorMessage(
-        getMagicLinkErrorMessage(result.data, 'Nie udało się wysłać linku logowania.'),
-      );
-      return;
+      if (!result.ok) {
+        setErrorMessage(
+          getMagicLinkErrorMessage(
+            result.data,
+            'Nie udało się wysłać linku logowania.',
+            result.status,
+          ),
+        );
+        return;
+      }
+
+      const payload = result.data;
+      const serverMessage =
+        payload &&
+        typeof payload === 'object' &&
+        typeof /** @type {{ message?: string }} */ (payload).message === 'string'
+          ? /** @type {{ message: string }} */ (payload).message
+          : null;
+      setSuccessMessage(serverMessage ?? 'Link logowania został wysłany na podany adres e-mail.');
+    } catch {
+      setErrorMessage('Nie udało się wysłać linku logowania.');
+    } finally {
+      setIsBusy(false);
     }
-
-    setSuccessMessage('Link logowania został wysłany na podany adres e-mail.');
   }, [email, selectedOrganizationId]);
 
   const isSelectDisabled = isOrganizationsLoading || organizations.length === 0 || isBusy;

@@ -23,7 +23,7 @@ export default function LoginPionierId({ onContinue, onEmailLogin }) {
           <button
             type="button"
             className="auth-card__secondary-link login-pionierid__email-link"
-            onClick={onEmailLogin}
+            onClick={() => onEmailLogin?.()}
           >
             Zaloguj się przez e-mail
           </button>
