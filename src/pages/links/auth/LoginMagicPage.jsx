@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { AUTH_LOGIN_MAGIC_LINK_VERIFY_PATH } from '../../../constants/authPaths.constants.js';
+import {
+  AUTH_LOGIN_MAGIC_LINK_VERIFY_PATH,
+  AUTH_LOGIN_ME_PATH,
+} from '../../../constants/authPaths.constants.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { homePath, loginPath } from '../../../routes/pathRegistry.js';
-import { postJson } from '../../../services/api-client.js';
+import { getJson, postJson } from '../../../services/api-client.js';
 import { getMagicLinkErrorMessage } from '../../../services/magicLinkErrors.js';
 import {
   fetchRegistrationStatus,
@@ -14,10 +17,54 @@ import '../../content/auth/LoginMagic.css';
 
 /** @typedef {'loading' | 'error' | 'redirecting'} LoginMagicStatus */
 
+/** Tokens that already established a session in this tab. */
+const magicLinkVerifyCompleted = new Set();
+
+/** @type {Map<string, Promise<{ ok: boolean, status: number, data: unknown }>>} */
+const magicLinkVerifyPromises = new Map();
+
+/**
+ * Runs magic-link verify at most once per token (shared across Strict Mode remounts).
+ * @param {string} token
+ */
+function verifyMagicLinkTokenOnce(token) {
+  if (magicLinkVerifyCompleted.has(token)) {
+    return Promise.resolve({ ok: true, status: 200, data: null });
+  }
+
+  const existingPromise = magicLinkVerifyPromises.get(token);
+  if (existingPromise) {
+    return existingPromise;
+  }
+
+  const verifyPromise = postJson(AUTH_LOGIN_MAGIC_LINK_VERIFY_PATH, { token }).then((result) => {
+    if (result.ok) {
+      magicLinkVerifyCompleted.add(token);
+    }
+    return result;
+  }).finally(() => {
+    magicLinkVerifyPromises.delete(token);
+  });
+
+  magicLinkVerifyPromises.set(token, verifyPromise);
+  return verifyPromise;
+}
+
+/**
+ * @returns {Promise<boolean>}
+ */
+async function hasActiveSessionCookie() {
+  const result = await getJson(AUTH_LOGIN_ME_PATH);
+  return result.ok && result.data?.authenticated === true;
+}
+
 export default function LoginMagicPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const session = useSessionOptional();
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
+
   const [status, setStatus] = useState(/** @type {LoginMagicStatus} */ ('loading'));
   const [message, setMessage] = useState('Weryfikacja linku logowania…');
 
@@ -31,15 +78,43 @@ export default function LoginMagicPage() {
 
     let cancelled = false;
 
-    async function verifyToken() {
+    async function completeLoginRedirect() {
+      await sessionRef.current?.refetchSession?.({ force: true });
+
+      if (cancelled) {
+        return;
+      }
+
+      const registrationStatus = await fetchRegistrationStatus();
+      if (cancelled) {
+        return;
+      }
+
+      if (isRegistrationComplete(registrationStatus)) {
+        navigate(homePath(), { replace: true });
+        return;
+      }
+
+      navigate(loginPath(), { replace: true });
+    }
+
+    async function runVerifyFlow() {
       try {
-        const result = await postJson(AUTH_LOGIN_MAGIC_LINK_VERIFY_PATH, { token });
+        const result = await verifyMagicLinkTokenOnce(token);
 
         if (cancelled) {
           return;
         }
 
         if (!result.ok) {
+          if (await hasActiveSessionCookie()) {
+            magicLinkVerifyCompleted.add(token);
+            setStatus('redirecting');
+            setMessage('Logowanie powiodło się. Przekierowujemy…');
+            await completeLoginRedirect();
+            return;
+          }
+
           setStatus('error');
           setMessage(
             getMagicLinkErrorMessage(
@@ -53,52 +128,43 @@ export default function LoginMagicPage() {
 
         setStatus('redirecting');
         setMessage('Logowanie powiodło się. Przekierowujemy…');
-
-        await session?.refetchSession?.({ force: true });
-        const registrationStatus = await fetchRegistrationStatus();
-
+        await completeLoginRedirect();
+      } catch {
         if (cancelled) {
           return;
         }
 
-        if (isRegistrationComplete(registrationStatus)) {
-          navigate(homePath(), { replace: true });
+        if (await hasActiveSessionCookie()) {
+          magicLinkVerifyCompleted.add(token);
+          setStatus('redirecting');
+          setMessage('Logowanie powiodło się. Przekierowujemy…');
+          await completeLoginRedirect();
           return;
         }
 
-        navigate(loginPath(), { replace: true });
-      } catch {
-        if (!cancelled) {
-          setStatus('error');
-          setMessage('Nie udało się zweryfikować linku logowania.');
-        }
+        setStatus('error');
+        setMessage('Nie udało się zweryfikować linku logowania.');
       }
     }
 
-    void verifyToken();
+    void runVerifyFlow();
 
     return () => {
       cancelled = true;
     };
-  }, [navigate, searchParams, session]);
+  }, [navigate, searchParams]);
 
   const isError = status === 'error';
-  const isLoading = status === 'loading';
+  const showSpinner = status === 'loading' || status === 'redirecting';
 
   return (
     <section
       className="auth-card auth-card--wizard-panel auth-card--left-aligned login-magic"
       aria-live="polite"
     >
-      <img
-        src="/images/pionierid-logo.png"
-        alt="PIONIER.id"
-        className="login-magic__logo auth-logo--pionier"
-      />
-
       <h1 className="login-magic__title">Logowanie przez e-mail</h1>
 
-      {isLoading ? <div className="login-magic__spinner" aria-hidden="true" /> : null}
+      {showSpinner ? <div className="login-magic__spinner" aria-hidden="true" /> : null}
 
       <p
         className={`login-magic__status${isError ? ' login-magic__status--error' : ''}`}

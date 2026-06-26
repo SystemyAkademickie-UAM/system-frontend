@@ -10,16 +10,8 @@
   gap: 0;
 }
 
-.login-magic__logo {
-  width: 100%;
-  max-width: var(--auth-content-max-width);
-  height: auto;
-  object-fit: contain;
-  margin: 0 0 var(--auth-card-logo-to-label-gap);
-}
-
 .login-magic__title {
-  margin: 0 0 var(--auth-card-logo-to-label-gap);
+  margin: 0 0 var(--auth-card-field-to-button-gap);
   width: 100%;
   max-width: var(--auth-content-max-width);
   font-family: 'Manrope', sans-serif;
@@ -91,9 +83,5 @@
 @media (max-width: 640px) {
   .login-magic {
     padding: 1rem 20px 1.75rem;
-  }
-
-  .login-magic__logo {
-    margin-bottom: 2rem;
   }
 }
