@@ -8,8 +8,8 @@ import {
   updateGroupShopItem,
   updateGroupShopOpenStatus,
   useGroupInventoryItem,
-} from '../../../services/shop.api.js';
-import { getShopItemEffectivePrice } from './shopPricing.js';
+} from '../../services/shop.api.js';
+import { getShopItemEffectivePrice } from '../../utils/shop/shopPricing.js';
 import {
   getShopCartItemIds,
   setShopCartItemIds,
@@ -26,26 +26,37 @@ export function useGroupShopItems(groupId) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const refetch = useCallback(async () => {
+  const refetch = useCallback(async (options = {}) => {
+    const silent = options.silent === true;
+
     if (!groupId) {
       setItemsState([]);
-      setIsLoading(false);
-      return;
+      if (!silent) {
+        setIsLoading(false);
+      }
+      return { ok: false, error: 'Brak identyfikatora grupy' };
     }
 
-    setIsLoading(true);
-    setError('');
+    if (!silent) {
+      setIsLoading(true);
+      setError('');
+    }
 
     const result = await fetchGroupShopItems(groupId);
-    setIsLoading(false);
+
+    if (!silent) {
+      setIsLoading(false);
+    }
 
     if (result.ok) {
       setItemsState(result.items);
-      return;
+      return { ok: true };
     }
 
     setItemsState([]);
-    setError(result.error ?? 'Nie udało się pobrać produktów sklepu');
+    const errorMessage = result.error ?? 'Nie udało się pobrać produktów sklepu';
+    setError(errorMessage);
+    return { ok: false, error: errorMessage };
   }, [groupId]);
 
   useEffect(() => {
@@ -111,7 +122,7 @@ export function useGroupShopItems(groupId) {
 
 /**
  * @param {string | number | null | undefined} groupId
- * @param {import('./shopItem.types.js').ShopItem[]} [items]
+ * @param {import('../../utils/shop/shopItem.types.js').ShopItem[]} [items]
  */
 export function useGroupShopCart(groupId, items = []) {
   const cartItemIds = useShopCartItemIds(groupId);
@@ -170,56 +181,43 @@ export function useGroupShopCart(groupId, items = []) {
 
 /**
  * @param {string | number | null | undefined} groupId
- * @param {{ pollIntervalMs?: number }} [options]
  */
-export function useGroupShopOpen(groupId, options = {}) {
-  const { pollIntervalMs = 0 } = options;
+export function useGroupShopOpen(groupId) {
   const [isShopOpen, setIsShopOpenState] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refetch = useCallback(async () => {
+  const refetch = useCallback(async (options = {}) => {
+    const silent = options.silent === true;
+
     if (!groupId) {
       setIsShopOpenState(true);
-      setIsLoading(false);
-      return;
+      if (!silent) {
+        setIsLoading(false);
+      }
+      return { ok: false, error: 'Brak identyfikatora grupy' };
     }
 
-    setIsLoading(true);
+    if (!silent) {
+      setIsLoading(true);
+    }
+
     const result = await fetchGroupShopOpenStatus(groupId);
-    setIsLoading(false);
+
+    if (!silent) {
+      setIsLoading(false);
+    }
+
     if (result.ok) {
       setIsShopOpenState(result.shopOpen);
+      return { ok: true };
     }
+
+    return { ok: false, error: result.error ?? 'Nie udało się pobrać statusu sklepu' };
   }, [groupId]);
 
   useEffect(() => {
     refetch();
   }, [refetch]);
-
-  useEffect(() => {
-    if (!pollIntervalMs || !groupId) {
-      return undefined;
-    }
-
-    const intervalId = window.setInterval(() => {
-      refetch();
-    }, pollIntervalMs);
-
-    const refreshOnVisible = () => {
-      if (document.visibilityState === 'visible') {
-        refetch();
-      }
-    };
-
-    window.addEventListener('focus', refreshOnVisible);
-    document.addEventListener('visibilitychange', refreshOnVisible);
-
-    return () => {
-      window.clearInterval(intervalId);
-      window.removeEventListener('focus', refreshOnVisible);
-      document.removeEventListener('visibilitychange', refreshOnVisible);
-    };
-  }, [pollIntervalMs, groupId, refetch]);
 
   const toggleShopOpen = useCallback(async () => {
     if (!groupId) {

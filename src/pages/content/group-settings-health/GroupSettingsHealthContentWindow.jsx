@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 
 import closeicon from '../../../../public/assets/icons/x-close-svgrepo-com.svg';
 import decreaseicon from '../../../../public/assets/icons/minus-circle-svgrepo-com.svg';

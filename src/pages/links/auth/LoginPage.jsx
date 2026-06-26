@@ -166,7 +166,7 @@ export default function LoginPage() {
       return;
     }
     setIsLogoutBusy(true);
-    logoutUser(() => {
+    void logoutUser(() => {
       void handleLogoutFailed();
     });
   }, [handleLogoutFailed]);

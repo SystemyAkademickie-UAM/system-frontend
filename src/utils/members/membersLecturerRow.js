@@ -1,5 +1,5 @@
-import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import { resolveGroupLecturerDisplay } from '../../../utils/resolveGroupLecturerDisplay.js';
+import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
+import { resolveGroupLecturerDisplay } from '../resolveGroupLecturerDisplay.js';
 
 const AVATAR_BASE = 'https://api.dicebear.com/7.x/adventurer/svg?seed=';
 

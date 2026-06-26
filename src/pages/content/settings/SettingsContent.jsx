@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
-import { useAutoSaveForm } from '../../../hooks/useAutoSaveForm.js';
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
+import { Divider, CharacterLimitedField, Button, Modal, useToast } from '../../../components/ui/index.js';
+import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
+import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
-import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
-import { Divider, CharacterLimitedField, useToast } from '../../../components/ui/index.js';
 import { SETTINGS_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 
@@ -18,12 +19,6 @@ import '../../../components/page/PageUnavailable.css';
 import '../shared/groupSectionPage.css';
 import '../group-members/MembersHomeContent.css';
 import '../group-settings/GroupSettingsForm.css';
-
-import { publicIconPath } from '../../../utils/publicAssetUrl.js';
-
-const lefticon = publicIconPath('arrow-left-svgrepo-com.svg');
-const righticon = publicIconPath('arrow-right-svgrepo-com.svg');
-
 import './SettingsContent.css';
 
 const languagesdictionary = { polish: 'polski', english: 'English', japanese: '日本語', kana: 'にほんご' };
@@ -51,6 +46,27 @@ const showNicknameDescLABEL = {
   japanese: 'オフにすると、ナビバーとグループ説明にニックネームではなく氏名が表示されます。',
   kana: 'オフにすると、ナビバーとグループ説明にニックネームではなく氏名が表示されます。',
 };
+const savebuttonLABEL = { polish: 'Zapisz zmiany', english: 'Save changes', japanese: '変更を保存', kana: 'へんこうをほぞん' };
+const unsavedTitleLABEL = {
+  polish: 'Niezapisane zmiany',
+  english: 'Unsaved changes',
+  japanese: '未保存の変更',
+  kana: 'みほぞんのへんこう',
+};
+const unsavedMessageLABEL = {
+  polish: 'Masz niezapisane zmiany na tej stronie. Czy chcesz je zapisać przed opuszczeniem?',
+  english: 'You have unsaved changes on this page. Do you want to save them before leaving?',
+  japanese: 'このページに未保存の変更があります。離れる前に保存しますか？',
+  kana: 'このページにみほぞんのへんこうがあります。離れるまえにほぞんしますか？',
+};
+const unsavedCancelLABEL = { polish: 'Anuluj', english: 'Cancel', japanese: 'キャンセル', kana: 'キャンセル' };
+const unsavedDiscardLABEL = {
+  polish: 'Odrzuć zmiany',
+  english: 'Discard changes',
+  japanese: '変更を破棄',
+  kana: 'へんこうをはき',
+};
+const unsavedSaveLABEL = { polish: 'Zapisz', english: 'Save', japanese: '保存', kana: 'ほぞん' };
 
 function readLanguageCookie() {
   const cookies = Object.fromEntries(
@@ -88,7 +104,8 @@ export default function SettingsContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [nickname, setNickname] = useState('');
   const [avatars, setAvatars] = useState([]);
-  const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(0);
+  const [selectedAvatarId, setSelectedAvatarId] = useState(null);
+  const [savedSnapshot, setSavedSnapshot] = useState(null);
   const [divlanguage, setDivlanguage] = useState('polski');
   const [language, setLanguage] = useState(() => readLanguageCookie() || 'polish');
 
@@ -110,11 +127,20 @@ export default function SettingsContent() {
       setAvatars(avatarList);
 
       const avatarIndex = avatarList.findIndex((avatar) => avatar.id === profile.avatarId);
-      setSelectedAvatarIndex(avatarIndex >= 0 ? avatarIndex : 0);
+      const loadedAvatarId = avatarIndex >= 0 ? profile.avatarId : avatarList[0]?.id ?? null;
+      setSelectedAvatarId(loadedAvatarId);
 
       if (role === APP_ROLE.LECTURER) {
         setDraftShowNickname(showNickname);
       }
+
+      const currentLanguage = readLanguageCookie() || 'polish';
+      setSavedSnapshot({
+        nickname: profile.nickname || '',
+        avatarId: loadedAvatarId,
+        language: currentLanguage,
+        ...(role === APP_ROLE.LECTURER ? { showNickname } : {}),
+      });
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać ustawień');
     } finally {
@@ -131,13 +157,12 @@ export default function SettingsContent() {
     setIsSaving(true);
     setErrorMessage('');
 
-    const selectedAvatar = avatars[selectedAvatarIndex];
     const payload = {
       nickname: nickname.trim(),
     };
 
-    if (selectedAvatar?.id) {
-      payload.avatarId = selectedAvatar.id;
+    if (selectedAvatarId) {
+      payload.avatarId = selectedAvatarId;
     }
 
     const result = await updateProfile(payload);
@@ -145,12 +170,11 @@ export default function SettingsContent() {
     if (!result.ok) {
       setIsSaving(false);
       showError(result.error || 'Nie udało się zapisać ustawień');
-      return;
+      return false;
     }
 
-    if (result.profile?.nickname) {
-      setNickname(result.profile.nickname);
-    }
+    const trimmedNickname = result.profile?.nickname ?? nickname.trim();
+    setNickname(trimmedNickname);
 
     await refetchProfile();
 
@@ -158,48 +182,69 @@ export default function SettingsContent() {
       setShowNickname(draftShowNickname);
     }
 
+    setSavedSnapshot({
+      nickname: trimmedNickname,
+      avatarId: selectedAvatarId,
+      language: selectedLanguage,
+      ...(role === APP_ROLE.LECTURER ? { showNickname: draftShowNickname } : {}),
+    });
+
     setIsSaving(false);
     showSuccess('Zmiany zostały zapisane.');
+    return true;
   }, [
-    avatars,
     divlanguage,
     draftShowNickname,
     nickname,
     refetchProfile,
     role,
-    selectedAvatarIndex,
+    selectedAvatarId,
     setShowNickname,
     showError,
     showSuccess,
   ]);
 
-  const { commitSave, handleTextFieldKeyDown } = useAutoSaveForm({
-    ready: !isLoading && !isSaving,
-    watchValues: [selectedAvatarIndex, divlanguage, draftShowNickname],
-    getFingerprint: () => JSON.stringify([
-      nickname.trim(),
-      selectedAvatarIndex,
-      divlanguage,
-      draftShowNickname,
-    ]),
+  const isDirty = useMemo(() => {
+    if (!savedSnapshot || isLoading) {
+      return false;
+    }
+
+    if (nickname.trim() !== savedSnapshot.nickname) {
+      return true;
+    }
+
+    if (selectedAvatarId !== savedSnapshot.avatarId) {
+      return true;
+    }
+
+    if (resolveLanguageCode(divlanguage) !== savedSnapshot.language) {
+      return true;
+    }
+
+    if (role === APP_ROLE.LECTURER && draftShowNickname !== savedSnapshot.showNickname) {
+      return true;
+    }
+
+    return false;
+  }, [
+    divlanguage,
+    draftShowNickname,
+    isLoading,
+    nickname,
+    role,
+    savedSnapshot,
+    selectedAvatarId,
+  ]);
+
+  const {
+    isPromptOpen,
+    dismissPrompt,
+    discardChanges,
+    saveAndContinue,
+  } = useUnsavedChangesGuard({
+    when: isDirty && !isSaving,
     onSave: persistSettings,
   });
-
-  function previousicon() {
-    if (avatars.length === 0) return;
-
-    setSelectedAvatarIndex((current) => (
-      current <= 0 ? avatars.length - 1 : current - 1
-    ));
-  }
-
-  function nexticon() {
-    if (avatars.length === 0) return;
-
-    setSelectedAvatarIndex((current) => (
-      current >= avatars.length - 1 ? 0 : current + 1
-    ));
-  }
 
   function onNicknamechange(stringvalue) {
     let nextValue = stringvalue;
@@ -226,8 +271,6 @@ export default function SettingsContent() {
     loadSettings();
   }, [loadSettings]);
 
-  const selectedAvatar = avatars[selectedAvatarIndex] ?? null;
-
   return (
     <div className="app-page-layout">
       <SectionPageLayout
@@ -242,31 +285,20 @@ export default function SettingsContent() {
         {!isLoading ? (
           <div className="group-settings-form group-settings-form--drive-layout">
             <section className="group-settings-form__panel" aria-labelledby="settings-avatar-title">
-              <h2 id="settings-avatar-title" className="group-settings-form__panel-title">
-                {avatarLABEL[language]}
-              </h2>
-              <div className="settings-page__avatar-controls">
-                <button type="button" className="settings-page__avatar-nav" onClick={previousicon} aria-label="Poprzedni awatar" disabled={isSaving}>
-                  <img src={lefticon} alt="" />
-                </button>
-                <div className="settings-page__avatar-preview">
-                  {selectedAvatar?.imageUrl ? (
-                    <img
-                      src={selectedAvatar.imageUrl}
-                      alt=""
-                      className={getAvatarImageClassName(selectedAvatar.imageUrl)}
-                    />
-                  ) : null}
-                </div>
-                <button type="button" className="settings-page__avatar-nav" onClick={nexticon} aria-label="Następny awatar" disabled={isSaving}>
-                  <img src={righticon} alt="" />
-                </button>
-              </div>
+              <SettingsSectionHeader id="settings-avatar-title" title={avatarLABEL[language]} />
+              <AvatarPicker
+                avatars={avatars}
+                value={selectedAvatarId}
+                onChange={setSelectedAvatarId}
+                disabled={isSaving}
+                className="settings-page__avatar-picker"
+              />
             </section>
 
             <Divider className="settings-page__divider" length="50%" />
 
             <section className="settings-page__preferences" aria-label="Preferencje konta">
+              <SettingsSectionHeader title={nicknameLABEL[language]} id="settings-nickname-title" />
               <div className="settings-page__field group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="settings-nickname">
                   {nicknameLABEL[language]}
@@ -279,8 +311,6 @@ export default function SettingsContent() {
                     value={nickname}
                     maxLength={SETTINGS_NICKNAME_MAX_LENGTH}
                     onChange={(event) => onNicknamechange(event.target.value)}
-                    onBlur={commitSave}
-                    onKeyDown={handleTextFieldKeyDown}
                     disabled={isSaving}
                   />
                 </CharacterLimitedField>
@@ -303,6 +333,7 @@ export default function SettingsContent() {
 
               <Divider className="settings-page__divider" length="50%" />
 
+              <SettingsSectionHeader title={languageLABEL[language]} id="settings-language-title" />
               <div className="settings-page__field group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="settings-language">
                   {languageLABEL[language]}
@@ -334,6 +365,46 @@ export default function SettingsContent() {
             </div>
           </div>
         ) : null}
+
+        {!isLoading ? (
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="settings-page__save-fab"
+            onClick={persistSettings}
+            disabled={isSaving}
+          >
+            {savebuttonLABEL[language]}
+          </Button>
+        ) : null}
+
+        <Modal
+          isOpen={isPromptOpen}
+          onClose={dismissPrompt}
+          title={unsavedTitleLABEL[language]}
+          subtitle={unsavedMessageLABEL[language]}
+          showFooter={false}
+          className="settings-page__unsaved-modal"
+        >
+          <div className="settings-page__unsaved-actions">
+            <Button type="button" variant="secondary" size="md" onClick={dismissPrompt}>
+              {unsavedCancelLABEL[language]}
+            </Button>
+            <Button type="button" variant="secondary" size="md" onClick={discardChanges}>
+              {unsavedDiscardLABEL[language]}
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={saveAndContinue}
+              disabled={isSaving}
+            >
+              {unsavedSaveLABEL[language]}
+            </Button>
+          </div>
+        </Modal>
 
         {errorMessage ? (
           <p className="group-settings-form__error" role="alert">{errorMessage}</p>

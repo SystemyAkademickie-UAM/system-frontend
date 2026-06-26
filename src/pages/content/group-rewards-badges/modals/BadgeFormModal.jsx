@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BADGE_RARITY, BADGE_RARITY_LABELS, InfoTooltip, Modal } from '../../../../components/ui/index.js';
+import { BADGE_RARITY, BADGE_RARITY_LABELS, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
 import IconPicker from '../../../../components/ui/IconPicker/IconPicker.jsx';
 import { fetchIconCatalog } from '../../../../services/icons.api.js';
-import { validateWholeNumberInput } from '../../group-rewards/shared/rewardsNumericValidation.js';
+import { validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = {
@@ -65,8 +65,6 @@ export default function BadgeFormModal({
     && rewardValidation.valid
   ), [form, rewardValidation.valid]);
 
-  const showRewardError = form.rewardAmount.trim() !== '' && !rewardValidation.valid;
-
   const handleChange = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
   };
@@ -95,16 +93,15 @@ export default function BadgeFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        <div className="rewards-modal__field">
-          <label htmlFor="badge-name" className="rewards-modal__label">Nazwa</label>
-          <input
-            id="badge-name"
-            type="text"
-            className="rewards-modal__input"
-            value={form.name}
-            onChange={handleChange('name')}
-          />
-        </div>
+        <TextField
+          id="badge-name"
+          label="Nazwa"
+          fieldKind="name"
+          value={form.name}
+          onChange={handleChange('name')}
+          className="rewards-modal__field"
+          inputClassName="rewards-modal__input"
+        />
 
         <div className="rewards-modal__field">
           <label className="rewards-modal__label">Ikona</label>
@@ -117,66 +114,51 @@ export default function BadgeFormModal({
         </div>
 
         <div className="rewards-modal__field">
-          <label htmlFor="badge-rarity" className="rewards-modal__label rewards-modal__label--with-info">
+          <label htmlFor="badge-rarity" className="rewards-modal__label">
             Jakość
-            <InfoTooltip text="Określa rzadkość odznaki i kolor akcentu kafelka (pasek boczny, etykiety)." />
+            <InfoTooltip text="Wpływa na rzadkość odznaki w skarbcu." />
           </label>
           <select
             id="badge-rarity"
-            className="rewards-modal__select"
+            className="rewards-modal__input"
             value={form.rarity}
             onChange={handleChange('rarity')}
           >
-            {Object.values(BADGE_RARITY).map((rarity) => (
-              <option key={rarity} value={rarity}>
-                {BADGE_RARITY_LABELS[rarity]}
-              </option>
+            {Object.entries(BADGE_RARITY_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
             ))}
           </select>
         </div>
 
-        <div className="rewards-modal__field">
-          <label htmlFor="badge-story" className="rewards-modal__label">Opis fabularny</label>
-          <textarea
-            id="badge-story"
-            className="rewards-modal__textarea"
-            value={form.storyDescription}
-            onChange={handleChange('storyDescription')}
-          />
-        </div>
+        <TextField
+          id="badge-story"
+          label="Opis fabularny"
+          fieldKind="shortDescription"
+          value={form.storyDescription}
+          onChange={handleChange('storyDescription')}
+          className="rewards-modal__field"
+          inputClassName="rewards-modal__textarea"
+        />
 
-        <div className="rewards-modal__field">
-          <label htmlFor="badge-didactic" className="rewards-modal__label">Opis dydaktyczny</label>
-          <textarea
-            id="badge-didactic"
-            className="rewards-modal__textarea"
-            value={form.didacticDescription}
-            onChange={handleChange('didacticDescription')}
-          />
-        </div>
+        <TextField
+          id="badge-edu"
+          label="Opis dydaktyczny"
+          fieldKind="shortDescription"
+          value={form.didacticDescription}
+          onChange={handleChange('didacticDescription')}
+          className="rewards-modal__field"
+          inputClassName="rewards-modal__textarea"
+        />
 
-        <div className="rewards-modal__field">
-          <label htmlFor="badge-reward" className="rewards-modal__label">Nagroda</label>
-          <input
-            id="badge-reward"
-            type="text"
-            inputMode="numeric"
-            className={[
-              'rewards-modal__input',
-              showRewardError ? 'rewards-modal__input--error' : '',
-            ].filter(Boolean).join(' ')}
-            value={form.rewardAmount}
-            onChange={handleChange('rewardAmount')}
-            placeholder="np. 50"
-            aria-invalid={showRewardError}
-            aria-describedby={showRewardError ? 'badge-reward-error' : undefined}
-          />
-          {showRewardError ? (
-            <p id="badge-reward-error" className="rewards-modal__field-error" role="alert">
-              {rewardValidation.error}
-            </p>
-          ) : null}
-        </div>
+        <TextField
+          id="badge-reward"
+          label="Nagroda (waluta)"
+          type="number"
+          value={form.rewardAmount}
+          onChange={handleChange('rewardAmount')}
+          className="rewards-modal__field"
+          inputClassName="rewards-modal__input"
+        />
       </div>
     </Modal>
   );

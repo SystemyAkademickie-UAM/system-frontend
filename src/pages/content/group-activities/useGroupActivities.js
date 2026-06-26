@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
-
 async function postJson(path, body) {
   const base = getApiBaseUrl();
   const browserid = getOrCreateBrowserId();
@@ -58,11 +57,22 @@ function mapActivity(raw) {
     description0: raw.storyDescription,
     description1: raw.educationalDescription,
     reward: raw.currency,
+    completionCount: raw.completionCount ?? 0,
   };
 }
 
 function sortByNewestFirst(items) {
   return [...items].sort((a, b) => b.id - a.id);
+}
+
+function mapStage(raw) {
+  return {
+    id: raw.id,
+    name: raw.name,
+    visibilityStatus: raw.visibilityStatus ?? 0,
+    activities: [],
+    expanded: false,
+  };
 }
 
 export function useGroupActivities() {
@@ -78,15 +88,15 @@ export function useGroupActivities() {
       stageId,
     });
 
-    const activities = sortByNewestFirst((data?.activities ?? []).map(mapActivity));
+      const activities = sortByNewestFirst((data?.activities ?? []).map(mapActivity));
 
-    setStages((prev) => prev.map((stage) => (
-      stage.id === stageId
-        ? { ...stage, activities }
-        : stage
-    )));
+      setStages((prev) => prev.map((stage) => (
+        stage.id === stageId
+          ? { ...stage, activities }
+          : stage
+      )));
 
-    return activities;
+      return activities;
   }, []);
 
   const fetchStages = useCallback(async () => {
@@ -105,13 +115,7 @@ export function useGroupActivities() {
         groupId: Number(groupId),
       });
 
-      const receivedStages = sortByNewestFirst((data?.stages ?? []).map((stage) => ({
-        id: stage.id,
-        name: stage.name,
-        activities: [],
-        expanded: false,
-      })));
-
+      const receivedStages = (data?.stages ?? []).map(mapStage);
       setStages(receivedStages);
       setIsLoading(false);
 
@@ -138,7 +142,7 @@ export function useGroupActivities() {
     )));
   }, []);
 
-  const createStage = useCallback(async (name) => {
+  const createStage = useCallback(async (name, { visibilityStatus = 1 } = {}) => {
     const trimmed = name.trim();
     if (!trimmed) {
       showError('Podaj nazwę etapu.');
@@ -150,6 +154,7 @@ export function useGroupActivities() {
         method: 'post',
         groupId: Number(groupId),
         name: trimmed,
+        visibilityStatus,
       });
       showSuccess('Etap został dodany.');
       await fetchStages();
@@ -161,21 +166,39 @@ export function useGroupActivities() {
     }
   }, [groupId, fetchStages, showSuccess, showError]);
 
-  const updateStage = useCallback(async (stageId, name) => {
-    const trimmed = name.trim();
-    if (!trimmed) {
+  const updateStage = useCallback(async (stageId, payload) => {
+    const values = typeof payload === 'string'
+      ? { name: payload }
+      : payload;
+    const trimmed = values.name?.trim();
+    if (values.name !== undefined && !trimmed) {
       showError('Podaj nazwę etapu.');
       return { ok: false };
     }
 
     try {
-      await postJson('/stages', {
+      const body = {
         method: 'modify',
         stageId,
-        name: trimmed,
-      });
+      };
+      if (trimmed) {
+        body.name = trimmed;
+      }
+      if (values.visibilityStatus !== undefined) {
+        body.visibilityStatus = values.visibilityStatus;
+      }
+
+      await postJson('/stages', body);
       setStages((prev) => prev.map((stage) => (
-        stage.id === stageId ? { ...stage, name: trimmed } : stage
+        stage.id === stageId
+          ? {
+            ...stage,
+            ...(trimmed ? { name: trimmed } : {}),
+            ...(values.visibilityStatus !== undefined
+              ? { visibilityStatus: values.visibilityStatus }
+              : {}),
+          }
+          : stage
       )));
       showSuccess('Etap został zaktualizowany.');
       return { ok: true };
@@ -202,17 +225,20 @@ export function useGroupActivities() {
     }
   }, [fetchStages, showSuccess, showError]);
 
-  const copyStage = useCallback(async (stageId) => {
+  const copyStage = useCallback(async (stageId, cloneName) => {
     const sourceStage = stages.find((stage) => stage.id === stageId);
     if (!sourceStage) {
       return { ok: false };
     }
 
+    const trimmedName = cloneName?.trim() || sourceStage.name;
+
     try {
       const data = await postJson('/stages', {
         method: 'post',
         groupId: Number(groupId),
-        name: sourceStage.name,
+        name: trimmedName,
+        visibilityStatus: sourceStage.visibilityStatus ?? 0,
       });
 
       const newStageId = data?.stage;
@@ -239,6 +265,28 @@ export function useGroupActivities() {
     }
   }, [groupId, stages, fetchStages, showSuccess, showError]);
 
+  const reorderStages = useCallback(async (orderedStageIds) => {
+    try {
+      await postJson('/stages', {
+        method: 'reorder',
+        groupId: Number(groupId),
+        stageIds: orderedStageIds,
+      });
+
+      setStages((prev) => {
+        const byId = new Map(prev.map((stage) => [stage.id, stage]));
+        return orderedStageIds
+          .map((stageId) => byId.get(stageId))
+          .filter(Boolean);
+      });
+      showSuccess('Kolejność etapów została zapisana.');
+      return { ok: true };
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      showError(message);
+      return { ok: false, error: message };
+    }
+  }, [groupId, showSuccess, showError]);
   const createActivity = useCallback(async (stageId, values) => {
     try {
       await postJson('/activities', {
@@ -306,6 +354,7 @@ export function useGroupActivities() {
     updateStage,
     deleteStage,
     copyStage,
+    reorderStages,
     createActivity,
     updateActivity,
     deleteActivity,

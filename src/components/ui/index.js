@@ -27,7 +27,15 @@ export { default as ShopCartPanel } from './ShopCartPanel/ShopCartPanel.jsx';
 export { default as TexturedSurface } from './TexturedSurface/TexturedSurface.jsx';
 export { default as CharacterCounter } from './CharacterCounter/CharacterCounter.jsx';
 export { default as CharacterLimitedField } from './CharacterCounter/CharacterLimitedField.jsx';
+export { default as TextField } from './TextField/TextField.jsx';
 export { default as Divider } from './Divider/Divider.jsx';
 export { default as TitleWithDivider } from './TitleWithDivider/TitleWithDivider.jsx';
 export { default as ContentWithMeasuredDivider } from './ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
-export { default as SmartPostCard } from './SmartPostCard/SmartPostCard.jsx';
+export { default as AvatarPicker } from './AvatarPicker/AvatarPicker.jsx';
+export { default as ViewLayoutToggle, VIEW_LAYOUT } from './ViewLayoutToggle/ViewLayoutToggle.jsx';
+export {
+  CatalogFiltersToggle,
+  CatalogFiltersPanel,
+  CatalogFilterGroup,
+  CatalogSortSelect,
+} from './CatalogFilters/CatalogFilters.jsx';

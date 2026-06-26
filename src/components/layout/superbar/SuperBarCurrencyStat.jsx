@@ -47,7 +47,7 @@ export default function SuperBarCurrencyStat({
         onMouseLeave={handleMouseLeave}
       >
         <span className="super-bar-stat__icon">
-          <CurrencyIcon size="lg" ariaLabel={currencyLabel} />
+          <CurrencyIcon size="xl" ariaLabel={currencyLabel} />
         </span>
         <SuperBarStatBadge value={currentAmount} />
       </div>

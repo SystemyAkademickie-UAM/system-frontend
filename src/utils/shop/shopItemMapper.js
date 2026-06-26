@@ -1,4 +1,4 @@
-import { buildDriveBannerUrl } from '../../../constants/drive.constants.js';
+import { parseShopItemImageRef } from './shopItemIcon.js';
 
 /**
  * @param {unknown} raw
@@ -7,17 +7,23 @@ import { buildDriveBannerUrl } from '../../../constants/drive.constants.js';
 export function mapBackendShopItem(raw) {
   const item = /** @type {Record<string, unknown>} */ (raw ?? {});
   const listing = /** @type {Record<string, unknown>} */ (item.listing ?? {});
+  const basePrice = Number(listing.basePrice ?? 0);
+  const discountedPrice = listing.discountedPrice;
 
   const categoryId = item.categoryId ?? null;
   const imageRef = typeof item.imageRef === 'string' ? item.imageRef : null;
+  const icon = parseShopItemImageRef(imageRef);
 
   return {
     id: String(item.id ?? ''),
     name: typeof item.name === 'string' ? item.name : '',
     storyDescription: typeof item.storyDescription === 'string' ? item.storyDescription : '',
     didacticDescription: typeof item.educationalDescription === 'string' ? item.educationalDescription : '',
-    priceAmount: Number(listing.basePrice ?? 0),
-    imageUrl: buildDriveBannerUrl(imageRef) ?? undefined,
+    priceAmount: basePrice,
+    salePriceAmount: discountedPrice === null || discountedPrice === undefined
+      ? undefined
+      : Number(discountedPrice),
+    imageUrl: icon.imageUrl ?? undefined,
     categoryId: categoryId === null || categoryId === undefined ? null : Number(categoryId),
     stockQuantity: listing.stockQuantity === null || listing.stockQuantity === undefined
       ? null
@@ -28,6 +34,7 @@ export function mapBackendShopItem(raw) {
     categories: categoryId !== null && categoryId !== undefined ? [String(categoryId)] : [],
     imageRef: typeof item.imageRef === 'string' ? item.imageRef : null,
     isPublished: typeof item.isPublished === 'boolean' ? item.isPublished : true,
+    isLocked: listing.isLocked === true,
   };
 }
 

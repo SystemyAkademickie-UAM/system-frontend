@@ -19,7 +19,7 @@ function storageKey(groupId) {
 
 /**
  * @param {string | number} groupId
- * @returns {import('./shopItem.types.js').ShopItem[]}
+ * @returns {import('../../../utils/shop/shopItem.types.js').ShopItem[]}
  */
 export function readShopItems(groupId) {
   if (!groupId) {
@@ -40,7 +40,7 @@ export function readShopItems(groupId) {
 
 /**
  * @param {string | number} groupId
- * @param {import('./shopItem.types.js').ShopItem[]} items
+ * @param {import('../../../utils/shop/shopItem.types.js').ShopItem[]} items
  */
 export function writeShopItems(groupId, items) {
   if (!groupId) {
@@ -52,7 +52,7 @@ export function writeShopItems(groupId, items) {
 
 /**
  * @param {string | number} groupId
- * @param {import('./shopItem.types.js').ShopItem[]} items
+ * @param {import('../../../utils/shop/shopItem.types.js').ShopItem[]} items
  */
 export function appendShopItems(groupId, items) {
   const existing = readShopItems(groupId);

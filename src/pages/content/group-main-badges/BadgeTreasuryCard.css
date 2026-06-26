@@ -17,20 +17,13 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  border-radius: var(--badge-border-radius);
-  background: var(--color-bg-surface);
   overflow: visible;
 }
 
 .badge-treasury-card__badge {
   flex: 1 1 auto;
   height: 100%;
-  border-radius: var(--badge-border-radius);
   overflow: hidden;
-}
-
-.badge-treasury-card__badge .maq-badge__body {
-  padding-bottom: 1rem;
 }
 
 .badge-treasury-card__badge .maq-badge__reward {

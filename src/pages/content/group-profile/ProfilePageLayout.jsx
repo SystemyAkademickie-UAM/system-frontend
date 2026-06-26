@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Divider, SubNav } from '../../../components/ui/index.js';
+import { Divider, SubNav, CurrencyDisplay } from '../../../components/ui/index.js';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { formatProfileNumber } from '../../../services/studentProfile.api.js';
@@ -7,6 +7,15 @@ import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { ProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
 import { useGroupStudentProfile } from './useGroupStudentProfile.js';
 import './ProfilePageLayout.css';
+
+function ProfileCurrencyStat({ amount }) {
+  return (
+    <div className="profile-page-layout__stat-line">
+      <span className="profile-page-layout__stat-label">Zdobyta waluta</span>
+      <CurrencyDisplay amount={amount} size="sm" className="profile-page-layout__stat-value" />
+    </div>
+  );
+}
 
 function ProfileStatLine({ label, value }) {
   return (
@@ -59,6 +68,8 @@ export default function ProfilePageLayout({ children }) {
               <h1 className="profile-page-layout__title">{displayName}</h1>
             </header>
 
+            <Divider className="maq-section-page__divider profile-page-layout__head-divider" />
+
             <div className="profile-page-layout__summary">
               <div className="profile-page-layout__avatar-column">
                 {avatarUrl ? (
@@ -76,7 +87,7 @@ export default function ProfilePageLayout({ children }) {
               <Divider orientation="vertical" className="profile-page-layout__summary-divider" />
 
               <div className="profile-page-layout__stats-column">
-                <ProfileStatLine label="Zdobyta waluta" value={formatProfileNumber(profile.totalEarned)} />
+                <ProfileCurrencyStat amount={profile.totalEarned} />
                 <ProfileStatLine label="Zdobyte odznaki" value={formatProfileNumber(profile.badgesCount)} />
                 <ProfileStatLine label="Obecny ranking" value="X" />
                 <ProfileStatLine label="Najwyższa pozycja" value="X" />

@@ -1,5 +1,5 @@
-import { getJson, patchJson, postJson } from '../../../services/api-client.js';
-import { buildDriveBannerUrl } from '../../../constants/drive.constants.js';
+import { getJson, patchJson, postJson } from './api-client.js';
+import { buildDriveBannerUrl } from '../constants/drive.constants.js';
 
 /** Matches backend `GROUP_RESPONSE_GROUP_NOT_CREATED_ID`. */
 const GROUP_RESPONSE_NOT_CREATED = 0;
@@ -37,6 +37,8 @@ function mapBackendGroup(backendGroup, options = {}) {
     bannerUrl: buildDriveBannerUrl(imageRef),
     description: backendGroup.description || null,
     isMine: options.isMine,
+    shopOpensAt: backendGroup.shopOpensAt ?? null,
+    rankShowMemberAvatars: backendGroup.rankShowMemberAvatars !== false,
   };
 }
 

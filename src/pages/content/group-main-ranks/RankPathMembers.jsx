@@ -1,13 +1,14 @@
 import { Link, useParams } from 'react-router-dom';
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import CurrencyDisplay from '../../../components/ui/Currency/CurrencyDisplay.jsx';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
 import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import './RankPathMembers.css';
 
 const DEFAULT_MAX_VISIBLE = 15;
 
-function OverflowBadge({ hiddenStudents, currencySymbol, groupId }) {
+function OverflowBadge({ hiddenStudents, groupId }) {
   const triggerRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -57,10 +58,11 @@ function OverflowBadge({ hiddenStudents, currencySymbol, groupId }) {
                   ) : (
                     <span>{student.nickname}</span>
                   )}
-                  <span className="rank-path-members__overflow-earned">
-                    {student.totalEarned}
-                    {currencySymbol ? ` ${currencySymbol}` : ''}
-                  </span>
+                  <CurrencyDisplay
+                    amount={student.totalEarned}
+                    size="sm"
+                    className="rank-path-members__overflow-earned"
+                  />
                 </li>
               ))}
             </ul>
@@ -77,7 +79,6 @@ function OverflowBadge({ hiddenStudents, currencySymbol, groupId }) {
  */
 export default function RankPathMembers({
   students,
-  currencySymbol,
   maxVisible = DEFAULT_MAX_VISIBLE,
 }) {
   const { groupId } = useParams();
@@ -97,7 +98,6 @@ export default function RankPathMembers({
           nickname={student.nickname}
           avatarUrl={student.avatarUrl}
           totalEarned={student.totalEarned}
-          currencySymbol={currencySymbol}
           size="md"
           tooltipPlacement="left"
           href={groupId && student.accountId
@@ -108,7 +108,6 @@ export default function RankPathMembers({
       {hiddenStudents.length > 0 ? (
         <OverflowBadge
           hiddenStudents={hiddenStudents}
-          currencySymbol={currencySymbol}
           groupId={groupId}
         />
       ) : null}

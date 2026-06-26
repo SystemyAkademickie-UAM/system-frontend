@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, SearchBar } from '../../../components/ui/index.js';
+import { NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { useGroupActivities } from './useGroupActivities.js';
 import ActivitiesTreeTable from './shared/ActivitiesTreeTable.jsx';
@@ -9,6 +10,8 @@ import ActivityDeleteModal from './modals/ActivityDeleteModal.jsx';
 import ActivityAssignModal from './modals/ActivityAssignModal.jsx';
 import StageFormModal from './modals/StageFormModal.jsx';
 import StageDeleteModal from './modals/StageDeleteModal.jsx';
+import { buildStageCloneName } from '../../../utils/stages/stageCloneName.js';
+import StageCloneModal from './modals/StageCloneModal.jsx';
 import './shared/activitiesShared.css';
 
 function filterStages(stages, query) {
@@ -48,6 +51,7 @@ export default function ActivitiesContent() {
     updateStage,
     deleteStage,
     copyStage,
+    reorderStages,
     createActivity,
     updateActivity,
     deleteActivity,
@@ -83,13 +87,21 @@ export default function ActivitiesContent() {
     }
   }, [createStage, newStageName]);
 
-  const handleStageEditConfirm = useCallback(async ({ name }) => {
+  const handleStageEditConfirm = useCallback(async (values) => {
     if (!activeModal?.stage) return;
     setModalLoading(true);
-    const result = await updateStage(activeModal.stage.id, name);
+    const result = await updateStage(activeModal.stage.id, values);
     setModalLoading(false);
     if (result.ok) closeModal();
   }, [activeModal, updateStage, closeModal]);
+
+  const handleStageCloneConfirm = useCallback(async (cloneName) => {
+    if (!activeModal?.stage) return;
+    setModalLoading(true);
+    const result = await copyStage(activeModal.stage.id, cloneName);
+    setModalLoading(false);
+    if (result.ok) closeModal();
+  }, [activeModal, copyStage, closeModal]);
 
   const handleStageDeleteConfirm = useCallback(async () => {
     if (!activeModal?.stage) return;
@@ -145,18 +157,31 @@ export default function ActivitiesContent() {
         onSelect: (stage) => openModal('editStage', { stage }),
       },
       {
+        id: 'visibility',
+        label: 'Ukryj / upublicznij etap',
+        description: 'Zmień widoczność etapu dla studentów.',
+        onSelect: async (stageItem) => {
+          const nextStatus = stageItem.visibilityStatus === 1 ? 0 : 1;
+          await updateStage(stageItem.id, { visibilityStatus: nextStatus });
+        },
+      },
+      {
         id: 'copy',
         label: 'Kopiuj etap',
         description: 'Utwórz kopię etapu wraz z aktywnościami.',
-        onSelect: async (stage) => {
-          await copyStage(stage.id);
+        onSelect: (stageItem) => {
+          const defaultName = buildStageCloneName(
+            stageItem.name,
+            stages.map((item) => item.name),
+          );
+          openModal('cloneStage', { stage: stageItem, defaultCloneName: defaultName });
         },
       },
     ],
     onDelete: (stage) => openModal('deleteStage', { stage }),
     deleteLabel: 'Usuń etap',
     deleteAriaLabel: (stage) => `Usuń etap ${stage.name}`,
-  }), [openModal, copyStage]);
+  }), [openModal, copyStage, updateStage, stages]);
 
   const activityRowActions = useMemo(() => ({
     inlineActions: [
@@ -194,12 +219,14 @@ export default function ActivitiesContent() {
         <div className="maq-section-page__toolbar-start">
           <div className="activities-page__add-island">
             <input
+              id="new-stage-name"
               type="text"
               className="activities-page__add-input"
               value={newStageName}
               onChange={(event) => setNewStageName(event.target.value)}
               placeholder="Nazwa nowego etapu"
               aria-label="Nazwa nowego etapu"
+              maxLength={NAME_MAX_LENGTH}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
                   handleAddStage();
@@ -244,6 +271,7 @@ export default function ActivitiesContent() {
           onToggleExpand={handleToggleExpand}
           stageRowActions={stageRowActions}
           activityRowActions={activityRowActions}
+          onReorderStages={reorderStages}
         />
       )}
 
@@ -260,6 +288,15 @@ export default function ActivitiesContent() {
         stage={modalStage}
         onClose={closeModal}
         onConfirm={handleStageDeleteConfirm}
+        isLoading={modalLoading}
+      />
+
+      <StageCloneModal
+        isOpen={activeModal?.type === 'cloneStage'}
+        stage={modalStage}
+        defaultName={activeModal?.defaultCloneName ?? ''}
+        onClose={closeModal}
+        onConfirm={handleStageCloneConfirm}
         isLoading={modalLoading}
       />
 

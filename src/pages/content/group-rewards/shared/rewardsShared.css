@@ -45,7 +45,33 @@
   width: 100%;
   max-width: 18rem;
   flex: 0 0 auto;
-  margin-left: auto;
+}
+
+.rewards-page__toolbar-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.625rem;
+}
+
+.rewards-page__toolbar-end .rewards-page__search {
+  margin-left: 0;
+}
+
+.rewards-page__filters {
+  margin-bottom: 1rem;
+}
+
+.rewards-ranks__members-toggle-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.rewards-ranks__members-toggle {
+  white-space: nowrap;
 }
 
 .rewards-page__loading,

@@ -3,6 +3,13 @@
   width: 100%;
   max-width: none;
   align-self: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.settings-page.page-unavailable {
+  flex: 1;
+  min-height: 0;
 }
 
 .settings-page__body {
@@ -10,6 +17,8 @@
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .settings-page__preferences {
@@ -38,6 +47,24 @@
 
 .settings-page__divider {
   flex-shrink: 0;
+}
+
+.settings-page__avatar-picker.maq-avatar-picker {
+  width: 100%;
+  max-width: 50%;
+  align-self: flex-start;
+}
+
+.settings-page .group-settings-form--drive-layout {
+  flex: 1;
+  min-height: 0;
+}
+
+.settings-page .group-settings-form--drive-layout > .group-settings-form__panel:first-of-type:has(.maq-avatar-picker--gallery-open) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .settings-page__avatar-controls {
@@ -119,6 +146,22 @@
   align-items: center;
   gap: 0.75rem;
   padding-top: 0.25rem;
+  padding-bottom: 4.5rem;
+}
+
+.settings-page__save-fab {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 90;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.settings-page__unsaved-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
 }
 
 .settings-page__help-text {
@@ -133,7 +176,21 @@
     max-width: 100%;
   }
 
+  .settings-page__avatar-picker.maq-avatar-picker {
+    max-width: 100%;
+  }
+
   .settings-page__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-page__save-fab {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .settings-page__unsaved-actions {
     flex-direction: column;
     align-items: stretch;
   }

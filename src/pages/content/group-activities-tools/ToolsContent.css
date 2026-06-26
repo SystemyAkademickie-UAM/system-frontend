@@ -33,6 +33,10 @@
   flex-shrink: 0;
 }
 
+.activities-tools-page__tool-icon--flipped {
+  transform: rotate(180deg);
+}
+
 .activities-tools-page__tool-btn:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;

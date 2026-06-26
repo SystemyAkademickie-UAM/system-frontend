@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
 import { Button, Divider, CharacterLimitedField, useToast } from '../../../components/ui/index.js';
 import {
   GROUP_NAME_MAX_LENGTH,
@@ -7,16 +8,15 @@ import {
   GROUP_DESCRIPTION_MAX_LENGTH,
 } from '../../../constants/fieldLimits.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
-import { useAutoSaveForm } from '../../../hooks/useAutoSaveForm.js';
 import {
   buildBannerImageRefPayload,
   createDefaultBannerPickerValue,
   parseImageRefToBannerPickerValue,
   serializeBannerPickerValue,
 } from '../../../utils/groupBannerRef.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
-import { createGroup, fetchGroupById, updateGroup } from '../groups-list/groupsList.api.js';
+import { createGroup, fetchGroupById, updateGroup } from '../../../services/groups.api.js';
 import './GroupSettingsForm.css';
 
 const GROUP_NAME_MAX = GROUP_NAME_MAX_LENGTH;
@@ -191,19 +191,6 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
     subjectnamevalue,
   ]);
 
-  const bannerFingerprint = serializeBannerPickerValue(bannerSelection);
-
-  const { commitSave, handleTextFieldKeyDown } = useAutoSaveForm({
-    ready: Boolean(groupId) && !isLoadingGroup && !isSaving,
-    watchValues: [bannerFingerprint],
-    getFingerprint: () => JSON.stringify([
-      groupnamevalue.trim(),
-      subjectnamevalue.trim(),
-      groupdescriptionvalue.trim(),
-      bannerFingerprint,
-    ]),
-    onSave: persistGroupSettings,
-  });
 
   function onRejectclick() {
     setGroupnamevalue('');
@@ -224,6 +211,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
   return (
     <div className="group-settings-form group-settings-form--drive-layout">
       <section className="group-settings-form__panel" aria-label="Ustawienia grupy">
+        <SettingsSectionHeader title="Ogólne" id="group-settings-general-title" />
         {isLoadingGroup ? (
           <p className="group-settings-form__hint">Ładowanie danych grupy…</p>
         ) : null}
@@ -243,8 +231,6 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
                 value={groupnamevalue}
                 maxLength={GROUP_NAME_MAX}
                 onChange={(event) => onGroupnamechange(event.target.value)}
-                onBlur={commitSave}
-                onKeyDown={handleTextFieldKeyDown}
                 disabled={isSaving || isLoadingGroup}
               />
             </CharacterLimitedField>
@@ -264,8 +250,6 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
                 value={subjectnamevalue}
                 maxLength={SUBJECT_NAME_MAX}
                 onChange={(event) => onSubjectnamechange(event.target.value)}
-                onBlur={commitSave}
-                onKeyDown={handleTextFieldKeyDown}
                 disabled={isSaving || isLoadingGroup}
               />
             </CharacterLimitedField>
@@ -282,7 +266,6 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
                 value={groupdescriptionvalue}
                 maxLength={GROUP_DESCRIPTION_MAX}
                 onChange={(event) => onGroupdescriptionchange(event.target.value)}
-                onBlur={commitSave}
                 placeholder="Krótko opisz tło fabularne i cele grupy…"
                 disabled={isSaving || isLoadingGroup}
               />
@@ -292,6 +275,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
 
         <Divider className="group-settings-form__section-divider" />
 
+        <SettingsSectionHeader title="Baner" id="group-settings-banner-title" />
         <div className="group-settings-form__field group-settings-form__field--banner">
           <GroupBannerPicker
             value={bannerSelection}
@@ -303,6 +287,20 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
 
       {errorMessage ? (
         <p className="group-settings-form__error" role="alert">{errorMessage}</p>
+      ) : null}
+
+      {groupId ? (
+        <div className="group-settings-form__footer">
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            onClick={persistGroupSettings}
+            disabled={isSaving || isLoadingGroup}
+          >
+            Zapisz zmiany
+          </Button>
+        </div>
       ) : null}
 
       {popupclose ? (

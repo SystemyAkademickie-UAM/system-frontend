@@ -1,7 +1,8 @@
-import { IconStar } from './ShellIcons.jsx';
+import LivesIcon from '../../ui/Lives/LivesIcon.jsx';
 import SuperBarBreadcrumb from './SuperBarBreadcrumb.jsx';
 import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
+import NotificationBell from './NotificationBell.jsx';
 import SuperBarStat from './SuperBarStat.jsx';
 import SuperBarUserMenu from './SuperBarUserMenu.jsx';
 import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
@@ -21,7 +22,7 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
  * @param {string | null} [props.displayName] — ksywka lub nazwa z sesji (null = placeholder)
  * @param {string} [props.roleLabel]
  * @param {string | null} [props.avatarUrl] — awatar z profilu użytkownika
- * @param {string} [props.livesDisplay] — docelowo z API grupy
+ * @param {string} [props.livesLabel] — etykieta systemu żyć z konfiguracji grupy
  * @param {string} [props.currencyDisplay] — aktualna waluta studenta
  * @param {string} [props.totalEarnedDisplay] — zgromadzona waluta (podgląd hover)
  * @param {string} [props.currencyLabel] — nazwa waluty grupy
@@ -37,6 +38,7 @@ export default function SuperBar({
   roleLabel = PLACEHOLDER_ROLE_LABEL,
   avatarUrl = null,
   livesDisplay = DEFAULT_LIVES_DISPLAY,
+  livesLabel = 'Życia',
   currencyDisplay = DEFAULT_CURRENCY_DISPLAY,
   totalEarnedDisplay = '0',
   currencyLabel = 'Waluta',
@@ -78,7 +80,11 @@ export default function SuperBar({
       <div className="super-bar__end">
         {showStudentGroupStats ? (
           <>
-            <SuperBarStat icon={<IconStar />} value={livesDisplay} ariaLabel={`Życia: ${livesDisplay}`} />
+            <SuperBarStat
+              icon={<LivesIcon size="xl" ariaLabel={livesLabel} />}
+              value={livesDisplay}
+              ariaLabel={`${livesLabel}: ${livesDisplay}`}
+            />
             <SuperBarCurrencyStat
               currentAmount={currencyDisplay}
               totalEarned={totalEarnedDisplay}
@@ -87,6 +93,7 @@ export default function SuperBar({
             />
           </>
         ) : null}
+        <NotificationBell />
         <SuperBarSettingsButton onNavigate={onNavigate} />
         <SuperBarUserMenu
           displayName={resolvedDisplayName}

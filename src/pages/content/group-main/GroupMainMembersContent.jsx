@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { DataTable } from '../../../components/ui/index.js';
-import { fetchGroupStudents } from '../../../services/students.api.js';
+import { fetchMembersPageStudents } from '../../../services/groupParticipants.api.js';
+import { fetchGroupPreview } from '../../../services/groups.api.js';
 import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useSession } from '../../../context/SessionContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
-import { fetchGroupPreview } from '../groups-list/groupsList.api.js';
-import { buildLecturerMemberRow, generateMemberAvatarFallback } from '../group-members/membersLecturerRow.js';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { buildLecturerMemberRow, generateMemberAvatarFallback } from '../../../utils/members/membersLecturerRow.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import './GroupMainMembersContent.css';
 import './shared/groupMainSubpageHeader.css';
@@ -129,12 +130,19 @@ export default function GroupMainMembersContent() {
       setError('');
 
       try {
+        const isStudentView = role === APP_ROLE.STUDENT;
         const [students, preview] = await Promise.all([
-          fetchGroupStudents(groupId),
+          fetchMembersPageStudents(groupId, { isStudentView }),
           fetchGroupPreview(groupId),
         ]);
 
         if (cancelled) {
+          return;
+        }
+
+        if (!preview.group && students.length === 0) {
+          setError('Nie udało się pobrać listy uczestników.');
+          setMembers([]);
           return;
         }
 

@@ -138,68 +138,23 @@ export const ROUTE_TABLE = [
     pageModule: 'pages/links/groups/main/GroupMainHomePage.jsx',
     contentModule: 'pages/content/group-main/GroupMainHomeContent.jsx',
   },
-  {
-    id: 'group.main.posts',
-    section: 'group',
-    pathPattern: '/groups/:groupId/home/posts',
-    pageTitle: 'Aktywności — wpisy (legacy redirect)',
-    pageModule: 'pages/links/groups/main/GroupMainPostsPage.jsx',
-    contentModule: 'pages/content/group-main/GroupMainPostsContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
-  {
-    id: 'group.main.members',
-    section: 'group',
-    pathPattern: '/groups/:groupId/home/members',
-    pageTitle: 'Użytkownicy — uczestnicy (legacy redirect)',
-    pageModule: 'pages/links/groups/main/GroupMainMembersPage.jsx',
-    contentModule: 'pages/content/group-main-members/GroupMainMembersContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
-  {
-    id: 'group.main.activities',
-    section: 'group',
-    pathPattern: '/groups/:groupId/home/activities',
-    pageTitle: 'Aktywności — etapy (legacy redirect)',
-    pageModule: 'pages/links/groups/main/GroupMainActivitiesPage.jsx',
-    contentModule: 'pages/content/group-main-activities/GroupMainActivitiesContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
-  {
-    id: 'group.main.ranks',
-    section: 'group',
-    pathPattern: '/groups/:groupId/home/ranks',
-    pageTitle: 'Podgląd — rangi',
-    pageModule: 'pages/links/groups/main/GroupMainRanksPage.jsx',
-    contentModule: 'pages/content/group-main-ranks/GroupMainRanksContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
-  {
-    id: 'group.main.badges',
-    section: 'group',
-    pathPattern: '/groups/:groupId/home/badges',
-    pageTitle: 'Podgląd — odznaki',
-    pageModule: 'pages/links/groups/main/GroupMainBadgesPage.jsx',
-    contentModule: 'pages/content/group-main-badges/GroupMainBadgesContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
 
   // ===========================================================================
   // GROUP — Student flat routes (poza /home)
   // ===========================================================================
   {
-    id: 'group.student.feed',
+    id: 'group.student.posts',
     section: 'group',
-    pathPattern: '/groups/:groupId/feed',
+    pathPattern: '/groups/:groupId/posts',
     pageTitle: 'Wpisy',
     pageModule: 'pages/links/groups/main/GroupMainPostsPage.jsx',
     contentModule: 'pages/content/group-main/GroupMainPostsContent.jsx',
     roles: ['student'],
   },
   {
-    id: 'group.student.participants',
+    id: 'group.student.users',
     section: 'group',
-    pathPattern: '/groups/:groupId/participants',
+    pathPattern: '/groups/:groupId/users',
     pageTitle: 'Uczestnicy',
     pageModule: 'pages/links/groups/main/GroupMainMembersPage.jsx',
     contentModule: 'pages/content/group-main-members/GroupMainMembersContent.jsx',
@@ -246,10 +201,10 @@ export const ROUTE_TABLE = [
     roles: ['student'],
   },
   {
-    id: 'group.profile.log',
+    id: 'group.profile.activity',
     section: 'group',
-    pathPattern: '/groups/:groupId/profile/log',
-    pageTitle: 'Profil — aktywności',
+    pathPattern: '/groups/:groupId/profile/activity',
+    pageTitle: 'Profil — dziennik aktywności',
     pageModule: 'pages/links/groups/profile/ProfileLogPage.jsx',
     contentModule: 'pages/content/group-profile-log/ProfileLogContent.jsx',
     roles: ['student'],
@@ -313,9 +268,9 @@ export const ROUTE_TABLE = [
     roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
-    id: 'group.members.code',
+    id: 'group.members.codes',
     section: 'group',
-    pathPattern: '/groups/:groupId/members/code',
+    pathPattern: '/groups/:groupId/members/codes',
     pageTitle: 'Użytkownicy — kody dostępu',
     pageModule: 'pages/links/groups/members/MembersCodePage.jsx',
     contentModule: 'pages/content/group-members-code/MembersCodeContent.jsx',
@@ -338,22 +293,22 @@ export const ROUTE_TABLE = [
     id: 'group.activities.tools',
     section: 'group',
     pathPattern: '/groups/:groupId/activities/tools',
-    pageTitle: 'Aktywności — narzędzia',
+    pageTitle: 'Aktywności — raporty',
     pageModule: 'pages/links/groups/activities/ActivitiesToolsPage.jsx',
     contentModule: 'pages/content/group-activities-tools/ActivitiesToolsContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
   },
 
   // ===========================================================================
-  // GROUP — Wpisy (/posts) — lecturer
+  // GROUP — Wpisy (/activities/posts) — lecturer
   // ===========================================================================
   {
-    id: 'group.posts.home',
+    id: 'group.activities.posts',
     section: 'group',
-    pathPattern: '/groups/:groupId/posts',
+    pathPattern: '/groups/:groupId/activities/posts',
     pageTitle: 'Aktywności — wpisy',
     pageModule: 'pages/links/groups/posts/PostsHomePage.jsx',
-    contentModule: 'pages/content/group-posts/PostsHomeContent.jsx',
+    contentModule: 'pages/content/group-posts/PostsContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
   },
 
@@ -361,21 +316,21 @@ export const ROUTE_TABLE = [
   // GROUP — Systemy nagród (/rewards) — lecturer
   // ===========================================================================
   {
-    id: 'group.rewards.home',
-    section: 'group',
-    pathPattern: '/groups/:groupId/rewards',
-    pageTitle: 'Systemy nagród — rangi',
-    pageModule: 'pages/links/groups/rewards/RewardsHomePage.jsx',
-    contentModule: 'pages/content/group-rewards/RewardsHomeContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
-  {
     id: 'group.rewards.badges',
     section: 'group',
-    pathPattern: '/groups/:groupId/rewards/badges',
+    pathPattern: '/groups/:groupId/rewards',
     pageTitle: 'Systemy nagród — odznaki',
     pageModule: 'pages/links/groups/rewards/RewardsBadgesPage.jsx',
     contentModule: 'pages/content/group-rewards-badges/RewardsBadgesContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
+  },
+  {
+    id: 'group.rewards.ranks',
+    section: 'group',
+    pathPattern: '/groups/:groupId/rewards/ranks',
+    pageTitle: 'Systemy nagród — rangi',
+    pageModule: 'pages/links/groups/rewards/RewardsHomePage.jsx',
+    contentModule: 'pages/content/group-rewards/RewardsHomeContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
   },
   {
@@ -420,19 +375,6 @@ export const ROUTE_TABLE = [
   },
 
   // ===========================================================================
-  // GROUP — Podgląd (/preview) — lecturer
-  // ===========================================================================
-  {
-    id: 'group.preview.shop',
-    section: 'group',
-    pathPattern: '/groups/:groupId/preview/shop',
-    pageTitle: 'Podgląd — sklep',
-    pageModule: 'pages/links/groups/shop/ShopHomePage.jsx',
-    contentModule: 'pages/content/group-shop/GroupShopContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
-
-  // ===========================================================================
   // GROUP — Sklep (/shop)
   // ===========================================================================
   {
@@ -442,6 +384,7 @@ export const ROUTE_TABLE = [
     pageTitle: 'Sklep',
     pageModule: 'pages/links/groups/shop/ShopHomePage.jsx',
     contentModule: 'pages/content/group-shop/GroupShopContent.jsx',
+    roles: ['student'],
   },
   {
     id: 'group.shop.add',

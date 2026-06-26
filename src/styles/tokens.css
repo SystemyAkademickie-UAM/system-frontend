@@ -92,7 +92,8 @@
 
   /** Tekst i linie w kafelkach odznak (Figma) */
   --color-badge-text: #e3e0f7;
-  --color-badge-divider: rgba(60, 74, 60, 0.2);
+  --color-badge-divider: #21242e;
+  --color-badge-date: #BBCBB9;
 
   /** Typografia odznak */
   --font-size-badge-title: 18px;
@@ -101,10 +102,10 @@
   --font-size-badge-label: 14px;
   --font-size-badge-label-mini: 14px;
   --line-height-badge-label: 16px;
-  --font-size-badge-body: 14px;
+  --font-size-badge-body: 12px;
   --line-height-badge-body: 23px;
   --line-height-badge-meta: 15px;
-  --font-size-badge-rarity: 14px;
+  --font-size-badge-rarity: 12px;
   --font-size-badge-rarity-mini: 14px;
   --font-size-badge-reward: 14px;
   --letter-spacing-badge-label: 1px;
@@ -112,12 +113,15 @@
   /** Wymiary odznak */
   --size-badge-icon-circle: 64px;
   --size-badge-icon: 30px;
-  --badge-max-width: 533px;
+  --badge-max-width: 453px;
+  --product-card-max-width: 453px;
+  --color-product-card-accent: #b45309;
+  --product-card-accent-width: 4px;
   --badge-mini-max-width: 300px;
   --badge-mini-min-height: 125px;
   --badge-border-radius: 16px;
   --badge-mini-border-radius: 12px;
-  --badge-accent-width: 5px;
+  --badge-accent-width: 8px;
   --badge-mini-accent-width: 4px;
 
   /* --- Rangi — kafelek (domyślny motyw; później zależny od liczby rang) --- */
@@ -197,6 +201,8 @@
 
   --shell-sidebar-scrollbar-width: 10px;
   --shell-sidebar-width: calc(224px + var(--shell-sidebar-scrollbar-width));
+  /** Pionowy pasek przewijania strony (główna kolumna) — stabilizuje SuperBar. */
+  --shell-page-scrollbar-width: 15px;
   --shell-superbar-height: 63px;
   --z-index-shell-header: 10;
   --z-index-modal: 1000;

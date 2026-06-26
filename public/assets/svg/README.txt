@@ -45,7 +45,9 @@ status/
   info.svg            — podpowiedź (InfoTooltip)
 
 nav/
-  home.svg            — ekran główny
+  breadcrumb-home.svg — domek w breadcrumb SuperBar (lista grup)
+  group-main.svg      — siatka „Strona główna” w sidebarze
+  home.svg            — legacy (nie używać w nowym kodzie)
   profile.svg         — profil
   shop.svg            — sklep
   ranking.svg         — ranking
@@ -64,8 +66,12 @@ nav/
 
 Nawigacja boczna (Sidebar)
 ----------------------------
-iconId w shellTemplates.config.js = ścieżka bez .svg, np. nav/home
-NavGlyph ładuje: nav/home.svg
+iconId w shellTemplates.config.js = ścieżka bez .svg, np. nav/group-main
+NavGlyph ładuje: nav/group-main.svg (Strona główna grupy)
+
+Breadcrumb SuperBar
+-------------------
+SuperBarBreadcrumb używa SVG_ICONS.nav.breadcrumbHome → nav/breadcrumb-home.svg
 
 
 Dodawanie nowej ikony

@@ -1,0 +1,35 @@
+.welcome-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: min(420px, calc(100vh - 12rem));
+}
+
+.welcome-page__card {
+  gap: 1.5rem;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+}
+
+.welcome-page__logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.welcome-page__lead {
+  margin: 0;
+  font-size: var(--font-size-section-title);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+.welcome-page__login-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12rem;
+  text-decoration: none;
+}

@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ProductCard } from '../../../../components/ui/index.js';
 import { DataTableRowActions } from '../../../../components/ui/DataTable/DataTable.jsx';
-import { resolveShopCategoryLabels } from '../../group-shop/shopCategories.js';
+import { resolveShopCategoryLabels } from '../../../../utils/shop/shopCategories.js';
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
@@ -60,13 +60,13 @@ export default function RewardsShopItemTableRow({ row, columns, rowActions }) {
             <ProductCard
               variant="preview"
               hideActions
+              itemId={row.id}
               name={row.name}
               storyDescription={row.storyDescription}
               didacticDescription={row.didacticDescription}
               priceAmount={row.priceAmount}
               salePriceAmount={row.salePriceAmount}
-              priceEmoji="🥕"
-              imageUrl={row.imageUrl}
+              imageRef={row.imageRef}
               categories={resolveShopCategoryLabels(row.categories)}
             />
           </div>,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchGroupsCatalog, filterGroups } from './groupsList.api.js';
+import { fetchGroupsCatalog, filterGroups } from '../../../services/groups.api.js';
 
 export function useGroupsList() {
   const [myGroups, setMyGroups] = useState([]);

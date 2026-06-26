@@ -8,7 +8,14 @@ import { fetchGroupRanks } from '../../../services/ranks.api.js';
 
 import { fetchGroupBadges } from '../../../services/badges.api.js';
 
-import { generateMemberAvatarFallback } from './membersLecturerRow.js';
+import { generateMemberAvatarFallback } from '../../../utils/members/membersLecturerRow.js';
+import { detectRankPromotion } from '../../../utils/ranks/rankPromotion.js';
+import {
+  AUTO_RANK_OPTION,
+  isAutoRankEnabled,
+  resolveRankIdFromTotalEarned,
+  resolveRankNameFromTotalEarned,
+} from '../../../utils/ranks/autoRankAssignment.js';
 
 
 
@@ -41,7 +48,7 @@ import { generateMemberAvatarFallback } from './membersLecturerRow.js';
  * @property {number} totalCurrency
 
  * @property {number} badgesCount
-
+ * @property {boolean} autoRankEnabled
  */
 
 
@@ -49,42 +56,6 @@ import { generateMemberAvatarFallback } from './membersLecturerRow.js';
 function generateAvatarFallback(email, nickname) {
   const seed = email.split('@')[0] || nickname.replace(/\s+/g, '') || 'default';
   return generateMemberAvatarFallback(seed);
-}
-
-
-
-function getRankRequiredPoints(ranks, rankId) {
-
-  if (rankId == null) return -1;
-
-  return ranks.find((rank) => rank.id === rankId)?.requiredPoints ?? -1;
-
-}
-
-
-
-function isRankPromotion(ranks, previousRankId, nextRankId) {
-
-  if (nextRankId == null) return false;
-
-  return getRankRequiredPoints(ranks, nextRankId) > getRankRequiredPoints(ranks, previousRankId);
-
-}
-
-
-
-function detectRankPromotion(ranks, member, nextMember) {
-
-  if (!nextMember || !isRankPromotion(ranks, member.rankId, nextMember.rankId)) {
-
-    return null;
-
-  }
-
-
-
-  return nextMember.rank;
-
 }
 
 
@@ -136,6 +107,8 @@ function mapStudentToMember(student, index, ranksMap, badgesCount) {
     totalCurrency: student.totalEarned,
 
     badgesCount,
+
+    autoRankEnabled: student.autoRankEnabled !== false,
 
   };
 
@@ -319,6 +292,8 @@ export function useGroupMembers() {
 
       badgesCount: freshMember.badgesCount,
 
+      autoRankEnabled: freshMember.autoRankEnabled,
+
     });
 
 
@@ -371,34 +346,39 @@ export function useGroupMembers() {
 
 
 
-  const updateMemberRank = useCallback(async (member, newRankId) => {
-
+  const updateMemberRank = useCallback(async (member, selection) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
+    const isAutomatic = selection === AUTO_RANK_OPTION || selection?.mode === 'auto';
+    const payload = { enrollmentId: member.enrollmentId };
 
+    if (isAutomatic) {
+      payload.autoRankEnabled = true;
+      payload.rankId = resolveRankIdFromTotalEarned(ranks, member.totalCurrency);
+    } else {
+      const rankName = typeof selection === 'string' ? selection : selection?.rankName;
+      const selectedRank = ranks.find((rank) => rank.name === rankName);
+      payload.autoRankEnabled = false;
+      payload.rankId = selectedRank?.id ?? null;
+    }
 
-    const result = await bulkUpdateStudents(groupId, [
-
-      { enrollmentId: member.enrollmentId, rankId: newRankId },
-
-    ]);
-
-
+    const result = await bulkUpdateStudents(groupId, [payload]);
 
     if (result.ok) {
+      const rankName = isAutomatic
+        ? resolveRankNameFromTotalEarned(ranks, member.totalCurrency)
+        : (payload.rankId
+          ? (ranks.find((rank) => rank.id === payload.rankId)?.name || 'Brak rangi')
+          : 'Brak rangi');
 
-      const rankName = newRankId
-
-        ? (ranks.find((rank) => rank.id === newRankId)?.name || 'Brak rangi')
-
-        : 'Brak rangi';
-
-      updateMember(member.id, { rankId: newRankId, rank: rankName });
-
+      updateMember(member.id, {
+        rankId: payload.rankId,
+        rank: rankName,
+        autoRankEnabled: isAutomatic,
+      });
     }
 
     return result;
-
   }, [groupId, ranks, updateMember]);
 
 
@@ -498,6 +478,8 @@ export function useGroupMembers() {
     isLoading,
 
     error,
+
+    isAutoRankEnabled,
 
     refetch: () => loadData(),
 

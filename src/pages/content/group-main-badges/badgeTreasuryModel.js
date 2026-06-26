@@ -83,7 +83,6 @@ export function mapBadgeForTreasury(badge, index, earnedBadgeIds = null) {
     storyDescription: badge.storyDescription || '',
     didacticDescription: badge.educationalDescription || '',
     rewardAmount: badge.rewardAmount ?? 0,
-    rewardEmoji: '🥕',
     isUnlocked,
   };
 }

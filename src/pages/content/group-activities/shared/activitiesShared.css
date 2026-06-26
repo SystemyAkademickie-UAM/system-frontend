@@ -94,7 +94,7 @@
 
   display: inline-flex;
 
-  align-items: stretch;
+  align-items: center;
 
   gap: 0.75rem;
 
@@ -243,6 +243,49 @@
 
 .activities-island--expanded {
   border-color: rgba(255, 255, 255, 0.12);
+}
+
+.activities-island--hidden .activities-island__header-start,
+.activities-island--hidden .activities-island__body {
+  opacity: 0.82;
+}
+
+.activities-island__drag-handle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 2.5rem;
+  margin-right: -0.25rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-muted, rgba(227, 224, 247, 0.55));
+  cursor: grab;
+  font-size: 0.9rem;
+  letter-spacing: -0.15em;
+}
+
+.activities-island__drag-handle:active {
+  cursor: grabbing;
+}
+
+.activities-island__visibility-badge {
+  flex-shrink: 0;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.activities-island__visibility-badge--visible {
+  background: rgba(66, 243, 125, 0.12);
+  color: var(--color-accent);
 }
 
 .activities-island__header {

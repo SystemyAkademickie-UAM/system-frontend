@@ -59,7 +59,6 @@ export default function RewardsRankTableRow({ row, columns, rowActions }) {
             <Rank
               name={row.name}
               costAmount={row.costAmount}
-              costEmoji={row.costEmoji ?? '🥕'}
               storyDescription={row.storyDescription}
               shopItems={row.shopItems ?? []}
               discountPercent={row.discount ?? 0}

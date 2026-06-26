@@ -5,8 +5,8 @@ import { ENROLLMENT_ENTRY_CODE_MAX_LENGTH } from '../../../constants/fieldLimits
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { groupMainPath } from '../../../routes/pathRegistry.js';
-import { validateAlphanumericInput } from '../group-shared/alphanumericValidation.js';
-import { useGroupPreview } from '../group-shared/useGroupPreview.js';
+import { validateAlphanumericInput } from '../../../utils/validation/alphanumericValidation.js';
+import { useGroupPreview } from '../../../hooks/groups/useGroupPreview.js';
 import { enrollByCode } from '../../../services/enrollment.api.js';
 import '../../../components/page/PageUnavailable.css';
 import './GroupJoinContent.css';

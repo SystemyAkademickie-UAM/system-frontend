@@ -1,14 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
+  CatalogFilterGroup,
+  CatalogFiltersPanel,
+  CatalogFiltersToggle,
+  CatalogSortSelect,
+  Divider,
   Pagination,
   ProductCard,
   SearchBar,
   ShopCartPanel,
   ShopClosedOverlay,
   ShopToggleButton,
-  SubNav,
   useToast,
 } from '../../../components/ui/index.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
@@ -17,14 +21,13 @@ import '../group-main/shared/groupMainSubpageHeader.css';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { groupShopAddPath } from '../../../routes/pathRegistry.js';
 import {
   invalidateGroupInventory,
   invalidateStudentProfile,
 } from '../../../services/studentProfileEvents.js';
-import { resolveShopCategoryLabels } from './shopCategories.js';
-import { getShopItemEffectivePrice } from './shopPricing.js';
+import { resolveShopCategoryLabels } from '../../../utils/shop/shopCategories.js';
+import { getShopItemEffectivePrice } from '../../../utils/shop/shopPricing.js';
 import { EXTRA_LIFE_PRODUCT, EXTRA_LIFE_PRODUCT_ID } from './shopExtraLife.js';
 import {
   filterShopItems,
@@ -33,13 +36,13 @@ import {
   SHOP_SORT,
   SHOP_SORT_OPTIONS,
   sortShopItems,
-} from './shopModel.js';
+} from '../../../utils/shop/shopModel.js';
 import {
   useGroupShopCart,
   useGroupShopItems,
   useGroupShopLives,
   useGroupShopOpen,
-} from './useGroupShop.js';
+} from '../../../hooks/shop/useGroupShop.js';
 import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
 import ShopBuyModal from './modals/ShopBuyModal.jsx';
 import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
@@ -49,18 +52,14 @@ import '../group-members/MembersHomeContent.css';
 import './GroupShopContent.css';
 
 const ITEMS_PER_PAGE = 10;
-const STUDENT_SHOP_OPEN_POLL_MS = 15000;
 
 export default function GroupShopContent() {
   const { groupId } = useParams();
-  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { role } = useAppRole();
   const { showSuccess, showError, showToast } = useToast();
-  const isShopPreview = pathname.includes('/preview/shop');
-  const isStudentView = role === APP_ROLE.STUDENT || isShopPreview;
-  const isLecturerView = role !== APP_ROLE.STUDENT && !isShopPreview;
-  const previewNav = useGroupSubNav('group-preview');
+  const isStudentView = role === APP_ROLE.STUDENT;
+  const isLecturerView = role !== APP_ROLE.STUDENT;
 
   const {
     items,
@@ -87,9 +86,7 @@ export default function GroupShopContent() {
     removeFromCart,
     clearCart,
   } = useGroupShopCart(groupId, catalogItems);
-  const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId, {
-    pollIntervalMs: isStudentView ? STUDENT_SHOP_OPEN_POLL_MS : 0,
-  });
+  const { isShopOpen, toggleShopOpen, refetchShopOpen } = useGroupShopOpen(groupId);
   const { livesBlocked, toggleLivesBlocked, unblockLives } = useGroupShopLives(groupId);
   const livesBlockedForView = isLecturerView ? livesBlocked : false;
 
@@ -100,6 +97,7 @@ export default function GroupShopContent() {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshingShop, setIsRefreshingShop] = useState(false);
 
   const closeModal = useCallback(() => setActiveModal(null), []);
 
@@ -123,27 +121,31 @@ export default function GroupShopContent() {
     }
   }, [page, pagination.totalPages]);
 
-  useEffect(() => {
-    if (!isStudentView || !groupId) {
-      return undefined;
+  const handleRefreshShop = useCallback(async () => {
+    if (isRefreshingShop) {
+      return;
     }
 
-    const refreshCatalog = () => {
-      if (document.visibilityState === 'visible') {
-        refetch();
-      }
-    };
+    setIsRefreshingShop(true);
 
-    const intervalId = window.setInterval(refreshCatalog, STUDENT_SHOP_OPEN_POLL_MS);
-    window.addEventListener('focus', refreshCatalog);
-    document.addEventListener('visibilitychange', refreshCatalog);
+    const [itemsResult, openResult] = await Promise.all([
+      refetch({ silent: true }),
+      refetchShopOpen({ silent: true }),
+    ]);
 
-    return () => {
-      window.clearInterval(intervalId);
-      window.removeEventListener('focus', refreshCatalog);
-      document.removeEventListener('visibilitychange', refreshCatalog);
-    };
-  }, [isStudentView, groupId, refetch]);
+    setIsRefreshingShop(false);
+
+    if (itemsResult.ok && openResult.ok) {
+      showSuccess('Sklep został odświeżony.');
+      return;
+    }
+
+    showError(
+      itemsResult.error
+      ?? openResult.error
+      ?? 'Nie udało się odświeżyć sklepu.',
+    );
+  }, [isRefreshingShop, refetch, refetchShopOpen, showError, showSuccess]);
 
   const shopInteractionDisabled = !isShopOpen || livesBlockedForView;
   const purchaseDisabled = shopInteractionDisabled || isLecturerView;
@@ -273,32 +275,40 @@ export default function GroupShopContent() {
           </div>
         </RoleVisibility>
 
-        <ShopCartPanel
-          cartCount={cartCount}
-          cartItems={cartItems.map((item) => ({
-            id: item.id,
-            name: item.name,
-            priceAmount: getShopItemEffectivePrice(item),
-            imageUrl: item.imageUrl,
-          }))}
-          cartTotal={cartTotal}
-          disabled={purchaseDisabled}
-          onBuyAll={() => setActiveModal({ type: 'buyAll' })}
-          onRemoveFromCart={removeFromCart}
-          className="group-shop__cart"
-        />
+        <div className="group-shop__cart-actions">
+          {isStudentView ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="group-shop__refresh-btn"
+              onClick={handleRefreshShop}
+              disabled={isRefreshingShop}
+            >
+              Odśwież sklep
+            </Button>
+          ) : null}
 
-        <button
-          type="button"
-          className={[
-            'group-shop__filters-toggle',
-            filtersExpanded ? 'group-shop__filters-toggle--active' : '',
-          ].join(' ')}
-          aria-expanded={filtersExpanded}
-          onClick={() => setFiltersExpanded((expanded) => !expanded)}
-        >
-          Filtry i sortowanie
-        </button>
+          <ShopCartPanel
+            cartCount={cartCount}
+            cartItems={cartItems.map((item) => ({
+              id: item.id,
+              name: item.name,
+              priceAmount: getShopItemEffectivePrice(item),
+              imageUrl: item.imageUrl,
+            }))}
+            cartTotal={cartTotal}
+            disabled={purchaseDisabled}
+            onBuyAll={() => setActiveModal({ type: 'buyAll' })}
+            onRemoveFromCart={removeFromCart}
+            className="group-shop__cart"
+          />
+        </div>
+
+        <CatalogFiltersToggle
+          expanded={filtersExpanded}
+          onToggle={() => setFiltersExpanded((expanded) => !expanded)}
+        />
       </div>
     </>
   );
@@ -306,42 +316,20 @@ export default function GroupShopContent() {
   const shopBody = (
     <>
       {filtersExpanded ? (
-        <div className="group-shop__filters">
-          <div
-            className="group-shop__filter-group"
-            role="group"
-            aria-label="Filtr kategorii produktu"
-          >
-            {SHOP_CATEGORY_FILTERS.map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                className={[
-                  'group-shop__filter',
-                  categoryFilter === filter.id ? 'group-shop__filter--active' : '',
-                ].join(' ')}
-                onClick={() => setCategoryFilter(filter.id)}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
+        <CatalogFiltersPanel>
+          <CatalogFilterGroup
+            ariaLabel="Filtr kategorii produktu"
+            filters={SHOP_CATEGORY_FILTERS}
+            activeId={categoryFilter}
+            onSelect={setCategoryFilter}
+          />
 
-          <label className="group-shop__sort">
-            <span className="group-shop__sort-label">Sortuj:</span>
-            <select
-              className="group-shop__sort-select"
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value)}
-            >
-              {SHOP_SORT_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+          <CatalogSortSelect
+            value={sortBy}
+            onChange={setSortBy}
+            options={SHOP_SORT_OPTIONS}
+          />
+        </CatalogFiltersPanel>
       ) : null}
 
       {error ? (
@@ -390,15 +378,17 @@ export default function GroupShopContent() {
                 {pagination.pageItems.map((item) => (
                   <ProductCard
                     key={item.id}
+                    itemId={item.id}
                     name={item.name}
                     storyDescription={item.storyDescription}
                     didacticDescription={item.didacticDescription}
-                    priceAmount={item.priceAmount}
-                    salePriceAmount={item.salePriceAmount}
-                    imageUrl={item.imageUrl}
-                    categories={resolveShopCategoryLabels(item.categories)}
-                    showLecturerActions={isLecturerView}
-                    disabled={purchaseDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0)}
+                priceAmount={getShopItemEffectivePrice(item)}
+                salePriceAmount={item.salePriceAmount}
+                imageRef={item.imageRef}
+                categories={resolveShopCategoryLabels(item.categories)}
+                showLecturerActions={isLecturerView}
+                disabled={purchaseDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0) || item.isLocked}
+                isRankLocked={!isLecturerView && item.isLocked}
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
@@ -449,15 +439,9 @@ export default function GroupShopContent() {
 
   if (isStudentView) {
     return (
-      <section className="page-unavailable group-shop-page group-shop-page--student">
+      <section className="page-unavailable group-shop-page group-shop-page--student maq-section-page">
         <GroupMainSubpageHeader eyebrow="Targowisko" title="Sklep" />
-        {isShopPreview ? (
-          <SubNav
-            ariaLabel={previewNav.ariaLabel}
-            items={previewNav.items}
-            className="group-shop-page__preview-sub-nav"
-          />
-        ) : null}
+        <Divider className="maq-section-page__divider" />
         <div className="group-shop-page__student-toolbar maq-section-page__toolbar">
           {toolbar}
         </div>

@@ -79,3 +79,10 @@
   resize: vertical;
   min-height: 4.5rem;
 }
+
+.shop-edit-form__hint {
+  margin: 0;
+  font-size: var(--font-size-min);
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}

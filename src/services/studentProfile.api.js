@@ -27,9 +27,9 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {number} totalEarned
  * @property {number} badgesCount
  * @property {string | null} groupCurrency
- * @property {number | null} groupCurrencyIcon
+ * @property {string | null} groupCurrencyEmoji
  * @property {string | null} lives
- * @property {number | null} livesIcon
+ * @property {string | null} livesIcon
  * @property {boolean} [shopOpen]
  * @property {GroupStudentProfileBadge[]} earnedBadges
  * @property {Array<{ id: number, name: string, storyDescription: string | null, educationalDescription: string | null, currency: number, completedAt: string | null }>} completedActivities

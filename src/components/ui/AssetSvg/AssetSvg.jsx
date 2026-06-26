@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   resolveSvgAssetName,
   svgAssetPath,
@@ -29,6 +29,10 @@ export default function AssetSvg({
   const placeholderSrc = svgPlaceholderPath();
   const assetName = resolveSvgAssetName(name);
   const [src, setSrc] = useState(() => svgAssetPath(assetName));
+
+  useEffect(() => {
+    setSrc(svgAssetPath(assetName));
+  }, [assetName]);
 
   const handleError = useCallback(() => {
     setSrc((current) => (current === placeholderSrc ? current : placeholderSrc));

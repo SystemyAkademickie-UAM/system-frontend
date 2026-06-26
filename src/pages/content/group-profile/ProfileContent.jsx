@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import './ProfileContent.css';
 
 export default function ProfileContent() {

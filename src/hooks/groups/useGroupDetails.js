@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchGroupPreview } from '../groups-list/groupsList.api.js';
+import { fetchGroupPreview } from '../../services/groups.api.js';
 
 export function useGroupDetails(groupId) {
   const [group, setGroup] = useState(null);

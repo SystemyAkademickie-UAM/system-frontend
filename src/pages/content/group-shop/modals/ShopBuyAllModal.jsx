@@ -1,5 +1,5 @@
 import { Modal, CurrencyDisplay } from '../../../../components/ui/index.js';
-import { getShopItemEffectivePrice } from '../shopPricing.js';
+import { getShopItemEffectivePrice } from '../../../../utils/shop/shopPricing.js';
 import './shopModals.css';
 export default function ShopBuyAllModal({
   isOpen,

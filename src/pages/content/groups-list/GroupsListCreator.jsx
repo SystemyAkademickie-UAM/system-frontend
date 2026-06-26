@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
 import { CharacterLimitedField, useToast } from '../../../components/ui/index.js';
 import {

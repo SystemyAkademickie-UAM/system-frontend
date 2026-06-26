@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal } from '../../../../components/ui/index.js';
+import { Modal, TextField } from '../../../../components/ui/index.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
-const EMPTY_FORM = { name: '' };
+const EMPTY_FORM = { name: '', visibilityStatus: 1 };
 
 export default function StageFormModal({
   isOpen,
@@ -18,7 +18,10 @@ export default function StageFormModal({
     if (!isOpen) return;
 
     if (stage) {
-      setForm({ name: stage.name });
+      setForm({
+        name: stage.name,
+        visibilityStatus: stage.visibilityStatus === 1 ? 1 : 0,
+      });
       return;
     }
 
@@ -29,7 +32,10 @@ export default function StageFormModal({
 
   const handleConfirm = () => {
     if (!isValid || isLoading) return;
-    onConfirm?.({ name: form.name.trim() });
+    onConfirm?.({
+      name: form.name.trim(),
+      visibilityStatus: form.visibilityStatus,
+    });
   };
 
   return (
@@ -44,16 +50,28 @@ export default function StageFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
+        <TextField
+          id="stage-name"
+          label="Nazwa etapu"
+          fieldKind="name"
+          value={form.name}
+          onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+          placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne"
+          className="rewards-modal__field"
+          inputClassName="rewards-modal__input"
+        />
         <div className="rewards-modal__field">
-          <label htmlFor="stage-name" className="rewards-modal__label">Nazwa etapu</label>
-          <input
-            id="stage-name"
-            type="text"
-            className="rewards-modal__input"
-            value={form.name}
-            onChange={(event) => setForm({ name: event.target.value })}
-            placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne"
-          />
+          <label className="rewards-modal__checkbox-label">
+            <input
+              type="checkbox"
+              checked={form.visibilityStatus === 1}
+              onChange={(event) => setForm((prev) => ({
+                ...prev,
+                visibilityStatus: event.target.checked ? 1 : 0,
+              }))}
+            />
+            <span>Etapy widoczny dla studentów</span>
+          </label>
         </div>
       </div>
     </Modal>

@@ -1,14 +1,14 @@
+import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useGroupCurrency } from '../../../context/GroupCurrencyContext.jsx';
 import RankPathBoard from './RankPathBoard.jsx';
 import { useGroupMainRanks } from './useGroupMainRanks.js';
-import { GroupMainEmptyNotice, useGroupMainEmptyLink } from '../group-main/GroupMainHomeContent.jsx';
+import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
+import { useGroupMainEmptyLink } from '../../../hooks/group-main/useGroupMainEmptyLink.js';
 import '../group-main/GroupMainHomeContent.css';
 import './GroupMainRanksContent.css';
 
-export default function GroupMainRanksContent() {
+export default function GroupMainRanksContent({ embedded = false, showMemberAvatars: showMemberAvatarsOverride }) {
   const { groupId } = useParams();
-  const { symbol } = useGroupCurrency();
   const {
     ranks,
     students,
@@ -16,7 +16,26 @@ export default function GroupMainRanksContent() {
     isLoading,
     error,
     isStudentView,
+    showMemberAvatars: showMemberAvatarsFromHook,
   } = useGroupMainRanks();
+  const showMemberAvatars = showMemberAvatarsOverride ?? showMemberAvatarsFromHook;
+  const hasScrolledRef = useRef(false);
+
+  useEffect(() => {
+    if (!isStudentView || isLoading || ranks.length === 0 || hasScrolledRef.current) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      const marker = document.getElementById('rank-student-marker');
+      if (marker) {
+        marker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        hasScrolledRef.current = true;
+      }
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [isStudentView, isLoading, ranks.length, studentProfile?.totalEarned]);
 
   if (isLoading) {
     return <p className="group-main-ranks__message" role="status">Ładowanie ścieżki rozwoju…</p>;
@@ -34,12 +53,14 @@ export default function GroupMainRanksContent() {
 
   return (
     <section className="group-main-ranks" aria-label="Ścieżka rozwoju">
-      <div className="group-main-ranks__title-row">
-        <header className="group-main-ranks__page-header">
-          <p className="group-main-ranks__eyebrow">Skarbiec</p>
-          <h1 className="group-main-ranks__title">Rangi</h1>
-        </header>
-      </div>
+      {!embedded ? (
+        <div className="group-main-ranks__title-row">
+          <header className="group-main-ranks__page-header">
+            <p className="group-main-ranks__eyebrow">Skarbiec</p>
+            <h1 className="group-main-ranks__title">Rangi</h1>
+          </header>
+        </div>
+      ) : null}
 
       {ranks.length === 0 ? (
         <GroupMainEmptyNotice
@@ -52,10 +73,10 @@ export default function GroupMainRanksContent() {
           ranks={ranks}
           students={students}
           isStudentView={isStudentView}
+          showMemberAvatars={showMemberAvatars}
           totalEarned={studentProfile?.totalEarned ?? 0}
           studentNickname={studentProfile?.nickname || studentProfile?.name || 'Student'}
           studentAvatarUrl={studentProfile?.avatarUrl ?? null}
-          currencySymbol={symbol}
           showHeader={false}
         />
       )}

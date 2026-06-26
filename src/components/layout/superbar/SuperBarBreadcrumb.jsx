@@ -60,7 +60,7 @@ export default function SuperBarBreadcrumb({
               item.to && !isLast ? (
                 <Link to={item.to} className="super-bar-breadcrumb__home-link" aria-label={item.label}>
                   <AssetSvg
-                    name={SVG_ICONS.nav.home}
+                    name={SVG_ICONS.nav.breadcrumbHome}
                     className="super-bar-breadcrumb__home-icon"
                     width={18}
                     height={18}
@@ -70,7 +70,7 @@ export default function SuperBarBreadcrumb({
               ) : (
                 <span className="super-bar-breadcrumb__home-current" aria-current="page">
                   <AssetSvg
-                    name={SVG_ICONS.nav.home}
+                    name={SVG_ICONS.nav.breadcrumbHome}
                     className="super-bar-breadcrumb__home-icon"
                     width={18}
                     height={18}
@@ -86,7 +86,7 @@ export default function SuperBarBreadcrumb({
               <span
                 className={[
                   'super-bar-breadcrumb__current',
-                  item.isGroup ? 'super-bar-breadcrumb__current--group' : '',
+                  isLast ? 'super-bar-breadcrumb__current--active' : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
@@ -100,7 +100,7 @@ export default function SuperBarBreadcrumb({
             <li key={item.key} className="super-bar-breadcrumb__item">
               {index > 0 ? (
                 <span className="super-bar-breadcrumb__sep" aria-hidden="true">
-                  /
+                  &gt;
                 </span>
               ) : null}
               {content}

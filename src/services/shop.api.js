@@ -4,7 +4,7 @@ import {
   mapBackendShopItem,
   mapBackendShopItems,
   mapBackendShopTemplates,
-} from '../pages/content/group-shop/shopItemMapper.js';
+} from '../utils/shop/shopItemMapper.js';
 
 /**
  * @param {unknown} data
@@ -31,7 +31,7 @@ function extractApiError(data) {
 
 /**
  * @param {string | number} groupId
- * @returns {Promise<{ ok: boolean, items: import('../pages/content/group-shop/shopItem.types.js').ShopItem[], error?: string }>}
+ * @returns {Promise<{ ok: boolean, items: import('../utils/shop/shopItem.types.js').ShopItem[], error?: string }>}
  */
 export async function fetchGroupShopItems(groupId) {
   const result = await getJson(`/groups/${groupId}/shop-items`, { includeBrowserId: true });
@@ -60,7 +60,7 @@ export async function fetchGroupShopItem(groupId, itemId) {
 }
 
 /**
- * @returns {Promise<{ ok: boolean, templates: import('../pages/content/group-shop/shopItem.types.js').ShopItemTemplate[], error?: string }>}
+ * @returns {Promise<{ ok: boolean, templates: import('../utils/shop/shopItem.types.js').ShopItemTemplate[], error?: string }>}
  */
 export async function fetchShopTemplates() {
   const result = await getJson('/shop-templates');
@@ -138,7 +138,7 @@ function mapShopBuyError(message) {
     'Not enough currency': 'Niewystarczająca ilość waluty.',
     'Sklep grupy jest obecnie zamknięty.': 'Sklep grupy jest obecnie zamknięty.',
     'Student is not enrolled in this group': 'Nie jesteś zapisany do tej grupy.',
-    'Przedmiot wyprzedany. Brak sztuk na magazynie.': 'Przedmiot wyprzedany. Brak sztuk na magazynie.',
+    'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.': 'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.',
   };
 
   return translations[normalized] ?? normalized;

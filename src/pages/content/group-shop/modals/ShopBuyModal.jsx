@@ -1,5 +1,5 @@
 import { Modal, ProductCard } from '../../../../components/ui/index.js';
-import { resolveShopCategoryLabels } from '../shopCategories.js';
+import { resolveShopCategoryLabels } from '../../../../utils/shop/shopCategories.js';
 import './shopModals.css';
 
 export default function ShopBuyModal({
@@ -29,12 +29,13 @@ export default function ShopBuyModal({
       </p>
       <ProductCard
         variant="preview"
+        itemId={item.id}
         name={item.name}
         storyDescription={item.storyDescription}
         didacticDescription={item.didacticDescription}
         priceAmount={item.priceAmount}
         salePriceAmount={item.salePriceAmount}
-        imageUrl={item.imageUrl}
+        imageRef={item.imageRef}
         categories={categoryLabels}
         hideActions
         className="shop-modal__preview"

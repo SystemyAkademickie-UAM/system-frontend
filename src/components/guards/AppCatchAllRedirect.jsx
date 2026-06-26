@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../../context/SessionContext.jsx';
-import { groupsListPath, loginPath } from '../../routes/pathRegistry.js';
+import { groupsListPath, welcomePath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
 export default function AppCatchAllRedirect() {
@@ -14,5 +14,5 @@ export default function AppCatchAllRedirect() {
     );
   }
 
-  return <Navigate to={isAuthenticated ? groupsListPath() : loginPath()} replace />;
+  return <Navigate to={isAuthenticated ? groupsListPath() : welcomePath()} replace />;
 }

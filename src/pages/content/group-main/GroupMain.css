@@ -70,6 +70,14 @@
   overflow-wrap: anywhere;
 }
 
+.group-main-posts__published-at {
+  flex-shrink: 0;
+  align-self: flex-start;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, rgba(227, 224, 247, 0.65));
+  white-space: nowrap;
+}
+
 .group-main-posts__edit {
   flex: 1 1 auto;
   display: flex;

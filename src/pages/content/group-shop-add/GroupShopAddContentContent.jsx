@@ -1,10 +1,11 @@
 import {useState, useEffect, useRef} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 import {InfoTooltip, useToast} from '../../../components/ui/index.js';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
+import {syncShopItemRankUnlock} from '../../../utils/ranks/rankShopItemUnlock.js';
 
 import arrowcirclelefticon from '../../../../public/assets/icons/arrow-circle-left-svgrepo-com.svg';
 import arrowcirclerighticon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
@@ -56,6 +57,7 @@ export default function App() {
 
   const [ranks, setRanks] = useState([]);
   const [ranksfrombackend, setRanksfrombackend] = useState(0);
+  const [unlockRankId, setUnlockRankId] = useState('');
 
   const [badges, setBadges] = useState([]);
   const [badgediscounts, setBadgediscounts] = useState([]);
@@ -496,7 +498,14 @@ export default function App() {
           iconvalue = '';
         }
 
-        receivedranks.push({id: receiveddata[i].id, icon: iconvalue ? `backend:${iconvalue}` : '', name: receiveddata[i].name, discount: discountvalue, costafter: ''});
+        receivedranks.push({
+          id: receiveddata[i].id,
+          icon: iconvalue ? `backend:${iconvalue}` : '',
+          name: receiveddata[i].name,
+          discount: discountvalue,
+          costafter: '',
+          uniqueStoreItems: Array.isArray(receiveddata[i].uniqueStoreItems) ? receiveddata[i].uniqueStoreItems : [],
+        });
 
         i = i + 1;
       }
@@ -1054,6 +1063,25 @@ export default function App() {
         return;
       }
 
+      const createdItemId = data?.id != null ? String(data.id) : null;
+      if (unlockRankId !== '' && createdItemId) {
+        const rankRefs = ranks.map((rankEntry) => ({
+          dbId: rankEntry.id,
+          name: rankEntry.name,
+          shopItems: rankEntry.uniqueStoreItems || [],
+        }));
+        const rankResult = await syncShopItemRankUnlock(
+          groupId,
+          createdItemId,
+          Number(unlockRankId),
+          rankRefs,
+        );
+        if (!rankResult.ok) {
+          showError(rankResult.error ?? 'Przedmiot utworzony, ale nie udało się przypisać blokady rangi.');
+          return;
+        }
+      }
+
       showSuccess('Przedmiot został utworzony!');
       window.location.href = '/groups/' + groupId + '/shop';
 
@@ -1144,6 +1172,19 @@ export default function App() {
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
                   <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Opis dydaktyczny</div>
                   <textarea onChange = {(event) => setDescription1(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description1} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></textarea>
+                </div>
+
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', gap: '0.5vw'}}>
+                    Dostępność
+                    <InfoTooltip text = "Domyślnie przedmiot jest dostępny dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang." />
+                  </div>
+                  <select onChange = {(event) => setUnlockRankId(event.target.value)} value = {unlockRankId} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%'}} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}>
+                    <option value = "">Dostępny dla wszystkich</option>
+                    {ranks.map((rank) => (
+                      <option key = {'unlock-rank-' + rank.id} value = {String(rank.id)}>{'Zablokowany za rangę: ' + rank.name}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', gap: '2%'}}>

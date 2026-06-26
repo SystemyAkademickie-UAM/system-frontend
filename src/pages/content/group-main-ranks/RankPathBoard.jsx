@@ -42,8 +42,6 @@ import './RankPathBoard.css';
 
  * @param {string | null | undefined} [props.studentAvatarUrl]
 
- * @param {string} [props.currencySymbol]
-
  * @param {boolean} [props.showHeader=true]
 
  */
@@ -62,9 +60,9 @@ export default function RankPathBoard({
 
   studentAvatarUrl = null,
 
-  currencySymbol,
-
   showHeader = true,
+
+  showMemberAvatars = true,
 
 }) {
 
@@ -277,11 +275,9 @@ export default function RankPathBoard({
       {isStudentView && boardHeight > 0 ? (
 
         <div
-
+          id="rank-student-marker"
           className="rank-path-board__student-marker"
-
           style={{ top: `${progressPx - axisTop}px` }}
-
         >
 
           <PlayerAvatar
@@ -291,8 +287,6 @@ export default function RankPathBoard({
             avatarUrl={studentAvatarUrl}
 
             totalEarned={totalEarned}
-
-            currencySymbol={currencySymbol}
 
             size="lg"
 
@@ -327,8 +321,6 @@ export default function RankPathBoard({
 
               costAmount={rank.costAmount}
 
-              costEmoji={rank.costEmoji}
-
               storyDescription={rank.storyDescription}
 
               shopItems={rank.shopItems}
@@ -347,13 +339,11 @@ export default function RankPathBoard({
 
 
 
-          {!isStudentView ? (
+          {!isStudentView || showMemberAvatars ? (
 
             <RankPathMembers
 
               students={studentsByRank.get(rank.id) ?? []}
-
-              currencySymbol={currencySymbol}
 
             />
 

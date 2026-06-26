@@ -9,9 +9,13 @@
 .register-profile__avatar-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
   margin: 24px 0 32px;
+}
+
+.register-profile__avatar-picker {
+  width: 100%;
 }
 
 .register-profile__avatar-label {

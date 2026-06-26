@@ -3,9 +3,12 @@ import { useParams } from 'react-router-dom';
 import {
   BADGE_RARITY,
   BADGE_RARITY_LABELS,
+  CatalogFilterGroup,
+  CatalogFiltersPanel,
+  CatalogFiltersToggle,
+  CatalogSortSelect,
   SearchBar,
 } from '../../../components/ui/index.js';
-import { useGroupCurrency } from '../../../context/GroupCurrencyContext.jsx';
 import BadgeTreasuryCard from './BadgeTreasuryCard.jsx';
 import {
   filterTreasuryBadges,
@@ -15,8 +18,10 @@ import {
   TREASURY_SORT,
 } from './badgeTreasuryModel.js';
 import { useGroupMainBadges } from './useGroupMainBadges.js';
-import { GroupMainEmptyNotice, useGroupMainEmptyLink } from '../group-main/GroupMainHomeContent.jsx';
+import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
+import { useGroupMainEmptyLink } from '../../../hooks/group-main/useGroupMainEmptyLink.js';
 import '../group-main/GroupMainHomeContent.css';
+import '../group-shop/GroupShopContent.css';
 import './GroupMainBadgesContent.css';
 
 const RARITY_FILTERS = [
@@ -33,9 +38,24 @@ const UNLOCK_FILTERS = [
   { id: 'unearned', label: 'Zablokowane' },
 ];
 
-export default function GroupMainBadgesContent() {
+/**
+ * @param {Object} props
+ * @param {boolean} [props.embedded]
+ * @param {string} [props.searchQuery]
+ * @param {string} [props.rarityFilter]
+ * @param {string} [props.sortBy]
+ * @param {(value: string) => void} [props.onRarityFilterChange]
+ * @param {(value: string) => void} [props.onSortByChange]
+ */
+export default function GroupMainBadgesContent({
+  embedded = false,
+  searchQuery: externalSearchQuery,
+  rarityFilter: externalRarityFilter,
+  sortBy: externalSortBy,
+  onRarityFilterChange,
+  onSortByChange,
+}) {
   const { groupId } = useParams();
-  const { symbol } = useGroupCurrency();
   const {
     badges,
     earnersByBadgeId,
@@ -49,10 +69,18 @@ export default function GroupMainBadgesContent() {
   const defaultSort = isStudentView ? TREASURY_SORT.unlockFirst : TREASURY_SORT.qualityDesc;
   const sortOptions = isStudentView ? STUDENT_SORT_OPTIONS : LECTURER_SORT_OPTIONS;
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [rarityFilter, setRarityFilter] = useState('all');
+  const [internalSearchQuery, setInternalSearchQuery] = useState('');
+  const [internalRarityFilter, setInternalRarityFilter] = useState('all');
   const [unlockFilter, setUnlockFilter] = useState('all');
-  const [sortBy, setSortBy] = useState(defaultSort);
+  const [internalSortBy, setInternalSortBy] = useState(defaultSort);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+
+  const searchQuery = externalSearchQuery ?? internalSearchQuery;
+  const rarityFilter = externalRarityFilter ?? internalRarityFilter;
+  const sortBy = externalSortBy ?? internalSortBy;
+
+  const setRarityFilter = onRarityFilterChange ?? setInternalRarityFilter;
+  const setSortBy = onSortByChange ?? setInternalSortBy;
 
   const visibleBadges = useMemo(() => {
     const filtered = filterTreasuryBadges(badges, {
@@ -76,85 +104,65 @@ export default function GroupMainBadgesContent() {
     );
   }
 
+  const showStudentToolbar = !embedded && isStudentView;
+  const showStudentFiltersPanel = showStudentToolbar && filtersExpanded;
+
   return (
     <section className="badge-treasury" aria-label="Skarbiec odznak">
-      <div className="badge-treasury__title-row">
-        <header className="badge-treasury__page-header">
-          <p className="badge-treasury__eyebrow">Skarbiec</p>
-          <h1 className="badge-treasury__title">Odznaki</h1>
-        </header>
-      </div>
+      {!embedded ? (
+        <div className="badge-treasury__title-row">
+          <header className="badge-treasury__page-header">
+            <p className="badge-treasury__eyebrow">Skarbiec</p>
+            <h1 className="badge-treasury__title">Odznaki</h1>
+          </header>
+        </div>
+      ) : null}
 
-      <div className="badge-treasury__top">
-        <div className="badge-treasury__controls">
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj odznaki…"
-            name="badge-treasury-search"
-            className="badge-treasury__search"
-            aria-label="Szukaj odznaki po nazwie"
+      {showStudentToolbar ? (
+        <div className="badge-treasury__toolbar maq-section-page__toolbar">
+          <div className="maq-section-page__toolbar-start">
+            <SearchBar
+              value={internalSearchQuery}
+              onChange={(event) => setInternalSearchQuery(event.target.value)}
+              placeholder="Szukaj odznaki…"
+              name="badge-treasury-search"
+              className="group-shop__search badge-treasury__search"
+              aria-label="Szukaj odznaki po nazwie"
+            />
+          </div>
+          <div className="maq-section-page__toolbar-end badge-treasury__toolbar-end">
+            <CatalogFiltersToggle
+              expanded={filtersExpanded}
+              onToggle={() => setFiltersExpanded((expanded) => !expanded)}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {showStudentFiltersPanel ? (
+        <CatalogFiltersPanel className="badge-treasury__filters">
+          <CatalogFilterGroup
+            ariaLabel="Filtr rzadkości"
+            filters={RARITY_FILTERS}
+            activeId={rarityFilter}
+            onSelect={setRarityFilter}
           />
 
-          <div
-            className="badge-treasury__control-group badge-treasury__control-group--filters"
-            role="group"
-            aria-label="Filtr rzadkości"
-          >
-            {RARITY_FILTERS.map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                className={[
-                  'badge-treasury__filter',
-                  rarityFilter === filter.id ? 'badge-treasury__filter--active' : '',
-                ].join(' ')}
-                onClick={() => setRarityFilter(filter.id)}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
+          <CatalogFilterGroup
+            ariaLabel="Filtr odblokowania"
+            filters={UNLOCK_FILTERS}
+            activeId={unlockFilter}
+            onSelect={setUnlockFilter}
+          />
 
-          {isStudentView ? (
-            <div
-              className="badge-treasury__control-group badge-treasury__control-group--filters"
-              role="group"
-              aria-label="Filtr odblokowania"
-            >
-              {UNLOCK_FILTERS.map((filter) => (
-                <button
-                  key={filter.id}
-                  type="button"
-                  className={[
-                    'badge-treasury__filter',
-                    unlockFilter === filter.id ? 'badge-treasury__filter--active' : '',
-                  ].join(' ')}
-                  onClick={() => setUnlockFilter(filter.id)}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          ) : null}
-
-          <label className="badge-treasury__control-group badge-treasury__control-group--sort">
-            <span className="badge-treasury__sort-label">Sortuj:</span>
-            <select
-              id="badge-treasury-sort"
-              className="badge-treasury__sort-select"
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value)}
-            >
-              {sortOptions.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </div>
+          <CatalogSortSelect
+            selectId="badge-treasury-sort"
+            value={sortBy}
+            onChange={setSortBy}
+            options={sortOptions}
+          />
+        </CatalogFiltersPanel>
+      ) : null}
 
       {badges.length === 0 ? (
         <GroupMainEmptyNotice
@@ -172,7 +180,6 @@ export default function GroupMainBadgesContent() {
               badge={badge}
               earnersByBadgeId={earnersByBadgeId}
               excludeAccountId={isStudentView ? studentAccountId : null}
-              currencySymbol={symbol}
               isStudentView={isStudentView}
             />
           ))}
@@ -181,4 +188,3 @@ export default function GroupMainBadgesContent() {
     </section>
   );
 }
-

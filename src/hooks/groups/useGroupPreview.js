@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { fetchGroupPreview } from '../groups-list/groupsList.api.js';
+import { fetchGroupPreview } from '../../services/groups.api.js';
 
 /**
  * @typedef {Object} GroupPreviewState
- * @property {import('../groups-list/groupsList.api.js').GroupListItem | null} group
+ * @property {import('../../services/groups.api.js').GroupListItem | null} group
  * @property {boolean} hasAccess
  * @property {boolean} isOwner
  * @property {boolean} isEnrolled

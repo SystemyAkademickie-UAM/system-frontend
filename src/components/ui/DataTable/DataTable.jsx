@@ -103,7 +103,6 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
       position: 'fixed',
       top: openUpward ? rect.top - menuHeight - 4 : rect.bottom + 4,
       left,
-      zIndex: 1000,
     });
   }, []);
 

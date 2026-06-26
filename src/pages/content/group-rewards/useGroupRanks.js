@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidation.js';
 import { fetchGroupRanks, createRank, updateRank, deleteRank } from '../../../services/ranks.api.js';
 import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/students.api.js';
+import { normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
 
 /**
  * @typedef {Object} RankData
@@ -35,9 +36,8 @@ function mapRank(rank, index) {
     icon: rank.icon || '⭐',
     iconFile: rank.icon ? `backend:${rank.icon}` : '⭐',
     costAmount: rank.requiredPoints || 0,
-    costEmoji: '🥕',
     storyDescription: rank.storyDescription || '',
-    shopItems: rank.uniqueStoreItems || [],
+    shopItems: (rank.uniqueStoreItems || []).map(normalizeShopItemId),
     storeDiscount: rank.storeDiscount || 0,
     discount: Number(rank.discount ?? 0),
   };
@@ -101,7 +101,7 @@ export function useGroupRanks() {
       storyDescription: values.storyDescription || '',
       storeDiscount: values.storeDiscount || 0,
       discount: values.discount ?? 0,
-      uniqueStoreItems: values.shopItems || [],
+      uniqueStoreItems: (values.shopItems || []).map(normalizeShopItemId),
     });
 
     if (result.ok && result.rank) {
@@ -127,7 +127,7 @@ export function useGroupRanks() {
       storyDescription: values.storyDescription,
       storeDiscount: values.storeDiscount,
       discount: values.discount ?? 0,
-      uniqueStoreItems: values.shopItems,
+      uniqueStoreItems: (values.shopItems || []).map(normalizeShopItemId),
     });
 
     if (result.ok && result.rank) {

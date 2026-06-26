@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useOptionalGroupId } from './useOptionalGroupId.js';
-import { useGroupDetails } from '../pages/content/group-shared/useGroupDetails.js';
+import { useGroupDetails } from '../hooks/groups/useGroupDetails.js';
 import { resolveAppBreadcrumb } from '../navigation/breadcrumb.config.js';
 import { groupMainPath, groupsListPath } from '../routes/pathRegistry.js';
 

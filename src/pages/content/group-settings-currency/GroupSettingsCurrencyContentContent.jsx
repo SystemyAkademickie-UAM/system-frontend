@@ -1,7 +1,8 @@
 import {useState, useEffect, useRef} from 'react';
 import {useParams} from 'react-router-dom';
-import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import { DEFAULT_CURRENCY_SYMBOL } from '../../../constants/currency.constants.js';
+import { invalidateGroupCurrency } from '../../../services/groupCurrencyEvents.js';
+import { fetchGroupCurrencyConfig, updateGroupCurrencyConfig } from '../../../services/groupCurrency.api.js';
 
 import leftleft from '../../../../public/assets/icons/chevron-left-double-svgrepo-com.svg';
 import left from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
@@ -15,7 +16,7 @@ export default function App() {
   const {groupId} = useParams();
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [currenticon, setCurrenticon] = useState('🥕');
+  const [currenticon, setCurrenticon] = useState(DEFAULT_CURRENCY_SYMBOL);
   const [currencyname, setCurrencyname] = useState('');
   
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -47,10 +48,10 @@ export default function App() {
 
     setCurrencyname(namevalue);
 
-    let iconvalue = data.currencyIcon;
+    let iconvalue = data.currencyEmoji;
 
     if (iconvalue == null || iconvalue == '') {
-      iconvalue = '🥕';
+      iconvalue = DEFAULT_CURRENCY_SYMBOL;
     }
 
     setCurrenticon(iconvalue);
@@ -65,38 +66,10 @@ export default function App() {
     setErrorMessage('');
 
     try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/currency';
-
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
-      });
-
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/currency: ', response.status);
-      console.log('GET /groups/' + groupId + '/currency: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/currency not JSON: ' + responsetext);
+      const result = await fetchGroupCurrencyConfig(groupId);
+      if (result.ok && result.config) {
+        applycurrencydata(result.config);
       }
-
-      console.log('GET /groups/' + groupId + '/currency JSON:', data);
-
-      applycurrencydata(data);
-
     } catch (error) {
 
       let message;
@@ -128,42 +101,15 @@ export default function App() {
     setErrorMessage('');
 
     try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/currency';
-
-      const response = await fetch(url, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          currency: currencyname.trim(),
-          currencyIcon: currenticon
-        })
+      const result = await updateGroupCurrencyConfig(groupId, {
+        currency: currencyname.trim(),
+        currencyEmoji: currenticon,
       });
 
-      const responsetext = await response.text();
-
-      console.log('PATCH /groups/' + groupId + '/currency: ', response.status);
-      console.log('PATCH /groups/' + groupId + '/currency: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/currency not JSON: ' + responsetext);
+      if (result.ok && result.config) {
+        applycurrencydata(result.config);
+        invalidateGroupCurrency(groupId);
       }
-
-      console.log('PATCH /groups/' + groupId + '/currency JSON:', data);
-
-      applycurrencydata(data);
-
     } catch (error) {
 
       let message;

@@ -1,4 +1,5 @@
 import './ActivityCard.css';
+import { CurrencyIcon } from '../Currency/CurrencyDisplay.jsx';
 
 /**
  * Kompaktowy kafelek ze szczegółami aktywności (podgląd przy najechaniu).
@@ -8,7 +9,7 @@ import './ActivityCard.css';
  * @param {string} props.storyDescription
  * @param {string} props.didacticDescription
  * @param {number} [props.rewardAmount]
- * @param {string} [props.rewardEmoji='🥕']
+ * @param {string} [props.rewardEmoji] — opcjonalne nadpisanie symbolu waluty
  * @param {string} [props.className]
  */
 export default function ActivityCard({
@@ -16,7 +17,7 @@ export default function ActivityCard({
   storyDescription,
   didacticDescription,
   rewardAmount = 0,
-  rewardEmoji = '🥕',
+  rewardEmoji,
   className = '',
 }) {
   return (
@@ -31,7 +32,7 @@ export default function ActivityCard({
       <p className="maq-activity-card__reward">
         {rewardAmount}
         {' '}
-        <span aria-hidden="true">{rewardEmoji}</span>
+        <CurrencyIcon symbol={rewardEmoji} size="sm" ariaLabel="Waluta" />
       </p>
     </article>
   );

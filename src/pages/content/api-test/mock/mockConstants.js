@@ -241,6 +241,48 @@ export function getGroupStudentActivityTogglePath(groupId, accountId, activityId
   return `/groups/${groupId}/students/${accountId}/activities/${activityId}/toggle`;
 }
 
+// ── Backlog endpoints ───────────────────────────────────────────────
+
+/**
+ * @param {string} path
+ * @param {{ auth?: string, take?: string|number, skip?: string|number }} [options]
+ */
+function appendBacklogQuery(path, options = {}) {
+  const params = new URLSearchParams();
+  const auth = String(options.auth ?? '').trim();
+  if (auth !== '') {
+    params.set('auth', auth);
+  }
+  const take = String(options.take ?? '').trim();
+  if (take !== '') {
+    params.set('take', take);
+  }
+  const skip = String(options.skip ?? '').trim();
+  if (skip !== '') {
+    params.set('skip', skip);
+  }
+  const query = params.toString();
+  return query === '' ? path : `${path}?${query}`;
+}
+
+/**
+ * GET /groups/:groupId/backlog/me — student backlog in group.
+ * @param {number|string} groupId
+ * @param {{ auth?: string, take?: string|number, skip?: string|number }} [options]
+ */
+export function getGroupBacklogMePath(groupId, options = {}) {
+  return appendBacklogQuery(`/groups/${groupId}/backlog/me`, options);
+}
+
+/**
+ * GET /groups/:groupId/backlog — lecturer/admin group backlog.
+ * @param {number|string} groupId
+ * @param {{ auth?: string, take?: string|number, skip?: string|number }} [options]
+ */
+export function getGroupBacklogPath(groupId, options = {}) {
+  return appendBacklogQuery(`/groups/${groupId}/backlog`, options);
+}
+
 // ── Profile Settings endpoints ──────────────────────────────────────
 
 /** GET /profile - Get current user profile */

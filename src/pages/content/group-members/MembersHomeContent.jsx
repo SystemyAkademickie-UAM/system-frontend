@@ -109,20 +109,17 @@ export default function MembersHomeContent() {
     }
   }, [activeModal, updateMemberTotalEarned, closeModal, notifyRankPromotion, showSuccess]);
 
-  const handleRankConfirm = useCallback(async (rankName) => {
+  const handleRankConfirm = useCallback(async (selection) => {
     if (!activeModal?.member) return;
 
-    const selectedRank = ranks.find((r) => r.name === rankName);
-    const rankId = selectedRank?.id ?? null;
-
     setModalLoading(true);
-    const result = await updateMemberRank(activeModal.member, rankId);
+    const result = await updateMemberRank(activeModal.member, selection);
     setModalLoading(false);
 
     if (result.ok) {
       closeModal();
     }
-  }, [activeModal, ranks, updateMemberRank, closeModal]);
+  }, [activeModal, updateMemberRank, closeModal]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.member) return;
@@ -195,7 +192,12 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--rank',
       hiddenBelow: 768,
       render: (member) => (
-        <span className="members-table__rank-badge" title={member.rank}>{member.rank}</span>
+        <span className="members-table__rank-cell">
+          <span className="members-table__rank-badge" title={member.rank}>{member.rank}</span>
+          {member.autoRankEnabled === false ? (
+            <span className="members-table__rank-manual-note">*przyznawana ręcznie</span>
+          ) : null}
+        </span>
       ),
     },
     {
@@ -253,7 +255,7 @@ export default function MembersHomeContent() {
       {
         id: 'badges',
         label: 'Edytuj odznaki',
-        iconFile: SVG_ICONS.actions.manageBadges,
+        iconFile: SVG_ICONS.nav.profileBadges,
         ariaLabel: 'Edytuj odznaki uczestnika',
         onSelect: (member) => openModal('badges', member),
       },
@@ -376,7 +378,7 @@ export default function MembersHomeContent() {
       <MemberRankModal
         isOpen={activeModal?.type === 'rank'}
         member={modalMember}
-        ranks={rankNames}
+        ranks={ranks}
         onClose={closeModal}
         onConfirm={handleRankConfirm}
         isLoading={modalLoading}

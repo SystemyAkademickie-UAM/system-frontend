@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
-import { groupsListPath, loginPath } from '../../routes/pathRegistry.js';
+import { groupsListPath, welcomePath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
 /**
@@ -32,13 +32,13 @@ export default function RouteGuard({
   }
 
   if (requireAuth && !isAuthenticated) {
-    return <Navigate to={redirectTo || loginPath()} state={{ from: location }} replace />;
+    return <Navigate to={redirectTo || welcomePath()} state={{ from: location }} replace />;
   }
 
   if (allowedRoles && allowedRoles.length > 0) {
     const hasAccess = allowedRoles.includes(role);
     if (!hasAccess) {
-      const fallback = redirectTo ?? (isAuthenticated ? groupsListPath() : loginPath());
+      const fallback = redirectTo ?? (isAuthenticated ? groupsListPath() : welcomePath());
       return <Navigate to={fallback} replace />;
     }
   }

@@ -37,7 +37,7 @@ function mapBadge(badge, index) {
     storyDescription: badge.storyDescription || '',
     didacticDescription: badge.educationalDescription || '',
     rewardAmount: badge.rewardAmount || 0,
-    rewardEmoji: '🥕',
+    isPublished: badge.isPublished !== false,
   };
 }
 
@@ -158,6 +158,28 @@ export function useGroupBadges() {
     return result;
   }, [groupId, badges]);
 
+  const handleTogglePublished = useCallback(async (badgeId) => {
+    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+
+    const badge = badges.find((item) => item.id === badgeId);
+    if (!badge) return { ok: false, error: 'Odznaka nie istnieje' };
+
+    const result = await updateBadge(groupId, badge.dbId, {
+      isPublished: badge.isPublished === false,
+    });
+
+    if (result.ok && result.badge) {
+      setBadges((prev) => prev.map((item) => (
+        item.id === badgeId
+          ? { ...item, ...mapBadge(result.badge, item.position - 1) }
+          : item
+      )));
+      notifyGroupContentChanged(groupId, 'badges');
+    }
+
+    return result;
+  }, [groupId, badges]);
+
   return {
     groupId,
     badges,
@@ -168,5 +190,6 @@ export function useGroupBadges() {
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleTogglePublished,
   };
 }

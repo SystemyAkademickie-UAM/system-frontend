@@ -39,6 +39,12 @@
   font-size: 18px;
 }
 
+.maq-currency-icon--xl {
+  width: 30px;
+  height: 30px;
+  font-size: 24px;
+}
+
 .maq-currency-display--sm .maq-currency-display__amount {
   font-size: var(--font-size-body);
 }

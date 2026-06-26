@@ -36,7 +36,7 @@ export default function Badge({
   className = '',
 }) {
   const config = getBadgeRarityConfig(rarity);
-  const showFooter = showEarnedAt && earnedAt;
+  const showDate = showEarnedAt && Boolean(earnedAt);
 
   return (
     <article
@@ -44,43 +44,46 @@ export default function Badge({
       data-rarity={rarity}
       style={getBadgeCssVars(rarity, { isLocked })}
     >
-      <span className="maq-badge__rarity">{config.label}</span>
-
-      <div className="maq-badge__body">
-        <div className="maq-badge__icon-wrap">
-          <BadgeIcon iconFile={iconFile} />
-        </div>
-
-        <div className="maq-badge__content">
-          <h3 className="maq-badge__name">{name}</h3>
-
-          <div className="maq-badge__sections">
-            <div className="maq-badge__section">
-              <span className="maq-badge__section-label">Opis fabularny</span>
-              <p className="maq-badge__story-text">{storyDescription}</p>
-            </div>
-
-            <div className="maq-badge__section">
-              <span className="maq-badge__section-label">Opis dydaktyczny</span>
-              <p className="maq-badge__didactic-text">{didacticDescription}</p>
-            </div>
+      <div className="maq-badge__main">
+        <header className="maq-badge__header">
+          <div className="maq-badge__icon-wrap">
+            {icon ?? <BadgeIcon iconFile={iconFile} />}
           </div>
 
-          <div className="maq-badge__reward">
-            <span className="maq-badge__section-label">Nagroda</span>
-            <CurrencyDisplay
-              amount={rewardAmount}
-              symbol={rewardEmoji}
-              size="md"
-              className="maq-badge__reward-value"
-            />
+          <div className="maq-badge__heading">
+            <h3 className="maq-badge__name">{name}</h3>
+            <span className="maq-badge__rarity">{config.label}</span>
           </div>
 
-          {showFooter ? (
-            <p className="maq-badge__earned-at">{`• ${earnedAt}`}</p>
+          {showDate ? (
+            <time className="maq-badge__date" dateTime={earnedAt}>
+              {`• ${earnedAt}`}
+            </time>
           ) : null}
+        </header>
+
+        <div className="maq-badge__descriptions">
+          <div className="maq-badge__section">
+            <span className="maq-badge__section-label">Opis fabularny</span>
+            <p className="maq-badge__story-text">{storyDescription}</p>
+          </div>
+
+          <div className="maq-badge__section">
+            <span className="maq-badge__section-label">Opis dydaktyczny</span>
+            <p className="maq-badge__didactic-text">{didacticDescription}</p>
+          </div>
         </div>
       </div>
+
+      <footer className="maq-badge__reward">
+        <span className="maq-badge__section-label">Nagroda</span>
+        <CurrencyDisplay
+          amount={rewardAmount}
+          symbol={rewardEmoji}
+          size="md"
+          className="maq-badge__reward-value"
+        />
+      </footer>
     </article>
   );
 }

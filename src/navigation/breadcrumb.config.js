@@ -33,11 +33,11 @@ export const BREADCRUMB_BY_PATH = {
 /** Ścieżki grupowe — dopasowanie po regex (kolejność ma znaczenie). */
 export const GROUP_BREADCRUMB_RULES = [
   {
-    pattern: /^\/groups\/[^/]+\/feed\/?$/u,
+    pattern: /^\/groups\/[^/]+\/posts\/?$/u,
     segments: [{ label: 'Wpisy' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/participants\/?$/u,
+    pattern: /^\/groups\/[^/]+\/users\/?$/u,
     segments: [{ label: 'Uczestnicy' }],
   },
   {
@@ -53,28 +53,8 @@ export const GROUP_BREADCRUMB_RULES = [
     segments: [{ label: 'Odznaki' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/home\/posts\/?$/u,
-    segments: [{ label: 'Aktywności', path: groupActivitiesPath }, { label: 'Wpisy' }],
-  },
-  {
-    pattern: /^\/groups\/[^/]+\/home\/members\/?$/u,
-    segments: [{ label: 'Użytkownicy', path: groupMembersPath }],
-  },
-  {
-    pattern: /^\/groups\/[^/]+\/home\/activities\/?$/u,
-    segments: [{ label: 'Aktywności' }],
-  },
-  {
-    pattern: /^\/groups\/[^/]+\/home\/ranks\/?$/u,
-    segments: [{ label: 'Podgląd' }, { label: 'Rangi' }],
-  },
-  {
-    pattern: /^\/groups\/[^/]+\/home\/badges\/?$/u,
-    segments: [{ label: 'Podgląd' }, { label: 'Odznaki' }],
-  },
-  {
     pattern: /^\/groups\/[^/]+\/home\/?$/u,
-    segments: [{ label: 'Strona główna' }],
+    segments: [],
   },
   {
     pattern: /^\/groups\/[^/]+\/studentprofile\/[^/]+\/eq\/?$/u,
@@ -93,20 +73,20 @@ export const GROUP_BREADCRUMB_RULES = [
     segments: [{ label: 'Ekwipunek' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/profile\/log\/?$/u,
-    segments: [{ label: 'Aktywności' }],
+    pattern: /^\/groups\/[^/]+\/profile\/activity\/?$/u,
+    segments: [{ label: 'Dziennik aktywności' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/?$/u,
     segments: [{ label: 'Zdobyte odznaki' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/members\/code\/?$/u,
+    pattern: /^\/groups\/[^/]+\/members\/codes\/?$/u,
     segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Kody dostępu' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/members\/log\/?$/u,
-    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Log aktywności' }],
+    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Dziennik aktywności' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/members\/?$/u,
@@ -114,31 +94,27 @@ export const GROUP_BREADCRUMB_RULES = [
   },
   {
     pattern: /^\/groups\/[^/]+\/activities\/tools\/?$/u,
-    segments: [{ label: 'Aktywności', path: groupActivitiesPath }, { label: 'Narzędzia' }],
+    segments: [{ label: 'Aktywności', path: groupActivitiesPath }, { label: 'Raporty' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/activities\/?$/u,
     segments: [{ label: 'Aktywności' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/preview\/shop\/?$/u,
-    segments: [{ label: 'Podgląd' }, { label: 'Sklep' }],
-  },
-  {
-    pattern: /^\/groups\/[^/]+\/posts\/?$/u,
+    pattern: /^\/groups\/[^/]+\/activities\/posts\/?$/u,
     segments: [{ label: 'Aktywności', path: groupActivitiesPath }, { label: 'Wpisy' }],
   },
   {
-    pattern: /^\/groups\/[^/]+\/rewards\/badges\/?$/u,
-    segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Odznaki' }],
+    pattern: /^\/groups\/[^/]+\/rewards\/ranks\/?$/u,
+    segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Rangi' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/rewards\/shopitems\/?$/u,
-    segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Przedmioty sklepowe' }],
+    segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Sklep' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/rewards\/?$/u,
-    segments: [{ label: 'Systemy nagród' }],
+    segments: [{ label: 'Systemy nagród', path: groupRewardsPath }, { label: 'Odznaki' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/groupsettings\/currency\/?$/u,

@@ -1,10 +1,7 @@
-import { Link, useParams } from 'react-router-dom';
-import { useAppRole } from '../../../context/AppRoleContext.jsx';
-import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { useParams } from 'react-router-dom';
 import { TexturedSurface } from '../../../components/ui/index.js';
 import ContentWithMeasuredDivider from '../../../components/ui/ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
-import { groupActivitiesPath, groupRewardsBadgesPath, groupRewardsPath } from '../../../routes/pathRegistry.js';
-import { useGroupDetails } from '../group-shared/useGroupDetails.js';
+import { useGroupDetails } from '../../../hooks/groups/useGroupDetails.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import './GroupMainHomeContent.css';
 import './shared/groupMainSubpageHeader.css';
@@ -64,59 +61,3 @@ export default function GroupMainHomeContent() {
     </div>
   );
 }
-
-export function GroupMainEmptyNotice({ message, linkLabel, linkTo }) {
-  return (
-    <p className="group-main-home__empty-notice">
-      {message}{' '}
-      {linkLabel && linkTo ? (
-        <Link className="group-main-home__empty-link" to={linkTo}>
-          {linkLabel}
-        </Link>
-      ) : null}
-    </p>
-  );
-}
-
-function resolveEmptyLinkForRole(role, linkConfig, groupId) {
-  if (role === APP_ROLE.STUDENT) {
-    return {
-      message: linkConfig.studentMessage ?? linkConfig.message,
-      linkLabel: null,
-      linkTo: null,
-    };
-  }
-
-  return {
-    message: linkConfig.message,
-    linkLabel: linkConfig.linkLabel,
-    linkTo: linkConfig.path(groupId),
-  };
-}
-
-export function useGroupMainEmptyLink(key, groupId) {
-  const { role } = useAppRole();
-  const linkConfig = GROUP_MAIN_EMPTY_LINKS[key];
-  return resolveEmptyLinkForRole(role, linkConfig, groupId);
-}
-
-export const GROUP_MAIN_EMPTY_LINKS = {
-  ranks: {
-    message: 'Nie dodano jeszcze rang.',
-    studentMessage: 'Nie dodano jeszcze rang w tej grupie.',
-    linkLabel: 'Dodaj je w systemie nagród',
-    path: groupRewardsPath,
-  },
-  badges: {
-    message: 'Nie dodano jeszcze odznak.',
-    studentMessage: 'Nie dodano jeszcze odznak w tej grupie.',
-    linkLabel: 'Dodaj je w systemie nagród',
-    path: groupRewardsBadgesPath,
-  },
-  activities: {
-    message: 'Nie dodano jeszcze aktywności.',
-    studentMessage: 'Nie dodano jeszcze aktywności w tej grupie.',
-    linkLabel: 'Dodaj je w module aktywności',
-    path: groupActivitiesPath,
-  },
-};

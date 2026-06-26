@@ -1,0 +1,49 @@
+.maq-text-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  width: 100%;
+}
+
+.maq-text-field__label {
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.maq-text-field__control {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-body);
+  outline: none;
+}
+
+.maq-text-field__control--textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.maq-text-field__control:focus {
+  border-color: var(--color-accent);
+}
+
+.maq-text-field__control--error {
+  border-color: var(--color-input-error-border, #f87171);
+}
+
+.maq-text-field__control:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.maq-text-field__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-input-error, #f87171);
+}

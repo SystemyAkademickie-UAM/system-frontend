@@ -13,6 +13,7 @@
  * @property {number | null} [perStudentLimit]
  * @property {string | null} [imageRef]
  * @property {boolean} [isPublished]
+ * @property {boolean} [isLocked]
  * @property {boolean} [isExtraLife]
  */
 

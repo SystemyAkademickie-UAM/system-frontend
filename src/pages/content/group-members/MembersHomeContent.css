@@ -148,3 +148,16 @@
     font-size: 15px;
   }
 }
+
+.members-table__rank-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.members-table__rank-manual-note {
+  font-size: 11px;
+  color: var(--color-text-muted, rgba(227, 224, 247, 0.65));
+  font-style: italic;
+  line-height: 1.2;
+}

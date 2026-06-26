@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   Button,
   CurrencyDisplay,
@@ -8,16 +9,22 @@ import {
   SearchBar,
   useToast,
 } from '../../../components/ui/index.js';
+import { useGroupRankPathSettings } from '../../../hooks/groups/useGroupShopSchedule.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import '../../../components/page/PageUnavailable.css';
 import { useGroupRanks } from './useGroupRanks.js';
+import { useGroupShopItems } from '../../../hooks/shop/useGroupShop.js';
+import { resolveShopItemLabels } from '../../../utils/ranks/rankShopItemUnlock.js';
 import RewardsRankTableRow from './shared/RewardsRankTableRow.jsx';
 import './shared/rewardsShared.css';
 import './shared/rewardsTablePreview.css';
 import RankAssignModal from './modals/RankAssignModal.jsx';
 import RankDeleteModal from './modals/RankDeleteModal.jsx';
+import { useViewLayoutPreference } from '../../../hooks/useViewLayoutPreference.js';
+import ViewLayoutToggle from '../../../components/ui/ViewLayoutToggle/ViewLayoutToggle.jsx';
+import GroupMainRanksContent from '../group-main-ranks/GroupMainRanksContent.jsx';
 import RankFormModal from './modals/RankFormModal.jsx';
 
 const RANK_COLUMNS = [
@@ -69,7 +76,7 @@ const RANK_COLUMNS = [
     sort: 'number',
     width: '120px',
     render: (rank) => (
-      <CurrencyDisplay amount={rank.costAmount} symbol={rank.costEmoji} size="sm" />
+      <CurrencyDisplay amount={rank.costAmount} size="sm" />
     ),
   },
   {
@@ -103,17 +110,30 @@ const RANK_COLUMNS = [
     width: '220px',
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
-    render: (rank) => (
-      <span className="rewards-table__cell-text">
-        {rank.shopItems?.join(', ') || '—'}
-      </span>
-    ),
   },
 ];
 
+function createRankColumns(resolveShopItems) {
+  return RANK_COLUMNS.map((column) => (
+    column.key === 'shopItems'
+      ? {
+        ...column,
+        render: (rank) => (
+          <span className="rewards-table__cell-text">
+            {resolveShopItems(rank.shopItems).join(', ') || '—'}
+          </span>
+        ),
+      }
+      : column
+  ));
+}
+
 export default function RewardsHomeContent() {
   const nav = useGroupSubNav('group-rewards');
+  const { groupId } = useParams();
+  const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-ranks-view');
   const { showSuccess, showError } = useToast();
+  const { showMemberAvatars, toggleShowMemberAvatars } = useGroupRankPathSettings(groupId);
   const {
     ranks,
     students,
@@ -124,6 +144,17 @@ export default function RewardsHomeContent() {
     handleDelete,
     handleAssign,
   } = useGroupRanks();
+  const { items: shopCatalogItems } = useGroupShopItems(groupId);
+
+  const resolveShopItemNames = useCallback(
+    (itemIds = []) => resolveShopItemLabels(itemIds, shopCatalogItems),
+    [shopCatalogItems],
+  );
+
+  const rankColumns = useMemo(
+    () => createRankColumns(resolveShopItemNames),
+    [resolveShopItemNames],
+  );
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
@@ -211,6 +242,16 @@ export default function RewardsHomeContent() {
     ],
   }), [openModal]);
 
+  const handleToggleMemberAvatars = useCallback(async () => {
+    const wasVisible = showMemberAvatars;
+    const result = await toggleShowMemberAvatars();
+    if (result.ok) {
+      showSuccess(wasVisible
+        ? 'Uczestnicy zostali ukryci na ścieżce rang.'
+        : 'Uczestnicy są widoczni na ścieżce rang.');
+    }
+  }, [toggleShowMemberAvatars, showMemberAvatars, showSuccess]);
+
   const modalRank = activeModal?.rank ?? null;
 
   if (error) {
@@ -232,6 +273,7 @@ export default function RewardsHomeContent() {
       title={nav.sectionTitle}
       subNavItems={nav.items}
       subNavAriaLabel={nav.ariaLabel}
+      headerAction={<ViewLayoutToggle layout={layout} onToggle={toggleLayout} />}
       toolbar={(
         <>
           <div className="maq-section-page__toolbar-start">
@@ -244,7 +286,19 @@ export default function RewardsHomeContent() {
               Dodaj rangę
             </Button>
           </div>
-          <div className="maq-section-page__toolbar-end">
+          <div className="maq-section-page__toolbar-end rewards-page__toolbar-end">
+            <div className="rewards-ranks__members-toggle-wrap">
+              <Button
+                type="button"
+                variant={showMemberAvatars ? 'primary' : 'secondary'}
+                size="md"
+                className="rewards-ranks__members-toggle"
+                onClick={handleToggleMemberAvatars}
+              >
+                {showMemberAvatars ? 'Ukryj uczestników' : 'Pokaż uczestników'}
+              </Button>
+              <InfoTooltip text="Steruje widocznością awatarów uczestników na ścieżce rang w widoku kafelkowym." />
+            </div>
             <SearchBar
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
@@ -262,9 +316,11 @@ export default function RewardsHomeContent() {
         <p className="rewards-page__loading page-unavailable__notice">Ładowanie rang…</p>
       ) : ranks.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">Brak rang w tej grupie. Kliknij „Dodaj rangę”, aby utworzyć pierwszą.</p>
+      ) : isTileView ? (
+        <GroupMainRanksContent embedded showMemberAvatars={showMemberAvatars} />
       ) : (
         <DataTable
-          columns={RANK_COLUMNS}
+          columns={rankColumns}
           data={ranks}
           rowKey="id"
           tiebreakerKey="position"
@@ -279,6 +335,7 @@ export default function RewardsHomeContent() {
               || rank.iconFile.toLowerCase().includes(query)
               || rank.storyDescription.toLowerCase().includes(query)
               || String(rank.discount ?? '').includes(query)
+              || resolveShopItemNames(rank.shopItems).some((item) => item.toLowerCase().includes(query))
               || (rank.shopItems || []).some((item) => item.toLowerCase().includes(query))
             ),
           }}
@@ -290,6 +347,7 @@ export default function RewardsHomeContent() {
       <RankFormModal
         isOpen={activeModal?.type === 'create'}
         existingRanks={ranks}
+        shopCatalogItems={shopCatalogItems}
         onClose={closeModal}
         onConfirm={handleCreateConfirm}
         isLoading={modalLoading}
@@ -297,6 +355,8 @@ export default function RewardsHomeContent() {
       <RankFormModal
         isOpen={activeModal?.type === 'edit'}
         rank={modalRank}
+        existingRanks={ranks}
+        shopCatalogItems={shopCatalogItems}
         onClose={closeModal}
         onConfirm={handleEditConfirm}
         isLoading={modalLoading}

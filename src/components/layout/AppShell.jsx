@@ -2,11 +2,14 @@ import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { APP_ROLE, ROLE_UI_LABEL } from '../../navigation/shellTemplates.config.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
+import { GroupCurrencySettingsProvider } from '../../context/GroupCurrencyContext.jsx';
+import { GroupLivesSettingsProvider } from '../../context/GroupLivesContext.jsx';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useUserProfile } from '../../context/UserProfileContext.jsx';
 import { useAppBreadcrumb } from '../../hooks/useAppBreadcrumb.js';
 import { useCompactAppLayout } from '../../hooks/useCompactAppLayout.js';
 import { useLeaderDisplayPreferences } from '../../hooks/useLeaderDisplayPreferences.js';
+import { useShellGroupContext } from '../../hooks/useShellGroupContext.js';
 import { useStudentSuperBarStats } from '../../hooks/useStudentSuperBarStats.js';
 import Sidebar from './Sidebar.jsx';
 import SuperBar from './superbar/SuperBar.jsx';
@@ -37,10 +40,11 @@ export default function AppShell() {
   const location = useLocation();
   const menuId = useId();
   const { role } = useAppRole();
+  const { rawGroupId } = useShellGroupContext();
   const { user, isLoading: isSessionLoading } = useSession();
   const { profile, avatarUrl, isLoading: isProfileLoading } = useUserProfile();
   const { showNickname: leaderShowsNickname } = useLeaderDisplayPreferences();
-  const { livesDisplay, currencyDisplay, totalEarnedDisplay, currencyLabel } = useStudentSuperBarStats();
+  const { livesDisplay, currencyDisplay, totalEarnedDisplay, currencyLabel, livesLabel } = useStudentSuperBarStats();
   const breadcrumb = useAppBreadcrumb();
   const isCompactLayout = useCompactAppLayout();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -89,7 +93,9 @@ export default function AppShell() {
   }, [isMobileNavOpen]);
 
   return (
-    <div className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}>
+    <GroupCurrencySettingsProvider groupId={rawGroupId}>
+    <GroupLivesSettingsProvider groupId={rawGroupId}>
+      <div className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}>
       <a className="app-shell__skip" href="#main-content">
         Przejdź do treści
       </a>
@@ -124,6 +130,7 @@ export default function AppShell() {
             roleLabel={roleLabel}
             avatarUrl={avatarUrl}
             livesDisplay={livesDisplay}
+            livesLabel={livesLabel}
             currencyDisplay={currencyDisplay}
             totalEarnedDisplay={totalEarnedDisplay}
             currencyLabel={currencyLabel}
@@ -142,6 +149,8 @@ export default function AppShell() {
           </main>
         </div>
       </div>
-    </div>
+      </div>
+    </GroupLivesSettingsProvider>
+    </GroupCurrencySettingsProvider>
   );
 }

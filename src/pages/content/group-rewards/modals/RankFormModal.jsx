@@ -1,20 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
 import IconPicker from '../../../../components/ui/IconPicker/IconPicker.jsx';
 import { fetchIconCatalog } from '../../../../services/icons.api.js';
-import { calculateDefaultRankDiscount } from '../shared/rankDiscountUtils.js';
-import { validateDiscountPercentInput, validateWholeNumberInput } from '../shared/rewardsNumericValidation.js';
+import { calculateDefaultRankDiscount } from '../../../../utils/ranks/rankDiscount.js';
+import { validateDiscountPercentInput, validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import RankUnlockItemChecklist from '../shared/RankUnlockItemChecklist.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
-
-function formatShopItems(items) {
-  if (!items || !Array.isArray(items)) return '';
-  return items.join('\n');
-}
-
-function parseShopItems(text) {
-  if (!text || typeof text !== 'string') return [];
-  return text.split('\n').map((s) => s.trim()).filter(Boolean);
-}
 
 const EMPTY_FORM = {
   name: '',
@@ -22,19 +13,41 @@ const EMPTY_FORM = {
   costAmount: '',
   discount: '',
   storyDescription: '',
-  shopItems: '',
+  selectedShopItems: [],
 };
+
+function normalizeRankShopItemIds(items = []) {
+  return items.map((item) => String(item).trim()).filter(Boolean);
+}
 
 export default function RankFormModal({
   isOpen,
   rank,
   existingRanks = [],
+  shopCatalogItems = [],
   onClose,
   onConfirm,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [iconCatalog, setIconCatalog] = useState([]);
   const isEdit = Boolean(rank);
+
+  const rankRefs = useMemo(
+    () => existingRanks.map((entry) => ({
+      dbId: entry.dbId,
+      name: entry.name,
+      shopItems: entry.shopItems ?? [],
+    })),
+    [existingRanks],
+  );
+
+  const catalogItems = useMemo(
+    () => shopCatalogItems.map((item) => ({
+      id: String(item.id),
+      name: item.name,
+    })),
+    [shopCatalogItems],
+  );
 
   useEffect(() => {
     if (!isOpen) return;
@@ -56,7 +69,7 @@ export default function RankFormModal({
         costAmount: String(rank.costAmount),
         discount: rank.discount === 0 || rank.discount ? String(rank.discount) : '',
         storyDescription: rank.storyDescription,
-        shopItems: formatShopItems(rank.shopItems),
+        selectedShopItems: normalizeRankShopItemIds(rank.shopItems ?? []),
       });
       return;
     }
@@ -92,8 +105,23 @@ export default function RankFormModal({
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
   };
 
+  const handleShopItemToggle = useCallback((itemId, checked) => {
+    setForm((prev) => {
+      const next = new Set(prev.selectedShopItems);
+      if (checked) {
+        next.add(itemId);
+      } else {
+        next.delete(itemId);
+      }
+      return { ...prev, selectedShopItems: Array.from(next) };
+    });
+  }, []);
+
   const handleConfirm = () => {
     if (!isValid) return;
+
+    const catalogIds = new Set(catalogItems.map((item) => String(item.id)));
+    const shopItems = form.selectedShopItems.filter((itemId) => catalogIds.has(itemId));
 
     onConfirm?.({
       name: form.name.trim(),
@@ -101,7 +129,7 @@ export default function RankFormModal({
       costAmount: costValidation.value,
       discount: discountValidation.value,
       storyDescription: form.storyDescription.trim(),
-      shopItems: parseShopItems(form.shopItems),
+      shopItems,
     });
   };
 
@@ -197,15 +225,16 @@ export default function RankFormModal({
         </div>
 
         <div className="rewards-modal__field">
-          <label htmlFor="rank-items" className="rewards-modal__label">
-            Odblokowane przedmioty (jeden w linii)
-          </label>
-          <textarea
-            id="rank-items"
-            className="rewards-modal__textarea"
-            value={form.shopItems}
-            onChange={handleChange('shopItems')}
-            placeholder={'Podstawowy miecz\nPlecak podróżnika'}
+          <span className="rewards-modal__label">Odblokowane przedmioty</span>
+          <p className="rewards-modal__field-hint">
+            Przedmioty niezaznaczone są domyślnie dostępne dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang.
+          </p>
+          <RankUnlockItemChecklist
+            catalogItems={catalogItems}
+            ranks={rankRefs}
+            currentRankDbId={rank?.dbId ?? null}
+            selectedIds={form.selectedShopItems}
+            onToggle={handleShopItemToggle}
           />
         </div>
       </div>

@@ -15,6 +15,7 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {number} avatarId
  * @property {string | null} avatarUrl
  * @property {number} [badgesCount]
+ * @property {boolean} [autoRankEnabled]
  */
 
 /**
@@ -42,7 +43,7 @@ export async function fetchGroupStudents(groupId) {
  * PATCH /groups/:groupId/students/bulk-update
  *
  * @param {string | number} groupId
- * @param {Array<{ enrollmentId: number, rankId?: number | null, currency?: number, totalEarned?: number }>} students
+ * @param {Array<{ enrollmentId: number, rankId?: number | null, currency?: number, totalEarned?: number, autoRankEnabled?: boolean }>} students
  * @returns {Promise<{ ok: boolean, updated?: number, error?: string }>}
  */
 export async function bulkUpdateStudents(groupId, students) {

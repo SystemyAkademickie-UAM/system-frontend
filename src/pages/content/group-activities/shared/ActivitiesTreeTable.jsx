@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import Sortable from 'sortablejs';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { CurrencyDisplay } from '../../../../components/ui/index.js';
@@ -14,6 +15,7 @@ function StageIsland({
 }) {
   const activityCount = stage.activities?.length ?? 0;
   const activityLabel = activityCount === 1 ? 'aktywność' : 'aktywności';
+  const isHidden = stage.visibilityStatus === 0;
 
   const handleHeaderKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -27,7 +29,9 @@ function StageIsland({
       className={[
         'activities-island',
         stage.expanded ? 'activities-island--expanded' : '',
+        isHidden ? 'activities-island--hidden' : '',
       ].filter(Boolean).join(' ')}
+      data-stage-id={stage.id}
     >
       <header
         className="activities-island__header"
@@ -37,6 +41,14 @@ function StageIsland({
         tabIndex={0}
         aria-expanded={stage.expanded}
       >
+        <button
+          type="button"
+          className="activities-island__drag-handle"
+          aria-label={`Zmień kolejność etapu ${stage.name}`}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <span aria-hidden="true">⋮⋮</span>
+        </button>
         <div className="activities-island__header-start">
           <span className="activities-island__icon" aria-hidden="true">
             {stage.name.trim().charAt(0).toUpperCase() || '?'}
@@ -49,6 +61,13 @@ function StageIsland({
                 {' '}
                 {activityLabel}
               </span>
+              {isHidden ? (
+                <span className="activities-island__visibility-badge">Ukryty</span>
+              ) : (
+                <span className="activities-island__visibility-badge activities-island__visibility-badge--visible">
+                  Publiczny
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -90,6 +109,7 @@ function StageIsland({
                       Opis dydaktyczny
                     </th>
                     <th className="activities-island__th" scope="col">Nagroda</th>
+                    <th className="activities-island__th activities-island__th--hide-mobile" scope="col">Uczestnicy</th>
                     <th className="activities-island__th activities-island__th--actions" scope="col">
                       <span className="visually-hidden">Akcje</span>
                     </th>
@@ -114,6 +134,11 @@ function StageIsland({
                       <td className="activities-island__cell">
                         <CurrencyDisplay amount={activity.reward ?? 0} size="sm" />
                       </td>
+                      <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--participants">
+                        <span className="activities-island__participants-count" title="Uczestnicy z zaliczoną aktywnością">
+                          {activity.completionCount ?? 0}
+                        </span>
+                      </td>
                       <td className="activities-island__cell activities-island__cell--actions">
                         <DataTableRowActions
                           row={{ stage, activity }}
@@ -137,11 +162,38 @@ export default function ActivitiesTreeTable({
   onToggleExpand,
   stageRowActions,
   activityRowActions,
+  onReorderStages,
 }) {
+  const containerRef = useRef(null);
   const visibleStages = useMemo(() => stages, [stages]);
 
+  useEffect(() => {
+    if (!containerRef.current || !onReorderStages) {
+      return undefined;
+    }
+
+    const sortable = Sortable.create(containerRef.current, {
+      animation: 150,
+      handle: '.activities-island__drag-handle',
+      draggable: '.activities-island',
+      onEnd() {
+        const orderedIds = [...containerRef.current.querySelectorAll('[data-stage-id]')]
+          .map((element) => Number(element.getAttribute('data-stage-id')))
+          .filter((id) => Number.isFinite(id));
+
+        if (orderedIds.length > 0) {
+          onReorderStages(orderedIds);
+        }
+      },
+    });
+
+    return () => {
+      sortable.destroy();
+    };
+  }, [onReorderStages, visibleStages]);
+
   return (
-    <div className="activities-islands">
+    <div className="activities-islands" ref={containerRef}>
       {visibleStages.map((stage) => (
         <StageIsland
           key={`stage-${stage.id}`}

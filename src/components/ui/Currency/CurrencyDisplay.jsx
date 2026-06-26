@@ -9,7 +9,7 @@ import './CurrencyDisplay.css';
  * @param {string} [props.symbol] — nadpisanie emoji (np. 🥕)
  * @param {string} [props.iconFile] — plik SVG w public/assets/svg/
  * @param {string} [props.iconUrl] — pełny URL obrazka
- * @param {'sm' | 'md' | 'lg'} [props.size='md']
+ * @param {'sm' | 'md' | 'lg' | 'xl'} [props.size='md']
  * @param {string} [props.className]
  * @param {string} [props.ariaLabel]
  */

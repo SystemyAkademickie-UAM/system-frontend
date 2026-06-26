@@ -1,7 +1,8 @@
 import {useState, useEffect, useRef} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
+import {invalidateGroupLives} from '../../../services/groupLivesEvents.js';
 
 import GroupSettingsHealthContentWindow from './GroupSettingsHealthContentWindow.jsx';
 
@@ -285,6 +286,7 @@ export default function App() {
 
       console.log('PATCH /groups/' + groupId + '/lives-config JSON:', data);
 
+      invalidateGroupLives(groupId);
       onfetchlivessettings();
 
     } catch (error) {

@@ -12,7 +12,7 @@ import './GroupCard.css';
 
 /**
  * @param {Object} props
- * @param {import('./groupsList.api.js').GroupListItem} props.group
+ * @param {import('../../../services/groups.api.js').GroupListItem} props.group
  */
 export default function GroupCard({ group }) {
   const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);

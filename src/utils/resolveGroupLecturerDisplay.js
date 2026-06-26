@@ -13,7 +13,7 @@ function buildLegalName(user) {
  * Preferuje imię i nazwisko prowadzącego zamiast ksywki, gdy wyłączono ją w ustawieniach.
  * Backend zawsze zwraca sformatowany `lecturers` z ksywką — ta funkcja koryguje widok własnych grup.
  *
- * @param {import('../pages/content/groups-list/groupsList.api.js').GroupListItem} group
+ * @param {import('../services/groups.api.js').GroupListItem} group
  * @param {{ role?: string, showNickname?: boolean, user?: object | null }} options
  */
 export function resolveGroupLecturerDisplay(group, { role, showNickname, user } = {}) {
