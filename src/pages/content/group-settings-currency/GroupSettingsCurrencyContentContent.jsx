@@ -2,6 +2,7 @@ import {useState, useEffect, useRef} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {InfoTooltip, useToast} from '../../../components/ui/index.js';
 
 import leftleft from '../../../../public/assets/icons/chevron-left-double-svgrepo-com.svg';
 import left from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
@@ -11,6 +12,8 @@ import right from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg
 import 'unicode-emoji-picker';
 
 export default function App() {
+
+  const {showSuccess, showError} = useToast();
 
   const {groupId} = useParams();
   const [errorMessage, setErrorMessage] = useState('');
@@ -47,7 +50,7 @@ export default function App() {
 
     setCurrencyname(namevalue);
 
-    let iconvalue = data.currencyIcon;
+    let iconvalue = data.currencyEmoji;
 
     if (iconvalue == null || iconvalue == '') {
       iconvalue = '🥕';
@@ -117,6 +120,7 @@ export default function App() {
 
   function resetcurrencysettings() {
     onfetchcurrencysettings();
+    showSuccess('Zmiany zostały cofnięte.');
   }
 
 
@@ -143,7 +147,7 @@ export default function App() {
         },
         body: JSON.stringify({
           currency: currencyname.trim(),
-          currencyIcon: currenticon
+          currencyEmoji: currenticon
         })
       });
 
@@ -161,7 +165,7 @@ export default function App() {
       }
 
       console.log('PATCH /groups/' + groupId + '/currency JSON:', data);
-
+      showSuccess('Zapisano zmiany.');
       applycurrencydata(data);
 
     } catch (error) {
@@ -193,17 +197,17 @@ export default function App() {
       <div>
         <div style = {{width: '75vw', height: '100%', position: 'relative', top: '0%', left: '0%'}}>
 
-          <div style = {{width: '98%', position: 'relative', top: '0%', left: '1%', display: 'flex', flexDirection: 'column', gap: '2vh', paddingBottom: '4vh'}}>
+          <div style = {{width: '98%', position: 'relative', top: '0%', left: '0%', display: 'flex', flexDirection: 'column', gap: '2vh', paddingBottom: '4vh'}}>
 
 
 
-            <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '2vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
+            <div style = {{width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '2vh', paddingTop: '1vh', paddingBottom: '2vh', paddingLeft: '0%', paddingRight: '0%'}}>
 
               <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Ikona waluty</div>
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '2vh'}}>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Ikona waluty</div>
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: '2vh'}}>
                   
-                  <div onClick = {() => setIsPickerOpen(!isPickerOpen)} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                  <div onClick = {() => setIsPickerOpen(!isPickerOpen)} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
                     <div style = {{color: 'rgb(227, 224, 247)', fontSize: '48px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>{currenticon}</div>
                   </div>
                   
@@ -216,13 +220,13 @@ export default function App() {
                 </div>
               </div>
 
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
                 <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Nazwa waluty</div>
-                <input onChange = {(event) => setCurrencyname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {currencyname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
+                <input onChange = {(event) => setCurrencyname(event.target.value)} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {currencyname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
               </div>
 
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%', paddingTop: '1vh'}}>
-                <div onClick = {() => resetcurrencysettings()} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij zmiany</div>
+              <div style = {{width: '100%', position: 'fixed', display: 'flex', flexDirection: 'row', alignItems: 'center', bottom: '2.5vh', right: '2.5vw', justifyContent: 'flex-end', gap: '2%', paddingTop: '1vh'}}>
+                <div onClick = {() => resetcurrencysettings()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij zmiany</div>
                 <div onClick = {() => savecurrencychanges()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Zapisz zmiany</div>
               </div>
 
