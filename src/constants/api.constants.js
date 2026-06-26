@@ -83,8 +83,9 @@ export function getApiBaseUrl() {
 }
 
 /**
- * Resolves the absolute URL for an asset (e.g. image) using the backend base URL.
- * If the path is already an absolute URL, it returns it as is.
+ * Resolves the absolute URL for a backend-hosted asset (avatars, banners, shop images).
+ * DB paths stay `/assets/...`; production serves them under `/api/assets/...` via the API proxy.
+ * Frontend-owned files (favicon, UI SVGs) use `publicAssetPath()` instead.
  * @param {string | null | undefined} path
  * @returns {string | null}
  */
@@ -93,17 +94,27 @@ export function getAssetUrl(path) {
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  
-  const configured = import.meta.env.VITE_API_BASE_URL;
-  let backendBase;
-  if (configured !== undefined && configured !== '') {
-    backendBase = configured.replace(/\/+$/, '').replace(/\/api$/, '');
-  } else if (import.meta.env.DEV) {
-    backendBase = 'http://127.0.0.1:8080';
-  } else {
-    const apiBase = getApiBaseUrl();
-    backendBase = apiBase.replace(/\/api$/, '');
+
+  const trimmed = String(path).trim();
+  if (!trimmed) return null;
+
+  let assetPath = trimmed;
+  if (assetPath.startsWith('/api/assets/')) {
+    assetPath = assetPath.slice('/api'.length);
+  } else if (!assetPath.startsWith('/assets/')) {
+    assetPath = assetPath.startsWith('assets/')
+      ? `/${assetPath}`
+      : `/assets/${assetPath.replace(/^\/+/, '')}`;
   }
-  
-  return `${backendBase}${path.startsWith('/') ? '' : '/'}${path}`;
+
+  const apiBase = getApiBaseUrl();
+  if (apiBase) {
+    return `${apiBase}${assetPath}`;
+  }
+
+  if (import.meta.env.DEV) {
+    return `http://127.0.0.1:8080/api${assetPath}`;
+  }
+
+  return assetPath;
 }

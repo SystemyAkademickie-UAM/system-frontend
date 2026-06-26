@@ -36,28 +36,33 @@ export function useGroupBacklogNotifications(groupId, {
     setIsLoading(true);
     setError('');
 
-    const [listResult, totalResult, countResult] = await Promise.all([
-      fetchGroupBacklog(groupId, { take, skip, studentView: isStudentView }),
-      fetchGroupBacklogTotalCount(groupId),
-      fetchGroupBacklogUnreadCount(groupId),
-    ]);
+    try {
+      const [listResult, totalResult, countResult] = await Promise.all([
+        fetchGroupBacklog(groupId, { take, skip, studentView: isStudentView }),
+        fetchGroupBacklogTotalCount(groupId),
+        fetchGroupBacklogUnreadCount(groupId),
+      ]);
 
-    if (!listResult.ok) {
-      setError(listResult.error ?? 'Nie udało się pobrać powiadomień.');
+      if (!listResult.ok) {
+        setError(listResult.error ?? 'Nie udało się pobrać powiadomień.');
+        setItems([]);
+      } else {
+        setItems(listResult.items);
+      }
+
+      if (totalResult.ok) {
+        setTotalCount(totalResult.count);
+      }
+
+      if (countResult.ok) {
+        setUnreadCount(countResult.count);
+      }
+    } catch {
+      setError('Nie udało się pobrać powiadomień.');
       setItems([]);
-    } else {
-      setItems(listResult.items);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (totalResult.ok) {
-      setTotalCount(totalResult.count);
-    }
-
-    if (countResult.ok) {
-      setUnreadCount(countResult.count);
-    }
-
-    setIsLoading(false);
   }, [groupId, isStudentView, skip, take]);
 
   useEffect(() => {
