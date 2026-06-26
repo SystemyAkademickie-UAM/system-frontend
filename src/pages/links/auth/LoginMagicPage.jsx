@@ -32,39 +32,47 @@ export default function LoginMagicPage() {
     let cancelled = false;
 
     async function verifyToken() {
-      const result = await postJson(AUTH_LOGIN_MAGIC_LINK_VERIFY_PATH, { token });
+      try {
+        const result = await postJson(AUTH_LOGIN_MAGIC_LINK_VERIFY_PATH, { token });
 
-      if (cancelled) {
-        return;
+        if (cancelled) {
+          return;
+        }
+
+        if (!result.ok) {
+          setStatus('error');
+          setMessage(
+            getMagicLinkErrorMessage(
+              result.data,
+              'Nie udało się zweryfikować linku logowania.',
+              result.status,
+            ),
+          );
+          return;
+        }
+
+        setStatus('redirecting');
+        setMessage('Logowanie powiodło się. Przekierowujemy…');
+
+        await session?.refetchSession?.({ force: true });
+        const registrationStatus = await fetchRegistrationStatus();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (isRegistrationComplete(registrationStatus)) {
+          navigate(homePath(), { replace: true });
+          return;
+        }
+
+        navigate(loginPath(), { replace: true });
+      } catch {
+        if (!cancelled) {
+          setStatus('error');
+          setMessage('Nie udało się zweryfikować linku logowania.');
+        }
       }
-
-      if (!result.ok) {
-        setStatus('error');
-        setMessage(
-          getMagicLinkErrorMessage(
-            result.data,
-            'Nie udało się zweryfikować linku logowania.',
-          ),
-        );
-        return;
-      }
-
-      setStatus('redirecting');
-      setMessage('Logowanie powiodło się. Przekierowujemy…');
-
-      await session?.refetchSession?.({ force: true });
-      const registrationStatus = await fetchRegistrationStatus();
-
-      if (cancelled) {
-        return;
-      }
-
-      if (isRegistrationComplete(registrationStatus)) {
-        navigate(homePath(), { replace: true });
-        return;
-      }
-
-      navigate(loginPath(), { replace: true });
     }
 
     void verifyToken();

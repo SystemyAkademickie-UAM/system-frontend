@@ -14,5 +14,9 @@ export function resolveAuthRouteStep(pathname) {
     return 0;
   }
 
+  if (normalized === '/login/magic') {
+    return 1;
+  }
+
   return null;
 }

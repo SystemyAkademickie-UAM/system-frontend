@@ -12,14 +12,22 @@ const MAGIC_LINK_ERROR_MESSAGES = {
  * Maps backend magic-link error codes to user-facing Polish messages.
  * @param {unknown} data
  * @param {string} fallback
+ * @param {number} [httpStatus]
  * @returns {string}
  */
-export function getMagicLinkErrorMessage(data, fallback) {
+export function getMagicLinkErrorMessage(data, fallback, httpStatus) {
+  if (data && typeof data === 'object') {
+    const retryAfterSeconds = /** @type {{ retryAfterSeconds?: number }} */ (data).retryAfterSeconds;
+    if (httpStatus === 429 && typeof retryAfterSeconds === 'number' && retryAfterSeconds > 0) {
+      return `Link logowania został już wysłany. Spróbuj ponownie za ${retryAfterSeconds} s.`;
+    }
+  }
+
   if (!data || typeof data !== 'object') {
     return fallback;
   }
 
-  const error = /** @type {MagicLinkApiError} */ (data);
+  const error = /** @type {MagicLinkApiError & { retryAfterSeconds?: number }} */ (data);
   const code = error.error;
   if (code && typeof code === 'string' && MAGIC_LINK_ERROR_MESSAGES[code]) {
     return MAGIC_LINK_ERROR_MESSAGES[code];
