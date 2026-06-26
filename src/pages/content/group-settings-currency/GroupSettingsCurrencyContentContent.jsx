@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
 import GroupSettingsUnsavedModal from '../group-settings/GroupSettingsUnsavedModal.jsx';
 import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
-import { Button, useToast } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, useToast } from '../../../components/ui/index.js';
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
 import { DEFAULT_CURRENCY_SYMBOL } from '../../../constants/currency.constants.js';
+import { CURRENCY_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { invalidateGroupCurrency } from '../../../services/groupCurrencyEvents.js';
 import { fetchGroupCurrencyConfig, updateGroupCurrencyConfig } from '../../../services/groupCurrency.api.js';
 import '../group-settings/GroupSettingsForm.css';
@@ -101,8 +102,9 @@ export default function GroupSettingsCurrencyContentContent() {
       return false;
     }
 
-    return buildSnapshot(currencyName, currencyIcon).currencyName !== savedSnapshot.currencyName
-      || buildSnapshot(currencyName, currencyIcon).currencyIcon !== savedSnapshot.currencyIcon;
+    const current = buildSnapshot(currencyName, currencyIcon);
+    return current.currencyName !== savedSnapshot.currencyName
+      || current.currencyIcon !== savedSnapshot.currencyIcon;
   }, [currencyIcon, currencyName, isLoading, savedSnapshot]);
 
   const {
@@ -137,13 +139,16 @@ export default function GroupSettingsCurrencyContentContent() {
               <label className="group-settings-form__label" htmlFor="group-currency-name">
                 Nazwa waluty
               </label>
-              <input
-                id="group-currency-name"
-                className="group-settings-form__input"
-                value={currencyName}
-                onChange={(event) => setCurrencyName(event.target.value)}
-                disabled={isSaving}
-              />
+              <CharacterLimitedField value={currencyName} maxLength={CURRENCY_LABEL_MAX_LENGTH}>
+                <input
+                  id="group-currency-name"
+                  className="group-settings-form__input"
+                  value={currencyName}
+                  maxLength={CURRENCY_LABEL_MAX_LENGTH}
+                  onChange={(event) => setCurrencyName(event.target.value)}
+                  disabled={isSaving}
+                />
+              </CharacterLimitedField>
             </div>
           </div>
         )}
@@ -157,7 +162,7 @@ export default function GroupSettingsCurrencyContentContent() {
         <Button
           type="button"
           variant="primary"
-          size="md"
+          size="sm"
           className="group-settings-form__save-fab"
           onClick={persistSettings}
           disabled={isSaving}

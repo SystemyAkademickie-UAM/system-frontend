@@ -71,9 +71,9 @@ export function groupMainPath(groupId) {
   return `/groups/${groupId}/home`;
 }
 
-/** Profil innego użytkownika — `/groups/:groupId/studentprofile/:studentId`. */
+/** Profil innego użytkownika — `/groups/:groupId/student-profile/:studentId`. */
 export function groupStudentProfilePath(groupId, studentId) {
-  return `/groups/${groupId}/studentprofile/${studentId}`;
+  return `/groups/${groupId}/student-profile/${studentId}`;
 }
 
 // ============================================================================

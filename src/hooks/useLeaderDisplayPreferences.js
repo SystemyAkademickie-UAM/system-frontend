@@ -14,12 +14,29 @@ function readShowNickname() {
 }
 
 export function setLeaderShowNickname(enabled) {
+  if (typeof window === 'undefined') {
+    return;
+  }
   window.localStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
   window.dispatchEvent(new CustomEvent('maq:leader-display-preferences'));
 }
 
-export function useLeaderDisplayPreferences() {
+/**
+ * Preferencja wyświetlania ksywki prowadzącego.
+ * Źródło prawdy: backend (`profile.showNickname`); localStorage synchronizuje UI między kartami.
+ *
+ * @param {boolean | undefined} profileShowNickname — z GET /profile
+ */
+export function useLeaderDisplayPreferences(profileShowNickname) {
   const [showNickname, setShowNicknameState] = useState(readShowNickname);
+
+  useEffect(() => {
+    if (profileShowNickname === undefined) {
+      return;
+    }
+    setLeaderShowNickname(profileShowNickname);
+    setShowNicknameState(profileShowNickname);
+  }, [profileShowNickname]);
 
   useEffect(() => {
     const sync = () => setShowNicknameState(readShowNickname());

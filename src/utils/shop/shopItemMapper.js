@@ -12,6 +12,9 @@ export function mapBackendShopItem(raw) {
   const rankDiscountedPrice = listing.rankDiscountedPrice;
 
   const categoryId = item.categoryId ?? null;
+  const categoryIds = Array.isArray(item.categoryIds)
+    ? item.categoryIds.map((id) => Number(id)).filter((id) => Number.isFinite(id))
+    : (categoryId !== null && categoryId !== undefined ? [Number(categoryId)] : []);
   const imageRef = typeof item.imageRef === 'string' ? item.imageRef : null;
   const icon = parseShopItemImageRef(imageRef);
   const badgePromotions = Array.isArray(listing.badgePromotions) ? listing.badgePromotions : [];
@@ -30,17 +33,18 @@ export function mapBackendShopItem(raw) {
       ? undefined
       : Number(rankDiscountedPrice),
     imageUrl: icon.imageUrl ?? undefined,
-    categoryId: categoryId === null || categoryId === undefined ? null : Number(categoryId),
+    categoryId: categoryIds[0] ?? null,
     stockQuantity: listing.stockQuantity === null || listing.stockQuantity === undefined
       ? null
       : Number(listing.stockQuantity),
     perStudentLimit: listing.perStudentLimit === null || listing.perStudentLimit === undefined
       ? null
       : Number(listing.perStudentLimit),
-    categories: categoryId !== null && categoryId !== undefined ? [String(categoryId)] : [],
+    categories: categoryIds.map(String),
     imageRef: typeof item.imageRef === 'string' ? item.imageRef : null,
     isPublished: typeof item.isPublished === 'boolean' ? item.isPublished : true,
     isLocked: listing.isLocked === true,
+    isExtraLife: item.isExtraLife === true,
     badgePromotions,
     rankPromotions,
   };

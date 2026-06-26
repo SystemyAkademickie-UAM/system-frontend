@@ -13,6 +13,7 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {string | null} language
  * @property {boolean} registrationCompleted
  * @property {string | null} eulaAcceptedAt
+ * @property {boolean} [showNickname]
  */
 
 /**
@@ -60,7 +61,7 @@ export async function fetchAvatars() {
  * Aktualizuje profil użytkownika.
  * PATCH /profile/settings
  *
- * @param {{ nickname?: string, avatarId?: number }} updates
+ * @param {{ nickname?: string, avatarId?: number, showNickname?: boolean }} updates
  * @returns {Promise<{ ok: boolean, profile?: UserProfile, error?: string }>}
  */
 export async function updateProfile(updates) {

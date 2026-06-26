@@ -36,7 +36,42 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
     const lines = [];
 
     try {
+      if (
+        options.seedStages
+        || options.seedActivities
+        || options.seedRanks
+        || options.seedBadges
+      ) {
+        await seedGroupData({
+          groupId,
+          count: SEED_COUNT,
+          onLog: (line) => {
+            lines.push(line);
+            setLogText(lines.join('\n'));
+          },
+          seedStages: options.seedStages,
+          seedActivities: options.seedActivities,
+          seedRanks: options.seedRanks,
+          seedBadges: options.seedBadges,
+        });
+      }
+
       if (options.seedShopItems) {
+        if (!options.seedRanks && !options.seedBadges) {
+          await seedGroupData({
+            groupId,
+            count: SEED_COUNT,
+            onLog: (line) => {
+              lines.push(line);
+              setLogText(lines.join('\n'));
+            },
+            seedStages: false,
+            seedActivities: false,
+            seedRanks: true,
+            seedBadges: true,
+          });
+        }
+
         await seedTemporaryShopItems({
           groupId,
           count: SEED_COUNT,
@@ -55,26 +90,6 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
             lines.push(line);
             setLogText(lines.join('\n'));
           },
-        });
-      }
-
-      if (
-        options.seedStages
-        || options.seedActivities
-        || options.seedRanks
-        || options.seedBadges
-      ) {
-        await seedGroupData({
-          groupId,
-          count: SEED_COUNT,
-          onLog: (line) => {
-            lines.push(line);
-            setLogText(lines.join('\n'));
-          },
-          seedStages: options.seedStages,
-          seedActivities: options.seedActivities,
-          seedRanks: options.seedRanks,
-          seedBadges: options.seedBadges,
         });
       }
 
@@ -164,7 +179,7 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
           disabled={isBusy}
           onClick={() => runSeed({ seedTemplates: true })}
         >
-          Szablony grup
+          Szablony grup (lecturer1–3)
         </button>
       </div>
 

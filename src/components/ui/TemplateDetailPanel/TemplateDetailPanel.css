@@ -15,6 +15,14 @@
   max-height: none;
 }
 
+.maq-template-detail-panel--fitted {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
 .maq-template-detail-panel__loading,
 .maq-template-detail-panel__empty,
 .maq-template-detail-panel__muted {

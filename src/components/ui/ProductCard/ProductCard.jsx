@@ -11,7 +11,7 @@ import ProductCategoryStrip from '../ProductCategoryStrip/ProductCategoryStrip.j
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 
 import { parseShopItemImageRef } from '../../../utils/shop/shopItemIcon.js';
-import { getShopItemAccentColor } from '../../../utils/shop/shopItemAccentColor.js';
+import { getProductCardColorVars } from '../../../utils/shop/shopCategoryColors.js';
 import { getShopItemPriceDisplay } from '../../../utils/shop/shopPricing.js';
 
 import './ProductCard.css';
@@ -236,6 +236,14 @@ export default function ProductCard({
 
   className = '',
 
+  inventoryMode = false,
+
+  ownedQuantity = 1,
+
+  onUse,
+
+  readOnly = false,
+
 }) {
 
   const icon = useMemo(
@@ -250,9 +258,11 @@ export default function ProductCard({
 
   const isPreview = variant === 'preview';
 
-  const showCartButton = !hideAddToCart && !hideActions;
+  const isInventory = inventoryMode === true;
 
-  const showFooter = !hideActions || isPreview;
+  const showCartButton = !hideAddToCart && !hideActions && !isInventory;
+
+  const showFooter = isInventory || !hideActions || isPreview;
 
   const resolvedCategories = categoryDetails.length > 0
     ? categoryDetails
@@ -263,10 +273,8 @@ export default function ProductCard({
     }));
 
   const cardStyle = useMemo(
-    () => ({
-      '--product-card-accent-color': getShopItemAccentColor(itemId ?? name),
-    }),
-    [itemId, name],
+    () => getProductCardColorVars(resolvedCategories),
+    [resolvedCategories],
   );
 
 
@@ -452,6 +460,30 @@ export default function ProductCard({
 
         <footer className="maq-product-card__footer">
 
+          {isInventory ? (
+            <>
+              <div className="maq-product-card__price-bar">
+                <span className="maq-product-card__section-label">Posiadane</span>
+                <span className="maq-product-card__owned-count">{ownedQuantity}</span>
+              </div>
+
+              {!readOnly ? (
+                <div className="maq-product-card__actions">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    disabled={disabled}
+                    onClick={onUse}
+                    className="maq-product-card__buy-btn"
+                  >
+                    Użyj
+                  </Button>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <>
           <div className="maq-product-card__price-bar">
 
             <span className="maq-product-card__section-label">Cena</span>
@@ -524,6 +556,9 @@ export default function ProductCard({
 
             </div>
 
+          )}
+
+            </>
           )}
 
         </footer>

@@ -11,6 +11,10 @@ import { extractApiError } from './apiErrors.js';
  * @property {number | null} baseGroupId
  * @property {string} createdAt
  * @property {boolean} [isFavorite]
+ * @property {boolean} [isOwn]
+ * @property {string} [creatorNickname]
+ * @property {string} [creatorLegalName]
+ * @property {string} [creatorDisplayName]
  */
 
 /**
@@ -46,24 +50,37 @@ function mapListItem(raw) {
     baseGroupId: raw.baseGroupId != null ? Number(raw.baseGroupId) : null,
     createdAt: String(raw.createdAt ?? ''),
     isFavorite: Boolean(raw.isFavorite),
+    isOwn: Boolean(raw.isOwn),
+    creatorNickname: raw.creatorNickname != null ? String(raw.creatorNickname) : '',
+    creatorLegalName: raw.creatorLegalName != null ? String(raw.creatorLegalName) : '',
+    creatorDisplayName: raw.creatorDisplayName != null ? String(raw.creatorDisplayName) : '',
   };
 }
 
 /**
  * GET /group-templates
- * @param {{ scope?: 'public' | 'my', limit?: number, offset?: number }} [params]
+ * @param {{ scope?: 'public' | 'my', limit?: number, offset?: number, favoritesOnly?: boolean }} [params]
  * @returns {Promise<PaginatedGroupTemplates>}
  */
-export async function fetchGroupTemplates({ scope = 'public', limit = 100, offset = 0 } = {}) {
+export async function fetchGroupTemplates({
+  scope = 'public',
+  limit = 100,
+  offset = 0,
+  favoritesOnly = false,
+} = {}) {
   const query = new URLSearchParams({
     scope,
     limit: String(limit),
     offset: String(offset),
   });
+  if (favoritesOnly) {
+    query.set('favoritesOnly', 'true');
+  }
   const result = await getJson(`/group-templates?${query.toString()}`);
   if (!result.ok) {
+    const error = extractApiError(result.data, 'Nie udało się pobrać szablonów');
     console.error('Failed to fetch group templates:', result.status, result.data);
-    return { items: [], total: 0, limit, offset };
+    throw new Error(error);
   }
   const data = /** @type {{ items?: unknown[], total?: number, limit?: number, offset?: number }} */ (result.data);
   const items = Array.isArray(data.items) ? data.items.map(mapListItem) : [];
@@ -96,7 +113,7 @@ export async function fetchGroupTemplateDetails(templateId) {
 /**
  * POST /groups/:groupId/save-as-template
  * @param {string | number} groupId
- * @param {{ name: string, description?: string, isPublic?: boolean }} payload
+ * @param {{ name: string, description?: string, isPublic?: boolean, devCreatorEmail?: string }} payload
  */
 export async function saveGroupAsTemplate(groupId, payload) {
   const result = await postJson(`/groups/${groupId}/save-as-template`, payload);
@@ -178,7 +195,22 @@ export function filterTemplatesByName(templates, query) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return templates;
   return templates.filter((template) => {
-    const haystack = [template.name, template.description ?? ''].join(' ').toLowerCase();
+    const creatorFields = [
+      template.creatorDisplayName,
+      template.creatorNickname,
+      template.creatorLegalName,
+    ]
+      .filter(Boolean)
+      .flatMap((value) => String(value).split(/\s+/));
+
+    const haystack = [
+      template.name,
+      template.description ?? '',
+      ...creatorFields,
+    ]
+      .join(' ')
+      .toLowerCase();
+
     return haystack.includes(normalized);
   });
 }

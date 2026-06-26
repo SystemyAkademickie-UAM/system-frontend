@@ -16,8 +16,6 @@ import {
   useToast,
 } from '../../../components/ui/index.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
-import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
-import '../group-main/shared/groupMainSubpageHeader.css';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
@@ -27,7 +25,11 @@ import {
   resolveShopCategoryDetails,
 } from '../../../utils/shop/shopCategories.js';
 import { getShopItemEffectivePrice } from '../../../utils/shop/shopPricing.js';
-import { EXTRA_LIFE_PRODUCT, EXTRA_LIFE_PRODUCT_ID } from './shopExtraLife.js';
+import {
+  filterCatalogShopItems,
+  findExtraLifeShopItem,
+  sortShopItemsWithExtraLifeFirst,
+} from '../../../utils/shop/extraLifeItem.js';
 import {
   filterShopItems,
   paginateShopItems,
@@ -55,6 +57,7 @@ import '../../../components/page/PageUnavailable.css';
 import '../shared/groupSectionPage.css';
 import '../group-members/MembersHomeContent.css';
 import './GroupShopContent.css';
+import '../group-main/shared/groupMainSubpageHeader.css';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -75,11 +78,17 @@ export default function GroupShopContent() {
   } = useGroupShopItems(groupId);
 
   const catalogItems = useMemo(() => {
-    if (!isStudentView) {
-      return items;
-    }
-    return items.filter((item) => item.isPublished !== false);
+    const sourceItems = isStudentView
+      ? filterCatalogShopItems(items, true).filter((item) => item.isPublished !== false)
+      : sortShopItemsWithExtraLifeFirst(items);
+
+    return sourceItems;
   }, [items, isStudentView]);
+
+  const extraLifeProduct = useMemo(
+    () => findExtraLifeShopItem(items),
+    [items],
+  );
 
   const {
     cartItems,
@@ -96,18 +105,6 @@ export default function GroupShopContent() {
     showExtraLifeProduct,
     refetch: refetchLives,
   } = useGroupShopLivesSystem(groupId, { isStudentView });
-
-  const catalogSourceItems = useMemo(() => {
-    if (!isStudentView || !showExtraLifeProduct || isGameOver) {
-      return catalogItems;
-    }
-
-    return [{
-      ...EXTRA_LIFE_PRODUCT,
-      categories: [],
-      isExtraLife: true,
-    }, ...catalogItems];
-  }, [catalogItems, isGameOver, isStudentView, showExtraLifeProduct]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -138,9 +135,9 @@ export default function GroupShopContent() {
   }, [closeModal, refetch, refetchCategories]);
 
   const visibleItems = useMemo(() => {
-    const filtered = filterShopItems(catalogSourceItems, { searchQuery, categoryFilter });
+    const filtered = filterShopItems(catalogItems, { searchQuery, categoryFilter });
     return sortShopItems(filtered, sortBy);
-  }, [catalogSourceItems, searchQuery, categoryFilter, sortBy]);
+  }, [catalogItems, searchQuery, categoryFilter, sortBy]);
 
   const pagination = useMemo(
     () => paginateShopItems(visibleItems, page, ITEMS_PER_PAGE),
@@ -199,14 +196,6 @@ export default function GroupShopContent() {
       return;
     }
 
-    if (activeModal.item.id === EXTRA_LIFE_PRODUCT_ID) {
-      invalidateStudentProfile(groupId);
-      await refetchLives();
-      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
-      closeModal();
-      return;
-    }
-
     setIsSubmitting(true);
     const result = await buyItem(activeModal.item.id);
     setIsSubmitting(false);
@@ -217,9 +206,14 @@ export default function GroupShopContent() {
     }
 
     await refreshAfterPurchase();
-    showSuccess('Produkt został zakupiony.');
+    if (activeModal.item.isExtraLife) {
+      await refetchLives();
+      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
+    } else {
+      showSuccess('Produkt został zakupiony.');
+    }
     closeModal();
-  }, [activeModal, buyItem, closeModal, groupId, refetchLives, refreshAfterPurchase, showError, showSuccess]);
+  }, [activeModal, buyItem, closeModal, refetchLives, refreshAfterPurchase, showError, showSuccess]);
 
   const handleBuyAllConfirm = useCallback(async () => {
     if (cartItems.length === 0) {
@@ -386,8 +380,12 @@ export default function GroupShopContent() {
         <ShopClosedOverlay
           isClosed={!isShopOpen}
           isGameOver={isShopOpen && isGameOver}
-          extraLifeProduct={showExtraLifeProduct ? EXTRA_LIFE_PRODUCT : null}
-          onExtraLifeBuy={() => setActiveModal({ type: 'buy', item: EXTRA_LIFE_PRODUCT })}
+          extraLifeProduct={showExtraLifeProduct ? extraLifeProduct : null}
+          onExtraLifeBuy={() => {
+            if (extraLifeProduct) {
+              setActiveModal({ type: 'buy', item: extraLifeProduct });
+            }
+          }}
         />
 
         <div className="group-shop__catalog-surface">
@@ -437,7 +435,7 @@ export default function GroupShopContent() {
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
                     onEdit={() => setActiveModal({ type: 'itemForm', itemId: item.id })}
-                    onDelete={() => setActiveModal({ type: 'delete', item })}
+                    onDelete={item.isExtraLife ? undefined : () => setActiveModal({ type: 'delete', item })}
                     className={[
                       'group-shop__card',
                       item.isExtraLife ? 'maq-product-card--extra-life' : '',
@@ -504,12 +502,20 @@ export default function GroupShopContent() {
 
   if (isStudentView) {
     return (
-      <section className="page-unavailable group-shop-page group-shop-page--student maq-section-page">
-        <GroupMainSubpageHeader eyebrow="Targowisko" title="Sklep" />
-        <Divider className="maq-section-page__divider" />
-        <div className="group-shop-page__student-toolbar maq-section-page__toolbar">
+      <section className="group-shop-page group-shop-page--student" aria-label="Sklep grupy">
+        <div className="group-shop-page__title-row">
+          <header className="group-shop-page__page-header">
+            <p className="group-main-subpage__eyebrow">Targowisko</p>
+            <h1 className="group-main-subpage__title">Sklep</h1>
+          </header>
+        </div>
+
+        <Divider className="group-main-subpage__divider" />
+
+        <div className="group-shop-page__student-toolbar">
           {toolbar}
         </div>
+
         {shopBody}
       </section>
     );

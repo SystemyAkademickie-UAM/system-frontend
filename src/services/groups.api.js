@@ -1,4 +1,5 @@
 import { getJson, patchJson, postJson } from './api-client.js';
+import { getAssetUrl } from '../constants/api.constants.js';
 import { buildDriveBannerUrl } from '../constants/drive.constants.js';
 
 /** Matches backend `GROUP_RESPONSE_GROUP_NOT_CREATED_ID`. */
@@ -12,6 +13,7 @@ const GROUP_RESPONSE_NOT_AUTHORIZED = 1;
  * @property {string} storyName - Display name (groupName from backend)
  * @property {string} subject - Subject name
  * @property {string} lecturer - Lecturer name(s)
+ * @property {string | null} [lecturerAvatarUrl] - Lecturer profile avatar URL
  * @property {string | null} bannerUrl - Banner image URL, color ref (color:#hex) or null
  * @property {string | null} [imageRef] - Raw image_ref from backend
  * @property {string | null} description - Group description
@@ -33,6 +35,7 @@ function mapBackendGroup(backendGroup, options = {}) {
     // zwracamy pustą wartość, żeby pole nie kopiowało się z nazwy grupy.
     subject: backendGroup.subjectName || '',
     lecturer: backendGroup.lecturers || '',
+    lecturerAvatarUrl: getAssetUrl(backendGroup.lecturerAvatarUrl),
     imageRef: imageRef ? String(imageRef) : null,
     bannerUrl: buildDriveBannerUrl(imageRef),
     description: backendGroup.description || null,

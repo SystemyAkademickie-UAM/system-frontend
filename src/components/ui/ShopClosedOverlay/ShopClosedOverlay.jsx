@@ -59,6 +59,8 @@ export default function ShopClosedOverlay({
                   storyDescription={extraLifeProduct.storyDescription}
                   didacticDescription={extraLifeProduct.didacticDescription}
                   priceAmount={extraLifeProduct.priceAmount}
+                  salePriceAmount={extraLifeProduct.salePriceAmount}
+                  rankDiscountedPrice={extraLifeProduct.rankDiscountedPrice}
                   imageRef={extraLifeProduct.imageRef}
                   hideAddToCart
                   onBuy={onExtraLifeBuy}

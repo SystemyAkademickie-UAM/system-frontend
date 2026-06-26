@@ -1,5 +1,6 @@
 .maq-product-card {
   --product-card-accent-color: var(--color-product-card-accent, #b45309);
+  --product-card-stroke-color: color-mix(in srgb, var(--product-card-accent-color) 58%, black);
 
   position: relative;
   box-sizing: border-box;
@@ -11,8 +12,8 @@
   max-width: var(--product-card-max-width, 453px);
   min-height: 100%;
   border: 0;
-  border-left: var(--product-card-accent-width, 4px) solid var(--product-card-accent-color);
-  border-right: var(--product-card-accent-width, 4px) solid var(--product-card-accent-color);
+  border-left: var(--product-card-accent-width, 4px) solid var(--product-card-stroke-color);
+  border-right: var(--product-card-accent-width, 4px) solid var(--product-card-stroke-color);
   border-radius: var(--badge-border-radius);
   background: var(--color-bg-surface);
   overflow: hidden;
@@ -50,7 +51,7 @@
 
   padding: 10px;
 
-  border-bottom: 1px solid var(--color-badge-divider);
+  border-bottom: 1px solid var(--product-card-stroke-color);
 
 }
 
@@ -178,7 +179,7 @@
 
   padding: 10px 12px;
 
-  border-bottom: 1px solid var(--color-badge-divider);
+  border-bottom: 1px solid var(--product-card-stroke-color);
 
 }
 
@@ -400,6 +401,12 @@
 
   color: var(--product-card-sale-color);
 
+}
+
+.maq-product-card__owned-count {
+  font-size: var(--font-size-nav-stat);
+  font-weight: 700;
+  color: var(--color-text-primary);
 }
 
 

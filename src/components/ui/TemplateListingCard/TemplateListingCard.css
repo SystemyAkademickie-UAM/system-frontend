@@ -2,6 +2,25 @@
   min-width: 0;
 }
 
+.maq-template-listing-card__shell {
+  position: relative;
+}
+
+.maq-template-listing-card__shell--static {
+  display: flex;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: var(--color-bg-surface);
+  overflow: hidden;
+}
+
+.maq-template-listing-card__shell > .maq-template-listing-card__head-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1.1rem;
+  z-index: 2;
+}
+
 .maq-template-listing-card__button {
   display: flex;
   width: 100%;
@@ -20,7 +39,8 @@
     border-color 0.15s ease;
 }
 
-.maq-template-listing-card__button:hover {
+.maq-template-listing-card__shell:hover .maq-template-listing-card__button,
+.maq-template-listing-card__shell--static:hover {
   transform: translateY(-2px);
   border-color: rgba(66, 243, 125, 0.35);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
@@ -31,14 +51,12 @@
   outline-offset: 2px;
 }
 
-.maq-template-listing-card:not(:has(.maq-template-listing-card__button)) {
-  display: flex;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  background: var(--color-bg-surface);
-  overflow: hidden;
+.maq-template-listing-card__shell--static {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
 }
-
 .maq-template-listing-card__media {
   flex: 0 0 220px;
   width: 220px;
@@ -91,6 +109,9 @@
   color: var(--color-text-primary);
 }
 
+.maq-template-listing-card__title--with-actions {
+  padding-right: 2.75rem;
+}
 .maq-template-listing-card__head-actions {
   display: inline-flex;
   align-items: center;
@@ -98,19 +119,29 @@
   flex-shrink: 0;
 }
 
-.maq-template-listing-card__surface {
-  position: relative;
-}
-
-.maq-template-listing-card__menu-overlay {
-  position: absolute;
-  top: 0.85rem;
-  right: 0.85rem;
-  z-index: 2;
-}
-
 .maq-template-listing-card__menu {
   display: inline-flex;
+  flex-shrink: 0;
+}
+
+.maq-template-listing-card__menu .data-table__action-btn {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.maq-template-listing-card__menu .data-table__action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-primary);
+}
+
+/* Poza tabelą — pokaż ⋮ po najechaniu na kafelek (nie .data-table__row). */
+.maq-template-listing-card .data-table__actions {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.maq-template-listing-card:hover .data-table__actions,
+.maq-template-listing-card:focus-within .data-table__actions {
+  opacity: 1;
 }
 
 .maq-template-listing-card__favorite {
@@ -130,11 +161,17 @@
 
 .maq-template-listing-card__favorite:hover {
   background: rgba(255, 255, 255, 0.12);
-  color: #fbbf24;
+  color: #f87171;
 }
 
 .maq-template-listing-card__favorite--active {
-  color: #fbbf24;
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.maq-template-listing-card__favorite--active:hover {
+  background: #ef4444;
+  color: #ffffff;
 }
 
 .maq-template-listing-card__subject {
@@ -196,6 +233,22 @@
   color: #86efac;
 }
 
+.maq-template-listing-card__badge--creator {
+  background: rgba(66, 243, 125, 0.15);
+  color: #86efac;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+}
+
+.maq-template-listing-card__badge--own {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+}
+
 .maq-template-listing-card__badge--private {
   background: rgba(255, 255, 255, 0.08);
   color: var(--color-text-secondary);
@@ -208,8 +261,13 @@
 
 @media (max-width: 699px) {
   .maq-template-listing-card__button,
-  .maq-template-listing-card:not(:has(.maq-template-listing-card__button)) {
+  .maq-template-listing-card__shell--static {
     flex-direction: column;
+  }
+
+  .maq-template-listing-card__shell > .maq-template-listing-card__head-actions {
+    top: auto;
+    bottom: 1rem;
   }
 
   .maq-template-listing-card__media {

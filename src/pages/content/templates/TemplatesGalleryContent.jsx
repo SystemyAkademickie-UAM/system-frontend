@@ -1,12 +1,25 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { Pagination, SearchBar, useToast } from '../../../components/ui/index.js';
+import {
+  CatalogFilterGroup,
+  Pagination,
+  SearchBar,
+  useToast,
+} from '../../../components/ui/index.js';
 import TemplateListingCard from '../../../components/ui/TemplateListingCard/TemplateListingCard.jsx';
 import CreateGroupFromTemplateModal from './CreateGroupFromTemplateModal.jsx';
+import { resolveTemplateCreatorDisplay } from './templateCreatorDisplay.js';
 import { useTemplatesPage } from './useTemplatesPage.js';
 import './TemplatesPageLayout.css';
 
+const GALLERY_FILTERS = [
+  { id: 'all', label: 'Wszystkie' },
+  { id: 'favorites', label: 'Ulubione' },
+];
+
 export default function TemplatesGalleryContent() {
+  const [listFilter, setListFilter] = useState('all');
+  const favoritesOnly = listFilter === 'favorites';
   const {
     templates,
     totalTemplates,
@@ -19,9 +32,17 @@ export default function TemplatesGalleryContent() {
     errorMessage,
     toggleFavorite,
     getTemplateCardProps,
-  } = useTemplatesPage('public');
+  } = useTemplatesPage('public', { favoritesOnly });
   const { showSuccess, showError } = useToast();
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+
+  const creatorLabelsById = useMemo(() => {
+    const labels = new Map();
+    templates.forEach((template) => {
+      labels.set(template.id, resolveTemplateCreatorDisplay(template));
+    });
+    return labels;
+  }, [templates]);
 
   const handleToggleFavorite = useCallback(async (templateId) => {
     const template = templates.find((item) => item.id === templateId);
@@ -40,17 +61,25 @@ export default function TemplatesGalleryContent() {
 
   const emptyMessage = searchQuery.trim()
     ? 'Nie znaleziono szablonów pasujących do wyszukiwania.'
-    : 'Brak publicznych szablonów w galerii.';
+    : favoritesOnly
+      ? 'Brak ulubionych szablonów w galerii.'
+      : 'Brak publicznych szablonów w galerii.';
 
   return (
     <div className="templates-page-content">
       <div className="templates-page-content__controls">
+        <CatalogFilterGroup
+          ariaLabel="Filtr galerii szablonów"
+          filters={GALLERY_FILTERS}
+          activeId={listFilter}
+          onSelect={setListFilter}
+        />
         <SearchBar
           className="templates-page-content__search"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj po nazwie…"
-          aria-label="Szukaj szablonów po nazwie"
+          placeholder="Szukaj po nazwie lub prowadzącym…"
+          aria-label="Szukaj szablonów po nazwie, ksywce lub imieniu i nazwisku prowadzącego"
         />
       </div>
 
@@ -74,12 +103,14 @@ export default function TemplatesGalleryContent() {
                   <TemplateListingCard
                     name={template.name}
                     description={template.description}
-                    isPublic={template.isPublic}
                     createdAt={template.createdAt}
                     bannerUrl={cardProps.bannerUrl}
                     subjectName={cardProps.subjectName}
                     stats={cardProps.stats}
                     isFavorite={Boolean(template.isFavorite)}
+                    isOwnTemplate={Boolean(template.isOwn)}
+                    creatorLabel={creatorLabelsById.get(template.id)}
+                    showVisibilityBadge={false}
                     onToggleFavorite={() => handleToggleFavorite(template.id)}
                     onClick={() => setSelectedTemplate(template)}
                   />

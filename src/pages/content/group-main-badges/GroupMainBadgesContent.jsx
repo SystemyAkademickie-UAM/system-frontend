@@ -7,6 +7,7 @@ import {
   CatalogFiltersPanel,
   CatalogFiltersToggle,
   CatalogSortSelect,
+  Divider,
   SearchBar,
 } from '../../../components/ui/index.js';
 import BadgeTreasuryCard from './BadgeTreasuryCard.jsx';
@@ -20,8 +21,8 @@ import {
 import { useGroupMainBadges } from './useGroupMainBadges.js';
 import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
 import { useGroupMainEmptyLink } from '../../../hooks/group-main/useGroupMainEmptyLink.js';
+import '../group-main/shared/groupMainSubpageHeader.css';
 import '../group-main/GroupMainHomeContent.css';
-import '../group-shop/GroupShopContent.css';
 import './GroupMainBadgesContent.css';
 
 const RARITY_FILTERS = [
@@ -110,12 +111,15 @@ export default function GroupMainBadgesContent({
   return (
     <section className="badge-treasury" aria-label="Skarbiec odznak">
       {!embedded ? (
-        <div className="badge-treasury__title-row">
-          <header className="badge-treasury__page-header">
-            <p className="badge-treasury__eyebrow">Skarbiec</p>
-            <h1 className="badge-treasury__title">Odznaki</h1>
-          </header>
-        </div>
+        <>
+          <div className="badge-treasury__title-row">
+            <header className="badge-treasury__page-header">
+              <p className="badge-treasury__eyebrow">Skarbiec</p>
+              <h1 className="badge-treasury__title">Odznaki</h1>
+            </header>
+          </div>
+          <Divider className="group-main-subpage__divider" />
+        </>
       ) : null}
 
       {showStudentToolbar ? (
@@ -141,26 +145,38 @@ export default function GroupMainBadgesContent({
 
       {showStudentFiltersPanel ? (
         <CatalogFiltersPanel className="badge-treasury__filters">
-          <CatalogFilterGroup
-            ariaLabel="Filtr rzadkości"
-            filters={RARITY_FILTERS}
-            activeId={rarityFilter}
-            onSelect={setRarityFilter}
-          />
+          <div className="badge-treasury__filters-layout">
+            <div className="badge-treasury__filter-group-wrap badge-treasury__filter-group-wrap--rarity">
+              <CatalogFilterGroup
+                ariaLabel="Filtr rzadkości"
+                filters={RARITY_FILTERS}
+                activeId={rarityFilter}
+                onSelect={setRarityFilter}
+              />
+            </div>
 
-          <CatalogFilterGroup
-            ariaLabel="Filtr odblokowania"
-            filters={UNLOCK_FILTERS}
-            activeId={unlockFilter}
-            onSelect={setUnlockFilter}
-          />
+            <div
+              className="badge-treasury__filters-spacer"
+              aria-hidden="true"
+            />
 
-          <CatalogSortSelect
-            selectId="badge-treasury-sort"
-            value={sortBy}
-            onChange={setSortBy}
-            options={sortOptions}
-          />
+            <div className="badge-treasury__filter-group-wrap badge-treasury__filter-group-wrap--unlock">
+              <CatalogFilterGroup
+                ariaLabel="Filtr odblokowania"
+                filters={UNLOCK_FILTERS}
+                activeId={unlockFilter}
+                onSelect={setUnlockFilter}
+              />
+            </div>
+
+            <CatalogSortSelect
+              selectId="badge-treasury-sort"
+              value={sortBy}
+              onChange={setSortBy}
+              options={sortOptions}
+              className="badge-treasury__sort"
+            />
+          </div>
         </CatalogFiltersPanel>
       ) : null}
 

@@ -6,15 +6,15 @@ import {
   filterTemplatesByName,
   setGroupTemplateFavorite,
 } from '../../../services/groupTemplates.api.js';
-import { sortTemplatesWithFavoritesFirst } from './templateFavorites.js';
 import { getTemplateBannerUrl, getTemplateSummaryStats } from './groupSnapshotForTemplate.js';
 
 export const TEMPLATES_PAGE_SIZE = 10;
 
 /**
  * @param {'my' | 'public'} scope
+ * @param {{ favoritesOnly?: boolean }} [options]
  */
-export function useTemplatesPage(scope) {
+export function useTemplatesPage(scope, { favoritesOnly = false } = {}) {
   const [templates, setTemplates] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -26,15 +26,20 @@ export function useTemplatesPage(scope) {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const result = await fetchGroupTemplates({ scope, limit: 100, offset: 0 });
+      const result = await fetchGroupTemplates({
+        scope,
+        limit: 100,
+        offset: 0,
+        favoritesOnly: scope === 'public' ? favoritesOnly : false,
+      });
       setTemplates(result.items);
-    } catch {
-      setErrorMessage('Nie udało się pobrać szablonów.');
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać szablonów.');
       setTemplates([]);
     } finally {
       setIsLoading(false);
     }
-  }, [scope]);
+  }, [scope, favoritesOnly]);
 
   useEffect(() => {
     refetch();
@@ -42,7 +47,7 @@ export function useTemplatesPage(scope) {
 
   useEffect(() => {
     setPage(1);
-  }, [searchQuery, scope]);
+  }, [searchQuery, scope, favoritesOnly]);
 
   useEffect(() => {
     if (templates.length === 0) return undefined;
@@ -76,12 +81,14 @@ export function useTemplatesPage(scope) {
 
   const sortedTemplates = useMemo(() => {
     const filtered = filterTemplatesByName(templates, searchQuery);
-    if (scope === 'public') {
-      return sortTemplatesWithFavoritesFirst(filtered);
+    if (scope === 'my') {
+      return [...filtered].sort(
+        (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+      );
     }
-    return [...filtered].sort(
-      (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
-    );
+    // Galeria publiczna: zachowaj kolejność z API (bez ponownego sortowania po ulubionych),
+    // żeby dodanie do ulubionych nie przesuwało kafelka na początek listy.
+    return filtered;
   }, [templates, searchQuery, scope]);
 
   const totalPages = Math.max(1, Math.ceil(sortedTemplates.length / TEMPLATES_PAGE_SIZE));
@@ -117,10 +124,15 @@ export function useTemplatesPage(scope) {
           ? { ...template, isFavorite: current.isFavorite }
           : template
       )));
+      return result;
+    }
+
+    if (scope === 'public' && favoritesOnly && !nextFavorite) {
+      setTemplates((items) => items.filter((template) => template.id !== templateId));
     }
 
     return result;
-  }, [templates]);
+  }, [templates, scope, favoritesOnly]);
 
   const getTemplateCardProps = useCallback(
     (template) => {

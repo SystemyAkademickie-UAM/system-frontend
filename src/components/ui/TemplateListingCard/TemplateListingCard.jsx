@@ -19,6 +19,9 @@ import './TemplateListingCard.css';
  * @param {boolean} [props.isFavorite=false]
  * @param {(event: import('react').MouseEvent) => void} [props.onToggleFavorite]
  * @param {() => void} [props.onClick]
+ * @param {string} [props.creatorLabel] — galeria: ksywka / imię i nazwisko autora
+ * @param {boolean} [props.isOwnTemplate=false] — galeria: szablon bieżącego prowadzącego
+ * @param {boolean} [props.showVisibilityBadge=true] — „Moje szablony”: publiczny / prywatny
  * @param {object} [props.row]
  * @param {import('../DataTable/DataTable.jsx').DataTableRowActionsConfig} [props.rowActions]
  * @param {string} [props.className]
@@ -34,6 +37,9 @@ export default function TemplateListingCard({
   isFavorite = false,
   onToggleFavorite,
   onClick,
+  creatorLabel,
+  isOwnTemplate = false,
+  showVisibilityBadge = true,
   row,
   rowActions,
   className = '',
@@ -42,6 +48,7 @@ export default function TemplateListingCard({
   const isColorBanner = isColorBannerRef(bannerUrl);
   const colorBannerValue = parseColorBannerRef(bannerUrl);
   const showFallback = !isColorBanner && (bannerFailed || !bannerUrl);
+  const hasHeadActions = Boolean(onToggleFavorite || (rowActions && row));
 
   useEffect(() => {
     setBannerFailed(!bannerUrl || isColorBannerRef(bannerUrl));
@@ -51,8 +58,12 @@ export default function TemplateListingCard({
     ? new Date(createdAt).toLocaleDateString('pl-PL', { day: '2-digit', month: 'short', year: 'numeric' })
     : null;
 
-  const headActions = (
-    <div className="maq-template-listing-card__head-actions">
+  const headActions = hasHeadActions ? (
+    <div
+      className="maq-template-listing-card__head-actions"
+      onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => event.stopPropagation()}
+    >
       {onToggleFavorite ? (
         <button
           type="button"
@@ -77,18 +88,15 @@ export default function TemplateListingCard({
           />
         </button>
       ) : null}
-      {rowActions && row && !onClick ? (
-        <div
-          className="maq-template-listing-card__menu"
-          onClick={(event) => event.stopPropagation()}
-        >
+      {rowActions && row ? (
+        <div className="maq-template-listing-card__menu">
           <DataTableRowActions row={row} rowActions={rowActions} />
         </div>
       ) : null}
     </div>
-  );
+  ) : null;
 
-  const content = (
+  const mainContent = (
     <>
       <div className="maq-template-listing-card__media">
         {isColorBanner ? (
@@ -115,8 +123,16 @@ export default function TemplateListingCard({
 
       <div className="maq-template-listing-card__body">
         <div className="maq-template-listing-card__head">
-          <h3 className="maq-template-listing-card__title">{name}</h3>
-          {headActions}
+          <h3
+            className={[
+              'maq-template-listing-card__title',
+              hasHeadActions ? 'maq-template-listing-card__title--with-actions' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            {name}
+          </h3>
         </div>
 
         {subjectName ? (
@@ -142,7 +158,17 @@ export default function TemplateListingCard({
         ) : null}
 
         <div className="maq-template-listing-card__footer">
-          {typeof isPublic === 'boolean' ? (
+          {isOwnTemplate ? (
+            <span className="maq-template-listing-card__badge maq-template-listing-card__badge--own">
+              Twój szablon
+            </span>
+          ) : null}
+          {creatorLabel ? (
+            <span className="maq-template-listing-card__badge maq-template-listing-card__badge--creator">
+              {creatorLabel}
+            </span>
+          ) : null}
+          {showVisibilityBadge && typeof isPublic === 'boolean' ? (
             <span
               className={[
                 'maq-template-listing-card__badge',
@@ -163,22 +189,22 @@ export default function TemplateListingCard({
   if (onClick) {
     return (
       <article className={classNames}>
-        <div className="maq-template-listing-card__surface">
-          {rowActions && row ? (
-            <div
-              className="maq-template-listing-card__menu-overlay"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <DataTableRowActions row={row} rowActions={rowActions} />
-            </div>
-          ) : null}
+        <div className="maq-template-listing-card__shell">
           <button type="button" className="maq-template-listing-card__button" onClick={onClick}>
-            {content}
+            {mainContent}
           </button>
+          {headActions}
         </div>
       </article>
     );
   }
 
-  return <article className={classNames}>{content}</article>;
+  return (
+    <article className={classNames}>
+      <div className="maq-template-listing-card__shell maq-template-listing-card__shell--static">
+        {mainContent}
+        {headActions}
+      </div>
+    </article>
+  );
 }

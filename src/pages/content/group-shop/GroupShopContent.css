@@ -2,6 +2,30 @@
   position: relative;
 }
 
+.group-shop-page--student {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.group-shop-page__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: var(--group-main-subnav-height);
+  margin-top: calc(-1 * (var(--group-main-subnav-height) + var(--group-main-layout-gap)));
+  margin-bottom: var(--group-main-layout-gap);
+  pointer-events: none;
+}
+
+.group-shop-page__page-header {
+  max-width: min(100%, 22rem);
+  text-align: left;
+  pointer-events: auto;
+}
+
 .group-shop-page__header-row {
   align-items: flex-start;
 }
@@ -25,7 +49,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .group-shop__header {
@@ -147,7 +171,11 @@
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 960px) {
+  .group-shop-page__title-row {
+    margin-bottom: 1rem;
+  }
+
   .group-shop__header {
     grid-template-columns: 1fr;
   }

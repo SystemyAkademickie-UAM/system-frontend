@@ -5,7 +5,7 @@ import { updateGroupTemplate } from '../../../services/groupTemplates.api.js';
 /**
  * @param {Object} props
  * @param {boolean} props.isOpen
- * @param {'name' | 'description'} props.field
+ * @param {'name' | 'description' | 'both'} props.field
  * @param {import('../../../services/groupTemplates.api.js').GroupTemplateListItem | null} props.template
  * @param {() => void} props.onClose
  * @param {() => void | Promise<void>} props.onSaved
@@ -17,28 +17,34 @@ export default function TemplateFieldEditModal({
   onClose,
   onSaved,
 }) {
-  const [value, setValue] = useState('');
+  const [nameValue, setNameValue] = useState('');
+  const [descriptionValue, setDescriptionValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (!isOpen || !template) {
-      setValue('');
+      setNameValue('');
+      setDescriptionValue('');
       setErrorMessage('');
       setIsSaving(false);
       return;
     }
-    setValue(field === 'name' ? template.name : template.description ?? '');
+    setNameValue(template.name);
+    setDescriptionValue(template.description ?? '');
     setErrorMessage('');
   }, [isOpen, template, field]);
 
-  const title = field === 'name' ? 'Edytuj nazwę szablonu' : 'Edytuj opis szablonu';
-  const label = field === 'name' ? 'Nazwa szablonu' : 'Opis szablonu (opcjonalny)';
-  const fieldKind = field === 'name' ? 'name' : 'groupDescription';
+  const title = field === 'name'
+    ? 'Edytuj nazwę szablonu'
+    : field === 'description'
+      ? 'Edytuj opis szablonu'
+      : 'Edytuj szablon';
 
   const handleConfirm = async () => {
     if (!template) return;
-    if (field === 'name' && !value.trim()) {
+    const trimmedName = nameValue.trim();
+    if ((field === 'name' || field === 'both') && !trimmedName) {
       setErrorMessage('Podaj nazwę szablonu.');
       return;
     }
@@ -46,8 +52,13 @@ export default function TemplateFieldEditModal({
     setIsSaving(true);
     setErrorMessage('');
     const payload = field === 'name'
-      ? { name: value.trim() }
-      : { description: value.trim() || null };
+      ? { name: trimmedName }
+      : field === 'description'
+        ? { description: descriptionValue.trim() || null }
+        : {
+            name: trimmedName,
+            description: descriptionValue.trim() || null,
+          };
     const result = await updateGroupTemplate(template.id, payload);
     setIsSaving(false);
 
@@ -68,14 +79,27 @@ export default function TemplateFieldEditModal({
       size="md"
       showFooter={false}
     >
-      <TextField
-        id={`template-edit-${field}`}
-        label={label}
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        fieldKind={fieldKind}
-        required={field === 'name'}
-      />
+      {(field === 'name' || field === 'both') ? (
+        <TextField
+          id="template-edit-name"
+          label="Nazwa szablonu"
+          value={nameValue}
+          onChange={(event) => setNameValue(event.target.value)}
+          fieldKind="name"
+          required
+        />
+      ) : null}
+
+      {(field === 'description' || field === 'both') ? (
+        <TextField
+          id="template-edit-description"
+          label="Opis szablonu (opcjonalny)"
+          value={descriptionValue}
+          onChange={(event) => setDescriptionValue(event.target.value)}
+          fieldKind="groupDescription"
+          className={field === 'both' ? 'templates-page-content__edit-field-gap' : ''}
+        />
+      ) : null}
 
       {errorMessage ? (
         <p className="templates-page-content__message templates-page-content__message--error" role="alert">

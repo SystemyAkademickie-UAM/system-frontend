@@ -290,14 +290,15 @@
   }
 }
 
-.super-bar-stat--currency {
+.super-bar-stat--currency,
+.super-bar-stat--lives {
   cursor: default;
 }
 
-.super-bar-currency-preview {
+.super-bar-stat-preview {
   position: fixed;
   z-index: var(--z-index-toast, 12000);
-  width: 220px;
+  width: 240px;
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -307,7 +308,7 @@
   font-family: inherit;
 }
 
-.super-bar-currency-preview__title {
+.super-bar-stat-preview__title {
   margin: 0 0 4px;
   font-size: var(--font-size-body);
   font-weight: 700;
@@ -316,7 +317,7 @@
   color: var(--color-text-secondary);
 }
 
-.super-bar-currency-preview__label {
+.super-bar-stat-preview__label {
   margin: 0 0 6px;
   font-size: var(--font-size-badge-label-mini);
   font-weight: 600;
@@ -324,7 +325,15 @@
   color: var(--color-accent);
 }
 
-.super-bar-currency-preview__value {
+.super-bar-stat-preview__detail {
+  margin: 0;
+  font-size: var(--font-size-body-sm, var(--font-size-min));
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+}
+
+.super-bar-stat-preview__value {
   color: var(--color-text-primary);
   font-size: var(--font-size-body);
 }

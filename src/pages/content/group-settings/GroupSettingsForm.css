@@ -147,9 +147,34 @@
 }
 
 .group-settings-form__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: var(--font-size-body);
   font-weight: 600;
   color: var(--color-text-secondary);
+}
+
+.group-settings-form .rewards-modal__option-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.group-settings-form__input--compact {
+  width: 6.5rem;
+  max-width: 100%;
+}
+
+.group-settings-form__section--muted {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+}
+
+.group-settings-form__save-fab.maq-btn--sm {
+  min-height: 2.25rem;
+  padding-inline: 1rem;
 }
 
 .group-settings-form__label-error {

@@ -915,17 +915,17 @@ export default function ShopItemFormContent({
       items.educationalDescription = description1.trim();
     }
 
-    let categoryid = null;
+    let categoryIds = [];
     let i = 0;
     while (i < categories.length) {
-      if (categories[i].checked == 1 && categoryid == null) {
-        categoryid = categories[i].id;
+      if (categories[i].checked == 1) {
+        categoryIds.push(categories[i].id);
       }
       i = i + 1;
     }
 
-    if (categoryid != null) {
-      items.categoryId = categoryid;
+    if (categoryIds.length > 0) {
+      items.categoryIds = categoryIds;
     } else if (editingItemId) {
       items.categoryId = null;
     }
@@ -1116,9 +1116,11 @@ export default function ShopItemFormContent({
         setStudentlimit('');
       }
 
+      const selectedCategoryIds = new Set((item.categories ?? []).map((categoryId) => String(categoryId)));
+
       setCategories((current) => current.map((category) => ({
         ...category,
-        checked: String(category.id) === String(item.categoryId) ? 1 : 0,
+        checked: selectedCategoryIds.has(String(category.id)) ? 1 : 0,
       })));
 
       const rankRefs = ranks.map((rankEntry) => ({
@@ -1210,7 +1212,7 @@ export default function ShopItemFormContent({
             <div className="shop-item-form__field">
               <span className="shop-item-form__label shop-item-form__label--heading">
                 Kategoria
-                <InfoTooltip text="Każdy przedmiot może należeć do jednej kategorii. Zarządzaj listą kategorii przyciskiem Kategorie na stronie sklepu." />
+                <InfoTooltip text="Przedmiot może należeć do wielu kategorii — kolory kategorii mieszają się na kafelku produktu." />
               </span>
               {categories.length === 0 ? (
                 <p className="shop-item-form__empty">Brak kategorii — dodaj je w sklepie.</p>

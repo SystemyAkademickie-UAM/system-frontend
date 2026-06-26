@@ -4,11 +4,15 @@ import SettingsSectionHeader from '../../../components/layout/sectionPage/Settin
 import GroupSettingsUnsavedModal from '../group-settings/GroupSettingsUnsavedModal.jsx';
 import SettingsCheckboxField from '../group-settings/SettingsCheckboxField.jsx';
 import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
-import { Button, Divider, useToast } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, Divider, InfoTooltip, useToast } from '../../../components/ui/index.js';
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
+import { LIVES_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../../../constants/lives.constants.js';
 import { fetchGroupLivesConfig, updateGroupLivesConfig } from '../../../services/groupLives.api.js';
+import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { invalidateGroupLives } from '../../../services/groupLivesEvents.js';
+import { findExtraLifeShopItem } from '../../../utils/shop/extraLifeItem.js';
+import ShopItemFormModal from '../group-shop/modals/ShopItemFormModal.jsx';
 import GroupSettingsHealthContentWindow from './GroupSettingsHealthContentWindow.jsx';
 import '../group-settings/GroupSettingsForm.css';
 
@@ -83,6 +87,24 @@ export default function GroupSettingsHealthContentContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isManageOpen, setIsManageOpen] = useState(false);
+  const [isExtraLifeModalOpen, setIsExtraLifeModalOpen] = useState(false);
+  const [extraLifeItemId, setExtraLifeItemId] = useState(null);
+
+  const loadExtraLifeItem = useCallback(async () => {
+    if (!groupId) {
+      setExtraLifeItemId(null);
+      return;
+    }
+
+    const result = await fetchGroupShopItems(groupId);
+    if (!result.ok) {
+      setExtraLifeItemId(null);
+      return;
+    }
+
+    const extraLifeItem = findExtraLifeShopItem(result.items);
+    setExtraLifeItemId(extraLifeItem?.id ?? null);
+  }, [groupId]);
 
   const loadSettings = useCallback(async () => {
     if (!groupId) {
@@ -118,7 +140,8 @@ export default function GroupSettingsHealthContentContent() {
 
   useEffect(() => {
     void loadSettings();
-  }, [loadSettings]);
+    void loadExtraLifeItem();
+  }, [loadSettings, loadExtraLifeItem]);
 
   const persistSettings = useCallback(async () => {
     if (!groupId) {
@@ -209,6 +232,11 @@ export default function GroupSettingsHealthContentContent() {
     onSave: persistSettings,
   });
 
+  const detailsSectionClassName = [
+    'group-settings-form__stack',
+    livesEnabled ? '' : 'group-settings-form__section--muted',
+  ].filter(Boolean).join(' ');
+
   return (
     <div className="group-settings-form group-settings-form--drive-layout">
       <section className="group-settings-form__panel" aria-label="System żyć">
@@ -217,29 +245,7 @@ export default function GroupSettingsHealthContentContent() {
         {isLoading ? (
           <p className="group-settings-form__hint">Ładowanie ustawień systemu żyć…</p>
         ) : (
-          <div className="group-settings-form__stack">
-            <EmojiPickerField
-              className="group-settings-form__field"
-              label="Ikona żyć"
-              value={livesIcon}
-              defaultEmoji={DEFAULT_LIVES_SYMBOL}
-              onChange={setLivesIcon}
-              ariaLabel="Wybierz ikonę żyć"
-            />
-
-            <div className="group-settings-form__field">
-              <label className="group-settings-form__label" htmlFor="group-lives-label">
-                Nazwa żyć
-              </label>
-              <input
-                id="group-lives-label"
-                className="group-settings-form__input"
-                value={livesLabel}
-                onChange={(event) => setLivesLabel(event.target.value)}
-                disabled={isSaving}
-              />
-            </div>
-
+          <>
             <div className="group-settings-form__field">
               <SettingsCheckboxField
                 id="group-lives-enabled"
@@ -248,63 +254,108 @@ export default function GroupSettingsHealthContentContent() {
                 disabled={isSaving}
               >
                 Włącz system żyć
+                <InfoTooltip text="Pozwala włączyć i wyłączyć system szans." />
               </SettingsCheckboxField>
             </div>
 
-            <div className="group-settings-form__field">
-              <label className="group-settings-form__label" htmlFor="group-lives-limit">
-                Limit żyć
-              </label>
-              <input
-                id="group-lives-limit"
-                className="group-settings-form__input"
-                inputMode="numeric"
-                value={livesLimit}
-                onChange={(event) => setLivesLimit(filterDigits(event.target.value))}
-                disabled={isSaving}
-              />
-            </div>
+            <Divider className="group-settings-form__section-divider" />
 
-            <div className="group-settings-form__field">
-              <label className="group-settings-form__label" htmlFor="group-lives-start">
-                Startowa liczba żyć
-              </label>
-              <input
-                id="group-lives-start"
-                className="group-settings-form__input"
-                inputMode="numeric"
-                value={livesStart}
-                onChange={(event) => setLivesStart(filterDigits(event.target.value))}
-                disabled={isSaving}
+            <div className={detailsSectionClassName}>
+              <EmojiPickerField
+                className="group-settings-form__field"
+                label="Ikona żyć"
+                value={livesIcon}
+                defaultEmoji={DEFAULT_LIVES_SYMBOL}
+                onChange={setLivesIcon}
+                ariaLabel="Wybierz ikonę żyć"
               />
-            </div>
 
-            <div className="group-settings-form__field">
-              <SettingsCheckboxField
-                id="group-lives-shop-enabled"
-                checked={livesShopEnabled}
-                onChange={setLivesShopEnabled}
-                disabled={isSaving}
-              >
-                Możliwość kupowania żyć w sklepie
-              </SettingsCheckboxField>
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-lives-label">
+                  Nazwa żyć
+                </label>
+                <CharacterLimitedField value={livesLabel} maxLength={LIVES_LABEL_MAX_LENGTH}>
+                  <input
+                    id="group-lives-label"
+                    className="group-settings-form__input"
+                    value={livesLabel}
+                    maxLength={LIVES_LABEL_MAX_LENGTH}
+                    onChange={(event) => setLivesLabel(event.target.value)}
+                    disabled={isSaving || !livesEnabled}
+                  />
+                </CharacterLimitedField>
+              </div>
+
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-lives-limit">
+                  Limit żyć
+                  <InfoTooltip text="Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." />
+                </label>
+                <input
+                  id="group-lives-limit"
+                  className="group-settings-form__input group-settings-form__input--compact"
+                  inputMode="numeric"
+                  value={livesLimit}
+                  onChange={(event) => setLivesLimit(filterDigits(event.target.value))}
+                  disabled={isSaving || !livesEnabled}
+                />
+              </div>
+
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-lives-start">
+                  Startowa liczba żyć
+                  <InfoTooltip text="Liczba szans, jaką student otrzymuje po dołączeniu do grupy." />
+                </label>
+                <input
+                  id="group-lives-start"
+                  className="group-settings-form__input group-settings-form__input--compact"
+                  inputMode="numeric"
+                  value={livesStart}
+                  onChange={(event) => setLivesStart(filterDigits(event.target.value))}
+                  disabled={isSaving || !livesEnabled}
+                />
+              </div>
+
+              <div className="group-settings-form__field">
+                <SettingsCheckboxField
+                  id="group-lives-shop-enabled"
+                  checked={livesShopEnabled}
+                  onChange={setLivesShopEnabled}
+                  disabled={isSaving || !livesEnabled}
+                >
+                  Możliwość kupowania żyć w sklepie
+                  <InfoTooltip text="Umożliwia kupowanie szans w sklepie." />
+                </SettingsCheckboxField>
+              </div>
+
+              <Divider className="group-settings-form__section-divider" />
+
+              <div className="group-settings-form__field">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsExtraLifeModalOpen(true)}
+                  disabled={!livesEnabled || !livesShopEnabled || !extraLifeItemId}
+                >
+                  Edytuj produkt: Dodatkowe życie
+                </Button>
+              </div>
+
+              <div className="group-settings-form__field">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsManageOpen(true)}
+                  disabled={!livesEnabled}
+                >
+                  Zarządzanie życiami studentów
+                </Button>
+              </div>
             </div>
-          </div>
+          </>
         )}
-
-        <Divider className="group-settings-form__section-divider" />
-
-        <div className="group-settings-form__field">
-          <Button
-            type="button"
-            variant="secondary"
-            size="md"
-            onClick={() => setIsManageOpen(true)}
-            disabled={isLoading}
-          >
-            Zarządzanie życiami studentów
-          </Button>
-        </div>
       </section>
 
       {errorMessage ? (
@@ -315,7 +366,7 @@ export default function GroupSettingsHealthContentContent() {
         <Button
           type="button"
           variant="primary"
-          size="md"
+          size="sm"
           className="group-settings-form__save-fab"
           onClick={persistSettings}
           disabled={isSaving}
@@ -339,6 +390,19 @@ export default function GroupSettingsHealthContentContent() {
           liveslabel={livesLabel}
           livesicon={livesIcon}
           livesstart={livesStart}
+        />
+      ) : null}
+
+      {isExtraLifeModalOpen && extraLifeItemId ? (
+        <ShopItemFormModal
+          isOpen={isExtraLifeModalOpen}
+          groupId={groupId}
+          itemId={extraLifeItemId}
+          onClose={() => setIsExtraLifeModalOpen(false)}
+          onSaved={async () => {
+            setIsExtraLifeModalOpen(false);
+            await loadExtraLifeItem();
+          }}
         />
       ) : null}
     </div>

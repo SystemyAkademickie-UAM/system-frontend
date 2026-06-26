@@ -24,7 +24,7 @@
 .group-main-subpage__eyebrow {
   margin: 0 0 0.15rem;
   font-size: var(--font-size-body);
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -33,7 +33,7 @@
 .group-main-subpage__title {
   margin: 0;
   font-size: clamp(1.5rem, 2.2vw, 2rem);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.15;
   color: var(--color-text-primary);
 }
@@ -53,4 +53,9 @@
   .group-main-subpage__title-row {
     margin-bottom: 1rem;
   }
+}
+
+.group-main-subpage__divider {
+  width: 100%;
+  margin: 0 0 1.25rem;
 }

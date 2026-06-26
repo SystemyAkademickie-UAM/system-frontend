@@ -1,5 +1,6 @@
 import { getJson, patchJson, deleteJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
+import { invalidateStudentProfile } from './studentProfileEvents.js';
 
 /**
  * @typedef {Object} StudentListItem
@@ -174,6 +175,7 @@ export async function toggleStudentActivity(groupId, accountId, activityId) {
     return { ok: false, error: errorData?.message || 'Nie udało się zmienić postępu aktywności' };
   }
   const data = /** @type {{ isCompleted?: boolean }} */ (result.data);
+  invalidateStudentProfile(groupId);
   return { ok: true, isCompleted: data.isCompleted };
 }
 

@@ -38,17 +38,7 @@ export default function ProfilePageLayout({ children }) {
     }
   }, [studentId, userProfile?.nickname, userProfile?.avatarId, refetch, userProfile]);
 
-  const subNavItems = studentId
-    ? nav.items.map((item) => ({
-        ...item,
-        to: item.to
-          ? item.to.replace(
-              `/groups/${profileState.groupId}/profile`,
-              `/groups/${profileState.groupId}/studentprofile/${studentId}`,
-            )
-          : item.to,
-      }))
-    : nav.items;
+  const subNavItems = nav.items;
 
   const nickname = (profile?.nickname || userProfile?.nickname || '').trim();
   const legalName = [profile?.name, profile?.surname].filter(Boolean).join(' ').trim();

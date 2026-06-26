@@ -1,10 +1,11 @@
 import {useState, useEffect} from 'react';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
+import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 
-import closeicon from '../../../../public/assets/icons/x-close-svgrepo-com.svg';
-import decreaseicon from '../../../../public/assets/icons/minus-circle-svgrepo-com.svg';
-import increaseicon from '../../../../public/assets/icons/plus-circle-svgrepo-com.svg';
+const closeicon = PUBLIC_UI_ICONS.close;
+const decreaseicon = PUBLIC_UI_ICONS.decrease;
+const increaseicon = PUBLIC_UI_ICONS.increase;
 
 export default function GroupSettingsHealthContentWindow({popupclose, groupId, liveslabel, livesicon, livesstart}) {
 

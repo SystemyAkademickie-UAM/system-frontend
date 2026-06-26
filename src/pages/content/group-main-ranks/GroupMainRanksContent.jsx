@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { Divider } from '../../../components/ui/index.js';
 import RankPathBoard from './RankPathBoard.jsx';
 import { useGroupMainRanks } from './useGroupMainRanks.js';
 import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
 import { useGroupMainEmptyLink } from '../../../hooks/group-main/useGroupMainEmptyLink.js';
+import '../group-main/shared/groupMainSubpageHeader.css';
 import '../group-main/GroupMainHomeContent.css';
 import './GroupMainRanksContent.css';
 
@@ -54,12 +56,15 @@ export default function GroupMainRanksContent({ embedded = false, showMemberAvat
   return (
     <section className="group-main-ranks" aria-label="Ścieżka rozwoju">
       {!embedded ? (
-        <div className="group-main-ranks__title-row">
-          <header className="group-main-ranks__page-header">
-            <p className="group-main-ranks__eyebrow">Skarbiec</p>
-            <h1 className="group-main-ranks__title">Rangi</h1>
-          </header>
-        </div>
+        <>
+          <div className="group-main-ranks__title-row">
+            <header className="group-main-ranks__page-header">
+              <p className="group-main-ranks__eyebrow">Skarbiec</p>
+              <h1 className="group-main-ranks__title">Rangi</h1>
+            </header>
+          </div>
+          <Divider className="group-main-subpage__divider" />
+        </>
       ) : null}
 
       {ranks.length === 0 ? (

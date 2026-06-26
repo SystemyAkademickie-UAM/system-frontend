@@ -11,8 +11,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
   gap: 1rem;
-  align-items: stretch;
-  min-height: min(68vh, 620px);
+  align-items: start;
 }
 
 .create-template-modal__left {
@@ -20,7 +19,6 @@
   flex-direction: column;
   gap: 0.75rem;
   min-width: 0;
-  min-height: 0;
 }
 
 .create-template-modal__search {
@@ -52,8 +50,9 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 0;
-  height: 100%;
+  height: min(520px, 55vh);
+  max-height: min(520px, 55vh);
+  overflow: hidden;
 }
 
 .create-template-modal__preview-title {
@@ -66,18 +65,70 @@
   color: var(--color-text-secondary);
 }
 
-.create-template-modal__preview .maq-template-detail-panel--expanded {
+.create-template-modal__preview .maq-template-detail-panel--fitted {
   flex: 1 1 auto;
   min-height: 0;
-  max-height: none;
 }
 
 .create-template-modal__checkbox {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.65rem;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
   font-size: var(--font-size-body);
   color: var(--color-text-primary);
+}
+
+.create-template-modal__checkbox-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.create-template-modal__checkbox-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-accent-on);
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.create-template-modal__checkbox:hover .create-template-modal__checkbox-box {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+
+.create-template-modal__checkbox-box--checked {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+.create-template-modal__checkbox-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.create-template-modal__checkbox-input:focus-visible + .create-template-modal__checkbox-box {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.create-template-modal__checkbox-text {
+  line-height: 1.35;
 }
 
 .create-template-modal__message,
@@ -103,9 +154,13 @@
     min-height: auto;
   }
 
-  .create-template-modal__preview .maq-template-detail-panel--expanded {
-    min-height: 320px;
-    max-height: 50vh;
+  .create-template-modal__preview {
+    height: min(360px, 45vh);
+    max-height: min(360px, 45vh);
+  }
+
+  .create-template-modal__preview .maq-template-detail-panel--fitted {
+    min-height: 0;
   }
 
   .create-template-modal__grid {

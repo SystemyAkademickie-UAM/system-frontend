@@ -147,47 +147,21 @@ export default function TemplatesMyContent() {
 
 
   const rowActions = useMemo(() => ({
-
     menuItems: [
-
       {
-
-        id: 'editName',
-
-        label: 'Edytuj nazwę',
-
-        onSelect: (template) => openModal('editName', template),
-
+        id: 'edit',
+        label: 'Edytuj szablon',
+        onSelect: (template) => openModal('edit', template),
       },
-
       {
-
-        id: 'editDescription',
-
-        label: 'Edytuj opis',
-
-        onSelect: (template) => openModal('editDescription', template),
-
-      },
-
-      {
-
         id: 'togglePublic',
-
         label: 'Zmień widoczność w galerii',
-
         onSelect: (template) => handleTogglePublic(template),
-
       },
-
     ],
-
     onDelete: (template) => openModal('delete', template),
-
     deleteLabel: 'Usuń szablon',
-
     deleteAriaLabel: (template) => `Usuń szablon ${template.name}`,
-
   }), [handleTogglePublic, openModal]);
 
 
@@ -343,33 +317,27 @@ export default function TemplatesMyContent() {
 
 
       <TemplateFieldEditModal
-
-        isOpen={activeModal?.type === 'editName'}
-
-        field="name"
-
+        isOpen={activeModal?.type === 'edit'}
+        field="both"
         template={activeModal?.template ?? null}
-
         onClose={closeModal}
-
         onSaved={refetch}
-
       />
 
-
+      <TemplateFieldEditModal
+        isOpen={activeModal?.type === 'editName'}
+        field="name"
+        template={activeModal?.template ?? null}
+        onClose={closeModal}
+        onSaved={refetch}
+      />
 
       <TemplateFieldEditModal
-
         isOpen={activeModal?.type === 'editDescription'}
-
         field="description"
-
         template={activeModal?.template ?? null}
-
         onClose={closeModal}
-
         onSaved={refetch}
-
       />
 
 

@@ -1,6 +1,12 @@
 /** Maks. długość nazwy (grupa, aktywność, odznaka, ranga, produkt itd.). */
 export const NAME_MAX_LENGTH = 64;
 
+/** Maks. długość nazwy waluty grupy. */
+export const CURRENCY_LABEL_MAX_LENGTH = NAME_MAX_LENGTH;
+
+/** Maks. długość nazwy żyć grupy (zgodnie z API). */
+export const LIVES_LABEL_MAX_LENGTH = 100;
+
 /** Maks. długość nazwy etapu (dodawanie, edycja, kopiowanie). */
 export const STAGE_NAME_MAX_LENGTH = 50;
 

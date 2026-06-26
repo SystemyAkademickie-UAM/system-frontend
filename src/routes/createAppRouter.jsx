@@ -42,10 +42,7 @@ import ProfileLayout from '../pages/links/groups/layouts/ProfileLayout.jsx';
 import ProfileHomePage from '../pages/links/groups/profile/ProfileHomePage.jsx';
 import ProfileLogPage from '../pages/links/groups/profile/ProfileLogPage.jsx';
 import ProfileEqPage from '../pages/links/groups/profile/ProfileEqPage.jsx';
-import StudentProfileLayout from '../pages/links/groups/layouts/StudentProfileLayout.jsx';
-import StudentProfileHomePage from '../pages/links/groups/student-profile/StudentProfileHomePage.jsx';
-import StudentProfileLogPage from '../pages/links/groups/student-profile/StudentProfileLogPage.jsx';
-import StudentProfileEqPage from '../pages/links/groups/student-profile/StudentProfileEqPage.jsx';
+import StudentProfileViewPage from '../pages/links/groups/student-profile/StudentProfileViewPage.jsx';
 
 // Members (Użytkownicy) - lecturer only
 import MembersLayout from '../pages/links/groups/layouts/MembersLayout.jsx';
@@ -208,16 +205,11 @@ const appRouteTree = [
                   },
 
                   // ----------------------------------------
-                  // STUDENT PROFILE (view other user) - any member
+                  // STUDENT PROFILE (lecturer view) — ekwipunek uczestnika
                   // ----------------------------------------
                   {
-                    path: 'studentprofile/:studentId',
-                    element: withGuard(<StudentProfileLayout />),
-                    children: [
-                      { index: true, element: <StudentProfileHomePage /> },
-                      { path: 'log', element: <StudentProfileLogPage /> },
-                      { path: 'eq', element: <StudentProfileEqPage /> },
-                    ],
+                    path: 'student-profile/:studentId',
+                    element: withGuard(<StudentProfileViewPage />, { allowedRoles: LECTURER_ONLY }),
                   },
 
                   // ----------------------------------------

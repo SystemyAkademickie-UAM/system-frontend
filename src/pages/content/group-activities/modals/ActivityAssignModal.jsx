@@ -11,6 +11,7 @@ import {
   setActivityCompletions,
 
 } from '../../../../services/students.api.js';
+import { invalidateStudentProfile } from '../../../../services/studentProfileEvents.js';
 import { formatStudentDisplayName } from '../../../../utils/members/studentDisplayName.js';
 
 
@@ -271,7 +272,7 @@ export default function ActivityAssignModal({
 
 
       showSuccess('Przypisanie aktywności zostało zapisane.');
-
+      invalidateStudentProfile(groupId);
       onClose();
 
     } catch (error) {

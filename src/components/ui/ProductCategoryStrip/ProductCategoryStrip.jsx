@@ -1,6 +1,8 @@
+import {
+  DEFAULT_CATEGORY_COLOR,
+  getContrastingCategoryTextColor,
+} from '../../../utils/shop/shopCategoryColors.js';
 import './ProductCategoryStrip.css';
-
-const DEFAULT_CATEGORY_COLOR = '#42f37d';
 
 /**
  * Pasek kategorii na prawej krawędzi kafelka produktu.
@@ -23,19 +25,32 @@ export default function ProductCategoryStrip({ categories = [], className = '' }
       aria-label={`Kategorie: ${categories.map((category) => category.name).join(', ')}`}
     >
       <ul className="maq-product-category-strip__list">
-        {categories.map((category, index) => (
+        {categories.map((category, index) => {
+          const categoryColor = category.color ?? DEFAULT_CATEGORY_COLOR;
+          const labelTextColor = getContrastingCategoryTextColor(categoryColor);
+
+          return (
           <li
             key={category.id ?? `category-${index}`}
             className="maq-product-category-strip__item"
           >
             <span
               className="maq-product-category-strip__orb"
-              style={{ backgroundColor: category.color ?? DEFAULT_CATEGORY_COLOR }}
+              style={{ backgroundColor: categoryColor }}
               aria-hidden="true"
             />
-            <span className="maq-product-category-strip__label">{category.name}</span>
+            <span
+              className="maq-product-category-strip__label"
+              style={{
+                backgroundColor: categoryColor,
+                color: labelTextColor,
+              }}
+            >
+              {category.name}
+            </span>
           </li>
-        ))}
+          );
+        })}
       </ul>
     </div>
   );

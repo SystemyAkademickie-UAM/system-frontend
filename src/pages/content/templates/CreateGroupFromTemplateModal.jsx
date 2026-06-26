@@ -71,7 +71,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
       onClose={onClose}
       title="Utwórz grupę ze szablonu"
       subtitle={template?.name}
-      size="xl"
+      size="lg"
       showFooter={false}
       className="create-group-from-template-modal"
     >

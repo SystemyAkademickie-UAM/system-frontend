@@ -1,27 +1,45 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import NotificationsFeed from '../../notifications/NotificationsFeed.jsx';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
-import { useNotifications } from '../../../context/NotificationsContext.jsx';
+import { useGroupBacklogNotifications } from '../../../hooks/notifications/useGroupBacklogNotifications.js';
 import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import { groupMembersLogPath } from '../../../routes/pathRegistry.js';
+import { groupMainPath, groupMembersLogPath } from '../../../routes/pathRegistry.js';
 import AssetSvg from '../../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import './NotificationBell.css';
 
+const BELL_LIMIT = 10;
+
 /**
- * Dzwonek powiadomień w SuperBar — łatwe dokładanie elementów przez `useNotifications().addNotification`.
+ * Dzwonek powiadomień w SuperBar — ostatnie 10 wpisów z API backlogu.
  */
 export default function NotificationBell() {
   const panelId = useId();
   const rootRef = useRef(null);
-  const { items } = useNotifications();
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
   const [isOpen, setIsOpen] = useState(false);
+  const isStudentView = role === APP_ROLE.STUDENT;
 
-  const unreadCount = items.filter((item) => !item.read).length;
-  const showViewAll = role === APP_ROLE.LECTURER && groupId !== null;
+  const {
+    notifications,
+    unreadCount,
+    isLoading,
+    error,
+    markRead,
+  } = useGroupBacklogNotifications(groupId, {
+    isStudentView,
+    take: BELL_LIMIT,
+    pollMs: isOpen ? 30000 : 60000,
+  });
+
+  const viewAllTarget = isStudentView && groupId
+    ? `${groupMainPath(groupId)}#group-notifications`
+    : groupId
+      ? groupMembersLogPath(groupId)
+      : null;
 
   useEffect(() => {
     if (!isOpen) {
@@ -48,6 +66,10 @@ export default function NotificationBell() {
     };
   }, [isOpen]);
 
+  if (!groupId) {
+    return null;
+  }
+
   return (
     <div className="notification-bell" ref={rootRef}>
       <button
@@ -66,7 +88,9 @@ export default function NotificationBell() {
           alt=""
         />
         {unreadCount > 0 ? (
-          <span className="notification-bell__badge" aria-hidden="true">{unreadCount}</span>
+          <span className="notification-bell__badge" aria-hidden="true">
+            {unreadCount > 99 ? '99+' : unreadCount}
+          </span>
         ) : null}
       </button>
 
@@ -76,37 +100,27 @@ export default function NotificationBell() {
             <p className="notification-bell__panel-title">Powiadomienia</p>
           </div>
 
-          <div className="notification-bell__list" role="list">
-            {items.length === 0 ? (
-              <p className="notification-bell__empty" role="status">Brak nowych powiadomień.</p>
-            ) : (
-              items.map((item) => (
-                <article
-                  key={item.id}
-                  className={[
-                    'notification-bell__item',
-                    item.read ? '' : 'notification-bell__item--unread',
-                  ].filter(Boolean).join(' ')}
-                  role="listitem"
-                >
-                  <p className="notification-bell__item-title">{item.title}</p>
-                  {item.message ? (
-                    <p className="notification-bell__item-message">{item.message}</p>
-                  ) : null}
-                  {item.createdAt ? (
-                    <time className="notification-bell__item-time" dateTime={item.createdAt}>
-                      {item.createdAt}
-                    </time>
-                  ) : null}
-                </article>
-              ))
-            )}
+          <div className="notification-bell__list">
+            <NotificationsFeed
+              groupId={groupId}
+              role={role}
+              notifications={notifications}
+              isLoading={isLoading}
+              error={error}
+              limit={BELL_LIMIT}
+              showDivider
+              linkable={isStudentView}
+              compact
+              emptyMessage="Brak nowych powiadomień."
+              onMarkRead={(id) => markRead(id)}
+              persistLastSeenOnLeave={false}
+            />
           </div>
 
-          {showViewAll ? (
+          {viewAllTarget ? (
             <div className="notification-bell__footer">
               <Link
-                to={groupMembersLogPath(groupId)}
+                to={viewAllTarget}
                 className="notification-bell__view-all"
                 onClick={() => setIsOpen(false)}
               >

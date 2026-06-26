@@ -58,11 +58,13 @@ export default function TemplateDetailsModal({ isOpen, template, onClose }) {
           </div>
         ) : null}
 
-        <TemplateDetailPanel
-          data={data}
-          isLoading={isLoadingDetails}
-          className="maq-template-detail-panel--expanded template-details-modal__panel"
-        />
+        <div className="template-details-modal__panel-wrap">
+          <TemplateDetailPanel
+            data={data}
+            isLoading={isLoadingDetails}
+            className="maq-template-detail-panel--fitted template-details-modal__panel"
+          />
+        </div>
       </div>
 
       <div className="template-details-modal__footer">

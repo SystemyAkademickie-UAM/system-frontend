@@ -1,0 +1,114 @@
+.notifications-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.notifications-feed__status {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.notifications-feed__status--error {
+  color: var(--color-input-error);
+}
+
+.notifications-feed__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notifications-feed__item {
+  display: block;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: rgba(13, 13, 24, 0.45);
+  color: inherit;
+  text-decoration: none;
+  cursor: default;
+}
+
+.notifications-feed--compact .notifications-feed__item {
+  padding: 0.75rem;
+}
+
+.notifications-feed__item--linkable {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.notifications-feed__item--linkable:hover {
+  background: rgba(30, 204, 56, 0.08);
+}
+
+.notifications-feed__item--unread {
+  border-left: 4px solid var(--color-accent);
+}
+
+.notifications-feed__item-title {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.notifications-feed__item-message {
+  margin: 0.35rem 0 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.notifications-feed__item-time {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: rgba(189, 202, 190, 0.75);
+}
+
+.notifications-feed__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.notifications-feed__divider-line {
+  flex: 1 1 auto;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(189, 202, 190, 0.35);
+}
+
+.notifications-feed__divider-label {
+  flex: 0 0 auto;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(189, 202, 190, 0.85);
+  white-space: nowrap;
+}
+
+.notifications-feed__footer {
+  padding-top: 0.25rem;
+}
+
+.notifications-feed__footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.25rem;
+  border-radius: 8px;
+  background: rgba(30, 204, 56, 0.15);
+  color: var(--color-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.notifications-feed__footer-link:hover {
+  background: rgba(30, 204, 56, 0.25);
+}

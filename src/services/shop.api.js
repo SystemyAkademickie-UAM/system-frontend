@@ -117,6 +117,9 @@ function mapShopBuyError(message) {
     'Sklep grupy jest obecnie zamknięty.': 'Sklep grupy jest obecnie zamknięty.',
     'Student is not enrolled in this group': 'Nie jesteś zapisany do tej grupy.',
     'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.': 'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.',
+    'Kupowanie dodatkowego życia jest wyłączone.': 'Kupowanie dodatkowego życia jest wyłączone.',
+    'Dodatkowe życie można kupić tylko po utracie wszystkich żyć.': 'Dodatkowe życie można kupić tylko po utracie wszystkich żyć.',
+    'Produkt „Dodatkowe życie” nie może zostać usunięty.': 'Produkt „Dodatkowe życie” nie może zostać usunięty.',
   };
 
   return translations[normalized] ?? normalized;
@@ -139,6 +142,20 @@ export async function buyGroupShopItem(groupId, itemId) {
  */
 export async function fetchGroupInventory(groupId) {
   const result = await getJson(`/groups/${groupId}/inventory`, { includeBrowserId: true });
+  if (!result.ok) {
+    return { ok: false, entries: [], error: extractApiError(result.data) };
+  }
+  return { ok: true, entries: mapBackendInventory(result.data) };
+}
+
+/**
+ * Ekwipunek wybranego uczestnika (prowadzący).
+ *
+ * @param {string | number} groupId
+ * @param {string | number} accountId
+ */
+export async function fetchStudentInventory(groupId, accountId) {
+  const result = await getJson(`/groups/${groupId}/students/${accountId}/inventory`);
   if (!result.ok) {
     return { ok: false, entries: [], error: extractApiError(result.data) };
   }

@@ -41,10 +41,10 @@ const showNicknameLABEL = {
   kana: 'ニックネームをひょうじ',
 };
 const showNicknameDescLABEL = {
-  polish: 'Gdy wyłączone, w pasku nawigacji i opisie grupy widać imię i nazwisko zamiast ksywki.',
-  english: 'When disabled, the navigation bar and group description show your legal name instead of nickname.',
-  japanese: 'オフにすると、ナビバーとグループ説明にニックネームではなく氏名が表示されます。',
-  kana: 'オフにすると、ナビバーとグループ説明にニックネームではなく氏名が表示されます。',
+  polish: 'Gdy wyłączone, uczniowie i inni prowadzący widzą imię i nazwisko zamiast ksywki (lista grup, strona główna, galeria szablonów itd.).',
+  english: 'When disabled, students and other lecturers see your legal name instead of nickname (group list, home page, template gallery, etc.).',
+  japanese: 'オフにすると、他の利用者にはニックネームではなく氏名が表示されます。',
+  kana: 'オフにすると、ほかの利用者にはニックネームではなく氏名が表示されます。',
 };
 const savebuttonLABEL = { polish: 'Zapisz zmiany', english: 'Save changes', japanese: '変更を保存', kana: 'へんこうをほぞん' };
 const unsavedTitleLABEL = {
@@ -95,7 +95,7 @@ function resolveLanguageCode(displayLanguage) {
 export default function SettingsContent() {
   const { refetchProfile } = useUserProfile();
   const { role } = useAppRole();
-  const { showNickname, setShowNickname } = useLeaderDisplayPreferences();
+  const { setShowNickname } = useLeaderDisplayPreferences();
   const { showSuccess, showError } = useToast();
 
   const [draftShowNickname, setDraftShowNickname] = useState(showNickname);
@@ -131,7 +131,8 @@ export default function SettingsContent() {
       setSelectedAvatarId(loadedAvatarId);
 
       if (role === APP_ROLE.LECTURER) {
-        setDraftShowNickname(showNickname);
+        const loadedShowNickname = profile.showNickname !== false;
+        setDraftShowNickname(loadedShowNickname);
       }
 
       const currentLanguage = readLanguageCookie() || 'polish';
@@ -139,14 +140,14 @@ export default function SettingsContent() {
         nickname: profile.nickname || '',
         avatarId: loadedAvatarId,
         language: currentLanguage,
-        ...(role === APP_ROLE.LECTURER ? { showNickname } : {}),
+        ...(role === APP_ROLE.LECTURER ? { showNickname: profile.showNickname !== false } : {}),
       });
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać ustawień');
     } finally {
       setIsLoading(false);
     }
-  }, [role, showNickname]);
+  }, [role]);
 
   const persistSettings = useCallback(async () => {
     const selectedLanguage = resolveLanguageCode(divlanguage);
@@ -165,6 +166,10 @@ export default function SettingsContent() {
       payload.avatarId = selectedAvatarId;
     }
 
+    if (role === APP_ROLE.LECTURER) {
+      payload.showNickname = draftShowNickname;
+    }
+
     const result = await updateProfile(payload);
 
     if (!result.ok) {
@@ -179,14 +184,16 @@ export default function SettingsContent() {
     await refetchProfile();
 
     if (role === APP_ROLE.LECTURER) {
-      setShowNickname(draftShowNickname);
+      const savedShowNickname = result.profile?.showNickname !== false;
+      setDraftShowNickname(savedShowNickname);
+      setShowNickname(savedShowNickname);
     }
 
     setSavedSnapshot({
       nickname: trimmedNickname,
       avatarId: selectedAvatarId,
       language: selectedLanguage,
-      ...(role === APP_ROLE.LECTURER ? { showNickname: draftShowNickname } : {}),
+      ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
 
     setIsSaving(false);

@@ -6,23 +6,19 @@ import { fetchGroupPreview } from '../../../services/groups.api.js';
 import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
-import { useSession } from '../../../context/SessionContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
-import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { buildLecturerMemberRow, generateMemberAvatarFallback } from '../../../utils/members/membersLecturerRow.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import './GroupMainMembersContent.css';
 import './shared/groupMainSubpageHeader.css';
 
-function buildRows(students, preview, { role, showNickname, user, profileAvatarUrl }) {
+function buildRows(students, preview, { role, profileAvatarUrl }) {
   const rows = [];
   const lecturerRow = buildLecturerMemberRow({
     group: preview.group,
     isOwnGroup: preview.isOwner,
     role,
-    showNickname,
-    user,
     profileAvatarUrl,
   });
 
@@ -53,10 +49,10 @@ function buildRows(students, preview, { role, showNickname, user, profileAvatarU
   return rows;
 }
 
-function GroupMainMembersTableRow({ row, columns }) {
+function GroupMainMembersTableRow({ row, columns, canOpenProfiles }) {
   const { groupId } = useParams();
   const navigate = useNavigate();
-  const isClickable = Boolean(groupId && row.accountId && !row.isLecturer);
+  const isClickable = canOpenProfiles && Boolean(groupId && row.accountId && !row.isLecturer);
 
   const openProfile = () => {
     if (!isClickable) {
@@ -109,9 +105,7 @@ function GroupMainMembersTableRow({ row, columns }) {
 export default function GroupMainMembersContent() {
   const { groupId } = useParams();
   const { role } = useAppRole();
-  const { user } = useSession();
   const { avatarUrl: profileAvatarUrl } = useUserProfile();
-  const { showNickname } = useLeaderDisplayPreferences();
   const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -148,8 +142,6 @@ export default function GroupMainMembersContent() {
 
         setMembers(buildRows(students, preview, {
           role,
-          showNickname,
-          user,
           profileAvatarUrl,
         }));
       } catch (loadError) {
@@ -170,7 +162,9 @@ export default function GroupMainMembersContent() {
     return () => {
       cancelled = true;
     };
-  }, [groupId, role, showNickname, user, profileAvatarUrl]);
+  }, [groupId, role, profileAvatarUrl]);
+
+  const canOpenProfiles = role !== APP_ROLE.STUDENT;
 
   const columns = useMemo(
     () => [
@@ -219,7 +213,9 @@ export default function GroupMainMembersContent() {
         columns={columns}
         data={members}
         tiebreakerKey="position"
-        renderRow={GroupMainMembersTableRow}
+        renderRow={(props) => (
+          <GroupMainMembersTableRow {...props} canOpenProfiles={canOpenProfiles} />
+        )}
         search={{
           placeholder: 'Szukaj po ksywce',
           filter: (row, query) => row.nickname.toLowerCase().includes(query.toLowerCase()),

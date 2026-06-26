@@ -7,6 +7,14 @@ import { fetchGroupSnapshotForTemplate } from './groupSnapshotForTemplate.js';
 import SelectGroupMiniCard from './SelectGroupMiniCard.jsx';
 import './CreateTemplateModal.css';
 
+function CheckIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /**
  * @param {Object} props
  * @param {boolean} props.isOpen
@@ -172,10 +180,22 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
             <label className="create-template-modal__checkbox">
               <input
                 type="checkbox"
+                className="create-template-modal__checkbox-input"
                 checked={isPublic}
                 onChange={(event) => setIsPublic(event.target.checked)}
               />
-              <span>Udostępnij w publicznej galerii szablonów</span>
+              <span
+                className={[
+                  'create-template-modal__checkbox-box',
+                  isPublic ? 'create-template-modal__checkbox-box--checked' : '',
+                ].filter(Boolean).join(' ')}
+                aria-hidden="true"
+              >
+                {isPublic ? <CheckIcon className="create-template-modal__checkbox-icon" /> : null}
+              </span>
+              <span className="create-template-modal__checkbox-text">
+                Udostępnij w publicznej galerii szablonów
+              </span>
             </label>
           </div>
         </div>
@@ -185,7 +205,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
           <TemplateDetailPanel
             data={previewData}
             isLoading={isLoadingPreview && Boolean(previewGroupId)}
-            className="maq-template-detail-panel--expanded"
+            className="maq-template-detail-panel--fitted"
           />
         </aside>
       </div>

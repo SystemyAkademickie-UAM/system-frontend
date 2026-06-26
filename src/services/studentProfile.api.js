@@ -28,7 +28,7 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {number} badgesCount
  * @property {string | null} groupCurrency
  * @property {string | null} groupCurrencyEmoji
- * @property {string | null} lives
+ * @property {number | null} lives
  * @property {string | null} livesIcon
  * @property {boolean} [shopOpen]
  * @property {GroupStudentProfileBadge[]} earnedBadges

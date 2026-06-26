@@ -17,4 +17,6 @@ export const PUBLIC_UI_ICONS = {
   chevronLeftDouble: publicIconPath('chevron-left-double-svgrepo-com.svg'),
   chevronRight: publicIconPath('chevron-right-svgrepo-com.svg'),
   chevronRightDouble: publicIconPath('chevron-right-double-svgrepo-com.svg'),
+  decrease: publicIconPath('minus-circle-svgrepo-com.svg'),
+  increase: publicIconPath('plus-circle-svgrepo-com.svg'),
 };

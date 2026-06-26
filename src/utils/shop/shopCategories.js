@@ -1,10 +1,11 @@
+import { mixCategoryColors } from './shopCategoryColors.js';
+
 /**
  * Buduje filtry kategorii sklepu na podstawie danych z API.
  *
  * @param {import('../../services/itemCategories.api.js').ItemCategory[]} categories
  */
-export function buildShopCategoryFilters(categories = []) {
-  return [
+export function buildShopCategoryFilters(categories = []) {  return [
     { id: 'all', label: 'Wszystkie' },
     ...categories.map((category) => ({
       id: String(category.id),
@@ -42,4 +43,18 @@ export function resolveShopCategoryDetails(categoryIds = [], categoriesById = ne
  */
 export function getShopCategoryColor(category) {
   return category?.color ?? undefined;
+}
+
+/**
+ * Miesza kolory wielu kategorii przypisanych do produktu.
+ *
+ * @param {import('../../services/itemCategories.api.js').ItemCategory[]} categories
+ * @returns {string | undefined}
+ */
+export function getMixedShopCategoryColor(categories = []) {
+  if (!Array.isArray(categories) || categories.length === 0) {
+    return undefined;
+  }
+
+  return mixCategoryColors(categories.map((category) => category.color));
 }

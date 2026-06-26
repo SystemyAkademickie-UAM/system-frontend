@@ -6,6 +6,7 @@ import {
 } from '../../../constants/authPaths.constants.js';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { getJson, postJson } from '../../../services/api-client.js';
+import { getMagicLinkErrorMessage } from '../../../services/magicLinkErrors.js';
 import './AuthCard.css';
 import './LoginInstitution.css';
 
@@ -82,8 +83,9 @@ export default function LoginEmail({ onBack }) {
     setIsBusy(false);
 
     if (!result.ok) {
-      const data = /** @type {{ message?: string, error?: string }} */ (result.data);
-      setErrorMessage(data?.message || data?.error || 'Nie udało się wysłać linku logowania.');
+      setErrorMessage(
+        getMagicLinkErrorMessage(result.data, 'Nie udało się wysłać linku logowania.'),
+      );
       return;
     }
 
@@ -103,10 +105,10 @@ export default function LoginEmail({ onBack }) {
         <BackIcon className="auth-card__back-icon" />
       </button>
 
-      <h1 className="auth-card__title">Zaloguj się przez e-mail</h1>
+      <h1 className="login-institution__page-title">Zaloguj się przez e-mail</h1>
 
       <div className="login-institution__field">
-        <label className="auth-card__title" htmlFor="email-institution-select">
+        <label className="login-institution__field-label" htmlFor="email-institution-select">
           Wybierz uczelnię
         </label>
         <div className="login-institution__select-wrap">
@@ -133,31 +135,37 @@ export default function LoginEmail({ onBack }) {
       </div>
 
       <div className="login-institution__field">
-        <label className="auth-card__title" htmlFor="email-login-input">
+        <label className="login-institution__field-label" htmlFor="email-login-input">
           Adres e-mail
         </label>
-        <input
-          id="email-login-input"
-          type="email"
-          className="auth-card__input"
-          value={email}
-          disabled={isBusy}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="twoj.email@uczelnia.pl"
-          autoComplete="email"
-        />
+        <div className="login-institution__input-wrap">
+          <input
+            id="email-login-input"
+            type="email"
+            className="login-institution__input"
+            value={email}
+            disabled={isBusy}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="twoj.email@uczelnia.pl"
+            autoComplete="email"
+          />
+        </div>
       </div>
 
-      {errorMessage ? (
-        <p className="login-institution__error" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
+      {(errorMessage || successMessage) ? (
+        <div className="login-institution__messages">
+          {errorMessage ? (
+            <p className="login-institution__error" role="alert">
+              {errorMessage}
+            </p>
+          ) : null}
 
-      {successMessage ? (
-        <p className="login-institution__success" role="status">
-          {successMessage}
-        </p>
+          {successMessage ? (
+            <p className="login-institution__success" role="status">
+              {successMessage}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       <button

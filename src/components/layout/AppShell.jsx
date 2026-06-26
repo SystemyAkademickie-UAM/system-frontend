@@ -43,8 +43,17 @@ export default function AppShell() {
   const { rawGroupId } = useShellGroupContext();
   const { user, isLoading: isSessionLoading } = useSession();
   const { profile, avatarUrl, isLoading: isProfileLoading } = useUserProfile();
-  const { showNickname: leaderShowsNickname } = useLeaderDisplayPreferences();
-  const { livesDisplay, currencyDisplay, totalEarnedDisplay, currencyLabel, livesLabel } = useStudentSuperBarStats();
+  const { showNickname: leaderShowsNickname } = useLeaderDisplayPreferences(profile?.showNickname);
+  const {
+    livesDisplay,
+    currencyDisplay,
+    totalEarnedDisplay,
+    currencyLabel,
+    livesLabel,
+    livesEnabled,
+    livesMax,
+    livesShopEnabled,
+  } = useStudentSuperBarStats();
   const breadcrumb = useAppBreadcrumb();
   const isCompactLayout = useCompactAppLayout();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -131,6 +140,9 @@ export default function AppShell() {
             avatarUrl={avatarUrl}
             livesDisplay={livesDisplay}
             livesLabel={livesLabel}
+            livesEnabled={livesEnabled}
+            livesMax={livesMax}
+            livesShopEnabled={livesShopEnabled}
             currencyDisplay={currencyDisplay}
             totalEarnedDisplay={totalEarnedDisplay}
             currencyLabel={currencyLabel}
