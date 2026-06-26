@@ -193,6 +193,8 @@ export default function App() {
 
 
 
+
+
   async function onFetchcategories() {
 
     setErrorMessage('');
@@ -260,6 +262,7 @@ export default function App() {
       setErrorMessage(message);
     }
   }
+
 
 
 
@@ -496,7 +499,7 @@ export default function App() {
           iconvalue = '';
         }
 
-        receivedranks.push({id: receiveddata[i].id, icon: iconvalue ? `backend:${iconvalue}` : '', name: receiveddata[i].name, discount: discountvalue, costafter: ''});
+        receivedranks.push({id: receiveddata[i].id, icon: iconvalue ? `backend:${iconvalue}` : '', name: receiveddata[i].name, discount: discountvalue, costafter: '', isCustom: 0});
 
         i = i + 1;
       }
@@ -802,7 +805,7 @@ export default function App() {
         newcostafter = discounted;
       }
 
-      newranks.push({id: ranks[i].id, icon: ranks[i].icon, name: ranks[i].name, discount: ranks[i].discount, costafter: newcostafter});
+      newranks.push({id: ranks[i].id, icon: ranks[i].icon, name: ranks[i].name, discount: ranks[i].discount, costafter: newcostafter, isCustom: 0});
 
       i = i + 1;
     }
@@ -823,7 +826,7 @@ export default function App() {
     while (i < ranks.length) {
 
       if (ranks[i].id == rankId) {
-        newranks.push({id: ranks[i].id, icon: ranks[i].icon, name: ranks[i].name, discount: ranks[i].discount, costafter: value});
+        newranks.push({id: ranks[i].id, icon: ranks[i].icon, name: ranks[i].name, discount: ranks[i].discount, costafter: value, isCustom: 1});
       } else {
         newranks.push(ranks[i]);
       }
@@ -919,7 +922,7 @@ export default function App() {
     setBadgediscounts(newdiscounts);
     setSelectedbadge('Wybierz odznakę');
     setPendingdiscountvalue('');
-    showSuccess('Zniżka dla odznaki została utworzona (lokalnie).');
+    showSuccess('Zniżka dla odznaki została utworzona.');
   }
 
 
@@ -942,7 +945,7 @@ export default function App() {
     }
 
     setBadgediscounts(newdiscounts);
-    showSuccess('Zniżka za odznakę została usunięta (lokalnie).');
+    showSuccess('Zniżka za odznakę została usunięta.');
   }
 
 
@@ -957,22 +960,22 @@ export default function App() {
   async function createitem() {
 
     if (itemname.trim().length == 0) {
-      showError('Prosze wpisac nazwe przedmiotu.');
+      showError('Proszę wpisać nazwę przedmiotu.');
       return;
     }
 
     if (cost == '' || Number(cost) < 0) {
-      showError('Prosze wpisac poprawny koszt przedmiotu.');
+      showError('Proszę wpisać poprawny koszt przedmiotu.');
       return;
     }
 
     if (grouplimitenabled == 1 && grouplimit == '') {
-      showError('Prosze wpisac limit sztuk na grupe lub odznaczyc limit.');
+      showError('Proszę wpisać limit sztuk na grupę lub odznaczyć limit.');
       return;
     }
 
     if (studentlimitenabled == 1 && studentlimit == '') {
-      showError('Prosze wpisac limit sztuk na studenta lub odznaczyc limit.');
+      showError('Proszę wpisać limit sztuk na studenta lub odznaczyć limit.');
       return;
     }
 
@@ -985,18 +988,18 @@ export default function App() {
 
       const url = base + '/groups/' + groupId + '/shop-items';
 
-      const payload = {
+      const items = {
         name: itemname.trim(),
         basePrice: Number(cost),
         imageRef: currenticon + '*' + iconbackground
       };
 
       if (description0.trim().length > 0) {
-        payload.storyDescription = description0.trim();
+        items.storyDescription = description0.trim();
       }
 
       if (description1.trim().length > 0) {
-        payload.educationalDescription = description1.trim();
+        items.educationalDescription = description1.trim();
       }
 
       let categoryid = null;
@@ -1013,16 +1016,58 @@ export default function App() {
       }
 
       if (categoryid != null) {
-        payload.categoryId = categoryid;
+        items.categoryId = categoryid;
       }
 
       if (grouplimitenabled == 1) {
-        payload.stockQuantity = Number(grouplimit);
+        items.stockQuantity = Number(grouplimit);
       }
 
       if (studentlimitenabled == 1) {
-        payload.perStudentLimit = Number(studentlimit);
+        items.perStudentLimit = Number(studentlimit);
       }
+
+      const badgePromotions = [];
+
+      i = 0;
+
+      while (i < badgediscounts.length) {
+
+        let promotionType = 'fixed';
+        let promotionValue = Number(badgediscounts[i].value);
+
+        if (badgediscounts[i].value.endsWith('%')) {
+          promotionType = 'percent';
+          promotionValue = Number(badgediscounts[i].value.replace('%', ''));
+        }
+
+        badgePromotions.push({id: badgediscounts[i].badgeid, promotionType: promotionType, value: promotionValue});
+
+        i = i + 1;
+      }
+
+      const rankPromotions = [];
+
+      i = 0;
+
+      while (i < ranks.length) {
+
+        if (ranks[i].isCustom == 1 && ranks[i].costafter != '') {
+
+          let discountValue = Number(cost) - Number(ranks[i].costafter);
+
+          if (discountValue < 0) {
+            discountValue = 0;
+          }
+
+          rankPromotions.push({id: ranks[i].id, promotionType: 'fixed', value: discountValue});
+        }
+
+        i = i + 1;
+      }
+
+      items.badgePromotions = badgePromotions;
+      items.rankPromotions = rankPromotions;
 
       const response = await fetch(url, {
         method: 'POST',
@@ -1031,7 +1076,7 @@ export default function App() {
           'Content-Type': 'application/json',
           'X-Browser-ID': browserid
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(items)
       });
 
       const responsetext = await response.text();
@@ -1147,21 +1192,15 @@ export default function App() {
                 </div>
 
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', gap: '2%'}}>
-                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                      <input type = "checkbox" checked = {minpriceenabled == 1} onChange = {() => {if (minpriceenabled == 0) {setMinpriceenabled(1);} else {setMinpriceenabled(0); setMinprice('');}}} style = {{cursor: 'pointer'}}/>
-                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Cena minimalna*<InfoTooltip text = "Próg cenowy, poniżej którego nie zejdzie cena przedmiotu po obniżkach." /></div>
-                    </div>
-                    <input onInput = {(event) => onNumericinput(event.target.value, setMinprice)} disabled = {minpriceenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '5vh', position: 'relative', color: minpriceenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: minpriceenabled == 1 ? 1 : 0.5}} value = {minpriceenabled == 1 ? minprice : ''} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                  </div>
-                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+
+                  <div style = {{width: '50%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
                     <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
                       <input type = "checkbox" checked = {grouplimitenabled == 1} onChange = {() => {if (grouplimitenabled == 0) {setGrouplimitenabled(1);} else {setGrouplimitenabled(0); setGrouplimit('');}}} style = {{cursor: 'pointer'}}/>
                       <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na grupę<InfoTooltip text = "Ogranicza łaczną liczbę sztuk dostępnych w sklepie." /></div>
                     </div>
                     <input onInput = {(event) => onNumericinput(event.target.value, setGrouplimit)} disabled = {grouplimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '5vh', position: 'relative', color: grouplimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: grouplimitenabled == 1 ? 1 : 0.5}} value = {grouplimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
                   </div>
-                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+                  <div style = {{width: '50%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
                     <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
                       <input type = "checkbox" checked = {studentlimitenabled == 1} onChange = {() => {if (studentlimitenabled == 0) {setStudentlimitenabled(1);} else {setStudentlimitenabled(0); setStudentlimit('');}}} style = {{cursor: 'pointer'}}/>
                       <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na studenta<InfoTooltip text = "Ogranicza ile razy każdy z użytkowników może kupić ten przedmiot." /></div>
@@ -1228,7 +1267,7 @@ export default function App() {
               </div>
 
               <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za odznaki*<InfoTooltip text = "Wpisanie znaku '%' w wartości sprawia, że zniżka staje się procentowa." /></div>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za odznaki<InfoTooltip text = "Wpisanie znaku '%' w wartości sprawia, że zniżka staje się procentowa." /></div>
 
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%', flexWrap: 'wrap'}}>
                   <select onChange = {(event) => setSelectedbadge(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '40%', height: '5vh', position: 'relative', color: 'rgb(66, 243, 125)', fontSize: '14px', fontWeight: 900, paddingLeft: '2%', border: 'none', outline: 'none', borderRadius: '8px', cursor: 'pointer'}} value = {selectedbadge}>
@@ -1261,7 +1300,7 @@ export default function App() {
             <div style = {{width: '25%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '2vh'}}>
 
               <div style = {{width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za rangi{ranksfrombackend == 0 ? '*' : ''}</div>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za rangi{ranksfrombackend == 0 ? '*' : ''}<InfoTooltip text = "Choć cena finalna w przypadku posiadania przez studenta danej rangi obliczana jest automatycznie, można ją nadpisać." /></div>
                 {ranks.length == 0 ? (
                   <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Brak rang w grupie.</div>
                 ) : (
