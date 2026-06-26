@@ -2,6 +2,7 @@ import {useState, useEffect, useRef} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {InfoTooltip, useToast} from '../../../components/ui/index.js';
 
 import GroupSettingsHealthContentWindow from './GroupSettingsHealthContentWindow.jsx';
 
@@ -9,10 +10,12 @@ import 'unicode-emoji-picker';
 
 export default function App() {
 
+  const {showSuccess, showError} = useToast();
+
   const {groupId} = useParams();
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [currenticon, setCurrenticon] = useState('❤️');
+  const [currenticon, setCurrenticon] = useState('🍑');
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const pickerRef = useRef(null);
 
@@ -149,7 +152,15 @@ export default function App() {
 
     setLiveslimit(maxvalue);
 
-    setLivesstart('99');
+    let startvalue = data.startingLives;
+
+    if (startvalue == null) {
+      startvalue = '5';
+    } else {
+      startvalue = String(startvalue);
+    }
+
+    setLivesstart(startvalue);
 
     let shopvalue = 0;
 
@@ -162,7 +173,7 @@ export default function App() {
     let iconvalue = data.livesIcon;
 
     if (iconvalue == null || iconvalue == '') {
-      iconvalue = '❤️';
+      iconvalue = '🍑';
     }
 
     setCurrenticon(iconvalue);
@@ -229,6 +240,7 @@ export default function App() {
 
   function resetlivessettings() {
     onfetchlivessettings();
+    showSuccess('Zmiany zostały cofnięte.');
   }
 
 
@@ -260,6 +272,10 @@ export default function App() {
         payload.lives = Number(liveslimit);
       }
 
+      if (livesstart != '') {
+        payload.startingLives = Number(livesstart);
+      }
+
       const response = await fetch(url, {
         method: 'PATCH',
         credentials: 'include',
@@ -286,7 +302,7 @@ export default function App() {
       console.log('PATCH /groups/' + groupId + '/lives-config JSON:', data);
 
       onfetchlivessettings();
-
+      showSuccess('Zapisano zmiany.');
     } catch (error) {
 
       let message;
@@ -340,20 +356,20 @@ export default function App() {
       <div>
         <div style = {{width: '75vw', height: '100%', position: 'relative', top: '0%', left: '0%'}}>
 
-          <div style = {{width: '98%', position: 'relative', top: '0%', left: '1%', display: 'flex', flexDirection: 'column', gap: '2vh', paddingBottom: '4vh'}}>
+          <div style = {{width: '98%', position: 'relative', top: '0%', left: '0%', display: 'flex', flexDirection: 'column', gap: '2vh', paddingBottom: '4vh'}}>
 
 
 
-            <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '2vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
+            <div style = {{width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '2vh', paddingTop: '1vh', paddingBottom: '2vh', paddingLeft: '0%', paddingRight: '0%'}}>
 
               <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Ikona żyć</div>
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '2vh'}}>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Ikona żyć</div>
+                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: '2vh'}}>
                   
-                  <div onClick = {() => setIsPickerOpen(!isPickerOpen)} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
+                  <div onClick = {() => setIsPickerOpen(!isPickerOpen)} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
                     <div style = {{color: 'rgb(227, 224, 247)', fontSize: '48px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>{currenticon}</div>
                   </div>
-                  
+
                   {isPickerOpen ? (
                     <div onClick = {() => setIsPickerOpen(false)} style = {{position: 'fixed', top: '0vh', left: '0vw', width: '100vw',  height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999}}>
                       <div onClick = {(event) => event.stopPropagation()} style = {{position: 'relative'}}><unicode-emoji-picker ref = {onPickerMounted} style = {{'--fill-color': 'rgb(40, 40, 52)', '--text-color': 'rgb(227, 224, 247)', '--title-bar-fill-color': 'rgb(40, 40, 52)', '--variations-fill-color': 'rgb(26, 26, 42)', '--variations-backdrop-fill-color': 'rgba(40, 40, 52, 0.75)'}}></unicode-emoji-picker></div>
@@ -363,45 +379,46 @@ export default function App() {
                 </div>
               </div>
 
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
                 <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Nazwa żyć</div>
-                <input onChange = {(event) => setLivesname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none'}} value = {livesname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
+                <input onChange = {(event) => setLivesname(event.target.value)} style = {{backgroundColor: 'rgb(26, 26, 42)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none'}} value = {livesname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
               </div>
 
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>System żyć</div>
-                <div onClick = {() => togglesystemlives()} style = {{backgroundColor: livesenabled == 1 ? 'rgba(30, 204, 56)' : 'rgb(40, 40, 52)', width: '10vw', height: '5vh', position: 'relative', borderRadius: '8px', color: livesenabled == 1 ? 'rgb(0, 57, 21)' : 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>{livesenabled == 1 ? 'Wł.' : 'Wył.'}</div>
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>System żyć<InfoTooltip text = "Pozwala włączyć i wyłączyć system szans." /></div>
+                <div onClick = {() => togglesystemlives()} style = {{backgroundColor: livesenabled == 1 ? 'rgba(30, 204, 56)' : 'rgb(26, 26, 42)', width: '10vw', height: '5vh', position: 'relative', borderRadius: '8px', color: livesenabled == 1 ? 'rgb(0, 57, 21)' : 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>{livesenabled == 1 ? 'Wł.' : 'Wył.'}</div>
               </div>
 
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Limit żyć</div>
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Limit żyć<InfoTooltip text = "Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." /></div>
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                  <input type = "number" onInput = {(event) => onNumericinput(event.target.value, setLiveslimit)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none', textAlign: 'left', paddingRight: '1%'}} value = {liveslimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
+                  <input type = "number" onInput = {(event) => onNumericinput(event.target.value, setLiveslimit)} style = {{backgroundColor: 'rgb(26, 26, 42)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none', textAlign: 'left', paddingRight: '1%'}} value = {liveslimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
 
                 </div>
               </div>
 
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Startowa liczba żyć*</div>
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
+                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Startowa liczba żyć<InfoTooltip text = "Liczba szans, jaką student otrzymuje po dołączeniu do grupy." /></div>
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                  <input type = "number" onInput = {(event) => onNumericinput(event.target.value, setLivesstart)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none', textAlign: 'left', paddingRight: '1%'}} value = {livesstart} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
+                  <input type = "number" onInput = {(event) => onNumericinput(event.target.value, setLivesstart)} style = {{backgroundColor: 'rgb(26, 26, 42)', border: '2px solid rgba(0, 0, 0, 0)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none', textAlign: 'left', paddingRight: '1%'}} value = {livesstart} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
 
                 </div>
               </div>
 
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
+              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
                 <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
                   <input type = "checkbox" checked = {livesshopenabled == 1} onChange = {() => {if (livesshopenabled == 0) {setLivesshopenabled(1);} else {setLivesshopenabled(0);}}} style = {{cursor: 'pointer'}}/>
-                  <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center'}}>Możliwość kupowania żyć w sklepie</div>
+                  <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center'}}>Możliwość kupowania żyć w sklepie<InfoTooltip text = "Umożliwia kupowanie szans w sklepie." /></div>
                 </div>
               </div>
 
-              <div onClick = {() => editlives()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Edytuj życie</div>
+              <div onClick = {() => editlives()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh', marginTop: '2vh'}}>Edytuj życie</div>
 
               <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '2%', paddingTop: '1vh'}}>
                 <div onClick = {() => showlivespopup()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Zarządzanie</div>
-                <div style = {{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                  <div onClick = {() => resetlivessettings()} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij zmiany</div>
+
+                <div style = {{width: '100%', position: 'fixed', display: 'flex', flexDirection: 'row', alignItems: 'center', bottom: '2.5vh', right: '2.5vw', justifyContent: 'flex-end', gap: '2%', paddingTop: '1vh'}}>
+                  <div onClick = {() => resetlivessettings()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij zmiany</div>
                   <div onClick = {() => saveliveschanges()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Zapisz zmiany</div>
                 </div>
               </div>
