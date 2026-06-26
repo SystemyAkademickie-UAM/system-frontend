@@ -1,42 +1,29 @@
-import {useState, useEffect, useRef} from 'react';
+import {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
-import {InfoTooltip, useToast} from '../../../components/ui/index.js';
-import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
-import {resolveSvgAssetName} from '../../../utils/svgAssetPath.js';
+import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
+import {Button, Divider, InfoTooltip, useToast} from '../../../components/ui/index.js';
+import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import {createGroupShopItem, fetchGroupShopItems, updateGroupShopItem} from '../../../services/shop.api.js';
+import {syncShopItemRankUnlock, findRankUnlockingItem} from '../../../utils/ranks/rankShopItemUnlock.js';
+import '../group-shop/modals/ShopItemFormModal.css';
 
-import arrowcirclelefticon from '../../../../public/assets/icons/arrow-circle-left-svgrepo-com.svg';
-import arrowcirclerighticon from '../../../../public/assets/icons/arrow-circle-right-svgrepo-com.svg';
-import skipbackicon from '../../../../public/assets/icons/skip-back-svgrepo-com.svg';
-import skipforwardicon from '../../../../public/assets/icons/skip-forward-svgrepo-com.svg';
-import chevronlefticon from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
-import chevronrighticon from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg';
-import editicon from '../../../../public/assets/icons/edit-02-svgrepo-com.svg';
-import deleteicon from '../../../../public/assets/icons/trash-01-svgrepo-com.svg';
-import checkicon from '../../../../public/assets/icons/check-svgrepo-com.svg';
-import closeicon from '../../../../public/assets/icons/x-close-svgrepo-com.svg';
-import leftleft from '../../../../public/assets/icons/chevron-left-double-svgrepo-com.svg';
-import left from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
-import rightright from '../../../../public/assets/icons/chevron-right-double-svgrepo-com.svg';
-import right from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg';
-import up from '../../../../public/assets/icons/chevron-up-svgrepo-com.svg';
-import down from '../../../../public/assets/icons/chevron-down-svgrepo-com.svg';
-
-import 'unicode-emoji-picker';
-
-export default function App() {
+export default function ShopItemFormContent({
+  groupId: groupIdProp,
+  itemId = null,
+  onClose,
+  onSaved,
+}) {
 
   const {showSuccess, showError} = useToast();
 
-  const {groupId} = useParams();
+  const routeParams = useParams();
+  const groupId = groupIdProp ?? routeParams.groupId;
+  const editingItemId = itemId != null && itemId !== '' ? String(itemId) : null;
   const [errorMessage, setErrorMessage] = useState('');
 
   const [currenticon, setCurrenticon] = useState('🍑');
   const [iconbackground, setIconbackground] = useState('rgb(40,40,52)');
-  
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const pickerRef = useRef(null);
 
   const [itemname, setItemname] = useState('');
   const [description0, setDescription0] = useState('');
@@ -50,93 +37,15 @@ export default function App() {
   const [studentlimitenabled, setStudentlimitenabled] = useState(0);
 
   const [categories, setCategories] = useState([]);
-  const [categoriesopen, setCategoriesopen] = useState(0);
-  const [addingcategory, setAddingcategory] = useState(0);
-  const [newcategoryname, setNewcategoryname] = useState('');
 
   const [ranks, setRanks] = useState([]);
   const [ranksfrombackend, setRanksfrombackend] = useState(0);
+  const [unlockRankId, setUnlockRankId] = useState('');
 
   const [badges, setBadges] = useState([]);
   const [badgediscounts, setBadgediscounts] = useState([]);
   const [selectedbadge, setSelectedbadge] = useState('Wybierz odznakę');
   const [pendingdiscountvalue, setPendingdiscountvalue] = useState('');
-
-
-
-  function onPickerMounted(picker) {
-
-    if (!picker) {
-      return;
-    }
-
-    picker.addEventListener('emoji-pick', (event) => {
-      setCurrenticon(event.detail.emoji);
-      setIsPickerOpen(false);
-    });
-  }
-
-
-
-
-
-  function rgbstringtohex(rgbvalue) {
-
-    let cleaned = rgbvalue.replace('rgb(', '').replace(')', '').replace(' ', '');
-    let parts = cleaned.split(',');
-
-    let red = Number(parts[0]);
-    let green = Number(parts[1]);
-    let blue = Number(parts[2]);
-
-    let redhex = red.toString(16);
-    let greenhex = green.toString(16);
-    let bluehex = blue.toString(16);
-
-    if (redhex.length == 1) {
-      redhex = '0' + redhex;
-    }
-
-    if (greenhex.length == 1) {
-      greenhex = '0' + greenhex;
-    }
-
-    if (bluehex.length == 1) {
-      bluehex = '0' + bluehex;
-    }
-
-    return '#' + redhex + greenhex + bluehex;
-  }
-
-
-
-  function hextorgbstring(hexvalue) {
-
-    let cleanhex = hexvalue.replace('#', '');
-
-    let red = parseInt(cleanhex.substring(0, 2), 16);
-    let green = parseInt(cleanhex.substring(2, 4), 16);
-    let blue = parseInt(cleanhex.substring(4, 6), 16);
-
-    return 'rgb(' + red + ',' + green + ',' + blue + ')';
-  }
-
-
-
-  function getcategoryinputwidth(tempname) {
-
-    let widthvalue = 10 + tempname.length * 1.5;
-
-    if (widthvalue < 10) {
-      widthvalue = 10;
-    }
-
-    if (widthvalue > 90) {
-      widthvalue = 90;
-    }
-
-    return widthvalue + '%';
-  }
 
 
 
@@ -242,7 +151,12 @@ export default function App() {
 
       while (i < receiveddata.length) {
 
-        receivedcategories.push({id: receiveddata[i].id, name: receiveddata[i].name, checked: 0, editmode: 0, tempname: receiveddata[i].name});
+        receivedcategories.push({
+          id: receiveddata[i].id,
+          name: receiveddata[i].name,
+          color: receiveddata[i].color ?? null,
+          checked: 0,
+        });
 
         i = i + 1;
       }
@@ -487,9 +401,11 @@ export default function App() {
 
       while (i < receiveddata.length) {
 
-        let discountvalue = receiveddata[i].discount;
+        let discountvalue = receiveddata[i].globalDiscountType === 'percent'
+          ? Number(receiveddata[i].globalDiscountValue ?? 0)
+          : Number(receiveddata[i].discount ?? 0);
 
-        if (discountvalue == null) {
+        if (!Number.isFinite(discountvalue)) {
           discountvalue = 0;
         }
 
@@ -499,7 +415,15 @@ export default function App() {
           iconvalue = '';
         }
 
-        receivedranks.push({id: receiveddata[i].id, icon: iconvalue ? `backend:${iconvalue}` : '', name: receiveddata[i].name, discount: discountvalue, costafter: '', isCustom: 0});
+        receivedranks.push({
+          id: receiveddata[i].id,
+          icon: iconvalue || '',
+          name: receiveddata[i].name,
+          discount: discountvalue,
+          costafter: '',
+          isCustom: 0,
+          uniqueStoreItems: receiveddata[i].uniqueStoreItems ?? [],
+        });
 
         i = i + 1;
       }
@@ -805,7 +729,15 @@ export default function App() {
         newcostafter = discounted;
       }
 
-      newranks.push({id: ranks[i].id, icon: ranks[i].icon, name: ranks[i].name, discount: ranks[i].discount, costafter: newcostafter, isCustom: 0});
+      newranks.push({
+        id: ranks[i].id,
+        icon: ranks[i].icon,
+        name: ranks[i].name,
+        discount: ranks[i].discount,
+        costafter: newcostafter,
+        isCustom: 0,
+        uniqueStoreItems: ranks[i].uniqueStoreItems ?? [],
+      });
 
       i = i + 1;
     }
@@ -826,7 +758,15 @@ export default function App() {
     while (i < ranks.length) {
 
       if (ranks[i].id == rankId) {
-        newranks.push({id: ranks[i].id, icon: ranks[i].icon, name: ranks[i].name, discount: ranks[i].discount, costafter: value, isCustom: 1});
+        newranks.push({
+          id: ranks[i].id,
+          icon: ranks[i].icon,
+          name: ranks[i].name,
+          discount: ranks[i].discount,
+          costafter: value,
+          isCustom: 1,
+          uniqueStoreItems: ranks[i].uniqueStoreItems ?? [],
+        });
       } else {
         newranks.push(ranks[i]);
       }
@@ -951,8 +891,89 @@ export default function App() {
 
 
   function goback() {
+    if (onClose) {
+      onClose();
+      return;
+    }
     window.location.href = '/groups/' + groupId + '/shop';
-    showSuccess('Anulowano tworzenie przedmiotu.');
+  }
+
+
+
+  function buildItemPayload() {
+    const items = {
+      name: itemname.trim(),
+      basePrice: Number(cost),
+      imageRef: currenticon + '*' + iconbackground,
+    };
+
+    if (description0.trim().length > 0) {
+      items.storyDescription = description0.trim();
+    }
+
+    if (description1.trim().length > 0) {
+      items.educationalDescription = description1.trim();
+    }
+
+    let categoryIds = [];
+    let i = 0;
+    while (i < categories.length) {
+      if (categories[i].checked == 1) {
+        categoryIds.push(categories[i].id);
+      }
+      i = i + 1;
+    }
+
+    if (categoryIds.length > 0) {
+      items.categoryIds = categoryIds;
+    } else if (editingItemId) {
+      items.categoryId = null;
+    }
+
+    if (grouplimitenabled == 1) {
+      items.stockQuantity = Number(grouplimit);
+    } else if (editingItemId) {
+      items.stockQuantity = null;
+    }
+
+    if (studentlimitenabled == 1) {
+      items.perStudentLimit = Number(studentlimit);
+    } else if (editingItemId) {
+      items.perStudentLimit = null;
+    }
+
+    const badgePromotions = [];
+    i = 0;
+    while (i < badgediscounts.length) {
+      let promotionType = 'fixed';
+      let promotionValue = Number(badgediscounts[i].value);
+
+      if (badgediscounts[i].value.endsWith('%')) {
+        promotionType = 'percent';
+        promotionValue = Number(badgediscounts[i].value.replace('%', ''));
+      }
+
+      badgePromotions.push({id: badgediscounts[i].badgeid, promotionType: promotionType, value: promotionValue});
+      i = i + 1;
+    }
+
+    const rankPromotions = [];
+    i = 0;
+    while (i < ranks.length) {
+      if (ranks[i].isCustom == 1 && ranks[i].costafter != '') {
+        let discountValue = Number(cost) - Number(ranks[i].costafter);
+        if (discountValue < 0) {
+          discountValue = 0;
+        }
+        rankPromotions.push({id: ranks[i].id, promotionType: 'fixed', value: discountValue});
+      }
+      i = i + 1;
+    }
+
+    items.badgePromotions = badgePromotions;
+    items.rankPromotions = rankPromotions;
+
+    return items;
   }
 
 
@@ -982,125 +1003,41 @@ export default function App() {
     setErrorMessage('');
 
     try {
+      const items = buildItemPayload();
+      const saveResult = editingItemId
+        ? await updateGroupShopItem(groupId, editingItemId, items)
+        : await createGroupShopItem(groupId, items);
 
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/shop-items';
-
-      const items = {
-        name: itemname.trim(),
-        basePrice: Number(cost),
-        imageRef: currenticon + '*' + iconbackground
-      };
-
-      if (description0.trim().length > 0) {
-        items.storyDescription = description0.trim();
-      }
-
-      if (description1.trim().length > 0) {
-        items.educationalDescription = description1.trim();
-      }
-
-      let categoryid = null;
-
-      let i = 0;
-
-      while (i < categories.length) {
-
-        if (categories[i].checked == 1 && categoryid == null) {
-          categoryid = categories[i].id;
-        }
-
-        i = i + 1;
-      }
-
-      if (categoryid != null) {
-        items.categoryId = categoryid;
-      }
-
-      if (grouplimitenabled == 1) {
-        items.stockQuantity = Number(grouplimit);
-      }
-
-      if (studentlimitenabled == 1) {
-        items.perStudentLimit = Number(studentlimit);
-      }
-
-      const badgePromotions = [];
-
-      i = 0;
-
-      while (i < badgediscounts.length) {
-
-        let promotionType = 'fixed';
-        let promotionValue = Number(badgediscounts[i].value);
-
-        if (badgediscounts[i].value.endsWith('%')) {
-          promotionType = 'percent';
-          promotionValue = Number(badgediscounts[i].value.replace('%', ''));
-        }
-
-        badgePromotions.push({id: badgediscounts[i].badgeid, promotionType: promotionType, value: promotionValue});
-
-        i = i + 1;
-      }
-
-      const rankPromotions = [];
-
-      i = 0;
-
-      while (i < ranks.length) {
-
-        if (ranks[i].isCustom == 1 && ranks[i].costafter != '') {
-
-          let discountValue = Number(cost) - Number(ranks[i].costafter);
-
-          if (discountValue < 0) {
-            discountValue = 0;
-          }
-
-          rankPromotions.push({id: ranks[i].id, promotionType: 'fixed', value: discountValue});
-        }
-
-        i = i + 1;
-      }
-
-      items.badgePromotions = badgePromotions;
-      items.rankPromotions = rankPromotions;
-
-      const response = await fetch(url, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify(items)
-      });
-
-      const responsetext = await response.text();
-
-      console.log('POST /groups/' + groupId + '/shop-items: ', response.status);
-      console.log('POST /groups/' + groupId + '/shop-items: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/shop-items not JSON: ' + responsetext);
-      }
-
-      console.log('POST /groups/' + groupId + '/shop-items JSON:', data);
-
-      if (!response.ok) {
-        showError('Nie udalo sie utworzyc przedmiotu.');
+      if (!saveResult.ok) {
+        showError(saveResult.error ?? 'Nie udało się zapisać przedmiotu.');
         return;
       }
 
-      showSuccess('Przedmiot został utworzony!');
-      window.location.href = '/groups/' + groupId + '/shop';
+      const savedItemId = editingItemId ?? saveResult.item?.id ?? null;
+      if (savedItemId) {
+        const rankRefs = ranks.map((rankEntry) => ({
+          dbId: rankEntry.id,
+          name: rankEntry.name,
+          shopItems: rankEntry.uniqueStoreItems || [],
+        }));
+        const rankResult = await syncShopItemRankUnlock(
+          groupId,
+          String(savedItemId),
+          unlockRankId === '' ? null : Number(unlockRankId),
+          rankRefs,
+        );
+        if (!rankResult.ok) {
+          showError(rankResult.error ?? 'Przedmiot zapisany, ale nie udało się przypisać blokady rangi.');
+          return;
+        }
+      }
+
+      showSuccess(editingItemId ? 'Przedmiot został zaktualizowany!' : 'Przedmiot został utworzony!');
+      if (onSaved) {
+        onSaved();
+      } else {
+        window.location.href = '/groups/' + groupId + '/shop';
+      }
 
     } catch (error) {
 
@@ -1127,209 +1064,384 @@ export default function App() {
     onfetchranks();
     onfetchbadges();
 
-  }, []);
+  }, [groupId]);
+
+
+
+  useEffect(() => {
+    if (!editingItemId || ranksfrombackend !== 1) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      const result = await fetchGroupShopItems(groupId);
+      if (!result.ok || cancelled) {
+        return;
+      }
+
+      const item = result.items.find((entry) => entry.id === editingItemId);
+      if (!item || cancelled) {
+        return;
+      }
+
+      const imageParts = String(item.imageRef ?? '').split('*');
+      if (imageParts[0]) {
+        setCurrenticon(imageParts[0]);
+      }
+      if (imageParts[1]) {
+        setIconbackground(imageParts[1]);
+      }
+
+      setItemname(item.name ?? '');
+      setDescription0(item.storyDescription ?? '');
+      setDescription1(item.didacticDescription ?? '');
+      setCost(String(item.priceAmount ?? ''));
+      recalculatediscounts(String(item.priceAmount ?? ''));
+
+      if (item.stockQuantity != null) {
+        setGrouplimitenabled(1);
+        setGrouplimit(String(item.stockQuantity));
+      } else {
+        setGrouplimitenabled(0);
+        setGrouplimit('');
+      }
+
+      if (item.perStudentLimit != null) {
+        setStudentlimitenabled(1);
+        setStudentlimit(String(item.perStudentLimit));
+      } else {
+        setStudentlimitenabled(0);
+        setStudentlimit('');
+      }
+
+      const selectedCategoryIds = new Set((item.categories ?? []).map((categoryId) => String(categoryId)));
+
+      setCategories((current) => current.map((category) => ({
+        ...category,
+        checked: selectedCategoryIds.has(String(category.id)) ? 1 : 0,
+      })));
+
+      const rankRefs = ranks.map((rankEntry) => ({
+        dbId: rankEntry.id,
+        name: rankEntry.name,
+        shopItems: rankEntry.uniqueStoreItems || [],
+      }));
+      const owningRank = findRankUnlockingItem(editingItemId, rankRefs);
+      setUnlockRankId(owningRank ? String(owningRank.dbId) : '');
+
+      const loadedBadgeDiscounts = (item.badgePromotions ?? []).map((promo, index) => {
+        const badgeId = promo.badgeId ?? promo.id;
+        const badge = badges.find((entry) => entry.id === badgeId);
+        const value = promo.promotionType === 'percent'
+          ? `${promo.value}%`
+          : String(promo.value);
+        return {
+          id: index,
+          badgeid: badgeId,
+          badgename: badge?.name ?? `Odznaka ${badgeId}`,
+          value,
+        };
+      });
+      setBadgediscounts(loadedBadgeDiscounts);
+
+      setRanks((current) => current.map((rankEntry) => {
+        const promo = (item.rankPromotions ?? []).find((entry) => (entry.rankId ?? entry.id) === rankEntry.id);
+        if (!promo) {
+          return rankEntry;
+        }
+        const costafter = Math.max(0, Number(item.priceAmount ?? 0) - Number(promo.value ?? 0));
+        return {
+          ...rankEntry,
+          costafter: String(costafter),
+          isCustom: 1,
+        };
+      }));
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [badges, editingItemId, groupId, ranks, ranksfrombackend]);
 
 
 
   return (
-    <div>
-      <div>
+    <div className="shop-item-form">
+      {errorMessage ? (
+        <p className="shop-item-form__error" role="alert">{errorMessage}</p>
+      ) : null}
 
-        <div style = {{width: '82vw', height: '100%', position: 'relative', top: '0%', left: '0%'}}>
-
-          <div style = {{width: '98%', position: 'relative', top: '0%', left: '1%', display: 'flex', flexDirection: 'row', gap: '1%', paddingBottom: '4vh'}}>
-
-            <div style = {{width: '66%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-
-              <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
-                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}>Ikona przedmiotu</div>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '2vh'}}>
-                    <div onClick = {() => setIsPickerOpen(!isPickerOpen)} style = {{backgroundColor: 'rgb(40, 40, 52)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                      <div style = {{color: 'rgb(227, 224, 247)', fontSize: '48px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>{currenticon}</div>
-                    </div>
-                    {isPickerOpen ? (
-                      <div onClick = {() => setIsPickerOpen(false)} style = {{position: 'fixed', top: '0vh', left: '0vw', width: '100vw',  height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999}}>
-                        <div onClick = {(event) => event.stopPropagation()} style = {{position: 'relative'}}><unicode-emoji-picker ref = {onPickerMounted} style = {{'--fill-color': 'rgb(40, 40, 52)', '--text-color': 'rgb(227, 224, 247)', '--title-bar-fill-color': 'rgb(40, 40, 52)', '--variations-fill-color': 'rgb(26, 26, 42)', '--variations-backdrop-fill-color': 'rgba(40, 40, 52, 0.75)'}}></unicode-emoji-picker></div>
-                      </div>
-                    ) : null}
-                  </div>
-                  <div style = {{position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5vh'}}>
-                    <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>Kolor tła</div>
-                    <div style = {{position: 'relative', width: '6vh', height: '6vh', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                      <div style = {{width: '100%', height: '100%', backgroundColor: iconbackground, borderRadius: '8px', border: '2px solid rgb(66, 243, 125)', cursor: 'pointer'}}></div>
-                      <input type = "color" onChange = {(event) => setIconbackground(hextorgbstring(event.target.value))} value = {rgbstringtohex(iconbackground)} style = {{position: 'absolute', top: '0%', left: '0%', width: '100%', height: '100%', opacity: 0, cursor: 'pointer'}}/>
-                    </div>
-                  </div>
-                </div>
-
-
-
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', gap: '2%'}}>
-                
-                  <div style = {{width: '66%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-
-                    <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', gap: '0.5vw'}}>Nazwa przedmiotu</div>
-
-                    <input onChange = {(event) => setItemname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {itemname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                  </div>
-                  <div style = {{width: '32%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                    <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Cena</div>
-                    <input onInput = {(event) => {onNumericinput(event.target.value, setCost); recalculatediscounts(event.target.value);}} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left'}} value = {cost} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                  </div>
-                </div>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Opis fabularny</div>
-                  <textarea onChange = {(event) => setDescription0(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description0} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></textarea>
-                </div>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Opis dydaktyczny</div>
-                  <textarea onChange = {(event) => setDescription1(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '10vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'flex-start', justifyContent: 'flex-start', paddingLeft: '1%', paddingRight: '1%', paddingTop: '1vh', borderRadius: '8px', border: 'none', outline: 'none', resize: 'none', overflow: 'auto'}} value = {description1} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></textarea>
-                </div>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', gap: '2%'}}>
-
-                  <div style = {{width: '50%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                      <input type = "checkbox" checked = {grouplimitenabled == 1} onChange = {() => {if (grouplimitenabled == 0) {setGrouplimitenabled(1);} else {setGrouplimitenabled(0); setGrouplimit('');}}} style = {{cursor: 'pointer'}}/>
-                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na grupę<InfoTooltip text = "Ogranicza łaczną liczbę sztuk dostępnych w sklepie." /></div>
-                    </div>
-                    <input onInput = {(event) => onNumericinput(event.target.value, setGrouplimit)} disabled = {grouplimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '5vh', position: 'relative', color: grouplimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: grouplimitenabled == 1 ? 1 : 0.5}} value = {grouplimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                  </div>
-                  <div style = {{width: '50%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh'}}>
-                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                      <input type = "checkbox" checked = {studentlimitenabled == 1} onChange = {() => {if (studentlimitenabled == 0) {setStudentlimitenabled(1);} else {setStudentlimitenabled(0); setStudentlimit('');}}} style = {{cursor: 'pointer'}}/>
-                      <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', gap: '0.5vw'}}>Limit sztuk na studenta<InfoTooltip text = "Ogranicza ile razy każdy z użytkowników może kupić ten przedmiot." /></div>
-                    </div>
-                    <input onInput = {(event) => onNumericinput(event.target.value, setStudentlimit)} disabled = {studentlimitenabled == 0} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '5vh', position: 'relative', color: studentlimitenabled == 1 ? 'rgb(227, 224, 247)' : 'rgb(100, 100, 100)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'left', opacity: studentlimitenabled == 1 ? 1 : 0.5}} value = {studentlimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                  </div>
-                </div>
-
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingTop: '1vh'}}>
-                  <div onClick = {() => togglecategoriesopen()} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', paddingLeft: '1%', paddingRight: '1%'}}>
-                    <div style = {{color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', gap: '0.5vw'}}>Kategorie<InfoTooltip text = "Każdy z przedmiotów może zostać zaklasyfikowany do jednej z wybranych kategorii w celu ułatwienia filtrowania przedmiotów." /></div>
-                    <img src = {categoriesopen == 1 ? up : down} style = {{width: '20px', height: '20px'}}/>
-                  </div>
-
-                  {categoriesopen == 1 ? (
-                    <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingTop: '0.5vh'}}>
-                      {categories.map((category) => (
-                        <div key = {'category' + category.id} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%', paddingTop: '0.5vh', paddingBottom: '0.5vh', paddingLeft: '1%'}}>
-                          <input type = "checkbox" checked = {category.checked == 1} onChange = {() => oncategorycheckchange(category.id)} style = {{cursor: 'pointer'}}/>
-                          {category.editmode == 1 ? (
-                            <input onChange = {(event) => oncategorynamechange(category.id, event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: getcategoryinputwidth(category.tempname), height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {category.tempname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                          ) : (
-                            <div style = {{width: '90%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{category.name}</div>
-                          )}
-                          {category.editmode == 1 ? (
-                            <div onClick = {() => saveeditcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                              <img src = {checkicon} style = {{width: '50%', height: '50%'}}/>
-                            </div>
-                          ) : (
-                            <div onClick = {() => starteditcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                              <img src = {editicon} style = {{width: '50%', height: '50%'}}/>
-                            </div>
-                          )}
-                          {category.editmode == 1 ? (
-                            <div onClick = {() => canceleditcategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                              <img src = {closeicon} style = {{width: '50%', height: '50%'}}/>
-                            </div>
-                          ) : (
-                            <div onClick = {() => deletecategory(category.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                              <img src = {deleteicon} style = {{width: '50%', height: '50%'}}/>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-
-                      {addingcategory == 1 ? (
-                        <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%', paddingTop: '0.5vh', paddingBottom: '0.5vh', paddingLeft: '1%'}}>
-                          <input onChange = {(event) => setNewcategoryname(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '90%', height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {newcategoryname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                          <div onClick = {() => confirmaddcategory()} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                            <img src = {checkicon} style = {{width: '50%', height: '50%'}}/>
-                          </div>
-                          <div onClick = {() => canceladdcategory()} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '4vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                            <img src = {closeicon} style = {{width: '50%', height: '50%'}}/>
-                          </div>
-                        </div>
-                      ) : (
-                        <div onClick = {() => setAddingcategory(1)} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj kategorię</div>
-                        
-                      )}
-                    </div>
-                  ) : null}
-                </div>
-
+      <div className="shop-item-form__layout">
+        <div className="shop-item-form__main">
+          <section className="shop-item-form__panel">
+            <div className="shop-item-form__row shop-item-form__row--name-price">
+              <div className="shop-item-form__field">
+                <label className="shop-item-form__label" htmlFor="shop-item-name">Nazwa przedmiotu</label>
+                <input
+                  id="shop-item-name"
+                  className="shop-item-form__input"
+                  value={itemname}
+                  onChange={(event) => setItemname(event.target.value)}
+                />
               </div>
+              <div className="shop-item-form__field">
+                <label className="shop-item-form__label" htmlFor="shop-item-price">Cena</label>
+                <input
+                  id="shop-item-price"
+                  className="shop-item-form__input"
+                  value={cost}
+                  onInput={(event) => {
+                    onNumericinput(event.target.value, setCost);
+                    recalculatediscounts(event.target.value);
+                  }}
+                />
+              </div>
+            </div>
 
-              <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1.5vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za odznaki<InfoTooltip text = "Wpisanie znaku '%' w wartości sprawia, że zniżka staje się procentowa." /></div>
+            <EmojiPickerField
+              className="shop-item-form__icon-picker"
+              label="Ikona przedmiotu"
+              value={currenticon}
+              defaultEmoji="🍑"
+              onChange={setCurrenticon}
+              ariaLabel="Wybierz ikonę przedmiotu"
+            />
 
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%', flexWrap: 'wrap'}}>
-                  <select onChange = {(event) => setSelectedbadge(event.target.value)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '40%', height: '5vh', position: 'relative', color: 'rgb(66, 243, 125)', fontSize: '14px', fontWeight: 900, paddingLeft: '2%', border: 'none', outline: 'none', borderRadius: '8px', cursor: 'pointer'}} value = {selectedbadge}>
-                    <option value = 'Wybierz odznakę'>Wybierz odznakę</option>
-                    {badges.map((badge) => (
-                      <option key = {'badgeoption' + badge.id} value = {badge.name}>{badge.name}</option>
-                    ))}
-                  </select>
-                  <input onInput = {(event) => onDiscountinput(event.target.value, setPendingdiscountvalue)} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', textAlign: 'center'}} value = {pendingdiscountvalue} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                  <div onClick = {() => addbadgediscount()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '25%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Dodaj zniżkę</div>
-                </div>
-                {badgediscounts.map((discount) => (
-                  <div key = {'badgediscount' + discount.id} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                    <div style = {{backgroundColor: 'rgb(41, 40, 57)', width: '40%', height: '5vh', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', paddingLeft: '2%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{discount.badgename}</span></div>
-                    <input onInput = {(event) => onDiscountinput(event.target.value, (value) => onbadgediscountchange(discount.id, value))} style = {{backgroundColor: 'rgb(40, 40, 52)', border: '2px solid rgba(0, 0, 0, 0)', width: '50%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', textAlign: 'center'}} value = {discount.value} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                    <div onClick = {() => deletebadgediscount(discount.id)} style = {{backgroundColor: 'rgb(40, 40, 52)', width: '5%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                      <img src = {deleteicon} style = {{width: '35%', height: '35%'}}/>
-                    </div>
+            <div className="shop-item-form__field">
+              <span className="shop-item-form__label shop-item-form__label--heading">
+                Kategoria
+                <InfoTooltip text="Przedmiot może należeć do wielu kategorii — kolory kategorii mieszają się na kafelku produktu." />
+              </span>
+              {categories.length === 0 ? (
+                <p className="shop-item-form__empty">Brak kategorii — dodaj je w sklepie.</p>
+              ) : (
+                <ul className="shop-item-form__category-list">
+                  {categories.map((category) => (
+                    <li key={`category-${category.id}`}>
+                      <label className="shop-item-form__category-option">
+                        <input
+                          type="checkbox"
+                          checked={category.checked === 1}
+                          onChange={() => oncategorycheckchange(category.id)}
+                        />
+                        <span
+                          className="shop-item-form__category-swatch"
+                          style={{ backgroundColor: category.color ?? '#42f37d' }}
+                          aria-hidden="true"
+                        />
+                        <span>{category.name}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </section>
+
+          <Divider />
+
+          <section className="shop-item-form__panel">
+            <div className="shop-item-form__field">
+              <label className="shop-item-form__label" htmlFor="shop-item-story">Opis fabularny</label>
+              <textarea
+                id="shop-item-story"
+                className="shop-item-form__textarea"
+                value={description0}
+                onChange={(event) => setDescription0(event.target.value)}
+              />
+            </div>
+            <div className="shop-item-form__field">
+              <label className="shop-item-form__label" htmlFor="shop-item-edu">Opis dydaktyczny</label>
+              <textarea
+                id="shop-item-edu"
+                className="shop-item-form__textarea"
+                value={description1}
+                onChange={(event) => setDescription1(event.target.value)}
+              />
+            </div>
+          </section>
+
+          <Divider />
+
+          <section className="shop-item-form__panel">
+            <div className="shop-item-form__field">
+              <label className="shop-item-form__label" htmlFor="shop-item-unlock-rank">
+                Dostępność
+                <InfoTooltip text="Domyślnie przedmiot jest dostępny dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang." />
+              </label>
+              <select
+                id="shop-item-unlock-rank"
+                className="shop-item-form__select"
+                value={unlockRankId}
+                onChange={(event) => setUnlockRankId(event.target.value)}
+              >
+                <option value="">Dostępny dla wszystkich</option>
+                {ranks.map((rank) => (
+                  <option key={`unlock-rank-${rank.id}`} value={String(rank.id)}>
+                    {`Zablokowany za rangę: ${rank.name}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="shop-item-form__row shop-item-form__row--limits">
+              <div className="shop-item-form__field">
+                <label className="shop-item-form__limit-toggle" htmlFor="shop-item-group-limit-enabled">
+                  <input
+                    id="shop-item-group-limit-enabled"
+                    type="checkbox"
+                    checked={grouplimitenabled === 1}
+                    onChange={() => {
+                      if (grouplimitenabled === 0) {
+                        setGrouplimitenabled(1);
+                      } else {
+                        setGrouplimitenabled(0);
+                        setGrouplimit('');
+                      }
+                    }}
+                  />
+                  <span>
+                    Limit sztuk na grupę
+                    <InfoTooltip text="Ogranicza łączną liczbę sztuk dostępnych w sklepie." />
+                  </span>
+                </label>
+                <input
+                  className="shop-item-form__input"
+                  value={grouplimit}
+                  disabled={grouplimitenabled === 0}
+                  onInput={(event) => onNumericinput(event.target.value, setGrouplimit)}
+                />
+              </div>
+              <div className="shop-item-form__field">
+                <label className="shop-item-form__limit-toggle" htmlFor="shop-item-student-limit-enabled">
+                  <input
+                    id="shop-item-student-limit-enabled"
+                    type="checkbox"
+                    checked={studentlimitenabled === 1}
+                    onChange={() => {
+                      if (studentlimitenabled === 0) {
+                        setStudentlimitenabled(1);
+                      } else {
+                        setStudentlimitenabled(0);
+                        setStudentlimit('');
+                      }
+                    }}
+                  />
+                  <span>
+                    Limit sztuk na studenta
+                    <InfoTooltip text="Ogranicza ile razy każdy z użytkowników może kupić ten przedmiot." />
+                  </span>
+                </label>
+                <input
+                  className="shop-item-form__input"
+                  value={studentlimit}
+                  disabled={studentlimitenabled === 0}
+                  onInput={(event) => onNumericinput(event.target.value, setStudentlimit)}
+                />
+              </div>
+            </div>
+          </section>
+
+          <Divider />
+
+          <section className="shop-item-form__panel">
+            <span className="shop-item-form__label shop-item-form__label--heading">
+              Zniżki za odznaki
+              <InfoTooltip text="Wpisanie znaku '%' w wartości sprawia, że zniżka staje się procentowa." />
+            </span>
+
+            <div className="shop-item-form__badge-toolbar">
+              <select
+                className="shop-item-form__select"
+                value={selectedbadge}
+                onChange={(event) => setSelectedbadge(event.target.value)}
+              >
+                <option value="Wybierz odznakę">Wybierz odznakę</option>
+                {badges.map((badge) => (
+                  <option key={`badgeoption-${badge.id}`} value={badge.name}>{badge.name}</option>
+                ))}
+              </select>
+              <input
+                className="shop-item-form__input"
+                value={pendingdiscountvalue}
+                onInput={(event) => onDiscountinput(event.target.value, setPendingdiscountvalue)}
+              />
+              <Button type="button" variant="primary" size="md" onClick={addbadgediscount}>
+                Dodaj zniżkę
+              </Button>
+            </div>
+
+            {badgediscounts.map((discount) => (
+              <div key={`badgediscount-${discount.id}`} className="shop-item-form__badge-row">
+                <span className="shop-item-form__badge-name">{discount.badgename}</span>
+                <input
+                  className="shop-item-form__input"
+                  value={discount.value}
+                  onInput={(event) => onDiscountinput(
+                    event.target.value,
+                    (value) => onbadgediscountchange(discount.id, value),
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => deletebadgediscount(discount.id)}
+                >
+                  Usuń
+                </Button>
+              </div>
+            ))}
+          </section>
+
+          <div className="shop-item-form__footer">
+            <Button type="button" variant="secondary" size="md" onClick={goback}>
+              Cofnij
+            </Button>
+            <Button type="button" variant="primary" size="md" onClick={createitem}>
+              {editingItemId ? 'Zapisz zmiany' : 'Stwórz przedmiot'}
+            </Button>
+          </div>
+        </div>
+
+        <aside className="shop-item-form__sidebar">
+          <section className="shop-item-form__panel">
+            <span className="shop-item-form__label shop-item-form__label--heading">
+              Zniżki za rangi
+              {ranksfrombackend === 0 ? '*' : ''}
+              <InfoTooltip text="Choć cena finalna w przypadku posiadania przez studenta danej rangi obliczana jest automatycznie, można ją nadpisać." />
+            </span>
+
+            {ranks.length === 0 ? (
+              <p className="shop-item-form__empty">Brak rang w grupie.</p>
+            ) : (
+              <div className="shop-item-form__rank-list">
+                {ranks.map((rank) => (
+                  <div key={`rank-${rank.id}`} className="shop-item-form__rank-card">
+                    <span className="shop-item-form__rank-icon" aria-hidden="true">
+                      {rank.icon || '⭐'}
+                    </span>
+                    <span className="shop-item-form__rank-name">{rank.name}</span>
+                    <input
+                      className="shop-item-form__input shop-item-form__rank-price-input"
+                      value={rank.costafter}
+                      onInput={(event) => onNumericinput(
+                        event.target.value,
+                        (value) => onrankcostchange(rank.id, value),
+                      )}
+                    />
+                    <span className="shop-item-form__rank-discount">{rank.discount}%</span>
                   </div>
                 ))}
               </div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
-                <div onClick = {() => goback()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '15%', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij</div>
-                <div onClick = {() => createitem()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '20%', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Stwórz przedmiot</div>
-              </div>
-
-            </div>
-
-            <div style = {{width: '25%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '2vh'}}>
-
-              <div style = {{width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2%', paddingRight: '2%'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', paddingBottom: '1vh', gap: '0.5vw'}}>Zniżki za rangi{ranksfrombackend == 0 ? '*' : ''}<InfoTooltip text = "Choć cena finalna w przypadku posiadania przez studenta danej rangi obliczana jest automatycznie, można ją nadpisać." /></div>
-                {ranks.length == 0 ? (
-                  <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Brak rang w grupie.</div>
-                ) : (
-                  ranks.map((rank) => (
-                    <div key = {'rank' + rank.id} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '3%', paddingBottom: '3%', paddingLeft: '2.5%', paddingRight: '2.5%', borderRadius: '16px'}}>
-                      <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                        <div style = {{backgroundColor: 'rgb(40, 40, 52)', width: '15%', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%'}}>
-                          <AssetSvg name = {resolveSvgAssetName(rank.icon)} width = {32} height = {32}/>
-                        </div>
-                        <div style = {{width: '75%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', left: '2.5%', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{rank.name}</span></div>
-
-                      </div>
-                      <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2%'}}>
-                        <input onInput = {(event) => onNumericinput(event.target.value, (value) => onrankcostchange(rank.id, value))} style = {{backgroundColor: 'rgb(40, 40, 56)', border: '2px solid rgba(0, 0, 0, 0)', width: '100%', height: '4vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none', paddingRight: '1%', textAlign: 'center'}} value = {rank.costafter} onFocus = {(event) => (event.target.style.border = '2px solid rgb(66, 243, 125)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-                        <div style = {{width: '30%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>{rank.discount}%</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
+            )}
+          </section>
+        </aside>
       </div>
     </div>
-  )
+  );
 }
 
 

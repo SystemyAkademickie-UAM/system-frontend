@@ -1,6 +1,7 @@
 import { Modal, CurrencyDisplay } from '../../../../components/ui/index.js';
-import { getShopItemEffectivePrice } from '../shopPricing.js';
+import ShopItemPriceRow from '../../../../components/ui/ShopItemPriceRow/ShopItemPriceRow.jsx';
 import './shopModals.css';
+
 export default function ShopBuyAllModal({
   isOpen,
   cartItems,
@@ -40,7 +41,12 @@ export default function ShopBuyAllModal({
         {cartItems.map((item) => (
           <li key={item.id} className="shop-modal__summary-item">
             <span>{item.name}</span>
-            <CurrencyDisplay amount={getShopItemEffectivePrice(item)} size="sm" />
+            <ShopItemPriceRow
+              priceAmount={item.priceAmount}
+              salePriceAmount={item.salePriceAmount}
+              rankDiscountedPrice={item.rankDiscountedPrice}
+              size="sm"
+            />
           </li>
         ))}
       </ul>

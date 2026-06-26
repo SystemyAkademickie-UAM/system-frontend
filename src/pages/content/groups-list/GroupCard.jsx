@@ -3,32 +3,24 @@ import { Link } from 'react-router-dom';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { isColorBannerRef, parseColorBannerRef } from '../../../constants/drive.constants.js';
 import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
-import { useAppRole } from '../../../context/AppRoleContext.jsx';
-import { useSession } from '../../../context/SessionContext.jsx';
-import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
-import { resolveGroupLecturerDisplay } from '../../../utils/resolveGroupLecturerDisplay.js';
 import './GroupCard.css';
 
 /**
  * @param {Object} props
- * @param {import('./groupsList.api.js').GroupListItem} props.group
+ * @param {import('../../../services/groups.api.js').GroupListItem} props.group
  */
 export default function GroupCard({ group }) {
   const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
   const isColorBanner = isColorBannerRef(group.bannerUrl);
   const colorBannerValue = parseColorBannerRef(group.bannerUrl);
   const showFallback = !isColorBanner && (bannerFailed || !group.bannerUrl);
-  const { role } = useAppRole();
-  const { user } = useSession();
-  const { showNickname } = useLeaderDisplayPreferences();
 
   useEffect(() => {
     setBannerFailed(!group.bannerUrl || isColorBannerRef(group.bannerUrl));
   }, [group.bannerUrl]);
 
   const targetPath = group.isMine ? groupMainPath(group.id) : groupRootPath(group.id);
-  const lecturerDisplay = resolveGroupLecturerDisplay(group, { role, showNickname, user });
 
   return (
     <article className="group-card">
@@ -73,7 +65,7 @@ export default function GroupCard({ group }) {
             </div>
             <div className="group-card__meta-col">
               <dt className="group-card__label">Prowadzący</dt>
-              <dd className="group-card__value">{lecturerDisplay}</dd>
+              <dd className="group-card__value">{group.lecturer}</dd>
             </div>
           </dl>
         </div>

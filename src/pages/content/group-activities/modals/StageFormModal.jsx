@@ -1,8 +1,36 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Modal } from '../../../../components/ui/index.js';
+import { Modal, TextField } from '../../../../components/ui/index.js';
+import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
-const EMPTY_FORM = { name: '' };
+const EMPTY_FORM = { name: '', visibilityStatus: 1 };
+
+function StageVisibilityCheckbox({ checked, onChange }) {
+  return (
+    <label className="rewards-modal__option-label" htmlFor="stage-visibility">
+      <input
+        id="stage-visibility"
+        type="checkbox"
+        className="rewards-modal__option-input"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span
+        className={[
+          'rewards-modal__option-checkbox',
+          checked ? 'rewards-modal__option-checkbox--checked' : '',
+        ].filter(Boolean).join(' ')}
+        aria-hidden="true"
+      >
+        {checked ? (
+          <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+        ) : null}
+      </span>
+      <span className="rewards-modal__option-text">Etap widoczny dla studentów</span>
+    </label>
+  );
+}
 
 export default function StageFormModal({
   isOpen,
@@ -18,7 +46,10 @@ export default function StageFormModal({
     if (!isOpen) return;
 
     if (stage) {
-      setForm({ name: stage.name });
+      setForm({
+        name: stage.name,
+        visibilityStatus: stage.visibilityStatus === 1 ? 1 : 0,
+      });
       return;
     }
 
@@ -29,7 +60,10 @@ export default function StageFormModal({
 
   const handleConfirm = () => {
     if (!isValid || isLoading) return;
-    onConfirm?.({ name: form.name.trim() });
+    onConfirm?.({
+      name: form.name.trim(),
+      visibilityStatus: form.visibilityStatus,
+    });
   };
 
   return (
@@ -44,15 +78,23 @@ export default function StageFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
+        <TextField
+          id="stage-name"
+          label="Nazwa etapu"
+          fieldKind="stageName"
+          value={form.name}
+          onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+          placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne"
+          className="rewards-modal__field"
+          inputClassName="rewards-modal__input"
+        />
         <div className="rewards-modal__field">
-          <label htmlFor="stage-name" className="rewards-modal__label">Nazwa etapu</label>
-          <input
-            id="stage-name"
-            type="text"
-            className="rewards-modal__input"
-            value={form.name}
-            onChange={(event) => setForm({ name: event.target.value })}
-            placeholder="np. Laboratorium nr 1: Zajęcia organizacyjne"
+          <StageVisibilityCheckbox
+            checked={form.visibilityStatus === 1}
+            onChange={(checked) => setForm((prev) => ({
+              ...prev,
+              visibilityStatus: checked ? 1 : 0,
+            }))}
           />
         </div>
       </div>

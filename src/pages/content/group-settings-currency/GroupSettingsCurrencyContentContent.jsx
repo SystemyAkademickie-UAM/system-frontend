@@ -1,245 +1,183 @@
-import {useState, useEffect, useRef} from 'react';
-import {useParams} from 'react-router-dom';
-import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
-import {InfoTooltip, useToast} from '../../../components/ui/index.js';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
+import GroupSettingsUnsavedModal from '../group-settings/GroupSettingsUnsavedModal.jsx';
+import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import { Button, CharacterLimitedField, useToast } from '../../../components/ui/index.js';
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
+import { DEFAULT_CURRENCY_SYMBOL } from '../../../constants/currency.constants.js';
+import { CURRENCY_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
+import { invalidateGroupCurrency } from '../../../services/groupCurrencyEvents.js';
+import { fetchGroupCurrencyConfig, updateGroupCurrencyConfig } from '../../../services/groupCurrency.api.js';
+import '../group-settings/GroupSettingsForm.css';
 
-import leftleft from '../../../../public/assets/icons/chevron-left-double-svgrepo-com.svg';
-import left from '../../../../public/assets/icons/chevron-left-svgrepo-com.svg';
-import rightright from '../../../../public/assets/icons/chevron-right-double-svgrepo-com.svg';
-import right from '../../../../public/assets/icons/chevron-right-svgrepo-com.svg';
+function buildSnapshot(currencyName, currencyIcon) {
+  return {
+    currencyName: currencyName.trim(),
+    currencyIcon,
+  };
+}
 
-import 'unicode-emoji-picker';
+export default function GroupSettingsCurrencyContentContent() {
+  const { groupId } = useParams();
+  const { showSuccess, showError } = useToast();
 
-export default function App() {
-
-  const {showSuccess, showError} = useToast();
-
-  const {groupId} = useParams();
+  const [currencyName, setCurrencyName] = useState('');
+  const [currencyIcon, setCurrencyIcon] = useState(DEFAULT_CURRENCY_SYMBOL);
+  const [savedSnapshot, setSavedSnapshot] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [currenticon, setCurrenticon] = useState('🥕');
-  const [currencyname, setCurrencyname] = useState('');
-  
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const pickerRef = useRef(null);
+  const applyConfig = useCallback((config) => {
+    const name = config.currency ?? '';
+    const icon = config.currencyEmoji || DEFAULT_CURRENCY_SYMBOL;
+    setCurrencyName(name);
+    setCurrencyIcon(icon);
+    setSavedSnapshot(buildSnapshot(name, icon));
+  }, []);
 
-
-  function onPickerMounted(picker) {
-    if (!picker) {
+  const loadSettings = useCallback(async () => {
+    if (!groupId) {
       return;
     }
 
-    picker.addEventListener('emoji-pick', (event) => {
-      setCurrenticon(event.detail.emoji);
-      setIsPickerOpen(false);
-    });
-  }
-
-
-
-
-
-  function applycurrencydata(data) {
-
-    let namevalue = data.currency;
-
-    if (namevalue == null) {
-      namevalue = '';
-    }
-
-    setCurrencyname(namevalue);
-
-    let iconvalue = data.currencyEmoji;
-
-    if (iconvalue == null || iconvalue == '') {
-      iconvalue = '🥕';
-    }
-
-    setCurrenticon(iconvalue);
-  }
-
-
-
-
-
-  async function onfetchcurrencysettings() {
-
+    setIsLoading(true);
     setErrorMessage('');
 
     try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/currency';
-
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
-      });
-
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/currency: ', response.status);
-      console.log('GET /groups/' + groupId + '/currency: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/currency not JSON: ' + responsetext);
-      }
-
-      console.log('GET /groups/' + groupId + '/currency JSON:', data);
-
-      applycurrencydata(data);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
+      const result = await fetchGroupCurrencyConfig(groupId);
+      if (result.ok && result.config) {
+        applyConfig(result.config);
       } else {
-        message = String(error);
+        throw new Error('Nie udało się pobrać ustawień waluty.');
       }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  function resetcurrencysettings() {
-    onfetchcurrencysettings();
-    showSuccess('Zmiany zostały cofnięte.');
-  }
-
-
-
-
-
-  async function savecurrencychanges() {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/currency';
-
-      const response = await fetch(url, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify({
-          currency: currencyname.trim(),
-          currencyEmoji: currenticon
-        })
-      });
-
-      const responsetext = await response.text();
-
-      console.log('PATCH /groups/' + groupId + '/currency: ', response.status);
-      console.log('PATCH /groups/' + groupId + '/currency: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/currency not JSON: ' + responsetext);
-      }
-
-      console.log('PATCH /groups/' + groupId + '/currency JSON:', data);
-      showSuccess('Zapisano zmiany.');
-      applycurrencydata(data);
-
     } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
+      const message = error instanceof Error ? error.message : 'Nie udało się pobrać ustawień waluty.';
       setErrorMessage(message);
+      showError(message);
+    } finally {
+      setIsLoading(false);
     }
-  }
-
-
-
-
+  }, [applyConfig, groupId, showError]);
 
   useEffect(() => {
-    onfetchcurrencysettings();
-  }, []);
+    void loadSettings();
+  }, [loadSettings]);
 
+  const persistSettings = useCallback(async () => {
+    if (!groupId) {
+      return false;
+    }
 
+    setIsSaving(true);
+    setErrorMessage('');
+
+    try {
+      const result = await updateGroupCurrencyConfig(groupId, {
+        currency: currencyName.trim(),
+        currencyEmoji: currencyIcon,
+      });
+
+      if (!result.ok || !result.config) {
+        throw new Error('Nie udało się zapisać ustawień waluty.');
+      }
+
+      applyConfig(result.config);
+      invalidateGroupCurrency(groupId);
+      showSuccess('Zmiany zostały zapisane.');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Nie udało się zapisać ustawień waluty.';
+      setErrorMessage(message);
+      showError(message);
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [applyConfig, currencyIcon, currencyName, groupId, showError, showSuccess]);
+
+  const isDirty = useMemo(() => {
+    if (!savedSnapshot || isLoading) {
+      return false;
+    }
+
+    const current = buildSnapshot(currencyName, currencyIcon);
+    return current.currencyName !== savedSnapshot.currencyName
+      || current.currencyIcon !== savedSnapshot.currencyIcon;
+  }, [currencyIcon, currencyName, isLoading, savedSnapshot]);
+
+  const {
+    isPromptOpen,
+    dismissPrompt,
+    discardChanges,
+    saveAndContinue,
+  } = useUnsavedChangesGuard({
+    when: isDirty,
+    onSave: persistSettings,
+  });
 
   return (
-    <div>
-      <div>
-        <div style = {{width: '75vw', height: '100%', position: 'relative', top: '0%', left: '0%'}}>
+    <div className="group-settings-form group-settings-form--drive-layout">
+      <section className="group-settings-form__panel" aria-label="Waluta grupy">
+        <SettingsSectionHeader title="Waluta" id="group-currency-title" />
 
-          <div style = {{width: '98%', position: 'relative', top: '0%', left: '0%', display: 'flex', flexDirection: 'column', gap: '2vh', paddingBottom: '4vh'}}>
+        {isLoading ? (
+          <p className="group-settings-form__hint">Ładowanie ustawień waluty…</p>
+        ) : (
+          <div className="group-settings-form__stack">
+            <EmojiPickerField
+              className="group-settings-form__field"
+              label="Ikona waluty"
+              value={currencyIcon}
+              defaultEmoji={DEFAULT_CURRENCY_SYMBOL}
+              onChange={setCurrencyIcon}
+              ariaLabel="Wybierz ikonę waluty"
+            />
 
-
-
-            <div style = {{width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '2vh', paddingTop: '1vh', paddingBottom: '2vh', paddingLeft: '0%', paddingRight: '0%'}}>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Ikona waluty</div>
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: '2vh'}}>
-                  
-                  <div onClick = {() => setIsPickerOpen(!isPickerOpen)} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <div style = {{color: 'rgb(227, 224, 247)', fontSize: '48px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>{currenticon}</div>
-                  </div>
-                  
-                  {isPickerOpen ? (
-                    <div onClick = {() => setIsPickerOpen(false)} style = {{position: 'fixed', top: '0vh', left: '0vw', width: '100vw',  height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999}}>
-                      <div onClick = {(event) => event.stopPropagation()} style = {{position: 'relative'}}><unicode-emoji-picker ref = {onPickerMounted} style = {{'--fill-color': 'rgb(40, 40, 52)', '--text-color': 'rgb(227, 224, 247)', '--title-bar-fill-color': 'rgb(40, 40, 52)', '--variations-fill-color': 'rgb(26, 26, 42)', '--variations-backdrop-fill-color': 'rgba(40, 40, 52, 0.75)'}}></unicode-emoji-picker></div>
-                    </div>
-                  ) : null}
-
-                </div>
-              </div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Nazwa waluty</div>
-                <input onChange = {(event) => setCurrencyname(event.target.value)} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', border: 'none', outline: 'none'}} value = {currencyname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.border = 'none')}></input>
-              </div>
-
-              <div style = {{width: '100%', position: 'fixed', display: 'flex', flexDirection: 'row', alignItems: 'center', bottom: '2.5vh', right: '2.5vw', justifyContent: 'flex-end', gap: '2%', paddingTop: '1vh'}}>
-                <div onClick = {() => resetcurrencysettings()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij zmiany</div>
-                <div onClick = {() => savecurrencychanges()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Zapisz zmiany</div>
-              </div>
-
+            <div className="group-settings-form__field">
+              <label className="group-settings-form__label" htmlFor="group-currency-name">
+                Nazwa waluty
+              </label>
+              <CharacterLimitedField value={currencyName} maxLength={CURRENCY_LABEL_MAX_LENGTH}>
+                <input
+                  id="group-currency-name"
+                  className="group-settings-form__input"
+                  value={currencyName}
+                  maxLength={CURRENCY_LABEL_MAX_LENGTH}
+                  onChange={(event) => setCurrencyName(event.target.value)}
+                  disabled={isSaving}
+                />
+              </CharacterLimitedField>
             </div>
-
           </div>
+        )}
+      </section>
 
-        </div>
-      </div>
+      {errorMessage ? (
+        <p className="group-settings-form__error" role="alert">{errorMessage}</p>
+      ) : null}
 
+      {!isLoading ? (
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          className="group-settings-form__save-fab"
+          onClick={persistSettings}
+          disabled={isSaving}
+        >
+          Zapisz zmiany
+        </Button>
+      ) : null}
 
+      <GroupSettingsUnsavedModal
+        isOpen={isPromptOpen}
+        isSaving={isSaving}
+        onClose={dismissPrompt}
+        onDiscard={discardChanges}
+        onSave={saveAndContinue}
+      />
     </div>
-  )
+  );
 }
-
-

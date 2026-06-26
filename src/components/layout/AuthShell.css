@@ -13,12 +13,21 @@
   --auth-card-logo-to-label-gap: clamp(2.5rem, 5vw, 80px);
   --auth-card-label-to-field-gap: clamp(1.25rem, 2vw, 32px);
   --auth-card-field-to-button-gap: clamp(1rem, 2vw, 32px);
+  --auth-card-field-gap: clamp(1.25rem, 2vw, 24px);
   --auth-card-back-to-logo-gap: clamp(1.5rem, 2.5vw, 32px);
   /** Institution: label → dropdown (inline labels ignore vertical margins). */
   --auth-institution-label-to-field-gap: clamp(0.5rem, 1vw, 12px);
   --auth-card-transition-exit-ms: 240ms;
   --auth-card-transition-enter-ms: 240ms;
   --auth-card-transition-slide: 50%;
+  --auth-accent: var(--color-accent);
+  --auth-accent-pressed: var(--color-accent-pressed);
+  --auth-accent-on: var(--color-accent-on);
+  --auth-card-bg: var(--color-bg-elevated);
+  --auth-input-bg: var(--color-bg-surface);
+  --auth-text-primary: var(--color-text-primary);
+  --auth-text-secondary: var(--color-text-secondary);
+  --auth-link: var(--color-accent);
 
   position: relative;
   min-height: 100vh;
@@ -55,8 +64,8 @@
   left: -9999px;
   z-index: 100;
   padding: 0.75rem 1rem;
-  background: #44E286;
-  color: #00391F;
+  background: var(--auth-accent);
+  color: var(--auth-accent-on);
   font-weight: 600;
   text-decoration: none;
   border-radius: 0 0 0.5rem 0;
@@ -135,7 +144,7 @@
   font-weight: 700;
   font-size: clamp(14px, 0.94vw, 18px);
   line-height: 28px;
-  color: rgba(189, 202, 190, 0.6);
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
@@ -173,4 +182,26 @@
     padding-bottom: 1.5rem;
     gap: 2rem;
   }
+}
+
+.auth-shell--welcome {
+  min-height: 100vh;
+  height: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #02040a;
+}
+
+.auth-shell--welcome .auth-shell__main {
+  flex: 1 1 auto;
+  min-height: 100vh;
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.auth-shell--welcome .auth-shell__welcome-outlet {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 100vh;
 }

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
+import { formatStudentDisplayName } from '../../../utils/members/studentDisplayName.js';
 import { useParams } from 'react-router-dom';
 import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidation.js';
 import { fetchGroupBadges, createBadge, updateBadge, deleteBadge } from '../../../services/badges.api.js';
 import { fetchGroupStudents } from '../../../services/students.api.js';
+import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
 /**
  * @typedef {Object} BadgeData
@@ -26,18 +28,19 @@ import { fetchGroupStudents } from '../../../services/students.api.js';
  * @returns {BadgeData}
  */
 function mapBadge(badge, index) {
+  const icon = normalizeRankBadgeIcon(badge.icon, DEFAULT_BADGE_EMOJI);
   return {
     id: `badge-${badge.id}`,
     dbId: badge.id,
     position: index + 1,
     name: badge.name || 'Nieznana odznaka',
-    icon: badge.icon || '🏅',
-    iconFile: badge.icon ? `backend:${badge.icon}` : '🏅',
+    icon,
+    iconFile: icon,
     rarity: badge.rarity || 'common',
     storyDescription: badge.storyDescription || '',
     didacticDescription: badge.educationalDescription || '',
     rewardAmount: badge.rewardAmount || 0,
-    rewardEmoji: '🥕',
+    isPublished: badge.isPublished !== false,
   };
 }
 
@@ -72,7 +75,7 @@ export function useGroupBadges() {
         id: `student-${s.accountId}`,
         accountId: s.accountId,
         enrollmentId: s.enrollmentId,
-        name: `${s.name} ${s.surname}`.trim() || s.nickname,
+        name: formatStudentDisplayName(s),
         earnedBadgeIds: [],
       })));
     } catch (err) {
@@ -90,10 +93,10 @@ export function useGroupBadges() {
   const handleCreate = useCallback(async (values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
-    const iconVal = values.iconFile || '🏅';
+    const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_BADGE_EMOJI);
     const result = await createBadge(groupId, {
       name: values.name,
-      icon: iconVal.replace('backend:', ''),
+      icon,
       educationalDescription: values.didacticDescription || '',
       storyDescription: values.storyDescription || '',
       rewardAmount: values.rewardAmount || 0,
@@ -115,10 +118,10 @@ export function useGroupBadges() {
     const badge = badges.find((b) => b.id === badgeId);
     if (!badge) return { ok: false, error: 'Odznaka nie istnieje' };
 
-    const iconVal = values.iconFile || values.icon;
+    const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_BADGE_EMOJI);
     const result = await updateBadge(groupId, badge.dbId, {
       name: values.name,
-      icon: iconVal.replace('backend:', ''),
+      icon,
       educationalDescription: values.didacticDescription,
       storyDescription: values.storyDescription,
       rewardAmount: values.rewardAmount,
@@ -158,6 +161,28 @@ export function useGroupBadges() {
     return result;
   }, [groupId, badges]);
 
+  const handleTogglePublished = useCallback(async (badgeId) => {
+    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+
+    const badge = badges.find((item) => item.id === badgeId);
+    if (!badge) return { ok: false, error: 'Odznaka nie istnieje' };
+
+    const result = await updateBadge(groupId, badge.dbId, {
+      isPublished: badge.isPublished === false,
+    });
+
+    if (result.ok && result.badge) {
+      setBadges((prev) => prev.map((item) => (
+        item.id === badgeId
+          ? { ...item, ...mapBadge(result.badge, item.position - 1) }
+          : item
+      )));
+      notifyGroupContentChanged(groupId, 'badges');
+    }
+
+    return result;
+  }, [groupId, badges]);
+
   return {
     groupId,
     badges,
@@ -168,5 +193,6 @@ export function useGroupBadges() {
     handleCreate,
     handleUpdate,
     handleDelete,
+    handleTogglePublished,
   };
 }

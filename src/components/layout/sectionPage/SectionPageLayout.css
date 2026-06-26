@@ -24,7 +24,7 @@
 .maq-section-page__eyebrow {
   margin: 0;
   font-size: var(--font-size-body);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.25;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -44,7 +44,7 @@
   margin: 0;
   font-family: inherit;
   font-size: var(--font-size-section-title, 32px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.15;
   color: var(--color-text-primary);
 }

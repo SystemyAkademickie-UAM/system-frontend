@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { SearchBar, Button } from '../../../components/ui/index.js';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { templatesPath } from '../../../routes/pathRegistry.js';
 import GroupCard from './GroupCard.jsx';
 import GroupsListCreator from './GroupsListCreator.jsx';
 import GroupsListHero from './GroupsListHero.jsx';
@@ -66,7 +67,7 @@ export default function GroupsListContent() {
 
       <div className="groups-list__controls">
         <h2 id="groups-list-section-title" className="groups-list__section-title">
-          Grupy
+          Twoje grupy
         </h2>
         <div className="groups-list__actions">
           <SearchBar
@@ -77,6 +78,14 @@ export default function GroupsListContent() {
             aria-label="Szukaj kampanii po nazwie, przedmiocie lub prowadzącym"
           />
           <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
+            <Button
+              type="button"
+              variant="secondary"
+              className="groups-list__templates-btn"
+              to={templatesPath()}
+            >
+              Galeria szablonów
+            </Button>
             <Button
               type="button"
               variant="primary"
@@ -125,7 +134,6 @@ export default function GroupsListContent() {
       ) : (
         <>
           <div className="groups-list__section">
-            <h3 className="groups-list__subsection-title">Twoje grupy</h3>
             <GroupsGrid
               groups={myGroups}
               emptyMessage={

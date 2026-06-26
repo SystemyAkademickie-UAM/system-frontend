@@ -1,37 +1,15 @@
 import { deleteJson, getJson, patchJson, postJson } from './api-client.js';
+import { extractApiError } from './apiErrors.js';
 import {
   mapBackendInventory,
   mapBackendShopItem,
   mapBackendShopItems,
   mapBackendShopTemplates,
-} from '../pages/content/group-shop/shopItemMapper.js';
-
-/**
- * @param {unknown} data
- * @returns {string}
- */
-function extractApiError(data) {
-  if (typeof data === 'string' && data.trim()) {
-    return data.trim();
-  }
-  if (typeof data === 'object' && data !== null) {
-    const record = /** @type {{ message?: string | string[], error?: string }} */ (data);
-    if (Array.isArray(record.message)) {
-      return record.message.join(', ');
-    }
-    if (typeof record.message === 'string' && record.message.trim()) {
-      return record.message.trim();
-    }
-    if (typeof record.error === 'string' && record.error.trim()) {
-      return record.error.trim();
-    }
-  }
-  return 'Operacja nie powiodła się';
-}
+} from '../utils/shop/shopItemMapper.js';
 
 /**
  * @param {string | number} groupId
- * @returns {Promise<{ ok: boolean, items: import('../pages/content/group-shop/shopItem.types.js').ShopItem[], error?: string }>}
+ * @returns {Promise<{ ok: boolean, items: import('../utils/shop/shopItem.types.js').ShopItem[], error?: string }>}
  */
 export async function fetchGroupShopItems(groupId) {
   const result = await getJson(`/groups/${groupId}/shop-items`, { includeBrowserId: true });
@@ -60,7 +38,7 @@ export async function fetchGroupShopItem(groupId, itemId) {
 }
 
 /**
- * @returns {Promise<{ ok: boolean, templates: import('../pages/content/group-shop/shopItem.types.js').ShopItemTemplate[], error?: string }>}
+ * @returns {Promise<{ ok: boolean, templates: import('../utils/shop/shopItem.types.js').ShopItemTemplate[], error?: string }>}
  */
 export async function fetchShopTemplates() {
   const result = await getJson('/shop-templates');
@@ -138,7 +116,10 @@ function mapShopBuyError(message) {
     'Not enough currency': 'Niewystarczająca ilość waluty.',
     'Sklep grupy jest obecnie zamknięty.': 'Sklep grupy jest obecnie zamknięty.',
     'Student is not enrolled in this group': 'Nie jesteś zapisany do tej grupy.',
-    'Przedmiot wyprzedany. Brak sztuk na magazynie.': 'Przedmiot wyprzedany. Brak sztuk na magazynie.',
+    'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.': 'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.',
+    'Kupowanie dodatkowego życia jest wyłączone.': 'Kupowanie dodatkowego życia jest wyłączone.',
+    'Dodatkowe życie można kupić tylko po utracie wszystkich żyć.': 'Dodatkowe życie można kupić tylko po utracie wszystkich żyć.',
+    'Produkt „Dodatkowe życie” nie może zostać usunięty.': 'Produkt „Dodatkowe życie” nie może zostać usunięty.',
   };
 
   return translations[normalized] ?? normalized;
@@ -161,6 +142,20 @@ export async function buyGroupShopItem(groupId, itemId) {
  */
 export async function fetchGroupInventory(groupId) {
   const result = await getJson(`/groups/${groupId}/inventory`, { includeBrowserId: true });
+  if (!result.ok) {
+    return { ok: false, entries: [], error: extractApiError(result.data) };
+  }
+  return { ok: true, entries: mapBackendInventory(result.data) };
+}
+
+/**
+ * Ekwipunek wybranego uczestnika (prowadzący).
+ *
+ * @param {string | number} groupId
+ * @param {string | number} accountId
+ */
+export async function fetchStudentInventory(groupId, accountId) {
+  const result = await getJson(`/groups/${groupId}/students/${accountId}/inventory`);
   if (!result.ok) {
     return { ok: false, entries: [], error: extractApiError(result.data) };
   }

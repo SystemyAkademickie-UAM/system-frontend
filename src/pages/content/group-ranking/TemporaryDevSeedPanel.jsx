@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { isNodeProduction } from '../../../utils/nodeEnv.js';
 import { seedTemporaryShopItems } from '../group-shop/temporarySeedShopItems.js';
 import { seedGroupData } from './temporarySeedGroupData.js';
+import { seedTemporaryGroupTemplates } from './temporarySeedGroupTemplates.js';
 import './TemporaryDevSeedPanel.css';
 
 const SEED_COUNT = 10;
@@ -35,17 +36,6 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
     const lines = [];
 
     try {
-      if (options.seedShopItems) {
-        await seedTemporaryShopItems({
-          groupId,
-          count: SEED_COUNT,
-          onLog: (line) => {
-            lines.push(line);
-            setLogText(lines.join('\n'));
-          },
-        });
-      }
-
       if (
         options.seedStages
         || options.seedActivities
@@ -63,6 +53,43 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
           seedActivities: options.seedActivities,
           seedRanks: options.seedRanks,
           seedBadges: options.seedBadges,
+        });
+      }
+
+      if (options.seedShopItems) {
+        if (!options.seedRanks && !options.seedBadges) {
+          await seedGroupData({
+            groupId,
+            count: SEED_COUNT,
+            onLog: (line) => {
+              lines.push(line);
+              setLogText(lines.join('\n'));
+            },
+            seedStages: false,
+            seedActivities: false,
+            seedRanks: true,
+            seedBadges: true,
+          });
+        }
+
+        await seedTemporaryShopItems({
+          groupId,
+          count: SEED_COUNT,
+          onLog: (line) => {
+            lines.push(line);
+            setLogText(lines.join('\n'));
+          },
+        });
+      }
+
+      if (options.seedTemplates) {
+        await seedTemporaryGroupTemplates({
+          groupId,
+          count: SEED_COUNT,
+          onLog: (line) => {
+            lines.push(line);
+            setLogText(lines.join('\n'));
+          },
         });
       }
 
@@ -145,6 +172,14 @@ export default function TemporaryDevSeedPanel({ isStudentView, onComplete }) {
           onClick={() => runSeed({ seedShopItems: true })}
         >
           Produkty sklepu
+        </button>
+        <button
+          type="button"
+          className="temporary-dev-seed__btn"
+          disabled={isBusy}
+          onClick={() => runSeed({ seedTemplates: true })}
+        >
+          Szablony grup (lecturer1–3)
         </button>
       </div>
 

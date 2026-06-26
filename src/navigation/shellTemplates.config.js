@@ -36,18 +36,13 @@ export const HREF_BUILDERS = {
   // Lista grup
   GROUPS_LIST: () => paths.groupsListPath(),
 
-  // Ekran główny + podstrony
+  // Ekran główny
   GROUP_MAIN: (ctx) => (ctx.groupId ? paths.groupMainPath(ctx.groupId) : null),
-  GROUP_MAIN_POSTS: (ctx) => (ctx.groupId ? paths.groupMainPostsPath(ctx.groupId) : null),
-  GROUP_MAIN_MEMBERS: (ctx) => (ctx.groupId ? paths.groupMainMembersPath(ctx.groupId) : null),
-  GROUP_MAIN_ACTIVITIES: (ctx) => (ctx.groupId ? paths.groupMainActivitiesPath(ctx.groupId) : null),
-  GROUP_MAIN_RANKS: (ctx) => (ctx.groupId ? paths.groupMainRanksPath(ctx.groupId) : null),
-  GROUP_MAIN_BADGES: (ctx) => (ctx.groupId ? paths.groupMainBadgesPath(ctx.groupId) : null),
 
   // Student — płaskie trasy (poza /home)
-  GROUP_STUDENT_FEED: (ctx) => (ctx.groupId ? paths.groupStudentFeedPath(ctx.groupId) : null),
+  GROUP_STUDENT_FEED: (ctx) => (ctx.groupId ? paths.groupStudentPostsPath(ctx.groupId) : null),
   GROUP_STUDENT_PARTICIPANTS: (ctx) =>
-    ctx.groupId ? paths.groupStudentParticipantsPath(ctx.groupId) : null,
+    ctx.groupId ? paths.groupStudentUsersPath(ctx.groupId) : null,
   GROUP_STUDENT_ACTIVITY_LIST: (ctx) =>
     ctx.groupId ? paths.groupStudentActivityListPath(ctx.groupId) : null,
   GROUP_STUDENT_RANKS: (ctx) => (ctx.groupId ? paths.groupStudentRanksPath(ctx.groupId) : null),
@@ -57,13 +52,13 @@ export const HREF_BUILDERS = {
   GROUP_PROFILE: (ctx) => (ctx.groupId ? paths.groupProfilePath(ctx.groupId) : null),
   GROUP_STUDENT_PROFILE: (ctx) =>
     ctx.groupId && ctx.studentId ? paths.groupStudentProfilePath(ctx.groupId, ctx.studentId) : null,
-  GROUP_PROFILE_LOG: (ctx) => (ctx.groupId ? paths.groupProfileLogPath(ctx.groupId) : null),
+  GROUP_PROFILE_LOG: (ctx) => (ctx.groupId ? paths.groupProfileActivityPath(ctx.groupId) : null),
   GROUP_PROFILE_EQ: (ctx) => (ctx.groupId ? paths.groupProfileEqPath(ctx.groupId) : null),
 
   // Użytkownicy (lecturer) + podstrony
   GROUP_MEMBERS: (ctx) => (ctx.groupId ? paths.groupMembersPath(ctx.groupId) : null),
   GROUP_MEMBERS_LOG: (ctx) => (ctx.groupId ? paths.groupMembersLogPath(ctx.groupId) : null),
-  GROUP_MEMBERS_CODE: (ctx) => (ctx.groupId ? paths.groupMembersCodePath(ctx.groupId) : null),
+  GROUP_MEMBERS_CODE: (ctx) => (ctx.groupId ? paths.groupMembersCodesPath(ctx.groupId) : null),
 
   // Korzeń grupy
   GROUP_ROOT: (ctx) => (ctx.groupId ? paths.groupRootPath(ctx.groupId) : null),
@@ -77,7 +72,8 @@ export const HREF_BUILDERS = {
 
   // Systemy nagród (lecturer) + podstrony
   GROUP_REWARDS: (ctx) => (ctx.groupId ? paths.groupRewardsPath(ctx.groupId) : null),
-  GROUP_REWARDS_BADGES: (ctx) => (ctx.groupId ? paths.groupRewardsBadgesPath(ctx.groupId) : null),
+  GROUP_REWARDS_BADGES: (ctx) => (ctx.groupId ? paths.groupRewardsPath(ctx.groupId) : null),
+  GROUP_REWARDS_RANKS: (ctx) => (ctx.groupId ? paths.groupRewardsRanksPath(ctx.groupId) : null),
   GROUP_SHOP_ITEMS: (ctx) => (ctx.groupId ? paths.groupShopItemsPath(ctx.groupId) : null),
 
   // Ustawienia grupy (lecturer) + podstrony
@@ -88,7 +84,6 @@ export const HREF_BUILDERS = {
   // Sklep
   GROUP_SHOP: (ctx) => (ctx.groupId ? paths.groupShopPath(ctx.groupId) : null),
   GROUP_SHOP_ADD: (ctx) => (ctx.groupId ? paths.groupShopAddPath(ctx.groupId) : null),
-  GROUP_SHOP_PREVIEW: (ctx) => (ctx.groupId ? paths.groupShopPreviewPath(ctx.groupId) : null),
 
   // Ranking + podstrony
   GROUP_RANKING: (ctx) => (ctx.groupId ? paths.groupRankingPath(ctx.groupId) : null),
@@ -101,6 +96,8 @@ export const HREF_BUILDERS = {
   COURSE_MANAGEMENT: () => paths.courseManagementPath(),
   STATISTICS: () => paths.statisticsPath(),
   ORG_MANAGEMENT: () => paths.organizationsPath(),
+  TEMPLATES_MY: () => paths.templatesPath(),
+  TEMPLATES_GALLERY: () => paths.templatesGalleryPath(),
 
   // Legacy
   GROUP_CONTROL_PANEL: (ctx) => (ctx.groupId ? paths.groupControlPath(ctx.groupId) : null),
@@ -128,7 +125,7 @@ const studentView = {
       enabled: true,
       kind: 'navlink',
       label: 'Strona Główna',
-      iconId: 'nav/home',
+      iconId: 'nav/group-main',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
       matchEnd: true,
@@ -156,7 +153,7 @@ const studentView = {
           enabled: true,
           kind: 'tree-item',
           label: 'Zdobyte odznaki',
-          iconId: 'nav/profile',
+          iconId: 'nav/profile-badges',
           hrefKey: 'GROUP_PROFILE',
           requiresGroup: true,
           matchEnd: true,
@@ -165,7 +162,7 @@ const studentView = {
           id: 'profil-aktywnosci',
           enabled: true,
           kind: 'tree-item',
-          label: 'Aktywności',
+          label: 'Dziennik aktywności',
           iconId: 'nav/activity',
           hrefKey: 'GROUP_PROFILE_LOG',
           requiresGroup: true,
@@ -176,7 +173,7 @@ const studentView = {
           enabled: true,
           kind: 'tree-item',
           label: 'Ekwipunek',
-          iconId: 'nav/profile',
+          iconId: 'nav/profile-inventory',
           hrefKey: 'GROUP_PROFILE_EQ',
           requiresGroup: true,
           matchEnd: true,
@@ -198,7 +195,7 @@ const studentView = {
       enabled: true,
       kind: 'navlink',
       label: 'Odznaki',
-      iconId: 'nav/rewards',
+      iconId: 'nav/badges',
       hrefKey: 'GROUP_STUDENT_BADGES',
       requiresGroup: true,
       matchEnd: true,
@@ -208,7 +205,7 @@ const studentView = {
       enabled: true,
       kind: 'navlink',
       label: 'Rangi',
-      iconId: 'nav/rewards',
+      iconId: 'nav/ranks',
       hrefKey: 'GROUP_STUDENT_RANKS',
       requiresGroup: true,
       matchEnd: true,
@@ -296,7 +293,7 @@ const lecturerView = {
       enabled: true,
       kind: 'navlink',
       label: 'Strona Główna',
-      iconId: 'nav/home',
+      iconId: 'nav/group-main',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
       matchEnd: true,
@@ -314,7 +311,7 @@ const lecturerView = {
           enabled: true,
           kind: 'tree-item',
           label: 'Uczestnicy',
-          iconId: 'nav/users',
+          iconId: 'nav/members',
           hrefKey: 'GROUP_MEMBERS',
           requiresGroup: true,
           matchEnd: true,
@@ -323,7 +320,7 @@ const lecturerView = {
           id: 'uzytkownicy-log',
           enabled: true,
           kind: 'tree-item',
-          label: 'Log aktywności',
+          label: 'Dziennik aktywności',
           iconId: 'nav/activity',
           hrefKey: 'GROUP_MEMBERS_LOG',
           requiresGroup: true,
@@ -334,7 +331,7 @@ const lecturerView = {
           enabled: true,
           kind: 'tree-item',
           label: 'Kody dostępu',
-          iconId: 'nav/users',
+          iconId: 'nav/access-codes',
           hrefKey: 'GROUP_MEMBERS_CODE',
           requiresGroup: true,
           matchEnd: true,
@@ -370,11 +367,11 @@ const lecturerView = {
           matchEnd: true,
         },
         {
-          id: 'aktywnosci-narzedzia',
+          id: 'aktywnosci-raporty',
           enabled: true,
           kind: 'tree-item',
-          label: 'Narzędzia',
-          iconId: 'nav/activity',
+          label: 'Raporty',
+          iconId: 'nav/reports',
           hrefKey: 'GROUP_ACTIVITIES_TOOLS',
           requiresGroup: true,
           matchEnd: true,
@@ -394,8 +391,8 @@ const lecturerView = {
           enabled: true,
           kind: 'tree-item',
           label: 'Odznaki',
-          iconId: 'nav/rewards',
-          hrefKey: 'GROUP_REWARDS_BADGES',
+          iconId: 'nav/badges',
+          hrefKey: 'GROUP_REWARDS',
           requiresGroup: true,
           matchEnd: true,
         },
@@ -404,8 +401,8 @@ const lecturerView = {
           enabled: true,
           kind: 'tree-item',
           label: 'Rangi',
-          iconId: 'nav/rewards',
-          hrefKey: 'GROUP_REWARDS',
+          iconId: 'nav/ranks',
+          hrefKey: 'GROUP_REWARDS_RANKS',
           requiresGroup: true,
           matchEnd: true,
         },
@@ -413,23 +410,13 @@ const lecturerView = {
           id: 'nagrody-przedmioty',
           enabled: true,
           kind: 'tree-item',
-          label: 'Przedmioty sklepowe',
+          label: 'Sklep',
           iconId: 'nav/shop',
           hrefKey: 'GROUP_SHOP_ITEMS',
           requiresGroup: true,
           matchEnd: true,
         },
       ],
-    },
-    {
-      id: 'sklep',
-      enabled: true,
-      kind: 'navlink',
-      label: 'Sklep',
-      iconId: 'nav/shop',
-      hrefKey: 'GROUP_SHOP',
-      requiresGroup: true,
-      matchEnd: true,
     },
     {
       id: 'ustawienia-grupy',
@@ -454,7 +441,7 @@ const lecturerView = {
           enabled: true,
           kind: 'tree-item',
           label: 'Waluta',
-          iconId: 'nav/group-settings',
+          iconId: 'nav/currency',
           hrefKey: 'GROUP_SETTINGS_CURRENCY',
           requiresGroup: true,
           matchEnd: true,
@@ -464,7 +451,7 @@ const lecturerView = {
           enabled: true,
           kind: 'tree-item',
           label: 'System żyć',
-          iconId: 'nav/group-settings',
+          iconId: 'nav/lives',
           hrefKey: 'GROUP_SETTINGS_HEALTH',
           requiresGroup: true,
           matchEnd: true,
@@ -475,47 +462,6 @@ const lecturerView = {
       id: 'lecturer-nav-spacer-1',
       enabled: true,
       kind: 'spacer',
-    },
-    {
-      id: 'podglad',
-      enabled: true,
-      kind: 'tree-expandable',
-      label: 'Podgląd',
-      iconId: 'nav/profile',
-      requiresGroup: true,
-      defaultExpanded: false,
-      children: [
-        {
-          id: 'podglad-rangi',
-          enabled: true,
-          kind: 'tree-item',
-          label: 'Rangi',
-          iconId: 'nav/rewards',
-          hrefKey: 'GROUP_MAIN_RANKS',
-          requiresGroup: true,
-          matchEnd: true,
-        },
-        {
-          id: 'podglad-odznaki',
-          enabled: true,
-          kind: 'tree-item',
-          label: 'Odznaki',
-          iconId: 'nav/rewards',
-          hrefKey: 'GROUP_MAIN_BADGES',
-          requiresGroup: true,
-          matchEnd: true,
-        },
-        {
-          id: 'podglad-sklep',
-          enabled: true,
-          kind: 'tree-item',
-          label: 'Sklep',
-          iconId: 'nav/shop',
-          hrefKey: 'GROUP_SHOP_PREVIEW',
-          requiresGroup: true,
-          matchEnd: true,
-        },
-      ],
     },
     {
       id: 'lecturer-nav-spacer-2',
@@ -640,13 +586,13 @@ export const SHELL_TEMPLATE_BLUEPRINTS = {
  */
 export const SUB_NAV_META = {
   'group-main': { title: 'Strona główna', ariaLabel: 'Nawigacja strony głównej' },
-  'group-preview': { title: 'Podgląd', ariaLabel: 'Nawigacja podglądu studenta' },
   'group-profile': { title: 'Profil', ariaLabel: 'Nawigacja profilu' },
   'group-members': { title: 'Użytkownicy', ariaLabel: 'Nawigacja użytkowników' },
   'group-activities': { title: 'Aktywności', ariaLabel: 'Nawigacja aktywności' },
   'group-rewards': { title: 'Systemy nagród', ariaLabel: 'Nawigacja systemów nagród' },
   'group-settings': { title: 'Ustawienia grupy', ariaLabel: 'Nawigacja ustawień grupy' },
   'group-ranking': { title: 'Ranking', ariaLabel: 'Nawigacja rankingu' },
+  'app-templates': { title: 'Szablony', ariaLabel: 'Nawigacja szablonów' },
 };
 
 /**
@@ -659,38 +605,32 @@ export const SUB_NAV_CONFIG = {
     { id: 'home', label: 'Strona główna', hrefKey: 'GROUP_MAIN', end: true },
   ],
 
-  'group-preview': [
-    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_MAIN_RANKS', end: true },
-    { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_MAIN_BADGES' },
-    { id: 'shop', label: 'Sklep', hrefKey: 'GROUP_SHOP_PREVIEW' },
-  ],
-
   // Profil studenta
   'group-profile': [
     { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE', end: true },
-    { id: 'log', label: 'Aktywności', hrefKey: 'GROUP_PROFILE_LOG' },
-    { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_PROFILE_EQ' },
+    { id: 'log', label: 'Dziennik aktywności', hrefKey: 'GROUP_PROFILE_LOG', end: true },
+    { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_PROFILE_EQ', end: true },
   ],
 
   // Użytkownicy (lecturer)
   'group-members': [
     { id: 'list', label: 'Uczestnicy', hrefKey: 'GROUP_MEMBERS', end: true },
-    { id: 'log', label: 'Log aktywności', hrefKey: 'GROUP_MEMBERS_LOG' },
-    { id: 'code', label: 'Kody dostępu', hrefKey: 'GROUP_MEMBERS_CODE' },
+    { id: 'log', label: 'Dziennik aktywności', hrefKey: 'GROUP_MEMBERS_LOG', end: true },
+    { id: 'code', label: 'Kody dostępu', hrefKey: 'GROUP_MEMBERS_CODE', end: true },
   ],
 
   // Aktywności (lecturer)
   'group-activities': [
     { id: 'stages', label: 'Etapy', hrefKey: 'GROUP_ACTIVITIES', end: true },
-    { id: 'posts', label: 'Wpisy', hrefKey: 'GROUP_POSTS' },
-    { id: 'tools', label: 'Narzędzia', hrefKey: 'GROUP_ACTIVITIES_TOOLS' },
+    { id: 'posts', label: 'Wpisy', hrefKey: 'GROUP_POSTS', end: true },
+    { id: 'reports', label: 'Raporty', hrefKey: 'GROUP_ACTIVITIES_TOOLS', end: true },
   ],
 
   // Systemy nagród (lecturer)
   'group-rewards': [
-    { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_REWARDS_BADGES', end: true },
-    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_REWARDS' },
-    { id: 'shopitems', label: 'Przedmioty sklepowe', hrefKey: 'GROUP_SHOP_ITEMS' },
+    { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_REWARDS', end: true },
+    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_REWARDS_RANKS', end: true },
+    { id: 'shop-items', label: 'Sklep', hrefKey: 'GROUP_SHOP_ITEMS', end: true },
   ],
 
   // Ustawienia grupy (lecturer)
@@ -705,6 +645,11 @@ export const SUB_NAV_CONFIG = {
     { id: 'info', label: 'Twoje informacje', hrefKey: 'GROUP_RANKING', end: true },
     { id: 'group', label: 'Ranking grupy', hrefKey: 'GROUP_RANKING_GROUP' },
     { id: 'activities', label: 'Ranking aktywności', hrefKey: 'GROUP_RANKING_ACTIVITIES' },
+  ],
+
+  'app-templates': [
+    { id: 'mine', label: 'Moje szablony', hrefKey: 'TEMPLATES_MY', end: true },
+    { id: 'gallery', label: 'Galeria szablonów', hrefKey: 'TEMPLATES_GALLERY', end: true },
   ],
 };
 

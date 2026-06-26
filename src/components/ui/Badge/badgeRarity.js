@@ -6,7 +6,7 @@ export const BADGE_RARITY = {
   epic: 'epic',
 };
 
-/** Etykiety wyświetlane w prawym górnym rogu kafelka. */
+/** Etykiety rzadkości pod nazwą odznaki. */
 export const BADGE_RARITY_LABELS = {
   [BADGE_RARITY.common]: 'Zwykła',
   [BADGE_RARITY.uncommon]: 'Niezwykła',

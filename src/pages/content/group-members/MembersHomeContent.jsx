@@ -22,6 +22,22 @@ import MemberRankModal from './modals/MemberRankModal.jsx';
 
 import './MembersHomeContent.css';
 
+function renderMemberNameLines(member) {
+  const nickname = member.nickname?.trim() || '';
+  const legalName = member.legalName?.trim() || '';
+  const primary = nickname || legalName || member.email || member.name;
+  const legalLine = nickname && legalName && nickname !== legalName
+    ? `(${legalName})`
+    : null;
+
+  return (
+    <>
+      <span className="members-table__name">{primary}</span>
+      {legalLine ? <span className="members-table__nickname">{legalLine}</span> : null}
+    </>
+  );
+}
+
 export default function MembersHomeContent() {
   const nav = useGroupSubNav('group-members');
   const { showSuccess } = useToast();
@@ -109,20 +125,17 @@ export default function MembersHomeContent() {
     }
   }, [activeModal, updateMemberTotalEarned, closeModal, notifyRankPromotion, showSuccess]);
 
-  const handleRankConfirm = useCallback(async (rankName) => {
+  const handleRankConfirm = useCallback(async (selection) => {
     if (!activeModal?.member) return;
 
-    const selectedRank = ranks.find((r) => r.name === rankName);
-    const rankId = selectedRank?.id ?? null;
-
     setModalLoading(true);
-    const result = await updateMemberRank(activeModal.member, rankId);
+    const result = await updateMemberRank(activeModal.member, selection);
     setModalLoading(false);
 
     if (result.ok) {
       closeModal();
     }
-  }, [activeModal, ranks, updateMemberRank, closeModal]);
+  }, [activeModal, updateMemberRank, closeModal]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.member) return;
@@ -173,13 +186,10 @@ export default function MembersHomeContent() {
                 className="members-table__profile-link"
                 to={groupStudentProfilePath(groupId, member.accountId)}
               >
-                <span className="members-table__name">{member.name}</span>
+                {renderMemberNameLines(member)}
               </Link>
             ) : (
-              <span className="members-table__name">{member.name}</span>
-            )}
-            {member.nickname && member.nickname !== member.name && (
-              <span className="members-table__nickname">({member.nickname})</span>
+              renderMemberNameLines(member)
             )}
           </div>
         </div>
@@ -195,7 +205,12 @@ export default function MembersHomeContent() {
       cellClassName: 'members-table__cell--rank',
       hiddenBelow: 768,
       render: (member) => (
-        <span className="members-table__rank-badge" title={member.rank}>{member.rank}</span>
+        <span className="members-table__rank-cell">
+          <span className="members-table__rank-badge" title={member.rank}>{member.rank}</span>
+          {member.autoRankEnabled === false ? (
+            <span className="members-table__rank-manual-note">*przyznawana ręcznie</span>
+          ) : null}
+        </span>
       ),
     },
     {
@@ -252,9 +267,11 @@ export default function MembersHomeContent() {
     inlineActions: [
       {
         id: 'badges',
-        label: 'Edytuj odznaki',
-        iconFile: SVG_ICONS.actions.manageBadges,
-        ariaLabel: 'Edytuj odznaki uczestnika',
+        label: 'Przydziel odznakę',
+        iconFile: SVG_ICONS.nav.profileBadges,
+        iconClassName: 'data-table__inline-icon--badge-award',
+        iconSize: 40,
+        ariaLabel: 'Przydziel odznakę uczestnikowi',
         onSelect: (member) => openModal('badges', member),
       },
       {
@@ -337,7 +354,11 @@ export default function MembersHomeContent() {
           search={{
             external: true,
             value: searchQuery,
-            filter: (member, query) => member.name.toLowerCase().includes(query),
+            filter: (member, query) => (
+              member.name.toLowerCase().includes(query)
+              || member.nickname?.toLowerCase().includes(query)
+              || member.legalName?.toLowerCase().includes(query)
+            ),
           }}
           rowActions={rowActions}
           renderRow={MembersTableRow}
@@ -376,7 +397,7 @@ export default function MembersHomeContent() {
       <MemberRankModal
         isOpen={activeModal?.type === 'rank'}
         member={modalMember}
-        ranks={rankNames}
+        ranks={ranks}
         onClose={closeModal}
         onConfirm={handleRankConfirm}
         isLoading={modalLoading}

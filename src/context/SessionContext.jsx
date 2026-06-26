@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import { AUTH_LOGIN_ME_PATH } from '../constants/authPaths.constants.js';
+import { registerClientAuthClearListener } from '../auth/clientAuthState.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 import { getJson } from '../services/api-client.js';
 
@@ -66,6 +67,16 @@ export function SessionProvider({ children }) {
   const [sessionError, setSessionError] = useState(null);
   const sessionCheckInFlightRef = useRef(false);
 
+  const clearSession = useCallback(() => {
+    setUser(null);
+    setSessionError(null);
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    return registerClientAuthClearListener(clearSession);
+  }, [clearSession]);
+
   const checkSession = useCallback(async (options = {}) => {
     const force = options.force === true;
     if (sessionCheckInFlightRef.current) {
@@ -124,8 +135,9 @@ export function SessionProvider({ children }) {
       isLoading,
       sessionError,
       refetchSession: checkSession,
+      clearSession,
     }),
-    [user, role, isLoading, sessionError, checkSession],
+    [user, role, isLoading, sessionError, checkSession, clearSession],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

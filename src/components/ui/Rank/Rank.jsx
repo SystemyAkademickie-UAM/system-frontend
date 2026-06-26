@@ -1,19 +1,11 @@
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
-import { resolveSvgAssetName } from '../../../utils/svgAssetPath.js';
+import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { getRankCssVars } from './rankCssVars.js';
 import { RANK_THEME } from './rankTheme.js';
+import { formatRankDiscountLabel } from '../../../utils/ranks/rankDiscount.js';
 import './Rank.css';
-
-function formatRankDiscountLabel(discount) {
-  const value = Number(discount ?? 0);
-  const normalized = Number.isFinite(value) ? value : 0;
-  const formatted = Number.isInteger(normalized)
-    ? String(normalized)
-    : normalized.toFixed(2).replace(/\.?0+$/, '');
-  return `Zniżka w sklepie: ${formatted}%`;
-}
 
 /**
  * Kafelek rangi (Figma: Background+VerticalBorder).
@@ -26,12 +18,13 @@ export default function Rank({
   shopItems = [],
   discountPercent = 0,
   iconFile,
+  icon,
   theme = RANK_THEME.default,
   accentColor,
   isLocked = false,
   className = '',
 }) {
-  const assetName = resolveSvgAssetName(iconFile);
+  const emoji = normalizeRankBadgeIcon(icon ?? iconFile, DEFAULT_RANK_EMOJI);
 
   return (
     <article
@@ -41,11 +34,7 @@ export default function Rank({
     >
       <header className="maq-rank__header">
         <div className="maq-rank__icon-circle">
-          <AssetSvg
-            name={assetName}
-            className="maq-rank__icon-svg"
-            alt=""
-          />
+          <span className="maq-rank__icon-emoji" aria-hidden="true">{emoji}</span>
         </div>
         <h3 className="maq-rank__name">{name}</h3>
         <span className="maq-rank__cost">

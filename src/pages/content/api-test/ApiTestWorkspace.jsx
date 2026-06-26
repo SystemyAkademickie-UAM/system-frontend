@@ -9,7 +9,7 @@ import { AuthProvider, useAuth } from './mock/AuthContext.jsx';
 import {
   getOrCreateBrowserId,
   resetStoredBrowserId,
-} from './mock/browserIdStorage.js';
+} from '../../../auth/browserIdStorage.js';
 import {
   ENROLLMENT_CODE_MAX_LENGTH,
   ENROLLMENT_CODE_MIN_LENGTH,

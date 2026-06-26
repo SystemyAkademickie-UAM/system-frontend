@@ -33,13 +33,22 @@
   flex-shrink: 0;
 }
 
+.activities-tools-page__tool-icon--flipped {
+  transform: rotate(180deg);
+}
+
 .activities-tools-page__tool-btn:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-.activities-tools-page__tool-btn:hover {
+.activities-tools-page__tool-btn:hover:not(:disabled) {
   color: var(--color-accent);
+}
+
+.activities-tools-page__tool-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .activities-tools-page__checkbox-row {

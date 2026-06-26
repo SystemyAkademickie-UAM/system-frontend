@@ -102,7 +102,7 @@ export default function LoginInstitution({ onBack }) {
       />
 
       <div className="login-institution__field">
-        <label className="auth-card__title" htmlFor="institution-select">
+        <label className="login-institution__field-label" htmlFor="institution-select">
           Wybierz uczelnię
         </label>
         <div className="login-institution__select-wrap">

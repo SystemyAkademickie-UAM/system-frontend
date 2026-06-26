@@ -1,12 +1,16 @@
 /**
- * Auth shell exposes a single route (`/login`); wizard steps use in-page transitions.
+ * Auth shell route order for slide transitions (`/welcome` → `/login`).
  * @param {string} pathname
  * @returns {number | null}
  */
 export function resolveAuthRouteStep(pathname) {
-  const normalized = pathname.replace(/\/+$/, '');
+  const normalized = pathname.replace(/\/+$/, '') || '/';
 
-  if (normalized.endsWith('/login')) {
+  if (normalized === '/welcome') {
+    return -1;
+  }
+
+  if (normalized === '/login') {
     return 0;
   }
 

@@ -56,6 +56,10 @@
 }
 
 .members-table__profile-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
   color: inherit;
   text-decoration: none;
 }
@@ -121,6 +125,12 @@
   font-size: var(--members-font-table-secondary);
 }
 
+/* Ikona odznak ma cieńsze kreski — powiększamy ją do wizualnego rozmiaru ikony postępu. */
+.members-page .data-table__action-btn .data-table__inline-icon--badge-award {
+  width: 40px;
+  height: 40px;
+}
+
 .members-table__row--lecturer > .data-table__cell {
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
@@ -147,4 +157,17 @@
   .members-table__name {
     font-size: 15px;
   }
+}
+
+.members-table__rank-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.members-table__rank-manual-note {
+  font-size: 11px;
+  color: var(--color-text-muted, rgba(227, 224, 247, 0.65));
+  font-style: italic;
+  line-height: 1.2;
 }

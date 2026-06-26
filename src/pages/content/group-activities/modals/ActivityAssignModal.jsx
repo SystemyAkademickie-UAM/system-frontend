@@ -11,16 +11,13 @@ import {
   setActivityCompletions,
 
 } from '../../../../services/students.api.js';
+import { invalidateStudentProfile } from '../../../../services/studentProfileEvents.js';
+import { formatStudentDisplayName } from '../../../../utils/members/studentDisplayName.js';
 
 
 
 function MemberAssignRow({ member, checked, onToggle }) {
-
-  const displayName = member.nickname?.trim()
-
-    || [member.name, member.surname].filter(Boolean).join(' ').trim()
-
-    || member.email;
+  const displayName = formatStudentDisplayName(member);
 
 
 
@@ -275,7 +272,7 @@ export default function ActivityAssignModal({
 
 
       showSuccess('Przypisanie aktywności zostało zapisane.');
-
+      invalidateStudentProfile(groupId);
       onClose();
 
     } catch (error) {

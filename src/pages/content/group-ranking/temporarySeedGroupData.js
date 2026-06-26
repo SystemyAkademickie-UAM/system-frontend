@@ -1,4 +1,3 @@
-import { fetchIconCatalog } from '../../../services/icons.api.js';
 import { getBrowserIdForAuth } from '../../../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidation.js';
@@ -129,23 +128,10 @@ export function randomInt(min, max) {
 }
 
 /**
- * @returns {Promise<string[]>}
- */
-async function fetchBackendIconFilenames() {
-  const catalog = await fetchIconCatalog();
-  return catalog
-    .map((item) => String(item.id ?? item.fileName ?? '').replace(/^backend:/, ''))
-    .filter((filename) => filename.endsWith('.svg'));
-}
-
-/**
- * @param {string[]} iconFilenames
+ * @param {string[]} fallbackIcons
  * @returns {string}
  */
-function pickRankOrBadgeIcon(iconFilenames, fallbackIcons) {
-  if (iconFilenames.length > 0) {
-    return pickRandom(iconFilenames);
-  }
+function pickRankOrBadgeIcon(fallbackIcons) {
   return pickRandom(fallbackIcons);
 }
 
@@ -229,9 +215,6 @@ export async function seedGroupData({
   }
 
   const baseUrl = getApiBaseUrl();
-  const backendIconFilenames = (seedRanks || seedBadges)
-    ? await fetchBackendIconFilenames()
-    : [];
 
   /** @type {string[]} */
   const logLines = [];
@@ -335,7 +318,7 @@ export async function seedGroupData({
 
       const { ok, status, data } = await postJson(`${baseUrl}${getGroupRanksPath(publicGroupId)}`, {
         name,
-        icon: pickRankOrBadgeIcon(backendIconFilenames, RANK_ICONS),
+        icon: pickRankOrBadgeIcon(RANK_ICONS),
         requiredPoints,
         storyDescription: `Opowieść rangi „${name}” — kamień milowy na ścieżce rozwoju.`,
         storeDiscount: randomInt(0, 15),
@@ -372,7 +355,7 @@ export async function seedGroupData({
 
       const { ok, status, data } = await postJson(`${baseUrl}${getGroupBadgesPath(publicGroupId)}`, {
         name,
-        icon: pickRankOrBadgeIcon(backendIconFilenames, BADGE_ICONS),
+        icon: pickRankOrBadgeIcon(BADGE_ICONS),
         educationalDescription: `Zdobądź odznakę „${name}” wykonując wyzwanie kursu.`,
         storyDescription: `Symbol ${pickRandom(['odwagi', 'mądrości', 'wytrwałości', 'spostrzegawczości'])} w świecie gry.`,
         rewardAmount: randomInt(10, 100),

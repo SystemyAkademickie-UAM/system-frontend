@@ -9,7 +9,7 @@ Strony podpięte w routerze (createAppRouter.jsx)
   - activities/      → /activities/*
   - posts/           → /posts
   - rewards/         → /rewards/*
-  - group-settings/  → /groupsettings/*  (folder ≠ segment URL)
+  - group-settings/  → /group-settings/*
   - shop/            → /shop/*
   - ranking/         → /ranking/*
   - layouts/         → layouty z <Outlet /> dla sekcji z podstronami

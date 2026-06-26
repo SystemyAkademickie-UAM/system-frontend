@@ -1,8 +1,8 @@
-import { IconStar } from './ShellIcons.jsx';
 import SuperBarBreadcrumb from './SuperBarBreadcrumb.jsx';
 import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
+import SuperBarLivesStat from './SuperBarLivesStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
-import SuperBarStat from './SuperBarStat.jsx';
+import NotificationBell from './NotificationBell.jsx';
 import SuperBarUserMenu from './SuperBarUserMenu.jsx';
 import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
@@ -12,7 +12,7 @@ import './SuperBar.css';
 /** Placeholdery — używane gdy brak danych z sesji. */
 const PLACEHOLDER_DISPLAY_NAME = 'Użytkownik';
 const PLACEHOLDER_ROLE_LABEL = 'Student';
-const DEFAULT_LIVES_DISPLAY = '0/0';
+const DEFAULT_LIVES_DISPLAY = '0';
 const DEFAULT_CURRENCY_DISPLAY = '0';
 
 /**
@@ -21,7 +21,10 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
  * @param {string | null} [props.displayName] — ksywka lub nazwa z sesji (null = placeholder)
  * @param {string} [props.roleLabel]
  * @param {string | null} [props.avatarUrl] — awatar z profilu użytkownika
- * @param {string} [props.livesDisplay] — docelowo z API grupy
+ * @param {string} [props.livesLabel] — etykieta systemu żyć z konfiguracji grupy
+ * @param {boolean} [props.livesEnabled] — czy system żyć jest włączony
+ * @param {number | null} [props.livesMax] — maksymalna liczba żyć
+ * @param {boolean} [props.livesShopEnabled] — czy życia można kupić w sklepie
  * @param {string} [props.currencyDisplay] — aktualna waluta studenta
  * @param {string} [props.totalEarnedDisplay] — zgromadzona waluta (podgląd hover)
  * @param {string} [props.currencyLabel] — nazwa waluty grupy
@@ -37,6 +40,10 @@ export default function SuperBar({
   roleLabel = PLACEHOLDER_ROLE_LABEL,
   avatarUrl = null,
   livesDisplay = DEFAULT_LIVES_DISPLAY,
+  livesLabel = 'Życia',
+  livesEnabled = false,
+  livesMax = null,
+  livesShopEnabled = false,
   currencyDisplay = DEFAULT_CURRENCY_DISPLAY,
   totalEarnedDisplay = '0',
   currencyLabel = 'Waluta',
@@ -78,15 +85,24 @@ export default function SuperBar({
       <div className="super-bar__end">
         {showStudentGroupStats ? (
           <>
-            <SuperBarStat icon={<IconStar />} value={livesDisplay} ariaLabel={`Życia: ${livesDisplay}`} />
+            {livesEnabled ? (
+              <SuperBarLivesStat
+                currentAmount={livesDisplay}
+                livesLabel={livesLabel}
+                livesMax={livesMax}
+                livesShopEnabled={livesShopEnabled}
+                ariaLabel={`${livesLabel}: ${livesDisplay}`}
+              />
+            ) : null}
             <SuperBarCurrencyStat
               currentAmount={currencyDisplay}
               totalEarned={totalEarnedDisplay}
               currencyLabel={currencyLabel}
-              ariaLabel={`Waluta: ${currencyDisplay}`}
+              ariaLabel={`${currencyLabel}: ${currencyDisplay}`}
             />
           </>
         ) : null}
+        <NotificationBell />
         <SuperBarSettingsButton onNavigate={onNavigate} />
         <SuperBarUserMenu
           displayName={resolvedDisplayName}

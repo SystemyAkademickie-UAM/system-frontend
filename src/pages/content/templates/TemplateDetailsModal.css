@@ -1,0 +1,36 @@
+.template-details-modal .maq-modal__footer {
+  display: none;
+}
+
+.template-details-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: min(72vh, 680px);
+}
+
+.template-details-modal__summary .maq-template-listing-card {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.template-details-modal__panel-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: min(360px, 42vh);
+  overflow: hidden;
+}
+
+.template-details-modal__panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.template-details-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}

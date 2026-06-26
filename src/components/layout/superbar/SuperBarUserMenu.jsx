@@ -52,7 +52,7 @@ export default function SuperBarUserMenu({
     setIsLoggingOut(true);
     setOpen(false);
     onNavigate?.();
-    logoutUser(() => {
+    void logoutUser(() => {
       setIsLoggingOut(false);
       setLogoutError('Nie udało się wylogować.');
       setOpen(true);

@@ -5,7 +5,7 @@ import {
   fetchRegistrationStatus,
   isRegistrationComplete,
 } from '../../services/registrationStatus.api.js';
-import { groupsListPath, loginPath, registerPath } from '../../routes/pathRegistry.js';
+import { groupsListPath, registerPath, welcomePath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
 const REGISTRATION_STATE = {
@@ -17,7 +17,7 @@ const REGISTRATION_STATE = {
 
 /**
  * Session-aware entry route for `/`.
- * Anonymous → `/login`; authenticated + incomplete registration → `/login`; else → `/groups`.
+ * Anonymous → `/welcome`; authenticated + incomplete registration → `/login`; else → `/groups`.
  */
 export default function HomeRedirect() {
   const { isAuthenticated, isLoading } = useSession();
@@ -64,7 +64,7 @@ export default function HomeRedirect() {
   }
 
   if (!isAuthenticated || registrationState === REGISTRATION_STATE.ANONYMOUS) {
-    return <Navigate to={loginPath()} replace />;
+    return <Navigate to={welcomePath()} replace />;
   }
 
   if (registrationState === REGISTRATION_STATE.INCOMPLETE) {

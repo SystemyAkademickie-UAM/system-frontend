@@ -1,4 +1,5 @@
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
+import { Divider } from '../../../components/ui/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
@@ -14,8 +15,9 @@ export default function RankingHomeContent() {
 
   if (isStudentView) {
     return (
-      <section className="page-unavailable group-ranking-page group-ranking-page--student">
+      <section className="page-unavailable group-ranking-page group-ranking-page--student maq-section-page">
         <GroupMainSubpageHeader eyebrow="Rywalizacja" title="Twoje informacje" />
+        <Divider className="maq-section-page__divider" />
         <TemporaryDevSeedPanel isStudentView={isStudentView} />
       </section>
     );

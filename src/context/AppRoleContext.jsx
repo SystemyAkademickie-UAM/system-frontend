@@ -1,5 +1,6 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
+import { registerClientAuthClearListener } from '../auth/clientAuthState.js';
 import { useSessionOptional } from './SessionContext.jsx';
 
 const AppRoleContext = createContext(null);
@@ -19,6 +20,12 @@ const AppRoleContext = createContext(null);
 export function AppRoleProvider({ children }) {
   const session = useSessionOptional();
   const [roleOverride, setRoleOverride] = useState(null);
+
+  useEffect(() => {
+    return registerClientAuthClearListener(() => {
+      setRoleOverride(null);
+    });
+  }, []);
 
   const role = useMemo(() => {
     if (roleOverride) {

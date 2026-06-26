@@ -42,7 +42,7 @@
 
 .super-bar-breadcrumb__link {
   color: var(--color-nav-link);
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
 }
 
@@ -58,12 +58,12 @@
 }
 
 .super-bar-breadcrumb__current {
-  color: rgba(209, 250, 229, 0.85);
-  font-weight: 600;
+  color: rgba(209, 250, 229, 0.75);
+  font-weight: 500;
 }
 
-.super-bar-breadcrumb__current--group {
-  font-weight: 800;
+.super-bar-breadcrumb__current--active {
+  font-weight: 700;
   color: var(--color-nav-user-name);
 }
 

@@ -1,0 +1,63 @@
+.maq-emoji-picker-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.maq-emoji-picker-field__label {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.maq-emoji-picker-field__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.maq-emoji-picker-field__trigger:hover {
+  border-color: rgba(66, 243, 125, 0.45);
+  transform: translateY(-1px);
+}
+
+.maq-emoji-picker-field__trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.maq-emoji-picker-field__emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.maq-emoji-picker-field__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.maq-emoji-picker-field__dialog {
+  position: relative;
+}
+
+.maq-emoji-picker-field__picker {
+  --fill-color: rgb(40, 40, 52);
+  --text-color: rgb(227, 224, 247);
+  --title-bar-fill-color: rgb(40, 40, 52);
+  --variations-fill-color: rgb(26, 26, 42);
+  --variations-backdrop-fill-color: rgba(40, 40, 52, 0.75);
+}

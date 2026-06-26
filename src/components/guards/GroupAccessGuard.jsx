@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useParams } from 'react-router-dom';
 import { groupRootPath } from '../../routes/pathRegistry.js';
-import { useGroupPreview } from '../../pages/content/group-shared/useGroupPreview.js';
+import { useGroupPreview } from '../../hooks/groups/useGroupPreview.js';
 
 /**
  * Blokuje dostęp do podstron grupy bez uprawnień (właściciel / zapisany student).

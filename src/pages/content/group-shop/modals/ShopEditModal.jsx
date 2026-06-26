@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
+import { findRankUnlockingItem } from '../../../../utils/ranks/rankShopItemUnlock.js';
 import './shopModals.css';
 
 const EMPTY_FORM = {
@@ -9,21 +10,40 @@ const EMPTY_FORM = {
   didacticDescription: '',
   stockQuantity: '',
   perStudentLimit: '',
+  unlockRankDbId: '',
 };
+
+/**
+ * @typedef {Object} RankOption
+ * @property {number} dbId
+ * @property {string} name
+ * @property {string[]} [shopItems]
+ */
 
 export default function ShopEditModal({
   isOpen,
   item,
+  ranks = [],
   onClose,
   onConfirm,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
+
+  const rankOptions = useMemo(
+    () => ranks.map((rank) => ({
+      dbId: rank.dbId,
+      name: rank.name,
+      shopItems: rank.shopItems ?? [],
+    })),
+    [ranks],
+  );
 
   useEffect(() => {
     if (!isOpen || !item) {
       return;
     }
 
+    const owningRank = findRankUnlockingItem(item.id, rankOptions);
     setForm({
       name: item.name ?? '',
       basePrice: String(item.priceAmount ?? ''),
@@ -31,8 +51,9 @@ export default function ShopEditModal({
       didacticDescription: item.didacticDescription ?? '',
       stockQuantity: item.stockQuantity === null || item.stockQuantity === undefined ? '' : String(item.stockQuantity),
       perStudentLimit: item.perStudentLimit === null || item.perStudentLimit === undefined ? '' : String(item.perStudentLimit),
+      unlockRankDbId: owningRank ? String(owningRank.dbId) : '',
     });
-  }, [isOpen, item]);
+  }, [isOpen, item, rankOptions]);
 
   const handleChange = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
@@ -69,6 +90,8 @@ export default function ShopEditModal({
     } else {
       payload.perStudentLimit = Number(form.perStudentLimit);
     }
+
+    payload.unlockRankDbId = form.unlockRankDbId === '' ? null : Number(form.unlockRankDbId);
 
     onConfirm?.(item.id, payload);
   };
@@ -111,6 +134,24 @@ export default function ShopEditModal({
         <label className="shop-edit-form__field">
           <span className="shop-edit-form__label">Limit na studenta (puste = bez limitu)</span>
           <input className="shop-edit-form__input" type="number" min="0" value={form.perStudentLimit} onChange={handleChange('perStudentLimit')} />
+        </label>
+        <label className="shop-edit-form__field">
+          <span className="shop-edit-form__label">Dostępność</span>
+          <select
+            className="shop-edit-form__input"
+            value={form.unlockRankDbId}
+            onChange={handleChange('unlockRankDbId')}
+          >
+            <option value="">Dostępny dla wszystkich</option>
+            {rankOptions.map((rank) => (
+              <option key={rank.dbId} value={String(rank.dbId)}>
+                {`Zablokowany za rangę: ${rank.name}`}
+              </option>
+            ))}
+          </select>
+          <p className="shop-edit-form__hint">
+            Wyższa ranga odblokowuje też przedmioty przypisane do niższych rang.
+          </p>
         </label>
       </div>
     </Modal>

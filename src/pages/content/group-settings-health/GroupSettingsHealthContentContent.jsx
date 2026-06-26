@@ -1,438 +1,410 @@
-import {useState, useEffect, useRef} from 'react';
-import {useParams} from 'react-router-dom';
-import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
-import {InfoTooltip, useToast} from '../../../components/ui/index.js';
-
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
+import GroupSettingsUnsavedModal from '../group-settings/GroupSettingsUnsavedModal.jsx';
+import SettingsCheckboxField from '../group-settings/SettingsCheckboxField.jsx';
+import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import { Button, CharacterLimitedField, Divider, InfoTooltip, useToast } from '../../../components/ui/index.js';
+import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
+import { LIVES_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
+import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../../../constants/lives.constants.js';
+import { fetchGroupLivesConfig, updateGroupLivesConfig } from '../../../services/groupLives.api.js';
+import { fetchGroupShopItems } from '../../../services/shop.api.js';
+import { invalidateGroupLives } from '../../../services/groupLivesEvents.js';
+import { findExtraLifeShopItem } from '../../../utils/shop/extraLifeItem.js';
+import ShopItemFormModal from '../group-shop/modals/ShopItemFormModal.jsx';
 import GroupSettingsHealthContentWindow from './GroupSettingsHealthContentWindow.jsx';
+import '../group-settings/GroupSettingsForm.css';
 
-import 'unicode-emoji-picker';
+function filterDigits(value) {
+  return value.replace(/\D/g, '');
+}
 
-export default function App() {
+function buildSnapshot({
+  livesIcon,
+  livesLabel,
+  livesEnabled,
+  livesLimit,
+  livesStart,
+  livesShopEnabled,
+}) {
+  return {
+    livesIcon,
+    livesLabel: livesLabel.trim(),
+    livesEnabled,
+    livesLimit,
+    livesStart,
+    livesShopEnabled,
+  };
+}
 
-  const {showSuccess, showError} = useToast();
+function applyConfigToState(config, setters) {
+  const {
+    setLivesIcon,
+    setLivesLabel,
+    setLivesEnabled,
+    setLivesLimit,
+    setLivesStart,
+    setLivesShopEnabled,
+    setSavedSnapshot,
+  } = setters;
 
-  const {groupId} = useParams();
+  const livesIcon = config.livesIcon || DEFAULT_LIVES_SYMBOL;
+  const livesLabel = config.livesLabel || DEFAULT_LIVES_LABEL;
+  const livesEnabled = Boolean(config.livesEnabled);
+  const livesLimit = config.livesMax == null ? '' : String(config.livesMax);
+  const livesStart = config.startingLives == null ? '' : String(config.startingLives);
+  const livesShopEnabled = Boolean(config.livesShopEnabled);
+
+  setLivesIcon(livesIcon);
+  setLivesLabel(livesLabel);
+  setLivesEnabled(livesEnabled);
+  setLivesLimit(livesLimit);
+  setLivesStart(livesStart);
+  setLivesShopEnabled(livesShopEnabled);
+  setSavedSnapshot(buildSnapshot({
+    livesIcon,
+    livesLabel,
+    livesEnabled,
+    livesLimit,
+    livesStart,
+    livesShopEnabled,
+  }));
+}
+
+export default function GroupSettingsHealthContentContent() {
+  const { groupId } = useParams();
+  const { showSuccess, showError } = useToast();
+
+  const [livesIcon, setLivesIcon] = useState(DEFAULT_LIVES_SYMBOL);
+  const [livesLabel, setLivesLabel] = useState('');
+  const [livesEnabled, setLivesEnabled] = useState(false);
+  const [livesLimit, setLivesLimit] = useState('');
+  const [livesStart, setLivesStart] = useState('');
+  const [livesShopEnabled, setLivesShopEnabled] = useState(false);
+  const [savedSnapshot, setSavedSnapshot] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isManageOpen, setIsManageOpen] = useState(false);
+  const [isExtraLifeModalOpen, setIsExtraLifeModalOpen] = useState(false);
+  const [extraLifeItemId, setExtraLifeItemId] = useState(null);
 
-  const [currenticon, setCurrenticon] = useState('🍑');
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const pickerRef = useRef(null);
-
-  const [livesname, setLivesname] = useState('');
-  const [livesenabled, setLivesenabled] = useState(0);
-  const [liveslimit, setLiveslimit] = useState('');
-  const [livesstart, setLivesstart] = useState('99');
-  const [livesshopenabled, setLivesshopenabled] = useState(0);
-
-  const [livespopupopen, setLivespopupopen] = useState(0);
-
-
-
-  function onPickerMounted(picker) {
-
-    if (!picker) {
+  const loadExtraLifeItem = useCallback(async () => {
+    if (!groupId) {
+      setExtraLifeItemId(null);
       return;
     }
 
-    picker.addEventListener('emoji-pick', (event) => {
-      setCurrenticon(event.detail.emoji);
-      setIsPickerOpen(false);
-    });
-  }
-
-
-
-
-
-  function onNumericinput(stringvalue, setterfunction) {
-
-    let filtered = '';
-
-    let i = 0;
-
-    while (i < stringvalue.length) {
-
-      let character = stringvalue[i];
-
-      if (character == '0' || character == '1' || character == '2' || character == '3' || character == '4' || character == '5' || character == '6' || character == '7' || character == '8' || character == '9') {
-        filtered = filtered + character;
-      }
-
-      i = i + 1;
+    const result = await fetchGroupShopItems(groupId);
+    if (!result.ok) {
+      setExtraLifeItemId(null);
+      return;
     }
 
-    setterfunction(filtered);
-  }
+    const extraLifeItem = findExtraLifeShopItem(result.items);
+    setExtraLifeItemId(extraLifeItem?.id ?? null);
+  }, [groupId]);
 
-
-
-
-
-  function changeliveslimitby(delta) {
-
-    let currentvalue = Number(liveslimit);
-
-    if (liveslimit == '' || isNaN(currentvalue)) {
-      currentvalue = 0;
+  const loadSettings = useCallback(async () => {
+    if (!groupId) {
+      return;
     }
 
-    let newvalue = currentvalue + delta;
-
-    if (newvalue < 0) {
-      newvalue = 0;
-    }
-
-    setLiveslimit(String(newvalue));
-  }
-
-
-
-
-
-  function changelivesstartby(delta) {
-
-    let currentvalue = Number(livesstart);
-
-    if (livesstart == '' || isNaN(currentvalue)) {
-      currentvalue = 99;
-    }
-
-    let newvalue = currentvalue + delta;
-
-    if (newvalue < 0) {
-      newvalue = 0;
-    }
-
-    setLivesstart(String(newvalue));
-  }
-
-
-
-
-
-  function togglesystemlives() {
-
-    if (livesenabled == 0) {
-      setLivesenabled(1);
-    } else {
-      setLivesenabled(0);
-    }
-  }
-
-
-
-
-
-  function applylivesdata(data) {
-
-    let labelvalue = data.livesLabel;
-
-    if (labelvalue == null) {
-      labelvalue = '';
-    }
-
-    setLivesname(labelvalue);
-
-    let enabledvalue = 0;
-
-    if (data.livesEnabled == true || data.livesEnabled == 1) {
-      enabledvalue = 1;
-    }
-
-    setLivesenabled(enabledvalue);
-
-    let maxvalue = data.livesMax;
-
-    if (maxvalue == null) {
-      maxvalue = '';
-    } else {
-      maxvalue = String(maxvalue);
-    }
-
-    setLiveslimit(maxvalue);
-
-    let startvalue = data.startingLives;
-
-    if (startvalue == null) {
-      startvalue = '5';
-    } else {
-      startvalue = String(startvalue);
-    }
-
-    setLivesstart(startvalue);
-
-    let shopvalue = 0;
-
-    if (data.livesShopEnabled == true || data.livesShopEnabled == 1) {
-      shopvalue = 1;
-    }
-
-    setLivesshopenabled(shopvalue);
-
-    let iconvalue = data.livesIcon;
-
-    if (iconvalue == null || iconvalue == '') {
-      iconvalue = '🍑';
-    }
-
-    setCurrenticon(iconvalue);
-  }
-
-
-
-
-
-  async function onfetchlivessettings() {
-
+    setIsLoading(true);
     setErrorMessage('');
 
     try {
+      const result = await fetchGroupLivesConfig(groupId);
+      if (!result.ok || !result.config) {
+        throw new Error('Nie udało się pobrać ustawień systemu żyć.');
+      }
 
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/lives-config';
-
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+      applyConfigToState(result.config, {
+        setLivesIcon,
+        setLivesLabel,
+        setLivesEnabled,
+        setLivesLimit,
+        setLivesStart,
+        setLivesShopEnabled,
+        setSavedSnapshot,
       });
-
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/lives-config: ', response.status);
-      console.log('GET /groups/' + groupId + '/lives-config: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/lives-config not JSON: ' + responsetext);
-      }
-
-      console.log('GET /groups/' + groupId + '/lives-config JSON:', data);
-
-      applylivesdata(data);
-
     } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
+      const message = error instanceof Error ? error.message : 'Nie udało się pobrać ustawień systemu żyć.';
       setErrorMessage(message);
+      showError(message);
+    } finally {
+      setIsLoading(false);
     }
-  }
-
-
-
-
-
-  function resetlivessettings() {
-    onfetchlivessettings();
-    showSuccess('Zmiany zostały cofnięte.');
-  }
-
-
-
-
-
-  async function saveliveschanges() {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/lives-config';
-
-      const payload = {
-        livesEnabled: livesenabled == 1,
-        livesIcon: currenticon,
-        livesShopEnabled: livesshopenabled == 1
-      };
-
-      if (livesname.trim().length > 0) {
-        payload.livesLabel = livesname.trim();
-      }
-
-      if (liveslimit != '') {
-        payload.lives = Number(liveslimit);
-      }
-
-      if (livesstart != '') {
-        payload.startingLives = Number(livesstart);
-      }
-
-      const response = await fetch(url, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const responsetext = await response.text();
-
-      console.log('PATCH /groups/' + groupId + '/lives-config: ', response.status);
-      console.log('PATCH /groups/' + groupId + '/lives-config: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/lives-config not JSON: ' + responsetext);
-      }
-
-      console.log('PATCH /groups/' + groupId + '/lives-config JSON:', data);
-
-      onfetchlivessettings();
-      showSuccess('Zapisano zmiany.');
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
-
-
-
-
-
-  function showlivespopup() {
-    setLivespopupopen(1);
-  }
-
-
-
-
-
-  function hidelivespopup() {
-    setLivespopupopen(0);
-  }
-
-
-
-
-
-  function editlives() {
-    console.log('ok');
-  }
-
-
-
-
+  }, [groupId, showError]);
 
   useEffect(() => {
-    onfetchlivessettings();
-  }, []);
+    void loadSettings();
+    void loadExtraLifeItem();
+  }, [loadSettings, loadExtraLifeItem]);
 
+  const persistSettings = useCallback(async () => {
+    if (!groupId) {
+      return false;
+    }
 
+    setIsSaving(true);
+    setErrorMessage('');
+
+    const payload = {
+      livesEnabled,
+      livesIcon,
+      livesShopEnabled,
+    };
+
+    if (livesLabel.trim().length > 0) {
+      payload.livesLabel = livesLabel.trim();
+    }
+    if (livesLimit !== '') {
+      payload.lives = Number(livesLimit);
+    }
+    if (livesStart !== '') {
+      payload.startingLives = Number(livesStart);
+    }
+
+    try {
+      const result = await updateGroupLivesConfig(groupId, payload);
+      if (!result.ok) {
+        throw new Error('Nie udało się zapisać ustawień systemu żyć.');
+      }
+
+      invalidateGroupLives(groupId);
+      await loadSettings();
+      showSuccess('Zmiany zostały zapisane.');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Nie udało się zapisać ustawień systemu żyć.';
+      setErrorMessage(message);
+      showError(message);
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [
+    groupId,
+    livesEnabled,
+    livesIcon,
+    livesLabel,
+    livesLimit,
+    livesShopEnabled,
+    livesStart,
+    loadSettings,
+    showError,
+    showSuccess,
+  ]);
+
+  const isDirty = useMemo(() => {
+    if (!savedSnapshot || isLoading) {
+      return false;
+    }
+
+    return JSON.stringify(buildSnapshot({
+      livesIcon,
+      livesLabel,
+      livesEnabled,
+      livesLimit,
+      livesStart,
+      livesShopEnabled,
+    })) !== JSON.stringify(savedSnapshot);
+  }, [
+    isLoading,
+    livesEnabled,
+    livesIcon,
+    livesLabel,
+    livesLimit,
+    livesShopEnabled,
+    livesStart,
+    savedSnapshot,
+  ]);
+
+  const {
+    isPromptOpen,
+    dismissPrompt,
+    discardChanges,
+    saveAndContinue,
+  } = useUnsavedChangesGuard({
+    when: isDirty,
+    onSave: persistSettings,
+  });
+
+  const detailsSectionClassName = [
+    'group-settings-form__stack',
+    livesEnabled ? '' : 'group-settings-form__section--muted',
+  ].filter(Boolean).join(' ');
 
   return (
-    <div>
-      <div>
-        <div style = {{width: '75vw', height: '100%', position: 'relative', top: '0%', left: '0%'}}>
+    <div className="group-settings-form group-settings-form--drive-layout">
+      <section className="group-settings-form__panel" aria-label="System żyć">
+        <SettingsSectionHeader title="System żyć" id="group-lives-title" />
 
-          <div style = {{width: '98%', position: 'relative', top: '0%', left: '0%', display: 'flex', flexDirection: 'column', gap: '2vh', paddingBottom: '4vh'}}>
-
-
-
-            <div style = {{width: '100%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '2vh', paddingTop: '1vh', paddingBottom: '2vh', paddingLeft: '0%', paddingRight: '0%'}}>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Ikona żyć</div>
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: '2vh'}}>
-                  
-                  <div onClick = {() => setIsPickerOpen(!isPickerOpen)} style = {{backgroundColor: 'rgb(26, 26, 42)', height: '14vh', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <div style = {{color: 'rgb(227, 224, 247)', fontSize: '48px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center'}}>{currenticon}</div>
-                  </div>
-
-                  {isPickerOpen ? (
-                    <div onClick = {() => setIsPickerOpen(false)} style = {{position: 'fixed', top: '0vh', left: '0vw', width: '100vw',  height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999}}>
-                      <div onClick = {(event) => event.stopPropagation()} style = {{position: 'relative'}}><unicode-emoji-picker ref = {onPickerMounted} style = {{'--fill-color': 'rgb(40, 40, 52)', '--text-color': 'rgb(227, 224, 247)', '--title-bar-fill-color': 'rgb(40, 40, 52)', '--variations-fill-color': 'rgb(26, 26, 42)', '--variations-backdrop-fill-color': 'rgba(40, 40, 52, 0.75)'}}></unicode-emoji-picker></div>
-                    </div>
-                  ) : null}
-
-                </div>
-              </div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Nazwa żyć</div>
-                <input onChange = {(event) => setLivesname(event.target.value)} style = {{backgroundColor: 'rgb(26, 26, 42)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none'}} value = {livesname} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-              </div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>System żyć<InfoTooltip text = "Pozwala włączyć i wyłączyć system szans." /></div>
-                <div onClick = {() => togglesystemlives()} style = {{backgroundColor: livesenabled == 1 ? 'rgba(30, 204, 56)' : 'rgb(26, 26, 42)', width: '10vw', height: '5vh', position: 'relative', borderRadius: '8px', color: livesenabled == 1 ? 'rgb(0, 57, 21)' : 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>{livesenabled == 1 ? 'Wł.' : 'Wył.'}</div>
-              </div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Limit żyć<InfoTooltip text = "Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." /></div>
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                  <input type = "number" onInput = {(event) => onNumericinput(event.target.value, setLiveslimit)} style = {{backgroundColor: 'rgb(26, 26, 42)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none', textAlign: 'left', paddingRight: '1%'}} value = {liveslimit} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-
-                </div>
-              </div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Startowa liczba żyć<InfoTooltip text = "Liczba szans, jaką student otrzymuje po dołączeniu do grupy." /></div>
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                  <input type = "number" onInput = {(event) => onNumericinput(event.target.value, setLivesstart)} style = {{backgroundColor: 'rgb(26, 26, 42)', border: '2px solid rgba(0, 0, 0, 0)', border: '2px solid rgba(0, 0, 0, 0)', width: '30%', height: '5vh', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', borderRadius: '8px', outline: 'none', textAlign: 'left', paddingRight: '1%'}} value = {livesstart} onFocus = {(event) => (event.target.style.border = '2px solid rgb(30, 204, 56)')} onBlur = {(event) => (event.target.style.borderColor = 'rgba(0, 0, 0, 0)')}></input>
-
-                </div>
-              </div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '1vh'}}>
-                <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1%'}}>
-                  <input type = "checkbox" checked = {livesshopenabled == 1} onChange = {() => {if (livesshopenabled == 0) {setLivesshopenabled(1);} else {setLivesshopenabled(0);}}} style = {{cursor: 'pointer'}}/>
-                  <div style = {{color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center'}}>Możliwość kupowania żyć w sklepie<InfoTooltip text = "Umożliwia kupowanie szans w sklepie." /></div>
-                </div>
-              </div>
-
-              <div onClick = {() => editlives()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh', marginTop: '2vh'}}>Edytuj życie</div>
-
-              <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '2%', paddingTop: '1vh'}}>
-                <div onClick = {() => showlivespopup()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Zarządzanie</div>
-
-                <div style = {{width: '100%', position: 'fixed', display: 'flex', flexDirection: 'row', alignItems: 'center', bottom: '2.5vh', right: '2.5vw', justifyContent: 'flex-end', gap: '2%', paddingTop: '1vh'}}>
-                  <div onClick = {() => resetlivessettings()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Cofnij zmiany</div>
-                  <div onClick = {() => saveliveschanges()} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '10vw', position: 'relative', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer', paddingTop: '1vh', paddingBottom: '1vh'}}>Zapisz zmiany</div>
-                </div>
-              </div>
-
+        {isLoading ? (
+          <p className="group-settings-form__hint">Ładowanie ustawień systemu żyć…</p>
+        ) : (
+          <>
+            <div className="group-settings-form__field">
+              <SettingsCheckboxField
+                id="group-lives-enabled"
+                checked={livesEnabled}
+                onChange={setLivesEnabled}
+                disabled={isSaving}
+              >
+                Włącz system żyć
+                <InfoTooltip text="Pozwala włączyć i wyłączyć system szans." />
+              </SettingsCheckboxField>
             </div>
 
-          </div>
+            <Divider className="group-settings-form__section-divider" />
 
-        </div>
-      </div>
-      {livespopupopen == 1 ? (
-        <GroupSettingsHealthContentWindow popupclose = {hidelivespopup} groupId = {groupId} liveslabel = {livesname} livesicon = {currenticon} livesstart = {livesstart} />
+            <div className={detailsSectionClassName}>
+              <EmojiPickerField
+                className="group-settings-form__field"
+                label="Ikona żyć"
+                value={livesIcon}
+                defaultEmoji={DEFAULT_LIVES_SYMBOL}
+                onChange={setLivesIcon}
+                ariaLabel="Wybierz ikonę żyć"
+              />
+
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-lives-label">
+                  Nazwa żyć
+                </label>
+                <CharacterLimitedField value={livesLabel} maxLength={LIVES_LABEL_MAX_LENGTH}>
+                  <input
+                    id="group-lives-label"
+                    className="group-settings-form__input"
+                    value={livesLabel}
+                    maxLength={LIVES_LABEL_MAX_LENGTH}
+                    onChange={(event) => setLivesLabel(event.target.value)}
+                    disabled={isSaving || !livesEnabled}
+                  />
+                </CharacterLimitedField>
+              </div>
+
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-lives-limit">
+                  Limit żyć
+                  <InfoTooltip text="Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." />
+                </label>
+                <input
+                  id="group-lives-limit"
+                  className="group-settings-form__input group-settings-form__input--compact"
+                  inputMode="numeric"
+                  value={livesLimit}
+                  onChange={(event) => setLivesLimit(filterDigits(event.target.value))}
+                  disabled={isSaving || !livesEnabled}
+                />
+              </div>
+
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-lives-start">
+                  Startowa liczba żyć
+                  <InfoTooltip text="Liczba szans, jaką student otrzymuje po dołączeniu do grupy." />
+                </label>
+                <input
+                  id="group-lives-start"
+                  className="group-settings-form__input group-settings-form__input--compact"
+                  inputMode="numeric"
+                  value={livesStart}
+                  onChange={(event) => setLivesStart(filterDigits(event.target.value))}
+                  disabled={isSaving || !livesEnabled}
+                />
+              </div>
+
+              <div className="group-settings-form__field">
+                <SettingsCheckboxField
+                  id="group-lives-shop-enabled"
+                  checked={livesShopEnabled}
+                  onChange={setLivesShopEnabled}
+                  disabled={isSaving || !livesEnabled}
+                >
+                  Możliwość kupowania żyć w sklepie
+                  <InfoTooltip text="Umożliwia kupowanie szans w sklepie." />
+                </SettingsCheckboxField>
+              </div>
+
+              <Divider className="group-settings-form__section-divider" />
+
+              <div className="group-settings-form__field">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsExtraLifeModalOpen(true)}
+                  disabled={!livesEnabled || !livesShopEnabled || !extraLifeItemId}
+                >
+                  Edytuj produkt: Dodatkowe życie
+                </Button>
+              </div>
+
+              <div className="group-settings-form__field">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsManageOpen(true)}
+                  disabled={!livesEnabled}
+                >
+                  Zarządzanie życiami studentów
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
+      </section>
+
+      {errorMessage ? (
+        <p className="group-settings-form__error" role="alert">{errorMessage}</p>
+      ) : null}
+
+      {!isLoading ? (
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          className="group-settings-form__save-fab"
+          onClick={persistSettings}
+          disabled={isSaving}
+        >
+          Zapisz zmiany
+        </Button>
+      ) : null}
+
+      <GroupSettingsUnsavedModal
+        isOpen={isPromptOpen}
+        isSaving={isSaving}
+        onClose={dismissPrompt}
+        onDiscard={discardChanges}
+        onSave={saveAndContinue}
+      />
+
+      {isManageOpen ? (
+        <GroupSettingsHealthContentWindow
+          popupclose={() => setIsManageOpen(false)}
+          groupId={groupId}
+          liveslabel={livesLabel}
+          livesicon={livesIcon}
+          livesstart={livesStart}
+        />
+      ) : null}
+
+      {isExtraLifeModalOpen && extraLifeItemId ? (
+        <ShopItemFormModal
+          isOpen={isExtraLifeModalOpen}
+          groupId={groupId}
+          itemId={extraLifeItemId}
+          onClose={() => setIsExtraLifeModalOpen(false)}
+          onSaved={async () => {
+            setIsExtraLifeModalOpen(false);
+            await loadExtraLifeItem();
+          }}
+        />
       ) : null}
     </div>
-  )
+  );
 }
-

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
+import { AUTO_RANK_OPTION } from '../../../../utils/ranks/autoRankAssignment.js';
 import './memberModals.css';
 
 export default function MemberRankModal({
@@ -14,7 +15,7 @@ export default function MemberRankModal({
 
   useEffect(() => {
     if (!isOpen || !member) return;
-    setSelectedRank(member.rank || '');
+    setSelectedRank(member.autoRankEnabled === false ? (member.rank || '') : AUTO_RANK_OPTION);
   }, [isOpen, member]);
 
   const handleConfirm = () => {
@@ -25,7 +26,7 @@ export default function MemberRankModal({
     return null;
   }
 
-  const availableRanks = ranks.length > 0 ? ranks : ['Brak rang'];
+  const rankOptions = ranks.length > 0 ? ranks : [];
 
   return (
     <Modal
@@ -34,19 +35,38 @@ export default function MemberRankModal({
       title="Edytuj rangę"
       subtitle={member.name}
       onConfirm={handleConfirm}
-      confirmDisabled={isLoading}
+      confirmDisabled={isLoading || (rankOptions.length === 0 && selectedRank !== AUTO_RANK_OPTION)}
       size="sm"
       className="member-modal"
     >
-      {ranks.length === 0 ? (
+      {rankOptions.length === 0 ? (
         <p className="member-modal__empty">Brak zdefiniowanych rang w tej grupie.</p>
       ) : (
         <ul className="member-modal__rank-list" role="radiogroup" aria-label="Wybierz rangę">
-          {availableRanks.map((rank) => {
-            const isSelected = selectedRank === rank;
+          <li>
+            <label
+              className={[
+                'member-modal__rank-option',
+                selectedRank === AUTO_RANK_OPTION ? 'member-modal__rank-option--selected' : '',
+              ].join(' ')}
+            >
+              <input
+                type="radio"
+                name="member-rank"
+                className="member-modal__rank-radio"
+                value={AUTO_RANK_OPTION}
+                checked={selectedRank === AUTO_RANK_OPTION}
+                onChange={() => setSelectedRank(AUTO_RANK_OPTION)}
+                disabled={isLoading}
+              />
+              <span className="member-modal__rank-name">Automatyczna</span>
+            </label>
+          </li>
+          {rankOptions.map((rank) => {
+            const isSelected = selectedRank === rank.name;
 
             return (
-              <li key={rank}>
+              <li key={rank.id ?? rank.name}>
                 <label
                   className={[
                     'member-modal__rank-option',
@@ -57,12 +77,12 @@ export default function MemberRankModal({
                     type="radio"
                     name="member-rank"
                     className="member-modal__rank-radio"
-                    value={rank}
+                    value={rank.name}
                     checked={isSelected}
-                    onChange={() => setSelectedRank(rank)}
+                    onChange={() => setSelectedRank(rank.name)}
                     disabled={isLoading}
                   />
-                  <span className="member-modal__rank-name">{rank}</span>
+                  <span className="member-modal__rank-name">{rank.name}</span>
                 </label>
               </li>
             );

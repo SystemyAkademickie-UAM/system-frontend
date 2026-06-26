@@ -1,7 +1,7 @@
 import {useCallback, useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl, getSamlLoginUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import { Button, TexturedSurface, useToast } from '../../../components/ui/index.js';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
@@ -78,22 +78,13 @@ export default function App() {
 
       console.log('GET /groups/' + groupId + '/post JSON:', data);
 
-      let receiveddata = data;
-      const receivedposts = [];
-
-      let i = 0;
-
-      while (i < receiveddata.posts.length) {
-
-        receivedposts.push({
-          id: receiveddata.posts[i].id,
-          title: receiveddata.posts[i].title,
-          text: receiveddata.posts[i].content,
-          editmode: 0
-        });
-
-        i = i + 1;
-      }
+      const receivedposts = (data?.posts ?? []).map((post) => ({
+        id: post.id,
+        title: post.title ?? '',
+        text: post.content ?? '',
+        publishedAt: post.publishedAt ?? post.createdAt ?? null,
+        editmode: 0,
+      }));
 
       setPosts(receivedposts);
 
@@ -385,8 +376,9 @@ export default function App() {
 
 
   useEffect(() => {
+    if (!groupId) return;
     onFetchPosts();
-  }, []);
+  }, [groupId]);
 
   const isLecturer = role === APP_ROLE.LECTURER
     || role === APP_ROLE.ADMIN
@@ -421,6 +413,14 @@ export default function App() {
           [...tempPosts, ...posts].map((post) => {
             const canSavePost = isPostFormValid(post);
 
+            const publishedLabel = post.publishedAt
+              ? new Date(post.publishedAt).toLocaleDateString('pl-PL', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })
+              : null;
+
             return post.editmode < 1 ? (
               <SmartPostCard
                 key={`post${post.id}`}
@@ -433,6 +433,11 @@ export default function App() {
                 dividerClassName="group-main-posts__card-divider"
                 textClassName="group-main-posts__card-text"
                 titleTag="h2"
+                trailing={publishedLabel ? (
+                  <time className="group-main-posts__published-at" dateTime={post.publishedAt}>
+                    {publishedLabel}
+                  </time>
+                ) : null}
               />
             ) : (
               <TexturedSurface key={`post${post.id}`} className="group-main-posts__card-surface">

@@ -1,10 +1,14 @@
-import { Link, useParams } from 'react-router-dom';
-import { useAppRole } from '../../../context/AppRoleContext.jsx';
-import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import { TexturedSurface } from '../../../components/ui/index.js';
+import { useEffect } from 'react';
+import { useParams, useLocation } from 'react-router-dom';
+import { TexturedSurface, Divider } from '../../../components/ui/index.js';
 import ContentWithMeasuredDivider from '../../../components/ui/ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
-import { groupActivitiesPath, groupRewardsBadgesPath, groupRewardsPath } from '../../../routes/pathRegistry.js';
-import { useGroupDetails } from '../group-shared/useGroupDetails.js';
+import NotificationsFeed from '../../../components/notifications/NotificationsFeed.jsx';
+import PaginatedNotificationsSection from '../../../components/notifications/PaginatedNotificationsSection.jsx';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { useGroupDetails } from '../../../hooks/groups/useGroupDetails.js';
+import { useGroupBacklogNotifications } from '../../../hooks/notifications/useGroupBacklogNotifications.js';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { groupMembersLogPath } from '../../../routes/pathRegistry.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import './GroupMainHomeContent.css';
 import './shared/groupMainSubpageHeader.css';
@@ -22,9 +26,34 @@ function InfoRow({ label, value }) {
   );
 }
 
+const LECTURER_PREVIEW_LIMIT = 5;
+
 export default function GroupMainHomeContent() {
   const { groupId } = useParams();
+  const location = useLocation();
+  const { role } = useAppRole();
   const { group, isLoading, errorMessage } = useGroupDetails(groupId);
+  const isStudentView = role === APP_ROLE.STUDENT;
+
+  const {
+    notifications: lecturerPreviewNotifications,
+    isLoading: lecturerPreviewLoading,
+    error: lecturerPreviewError,
+    markRead: lecturerMarkRead,
+  } = useGroupBacklogNotifications(groupId, {
+    isStudentView: false,
+    take: LECTURER_PREVIEW_LIMIT,
+    pollMs: 60000,
+  });
+
+  useEffect(() => {
+    if (!isStudentView || location.hash !== '#group-notifications') {
+      return;
+    }
+
+    const target = document.getElementById('group-notifications');
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [isStudentView, location.hash]);
 
   if (isLoading) {
     return <p className="group-main-home__message">Ładowanie danych grupy…</p>;
@@ -42,7 +71,29 @@ export default function GroupMainHomeContent() {
     <div className="group-main-home">
       <GroupMainSubpageHeader eyebrow="Witamy" title="Strona główna" />
 
-      <TexturedSurface className="group-main-home__surface">
+      {!isStudentView ? (
+        <TexturedSurface className="group-main-home__surface group-main-home__surface--notifications">
+          <section className="group-main-home__section" aria-label="Najnowsze powiadomienia">
+            <h2 className="group-main-home__section-title">Najnowsze powiadomienia</h2>
+            <NotificationsFeed
+              groupId={groupId}
+              role={role}
+              notifications={lecturerPreviewNotifications}
+              isLoading={lecturerPreviewLoading}
+              error={lecturerPreviewError}
+              limit={LECTURER_PREVIEW_LIMIT}
+              showDivider
+              onMarkRead={(id) => lecturerMarkRead(id)}
+              footerLink={{
+                label: 'Zobacz więcej',
+                to: groupMembersLogPath(groupId),
+              }}
+            />
+          </section>
+        </TexturedSurface>
+      ) : null}
+
+      <TexturedSurface className="group-main-home__surface group-main-home__surface--overview">
         <section className="group-main-home__section group-main-home__section--description" aria-label="Opis grupy">
           <ContentWithMeasuredDivider
             className="group-main-home__description"
@@ -51,6 +102,8 @@ export default function GroupMainHomeContent() {
             {group?.description?.trim() || 'Brak opisu fabularnego grupy.'}
           </ContentWithMeasuredDivider>
         </section>
+
+        <Divider className="group-main-home__overview-divider" />
 
         <section className="group-main-home__section" aria-label="Dane grupy">
           <h2 className="group-main-home__section-title">Dane grupy</h2>
@@ -61,62 +114,17 @@ export default function GroupMainHomeContent() {
           <InfoRow label="System żyć" value={group?.lives != null ? String(group.lives) : null} />
         </section>
       </TexturedSurface>
+
+      {isStudentView ? (
+        <PaginatedNotificationsSection
+          groupId={groupId}
+          isStudentView
+          title="Powiadomienia"
+          sectionId="group-notifications"
+          linkable
+          surfaceClassName="group-main-home__surface--notifications"
+        />
+      ) : null}
     </div>
   );
 }
-
-export function GroupMainEmptyNotice({ message, linkLabel, linkTo }) {
-  return (
-    <p className="group-main-home__empty-notice">
-      {message}{' '}
-      {linkLabel && linkTo ? (
-        <Link className="group-main-home__empty-link" to={linkTo}>
-          {linkLabel}
-        </Link>
-      ) : null}
-    </p>
-  );
-}
-
-function resolveEmptyLinkForRole(role, linkConfig, groupId) {
-  if (role === APP_ROLE.STUDENT) {
-    return {
-      message: linkConfig.studentMessage ?? linkConfig.message,
-      linkLabel: null,
-      linkTo: null,
-    };
-  }
-
-  return {
-    message: linkConfig.message,
-    linkLabel: linkConfig.linkLabel,
-    linkTo: linkConfig.path(groupId),
-  };
-}
-
-export function useGroupMainEmptyLink(key, groupId) {
-  const { role } = useAppRole();
-  const linkConfig = GROUP_MAIN_EMPTY_LINKS[key];
-  return resolveEmptyLinkForRole(role, linkConfig, groupId);
-}
-
-export const GROUP_MAIN_EMPTY_LINKS = {
-  ranks: {
-    message: 'Nie dodano jeszcze rang.',
-    studentMessage: 'Nie dodano jeszcze rang w tej grupie.',
-    linkLabel: 'Dodaj je w systemie nagród',
-    path: groupRewardsPath,
-  },
-  badges: {
-    message: 'Nie dodano jeszcze odznak.',
-    studentMessage: 'Nie dodano jeszcze odznak w tej grupie.',
-    linkLabel: 'Dodaj je w systemie nagród',
-    path: groupRewardsBadgesPath,
-  },
-  activities: {
-    message: 'Nie dodano jeszcze aktywności.',
-    studentMessage: 'Nie dodano jeszcze aktywności w tej grupie.',
-    linkLabel: 'Dodaj je w module aktywności',
-    path: groupActivitiesPath,
-  },
-};

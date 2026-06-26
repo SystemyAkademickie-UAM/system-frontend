@@ -36,7 +36,8 @@
   margin-left: auto;
 }
 
-.groups-list__create-btn {
+.groups-list__create-btn,
+.groups-list__templates-btn {
   flex-shrink: 0;
   white-space: nowrap;
 }

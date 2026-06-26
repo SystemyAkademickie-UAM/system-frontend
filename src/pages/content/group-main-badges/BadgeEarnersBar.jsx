@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import CurrencyDisplay from '../../../components/ui/Currency/CurrencyDisplay.jsx';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
 import './BadgeEarnersBar.css';
 
 const DEFAULT_MAX_VISIBLE = 15;
 
-function OverflowBadge({ hiddenStudents, currencySymbol }) {
+function OverflowBadge({ hiddenStudents }) {
   const triggerRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -46,10 +47,11 @@ function OverflowBadge({ hiddenStudents, currencySymbol }) {
               {hiddenStudents.map((student) => (
                 <li key={student.id}>
                   <span>{student.nickname}</span>
-                  <span className="badge-earners-bar__overflow-earned">
-                    {student.totalEarned}
-                    {currencySymbol ? ` ${currencySymbol}` : ''}
-                  </span>
+                  <CurrencyDisplay
+                    amount={student.totalEarned}
+                    size="sm"
+                    className="badge-earners-bar__overflow-earned"
+                  />
                 </li>
               ))}
             </ul>
@@ -66,12 +68,10 @@ function OverflowBadge({ hiddenStudents, currencySymbol }) {
  *
  * @param {Object} props
  * @param {import('./badgeTreasuryModel.js').TreasuryStudent[]} props.students
- * @param {string} [props.currencySymbol]
  * @param {number} [props.maxVisible]
  */
 export default function BadgeEarnersBar({
   students,
-  currencySymbol,
   maxVisible = DEFAULT_MAX_VISIBLE,
   className = '',
 }) {
@@ -93,13 +93,12 @@ export default function BadgeEarnersBar({
           nickname={student.nickname}
           avatarUrl={student.avatarUrl}
           totalEarned={student.totalEarned}
-          currencySymbol={currencySymbol}
           size="md"
           tooltipPlacement="top"
         />
       ))}
       {hiddenStudents.length > 0 ? (
-        <OverflowBadge hiddenStudents={hiddenStudents} currencySymbol={currencySymbol} />
+        <OverflowBadge hiddenStudents={hiddenStudents} />
       ) : null}
     </div>
   );

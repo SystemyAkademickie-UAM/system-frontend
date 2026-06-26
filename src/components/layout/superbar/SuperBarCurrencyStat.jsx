@@ -47,7 +47,7 @@ export default function SuperBarCurrencyStat({
         onMouseLeave={handleMouseLeave}
       >
         <span className="super-bar-stat__icon">
-          <CurrencyIcon size="lg" ariaLabel={currencyLabel} />
+          <CurrencyIcon size="xl" ariaLabel={currencyLabel} />
         </span>
         <SuperBarStatBadge value={currentAmount} />
       </div>
@@ -55,13 +55,13 @@ export default function SuperBarCurrencyStat({
       {previewVisible
         ? createPortal(
           <div
-            className="super-bar-currency-preview"
+            className="super-bar-stat-preview super-bar-stat-preview--currency"
             style={{ left: `${previewPos.x}px`, top: `${previewPos.y}px` }}
             aria-hidden="true"
           >
-            <p className="super-bar-currency-preview__title">{currencyLabel}</p>
-            <p className="super-bar-currency-preview__label">Zgromadzona</p>
-            <CurrencyDisplay amount={totalEarned} size="md" className="super-bar-currency-preview__value" />
+            <p className="super-bar-stat-preview__title">{currencyLabel}</p>
+            <p className="super-bar-stat-preview__label">Zgromadzona</p>
+            <CurrencyDisplay amount={totalEarned} size="md" className="super-bar-stat-preview__value" />
           </div>,
           document.body,
         )

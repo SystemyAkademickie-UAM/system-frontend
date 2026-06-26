@@ -15,7 +15,6 @@ export default function BadgeTreasuryCard({
   badge,
   earnersByBadgeId,
   excludeAccountId = null,
-  currencySymbol,
   isStudentView = false,
 }) {
   const earners = getBadgeEarners(earnersByBadgeId, badge.dbId, excludeAccountId);
@@ -31,7 +30,6 @@ export default function BadgeTreasuryCard({
           storyDescription={badge.storyDescription || '—'}
           didacticDescription={badge.didacticDescription || '—'}
           rewardAmount={badge.rewardAmount}
-          rewardEmoji={badge.rewardEmoji}
           iconFile={badge.iconFile}
           showEarnedAt={false}
           isLocked={isLocked}
@@ -39,7 +37,6 @@ export default function BadgeTreasuryCard({
         />
         <BadgeEarnersBar
           students={earners}
-          currencySymbol={currencySymbol}
           className="badge-treasury-card__earners"
         />
       </div>

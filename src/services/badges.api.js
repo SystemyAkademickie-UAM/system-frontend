@@ -1,4 +1,5 @@
 import { getJson, postJson, patchJson, deleteJson } from './api-client.js';
+import { extractApiError } from './apiErrors.js';
 
 /**
  * @typedef {Object} Badge
@@ -45,8 +46,7 @@ export async function fetchGroupBadges(groupId) {
 export async function createBadge(groupId, badgeData) {
   const result = await postJson(`/groups/${groupId}/badges`, badgeData);
   if (!result.ok) {
-    const errorData = /** @type {{ message?: string }} */ (result.data);
-    return { ok: false, error: errorData?.message || 'Nie udało się utworzyć odznaki' };
+    return { ok: false, error: extractApiError(result.data, 'Nie udało się utworzyć odznaki') };
   }
   return { ok: true, badge: /** @type {Badge} */ (result.data) };
 }
@@ -63,8 +63,7 @@ export async function createBadge(groupId, badgeData) {
 export async function updateBadge(groupId, badgeId, updates) {
   const result = await patchJson(`/groups/${groupId}/badges/${badgeId}`, updates);
   if (!result.ok) {
-    const errorData = /** @type {{ message?: string }} */ (result.data);
-    return { ok: false, error: errorData?.message || 'Nie udało się zaktualizować odznaki' };
+    return { ok: false, error: extractApiError(result.data, 'Nie udało się zaktualizować odznaki') };
   }
   return { ok: true, badge: /** @type {Badge} */ (result.data) };
 }
@@ -80,8 +79,7 @@ export async function updateBadge(groupId, badgeId, updates) {
 export async function deleteBadge(groupId, badgeId) {
   const result = await deleteJson(`/groups/${groupId}/badges/${badgeId}`);
   if (!result.ok) {
-    const errorData = /** @type {{ message?: string }} */ (result.data);
-    return { ok: false, error: errorData?.message || 'Nie udało się usunąć odznaki' };
+    return { ok: false, error: extractApiError(result.data, 'Nie udało się usunąć odznaki') };
   }
   return { ok: true };
 }

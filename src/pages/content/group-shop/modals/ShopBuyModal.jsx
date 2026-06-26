@@ -1,10 +1,11 @@
 import { Modal, ProductCard } from '../../../../components/ui/index.js';
-import { resolveShopCategoryLabels } from '../shopCategories.js';
+import { resolveShopCategoryDetails } from '../../../../utils/shop/shopCategories.js';
 import './shopModals.css';
 
 export default function ShopBuyModal({
   isOpen,
   item,
+  categoriesById,
   onClose,
   onConfirm,
 }) {
@@ -12,7 +13,7 @@ export default function ShopBuyModal({
     return null;
   }
 
-  const categoryLabels = resolveShopCategoryLabels(item.categories);
+  const categoryDetails = resolveShopCategoryDetails(item.categories, categoriesById);
 
   return (
     <Modal
@@ -29,13 +30,15 @@ export default function ShopBuyModal({
       </p>
       <ProductCard
         variant="preview"
+        itemId={item.id}
         name={item.name}
         storyDescription={item.storyDescription}
         didacticDescription={item.didacticDescription}
         priceAmount={item.priceAmount}
         salePriceAmount={item.salePriceAmount}
-        imageUrl={item.imageUrl}
-        categories={categoryLabels}
+        rankDiscountedPrice={item.rankDiscountedPrice}
+        imageRef={item.imageRef}
+        categoryDetails={categoryDetails}
         hideActions
         className="shop-modal__preview"
         disabled

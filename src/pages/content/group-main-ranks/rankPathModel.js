@@ -1,4 +1,5 @@
 import { getRankGradientColor, RANK_LOCKED_COLOR } from '../../../utils/rankGradient.js';
+import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
 /**
  * @typedef {Object} RankPathRank
@@ -34,14 +35,15 @@ import { getRankGradientColor, RANK_LOCKED_COLOR } from '../../../utils/rankGrad
  * @returns {Omit<RankPathRank, 'accentColor' | 'isUnlocked'>}
  */
 export function mapRankForPath(rank, index) {
+  const icon = normalizeRankBadgeIcon(rank.icon, DEFAULT_RANK_EMOJI);
   return {
     id: `rank-${rank.id}`,
     dbId: rank.id,
     position: index + 1,
     name: rank.name || 'Nieznana ranga',
-    iconFile: rank.icon ? `backend:${rank.icon}` : '⭐',
+    icon,
+    iconFile: icon,
     costAmount: rank.requiredPoints ?? 0,
-    costEmoji: '🥕',
     storyDescription: rank.storyDescription || '',
     shopItems: rank.uniqueStoreItems || [],
     storeDiscount: rank.storeDiscount || 0,

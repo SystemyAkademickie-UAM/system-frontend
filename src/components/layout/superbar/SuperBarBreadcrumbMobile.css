@@ -5,6 +5,7 @@
 @media (max-width: 899px) {
   .super-bar-breadcrumb-mobile {
     display: block;
+    flex-shrink: 0;
     padding: 0.65rem clamp(1rem, 2.5vw, 1.25rem) 0;
     background: var(--color-bg-app);
   }

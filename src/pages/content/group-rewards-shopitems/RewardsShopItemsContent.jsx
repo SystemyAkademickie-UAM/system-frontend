@@ -1,20 +1,34 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   Button,
+  CatalogFilterGroup,
+  CatalogFiltersPanel,
+  CatalogFiltersToggle,
+  CatalogSortSelect,
   CurrencyDisplay,
   DataTable,
   SearchBar,
-  ShopToggleButton,
   useToast,
 } from '../../../components/ui/index.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
-import { groupShopAddPath } from '../../../routes/pathRegistry.js';
-import '../../../components/page/PageUnavailable.css';
-import { resolveShopCategoryLabels } from '../group-shop/shopCategories.js';
+import { buildShopCategoryFilters, resolveShopCategoryLabels } from '../../../utils/shop/shopCategories.js';
 import ShopDeleteModal from '../group-shop/modals/ShopDeleteModal.jsx';
-import { useGroupShopItems, useGroupShopOpen } from '../group-shop/useGroupShop.js';
+import ShopItemFormModal from '../group-shop/modals/ShopItemFormModal.jsx';
+import ShopAccessModal from '../group-shop/modals/ShopAccessModal.jsx';
+import ShopCategoriesModal from '../group-shop/modals/ShopCategoriesModal.jsx';
+import ShopStudentCatalogPanel from '../group-shop/ShopStudentCatalogPanel.jsx';
+import { useGroupShopSchedule } from '../../../hooks/groups/useGroupShopSchedule.js';
+import { useViewLayoutPreference } from '../../../hooks/useViewLayoutPreference.js';
+import ViewLayoutToggle from '../../../components/ui/ViewLayoutToggle/ViewLayoutToggle.jsx';
+import { useGroupShopItems, useGroupShopOpen } from '../../../hooks/shop/useGroupShop.js';
+import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
+import {
+  SHOP_SORT,
+  SHOP_SORT_OPTIONS,
+} from '../../../utils/shop/shopModel.js';
+import { getVisibilityStatusLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
 import RewardsShopItemTableRow from '../group-rewards/shared/RewardsShopItemTableRow.jsx';
 import '../group-rewards/shared/rewardsShared.css';
 import '../group-rewards/shared/rewardsTablePreview.css';
@@ -32,11 +46,11 @@ function formatLimitValue(value) {
 }
 
 /**
- * @param {import('../group-shop/shopItem.types.js').ShopItem} item
+ * @param {import('../../../utils/shop/shopItem.types.js').ShopItem} item
  * @param {number} index
  */
-function mapShopItemToRow(item, index) {
-  const categoryLabels = resolveShopCategoryLabels(item.categories);
+function mapShopItemToRow(item, index, categoriesById) {
+  const categoryLabels = resolveShopCategoryLabels(item.categories, categoriesById);
   return {
     ...item,
     position: index + 1,
@@ -67,6 +81,25 @@ const SHOP_ITEM_COLUMNS = [
     ),
   },
   {
+    key: 'visibility',
+    label: 'Widoczność',
+    sort: 'text',
+    width: '110px',
+    accessor: (item) => getVisibilityStatusLabel(item.isPublished),
+    render: (item) => (
+      <span
+        className={[
+          'rewards-table__visibility',
+          item.isPublished === false
+            ? 'rewards-table__visibility--hidden'
+            : 'rewards-table__visibility--public',
+        ].join(' ')}
+      >
+        {getVisibilityStatusLabel(item.isPublished)}
+      </span>
+    ),
+  },
+  {
     key: '_spacer',
     label: '',
     sort: false,
@@ -83,7 +116,6 @@ const SHOP_ITEM_COLUMNS = [
     render: (item) => (
       <CurrencyDisplay
         amount={item.priceAmount}
-        symbol="🥕"
         size="sm"
       />
     ),
@@ -151,38 +183,81 @@ const SHOP_ITEM_COLUMNS = [
 
 export default function RewardsShopItemsContent() {
   const nav = useGroupSubNav('group-rewards');
+  const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-shop-view');
   const { groupId } = useParams();
-  const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
   const {
     items,
     isLoading,
     error,
     deleteItem,
+    refetch,
   } = useGroupShopItems(groupId);
   const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
+  const { shopOpensAt, scheduleShopOpen } = useGroupShopSchedule(groupId);
+  const {
+    categories,
+    categoriesById,
+    refetch: refetchCategories,
+  } = useGroupItemCategories(groupId);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
+  const [shopAccessOpen, setShopAccessOpen] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortBy, setSortBy] = useState(SHOP_SORT.nameAsc);
+
+  const categoryFilters = useMemo(
+    () => buildShopCategoryFilters(categories),
+    [categories],
+  );
 
   const catalogItems = useMemo(
-    () => items.map(mapShopItemToRow),
-    [items],
+    () => items.map((item, index) => mapShopItemToRow(item, index, categoriesById)),
+    [items, categoriesById],
   );
+
+  const closeModal = useCallback(() => {
+    setActiveModal(null);
+  }, []);
+
+  const handleItemSaved = useCallback(async () => {
+    closeModal();
+    await refetch();
+    await refetchCategories();
+  }, [closeModal, refetch, refetchCategories]);
 
   const handleToggleShopOpen = useCallback(async () => {
     const result = await toggleShopOpen();
     if (!result?.ok) {
       showError(result?.error ?? 'Nie udało się zmienić statusu sklepu.');
+      return { ok: false };
     }
-  }, [showError, toggleShopOpen]);
+    showSuccess(isShopOpen ? 'Sklep został zamknięty.' : 'Sklep został otwarty.');
+    return { ok: true };
+  }, [isShopOpen, showError, showSuccess, toggleShopOpen]);
+
+  const handleScheduleShopOpen = useCallback(async (isoDate) => {
+    const result = await scheduleShopOpen(isoDate);
+    if (!result.ok) {
+      showError(result.error ?? 'Nie udało się zapisać harmonogramu otwarcia.');
+    } else if (isoDate) {
+      showSuccess('Zapisano planowane otwarcie sklepu.');
+    }
+    return result;
+  }, [scheduleShopOpen, showError, showSuccess]);
 
   const openDeleteModal = useCallback((item) => {
     setActiveModal({ type: 'delete', item });
   }, []);
 
-  const closeModal = useCallback(() => {
-    setActiveModal(null);
+  const openEditModal = useCallback((item) => {
+    setActiveModal({ type: 'itemForm', itemId: item.id });
+  }, []);
+
+  const openAddModal = useCallback(() => {
+    setActiveModal({ type: 'itemForm', itemId: null });
   }, []);
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -202,18 +277,15 @@ export default function RewardsShopItemsContent() {
   }, [activeModal, deleteItem, closeModal, showSuccess, showError]);
 
   const handleEdit = useCallback((item) => {
-    if (!groupId) {
-      return;
-    }
-    navigate(`${groupShopAddPath(groupId)}?itemId=${encodeURIComponent(item.id)}`);
-  }, [groupId, navigate]);
+    openEditModal(item);
+  }, [openEditModal]);
 
   const handleAddProduct = useCallback(() => {
     if (!groupId) {
       return;
     }
-    navigate(groupShopAddPath(groupId));
-  }, [groupId, navigate]);
+    openAddModal();
+  }, [groupId, openAddModal]);
 
   const rowActions = useMemo(() => ({
     onDelete: openDeleteModal,
@@ -250,14 +322,10 @@ export default function RewardsShopItemsContent() {
       title={nav.sectionTitle}
       subNavItems={nav.items}
       subNavAriaLabel={nav.ariaLabel}
+      headerAction={<ViewLayoutToggle layout={layout} onToggle={toggleLayout} />}
       toolbar={(
         <>
           <div className="maq-section-page__toolbar-start rewards-shop-items__toolbar-start">
-            <ShopToggleButton
-              isShopOpen={isShopOpen}
-              onToggle={handleToggleShopOpen}
-              className="rewards-shop-items__toggle"
-            />
             <Button
               variant="primary"
               size="md"
@@ -267,15 +335,43 @@ export default function RewardsShopItemsContent() {
               Dodaj produkt
             </Button>
           </div>
-          <div className="maq-section-page__toolbar-end">
-            <SearchBar
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Szukaj produktu…"
-              name="shop-item-catalog-search"
-              className="rewards-page__search rewards-shop-items__search"
-              aria-label="Szukaj produktu"
-            />
+          <div className="maq-section-page__toolbar-end rewards-shop-items__toolbar-end">
+            <div className="rewards-shop-items__toolbar-row">
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                className="rewards-shop-items__access-btn"
+                onClick={() => setActiveModal({ type: 'categories' })}
+              >
+                Kategorie
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                className="rewards-shop-items__access-btn"
+                onClick={() => setShopAccessOpen(true)}
+              >
+                Dostęp do sklepu
+              </Button>
+              <SearchBar
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Szukaj produktu…"
+                name="shop-item-catalog-search"
+                className="rewards-page__search rewards-shop-items__search"
+                aria-label="Szukaj produktu"
+              />
+            </div>
+            {isTileView ? (
+              <div className="rewards-shop-items__toolbar-row rewards-shop-items__toolbar-row--filters">
+                <CatalogFiltersToggle
+                  expanded={filtersExpanded}
+                  onToggle={() => setFiltersExpanded((expanded) => !expanded)}
+                />
+              </div>
+            ) : null}
           </div>
         </>
       )}
@@ -287,6 +383,37 @@ export default function RewardsShopItemsContent() {
         <p className="rewards-page__empty page-unavailable__notice">
           Brak produktów w sklepie. Kliknij „Dodaj produkt”, aby utworzyć pierwszy.
         </p>
+      ) : isTileView ? (
+        <>
+          {filtersExpanded ? (
+            <CatalogFiltersPanel className="rewards-page__filters">
+              <CatalogFilterGroup
+                ariaLabel="Filtr kategorii produktu"
+                filters={categoryFilters}
+                activeId={categoryFilter}
+                onSelect={setCategoryFilter}
+              />
+              <CatalogSortSelect
+                value={sortBy}
+                onChange={setSortBy}
+                options={SHOP_SORT_OPTIONS}
+              />
+            </CatalogFiltersPanel>
+          ) : null}
+          <ShopStudentCatalogPanel
+            groupId={groupId}
+            showLecturerActions
+            onlyPublished={false}
+            searchQuery={searchQuery}
+            filtersExpanded={false}
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            onEdit={handleEdit}
+            onDelete={openDeleteModal}
+          />
+        </>
       ) : (
         <DataTable
           columns={SHOP_ITEM_COLUMNS}
@@ -318,6 +445,31 @@ export default function RewardsShopItemsContent() {
         item={modalItem}
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
+      />
+
+      <ShopItemFormModal
+        isOpen={activeModal?.type === 'itemForm'}
+        groupId={groupId}
+        itemId={activeModal?.type === 'itemForm' ? activeModal.itemId : null}
+        onClose={closeModal}
+        onSaved={handleItemSaved}
+      />
+
+      <ShopAccessModal
+        isOpen={shopAccessOpen}
+        isShopOpen={isShopOpen}
+        shopOpensAt={shopOpensAt}
+        onClose={() => setShopAccessOpen(false)}
+        onToggleShopOpen={handleToggleShopOpen}
+        onScheduleShopOpen={handleScheduleShopOpen}
+      />
+
+      <ShopCategoriesModal
+        isOpen={activeModal?.type === 'categories'}
+        groupId={groupId}
+        categories={categories}
+        onClose={closeModal}
+        onChanged={refetchCategories}
       />
     </SectionPageLayout>
   );

@@ -8,7 +8,7 @@ import './ShopClosedOverlay.css';
  * @param {Object} props
  * @param {boolean} props.isClosed
  * @param {boolean} [props.isGameOver=false]
- * @param {import('../../../pages/content/group-shop/shopItem.types.js').ShopItem} [props.extraLifeProduct]
+ * @param {import('../../../utils/shop/shopItem.types.js').ShopItem} [props.extraLifeProduct]
  * @param {() => void} [props.onExtraLifeBuy]
  * @param {string} [props.className]
  */
@@ -54,11 +54,14 @@ export default function ShopClosedOverlay({
               <div className="maq-shop-closed-overlay__extra-life">
                 <ProductCard
                   variant="extra-life"
+                  itemId={extraLifeProduct.id}
                   name={extraLifeProduct.name}
                   storyDescription={extraLifeProduct.storyDescription}
                   didacticDescription={extraLifeProduct.didacticDescription}
                   priceAmount={extraLifeProduct.priceAmount}
-                  imageUrl={extraLifeProduct.imageUrl}
+                  salePriceAmount={extraLifeProduct.salePriceAmount}
+                  rankDiscountedPrice={extraLifeProduct.rankDiscountedPrice}
+                  imageRef={extraLifeProduct.imageRef}
                   hideAddToCart
                   onBuy={onExtraLifeBuy}
                   className="maq-shop-closed-overlay__extra-life-card"

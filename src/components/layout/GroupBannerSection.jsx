@@ -1,5 +1,5 @@
 import GroupBanner from '../../pages/content/group-shared/GroupBanner/GroupBanner.jsx';
-import { useGroupDetails } from '../../pages/content/group-shared/useGroupDetails.js';
+import { useGroupDetails } from '../../hooks/groups/useGroupDetails.js';
 
 /** Baner grupy współdzielony między widokami studenta (main, sklep, ranking). */
 export default function GroupBannerSection({ groupId }) {

@@ -22,11 +22,64 @@
   pointer-events: auto;
 }
 
-.badge-treasury__top {
+.badge-treasury__toolbar {
+  margin-bottom: 0.75rem;
+}
+
+.badge-treasury__toolbar-end {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.625rem;
+}
+
+.badge-treasury__filters.catalog-filters__panel {
+  display: block;
+}
+
+.badge-treasury__filters-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.badge-treasury__filters-spacer {
+  flex: 1 1 2rem;
+  min-width: 1rem;
+}
+
+.badge-treasury__filter-group-wrap--unlock {
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.badge-treasury__filters .badge-treasury__sort.catalog-filters__sort--panel {
+  margin-left: 0;
+  flex-shrink: 0;
+}
+
+@media (max-width: 720px) {
+  .badge-treasury__filters-spacer {
+    display: none;
+  }
+
+  .badge-treasury__filter-group-wrap--unlock {
+    width: 100%;
+    padding-left: 0;
+    padding-top: 0.5rem;
+    margin-top: 0.25rem;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .badge-treasury__filters .badge-treasury__sort.catalog-filters__sort--panel {
+    width: 100%;
+  }
 }
 
 .badge-treasury__eyebrow {
@@ -46,87 +99,9 @@
   color: var(--color-text-primary);
 }
 
-.badge-treasury__controls {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.625rem 0.75rem;
-}
-
 .badge-treasury__search {
-  flex: 0 1 14rem;
-  width: 100%;
-  max-width: 14rem;
-  min-width: 10rem;
-}
-
-.badge-treasury__control-group {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.375rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  background: var(--color-bg-surface);
-}
-
-.badge-treasury__control-group--sort {
-  gap: 0.5rem;
-  margin-left: auto;
-  padding: 0.375rem 0.5rem 0.375rem 0.75rem;
-  background: var(--color-bg-app);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.badge-treasury__filter {
-  padding: 0.375rem 0.75rem;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  line-height: 1.25rem;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.badge-treasury__filter:hover {
-  color: var(--color-text-primary);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.badge-treasury__filter--active {
-  background: var(--color-nav-sub-active-bg);
-  color: var(--color-accent);
-}
-
-.badge-treasury__sort-label {
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  white-space: nowrap;
-}
-
-.badge-treasury__sort-select {
-  min-width: 11rem;
-  max-width: 16rem;
-  padding: 0.375rem 0.75rem;
-  border: 0;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  font: inherit;
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  line-height: 1.25rem;
-  color: var(--color-text-primary);
-  cursor: pointer;
-}
-
-.badge-treasury__sort-select:focus {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 1px;
+  flex: 1 1 16rem;
+  max-width: 24rem;
 }
 
 .badge-treasury__message {
@@ -171,17 +146,6 @@
 @media (max-width: 960px) {
   .badge-treasury__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .badge-treasury__control-group--sort {
-    margin-left: 0;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .badge-treasury__sort-select {
-    flex: 1;
-    max-width: none;
   }
 }
 

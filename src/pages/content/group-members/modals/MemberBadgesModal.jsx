@@ -236,7 +236,7 @@ export default function MemberBadgesModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Dodaj / usuń odznakę"
+      title="Przydziel odznakę"
       subtitle={member.name}
       onConfirm={handleConfirm}
       confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}

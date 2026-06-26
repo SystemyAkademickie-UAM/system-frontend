@@ -1,14 +1,15 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../api-test/mock/browserIdStorage.js';
+import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 
 import { Button } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
-import { GroupMainEmptyNotice, useGroupMainEmptyLink } from '../group-main/GroupMainHomeContent.jsx';
+import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
+import { useGroupMainEmptyLink } from '../../../hooks/group-main/useGroupMainEmptyLink.js';
 import '../group-main/GroupMainHomeContent.css';
 import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
 import '../group-main/shared/groupMainSubpageHeader.css';
@@ -43,7 +44,8 @@ export default function GroupMainActivities() {
   const [selectedactivityname, setSelectedactivityname] = useState('');
 
 
-  async function onFetchStages() {
+  const onFetchStages = useCallback(async () => {
+    if (!groupId) return;
 
     setErrorMessage('');
 
@@ -63,7 +65,7 @@ export default function GroupMainActivities() {
         },
         body: JSON.stringify({
           method: 'retrieve',
-          groupId: groupId
+          groupId: Number(groupId),
         })
       });
 
@@ -82,29 +84,17 @@ export default function GroupMainActivities() {
 
       console.log('POST /stages retrieve JSON:', data);
 
-      let receiveddata = data;
-
-      const receivedstages = [];
-
-      let i = 0;
-
-      while (i < receiveddata.stages.length) {
-
-        receivedstages.push({id: receiveddata.stages[i].id, name: receiveddata.stages[i].name, activities: []});
-
-        i = i + 1;
-      }
+      const receivedstages = (data?.stages ?? []).map((stage) => ({
+          id: stage.id,
+          name: stage.name,
+          activities: [],
+        }));
 
       setStages(receivedstages);
 
-      i = 0;
-
-      while (i < receivedstages.length) {
-
-        onFetchActivities(receivedstages[i].id);
-
-        i = i + 1;
-      }
+      receivedstages.forEach((stage) => {
+        onFetchActivities(stage.id);
+      });
 
       setHasLoadedStages(true);
 
@@ -121,7 +111,7 @@ export default function GroupMainActivities() {
       setErrorMessage(message);
       setHasLoadedStages(true);
     }
-  }
+  }, [groupId]);
 
 
 
@@ -182,9 +172,11 @@ export default function GroupMainActivities() {
 
             let j = 0;
 
-            while (j < receiveddata.activities.length) {
+            const activitiesList = receiveddata?.activities ?? [];
 
-              newactivities.push({id: receiveddata.activities[j].id, name: receiveddata.activities[j].name, description0: receiveddata.activities[j].storyDescription, description1: receiveddata.activities[j].educationalDescription, reward: receiveddata.activities[j].currency, unlocked: 1});
+            while (j < activitiesList.length) {
+
+              newactivities.push({id: activitiesList[j].id, name: activitiesList[j].name, description0: activitiesList[j].storyDescription, description1: activitiesList[j].educationalDescription, reward: activitiesList[j].currency, unlocked: 1});
 
               j = j + 1;
             }
@@ -380,13 +372,12 @@ export default function GroupMainActivities() {
 
   useEffect(() => {
     onFetchStages();
-  }, []);
+  }, [onFetchStages]);
 
   useEffect(() => {
-    if (role == APP_ROLE.STUDENT) {
-      onFetchStudentProfile();
-    }
-  }, [role]);
+    if (!groupId || role !== APP_ROLE.STUDENT) return;
+    onFetchStudentProfile();
+  }, [groupId, role]);
 
 
 

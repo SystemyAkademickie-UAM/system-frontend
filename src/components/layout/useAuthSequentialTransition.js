@@ -67,13 +67,9 @@ export function useAuthSequentialTransition({ locationKey, currentNode, resolveT
     return undefined;
   }, [state.phase, state.payload]);
 
-  const isTransitionPending =
-    state.phase === AUTH_TRANSITION_PHASE.IDLE &&
-    locationKey !== commitRef.current.key;
-
   return {
     phase: state.phase,
     payload: state.payload,
-    settledNode: isTransitionPending ? commitRef.current.node : currentNode,
+    settledNode: currentNode,
   };
 }

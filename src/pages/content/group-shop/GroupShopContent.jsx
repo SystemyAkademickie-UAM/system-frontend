@@ -1,66 +1,72 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   Button,
+  CatalogFilterGroup,
+  CatalogFiltersPanel,
+  CatalogFiltersToggle,
+  CatalogSortSelect,
+  Divider,
   Pagination,
   ProductCard,
   SearchBar,
   ShopCartPanel,
   ShopClosedOverlay,
   ShopToggleButton,
-  SubNav,
   useToast,
 } from '../../../components/ui/index.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
-import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
-import '../group-main/shared/groupMainSubpageHeader.css';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
-import { groupShopAddPath } from '../../../routes/pathRegistry.js';
+
+import {
+  buildShopCategoryFilters,
+  resolveShopCategoryDetails,
+} from '../../../utils/shop/shopCategories.js';
+import { getShopItemEffectivePrice } from '../../../utils/shop/shopPricing.js';
+import {
+  filterCatalogShopItems,
+  findExtraLifeShopItem,
+  sortShopItemsWithExtraLifeFirst,
+} from '../../../utils/shop/extraLifeItem.js';
+import {
+  filterShopItems,
+  paginateShopItems,
+  SHOP_SORT,
+  SHOP_SORT_OPTIONS,
+  sortShopItems,
+} from '../../../utils/shop/shopModel.js';
+import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
+import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
+import {
+  useGroupShopCart,
+  useGroupShopItems,
+  useGroupShopOpen,
+} from '../../../hooks/shop/useGroupShop.js';
+import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
+import ShopBuyModal from './modals/ShopBuyModal.jsx';
+import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
+import ShopItemFormModal from './modals/ShopItemFormModal.jsx';
+import ShopCategoriesModal from './modals/ShopCategoriesModal.jsx';
 import {
   invalidateGroupInventory,
   invalidateStudentProfile,
 } from '../../../services/studentProfileEvents.js';
-import { resolveShopCategoryLabels } from './shopCategories.js';
-import { getShopItemEffectivePrice } from './shopPricing.js';
-import { EXTRA_LIFE_PRODUCT, EXTRA_LIFE_PRODUCT_ID } from './shopExtraLife.js';
-import {
-  filterShopItems,
-  paginateShopItems,
-  SHOP_CATEGORY_FILTERS,
-  SHOP_SORT,
-  SHOP_SORT_OPTIONS,
-  sortShopItems,
-} from './shopModel.js';
-import {
-  useGroupShopCart,
-  useGroupShopItems,
-  useGroupShopLives,
-  useGroupShopOpen,
-} from './useGroupShop.js';
-import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
-import ShopBuyModal from './modals/ShopBuyModal.jsx';
-import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
 import '../../../components/page/PageUnavailable.css';
 import '../shared/groupSectionPage.css';
 import '../group-members/MembersHomeContent.css';
 import './GroupShopContent.css';
+import '../group-main/shared/groupMainSubpageHeader.css';
 
 const ITEMS_PER_PAGE = 10;
-const STUDENT_SHOP_OPEN_POLL_MS = 15000;
 
 export default function GroupShopContent() {
   const { groupId } = useParams();
-  const { pathname } = useLocation();
-  const navigate = useNavigate();
   const { role } = useAppRole();
   const { showSuccess, showError, showToast } = useToast();
-  const isShopPreview = pathname.includes('/preview/shop');
-  const isStudentView = role === APP_ROLE.STUDENT || isShopPreview;
-  const isLecturerView = role !== APP_ROLE.STUDENT && !isShopPreview;
-  const previewNav = useGroupSubNav('group-preview');
+  const isStudentView = role === APP_ROLE.STUDENT;
+  const isLecturerView = role !== APP_ROLE.STUDENT;
 
   const {
     items,
@@ -72,11 +78,17 @@ export default function GroupShopContent() {
   } = useGroupShopItems(groupId);
 
   const catalogItems = useMemo(() => {
-    if (!isStudentView) {
-      return items;
-    }
-    return items.filter((item) => item.isPublished !== false);
+    const sourceItems = isStudentView
+      ? filterCatalogShopItems(items, true).filter((item) => item.isPublished !== false)
+      : sortShopItemsWithExtraLifeFirst(items);
+
+    return sourceItems;
   }, [items, isStudentView]);
+
+  const extraLifeProduct = useMemo(
+    () => findExtraLifeShopItem(items),
+    [items],
+  );
 
   const {
     cartItems,
@@ -87,11 +99,12 @@ export default function GroupShopContent() {
     removeFromCart,
     clearCart,
   } = useGroupShopCart(groupId, catalogItems);
-  const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId, {
-    pollIntervalMs: isStudentView ? STUDENT_SHOP_OPEN_POLL_MS : 0,
-  });
-  const { livesBlocked, toggleLivesBlocked, unblockLives } = useGroupShopLives(groupId);
-  const livesBlockedForView = isLecturerView ? livesBlocked : false;
+  const { isShopOpen, toggleShopOpen, refetchShopOpen } = useGroupShopOpen(groupId);
+  const {
+    isGameOver,
+    showExtraLifeProduct,
+    refetch: refetchLives,
+  } = useGroupShopLivesSystem(groupId, { isStudentView });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -100,8 +113,26 @@ export default function GroupShopContent() {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshingShop, setIsRefreshingShop] = useState(false);
+
+  const {
+    categories,
+    categoriesById,
+    refetch: refetchCategories,
+  } = useGroupItemCategories(groupId);
+
+  const categoryFilters = useMemo(
+    () => buildShopCategoryFilters(categories),
+    [categories],
+  );
 
   const closeModal = useCallback(() => setActiveModal(null), []);
+
+  const handleItemSaved = useCallback(async () => {
+    closeModal();
+    await refetch();
+    await refetchCategories();
+  }, [closeModal, refetch, refetchCategories]);
 
   const visibleItems = useMemo(() => {
     const filtered = filterShopItems(catalogItems, { searchQuery, categoryFilter });
@@ -123,29 +154,33 @@ export default function GroupShopContent() {
     }
   }, [page, pagination.totalPages]);
 
-  useEffect(() => {
-    if (!isStudentView || !groupId) {
-      return undefined;
+  const handleRefreshShop = useCallback(async () => {
+    if (isRefreshingShop) {
+      return;
     }
 
-    const refreshCatalog = () => {
-      if (document.visibilityState === 'visible') {
-        refetch();
-      }
-    };
+    setIsRefreshingShop(true);
 
-    const intervalId = window.setInterval(refreshCatalog, STUDENT_SHOP_OPEN_POLL_MS);
-    window.addEventListener('focus', refreshCatalog);
-    document.addEventListener('visibilitychange', refreshCatalog);
+    const [itemsResult, openResult] = await Promise.all([
+      refetch({ silent: true }),
+      refetchShopOpen({ silent: true }),
+    ]);
 
-    return () => {
-      window.clearInterval(intervalId);
-      window.removeEventListener('focus', refreshCatalog);
-      document.removeEventListener('visibilitychange', refreshCatalog);
-    };
-  }, [isStudentView, groupId, refetch]);
+    setIsRefreshingShop(false);
 
-  const shopInteractionDisabled = !isShopOpen || livesBlockedForView;
+    if (itemsResult.ok && openResult.ok) {
+      showSuccess('Sklep został odświeżony.');
+      return;
+    }
+
+    showError(
+      itemsResult.error
+      ?? openResult.error
+      ?? 'Nie udało się odświeżyć sklepu.',
+    );
+  }, [isRefreshingShop, refetch, refetchShopOpen, showError, showSuccess]);
+
+  const shopInteractionDisabled = !isShopOpen || (isStudentView && isGameOver);
   const purchaseDisabled = shopInteractionDisabled || isLecturerView;
 
   const refreshAfterPurchase = useCallback(async () => {
@@ -161,13 +196,6 @@ export default function GroupShopContent() {
       return;
     }
 
-    if (activeModal.item.id === EXTRA_LIFE_PRODUCT_ID) {
-      unblockLives();
-      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
-      closeModal();
-      return;
-    }
-
     setIsSubmitting(true);
     const result = await buyItem(activeModal.item.id);
     setIsSubmitting(false);
@@ -178,9 +206,14 @@ export default function GroupShopContent() {
     }
 
     await refreshAfterPurchase();
-    showSuccess('Produkt został zakupiony.');
+    if (activeModal.item.isExtraLife) {
+      await refetchLives();
+      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
+    } else {
+      showSuccess('Produkt został zakupiony.');
+    }
     closeModal();
-  }, [activeModal, buyItem, closeModal, refreshAfterPurchase, showError, showSuccess, unblockLives]);
+  }, [activeModal, buyItem, closeModal, refetchLives, refreshAfterPurchase, showError, showSuccess]);
 
   const handleBuyAllConfirm = useCallback(async () => {
     if (cartItems.length === 0) {
@@ -250,55 +283,65 @@ export default function GroupShopContent() {
       </div>
       <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
         <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
-          <Button
-            type="button"
-            variant="ghost"
-            size="md"
-            onClick={toggleLivesBlocked}
-            aria-pressed={livesBlocked}
-            className="group-shop__lives-toggle"
-          >
-            System żyć{livesBlocked ? ' (zablokowany)' : ''}
-          </Button>
-        </RoleVisibility>
-
-        <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
           <div className="group-shop__lecturer-actions">
             {groupId ? (
-              <Button to={groupShopAddPath(groupId)} variant="secondary" size="md">
-                Dodaj produkt
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setActiveModal({ type: 'categories' })}
+                >
+                  Kategorie
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  onClick={() => setActiveModal({ type: 'itemForm', itemId: null })}
+                >
+                  Dodaj produkt
+                </Button>
+              </>
             ) : null}
             <ShopToggleButton isShopOpen={isShopOpen} onToggle={handleToggleShopOpen} />
           </div>
         </RoleVisibility>
 
-        <ShopCartPanel
-          cartCount={cartCount}
-          cartItems={cartItems.map((item) => ({
-            id: item.id,
-            name: item.name,
-            priceAmount: getShopItemEffectivePrice(item),
-            imageUrl: item.imageUrl,
-          }))}
-          cartTotal={cartTotal}
-          disabled={purchaseDisabled}
-          onBuyAll={() => setActiveModal({ type: 'buyAll' })}
-          onRemoveFromCart={removeFromCart}
-          className="group-shop__cart"
-        />
+        <div className="group-shop__cart-actions">
+          {isStudentView ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="group-shop__refresh-btn"
+              onClick={handleRefreshShop}
+              disabled={isRefreshingShop}
+            >
+              Odśwież sklep
+            </Button>
+          ) : null}
 
-        <button
-          type="button"
-          className={[
-            'group-shop__filters-toggle',
-            filtersExpanded ? 'group-shop__filters-toggle--active' : '',
-          ].join(' ')}
-          aria-expanded={filtersExpanded}
-          onClick={() => setFiltersExpanded((expanded) => !expanded)}
-        >
-          Filtry i sortowanie
-        </button>
+          <ShopCartPanel
+            cartCount={cartCount}
+            cartItems={cartItems.map((item) => ({
+              id: item.id,
+              name: item.name,
+              priceAmount: getShopItemEffectivePrice(item),
+              imageUrl: item.imageUrl,
+            }))}
+            cartTotal={cartTotal}
+            disabled={purchaseDisabled}
+            onBuyAll={() => setActiveModal({ type: 'buyAll' })}
+            onRemoveFromCart={removeFromCart}
+            className="group-shop__cart"
+          />
+        </div>
+
+        <CatalogFiltersToggle
+          expanded={filtersExpanded}
+          onToggle={() => setFiltersExpanded((expanded) => !expanded)}
+        />
       </div>
     </>
   );
@@ -306,42 +349,20 @@ export default function GroupShopContent() {
   const shopBody = (
     <>
       {filtersExpanded ? (
-        <div className="group-shop__filters">
-          <div
-            className="group-shop__filter-group"
-            role="group"
-            aria-label="Filtr kategorii produktu"
-          >
-            {SHOP_CATEGORY_FILTERS.map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                className={[
-                  'group-shop__filter',
-                  categoryFilter === filter.id ? 'group-shop__filter--active' : '',
-                ].join(' ')}
-                onClick={() => setCategoryFilter(filter.id)}
-              >
-                {filter.label}
-              </button>
-            ))}
-          </div>
+        <CatalogFiltersPanel>
+          <CatalogFilterGroup
+            ariaLabel="Filtr kategorii produktu"
+            filters={categoryFilters}
+            activeId={categoryFilter}
+            onSelect={setCategoryFilter}
+          />
 
-          <label className="group-shop__sort">
-            <span className="group-shop__sort-label">Sortuj:</span>
-            <select
-              className="group-shop__sort-select"
-              value={sortBy}
-              onChange={(event) => setSortBy(event.target.value)}
-            >
-              {SHOP_SORT_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+          <CatalogSortSelect
+            value={sortBy}
+            onChange={setSortBy}
+            options={SHOP_SORT_OPTIONS}
+          />
+        </CatalogFiltersPanel>
       ) : null}
 
       {error ? (
@@ -358,9 +379,13 @@ export default function GroupShopContent() {
       >
         <ShopClosedOverlay
           isClosed={!isShopOpen}
-          isGameOver={isShopOpen && livesBlockedForView}
-          extraLifeProduct={EXTRA_LIFE_PRODUCT}
-          onExtraLifeBuy={() => setActiveModal({ type: 'buy', item: EXTRA_LIFE_PRODUCT })}
+          isGameOver={isShopOpen && isGameOver}
+          extraLifeProduct={showExtraLifeProduct ? extraLifeProduct : null}
+          onExtraLifeBuy={() => {
+            if (extraLifeProduct) {
+              setActiveModal({ type: 'buy', item: extraLifeProduct });
+            }
+          }}
         />
 
         <div className="group-shop__catalog-surface">
@@ -374,7 +399,11 @@ export default function GroupShopContent() {
               {isLecturerView ? (
                 <>
                   {' '}
-                  <button type="button" className="group-shop__empty-link" onClick={() => navigate(groupShopAddPath(groupId))}>
+                  <button
+                    type="button"
+                    className="group-shop__empty-link"
+                    onClick={() => setActiveModal({ type: 'itemForm', itemId: null })}
+                  >
                     Dodaj pierwszy produkt
                   </button>
                 </>
@@ -390,21 +419,28 @@ export default function GroupShopContent() {
                 {pagination.pageItems.map((item) => (
                   <ProductCard
                     key={item.id}
+                    itemId={item.id}
                     name={item.name}
                     storyDescription={item.storyDescription}
                     didacticDescription={item.didacticDescription}
                     priceAmount={item.priceAmount}
                     salePriceAmount={item.salePriceAmount}
-                    imageUrl={item.imageUrl}
-                    categories={resolveShopCategoryLabels(item.categories)}
+                    rankDiscountedPrice={item.rankDiscountedPrice}
+                    imageRef={item.imageRef}
+                    categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
                     showLecturerActions={isLecturerView}
-                    disabled={purchaseDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0)}
+                    disabled={purchaseDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0) || item.isLocked}
+                    isRankLocked={!isLecturerView && item.isLocked}
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
-                    onEdit={() => navigate(`${groupShopAddPath(groupId)}?itemId=${encodeURIComponent(item.id)}`)}
-                    onDelete={() => setActiveModal({ type: 'delete', item })}
-                    className="group-shop__card"
+                    onEdit={() => setActiveModal({ type: 'itemForm', itemId: item.id })}
+                    onDelete={item.isExtraLife ? undefined : () => setActiveModal({ type: 'delete', item })}
+                    className={[
+                      'group-shop__card',
+                      item.isExtraLife ? 'maq-product-card--extra-life' : '',
+                    ].filter(Boolean).join(' ')}
+                    hideAddToCart={item.isExtraLife}
                   />
                 ))}
               </div>
@@ -426,6 +462,7 @@ export default function GroupShopContent() {
       <ShopBuyModal
         isOpen={activeModal?.type === 'buy'}
         item={modalItem}
+        categoriesById={categoriesById}
         onClose={closeModal}
         onConfirm={handleBuyConfirm}
       />
@@ -444,23 +481,41 @@ export default function GroupShopContent() {
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
       />
+
+      <ShopItemFormModal
+        isOpen={activeModal?.type === 'itemForm'}
+        groupId={groupId}
+        itemId={activeModal?.type === 'itemForm' ? activeModal.itemId : null}
+        onClose={closeModal}
+        onSaved={handleItemSaved}
+      />
+
+      <ShopCategoriesModal
+        isOpen={activeModal?.type === 'categories'}
+        groupId={groupId}
+        categories={categories}
+        onClose={closeModal}
+        onChanged={refetchCategories}
+      />
     </>
   );
 
   if (isStudentView) {
     return (
-      <section className="page-unavailable group-shop-page group-shop-page--student">
-        <GroupMainSubpageHeader eyebrow="Targowisko" title="Sklep" />
-        {isShopPreview ? (
-          <SubNav
-            ariaLabel={previewNav.ariaLabel}
-            items={previewNav.items}
-            className="group-shop-page__preview-sub-nav"
-          />
-        ) : null}
-        <div className="group-shop-page__student-toolbar maq-section-page__toolbar">
+      <section className="group-shop-page group-shop-page--student" aria-label="Sklep grupy">
+        <div className="group-shop-page__title-row">
+          <header className="group-shop-page__page-header">
+            <p className="group-main-subpage__eyebrow">Targowisko</p>
+            <h1 className="group-main-subpage__title">Sklep</h1>
+          </header>
+        </div>
+
+        <Divider className="group-main-subpage__divider" />
+
+        <div className="group-shop-page__student-toolbar">
           {toolbar}
         </div>
+
         {shopBody}
       </section>
     );

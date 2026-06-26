@@ -10,6 +10,13 @@ const EXIT_ANIMATION_MS = 450;
 let toastCounter = 0;
 
 function parseToastMessage(message, variant = 'success') {
+  if (Array.isArray(message)) {
+    const detail = message.map((item) => String(item).trim()).filter(Boolean).join(', ');
+    return detail
+      ? { emphasis: variant === 'error' ? 'Błąd' : '', detail }
+      : { emphasis: variant === 'error' ? 'Błąd' : '', detail: 'Operacja nie powiodła się' };
+  }
+
   if (message && typeof message === 'object') {
     return {
       emphasis: message.title ?? message.emphasis ?? '',

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
-import { getOrCreateBrowserId } from '../api-test/mock/browserIdStorage.js';
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 
 /**
@@ -46,9 +46,12 @@ function mapPost(raw) {
     id: raw.id,
     title: raw.title ?? '',
     text: raw.content ?? raw.text ?? '',
+    isPublished: raw.isPublished !== false,
+    publishedAt: raw.publishedAt ?? null,
+    publishAt: raw.publishAt ?? null,
+    createdAt: raw.createdAt ?? null,
   };
 }
-
 function sortPostsNewestFirst(posts) {
   return [...posts].sort((a, b) => b.id - a.id);
 }
@@ -87,16 +90,36 @@ export function useGroupPosts() {
     fetchPosts();
   }, [fetchPosts]);
 
-  const createPost = useCallback(async ({ title, text }) => {
+  const createPost = useCallback(async ({
+    title,
+    text,
+    startHidden = false,
+    schedulePublish = false,
+    publishAt = null,
+    isPublished = true,
+  }) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
     try {
-      await requestJson(`/groups/${groupId}/post`, {
+      const createBody = { title, content: text };
+
+      if (schedulePublish && publishAt) {
+        createBody.publishAt = publishAt;
+      } else if (!startHidden) {
+        createBody.publishAt = new Date().toISOString();
+      }
+
+      const data = await requestJson(`/groups/${groupId}/post`, {
         method: 'POST',
-        body: JSON.stringify({ title, content: text }),
+        body: JSON.stringify(createBody),
       });
-      showSuccess('Wpis został dodany.');
-      await fetchPosts();
+
+      const postId = data?.post;
+      if (typeof postId !== 'number' || postId <= 0) {
+        throw new Error('Nie udało się utworzyć wpisu.');
+      }
+
+      showSuccess('Wpis został dodany.');      await fetchPosts();
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -105,13 +128,34 @@ export function useGroupPosts() {
     }
   }, [groupId, fetchPosts, showSuccess, showError]);
 
-  const updatePost = useCallback(async (postId, { title, text }) => {
+  const updatePost = useCallback(async (postId, {
+    title,
+    text,
+    startHidden = false,
+    schedulePublish = false,
+    publishAt = null,
+    isPublished,
+  }) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
     try {
-      const data = await requestJson(`/groups/${groupId}/post/${postId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ title, content: text }),
+      const patchBody = { title, content: text };
+
+      if (startHidden) {
+        patchBody.isPublished = false;
+        patchBody.publishAt = null;
+      } else if (schedulePublish && publishAt) {
+        patchBody.publishAt = publishAt;
+      } else if (isPublished === false) {
+        patchBody.isPublished = false;
+        patchBody.publishAt = null;
+      } else {
+        patchBody.isPublished = true;
+        patchBody.publishAt = null;
+      }
+
+      const data = await requestJson(`/groups/${groupId}/post/${postId}`, {        method: 'PATCH',
+        body: JSON.stringify(patchBody),
       });
 
       if (data?.updated === false) {

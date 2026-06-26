@@ -11,6 +11,15 @@ import PostFormModal from './PostFormModal.jsx';
 import PostDeleteModal from './PostDeleteModal.jsx';
 import './PostsContent.css';
 
+function formatPostDate(value) {
+  if (!value) return null;
+  return new Date(value).toLocaleDateString('pl-PL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 function filterPosts(posts, query) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return posts;
@@ -132,7 +141,10 @@ export default function PostsContent() {
         </p>
       ) : (
         <div className="posts-islands">
-          {filteredPosts.map((post) => (
+          {filteredPosts.map((post) => {
+            const publishedLabel = formatPostDate(post.publishedAt || post.createdAt);
+
+            return (
             <SmartPostCard
               key={`post-${post.id}`}
               title={post.title}
@@ -144,12 +156,30 @@ export default function PostsContent() {
               dividerClassName="posts-island__divider"
               textClassName="posts-island__text"
               trailing={(
-                <div className="posts-island__actions">
-                  <DataTableRowActions row={post} rowActions={postRowActions} />
+                <div className="posts-island__meta">
+                  <div className="posts-island__status-row">
+                    {publishedLabel ? (
+                      <time className="posts-island__date" dateTime={post.publishedAt || post.createdAt}>
+                        {publishedLabel}
+                      </time>
+                    ) : null}
+                    <span
+                      className={[
+                        'posts-island__status',
+                        post.isPublished ? 'posts-island__status--published' : 'posts-island__status--draft',
+                      ].join(' ')}
+                    >
+                      {post.isPublished ? 'Opublikowany' : 'Nieopublikowany'}
+                    </span>
+                  </div>
+                  <div className="posts-island__actions">
+                    <DataTableRowActions row={post} rowActions={postRowActions} />
+                  </div>
                 </div>
               )}
             />
-          ))}
+            );
+          })}
         </div>
       )}
 
