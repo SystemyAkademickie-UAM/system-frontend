@@ -10,6 +10,7 @@
  * - id: stabilny identyfikator (telemetria, testy).
  * - enabled: false — przycisk ukryty bez usuwania konfiguracji.
  * - requiresGroup: true — widoczny dopiero po wyborze grupy (ścieżka /groups/:groupId/...).
+ * - requiresGroupOwner: true — tylko właściciel grupy (Game Master), nie gość-prowadzący.
  * - hrefKey: klucz z HREF_BUILDERS (oprócz kind === 'logout').
  * - kind: 'navlink' | 'cta' | 'logout' | 'spacer' | 'unavailable' | 'tree-item' | 'tree-group' | 'tree-expandable'
  * - matchEnd: przekazywane do NavLink `end` (np. lista grup).
@@ -314,6 +315,7 @@ const lecturerView = {
           iconId: 'nav/members',
           hrefKey: 'GROUP_MEMBERS',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -324,6 +326,7 @@ const lecturerView = {
           iconId: 'nav/activity',
           hrefKey: 'GROUP_MEMBERS_LOG',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -334,6 +337,7 @@ const lecturerView = {
           iconId: 'nav/access-codes',
           hrefKey: 'GROUP_MEMBERS_CODE',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
       ],
@@ -354,6 +358,7 @@ const lecturerView = {
           iconId: 'nav/activity',
           hrefKey: 'GROUP_ACTIVITIES',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -364,6 +369,7 @@ const lecturerView = {
           iconId: 'nav/posts',
           hrefKey: 'GROUP_POSTS',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -374,6 +380,7 @@ const lecturerView = {
           iconId: 'nav/reports',
           hrefKey: 'GROUP_ACTIVITIES_TOOLS',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
       ],
@@ -394,6 +401,7 @@ const lecturerView = {
           iconId: 'nav/badges',
           hrefKey: 'GROUP_REWARDS',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -404,6 +412,7 @@ const lecturerView = {
           iconId: 'nav/ranks',
           hrefKey: 'GROUP_REWARDS_RANKS',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -414,6 +423,7 @@ const lecturerView = {
           iconId: 'nav/shop',
           hrefKey: 'GROUP_SHOP_ITEMS',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
       ],
@@ -434,6 +444,7 @@ const lecturerView = {
           iconId: 'nav/group-settings',
           hrefKey: 'GROUP_SETTINGS',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -444,6 +455,7 @@ const lecturerView = {
           iconId: 'nav/currency',
           hrefKey: 'GROUP_SETTINGS_CURRENCY',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
         {
@@ -454,6 +466,7 @@ const lecturerView = {
           iconId: 'nav/lives',
           hrefKey: 'GROUP_SETTINGS_HEALTH',
           requiresGroup: true,
+          requiresGroupOwner: true,
           matchEnd: true,
         },
       ],
@@ -683,6 +696,10 @@ function resolveNavItem(item, context) {
     return null;
   }
 
+  if (item.requiresGroupOwner && !context.isGroupOwner) {
+    return null;
+  }
+
   if (item.kind === 'spacer') {
     return { ...item };
   }
@@ -733,7 +750,7 @@ function resolveNavItem(item, context) {
 
 /**
  * @param {string} role
- * @param {{ groupId: string | null }} context
+ * @param {{ groupId: string | null, isGroupOwner?: boolean }} context
  */
 export function resolveShellView(role, context) {
   const view = SHELL_VIEWS[role] ?? SHELL_VIEWS[APP_ROLE.STUDENT];

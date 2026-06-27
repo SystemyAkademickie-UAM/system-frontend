@@ -1,6 +1,6 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
-import { HomeRedirect, RouteGuard, GroupAccessGuard } from '../components/guards/index.js';
+import { HomeRedirect, RouteGuard, GroupAccessGuard, GroupOwnerGuard } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 
 // Login/Auth pages
@@ -205,29 +205,18 @@ const appRouteTree = [
                   },
 
                   // ----------------------------------------
-                  // STUDENT PROFILE (lecturer view) — ekwipunek uczestnika
+                  // GAME MASTER routes — group owner only
                   // ----------------------------------------
+                  {
+                    element: withGuard(<GroupOwnerGuard />),
+                    children: [
+                  // STUDENT PROFILE (lecturer view) — ekwipunek uczestnika
                   {
                     path: 'student-profile/:studentId',
                     element: withGuard(<StudentProfileViewPage />, { allowedRoles: LECTURER_ONLY }),
                   },
 
-                  // ----------------------------------------
-                  // PROFILE - student only (own profile)
-                  // ----------------------------------------
-                  {
-                    path: 'profile',
-                    element: withGuard(<ProfileLayout />, { allowedRoles: STUDENT_ONLY }),
-                    children: [
-                      { index: true, element: <ProfileHomePage /> },
-                      { path: 'activity', element: <ProfileLogPage /> },
-                      { path: 'eq', element: <ProfileEqPage /> },
-                    ],
-                  },
-
-                  // ----------------------------------------
                   // MEMBERS (Użytkownicy) - lecturer only
-                  // ----------------------------------------
                   {
                     path: 'members',
                     element: withGuard(<MembersLayout />, { allowedRoles: LECTURER_ONLY }),
@@ -238,9 +227,7 @@ const appRouteTree = [
                     ],
                   },
 
-                  // ----------------------------------------
                   // ACTIVITIES (Aktywności) - lecturer only
-                  // ----------------------------------------
                   {
                     path: 'activities',
                     element: withGuard(<ActivitiesLayout />, { allowedRoles: LECTURER_ONLY }),
@@ -251,9 +238,7 @@ const appRouteTree = [
                     ],
                   },
 
-                  // ----------------------------------------
                   // REWARDS (Systemy nagród) - lecturer only
-                  // ----------------------------------------
                   {
                     path: 'rewards',
                     element: withGuard(<RewardsLayout />, { allowedRoles: LECTURER_ONLY }),
@@ -265,9 +250,7 @@ const appRouteTree = [
                     ],
                   },
 
-                  // ----------------------------------------
                   // GROUP SETTINGS (Ustawienia grupy) - lecturer only
-                  // ----------------------------------------
                   {
                     path: 'group-settings',
                     element: withGuard(<GroupSettingsLayout />, { allowedRoles: LECTURER_ONLY }),
@@ -275,6 +258,24 @@ const appRouteTree = [
                       { index: true, element: <GroupSettingsHomePage /> },
                       { path: 'currency', element: <GroupSettingsCurrencyPage /> },
                       { path: 'lives', element: <GroupSettingsHealthPage /> },
+                    ],
+                  },
+
+                  {
+                    path: 'shop/add',
+                    element: withGuard(<ShopAddRedirect />, { allowedRoles: LECTURER_ONLY }),
+                  },
+                    ],
+                  },
+
+                  // PROFILE - student only (own profile)
+                  {
+                    path: 'profile',
+                    element: withGuard(<ProfileLayout />, { allowedRoles: STUDENT_ONLY }),
+                    children: [
+                      { index: true, element: <ProfileHomePage /> },
+                      { path: 'activity', element: <ProfileLogPage /> },
+                      { path: 'eq', element: <ProfileEqPage /> },
                     ],
                   },
 
@@ -287,10 +288,6 @@ const appRouteTree = [
                     children: [
                       { index: true, element: <ShopHomePage /> },
                     ],
-                  },
-                  {
-                    path: 'shop/add',
-                    element: withGuard(<ShopAddRedirect />, { allowedRoles: LECTURER_ONLY }),
                   },
 
                   // ----------------------------------------

@@ -1,4 +1,5 @@
 import { useOptionalGroupId } from '../../hooks/useOptionalGroupId.js';
+import { useGroupPreview } from '../../hooks/groups/useGroupPreview.js';
 import { resolveShellView } from '../../navigation/shellTemplates.config.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { groupsListPath } from '../../routes/pathRegistry.js';
@@ -11,7 +12,8 @@ import './navigation-shell.css';
 export default function Sidebar({ onNavigate }) {
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
-  const shell = resolveShellView(role, { groupId });
+  const { isOwner } = useGroupPreview(groupId);
+  const shell = resolveShellView(role, { groupId, isGroupOwner: isOwner });
 
   const handleNav = () => {
     onNavigate?.();

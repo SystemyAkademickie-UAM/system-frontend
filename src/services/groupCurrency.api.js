@@ -65,11 +65,17 @@ export async function fetchGroupCurrencyConfig(groupId) {
  */
 export async function updateGroupCurrencyConfig(groupId, payload) {
   const result = await patchJson(`/groups/${groupId}/currency`, payload);
-  if (!result.ok || !result.data || typeof result.data !== 'object') {
+  if (!result.ok || result.status === 403 || !result.data || typeof result.data !== 'object') {
     return { ok: false };
   }
 
-  const data = /** @type {{ currency?: string | null, currencyEmoji?: string | null }} */ (result.data);
+  const data = /** @type {{ updated?: boolean, currency?: string | null, currencyEmoji?: string | null }} */ (
+    result.data
+  );
+  if (data.updated === false) {
+    return { ok: false };
+  }
+
   return {
     ok: true,
     config: {
