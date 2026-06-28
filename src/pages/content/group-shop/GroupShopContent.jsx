@@ -16,8 +16,8 @@ import {
   useToast,
 } from '../../../components/ui/index.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
-import { RoleVisibility } from '../../../components/guards/index.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { useGroupPreview } from '../../../hooks/groups/useGroupPreview.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 
 import {
@@ -64,9 +64,11 @@ const ITEMS_PER_PAGE = 10;
 export default function GroupShopContent() {
   const { groupId } = useParams();
   const { role } = useAppRole();
+  const { isOwner } = useGroupPreview(groupId);
   const { showSuccess, showError, showToast } = useToast();
   const isStudentView = role === APP_ROLE.STUDENT;
   const isLecturerView = role !== APP_ROLE.STUDENT;
+  const canManageShop = isLecturerView && isOwner;
 
   const {
     items,
@@ -282,7 +284,7 @@ export default function GroupShopContent() {
         />
       </div>
       <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
-        <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
+        {canManageShop ? (
           <div className="group-shop__lecturer-actions">
             {groupId ? (
               <>
@@ -306,7 +308,7 @@ export default function GroupShopContent() {
             ) : null}
             <ShopToggleButton isShopOpen={isShopOpen} onToggle={handleToggleShopOpen} />
           </div>
-        </RoleVisibility>
+        ) : null}
 
         <div className="group-shop__cart-actions">
           {isStudentView ? (

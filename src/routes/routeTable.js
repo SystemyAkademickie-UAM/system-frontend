@@ -14,6 +14,7 @@
  * @property {string} [contentModule] — ścieżka do *Content.jsx w content/
  * @property {string} [section] — grupa logiczna (auth, app, group, dev)
  * @property {string[]} [roles] — dozwolone role (puste = jak w routerze)
+ * @property {boolean} [requiresGroupOwner] — tylko właściciel grupy (Game Master)
  */
 
 /** @type {AppRouteDefinition[]} */
