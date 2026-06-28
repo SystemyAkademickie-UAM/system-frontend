@@ -3,6 +3,56 @@ import { Button, Modal } from '../index.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useResponsivePopularCount } from './useResponsivePopularCount.js';
 import './AvatarPicker.css';
+
+const AVATARPICKERLABELTEXT = {
+  polish: 'Twój awatar',
+  english: 'Your avatar',
+};
+
+const POPULARLABELTEXT = {
+  polish: 'Najczęściej używane',
+  english: 'Most used',
+};
+
+const SHOWALLLABELTEXT = {
+  polish: 'Pokaż pozostałe awatary',
+  english: 'Show all avatars',
+};
+
+const HIDEALLLABELTEXT = {
+  polish: 'Ukryj pozostałe awatary',
+  english: 'Hide all avatars',
+};
+
+const SHOWALLBUTTONLABELTEXT = {
+  polish: 'Pokaż wszystkie',
+  english: 'Show all',
+};
+
+const SELECTAVATARMODALLABELTEXT = {
+  polish: 'Wybierz awatar',
+  english: 'Select avatar',
+};
+
+const SELECTTITLELABEL = {
+  polish: 'Wybierz awatar',
+  english: 'Select avatar',
+};
+
+const SELECTEDAVATARLABELTEXT = {
+  polish: 'Wybrany awatar',
+  english: 'Selected avatar',
+};
+
+const REMAININGAVATARSLABELTEXT = {
+  polish: 'Pozostałe awatary',
+  english: 'Remaining avatars',
+};
+
+const ALLAVATARSLABELTEXT = {
+  polish: 'Wszystkie awatary',
+  english: 'All avatars',
+};
 function AvatarPlaceholder({ className }) {
   return (
     <svg className={className} viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -45,6 +95,7 @@ export default function AvatarPicker({
   disabled = false,
   variant = 'default',
   className = '',
+  LANGUAGE = 'polish',
 }) {
   const isCompact = variant === 'compact';
   const responsivePopularCount = useResponsivePopularCount();
@@ -88,7 +139,7 @@ export default function AvatarPicker({
         onClick={() => handleSelect(avatar.id)}
         disabled={disabled}
         aria-pressed={isActive}
-        aria-label={avatar.name ? `Wybierz awatar ${avatar.name}` : `Wybierz awatar ${avatar.id}`}
+        aria-label={avatar.name ? `${SELECTTITLELABEL[LANGUAGE]} ${avatar.name}` : `${SELECTTITLELABEL[LANGUAGE]} ${avatar.id}`}
       >
         <span className="maq-avatar-picker__tile-frame">
           {avatar.imageUrl ? (
@@ -111,7 +162,7 @@ export default function AvatarPicker({
         {selectedAvatar?.imageUrl ? (
           <img
             src={selectedAvatar.imageUrl}
-            alt={selectedAvatar.name ?? 'Wybrany awatar'}
+            alt={selectedAvatar.name ?? SELECTEDAVATARLABELTEXT[LANGUAGE]}
             className={getAvatarImageClassName(selectedAvatar.imageUrl, 'maq-avatar-picker__current-image')}
           />
         ) : (
@@ -135,12 +186,12 @@ export default function AvatarPicker({
       ].filter(Boolean).join(' ')}
     >
       <div className="maq-avatar-picker__current">
-        <p className="maq-avatar-picker__label">Twój awatar</p>
+        <p className="maq-avatar-picker__label">{AVATARPICKERLABELTEXT[LANGUAGE]}</p>
         {renderCurrentPreview()}
       </div>
       {popularAvatars.length > 0 ? (
         <div className="maq-avatar-picker__popular">
-          <p className="maq-avatar-picker__label">Najczęściej używane</p>
+          <p className="maq-avatar-picker__label">{POPULARLABELTEXT[LANGUAGE]}</p>
           <div className="maq-avatar-picker__popular-grid" role="list">
             {popularAvatars.map((avatar) => renderTile(avatar, 'sm'))}
           </div>
@@ -164,14 +215,14 @@ export default function AvatarPicker({
             aria-expanded={isCompact ? showAllModal : showGallery}
           >
             {isCompact
-              ? 'Pokaż wszystkie'
-              : (showGallery ? 'Ukryj pozostałe awatary' : 'Pokaż pozostałe awatary')}
+              ? SHOWALLBUTTONLABELTEXT[LANGUAGE]
+              : (showGallery ? HIDEALLLABELTEXT[LANGUAGE] : SHOWALLLABELTEXT[LANGUAGE])}
           </Button>
         </div>
       ) : null}
 
       {!isCompact && showGallery && avatars.length > 0 ? (
-        <div className="maq-avatar-picker__gallery" role="list" aria-label="Pozostałe awatary">
+        <div className="maq-avatar-picker__gallery" role="list" aria-label={REMAININGAVATARSLABELTEXT[LANGUAGE]}>
           {(remainingAvatars.length > 0 ? remainingAvatars : avatars).map((avatar) => renderTile(avatar, 'md'))}
         </div>
       ) : null}
@@ -180,17 +231,17 @@ export default function AvatarPicker({
         <Modal
           isOpen={showAllModal}
           onClose={() => setShowAllModal(false)}
-          title="Wybierz awatar"
+          title={SELECTAVATARMODALLABELTEXT[LANGUAGE]}
           size="lg"
           showFooter={false}
           className="maq-avatar-picker__modal"
         >
           <div className="maq-avatar-picker__modal-content">
             <div className="maq-avatar-picker__modal-preview">
-              <p className="maq-avatar-picker__label">Twój awatar</p>
+              <p className="maq-avatar-picker__label">{AVATARPICKERLABELTEXT[LANGUAGE]}</p>
               {renderCurrentPreview('maq-avatar-picker__current-frame maq-avatar-picker__current-frame--modal')}
             </div>
-            <div className="maq-avatar-picker__modal-gallery" role="list" aria-label="Wszystkie awatary">
+            <div className="maq-avatar-picker__modal-gallery" role="list" aria-label={ALLAVATARSLABELTEXT[LANGUAGE]}>
               {avatars.map((avatar) => renderTile(avatar, 'md'))}
             </div>
           </div>
