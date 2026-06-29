@@ -49,10 +49,6 @@ import ShopBuyModal from './modals/ShopBuyModal.jsx';
 import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
 import ShopItemFormModal from './modals/ShopItemFormModal.jsx';
 import ShopCategoriesModal from './modals/ShopCategoriesModal.jsx';
-import {
-  invalidateGroupInventory,
-  invalidateStudentProfile,
-} from '../../../services/studentProfileEvents.js';
 import '../../../components/page/PageUnavailable.css';
 import '../shared/groupSectionPage.css';
 import '../group-members/MembersHomeContent.css';
@@ -101,7 +97,7 @@ export default function GroupShopContent() {
     removeFromCart,
     clearCart,
   } = useGroupShopCart(groupId, catalogItems);
-  const { isShopOpen, toggleShopOpen, refetchShopOpen } = useGroupShopOpen(groupId);
+  const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
   const {
     isGameOver,
     showExtraLifeProduct,
@@ -115,7 +111,6 @@ export default function GroupShopContent() {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isRefreshingShop, setIsRefreshingShop] = useState(false);
 
   const {
     categories,
@@ -156,42 +151,8 @@ export default function GroupShopContent() {
     }
   }, [page, pagination.totalPages]);
 
-  const handleRefreshShop = useCallback(async () => {
-    if (isRefreshingShop) {
-      return;
-    }
-
-    setIsRefreshingShop(true);
-
-    const [itemsResult, openResult] = await Promise.all([
-      refetch({ silent: true }),
-      refetchShopOpen({ silent: true }),
-    ]);
-
-    setIsRefreshingShop(false);
-
-    if (itemsResult.ok && openResult.ok) {
-      showSuccess('Sklep został odświeżony.');
-      return;
-    }
-
-    showError(
-      itemsResult.error
-      ?? openResult.error
-      ?? 'Nie udało się odświeżyć sklepu.',
-    );
-  }, [isRefreshingShop, refetch, refetchShopOpen, showError, showSuccess]);
-
   const shopInteractionDisabled = !isShopOpen || (isStudentView && isGameOver);
   const purchaseDisabled = shopInteractionDisabled || isLecturerView;
-
-  const refreshAfterPurchase = useCallback(async () => {
-    await refetch();
-    if (isStudentView && groupId) {
-      invalidateStudentProfile(groupId);
-      invalidateGroupInventory(groupId);
-    }
-  }, [refetch, isStudentView, groupId]);
 
   const handleBuyConfirm = useCallback(async () => {
     if (!activeModal?.item) {
@@ -207,7 +168,6 @@ export default function GroupShopContent() {
       return;
     }
 
-    await refreshAfterPurchase();
     if (activeModal.item.isExtraLife) {
       await refetchLives();
       showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
@@ -215,7 +175,7 @@ export default function GroupShopContent() {
       showSuccess('Produkt został zakupiony.');
     }
     closeModal();
-  }, [activeModal, buyItem, closeModal, refetchLives, refreshAfterPurchase, showError, showSuccess]);
+  }, [activeModal, buyItem, closeModal, refetchLives, showError, showSuccess]);
 
   const handleBuyAllConfirm = useCallback(async () => {
     if (cartItems.length === 0) {
@@ -228,16 +188,14 @@ export default function GroupShopContent() {
       if (!result.ok) {
         setIsSubmitting(false);
         showError(result.error ?? `Nie udało się kupić: ${item.name}`);
-        await refreshAfterPurchase();
         return;
       }
     }
     setIsSubmitting(false);
     clearCart();
-    await refreshAfterPurchase();
     showSuccess('Zakup produktów z koszyka został potwierdzony.');
     closeModal();
-  }, [buyItem, cartItems, clearCart, closeModal, refreshAfterPurchase, showError, showSuccess]);
+  }, [buyItem, cartItems, clearCart, closeModal, showError, showSuccess]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.item) {
@@ -311,19 +269,6 @@ export default function GroupShopContent() {
         ) : null}
 
         <div className="group-shop__cart-actions">
-          {isStudentView ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="md"
-              className="group-shop__refresh-btn"
-              onClick={handleRefreshShop}
-              disabled={isRefreshingShop}
-            >
-              Odśwież sklep
-            </Button>
-          ) : null}
-
           <ShopCartPanel
             cartCount={cartCount}
             cartItems={cartItems.map((item) => ({

@@ -14,9 +14,9 @@ Pliki
 
 Zachowanie
 ----------
-- Prowadzący: wszystkie odznaki kolorowe, domyślne sortowanie po jakości (epic → common)
+- Prowadzący: wszystkie odznaki kolorowe, domyślne sortowanie po rzadkości (epic → common)
 - Student: nieodblokowane odznaki szare (`Badge isLocked`), domyślne sortowanie:
-  odblokowane → zablokowane, potem jakość malejąco
+  odblokowane → zablokowane, potem rzadkości malejąco
 - Student nie widzi własnego awatara w pasku zdobywców; prowadzący widzi wszystkich
 - Odświeżanie danych przy powrocie do karty (focus / visibilitychange)
 

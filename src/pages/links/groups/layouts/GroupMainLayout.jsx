@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -15,14 +15,20 @@ export default function GroupMainLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { showSuccess } = useToast();
+  const joinedGroupId = useRef(null);
 
   useEffect(() => {
     const joinSuccessMessage = location.state?.[GROUP_JOIN_SUCCESS_STATE_KEY];
     if (!joinSuccessMessage) return;
 
+    if (joinedGroupId.current == groupId) {
+      return;
+    }
+
     showSuccess(joinSuccessMessage);
+    joinedGroupId.current = groupId;
     navigate(location.pathname, { replace: true, state: null });
-  }, [location.pathname, location.state, navigate, showSuccess]);
+  }, [location.pathname, location.state, navigate, groupId]);
 
   return (
     <div className="group-main-layout group-main-layout--no-sub-nav">

@@ -145,7 +145,7 @@ export default function ShopEditModal({
             <option value="">Dostępny dla wszystkich</option>
             {rankOptions.map((rank) => (
               <option key={rank.dbId} value={String(rank.dbId)}>
-                {`Zablokowany za rangę: ${rank.name}`}
+                {`Dostępny po osiągnięciu rangi: ${rank.name}`}
               </option>
             ))}
           </select>

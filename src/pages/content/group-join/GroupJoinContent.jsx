@@ -8,16 +8,106 @@ import { groupMainPath } from '../../../routes/pathRegistry.js';
 import { validateAlphanumericInput } from '../../../utils/validation/alphanumericValidation.js';
 import { useGroupPreview } from '../../../hooks/groups/useGroupPreview.js';
 import { enrollByCode } from '../../../services/enrollment.api.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import '../../../components/page/PageUnavailable.css';
 import './GroupJoinContent.css';
 
-const GROUP_JOIN_SUCCESS_MESSAGE = 'Pomyślnie dołączono do grupy.';
+const GROUPJOINSUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Pomyślnie dołączono do grupy.',
+  english: 'Successfully joined the group.',
+};
+
+const PAGETITLE__TEXTLABEL = {
+  polish: 'Dołączenie do grupy',
+  english: 'Join Group',
+};
+
+const PAGEDESCRIPTIONSTUDENT__TEXTLABEL = {
+  polish: 'Wpisz kod dostępu, aby wejść do wybranej grupy.',
+  english: 'Enter the access code to join the selected group.',
+};
+
+const PAGEDESCRIPTIONNONSTUDENT__TEXTLABEL = {
+  polish: 'Ta grupa nie należy do Twoich kursów.',
+  english: 'This group does not belong to your courses.',
+};
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Wczytywanie danych grupy...',
+  english: 'Loading group data...',
+};
+
+const NOACCESSMESSAGE__TEXTLABEL = {
+  polish: 'Nie masz dostępu do tej grupy. Możesz zarządzać wyłącznie własnymi kursami.',
+  english: 'You do not have access to this group. You can only manage your own courses.',
+};
+
+const GROUPINFOLEAD__TEXTLABEL = {
+  polish: 'Próbujesz dołączyć do grupy:',
+  english: 'You are trying to join the group:',
+};
+
+const STORYNAME__TEXTLABEL = {
+  polish: 'Nazwa fabularna',
+  english: 'Story Name',
+};
+
+const SUBJECT__TEXTLABEL = {
+  polish: 'Przedmiot',
+  english: 'Subject',
+};
+
+const LECTURER__TEXTLABEL = {
+  polish: 'Prowadzący',
+  english: 'Lecturer',
+};
+
+const GROUPID__TEXTLABEL = {
+  polish: 'Identyfikator grupy',
+  english: 'Group ID',
+};
+
+const ACCESSCODE__TEXTLABEL = {
+  polish: 'Kod dostępu',
+  english: 'Access Code',
+};
+
+const INPUTPLACEHOLDER__TEXTLABEL = {
+  polish: 'Wpisz 6-znakowy kod',
+  english: 'Enter 6-character code',
+};
+
+const JOINBUTTON__TEXTLABEL = {
+  polish: 'Dołącz',
+  english: 'Join',
+};
+
+const JOININGBUTTON__TEXTLABEL = {
+  polish: 'Dołączanie...',
+  english: 'Joining...',
+};
+
+const REDIRECTMESSAGE__TEXTLABEL = {
+  polish: 'Przekierowywanie do grupy...',
+  english: 'Redirecting to group...',
+};
+
+const MISSINGGROUPID__TEXTLABEL = {
+  polish: 'Brak identyfikatora grupy.',
+  english: 'Missing group ID.',
+};
+
+const INVALIDCODE__TEXTLABEL = {
+  polish: 'Nieprawidłowy kod dostępu.',
+  english: 'Invalid access code.',
+};
 
 export default function GroupJoinContent() {
   const { groupId } = useParams();
   const navigate = useNavigate();
   const { role } = useAppRole();
   const { group, hasAccess, isLoading, errorMessage } = useGroupPreview(groupId);
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [codeInput, setCodeInput] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +135,7 @@ export default function GroupJoinContent() {
     }
 
     if (!groupId) {
-      setSubmitError('Brak identyfikatora grupy.');
+      setSubmitError(MISSINGGROUPID__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -58,30 +148,30 @@ export default function GroupJoinContent() {
     if (result.ok) {
       navigate(groupMainPath(groupId), {
         replace: true,
-        state: { joinSuccessMessage: GROUP_JOIN_SUCCESS_MESSAGE },
+        state: { joinSuccessMessage: GROUPJOINSUCCESSMESSAGE__TEXTLABEL[LANGUAGE] },
       });
     } else {
-      setSubmitError(result.error || 'Nieprawidłowy kod dostępu.');
+      setSubmitError(result.error || INVALIDCODE__TEXTLABEL[LANGUAGE]);
     }
   };
 
   if (!isLoading && hasAccess && group) {
-    return <p className="group-join__message" role="status">Przekierowywanie do grupy…</p>;
+    return <p className="group-join__message" role="status">{REDIRECTMESSAGE__TEXTLABEL[LANGUAGE]}</p>;
   }
 
   return (
-    <section className="page-unavailable group-join" aria-label="Dołączenie do grupy">
+    <section className="page-unavailable group-join" aria-label={PAGETITLE__TEXTLABEL[LANGUAGE]}>
       <PageHeader
-        title="Dołączenie do grupy"
+        title={PAGETITLE__TEXTLABEL[LANGUAGE]}
         description={
           isStudent
-            ? 'Wpisz kod dostępu, aby wejść do wybranej grupy.'
-            : 'Ta grupa nie należy do Twoich kursów.'
+            ? PAGEDESCRIPTIONSTUDENT__TEXTLABEL[LANGUAGE]
+            : PAGEDESCRIPTIONNONSTUDENT__TEXTLABEL[LANGUAGE]
         }
       />
 
       {isLoading ? (
-        <p className="group-join__message" role="status">Ładowanie danych grupy…</p>
+        <p className="group-join__message" role="status">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : null}
 
       {!isLoading && errorMessage ? (
@@ -92,7 +182,7 @@ export default function GroupJoinContent() {
 
       {!isLoading && group && !hasAccess && !isStudent ? (
         <p className="group-join__message group-join__message--error" role="alert">
-          Nie masz dostępu do tej grupy. Możesz zarządzać wyłącznie własnymi kursami.
+          {NOACCESSMESSAGE__TEXTLABEL[LANGUAGE]}
         </p>
       ) : null}
 
@@ -100,24 +190,24 @@ export default function GroupJoinContent() {
         <>
           <div className="group-join__info">
             <p className="group-join__lead">
-              Próbujesz dołączyć do grupy:
+              {GROUPINFOLEAD__TEXTLABEL[LANGUAGE]}
             </p>
 
             <dl className="group-join__details">
               <div className="group-join__detail">
-                <dt>Nazwa fabularna</dt>
+                <dt>{STORYNAME__TEXTLABEL[LANGUAGE]}</dt>
                 <dd>{group.storyName}</dd>
               </div>
               <div className="group-join__detail">
-                <dt>Przedmiot</dt>
+                <dt>{SUBJECT__TEXTLABEL[LANGUAGE]}</dt>
                 <dd>{group.subject}</dd>
               </div>
               <div className="group-join__detail">
-                <dt>Prowadzący</dt>
+                <dt>{LECTURER__TEXTLABEL[LANGUAGE]}</dt>
                 <dd>{group.lecturer}</dd>
               </div>
               <div className="group-join__detail">
-                <dt>Identyfikator grupy</dt>
+                <dt>{GROUPID__TEXTLABEL[LANGUAGE]}</dt>
                 <dd>{group.id}</dd>
               </div>
             </dl>
@@ -126,7 +216,7 @@ export default function GroupJoinContent() {
           <form className="group-join__form" onSubmit={handleSubmit}>
             <div className="group-join__field">
               <label htmlFor="group-join-code" className="group-join__label">
-                Kod dostępu
+                {ACCESSCODE__TEXTLABEL[LANGUAGE]}
               </label>
               <div className="group-join__input-row">
                 <CharacterLimitedField
@@ -149,7 +239,7 @@ export default function GroupJoinContent() {
                       setCodeInput(event.target.value);
                       setSubmitError('');
                     }}
-                    placeholder="Wpisz 6-znakowy kod"
+                    placeholder={INPUTPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                     maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}
                     aria-invalid={showValidationError}
                     aria-describedby={
@@ -162,7 +252,7 @@ export default function GroupJoinContent() {
                   variant="primary"
                   disabled={!validation.valid || isSubmitting}
                 >
-                  {isSubmitting ? 'Dołączanie...' : 'Dołącz'}
+                  {isSubmitting ? JOININGBUTTON__TEXTLABEL[LANGUAGE] : JOINBUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
               </div>
 

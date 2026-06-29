@@ -6,12 +6,12 @@ export const VIEW_LAYOUT = {
 /** @type {Record<string, { label: string, variant: 'secondary' | 'primary', ariaLabel: string }>} */
 export const VIEW_LAYOUT_CONFIG = {
   [VIEW_LAYOUT.table]: {
-    label: 'Widok: Tabelkowy',
+    label: 'Lista',
     variant: 'secondary',
     ariaLabel: 'Przełącz na widok tabelkowy',
   },
   [VIEW_LAYOUT.tiles]: {
-    label: 'Widok: Kafelkowy',
+    label: 'Kafelki',
     variant: 'primary',
     ariaLabel: 'Przełącz na widok kafelkowy',
   },

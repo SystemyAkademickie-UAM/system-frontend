@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, TextField } from '../../../../components/ui/index.js';
 import { validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = {
@@ -18,8 +19,62 @@ export default function ActivityFormModal({
   onConfirm,
   isLoading = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [form, setForm] = useState(EMPTY_FORM);
   const isEdit = Boolean(activity);
+
+  const EDITACTIVITYTITLE__TEXTLABEL = {
+    polish: 'Edytuj aktywność',
+    english: 'Edit Activity',
+  };
+  const ADDACTIVITYTITLE__TEXTLABEL = {
+    polish: 'Dodaj aktywność',
+    english: 'Add Activity',
+  };
+  const SAVEBUTTON__TEXTLABEL = {
+    polish: 'Zapisz',
+    english: 'Save',
+  };
+  const ADDBUTTON__TEXTLABEL = {
+    polish: 'Dodaj',
+    english: 'Add',
+  };
+  const ACTIVITYNAME__TEXTLABEL = {
+    polish: 'Nazwa aktywności',
+    english: 'Activity Name',
+  };
+  const ACTIVITYNAMEPLACEHOLDER__TEXTLABEL = {
+    polish: 'np. Zadanie wprowadzające',
+    english: 'e.g. Introductory Task',
+  };
+  const REWARD__TEXTLABEL = {
+    polish: 'Nagroda',
+    english: 'Reward',
+  };
+  const REWARDPLACEHOLDER__TEXTLABEL = {
+    polish: 'np. 10',
+    english: 'e.g. 10',
+  };
+  const STORYDESCRIPTION__TEXTLABEL = {
+    polish: 'Opis fabularny',
+    english: 'Story Description',
+  };
+  const STORYDESCRIPTIONPLACEHOLDER__TEXTLABEL = {
+    polish: 'Krótki opis w kontekście fabuły kursu',
+    english: 'Short description in the context of the course story',
+  };
+  const EDUCATIONALDESCRIPTION__TEXTLABEL = {
+    polish: 'Opis dydaktyczny',
+    english: 'Educational Description',
+  };
+  const EDUCATIONALDESCRIPTIONPLACEHOLDER__TEXTLABEL = {
+    polish: 'Cele i wymagania edukacyjne',
+    english: 'Educational goals and requirements',
+  };
+  const STAGESUBTITLEPREFIX__TEXTLABEL = {
+    polish: 'Etap:',
+    english: 'Stage:',
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -68,11 +123,11 @@ export default function ActivityFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edytuj aktywność' : 'Dodaj aktywność'}
-      subtitle={stageName ? `Etap: ${stageName}` : undefined}
+      title={isEdit ? EDITACTIVITYTITLE__TEXTLABEL[LANGUAGE] : ADDACTIVITYTITLE__TEXTLABEL[LANGUAGE]}
+      subtitle={stageName ? `${STAGESUBTITLEPREFIX__TEXTLABEL[LANGUAGE]} ${stageName}` : undefined}
       onConfirm={handleConfirm}
       confirmDisabled={!isValid || isLoading}
-      confirmLabel={isEdit ? 'Zapisz' : 'Dodaj'}
+      confirmLabel={isEdit ? SAVEBUTTON__TEXTLABEL[LANGUAGE] : ADDBUTTON__TEXTLABEL[LANGUAGE]}
       size="md"
       className="rewards-modal"
     >
@@ -80,11 +135,11 @@ export default function ActivityFormModal({
         {isEdit ? (
           <TextField
             id="activity-name"
-            label="Nazwa aktywności"
+            label={ACTIVITYNAME__TEXTLABEL[LANGUAGE]}
             fieldKind="name"
             value={form.name}
             onChange={handleChange('name')}
-            placeholder="np. Zadanie wprowadzające"
+            placeholder={ACTIVITYNAMEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
             className="rewards-modal__field"
             inputClassName="rewards-modal__input"
           />
@@ -92,21 +147,21 @@ export default function ActivityFormModal({
           <div className="rewards-modal__row rewards-modal__row--name-reward">
             <TextField
               id="activity-name"
-              label="Nazwa aktywności"
+              label={ACTIVITYNAME__TEXTLABEL[LANGUAGE]}
               fieldKind="name"
               value={form.name}
               onChange={handleChange('name')}
-              placeholder="np. Zadanie wprowadzające"
+              placeholder={ACTIVITYNAMEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
               className="rewards-modal__field"
               inputClassName="rewards-modal__input"
             />
             <TextField
               id="activity-reward"
-              label="Nagroda"
+              label={REWARD__TEXTLABEL[LANGUAGE]}
               type="number"
               value={form.reward}
               onChange={handleChange('reward')}
-              placeholder="np. 10"
+              placeholder={REWARDPLACEHOLDER__TEXTLABEL[LANGUAGE]}
               className="rewards-modal__field"
               inputClassName="rewards-modal__input"
             />
@@ -115,22 +170,22 @@ export default function ActivityFormModal({
 
         <TextField
           id="activity-story"
-          label="Opis fabularny"
+          label={STORYDESCRIPTION__TEXTLABEL[LANGUAGE]}
           fieldKind="shortDescription"
           value={form.description0}
           onChange={handleChange('description0')}
-          placeholder="Krótki opis w kontekście fabuły kursu"
+          placeholder={STORYDESCRIPTIONPLACEHOLDER__TEXTLABEL[LANGUAGE]}
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
         />
 
         <TextField
           id="activity-edu"
-          label="Opis dydaktyczny"
+          label={EDUCATIONALDESCRIPTION__TEXTLABEL[LANGUAGE]}
           fieldKind="shortDescription"
           value={form.description1}
           onChange={handleChange('description1')}
-          placeholder="Cele i wymagania edukacyjne"
+          placeholder={EDUCATIONALDESCRIPTIONPLACEHOLDER__TEXTLABEL[LANGUAGE]}
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
         />
@@ -138,11 +193,11 @@ export default function ActivityFormModal({
         {isEdit ? (
           <TextField
             id="activity-reward"
-            label="Nagroda"
+            label={REWARD__TEXTLABEL[LANGUAGE]}
             type="number"
             value={form.reward}
             onChange={handleChange('reward')}
-            placeholder="np. 10"
+            placeholder={REWARDPLACEHOLDER__TEXTLABEL[LANGUAGE]}
             className="rewards-modal__field"
             inputClassName="rewards-modal__input"
           />
