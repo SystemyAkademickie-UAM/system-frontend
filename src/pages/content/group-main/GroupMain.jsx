@@ -5,6 +5,7 @@ import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import { Button, TexturedSurface, useToast } from '../../../components/ui/index.js';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import SmartPostCard from '../../../components/ui/SmartPostCard/SmartPostCard.jsx';
 
@@ -18,6 +19,56 @@ const deleteicon = PUBLIC_UI_ICONS.delete;
 const accepticon = PUBLIC_UI_ICONS.accept;
 const cancelicon = PUBLIC_UI_ICONS.cancel;
 
+const ANNOUNCEMENTSBOARD__TEXTLABEL = {
+  polish: 'Tablica ogłoszeń',
+  english: 'Announcements',
+};
+
+const POSTSTITLE__TEXTLABEL = {
+  polish: 'Wpisy',
+  english: 'Posts',
+};
+
+const ADDPOSTBUTTON__TEXTLABEL = {
+  polish: 'Dodaj wpis',
+  english: 'Add Post',
+};
+
+const EMPTYPOSTMESSAGE__TEXTLABEL = {
+  polish: 'Brak wpisów w tej grupie.',
+  english: 'No posts in this group.',
+};
+
+const POSTTITLEPLACEHOLDER__TEXTLABEL = {
+  polish: 'Temat wpisu',
+  english: 'Post title',
+};
+
+const POSTTEXTPLACEHOLDER__TEXTLABEL = {
+  polish: 'Treść wpisu',
+  english: 'Post content',
+};
+
+const SAVEPOST__TEXTLABEL = {
+  polish: 'Zapisz wpis',
+  english: 'Save post',
+};
+
+const CANCELEDIT__TEXTLABEL = {
+  polish: 'Anuluj edycję',
+  english: 'Cancel edit',
+};
+
+const CREATESUCCESS__TEXTLABEL = {
+  polish: 'Wpis został utworzony!',
+  english: 'Post created!',
+};
+
+const CREATEREQUIREDFIELDS__TEXTLABEL = {
+  polish: 'Oba pola muszą być wypełnione.',
+  english: 'Both fields must be filled.',
+};
+
 function isPostFormValid(post) {
   return post.title.trim().length > 0 && post.text.trim().length > 0;
 }
@@ -26,6 +77,7 @@ export default function App() {
 
   const {groupId} = useParams();
   const {showSuccess, showError} = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [groupnamevalue, setGroupnamevalue] = useState('');
@@ -143,9 +195,9 @@ export default function App() {
 
       console.log('POST /groups/' + groupId + '/post JSON:', data);
       if (post.title.length > 0 && post.text.length > 0) {
-        showSuccess('Wpis został utworzony!');
+        showSuccess(CREATESUCCESS__TEXTLABEL[LANGUAGE]);
       } else {
-        showError('Oba pola muszą być wypełnione.');
+        showError(CREATEREQUIREDFIELDS__TEXTLABEL[LANGUAGE]);
       }
       onFetchPosts();
 
@@ -387,8 +439,8 @@ export default function App() {
   return (
     <section className="group-main-posts" aria-label="Wpisy">
       <GroupMainSubpageHeader
-        eyebrow="Tablica ogłoszeń"
-        title="Wpisy"
+        eyebrow={ANNOUNCEMENTSBOARD__TEXTLABEL[LANGUAGE]}
+        title={POSTSTITLE__TEXTLABEL[LANGUAGE]}
         actions={isLecturer ? (
           <Button
             type="button"
@@ -397,7 +449,7 @@ export default function App() {
             className="group-main-subpage__add-btn"
             onClick={addpost}
           >
-            Dodaj wpis
+            {ADDPOSTBUTTON__TEXTLABEL[LANGUAGE]}
           </Button>
         ) : null}
       />
@@ -408,7 +460,7 @@ export default function App() {
 
       <div className="group-main-posts__list">
         {[...tempPosts, ...posts].length === 0 ? (
-          <p className="group-main-home__empty-notice">Brak wpisów w tej grupie.</p>
+          <p className="group-main-home__empty-notice">{EMPTYPOSTMESSAGE__TEXTLABEL[LANGUAGE]}</p>
         ) : (
           [...tempPosts, ...posts].map((post) => {
             const canSavePost = isPostFormValid(post);
@@ -447,13 +499,13 @@ export default function App() {
                       className="group-main-posts__input"
                       onChange={(event) => onPostChange(post.id, 'title', event.target.value)}
                       value={post.title}
-                      placeholder="Temat wpisu"
+                      placeholder={POSTTITLEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                     />
                     <textarea
                       className="group-main-posts__textarea"
                       onChange={(event) => onPostChange(post.id, 'text', event.target.value)}
                       value={post.text}
-                      placeholder="Treść wpisu"
+                      placeholder={POSTTEXTPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                     />
                   </div>
                   <div className="group-main-posts__edit-actions">
@@ -462,7 +514,7 @@ export default function App() {
                       className="group-main-posts__icon-btn"
                       onClick={() => onEditpostclick(post.id, post.editmode === 2 ? 1 : 0)}
                       disabled={!canSavePost}
-                      aria-label="Zapisz wpis"
+                      aria-label={SAVEPOST__TEXTLABEL[LANGUAGE]}
                     >
                       <img src={accepticon} alt="" />
                     </button>
@@ -470,7 +522,7 @@ export default function App() {
                       type="button"
                       className="group-main-posts__icon-btn"
                       onClick={() => onCancelpostclick(post.id)}
-                      aria-label="Anuluj edycję"
+                      aria-label={CANCELEDIT__TEXTLABEL[LANGUAGE]}
                     >
                       <img src={cancelicon} alt="" />
                     </button>

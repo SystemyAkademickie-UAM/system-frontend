@@ -38,27 +38,27 @@ function StageIsland({
     polish: 'Brak aktywności w tym etapie.',
     english: 'No activities in this stage.',
   };
-  const COLUMNNAME__TEXTLABEL = {
+  const NAME__TEXTLABEL = {
     polish: 'Nazwa',
     english: 'Name',
   };
-  const COLUMNSTORY__TEXTLABEL = {
+  const STORY__TEXTLABEL = {
     polish: 'Opis fabularny',
     english: 'Story Description',
   };
-  const COLUMNEDUCATIONAL__TEXTLABEL = {
+  const EDUCATIONAL__TEXTLABEL = {
     polish: 'Opis dydaktyczny',
     english: 'Educational Description',
   };
-  const COLUMNREWARD__TEXTLABEL = {
+  const REWARD__TEXTLABEL = {
     polish: 'Nagroda',
     english: 'Reward',
   };
-  const COLUMNPARTICIPANTS__TEXTLABEL = {
+  const PARTICIPANTS__TEXTLABEL = {
     polish: 'Uczestnicy',
     english: 'Participants',
   };
-  const COLUMNACTIONS__TEXTLABEL = {
+  const ACTIONS__TEXTLABEL = {
     polish: 'Akcje',
     english: 'Actions',
   };
@@ -152,17 +152,17 @@ function StageIsland({
               <table className="activities-island__table">
                 <thead>
                   <tr>
-                    <th className="activities-island__th" scope="col">{COLUMNNAME__TEXTLABEL[LANGUAGE]}</th>
+                    <th className="activities-island__th" scope="col">{NAME__TEXTLABEL[LANGUAGE]}</th>
                     <th className="activities-island__th activities-island__th--hide-mobile" scope="col">
-                      {COLUMNSTORY__TEXTLABEL[LANGUAGE]}
+                      {STORY__TEXTLABEL[LANGUAGE]}
                     </th>
                     <th className="activities-island__th activities-island__th--hide-mobile" scope="col">
-                      {COLUMNEDUCATIONAL__TEXTLABEL[LANGUAGE]}
+                      {EDUCATIONAL__TEXTLABEL[LANGUAGE]}
                     </th>
-                    <th className="activities-island__th" scope="col">{COLUMNREWARD__TEXTLABEL[LANGUAGE]}</th>
-                    <th className="activities-island__th activities-island__th--hide-mobile" scope="col">{COLUMNPARTICIPANTS__TEXTLABEL[LANGUAGE]}</th>
+                    <th className="activities-island__th" scope="col">{REWARD__TEXTLABEL[LANGUAGE]}</th>
+                    <th className="activities-island__th activities-island__th--hide-mobile" scope="col">{PARTICIPANTS__TEXTLABEL[LANGUAGE]}</th>
                     <th className="activities-island__th activities-island__th--actions" scope="col">
-                      <span className="visually-hidden">{COLUMNACTIONS__TEXTLABEL[LANGUAGE]}</span>
+                      <span className="visually-hidden">{ACTIONS__TEXTLABEL[LANGUAGE]}</span>
                     </th>
                   </tr>
                 </thead>

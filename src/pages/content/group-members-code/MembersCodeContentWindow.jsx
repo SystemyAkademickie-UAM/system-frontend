@@ -6,6 +6,7 @@ import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import {
   clampExpireDateTime,
   EXPIRE_IN_PAST_MESSAGE,
@@ -14,6 +15,121 @@ import {
   isExpireDateTimeInPast,
 } from './enrollmentCodeExpiry.js';
 import './MembersCodeContent.css';
+
+const FETCHCODEERROR__TEXTLABEL = {
+  polish: 'Nie udało się odczytać kodu.',
+  english: 'Failed to read the code.',
+};
+
+const FETCHCODESTATUSERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać kodu (status {status}).',
+  english: 'Failed to fetch code (status {status}).',
+};
+
+const CREATESUCCESS__TEXTLABEL = {
+  polish: 'Kod został utworzony.',
+  english: 'Code created.',
+};
+
+const UPDATESUCCESS__TEXTLABEL = {
+  polish: 'Kod został zmieniony.',
+  english: 'Code changed.',
+};
+
+const GENERATESTATUSERROR__TEXTLABEL = {
+  polish: 'Nie udało się wygenerować kodu (status {status}).',
+  english: 'Failed to generate code (status {status}).',
+};
+
+const UPDATESTATUSERROR__TEXTLABEL = {
+  polish: 'Nie udało się zmienić kodu (status {status}).',
+  english: 'Failed to change code (status {status}).',
+};
+
+const EXPIRYSELECTERROR__TEXTLABEL = {
+  polish: 'Wybierz datę wygaśnięcia kodu.',
+  english: 'Select the code expiration date.',
+};
+
+const MODALTITLEEDIT__TEXTLABEL = {
+  polish: 'Edytuj kod dostępu',
+  english: 'Edit access code',
+};
+
+const MODALTITLEGENERATE__TEXTLABEL = {
+  polish: 'Generuj nowy kod dostępu',
+  english: 'Generate new access code',
+};
+
+const EDIT__TEXTLABEL = {
+  polish: 'Zmień',
+  english: 'Change',
+};
+
+const GENERATE__TEXTLABEL = {
+  polish: 'Generuj',
+  english: 'Generate',
+};
+
+const CODELABEL__TEXTLABEL = {
+  polish: 'Kod',
+  english: 'Code',
+};
+
+const CUSTOMCODELABEL__TEXTLABEL = {
+  polish: 'Własny kod (opcjonalnie)',
+  english: 'Custom code (optional)',
+};
+
+const CUSTOMCODEPLACEHOLDER__TEXTLABEL = {
+  polish: 'losowy kod',
+  english: 'random code',
+};
+
+const EXPIRYDATELABEL__TEXTLABEL = {
+  polish: 'Data wygaśnięcia',
+  english: 'Expiration date',
+};
+
+const EXPIRYDATE__TEXTLABEL = {
+  polish: 'Data wygaśnięcia kodu',
+  english: 'Code expiration date',
+};
+
+const EXPIRYTIME__TEXTLABEL = {
+  polish: 'Godzina wygaśnięcia kodu',
+  english: 'Code expiration time',
+};
+
+const EXPIRYENABLE__TEXTLABEL = {
+  polish: 'Włącz datę wygaśnięcia kodu',
+  english: 'Enable code expiration date',
+};
+
+const USELIMITLABEL__TEXTLABEL = {
+  polish: 'Limit użyć',
+  english: 'Use limit',
+};
+
+const USELIMIT__TEXTLABEL = {
+  polish: 'Limit użyć kodu',
+  english: 'Code use limit',
+};
+
+const USELIMITENABLE__TEXTLABEL = {
+  polish: 'Włącz limit użyć kodu',
+  english: 'Enable code use limit',
+};
+
+const ACTIVELABEL__TEXTLABEL = {
+  polish: 'Kod aktywny',
+  english: 'Code active',
+};
+
+const ACTIVE__TEXTLABEL = {
+  polish: 'Kod aktywny',
+  english: 'Code active',
+};
 
 function buildExpiresAt(hasExpires, expireDate, expireTime) {
   if (hasExpires === 0) {
@@ -61,7 +177,9 @@ function ModalOptionCheckbox({ id, checked, onChange, ariaLabel }) {
   );
 }
 
-export default function MembersCodeContentWindow({ popupclose, groupId, editCodeId, onsaved }) {  const [errorMessage, setErrorMessage] = useState('');
+export default function MembersCodeContentWindow({ popupclose, groupId, editCodeId, onsaved }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const [errorMessage, setErrorMessage] = useState('');
   const { showSuccess } = useToast();
 
   const [inputCode, setInputCode] = useState('');
@@ -146,7 +264,7 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
     }
 
     if (!expireDate) {
-      setErrorMessage('Wybierz datę wygaśnięcia kodu.');
+      setErrorMessage(EXPIRYSELECTERROR__TEXTLABEL[LANGUAGE]);
       return false;
     }
 
@@ -207,11 +325,11 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
       try {
         data = JSON.parse(responseText);
       } catch {
-        throw new Error('Nie udało się odczytać kodu.');
+        throw new Error(FETCHCODEERROR__TEXTLABEL[LANGUAGE]);
       }
 
       if (!response.ok) {
-        throw new Error(`Nie udało się pobrać kodu (status ${response.status}).`);
+        throw new Error(FETCHCODESTATUSERROR__TEXTLABEL[LANGUAGE].replace('{status}', response.status));
       }
 
       fillFromReceivedData(data);
@@ -260,13 +378,13 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
       });
 
       if (response.status < 200 || response.status >= 300) {
-        setErrorMessage(`Nie udało się wygenerować kodu (status ${response.status}).`);
+        setErrorMessage(GENERATESTATUSERROR__TEXTLABEL[LANGUAGE].replace('{status}', response.status));
         return;
       }
 
       closeWindow();
       onsaved?.();
-      showSuccess('Kod został utworzony.');
+      showSuccess(CREATESUCCESS__TEXTLABEL[LANGUAGE]);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
@@ -314,13 +432,13 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
       });
 
       if (response.status < 200 || response.status >= 300) {
-        setErrorMessage(`Nie udało się zmienić kodu (status ${response.status}).`);
+        setErrorMessage(UPDATESTATUSERROR__TEXTLABEL[LANGUAGE].replace('{status}', response.status));
         return;
       }
 
       closeWindow();
       onsaved?.();
-      showSuccess('Kod został zmieniony.');
+      showSuccess(UPDATESUCCESS__TEXTLABEL[LANGUAGE]);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
@@ -349,9 +467,9 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
     <Modal
       isOpen
       onClose={closeWindow}
-      title={isEditMode ? 'Edytuj kod dostępu' : 'Generuj nowy kod dostępu'}
+      title={isEditMode ? MODALTITLEEDIT__TEXTLABEL[LANGUAGE] : MODALTITLEGENERATE__TEXTLABEL[LANGUAGE]}
       onConfirm={handleSaveClick}
-      confirmLabel={isEditMode ? 'Zmień' : 'Generuj'}
+      confirmLabel={isEditMode ? EDIT__TEXTLABEL[LANGUAGE] : GENERATE__TEXTLABEL[LANGUAGE]}
       confirmDisabled={saveDisabled}
       size="md"
       className="members-code-modal"
@@ -363,13 +481,13 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
 
         {isEditMode ? (
           <div className="members-code-modal__field">
-            <span className="members-code-modal__label">Kod</span>
+            <span className="members-code-modal__label">{CODELABEL__TEXTLABEL[LANGUAGE]}</span>
             <span className="members-code-modal__code-value">{displayCode}</span>
           </div>
         ) : (
           <div className="members-code-modal__field">
             <label htmlFor="members-code-custom" className="members-code-modal__label">
-              Własny kod (opcjonalnie)
+              {CUSTOMCODELABEL__TEXTLABEL[LANGUAGE]}
             </label>
             <CharacterLimitedField value={inputCode} maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}>
               <input
@@ -380,7 +498,7 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
                 onChange={(event) => setInputCode(
                   event.target.value.slice(0, ENROLLMENT_ENTRY_CODE_MAX_LENGTH),
                 )}
-                placeholder="losowy kod"
+                placeholder={CUSTOMCODEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                 maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}
               />
             </CharacterLimitedField>
@@ -388,7 +506,7 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
         )}
 
         <div className="members-code-modal__field">
-          <span className="members-code-modal__label">Data wygaśnięcia</span>
+          <span className="members-code-modal__label">{EXPIRYDATELABEL__TEXTLABEL[LANGUAGE]}</span>
           <div className="members-code-modal__option-row">
             <input
               type="date"
@@ -397,7 +515,7 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
               min={minExpireDate}
               disabled={hasExpires !== 1}
               onChange={(event) => handleExpireDateChange(event.target.value)}
-              aria-label="Data wygaśnięcia kodu"
+              aria-label={EXPIRYDATE__TEXTLABEL[LANGUAGE]}
             />
             <input
               type="time"
@@ -406,13 +524,13 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
               min={hasExpires === 1 && expireDate === minExpireDate ? minExpireTime : undefined}
               disabled={hasExpires !== 1}
               onChange={(event) => handleExpireTimeChange(event.target.value)}
-              aria-label="Godzina wygaśnięcia kodu"
+              aria-label={EXPIRYTIME__TEXTLABEL[LANGUAGE]}
             />
             <ModalOptionCheckbox
               id="members-code-expires-enabled"
               checked={hasExpires === 1}
               onChange={(checked) => (checked ? enableExpiration() : disableExpiration())}
-              ariaLabel="Włącz datę wygaśnięcia kodu"
+              ariaLabel={EXPIRYENABLE__TEXTLABEL[LANGUAGE]}
             />
           </div>
           {expireValidationError ? (
@@ -421,7 +539,7 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
         </div>
 
         <div className="members-code-modal__field">
-          <span className="members-code-modal__label">Limit użyć</span>
+          <span className="members-code-modal__label">{USELIMITLABEL__TEXTLABEL[LANGUAGE]}</span>
           <div className="members-code-modal__option-row">
             <input
               type="number"
@@ -430,7 +548,7 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
               value={maxUsesValue}
               disabled={hasMaxUses !== 1}
               onChange={(event) => setMaxUsesValue(event.target.value)}
-              aria-label="Limit użyć kodu"
+              aria-label={USELIMIT__TEXTLABEL[LANGUAGE]}
             />
             <ModalOptionCheckbox
               id="members-code-max-uses-enabled"
@@ -439,19 +557,19 @@ export default function MembersCodeContentWindow({ popupclose, groupId, editCode
                 setHasMaxUses(checked ? 1 : 0);
                 setErrorMessage('');
               }}
-              ariaLabel="Włącz limit użyć kodu"
+              ariaLabel={USELIMITENABLE__TEXTLABEL[LANGUAGE]}
             />
           </div>
         </div>
 
         {isEditMode ? (
           <div className="members-code-modal__field members-code-modal__field--inline">
-            <span className="members-code-modal__label">Kod aktywny</span>
+            <span className="members-code-modal__label">{ACTIVELABEL__TEXTLABEL[LANGUAGE]}</span>
             <ModalOptionCheckbox
               id="members-code-active"
               checked={isActive === 1}
               onChange={(checked) => setIsActive(checked ? 1 : 0)}
-              ariaLabel="Kod aktywny"
+              ariaLabel={ACTIVE__TEXTLABEL[LANGUAGE]}
             />
           </div>
         ) : null}

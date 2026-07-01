@@ -24,7 +24,7 @@ export default function StageDeleteModal({
     polish: 'Czy na pewno chcesz usunąć etap',
     english: 'Are you sure you want to delete the stage',
   };
-  const CONFICONFIRMSUFFIXRM__TEXTLABEL = {
+  const CONFIRMSUFFIX__TEXTLABEL = {
     polish: 'wraz z przypisanymi aktywnościami?',
     english: 'along with assigned activities?',
   };
@@ -48,7 +48,7 @@ export default function StageDeleteModal({
         {' '}
         <strong>{stage.name}</strong>
         {' '}
-        {CONFICONFIRMSUFFIXRM__TEXTLABEL[LANGUAGE]}
+        {CONFIRMSUFFIX__TEXTLABEL[LANGUAGE]}
       </p>
     </Modal>
   );

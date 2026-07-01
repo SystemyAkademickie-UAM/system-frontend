@@ -8,7 +8,23 @@ import {
   isNotificationAfterLastSeen,
   setNotificationsLastSeen,
 } from '../../utils/notifications/notificationsLastSeen.js';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './NotificationsFeed.css';
+
+const EMPTYMESSAGE__TEXTLABEL = {
+  polish: 'Brak powiadomień.',
+  english: 'No notifications.',
+};
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie powiadomień...',
+  english: 'Loading notifications...',
+};
+
+const NEWFROMLASTVISIT__TEXTLABEL = {
+  polish: 'Nowe od ostatniej wizyty',
+  english: 'New since last visit',
+};
 
 /**
  * @typedef {import('../../utils/notifications/formatBacklogNotification.js').ReturnType<typeof import('../../utils/notifications/formatBacklogNotification.js').formatBacklogNotification>} FormattedNotification
@@ -41,12 +57,15 @@ export default function NotificationsFeed({
   showDivider = false,
   linkable = false,
   compact = false,
-  emptyMessage = 'Brak powiadomień.',
+  emptyMessage,
   onMarkRead,
   footerLink = null,
   persistLastSeenOnLeave = true,
 }) {
   const navigate = useNavigate();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+  const resolvedEmptyMessage = emptyMessage ?? EMPTYMESSAGE__TEXTLABEL[LANGUAGE];
   const [lastSeenAt, setLastSeenAt] = useState(null);
 
   useEffect(() => {
@@ -99,7 +118,7 @@ export default function NotificationsFeed({
   };
 
   if (isLoading) {
-    return <p className="notifications-feed__status">Ładowanie powiadomień…</p>;
+    return <p className="notifications-feed__status">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>;
   }
 
   if (error) {
@@ -111,7 +130,7 @@ export default function NotificationsFeed({
   }
 
   if (visibleNotifications.length === 0) {
-    return <p className="notifications-feed__status">{emptyMessage}</p>;
+    return <p className="notifications-feed__status">{resolvedEmptyMessage}</p>;
   }
 
   return (
@@ -146,7 +165,7 @@ export default function NotificationsFeed({
               {index === dividerIndex ? (
                 <div className="notifications-feed__divider" role="separator" aria-label="Starsze powiadomienia">
                   <span className="notifications-feed__divider-line" />
-                  <span className="notifications-feed__divider-label">Nowe od ostatniej wizyty</span>
+                  <span className="notifications-feed__divider-label">{NEWFROMLASTVISIT__TEXTLABEL[LANGUAGE]}</span>
                   <span className="notifications-feed__divider-line" />
                 </div>
               ) : null}

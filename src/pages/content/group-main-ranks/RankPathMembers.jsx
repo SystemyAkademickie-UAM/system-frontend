@@ -4,11 +4,28 @@ import { createPortal } from 'react-dom';
 import CurrencyDisplay from '../../../components/ui/Currency/CurrencyDisplay.jsx';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
 import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './RankPathMembers.css';
 
 const DEFAULT_MAX_VISIBLE = 15;
 
+const OVERFLOW__TEXTLABEL = {
+  polish: 'Pozostali uczestnicy',
+  english: 'Other Participants',
+};
+
+const MEMBERS__TEXTLABEL = {
+  polish: (count) => `${count} uczestników z tą rangą`,
+  english: (count) => `${count} participants with this rank`,
+};
+
+const OVERFLOWBUTTON__TEXTLABEL = {
+  polish: (count) => `${count} dodatkowych uczestników`,
+  english: (count) => `${count} additional participants`,
+};
+
 function OverflowBadge({ hiddenStudents, groupId }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const triggerRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -28,7 +45,7 @@ function OverflowBadge({ hiddenStudents, groupId }) {
         ref={triggerRef}
         type="button"
         className="rank-path-members__overflow"
-        aria-label={`${hiddenStudents.length} dodatkowych uczestników`}
+        aria-label={OVERFLOWBUTTON__TEXTLABEL[LANGUAGE](hiddenStudents.length)}
         onMouseEnter={handleEnter}
         onMouseLeave={() => setVisible(false)}
         onFocus={handleEnter}
@@ -44,7 +61,7 @@ function OverflowBadge({ hiddenStudents, groupId }) {
             style={{ left: `${pos.x}px`, top: `${pos.y}px` }}
             role="tooltip"
           >
-            <p className="rank-path-members__overflow-title">Pozostali uczestnicy</p>
+            <p className="rank-path-members__overflow-title">{OVERFLOW__TEXTLABEL[LANGUAGE]}</p>
             <ul className="rank-path-members__overflow-list">
               {hiddenStudents.map((student) => (
                 <li key={student.id}>
@@ -81,6 +98,7 @@ export default function RankPathMembers({
   students,
   maxVisible = DEFAULT_MAX_VISIBLE,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
 
   if (!students.length) {
@@ -91,7 +109,7 @@ export default function RankPathMembers({
   const hiddenStudents = students.slice(maxVisible);
 
   return (
-    <div className="rank-path-members" aria-label={`${students.length} uczestników z tą rangą`}>
+    <div className="rank-path-members" aria-label={MEMBERS__TEXTLABEL[LANGUAGE](students.length)}>
       {visibleStudents.map((student) => (
         <PlayerAvatar
           key={student.id}

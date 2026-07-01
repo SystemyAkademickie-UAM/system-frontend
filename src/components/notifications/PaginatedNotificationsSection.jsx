@@ -3,9 +3,20 @@ import { Button, Pagination, TexturedSurface } from '../ui/index.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { useGroupBacklogNotifications } from '../../hooks/notifications/useGroupBacklogNotifications.js';
 import NotificationsFeed from './NotificationsFeed.jsx';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './PaginatedNotificationsSection.css';
 
 export const NOTIFICATIONS_PAGE_SIZE = 10;
+
+const MARKALLREAD__TEXTLABEL = {
+  polish: 'Oznacz wszystkie jako przeczytane',
+  english: 'Mark all as read',
+};
+
+const PAG__TEXTLABEL = {
+  polish: 'Paginacja powiadomień',
+  english: 'Notifications pagination',
+};
 
 /**
  * @param {{
@@ -34,6 +45,7 @@ export default function PaginatedNotificationsSection({
   pollMs = 60000,
 }) {
   const { role } = useAppRole();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [page, setPage] = useState(1);
   const skip = (page - 1) * pageSize;
 
@@ -89,7 +101,7 @@ export default function PaginatedNotificationsSection({
               void handleMarkAllRead();
             }}
           >
-            Oznacz wszystkie jako przeczytane
+            {MARKALLREAD__TEXTLABEL[LANGUAGE]}
           </Button>
         </div>
 
@@ -111,7 +123,7 @@ export default function PaginatedNotificationsSection({
               totalPages={totalPages}
               page={safePage}
               onPageChange={setPage}
-              ariaLabel="Paginacja powiadomień"
+              ariaLabel={PAG__TEXTLABEL[LANGUAGE]}
             />
           </div>
         ) : null}
