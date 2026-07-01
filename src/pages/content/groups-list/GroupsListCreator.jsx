@@ -12,13 +12,96 @@ import {
   buildBannerImageRefPayload,
   createDefaultBannerPickerValue,
 } from '../../../utils/groupBannerRef.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupsListCreator.css';
+
+const MINCHARACTERS__TEXTLABEL = {
+  polish: 'musi zawierać minimum 1 znak.',
+  english: 'must contain minimum 1 character.',
+};
+const MAXCHARACTERS__TEXTLABEL = {
+  polish: 'maks. {{count}} znaków.',
+  english: 'max. {{count}} characters.',
+};
+const GROUPNAMEMIN__TEXTLABEL = {
+  polish: 'Nazwa grupy musi zawierać minimum 1 znak.',
+  english: 'Group name must contain minimum 1 character.',
+};
+const SUBJECTNAMEMIN__TEXTLABEL = {
+  polish: 'Nazwa przedmiotu musi zawierać minimum 1 znak.',
+  english: 'Subject name must contain minimum 1 character.',
+};
+const DESCRIPTIONREQUIRED__TEXTLABEL = {
+  polish: 'Opis grupy jest wymagany.',
+  english: 'Group description is required.',
+};
+const NOAUTHORITY__TEXTLABEL = {
+  polish: 'Brak uprawnień do tworzenia grup.',
+  english: 'No permission to create groups.',
+};
+const CREATIONFAILED__TEXTLABEL = {
+  polish: 'Nie udało się utworzyć grupy.',
+  english: 'Failed to create group.',
+};
+const CREATORTITLE__TEXTLABEL = {
+  polish: 'Kreator grupy',
+  english: 'Group Creator',
+};
+const STEP1SUBTITLE__TEXTLABEL = {
+  polish: 'Nazwa, przedmiot i opis na jednej planszy.',
+  english: 'Name, subject and description on one board.',
+};
+const STEP2SUBTITLE__TEXTLABEL = {
+  polish: 'Wybierz baner: gotowy wzór, własny plik lub kolor tła.',
+  english: 'Choose banner: ready-made pattern, own file or background color.',
+};
+const BACKBUTTON__TEXTLABEL = {
+  polish: '← Wróć',
+  english: '← Back',
+};
+const GROUPDATALABEL__TEXTLABEL = {
+  polish: 'Dane grupy',
+  english: 'Group Data',
+};
+const BANNERLABEL__TEXTLABEL = {
+  polish: 'Baner grupy',
+  english: 'Group Banner',
+};
+const GROUPNAME__TEXTLABEL = {
+  polish: 'Nazwa grupy',
+  english: 'Group Name',
+};
+const SUBJECTNAME__TEXTLABEL = {
+  polish: 'Nazwa przedmiotu',
+  english: 'Subject Name',
+};
+const GROUPDESCRIPTION__TEXTLABEL = {
+  polish: 'Opis grupy',
+  english: 'Group Description',
+};
+const DESCRIPTIONPLACEHOLDER__TEXTLABEL = {
+  polish: 'Krótko opisz tło fabularne i cele grupy...',
+  english: 'Briefly describe the background and goals of the group...',
+};
+const REJECTBUTTON__TEXTLABEL = {
+  polish: 'Odrzuć',
+  english: 'Reject',
+};
+const NEXTBUTTON__TEXTLABEL = {
+  polish: 'Dalej',
+  english: 'Next',
+};
+const CREATEBUTTON__TEXTLABEL = {
+  polish: 'Stwórz',
+  english: 'Create',
+};
 
 const GROUP_NAME_MAX = GROUP_NAME_MAX_LENGTH;
 const SUBJECT_NAME_MAX = GROUP_SUBJECT_NAME_MAX_LENGTH;
 const GROUP_DESCRIPTION_MAX = GROUP_DESCRIPTION_MAX_LENGTH;
 
 export default function GroupsListCreator({ onClose, onCreated }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showError } = useToast();
   const [step, setStep] = useState(1);
   const [slideDirection, setSlideDirection] = useState('forward');
@@ -32,9 +115,9 @@ export default function GroupsListCreator({ onClose, onCreated }) {
   function onGroupnamechange(value) {
     const trimmed = value.length > GROUP_NAME_MAX ? value.slice(0, GROUP_NAME_MAX) : value;
     if (trimmed.length < 1) {
-      setGroupnamevalueerror('musi zawierać minimum 1 znak.');
+      setGroupnamevalueerror(MINCHARACTERS__TEXTLABEL[LANGUAGE]);
     } else if (value.length > GROUP_NAME_MAX) {
-      setGroupnamevalueerror(`maks. ${GROUP_NAME_MAX} znaków.`);
+      setGroupnamevalueerror(MAXCHARACTERS__TEXTLABEL[LANGUAGE].replace('{{count}}', GROUP_NAME_MAX));
     } else {
       setGroupnamevalueerror('');
     }
@@ -44,7 +127,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
   function onSubjectnamechange(value) {
     const trimmed = value.length > SUBJECT_NAME_MAX ? value.slice(0, SUBJECT_NAME_MAX) : value;
     if (value.length > SUBJECT_NAME_MAX) {
-      setSubjectnamevalueerror(`maks. ${SUBJECT_NAME_MAX} znaków.`);
+      setSubjectnamevalueerror(MAXCHARACTERS__TEXTLABEL[LANGUAGE].replace('{{count}}', SUBJECT_NAME_MAX));
     } else {
       setSubjectnamevalueerror('');
     }
@@ -79,19 +162,19 @@ export default function GroupsListCreator({ onClose, onCreated }) {
     let hasError = false;
 
     if (groupnamevalue.trim().length < 1) {
-      setGroupnamevalueerror('musi zawierać minimum 1 znak.');
-      validationErrors.push('Nazwa grupy musi zawierać minimum 1 znak.');
+      setGroupnamevalueerror(MINCHARACTERS__TEXTLABEL[LANGUAGE]);
+      validationErrors.push(GROUPNAMEMIN__TEXTLABEL[LANGUAGE]);
       hasError = true;
     }
 
     if (subjectnamevalue.trim().length < 1) {
-      setSubjectnamevalueerror('musi zawierać minimum 1 znak.');
-      validationErrors.push('Nazwa przedmiotu musi zawierać minimum 1 znak.');
+      setSubjectnamevalueerror(MINCHARACTERS__TEXTLABEL[LANGUAGE]);
+      validationErrors.push(SUBJECTNAMEMIN__TEXTLABEL[LANGUAGE]);
       hasError = true;
     }
 
     if (groupdescriptionvalue.trim().length < 1) {
-      validationErrors.push('Opis grupy jest wymagany.');
+      validationErrors.push(DESCRIPTIONREQUIRED__TEXTLABEL[LANGUAGE]);
       hasError = true;
     }
 
@@ -198,11 +281,11 @@ export default function GroupsListCreator({ onClose, onCreated }) {
         throw new Error('Error ' + response.status + ': ' + responsetext);
       }
       if (data.group === -1 || data.group === 1) {
-        showError('Brak uprawnień do tworzenia grup.');
+        showError(NOAUTHORITY__TEXTLABEL[LANGUAGE]);
         return;
       }
       if (data.group === -2 || data.group === 0) {
-        showError('Nie udało się utworzyć grupy.');
+        showError(CREATIONFAILED__TEXTLABEL[LANGUAGE]);
         return;
       }
 
@@ -233,7 +316,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
           <div className="groups-list-creator__titles">
             <div className="groups-list-creator__heading-row">
               <h2 id="groups-list-creator-title" className="groups-list-creator__title">
-                Kreator grupy
+                {CREATORTITLE__TEXTLABEL[LANGUAGE]}
               </h2>
               <span className="groups-list-creator__step-badge" aria-live="polite">
                 {step}/2
@@ -241,8 +324,8 @@ export default function GroupsListCreator({ onClose, onCreated }) {
             </div>
             <p className="groups-list-creator__subtitle">
               {step === 1
-                ? 'Nazwa, przedmiot i opis na jednej planszy.'
-                : 'Wybierz baner: gotowy wzór, własny plik lub kolor tła.'}
+                ? STEP1SUBTITLE__TEXTLABEL[LANGUAGE]
+                : STEP2SUBTITLE__TEXTLABEL[LANGUAGE]}
             </p>
           </div>
           {step === 2 ? (
@@ -250,9 +333,9 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               type="button"
               className="groups-list-creator__btn groups-list-creator__btn--ghost groups-list-creator__back-btn"
               onClick={onPreviousStep}
-              aria-label="Wróć do danych grupy"
+              aria-label={BACKBUTTON__TEXTLABEL[LANGUAGE]}
             >
-              ← Wróć
+              {BACKBUTTON__TEXTLABEL[LANGUAGE]}
             </button>
           ) : null}
         </header>
@@ -267,12 +350,12 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               .filter(Boolean)
               .join(' ')}
           >
-            <section className="groups-list-creator__step" aria-label="Dane grupy" aria-hidden={step !== 1}>
+            <section className="groups-list-creator__step" aria-label={GROUPDATALABEL__TEXTLABEL[LANGUAGE]} aria-hidden={step !== 1}>
               <div className="groups-list-creator__panel groups-list-creator__panel--compact">
                 <div className="groups-list-creator__fields">
                   <div className="groups-list-creator__field">
                     <label className="groups-list-creator__label" htmlFor="groups-list-creator-name">
-                      Nazwa grupy
+                      {GROUPNAME__TEXTLABEL[LANGUAGE]}
                       {groupnamevalueerror ? (
                         <span className="groups-list-creator__label-error">{groupnamevalueerror}</span>
                       ) : null}
@@ -291,7 +374,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
                   </div>
                   <div className="groups-list-creator__field">
                     <label className="groups-list-creator__label" htmlFor="groups-list-creator-subject">
-                      Nazwa przedmiotu
+                      {SUBJECTNAME__TEXTLABEL[LANGUAGE]}
                       {subjectnamevalueerror ? (
                         <span className="groups-list-creator__label-error">{subjectnamevalueerror}</span>
                       ) : null}
@@ -310,7 +393,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
                   </div>
                   <div className="groups-list-creator__field">
                     <label className="groups-list-creator__label" htmlFor="groups-list-creator-description">
-                      Opis grupy
+                      {GROUPDESCRIPTION__TEXTLABEL[LANGUAGE]}
                     </label>
                     <CharacterLimitedField value={groupdescriptionvalue} maxLength={GROUP_DESCRIPTION_MAX}>
                       <textarea
@@ -319,7 +402,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
                         value={groupdescriptionvalue}
                         maxLength={GROUP_DESCRIPTION_MAX}
                         onChange={(event) => onGroupdescriptionchange(event.target.value)}
-                        placeholder="Krótko opisz tło fabularne i cele grupy…"
+                        placeholder={DESCRIPTIONPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                         rows={4}
                       />
                     </CharacterLimitedField>
@@ -330,7 +413,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
 
             <section
               className="groups-list-creator__step groups-list-creator__step--banner"
-              aria-label="Baner grupy"
+              aria-label={BANNERLABEL__TEXTLABEL[LANGUAGE]}
               aria-hidden={step !== 2}
             >
               <div className="groups-list-creator__panel groups-list-creator__panel--banner">
@@ -354,7 +437,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
             className="groups-list-creator__btn groups-list-creator__btn--ghost"
             onClick={onRejectclick}
           >
-            Odrzuć
+            {REJECTBUTTON__TEXTLABEL[LANGUAGE]}
           </button>
           {step === 1 ? (
             <button
@@ -362,7 +445,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               className="groups-list-creator__btn groups-list-creator__btn--primary"
               onClick={onNextStep}
             >
-              Dalej
+              {NEXTBUTTON__TEXTLABEL[LANGUAGE]}
             </button>
           ) : (
             <button
@@ -370,7 +453,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               className="groups-list-creator__btn groups-list-creator__btn--primary"
               onClick={onSavegroupclick}
             >
-              Stwórz
+              {CREATEBUTTON__TEXTLABEL[LANGUAGE]}
             </button>
           )}
         </div>
