@@ -4,13 +4,28 @@ import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { isColorBannerRef, parseColorBannerRef } from '../../../constants/drive.constants.js';
 import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
 import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupCard.css';
+
+const NOIMAGE__TEXTLABEL = {
+  polish: 'Brak grafiki',
+  english: 'No image',
+};
+const SUBJECT__TEXTLABEL = {
+  polish: 'Przedmiot',
+  english: 'Subject',
+};
+const LECTURER__TEXTLABEL = {
+  polish: 'Prowadzący',
+  english: 'Lecturer',
+};
 
 /**
  * @param {Object} props
  * @param {import('../../../services/groups.api.js').GroupListItem} props.group
  */
 export default function GroupCard({ group }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
   const isColorBanner = isColorBannerRef(group.bannerUrl);
   const colorBannerValue = parseColorBannerRef(group.bannerUrl);
@@ -41,7 +56,7 @@ export default function GroupCard({ group }) {
                 height={48}
                 alt=""
               />
-              <span className="group-card__banner-fallback-text">Brak grafiki</span>
+              <span className="group-card__banner-fallback-text">{NOIMAGE__TEXTLABEL[LANGUAGE]}</span>
             </div>
           ) : (
             <img
@@ -60,11 +75,11 @@ export default function GroupCard({ group }) {
 
           <dl className="group-card__meta">
             <div className="group-card__meta-col">
-              <dt className="group-card__label">Przedmiot</dt>
+              <dt className="group-card__label">{SUBJECT__TEXTLABEL[LANGUAGE]}</dt>
               <dd className="group-card__value">{group.subject}</dd>
             </div>
             <div className="group-card__meta-col">
-              <dt className="group-card__label">Prowadzący</dt>
+              <dt className="group-card__label">{LECTURER__TEXTLABEL[LANGUAGE]}</dt>
               <dd className="group-card__value">{group.lecturer}</dd>
             </div>
           </dl>

@@ -4,6 +4,7 @@ import { Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
 
 import {
 
+
   fetchActivityCompletions,
 
   fetchGroupStudents,
@@ -13,6 +14,7 @@ import {
 } from '../../../../services/students.api.js';
 import { invalidateStudentProfile } from '../../../../services/studentProfileEvents.js';
 import { formatStudentDisplayName } from '../../../../utils/members/studentDisplayName.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 
 
 
@@ -88,6 +90,7 @@ export default function ActivityAssignModal({
 }) {
 
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const [members, setMembers] = useState([]);
 
@@ -99,6 +102,55 @@ export default function ActivityAssignModal({
 
   const [isSaving, setIsSaving] = useState(false);
 
+
+  const ASSIGNTITLE__TEXTLABEL = {
+    polish: 'Przypisz aktywność',
+    english: 'Assign Activity',
+  };
+  const SAVEBUTTON__TEXTLABEL = {
+    polish: 'Zapisz',
+    english: 'Save',
+  };
+  const SAVING__TEXTLABEL = {
+    polish: 'Zapisywanie...',
+    english: 'Saving...',
+  };
+  const SEARCHPLACEHOLDER__TEXTLABEL = {
+    polish: 'Szukaj uczestników…',
+    english: 'Search participants…',
+  };
+  const SEARCHARIALABEL__TEXTLABEL = {
+    polish: 'Szukaj uczestników',
+    english: 'Search participants',
+  };
+  const LOADING__TEXTLABEL = {
+    polish: 'Ładowanie uczestników...',
+    english: 'Loading participants...',
+  };
+  const NOMEMBERS__TEXTLABEL = {
+    polish: 'Brak uczestników w tej grupie.',
+    english: 'No participants in this group.',
+  };
+  const NOSEARCHRESULTS__TEXTLABEL = {
+    polish: 'Brak uczestników pasujących do wyszukiwania.',
+    english: 'No participants match the search.',
+  };
+  const LOADERROR__TEXTLABEL = {
+    polish: 'Nie udało się załadować uczestników',
+    english: 'Failed to load participants',
+  };
+  const SAVEERROR__TEXTLABEL = {
+    polish: 'Nie udało się zapisać przypisania aktywności',
+    english: 'Failed to save activity assignment',
+  };
+  const SAVESUCCESS__TEXTLABEL = {
+    polish: 'Przypisanie aktywności zostało zapisane.',
+    english: 'Activity assignment saved.',
+  };
+  const SAVEFAILURE__TEXTLABEL = {
+    polish: 'Nie udało się zapisać przypisania',
+    english: 'Failed to save assignment',
+  };
 
 
   useEffect(() => {
@@ -149,7 +201,7 @@ export default function ActivityAssignModal({
 
         if (!cancelled) {
 
-          showError(error instanceof Error ? error.message : 'Nie udało się załadować uczestników');
+          showError(error instanceof Error ? error.message : LOADERROR__TEXTLABEL[LANGUAGE]);
 
           setMembers([]);
 
@@ -181,7 +233,7 @@ export default function ActivityAssignModal({
 
     };
 
-  }, [isOpen, activity, groupId, showError]);
+  }, [isOpen, activity, groupId, showError, LANGUAGE]);
 
 
 
@@ -265,19 +317,19 @@ export default function ActivityAssignModal({
 
       if (!result.ok) {
 
-        throw new Error(result.error || 'Nie udało się zapisać przypisania aktywności');
+        throw new Error(result.error || SAVEERROR__TEXTLABEL[LANGUAGE]);
 
       }
 
 
 
-      showSuccess('Przypisanie aktywności zostało zapisane.');
+      showSuccess(SAVESUCCESS__TEXTLABEL[LANGUAGE]);
       invalidateStudentProfile(groupId);
       onClose();
 
     } catch (error) {
 
-      showError(error instanceof Error ? error.message : 'Nie udało się zapisać przypisania');
+      showError(error instanceof Error && error.message ? error.message : SAVEFAILURE__TEXTLABEL[LANGUAGE]);
 
     } finally {
 
@@ -305,13 +357,13 @@ export default function ActivityAssignModal({
 
       onClose={onClose}
 
-      title="Przypisz aktywność"
+      title={ASSIGNTITLE__TEXTLABEL[LANGUAGE]}
 
       subtitle={activity.name}
 
       onConfirm={handleConfirm}
 
-      confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}
+      confirmLabel={isSaving ? SAVING__TEXTLABEL[LANGUAGE] : SAVEBUTTON__TEXTLABEL[LANGUAGE]}
 
       confirmDisabled={isSaving || isLoading}
 
@@ -329,13 +381,13 @@ export default function ActivityAssignModal({
 
           onChange={(event) => setSearchQuery(event.target.value)}
 
-          placeholder="Szukaj uczestników…"
+          placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
 
           name="activity-assign-search"
 
           className="activity-assign-modal__search"
 
-          aria-label="Szukaj uczestników"
+          aria-label={SEARCHARIALABEL__TEXTLABEL[LANGUAGE]}
 
         />
 
@@ -345,7 +397,7 @@ export default function ActivityAssignModal({
 
       {isLoading ? (
 
-        <p className="activity-assign-modal__message">Ładowanie uczestników…</p>
+        <p className="activity-assign-modal__message">{LOADING__TEXTLABEL[LANGUAGE]}</p>
 
       ) : null}
 
@@ -357,9 +409,9 @@ export default function ActivityAssignModal({
 
           {members.length === 0
 
-            ? 'Brak uczestników w tej grupie.'
+            ? NOMEMBERS__TEXTLABEL[LANGUAGE]
 
-            : 'Brak uczestników pasujących do wyszukiwania.'}
+            : NOSEARCHRESULTS__TEXTLABEL[LANGUAGE]}
 
         </p>
 
@@ -396,4 +448,3 @@ export default function ActivityAssignModal({
   );
 
 }
-

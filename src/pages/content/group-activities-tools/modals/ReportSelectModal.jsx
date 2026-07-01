@@ -1,7 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, SearchBar } from '../../../../components/ui/index.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import '../../group-rewards/shared/rewardsModals.css';
 import './ReportSelectModal.css';
+
+const GENERATING__TEXTLABEL = {
+  polish: 'Generowanie...',
+  english: 'Generating...',
+};
+
+const GENERATEREPORT__TEXTLABEL = {
+  polish: 'Generuj raport',
+  english: 'Generate report',
+};
 
 /**
  * @param {Object} props
@@ -26,6 +37,7 @@ export default function ReportSelectModal({
   searchPlaceholder = 'Szukaj…',
   emptyMessage = 'Brak pozycji do wyboru.',
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedId, setSelectedId] = useState(null);
 
@@ -63,7 +75,7 @@ export default function ReportSelectModal({
       subtitle={subtitle}
       onConfirm={handleConfirm}
       confirmDisabled={selectedId == null || isLoading}
-      confirmLabel={isLoading ? 'Generowanie…' : 'Generuj raport'}
+      confirmLabel={isLoading ? GENERATING__TEXTLABEL[LANGUAGE] : GENERATEREPORT__TEXTLABEL[LANGUAGE]}
       size="md"
       className="rewards-modal"
     >

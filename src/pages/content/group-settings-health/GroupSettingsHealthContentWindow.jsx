@@ -62,22 +62,13 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
 
       while (i < receiveddata.length) {
 
-        receivedstudents.push({accountId: receiveddata[i].accountId, name: receiveddata[i].name, surname: receiveddata[i].surname, nickname: receiveddata[i].nickname, lives: 0, difference: 0});
+        receivedstudents.push({accountId: receiveddata[i].accountId, name: receiveddata[i].name, surname: receiveddata[i].surname, nickname: receiveddata[i].nickname, lives: receiveddata[i].lives ?? 0, difference: 0});
 
         i = i + 1;
       }
 
       setStudents(receivedstudents);
 
-      i = 0;
-
-      while (i < receivedstudents.length) {
-
-        onFetchStudentLives(receivedstudents[i].accountId);
-
-        i = i + 1;
-      }
-
     } catch (error) {
 
       let message;
@@ -92,91 +83,6 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
     }
   }
 
-
-
-
-
-  async function onFetchStudentLives(accountId) {
-
-    setErrorMessage('');
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/students/' + accountId + '/lives'; //endpoint has been made up...
-
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
-      });
-
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/students/' + accountId + '/lives*: ', response.status);
-      console.log('GET /groups/' + groupId + '/students/' + accountId + '/lives*: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/students/' + accountId + '/lives* not JSON: ' + responsetext);
-      }
-
-      console.log('GET /groups/' + groupId + '/students/' + accountId + '/lives* JSON:', data);
-
-      var livesvalue = Number(livesstart);
-
-      if (livesstart == '' || isNaN(livesvalue)) {
-        livesvalue = 99;
-      }
-
-      if (data != null && data.lives != null) {
-        livesvalue = Number(data.lives);
-      }
-
-      setStudents(function (prevStudents) {
-
-        const newstudents = [];
-
-        let i = 0;
-
-        while (i < prevStudents.length) {
-
-          if (prevStudents[i].accountId == accountId) {
-
-            newstudents.push({accountId: prevStudents[i].accountId, name: prevStudents[i].name, surname: prevStudents[i].surname, nickname: prevStudents[i].nickname, lives: livesvalue, difference: prevStudents[i].difference});
-
-          } else {
-
-            newstudents.push(prevStudents[i]);
-          }
-
-          i = i + 1;
-        }
-
-        return newstudents;
-      });
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-    }
-  }
 
 
 
@@ -191,7 +97,7 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/groups/' + groupId + '/students/' + accountId + '/lives/decrease'; //endpoint has been made up...
+      const url = base + '/groups/' + groupId + '/students/' + accountId + '/lives/decrement';
 
       const response = await fetch(url, {
         method: 'POST',
@@ -205,18 +111,20 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
 
       const responsetext = await response.text();
 
-      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/decrease*: ', response.status);
-      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/decrease*: ', responsetext);
+      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/decrement: ', response.status);
+      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/decrement: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/groups/' + groupId + '/students/' + accountId + '/lives/decrease* not JSON: ' + responsetext);
+        console.log('/groups/' + groupId + '/students/' + accountId + '/lives/decrement not JSON: ' + responsetext);
       }
 
-      console.log('POST decrease* JSON:', data);
+      console.log('POST decrement JSON:', data);
+
+      var livesvalue = data.lives;
 
       setStudents(function (prevStudents) {
 
@@ -228,13 +136,7 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
 
           if (prevStudents[i].accountId == accountId) {
 
-            var newlives = prevStudents[i].lives - 1;
-
-            if (newlives < 0) {
-              newlives = 0;
-            }
-
-            newstudents.push({accountId: prevStudents[i].accountId, name: prevStudents[i].name, surname: prevStudents[i].surname, nickname: prevStudents[i].nickname, lives: newlives, difference: prevStudents[i].difference - 1});
+            newstudents.push({accountId: prevStudents[i].accountId, name: prevStudents[i].name, surname: prevStudents[i].surname, nickname: prevStudents[i].nickname, lives: livesvalue, difference: prevStudents[i].difference - 1});
 
           } else {
 
@@ -274,7 +176,7 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/groups/' + groupId + '/students/' + accountId + '/lives/increase'; //endpoint has been made up...
+      const url = base + '/groups/' + groupId + '/students/' + accountId + '/lives/increment';
 
       const response = await fetch(url, {
         method: 'POST',
@@ -288,18 +190,20 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
 
       const responsetext = await response.text();
 
-      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/increase*: ', response.status);
-      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/increase*: ', responsetext);
+      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/increment: ', response.status);
+      console.log('POST /groups/' + groupId + '/students/' + accountId + '/lives/increment: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/groups/' + groupId + '/students/' + accountId + '/lives/increase* not JSON: ' + responsetext);
+        console.log('/groups/' + groupId + '/students/' + accountId + '/lives/increment not JSON: ' + responsetext);
       }
 
-      console.log('POST increase* JSON:', data);
+      console.log('POST increment JSON:', data);
+
+      var livesvalue = data.lives;
 
       setStudents(function (prevStudents) {
 
@@ -311,9 +215,7 @@ export default function GroupSettingsHealthContentWindow({popupclose, groupId, l
 
           if (prevStudents[i].accountId == accountId) {
 
-            var newlives = prevStudents[i].lives + 1;
-
-            newstudents.push({accountId: prevStudents[i].accountId, name: prevStudents[i].name, surname: prevStudents[i].surname, nickname: prevStudents[i].nickname, lives: newlives, difference: prevStudents[i].difference + 1});
+            newstudents.push({accountId: prevStudents[i].accountId, name: prevStudents[i].name, surname: prevStudents[i].surname, nickname: prevStudents[i].nickname, lives: livesvalue, difference: prevStudents[i].difference + 1});
 
           } else {
 

@@ -11,6 +11,7 @@ import {
   downloadStudentReport,
 } from '../../../services/groupReports.api.js';
 import { fetchGroupStudents } from '../../../services/students.api.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import ReportSelectModal from './modals/ReportSelectModal.jsx';
 import { formatReportParticipantLabel } from './reportParticipantLabel.js';
 import '../group-settings/GroupSettingsForm.css';
@@ -18,11 +19,93 @@ import './ToolsContent.css';
 
 const exportusersicon = publicIconPath('upload-02-svgrepo-com.svg');
 
-const REPORT_TOOLS = [
-  { id: 'group', label: 'Generuj raport GRUPY' },
-  { id: 'stage', label: 'Generuj raport ETAPU' },
-  { id: 'participant', label: 'Generuj raport UCZESTNIKA' },
-];
+const REPORTTOOLSLABELS__TEXTLABEL = {
+  polish: [
+    { id: 'group', label: 'Generuj raport GRUPY' },
+    { id: 'stage', label: 'Generuj raport ETAPU' },
+    { id: 'participant', label: 'Generuj raport UCZESTNIKA' },
+  ],
+  english: [
+    { id: 'group', label: 'Generate GROUP report' },
+    { id: 'stage', label: 'Generate STAGE report' },
+    { id: 'participant', label: 'Generate PARTICIPANT report' },
+  ],
+};
+
+const SUCCESSDOWNLOAD__TEXTLABEL = {
+  polish: 'Raport został pobrany.',
+  english: 'Report has been downloaded.',
+};
+
+const NOSTAGES__TEXTLABEL = {
+  polish: 'Brak etapów w tej grupie.',
+  english: 'No stages in this group.',
+};
+
+const NOPARTICIPANTS__TEXTLABEL = {
+  polish: 'Brak uczestników w tej grupie.',
+  english: 'No participants in this group.',
+};
+
+const GENERATING__TEXTLABEL = {
+  polish: 'Generowanie raportu...',
+  english: 'Generating report...',
+};
+
+const CSVTITLE__TEXTLABEL = {
+  polish: 'Pliki CSV',
+  english: 'CSV Files',
+};
+
+const CSVHINT__TEXTLABEL = {
+  polish: 'Skróty do generowania raportów postępu uczestników.',
+  english: 'Shortcuts to generate participant progress reports.',
+};
+
+const SUMMARYCREATORTITLE__TEXTLABEL = {
+  polish: 'Kreator podsumowania',
+  english: 'Summary Creator',
+};
+
+const SUMMARYCREATORHINT__TEXTLABEL = {
+  polish: 'Prosimy o zaznaczenie elementów, których podsumowanie zostanie wygenerowane.',
+  english: 'Please select the elements which summary shall be generated.',
+};
+
+const GENERATESUMMARYBUTTON__TEXTLABEL = {
+  polish: 'Wygeneruj podsumowanie',
+  english: 'Generate Summary',
+};
+
+const STAGEMODALTITLE__TEXTLABEL = {
+  polish: 'Wybierz etap',
+  english: 'Select Stage',
+};
+
+const STAGEMODALSUBTITLE__TEXTLABEL = {
+  polish: 'Raport obejmie wszystkich uczestników i aktywności z wybranego etapu.',
+  english: 'Report will include all participants and activities from the selected stage.',
+};
+
+const STAGEMODALSEARCH__TEXTLABEL = {
+  polish: 'Szukaj etapu...',
+  english: 'Search stage...',
+};
+
+const PARTICIPANTTITLE__TEXTLABEL = {
+  polish: 'Wybierz uczestnika',
+  english: 'Select Participant',
+};
+
+const PARTICIPANTSUBTITLE__TEXTLABEL = {
+  polish: 'Raport obejmie postęp wybranego uczestnika we wszystkich etapach.',
+  english: 'Report will include the progress of the selected participant in all stages.',
+};
+
+const PARTICIPANTMODALSEARCH__TEXTLABEL = {
+  polish: 'Szukaj uczestnika...',
+  english: 'Search participant...',
+};
 
 async function fetchStagesForGroup(groupId) {
   const base = getApiBaseUrl();
@@ -62,6 +145,7 @@ async function fetchStagesForGroup(groupId) {
 export default function ToolsContent() {
   const { groupId } = useParams();
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [errorMessage, setErrorMessage] = useState('');
   const [stages, setStages] = useState([]);
   const [participants, setParticipants] = useState([]);
@@ -119,7 +203,7 @@ export default function ToolsContent() {
 
     try {
       await downloadFn();
-      showSuccess('Raport został pobrany.');
+      showSuccess(SUCCESSDOWNLOAD__TEXTLABEL[LANGUAGE]);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
@@ -141,7 +225,7 @@ export default function ToolsContent() {
 
     if (toolId === 'stage') {
       if (stages.length === 0) {
-        const message = 'Brak etapów w tej grupie.';
+        const message = NOSTAGES__TEXTLABEL[LANGUAGE];
         setErrorMessage(message);
         showError(message);
         return;
@@ -152,7 +236,7 @@ export default function ToolsContent() {
 
     if (toolId === 'participant') {
       if (participants.length === 0) {
-        const message = 'Brak uczestników w tej grupie.';
+        const message = NOPARTICIPANTS__TEXTLABEL[LANGUAGE];
         setErrorMessage(message);
         showError(message);
         return;
@@ -185,10 +269,10 @@ export default function ToolsContent() {
 
       <div className="group-settings-form group-settings-form--drive-layout">
         <section className="group-settings-form__panel" aria-labelledby="activities-tools-csv-title">
-          <h2 id="activities-tools-csv-title" className="group-settings-form__panel-title">Pliki CSV</h2>
-          <p className="group-settings-form__hint">Skróty do generowania raportów postępu uczestników.</p>
+          <h2 id="activities-tools-csv-title" className="group-settings-form__panel-title">{CSVTITLE__TEXTLABEL[LANGUAGE]}</h2>
+          <p className="group-settings-form__hint">{CSVHINT__TEXTLABEL[LANGUAGE]}</p>
           <div className="activities-tools-page__tool-grid">
-            {REPORT_TOOLS.map((tool) => (
+            {REPORTTOOLSLABELS__TEXTLABEL[LANGUAGE].map((tool) => (
               <button
                 key={tool.id}
                 type="button"
@@ -202,7 +286,7 @@ export default function ToolsContent() {
                   className="activities-tools-page__tool-icon activities-tools-page__tool-icon--flipped"
                 />
                 <span>
-                  {downloading === tool.id ? 'Generowanie raportu…' : tool.label}
+                  {downloading === tool.id ? GENERATING__TEXTLABEL[LANGUAGE] : tool.label}
                 </span>
               </button>
             ))}
@@ -213,9 +297,9 @@ export default function ToolsContent() {
           <>
             <Divider />
             <section className="group-settings-form__panel" aria-labelledby="activities-tools-summary-title">
-              <h2 id="activities-tools-summary-title" className="group-settings-form__panel-title">Kreator podsumowania</h2>
+              <h2 id="activities-tools-summary-title" className="group-settings-form__panel-title">{SUMMARYCREATORTITLE__TEXTLABEL[LANGUAGE]}</h2>
               <p className="group-settings-form__hint">
-                Prosimy o zaznaczenie elementów, których podsumowanie zostanie wygenerowane.
+                {SUMMARYCREATORHINT__TEXTLABEL[LANGUAGE]}
               </p>
 
               {stages.map((stage) => (
@@ -231,7 +315,7 @@ export default function ToolsContent() {
 
               <div className="group-settings-form__footer">
                 <Button type="button" variant="primary" size="md">
-                  Wygeneruj podsumowanie
+                  {GENERATESUMMARYBUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
               </div>
             </section>
@@ -241,26 +325,26 @@ export default function ToolsContent() {
 
       <ReportSelectModal
         isOpen={activeModal === 'stage'}
-        title="Wybierz etap"
-        subtitle="Raport obejmie wszystkich uczestników i aktywności z wybranego etapu."
+        title={STAGEMODALTITLE__TEXTLABEL[LANGUAGE]}
+        subtitle={STAGEMODALSUBTITLE__TEXTLABEL[LANGUAGE]}
         items={stageItems}
         onClose={closeModal}
         onConfirm={handleStageReportConfirm}
         isLoading={downloading === 'stage'}
-        searchPlaceholder="Szukaj etapu…"
-        emptyMessage="Brak etapów w tej grupie."
+        searchPlaceholder={STAGEMODALSEARCH__TEXTLABEL[LANGUAGE]}
+        emptyMessage={NOSTAGES__TEXTLABEL[LANGUAGE]}
       />
 
       <ReportSelectModal
         isOpen={activeModal === 'participant'}
-        title="Wybierz uczestnika"
-        subtitle="Raport obejmie postęp wybranego uczestnika we wszystkich etapach."
+        title={PARTICIPANTTITLE__TEXTLABEL[LANGUAGE]}
+        subtitle={PARTICIPANTSUBTITLE__TEXTLABEL[LANGUAGE]}
         items={participantItems}
         onClose={closeModal}
         onConfirm={handleParticipantReportConfirm}
         isLoading={downloading === 'participant'}
-        searchPlaceholder="Szukaj uczestnika…"
-        emptyMessage="Brak uczestników w tej grupie."
+        searchPlaceholder={PARTICIPANTMODALSEARCH__TEXTLABEL[LANGUAGE]}
+        emptyMessage={NOPARTICIPANTS__TEXTLABEL[LANGUAGE]}
       />
     </div>
   );
