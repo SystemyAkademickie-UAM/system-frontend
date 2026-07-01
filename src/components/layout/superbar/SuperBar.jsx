@@ -1,4 +1,5 @@
 import SuperBarBreadcrumb from './SuperBarBreadcrumb.jsx';
+import SuperBarBackButton from './SuperBarBackButton.jsx';
 import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
 import SuperBarLivesStat from './SuperBarLivesStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
@@ -33,7 +34,7 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
  * @param {boolean} [props.menuExpanded]
  * @param {() => void} [props.onMenuToggle]
  * @param {boolean} [props.isLoading] — czy trwa ładowanie sesji
- * @param {{ groupName: string | null, groupPath: string | null, segments: { label: string, to?: string }[] } | null} [props.breadcrumb]
+ * @param {{ groupName: string | null, groupPath: string | null, segments: { label: string, to?: string }[], back?: { ariaLabel?: string, fallbackTo: string } | null } | null} [props.breadcrumb]
  */
 export default function SuperBar({
   displayName,
@@ -72,6 +73,13 @@ export default function SuperBar({
           >
             <span className="super-bar__menu-icon" aria-hidden="true" />
           </button>
+        ) : null}
+        {breadcrumb?.back ? (
+          <SuperBarBackButton
+            ariaLabel={breadcrumb.back.ariaLabel}
+            fallbackTo={breadcrumb.back.fallbackTo}
+            onNavigate={onNavigate}
+          />
         ) : null}
         {breadcrumb ? (
           <SuperBarBreadcrumb

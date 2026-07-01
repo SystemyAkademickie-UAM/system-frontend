@@ -415,7 +415,7 @@ export default function DataTable({
       : '';
   const RowComponent = renderRow ?? DefaultDataTableRow;
   const actionsCol = hasRowActions ? (
-    <col className="data-table__col data-table__col--actions" style={{ width: '100px' }} />
+    <col className="data-table__col data-table__col--actions" />
   ) : null;
   const actionsHeader = hasRowActions ? (
     <th className="data-table__th data-table__th--actions" scope="col">

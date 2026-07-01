@@ -46,7 +46,8 @@
 
 .group-main-layout--no-sub-nav .group-main-subpage__title-row,
 .group-main-layout--no-sub-nav .badge-treasury__title-row,
-.group-main-layout--no-sub-nav .group-main-ranks__title-row {
+.group-main-layout--no-sub-nav .group-main-ranks__title-row,
+.group-main-layout--no-sub-nav .group-shop-page__title-row {
   min-height: 0;
   margin-top: 0;
 }

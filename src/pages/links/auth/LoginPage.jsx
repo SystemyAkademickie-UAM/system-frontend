@@ -22,6 +22,10 @@ import {
 } from '../../../constants/loginFlow.constants.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
+import {
+  clearClientAuthState,
+  endClientLogout,
+} from '../../../auth/clientAuthState.js';
 import { isLogoutAvailable, logoutUser } from '../../../services/authService.js';
 import { homePath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
@@ -32,6 +36,9 @@ import {
   RegisterEula,
   RegisterProfile,
 } from '../../content/auth/index.js';
+
+/** Blokuje drugi toast po remouncie (StrictMode) lub ponownym uruchomieniu efektu. */
+let logoutSuccessToastHandled = false;
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -49,21 +56,32 @@ export default function LoginPage() {
   const [isLogoutBusy, setIsLogoutBusy] = useState(false);
   const [logoutError, setLogoutError] = useState(null);
   const samlRecoveryAttemptedRef = useRef(false);
+  const postLogoutLandingRef = useRef(false);
 
   useEffect(() => {
     if (searchParams.get('loggedOut') !== '1') {
+      logoutSuccessToastHandled = false;
       return;
     }
 
-    showSuccess('Wylogowano pomyślnie.');
+    postLogoutLandingRef.current = true;
+    clearClientAuthState();
+    endClientLogout();
     setSearchParams({}, { replace: true });
-  }, [searchParams, setSearchParams, showSuccess]);
+
+    if (!logoutSuccessToastHandled) {
+      logoutSuccessToastHandled = true;
+      showSuccess('Wylogowano pomyślnie.');
+    }
+
+    void session?.refetchSession?.({ force: true });
+  }, [searchParams, setSearchParams, showSuccess, session?.refetchSession]);
 
   useEffect(() => {
     if (session?.isLoading || session?.isAuthenticated) {
       return;
     }
-    if (samlRecoveryAttemptedRef.current) {
+    if (samlRecoveryAttemptedRef.current || postLogoutLandingRef.current) {
       return;
     }
 
@@ -73,6 +91,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (session?.isLoading) {
+      return;
+    }
+
+    if (postLogoutLandingRef.current) {
+      setRegistrationCheckDone(true);
+      if (!session?.isAuthenticated) {
+        postLogoutLandingRef.current = false;
+      }
       return;
     }
 

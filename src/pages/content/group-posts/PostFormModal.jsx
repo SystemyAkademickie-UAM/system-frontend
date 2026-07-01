@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, TextField } from '../../../components/ui/index.js';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
@@ -81,6 +81,29 @@ function PostOptionCheckbox({
   );
 }
 
+function openDateTimePicker(event, inputRef, disabled) {
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+
+  if (disabled || !inputRef.current) {
+    return;
+  }
+
+  const input = inputRef.current;
+  input.focus({ preventScroll: true });
+
+  if (typeof input.showPicker === 'function') {
+    try {
+      input.showPicker();
+      return;
+    } catch {
+      // Niektóre przeglądarki rzucają wyjątek poza bezpośrednim gestem użytkownika.
+    }
+  }
+
+  input.click();
+}
+
 export default function PostFormModal({
   isOpen,
   post,
@@ -89,6 +112,8 @@ export default function PostFormModal({
   isLoading = false,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
+  const dateInputRef = useRef(null);
+  const timeInputRef = useRef(null);
   const isEdit = Boolean(post);
 
   useEffect(() => {
@@ -117,6 +142,10 @@ export default function PostFormModal({
   );
 
   const scheduleInputsDisabled = !form.schedulePublish;
+  const datetimeRowClassName = [
+    'rewards-modal__datetime-row',
+    scheduleInputsDisabled ? 'rewards-modal__datetime-row--disabled' : '',
+  ].filter(Boolean).join(' ');
 
   const handleConfirm = () => {
     if (!isValid || isLoading) return;
@@ -196,50 +225,31 @@ export default function PostFormModal({
         </div>
         <div className="rewards-modal__field">
           <span className="rewards-modal__label">Data publikacji</span>
-          <div
-            className={[
-              'rewards-modal__datetime-row',
-              scheduleInputsDisabled ? 'rewards-modal__datetime-row--disabled' : '',
-            ].filter(Boolean).join(' ')}
-          >
-            <AssetSvg
-              name={SVG_ICONS.content.calendar}
-              width={20}
-              height={20}
-              alt=""
-              className="rewards-modal__datetime-icon"
-            />
+          <div className={datetimeRowClassName}>
             <input
+              ref={dateInputRef}
               id="post-publish-date"
               type="date"
               className="rewards-modal__input rewards-modal__input--date"
               value={form.publishDate}
               disabled={scheduleInputsDisabled}
               onChange={(event) => setForm((prev) => ({ ...prev, publishDate: event.target.value }))}
-              aria-label="Data publikacji"
+              onClick={(event) => openDateTimePicker(event, dateInputRef, scheduleInputsDisabled)}
+              aria-label="Wybierz datę publikacji"
             />
           </div>
-          <div
-            className={[
-              'rewards-modal__datetime-row',
-              scheduleInputsDisabled ? 'rewards-modal__datetime-row--disabled' : '',
-            ].filter(Boolean).join(' ')}
-          >
-            <AssetSvg
-              name={SVG_ICONS.content.clock}
-              width={20}
-              height={20}
-              alt=""
-              className="rewards-modal__datetime-icon"
-            />
+          <div className={datetimeRowClassName}>
             <input
+              ref={timeInputRef}
               id="post-publish-time"
               type="time"
               className="rewards-modal__input rewards-modal__input--time"
               value={form.publishTime}
               disabled={scheduleInputsDisabled}
               onChange={(event) => setForm((prev) => ({ ...prev, publishTime: event.target.value }))}
-              aria-label="Godzina publikacji"
+              onClick={(event) => openDateTimePicker(event, timeInputRef, scheduleInputsDisabled)}
+              step={60}
+              aria-label="Wybierz godzinę publikacji"
             />
           </div>
         </div>

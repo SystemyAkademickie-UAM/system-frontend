@@ -184,24 +184,26 @@
 }
 
 .rewards-modal__datetime-row {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
+  width: 100%;
 }
 
 .rewards-modal__datetime-row + .rewards-modal__datetime-row {
   margin-top: 0.5rem;
 }
 
-.rewards-modal__datetime-icon {
-  flex-shrink: 0;
-  color: var(--color-text-secondary);
-}
-
 .rewards-modal__input--date,
 .rewards-modal__input--time {
+  width: 25%;
+  max-width: 100%;
+  min-width: 9rem;
   min-height: 2.75rem;
   font-size: max(14px, var(--rewards-modal-input));
+  cursor: pointer;
+}
+
+.rewards-modal__input--date:disabled,
+.rewards-modal__input--time:disabled {
+  cursor: not-allowed;
 }
 
 .rewards-modal__datetime-row--disabled {

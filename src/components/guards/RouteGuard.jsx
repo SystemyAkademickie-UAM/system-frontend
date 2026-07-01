@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import { isClientLogoutInProgress } from '../../auth/clientAuthState.js';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { groupsListPath, welcomePath } from '../../routes/pathRegistry.js';
@@ -22,6 +23,14 @@ export default function RouteGuard({
   const location = useLocation();
   const { isAuthenticated, isLoading } = useSession();
   const { role } = useAppRole();
+
+  if (isClientLogoutInProgress()) {
+    return (
+      <div className="route-guard-loading" aria-busy="true" aria-label="Wylogowywanie…">
+        <span className="route-guard-loading__spinner" />
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (

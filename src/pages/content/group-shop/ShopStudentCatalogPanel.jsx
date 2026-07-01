@@ -12,7 +12,11 @@ import {
   sortShopItems,
 } from '../../../utils/shop/shopModel.js';
 import { buildShopCategoryFilters, resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
-import { sortShopItemsWithExtraLifeFirst } from '../../../utils/shop/extraLifeItem.js';
+import {
+  filterCatalogShopItems,
+  sortShopItemsWithExtraLifeFirst,
+} from '../../../utils/shop/extraLifeItem.js';
+import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import { useGroupShopItems, useGroupShopOpen } from '../../../hooks/shop/useGroupShop.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import './GroupShopContent.css';
@@ -48,6 +52,9 @@ export default function ShopStudentCatalogPanel({
 }) {
   const { items, isLoading, error } = useGroupShopItems(groupId);
   const { isShopOpen } = useGroupShopOpen(groupId);
+  const { showExtraLifeProduct } = useGroupShopLivesSystem(groupId, {
+    isStudentView: !showLecturerActions,
+  });
   const { categories, categoriesById } = useGroupItemCategories(groupId);
 
   const categoryFilters = useMemo(
@@ -59,8 +66,9 @@ export default function ShopStudentCatalogPanel({
     const source = onlyPublished
       ? items.filter((item) => item.isPublished !== false)
       : items;
-    return sortShopItemsWithExtraLifeFirst(source);
-  }, [items, onlyPublished]);
+    const filtered = filterCatalogShopItems(source, showExtraLifeProduct);
+    return sortShopItemsWithExtraLifeFirst(filtered);
+  }, [items, onlyPublished, showExtraLifeProduct]);
 
   const visibleItems = useMemo(() => {
     const filtered = filterShopItems(catalogItems, {

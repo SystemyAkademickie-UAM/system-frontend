@@ -7,6 +7,11 @@ import {
   markGroupBacklogItemRead,
 } from '../../services/backlog.api.js';
 import { formatBacklogNotification } from '../../utils/notifications/formatBacklogNotification.js';
+import {
+  notifyBacklogNotificationRead,
+  notifyBacklogNotificationsAllRead,
+  subscribeBacklogNotificationSync,
+} from '../../utils/notifications/backlogNotificationsSync.js';
 
 /**
  * @param {string | number | null | undefined} groupId
@@ -86,6 +91,36 @@ export function useGroupBacklogNotifications(groupId, {
     [groupId, isStudentView, items],
   );
 
+  const applySyncEvent = useCallback((event) => {
+    if (event.type === 'itemRead') {
+      setItems((current) => {
+        const target = current.find((item) => item.id === event.backlogId);
+        if (!target || target.isRead) {
+          return current;
+        }
+
+        setUnreadCount((count) => Math.max(0, count - 1));
+        return current.map((item) => (
+          item.id === event.backlogId ? { ...item, isRead: true } : item
+        ));
+      });
+      return;
+    }
+
+    if (event.type === 'allRead') {
+      setItems((current) => current.map((item) => ({ ...item, isRead: true })));
+      setUnreadCount(0);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!groupId) {
+      return undefined;
+    }
+
+    return subscribeBacklogNotificationSync(groupId, applySyncEvent);
+  }, [applySyncEvent, groupId]);
+
   const markRead = useCallback(async (backlogId) => {
     if (!groupId) {
       return { ok: false };
@@ -93,10 +128,7 @@ export function useGroupBacklogNotifications(groupId, {
 
     const result = await markGroupBacklogItemRead(groupId, backlogId);
     if (result.ok) {
-      setItems((current) => current.map((item) => (
-        item.id === backlogId ? { ...item, isRead: true } : item
-      )));
-      setUnreadCount((current) => Math.max(0, current - 1));
+      notifyBacklogNotificationRead(groupId, backlogId);
     }
     return result;
   }, [groupId]);
@@ -108,8 +140,7 @@ export function useGroupBacklogNotifications(groupId, {
 
     const result = await markAllGroupBacklogRead(groupId);
     if (result.ok) {
-      setItems((current) => current.map((item) => ({ ...item, isRead: true })));
-      setUnreadCount(0);
+      notifyBacklogNotificationsAllRead(groupId);
     }
     return result;
   }, [groupId]);

@@ -29,6 +29,8 @@ import {
   SHOP_SORT_OPTIONS,
 } from '../../../utils/shop/shopModel.js';
 import { getVisibilityStatusLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
+import { filterCatalogShopItems } from '../../../utils/shop/extraLifeItem.js';
+import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import RewardsShopItemTableRow from '../group-rewards/shared/RewardsShopItemTableRow.jsx';
 import '../group-rewards/shared/rewardsShared.css';
 import '../group-rewards/shared/rewardsTablePreview.css';
@@ -215,6 +217,7 @@ export default function RewardsShopItemsContent() {
     categoriesById,
     refetch: refetchCategories,
   } = useGroupItemCategories(groupId);
+  const { showExtraLifeProduct } = useGroupShopLivesSystem(groupId, { isStudentView: false });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
@@ -229,8 +232,9 @@ export default function RewardsShopItemsContent() {
   );
 
   const catalogItems = useMemo(
-    () => items.map((item, index) => mapShopItemToRow(item, index, categoriesById)),
-    [items, categoriesById],
+    () => filterCatalogShopItems(items, showExtraLifeProduct)
+      .map((item, index) => mapShopItemToRow(item, index, categoriesById)),
+    [items, categoriesById, showExtraLifeProduct],
   );
 
   const closeModal = useCallback(() => {

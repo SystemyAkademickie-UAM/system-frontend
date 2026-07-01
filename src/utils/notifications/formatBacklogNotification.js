@@ -99,6 +99,41 @@ function resolveStudentLabel(payload) {
 
 /**
  * @param {Record<string, unknown>} payload
+ * @returns {number | null}
+ */
+function resolveLivesDelta(payload) {
+  return readNumber(payload.livesDelta ?? payload.delta);
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {number | null}
+ */
+function resolvePrice(payload) {
+  return readNumber(payload.price ?? payload.amount);
+}
+
+/**
+ * @param {number | null} delta
+ * @param {number | null} lives
+ * @returns {string | null}
+ */
+function formatLivesChangeLabel(delta, lives) {
+  if (delta != null && lives != null) {
+    const deltaLabel = delta >= 0 ? `+${delta}` : String(delta);
+    return `Życia: ${deltaLabel} (aktualnie: ${lives})`;
+  }
+  if (lives != null) {
+    return `Aktualna liczba żyć: ${lives}`;
+  }
+  if (delta != null) {
+    return delta >= 0 ? `Życia: +${delta}` : `Życia: ${delta}`;
+  }
+  return null;
+}
+
+/**
+ * @param {Record<string, unknown>} payload
  * @returns {string[]}
  */
 function collectPayloadDetails(payload, { excludeInMessage = [] } = {}) {
@@ -127,7 +162,7 @@ function collectPayloadDetails(payload, { excludeInMessage = [] } = {}) {
   pushUnique(postTitle);
   pushUnique(activityName);
 
-  const price = readNumber(payload.price);
+  const price = resolvePrice(payload);
   if (price != null) {
     pushUnique(`Koszt: ${price}`);
   }
@@ -142,19 +177,16 @@ function collectPayloadDetails(payload, { excludeInMessage = [] } = {}) {
     pushUnique(`Nagroda: +${rewardAmount}`);
   }
 
-  const currencyAmount = readNumber(payload.currencyAmount ?? payload.amount);
-  if (currencyAmount != null) {
+  const currencyAmount = readNumber(payload.currencyAmount);
+  if (currencyAmount != null && currencyAmount !== points && currencyAmount !== price) {
     pushUnique(`Waluta: +${currencyAmount}`);
   }
 
-  const livesDelta = readNumber(payload.livesDelta);
-  if (livesDelta != null) {
-    pushUnique(livesDelta >= 0 ? `Życia: +${livesDelta}` : `Życia: ${livesDelta}`);
-  }
-
+  const livesDelta = resolveLivesDelta(payload);
   const newLives = readNumber(payload.newLives ?? payload.lives);
-  if (newLives != null && livesDelta == null) {
-    pushUnique(`Życia: ${newLives}`);
+  const livesLabel = formatLivesChangeLabel(livesDelta, newLives);
+  if (livesLabel) {
+    pushUnique(livesLabel);
   }
 
   return details;
@@ -174,13 +206,23 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
   const stageName = readString(payload.stageName);
   const postTitle = readString(payload.postTitle);
   const activityName = readString(payload.activityName);
-  const price = readNumber(payload.price);
+  const price = resolvePrice(payload);
+  const points = readNumber(payload.points ?? payload.currencyAmount ?? payload.amount);
+  const livesDelta = resolveLivesDelta(payload);
+  const lives = readNumber(payload.newLives ?? payload.lives);
+  const livesLabel = formatLivesChangeLabel(livesDelta, lives);
+  const isExtraLife = payload.isExtraLife === true;
 
   if (!isStudentView && studentLabel) {
     switch (type) {
       case 'STUDENT_JOINED':
         return `${studentLabel} dołączył(a) do grupy`;
       case 'SHOP_PURCHASE':
+        if (isExtraLife) {
+          return price != null
+            ? `${studentLabel} kupił(a) dodatkowe życie (${price})`
+            : `${studentLabel} kupił(a) dodatkowe życie`;
+        }
         return price != null && itemName
           ? `${studentLabel} kupił(a): ${itemName} (${price})`
           : itemName
@@ -202,12 +244,22 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
         return rankName
           ? `${studentLabel} awansował(a) na rangę: ${rankName}`
           : `${studentLabel} awansował(a) rangę`;
+      case 'LIVES_CHANGED':
+        return livesLabel
+          ? `${studentLabel}: ${livesLabel}`
+          : `${studentLabel}: zmiana liczby żyć`;
+      case 'CURRENCY_ADDED':
+        return points != null
+          ? `${studentLabel} otrzymał(a) walutę: +${points}`
+          : `${studentLabel} otrzymał(a) walutę`;
       default:
         break;
     }
   }
 
   switch (type) {
+    case 'STUDENT_JOINED':
+      return 'Dołączyłeś(aś) do grupy';
     case 'SHOP_ITEM_ADDED':
       return itemName ? `Nowy produkt: ${itemName}` : null;
     case 'BADGE_ADDED':
@@ -216,6 +268,8 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
       return rankName ? `Nowa ranga: ${rankName}` : null;
     case 'STAGE_ADDED':
       return stageName ? `Nowy etap: ${stageName}` : null;
+    case 'STAGE_COMPLETED':
+      return stageName ? `Ukończono etap: ${stageName}` : null;
     case 'POST_ADDED':
       return postTitle ? `Nowy wpis: ${postTitle}` : null;
     case 'BADGE_EARNED':
@@ -223,8 +277,17 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
     case 'RANK_UP':
       return rankName ? `Awans na rangę: ${rankName}` : null;
     case 'ACTIVITY_COMPLETED':
-      return activityName ? `Zaliczono: ${activityName}` : null;
+      return activityName
+        ? points != null
+          ? `Zaliczono: ${activityName} (+${points} pkt)`
+          : `Zaliczono: ${activityName}`
+        : points != null
+          ? `Zaliczono aktywność (+${points} pkt)`
+          : null;
     case 'SHOP_PURCHASE':
+      if (isExtraLife) {
+        return price != null ? `Kupiono dodatkowe życie (${price})` : 'Kupiono dodatkowe życie';
+      }
       return itemName && price != null
         ? `Zakup: ${itemName} (${price})`
         : itemName
@@ -232,9 +295,56 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
           : null;
     case 'ITEM_USED':
       return itemName ? `Użyto: ${itemName}` : null;
+    case 'LIVES_CHANGED':
+      return livesLabel ?? 'Zmiana liczby żyć';
+    case 'CURRENCY_ADDED':
+      return points != null ? `Zdobyto walutę: +${points}` : null;
+    case 'SHOP_STATUS_CHANGED':
+      if (payload.shopOpen === true) {
+        return 'Sklep grupy został otwarty';
+      }
+      if (payload.shopOpen === false) {
+        return 'Sklep grupy został zamknięty';
+      }
+      return readString(payload.message);
+    case 'LIVES_SYSTEM_CHANGED':
+      return readString(payload.message);
     default:
       return null;
   }
+}
+
+/**
+ * @param {string | null} fallbackTitle
+ * @param {string} message
+ * @param {string} typeLabel
+ * @returns {string}
+ */
+function resolveNotificationTitle(fallbackTitle, message, typeLabel) {
+  if (fallbackTitle) {
+    return fallbackTitle;
+  }
+  if (message) {
+    return message;
+  }
+  return typeLabel;
+}
+
+/**
+ * @param {string} title
+ * @param {string[]} details
+ * @returns {string}
+ */
+function resolveNotificationSubtitle(title, details) {
+  if (details.length === 0) {
+    return '';
+  }
+
+  const subtitle = details
+    .filter((detail) => !title.includes(detail))
+    .join(' · ');
+
+  return subtitle && subtitle !== title ? subtitle : '';
 }
 
 /**
@@ -248,9 +358,9 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
   const typeLabel = TYPE_LABELS[item.type] ?? item.type;
   const studentLabel = resolveStudentLabel(payload);
   const fallbackTitle = buildFallbackTitle(item.type, payload, isStudentView, studentLabel);
-  const title = message || fallbackTitle || typeLabel;
+  const title = resolveNotificationTitle(fallbackTitle, message, typeLabel);
 
-  const excludeInMessage = [message, title];
+  const excludeInMessage = [message, title, fallbackTitle, studentLabel].filter(Boolean);
   const details = collectPayloadDetails(payload, { excludeInMessage });
 
   if (!isStudentView && LECTURER_STUDENT_EVENT_TYPES.has(item.type) && studentLabel && !title.includes(studentLabel)) {
@@ -326,14 +436,12 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     }
   }
 
-  const detailMessage = details.length > 0 ? details.join(' · ') : '';
-
   return {
     id: item.id,
     type: item.type,
     typeLabel,
     title,
-    message: detailMessage && detailMessage !== title ? detailMessage : (message && message !== title ? '' : typeLabel),
+    message: resolveNotificationSubtitle(title, details),
     date: item.date,
     isRead: item.isRead,
     href,

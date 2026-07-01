@@ -15,16 +15,19 @@ export function findExtraLifeShopItem(items) {
 }
 
 /**
+ * Usuwa produkt „Dodatkowe życie” z katalogu sklepu, gdy system żyć
+ * lub możliwość kupowania w sklepie jest wyłączona.
+ *
  * @param {import('./shopItem.types.js').ShopItem[]} items
- * @param {boolean} [isStudentView=false]
+ * @param {boolean} [showExtraLifeProduct=false]
  * @returns {import('./shopItem.types.js').ShopItem[]}
  */
-export function filterCatalogShopItems(items, isStudentView = false) {
+export function filterCatalogShopItems(items, showExtraLifeProduct = false) {
   if (!Array.isArray(items)) {
     return [];
   }
 
-  if (!isStudentView) {
+  if (showExtraLifeProduct) {
     return items;
   }
 

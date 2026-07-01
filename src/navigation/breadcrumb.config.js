@@ -24,7 +24,10 @@ export const BREADCRUMB_BY_PATH = {
   [groupsListPath()]: [{ label: 'Grupy' }],
 
   [appSettingsPath()]: [{ label: 'Ustawienia' }],
-  [appHelpPath()]: [{ label: 'Centrum pomocy' }],
+  [appHelpPath()]: [
+    { label: 'Ustawienia', path: () => appSettingsPath() },
+    { label: 'Centrum pomocy' },
+  ],
 
   [userManagementPath()]: [{ label: 'Zarządzanie dostępem' }],
   [courseManagementPath()]: [{ label: 'Zarządzanie grupami' }],

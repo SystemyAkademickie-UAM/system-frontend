@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { logoutUser, isLogoutAvailable } from '../../../services/authService.js';
 import { IconUserPlaceholder } from './ShellIcons.jsx';
 import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
@@ -17,6 +18,7 @@ export default function SuperBarUserMenu({
 }) {
   const menuId = useId();
   const rootRef = useRef(null);
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState(null);
@@ -56,7 +58,7 @@ export default function SuperBarUserMenu({
       setIsLoggingOut(false);
       setLogoutError('Nie udało się wylogować.');
       setOpen(true);
-    });
+    }, { navigate });
   };
 
   return (

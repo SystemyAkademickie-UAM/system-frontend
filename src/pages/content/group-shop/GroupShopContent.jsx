@@ -87,14 +87,10 @@ export default function GroupShopContent() {
 
   const catalogItems = useMemo(() => {
     const publishedItems = items.filter((item) => item.isPublished !== false);
-    let sourceItems = publishedItems;
-
-    if (isStudentView && !showExtraLifeProduct) {
-      sourceItems = filterCatalogShopItems(publishedItems, true);
-    }
+    const sourceItems = filterCatalogShopItems(publishedItems, showExtraLifeProduct);
 
     return sortShopItemsWithExtraLifeFirst(sourceItems);
-  }, [items, isStudentView, showExtraLifeProduct]);
+  }, [items, showExtraLifeProduct]);
 
   const extraLifeProduct = useMemo(
     () => findExtraLifeShopItem(items),

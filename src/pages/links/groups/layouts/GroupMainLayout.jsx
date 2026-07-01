@@ -10,6 +10,9 @@ import './GroupMainLayout.css';
 
 const GROUP_JOIN_SUCCESS_STATE_KEY = 'joinSuccessMessage';
 
+/** Blokuje drugi toast po remouncie (StrictMode) lub ponownym uruchomieniu efektu. */
+let joinSuccessToastHandledKey = null;
+
 export default function GroupMainLayout() {
   const { groupId } = useParams();
   const location = useLocation();
@@ -18,10 +21,20 @@ export default function GroupMainLayout() {
 
   useEffect(() => {
     const joinSuccessMessage = location.state?.[GROUP_JOIN_SUCCESS_STATE_KEY];
-    if (!joinSuccessMessage) return;
+    if (!joinSuccessMessage) {
+      joinSuccessToastHandledKey = null;
+      return;
+    }
 
-    showSuccess(joinSuccessMessage);
+    const toastKey = `${location.pathname}:${joinSuccessMessage}`;
     navigate(location.pathname, { replace: true, state: null });
+
+    if (joinSuccessToastHandledKey === toastKey) {
+      return;
+    }
+
+    joinSuccessToastHandledKey = toastKey;
+    showSuccess(joinSuccessMessage);
   }, [location.pathname, location.state, navigate, showSuccess]);
 
   return (
