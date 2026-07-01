@@ -155,7 +155,7 @@ export default function TemplatesMyContent() {
       },
       {
         id: 'togglePublic',
-        label: 'Zmień widoczność w galerii',
+        label: 'Opublikuj bądź ukryj szablon w galerii',
         onSelect: (template) => handleTogglePublic(template),
       },
     ],

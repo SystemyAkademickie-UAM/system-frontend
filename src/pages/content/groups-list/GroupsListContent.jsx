@@ -9,7 +9,61 @@ import GroupsListCreator from './GroupsListCreator.jsx';
 import GroupsListHero from './GroupsListHero.jsx';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useGroupsList } from './useGroupsList.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupsListContent.css';
+
+const SECTIONTITLE__TEXTLABEL = {
+  polish: 'Twoje grupy',
+  english: 'Your Groups',
+};
+const SEARCHPLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj kampanii...',
+  english: 'Search campaigns...',
+};
+const SEARCH__TEXTLABEL = {
+  polish: 'Szukaj kampanii po nazwie, przedmiocie lub prowadzącym',
+  english: 'Search campaigns by name, subject or lecturer',
+};
+const TEMPLATESGALLERYBUTTON__TEXTLABEL = {
+  polish: 'Galeria szablonów',
+  english: 'Templates Gallery',
+};
+const CREATEGROUPBUTTON__TEXTLABEL = {
+  polish: 'Stwórz grupę',
+  english: 'Create Group',
+};
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie grup...',
+  english: 'Loading groups...',
+};
+const NOSEARCHRESULTS__TEXTLABEL = {
+  polish: 'Nie znaleziono grup pasujących do wyszukiwania.',
+  english: 'No groups matching the search.',
+};
+const NOSYSTEMGROUPS__TEXTLABEL = {
+  polish: 'Brak grup w systemie.',
+  english: 'No groups in the system.',
+};
+const NOMYGROUPSSEARCH__TEXTLABEL = {
+  polish: 'Brak przypisanych grup pasujących do wyszukiwania.',
+  english: 'No assigned groups matching the search.',
+};
+const NOTINANYGROUP__TEXTLABEL = {
+  polish: 'Nie należysz jeszcze do żadnej grupy.',
+  english: 'You are not in any group yet.',
+};
+const OTHERGROUPS__TEXTLABEL = {
+  polish: 'Pozostałe grupy',
+  english: 'Other Groups',
+};
+const NOOTHERGROUPSSEARCH__TEXTLABEL = {
+  polish: 'Brak pozostałych grup pasujących do wyszukiwania.',
+  english: 'No other groups matching the search.',
+};
+const NOOTHERGROUPS__TEXTLABEL = {
+  polish: 'Brak innych grup w systemie.',
+  english: 'No other groups in the system.',
+};
 
 function GroupsGrid({ groups, emptyMessage }) {
   if (groups.length === 0) {
@@ -28,6 +82,7 @@ function GroupsGrid({ groups, emptyMessage }) {
 }
 
 export default function GroupsListContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const {
     myGroups,
     otherGroups,
@@ -67,15 +122,15 @@ export default function GroupsListContent() {
 
       <div className="groups-list__controls">
         <h2 id="groups-list-section-title" className="groups-list__section-title">
-          Twoje grupy
+          {SECTIONTITLE__TEXTLABEL[LANGUAGE]}
         </h2>
         <div className="groups-list__actions">
           <SearchBar
             className="groups-list__search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj kampanii..."
-            aria-label="Szukaj kampanii po nazwie, przedmiocie lub prowadzącym"
+            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+            aria-label={SEARCH__TEXTLABEL[LANGUAGE]}
           />
           <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
             <Button
@@ -84,7 +139,7 @@ export default function GroupsListContent() {
               className="groups-list__templates-btn"
               to={templatesPath()}
             >
-              Galeria szablonów
+              {TEMPLATESGALLERYBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
             <Button
               type="button"
@@ -92,7 +147,7 @@ export default function GroupsListContent() {
               className="groups-list__create-btn"
               onClick={() => setIsCreatorOpen(true)}
             >
-              Stwórz grupę
+              {CREATEGROUPBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
           </RoleVisibility>
         </div>
@@ -123,13 +178,13 @@ export default function GroupsListContent() {
 
       {isLoading ? (
         <p className="groups-list__message" aria-live="polite">
-          Ładowanie grup…
+          {LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}
         </p>
       ) : !hasAnyGroups ? (
         <p className="groups-list__message" aria-live="polite">
           {isFiltering
-            ? 'Nie znaleziono grup pasujących do wyszukiwania.'
-            : 'Brak grup w systemie.'}
+            ? NOSEARCHRESULTS__TEXTLABEL[LANGUAGE]
+            : NOSYSTEMGROUPS__TEXTLABEL[LANGUAGE]}
         </p>
       ) : (
         <>
@@ -138,8 +193,8 @@ export default function GroupsListContent() {
               groups={myGroups}
               emptyMessage={
                 isFiltering
-                  ? 'Brak przypisanych grup pasujących do wyszukiwania.'
-                  : 'Nie należysz jeszcze do żadnej grupy.'
+                  ? NOMYGROUPSSEARCH__TEXTLABEL[LANGUAGE]
+                  : NOTINANYGROUP__TEXTLABEL[LANGUAGE]
               }
             />
           </div>
@@ -149,13 +204,13 @@ export default function GroupsListContent() {
               <hr className="groups-list__divider" aria-hidden="true" />
 
               <div className="groups-list__section">
-                <h3 className="groups-list__subsection-title">Pozostałe grupy</h3>
+                <h3 className="groups-list__subsection-title">{OTHERGROUPS__TEXTLABEL[LANGUAGE]}</h3>
                 <GroupsGrid
                   groups={otherGroups}
                   emptyMessage={
                     isFiltering
-                      ? 'Brak pozostałych grup pasujących do wyszukiwania.'
-                      : 'Brak innych grup w systemie.'
+                      ? NOOTHERGROUPSSEARCH__TEXTLABEL[LANGUAGE]
+                      : NOOTHERGROUPS__TEXTLABEL[LANGUAGE]
                   }
                 />
               </div>

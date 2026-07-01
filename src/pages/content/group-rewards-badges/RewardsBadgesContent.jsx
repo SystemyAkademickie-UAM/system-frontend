@@ -105,7 +105,7 @@ const BADGE_COLUMNS = [
   },
   {
     key: 'rarity',
-    label: 'Jakość',
+    label: 'Rzadkość',
     sort: 'text',
     width: '120px',
     cellClassName: 'rewards-table__cell--truncate',
@@ -359,7 +359,7 @@ export default function RewardsBadgesContent() {
           {filtersExpanded ? (
             <CatalogFiltersPanel className="rewards-page__filters">
               <CatalogFilterGroup
-                ariaLabel="Filtr jakości odznaki"
+                ariaLabel="Filtr rzadkości odznaki"
                 filters={RARITY_FILTERS}
                 activeId={rarityFilter}
                 onSelect={setRarityFilter}

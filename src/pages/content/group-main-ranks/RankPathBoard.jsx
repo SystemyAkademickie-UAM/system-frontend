@@ -18,6 +18,8 @@ import {
 
 } from '../../../utils/rankGradient.js';
 
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
 import { getStudentProgressPx, groupStudentsByRank } from './rankPathModel.js';
 
 import RankPathMembers from './RankPathMembers.jsx';
@@ -27,6 +29,21 @@ import LecturerTileActions from '../group-rewards/shared/LecturerTileActions.jsx
 import '../../../components/ui/ProductCard/ProductCard.css';
 
 import './RankPathBoard.css';
+
+const HEADEREYEBROW__TEXTLABEL = {
+  polish: 'Ścieżka rozwoju',
+  english: 'Rank Path',
+};
+
+const HEADERTITLE__TEXTLABEL = {
+  polish: 'Rangi',
+  english: 'Ranks',
+};
+
+const EMPTYMESSAGE__TEXTLABEL = {
+  polish: 'Brak zdefiniowanych rang w tej grupie.',
+  english: 'No ranks defined in this group.',
+};
 
 
 
@@ -53,7 +70,6 @@ import './RankPathBoard.css';
  */
 
 export default function RankPathBoard({
-
   ranks,
 
   students = [],
@@ -77,6 +93,7 @@ export default function RankPathBoard({
   onDeleteRank,
 
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const rowsRef = useRef(null);
 
@@ -391,9 +408,9 @@ export default function RankPathBoard({
 
         <header className="rank-path-board__header">
 
-          <p className="rank-path-board__eyebrow">Ścieżka rozwoju</p>
+          <p className="rank-path-board__eyebrow">{HEADEREYEBROW__TEXTLABEL[LANGUAGE]}</p>
 
-          <h2 className="rank-path-board__title">Rangi</h2>
+          <h2 className="rank-path-board__title">{HEADERTITLE__TEXTLABEL[LANGUAGE]}</h2>
 
         </header>
 
@@ -405,7 +422,7 @@ export default function RankPathBoard({
 
         <p className="rank-path-board__empty" role="status">
 
-          Brak zdefiniowanych rang w tej grupie.
+          {EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}
 
         </p>
 

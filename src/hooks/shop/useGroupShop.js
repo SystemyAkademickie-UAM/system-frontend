@@ -252,7 +252,6 @@ export function useGroupShopOpen(groupId) {
     toggleShopOpen,
     openShop,
     closeShop,
-    refetchShopOpen: refetch,
   };
 }
 

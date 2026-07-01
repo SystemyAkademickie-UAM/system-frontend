@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 import {useToast} from '../../../components/ui/index.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 
@@ -11,6 +12,7 @@ const lockedicon = PUBLIC_UI_ICONS.locked;
 
 export default function GroupMainActivitiesWindow({popupclose, groupId, stagename, activityname, activityid}) {
 
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [errorMessage, setErrorMessage] = useState('');
   const [students, setStudents] = useState([]);
   const [sortfield, setSortfield] = useState('nr');
@@ -20,6 +22,37 @@ export default function GroupMainActivitiesWindow({popupclose, groupId, stagenam
   const [nicknametext, setNicknametext] = useState('Nickname');
 
   const {showSuccess, showError} = useToast();
+
+  const NR__TEXTLABEL = {
+    polish: 'Nr',
+    english: 'No.',
+  };
+
+  const STUDENTNAME__TEXTLABEL = {
+    polish: 'Imię i Nazwisko',
+    english: 'Name',
+  };
+
+  const NICKNAME__TEXTLABEL = {
+    polish: 'Nickname',
+    english: 'Nickname',
+  };
+
+  const OPERATIONS__TEXTLABEL = {
+    polish: 'Operacje',
+    english: 'Operations',
+  };
+
+  const ASSIGNACTIVITY__TEXTLABEL = {
+    polish: 'Przypisano aktywność.',
+    english: 'Activity assigned.',
+  };
+
+  const REMOVEACTIVITY__TEXTLABEL = {
+    polish: 'Usunięto aktywność.',
+    english: 'Activity removed.',
+  };
+
 
   async function onFetchStudents() {
 
@@ -236,10 +269,10 @@ export default function GroupMainActivitiesWindow({popupclose, groupId, stagenam
       var newunlocked = 0;
 
       if (receiveddata.isCompleted == true) {
-        showSuccess('Przypisano aktywność.');
+        showSuccess(ASSIGNACTIVITY__TEXTLABEL[LANGUAGE]);
         newunlocked = 1;
       } else {
-        showSuccess('Usunito aktywność.');
+        showSuccess(REMOVEACTIVITY__TEXTLABEL[LANGUAGE]);
       }
 
       setStudents(function (prevStudents) {
@@ -332,31 +365,31 @@ export default function GroupMainActivitiesWindow({popupclose, groupId, stagenam
   useEffect(() => {
     onFetchStudents();
     if (sortfield == 'nr' && sortreverse == 0) {
-      setNrtext('Nr ▼');
-      setNametext('Imię i Nazwisko');
-      setNicknametext('Nickname');
+      setNrtext(NR__TEXTLABEL[LANGUAGE] + ' ▼');
+      setNametext(STUDENTNAME__TEXTLABEL[LANGUAGE]);
+      setNicknametext(NICKNAME__TEXTLABEL[LANGUAGE]);
     } else if (sortfield == 'nr' && sortreverse == 1) {
-      setNrtext('Nr ▲');
-      setNametext('Imię i Nazwisko');
-      setNicknametext('Nickname');
+      setNrtext(NR__TEXTLABEL[LANGUAGE] + ' ▲');
+      setNametext(STUDENTNAME__TEXTLABEL[LANGUAGE]);
+      setNicknametext(NICKNAME__TEXTLABEL[LANGUAGE]);
     } else if (sortfield == 'name' && sortreverse == 0) {
-      setNrtext('Nr');
-      setNametext('Imię i Nazwisko ▼');
-      setNicknametext('Nickname');
+      setNrtext(NR__TEXTLABEL[LANGUAGE]);
+      setNametext(STUDENTNAME__TEXTLABEL[LANGUAGE] + ' ▼');
+      setNicknametext(NICKNAME__TEXTLABEL[LANGUAGE]);
     } else if (sortfield == 'name' && sortreverse == 1) {
-      setNrtext('Nr');
-      setNametext('Imię i Nazwisko ▲');
-      setNicknametext('Nickname');
+      setNrtext(NR__TEXTLABEL[LANGUAGE]);
+      setNametext(STUDENTNAME__TEXTLABEL[LANGUAGE] + ' ▲');
+      setNicknametext(NICKNAME__TEXTLABEL[LANGUAGE]);
     } else if (sortfield == 'nickname' && sortreverse == 0) {
-      setNrtext('Nr');
-      setNametext('Imię i Nazwisko');
-      setNicknametext('Nickname ▼');
+      setNrtext(NR__TEXTLABEL[LANGUAGE]);
+      setNametext(STUDENTNAME__TEXTLABEL[LANGUAGE]);
+      setNicknametext(NICKNAME__TEXTLABEL[LANGUAGE] + ' ▼');
     } else if (sortfield == 'nickname' && sortreverse == 1) {
-      setNrtext('Nr');
-      setNametext('Imię i Nazwisko');
-      setNicknametext('Nickname ▲');
+      setNrtext(NR__TEXTLABEL[LANGUAGE]);
+      setNametext(STUDENTNAME__TEXTLABEL[LANGUAGE]);
+      setNicknametext(NICKNAME__TEXTLABEL[LANGUAGE] + ' ▲');
     }
-  }, [sortfield, sortreverse]);
+  }, [sortfield, sortreverse, LANGUAGE]);
 
 
 
@@ -450,7 +483,7 @@ export default function GroupMainActivitiesWindow({popupclose, groupId, stagenam
             <div onClick = {() => sortby('nr')} style = {{width: '10%', position: 'relative', color: sortfield == 'nr' ? 'rgb(66, 243, 125)' : 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', cursor: 'pointer'}}><span>{nrtext}</span></div>
             <div onClick = {() => sortby('name')} style = {{width: '35%', position: 'relative', color: sortfield == 'name' ? 'rgb(66, 243, 125)' : 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', cursor: 'pointer'}}><span>{nametext}</span></div>
             <div onClick = {() => sortby('nickname')} style = {{width: '30%', position: 'relative', color: sortfield == 'nickname' ? 'rgb(66, 243, 125)' : 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', cursor: 'pointer'}}><span>{nicknametext}</span></div>
-            <div style = {{width: '25%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>Operacje</span></div>
+            <div style = {{width: '25%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{OPERATIONS__TEXTLABEL[LANGUAGE]}</span></div>
           </div>
 
 

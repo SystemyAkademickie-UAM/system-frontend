@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Button,
   CatalogFilterGroup,
@@ -44,15 +44,14 @@ import {
   useGroupShopItems,
   useGroupShopOpen,
 } from '../../../hooks/shop/useGroupShop.js';
+import { useGroupCurrency } from '../../../context/GroupCurrencyContext.jsx';
+import { groupProfileEqPath } from '../../../routes/pathRegistry.js';
+import { setShopPurchaseSummary } from '../group-profile-eq/ProfileEqContentWindow.jsx';
 import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
 import ShopBuyModal from './modals/ShopBuyModal.jsx';
 import ShopDeleteModal from './modals/ShopDeleteModal.jsx';
 import ShopItemFormModal from './modals/ShopItemFormModal.jsx';
 import ShopCategoriesModal from './modals/ShopCategoriesModal.jsx';
-import {
-  invalidateGroupInventory,
-  invalidateStudentProfile,
-} from '../../../services/studentProfileEvents.js';
 import '../../../components/page/PageUnavailable.css';
 import '../shared/groupSectionPage.css';
 import '../group-members/MembersHomeContent.css';
@@ -61,11 +60,28 @@ import '../group-main/shared/groupMainSubpageHeader.css';
 
 const ITEMS_PER_PAGE = 10;
 
+function buildPurchaseSummaryItem(item) {
+  return {
+    id: item.id,
+    name: item.name,
+    storyDescription: item.storyDescription,
+    didacticDescription: item.didacticDescription,
+    imageRef: item.imageRef,
+    imageUrl: item.imageUrl,
+    categories: item.categories,
+    categoryId: item.categoryId,
+    priceAmount: Number(item.priceAmount ?? 0),
+    effectivePrice: getShopItemEffectivePrice(item),
+  };
+}
+
 export default function GroupShopContent() {
   const { groupId } = useParams();
+  const navigate = useNavigate();
   const { role } = useAppRole();
   const { isOwner } = useGroupPreview(groupId);
   const { showSuccess, showError, showToast } = useToast();
+  const { symbol: currencyEmoji } = useGroupCurrency();
   const isStudentView = role === APP_ROLE.STUDENT;
   const isLecturerView = role !== APP_ROLE.STUDENT;
   const canManageShop = isLecturerView && isOwner;
@@ -86,11 +102,14 @@ export default function GroupShopContent() {
   } = useGroupShopLivesSystem(groupId, { isStudentView });
 
   const catalogItems = useMemo(() => {
-    const publishedItems = items.filter((item) => item.isPublished !== false);
-    const sourceItems = filterCatalogShopItems(publishedItems, showExtraLifeProduct);
+    if (isStudentView) {
+      const publishedItems = items.filter((item) => item.isPublished !== false);
+      const sourceItems = filterCatalogShopItems(publishedItems, showExtraLifeProduct);
+      return sortShopItemsWithExtraLifeFirst(sourceItems);
+    }
 
-    return sortShopItemsWithExtraLifeFirst(sourceItems);
-  }, [items, showExtraLifeProduct]);
+    return sortShopItemsWithExtraLifeFirst(items);
+  }, [items, isStudentView, showExtraLifeProduct]);
 
   const extraLifeProduct = useMemo(
     () => findExtraLifeShopItem(items),
@@ -186,13 +205,18 @@ export default function GroupShopContent() {
   const shopInteractionDisabled = !isShopOpen || (isStudentView && isGameOver);
   const purchaseDisabled = shopInteractionDisabled || isLecturerView;
 
-  const refreshAfterPurchase = useCallback(async () => {
-    await refetch();
-    if (isStudentView && groupId) {
-      invalidateStudentProfile(groupId);
-      invalidateGroupInventory(groupId);
+  const redirectAfterPurchase = useCallback((purchasedItems) => {
+    if (!isStudentView || !groupId || purchasedItems.length === 0) {
+      return false;
     }
-  }, [refetch, isStudentView, groupId]);
+
+    setShopPurchaseSummary(groupId, {
+      items: purchasedItems,
+      currencyEmoji,
+    });
+    navigate(groupProfileEqPath(groupId));
+    return true;
+  }, [currencyEmoji, groupId, isStudentView, navigate]);
 
   const handleBuyConfirm = useCallback(async () => {
     if (!activeModal?.item) {
@@ -208,15 +232,22 @@ export default function GroupShopContent() {
       return;
     }
 
-    await refreshAfterPurchase();
+    if (activeModal.item.isExtraLife) {
+      await refetchLives();
+    }
+    closeModal();
+
+    if (redirectAfterPurchase([buildPurchaseSummaryItem(activeModal.item)])) {
+      return;
+    }
+
     if (activeModal.item.isExtraLife) {
       await refetchLives();
       showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
     } else {
       showSuccess('Produkt został zakupiony.');
     }
-    closeModal();
-  }, [activeModal, buyItem, closeModal, refetchLives, refreshAfterPurchase, showError, showSuccess]);
+  }, [activeModal, buyItem, closeModal, redirectAfterPurchase, refetchLives, showError, showSuccess]);
 
   const handleBuyAllConfirm = useCallback(async () => {
     if (cartItems.length === 0) {
@@ -224,21 +255,27 @@ export default function GroupShopContent() {
     }
 
     setIsSubmitting(true);
+    const purchasedItems = [];
+
     for (const item of cartItems) {
       const result = await buyItem(item.id);
       if (!result.ok) {
         setIsSubmitting(false);
         showError(result.error ?? `Nie udało się kupić: ${item.name}`);
-        await refreshAfterPurchase();
         return;
       }
+      purchasedItems.push(buildPurchaseSummaryItem(item));
     }
     setIsSubmitting(false);
     clearCart();
-    await refreshAfterPurchase();
-    showSuccess('Zakup produktów z koszyka został potwierdzony.');
     closeModal();
-  }, [buyItem, cartItems, clearCart, closeModal, refreshAfterPurchase, showError, showSuccess]);
+
+    if (redirectAfterPurchase(purchasedItems)) {
+      return;
+    }
+
+    showSuccess('Zakup produktów z koszyka został potwierdzony.');
+  }, [buyItem, cartItems, clearCart, closeModal, redirectAfterPurchase, showError, showSuccess]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.item) {
@@ -293,6 +330,15 @@ export default function GroupShopContent() {
                   type="button"
                   variant="secondary"
                   size="md"
+                  onClick={handleRefreshShop}
+                  disabled={isRefreshingShop}
+                >
+                  Odśwież sklep
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
                   onClick={() => setActiveModal({ type: 'categories' })}
                 >
                   Kategorie
@@ -312,19 +358,6 @@ export default function GroupShopContent() {
         ) : null}
 
         <div className="group-shop__cart-actions">
-          {isStudentView ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="md"
-              className="group-shop__refresh-btn"
-              onClick={handleRefreshShop}
-              disabled={isRefreshingShop}
-            >
-              Odśwież sklep
-            </Button>
-          ) : null}
-
           <ShopCartPanel
             cartCount={cartCount}
             cartItems={cartItems.map((item) => ({

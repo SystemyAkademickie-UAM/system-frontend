@@ -8,10 +8,46 @@ import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { buildLecturerMemberRow, generateMemberAvatarFallback } from '../../../utils/members/membersLecturerRow.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import './GroupMainMembersContent.css';
 import './shared/groupMainSubpageHeader.css';
+
+const EXPLORERSEYEBROW__TEXTLABEL = {
+  polish: 'Poszukiwacze przygód',
+  english: 'Adventure Seekers',
+};
+
+const MEMBERSTITLE__TEXTLABEL = {
+  polish: 'Uczestnicy',
+  english: 'Members',
+};
+
+const NOGROUPDATA__TEXTLABEL = {
+  polish: 'Brak identyfikatora grupy.',
+  english: 'Missing group identifier.',
+};
+
+const LOADINGMEMBERS__TEXTLABEL = {
+  polish: 'Ładowanie uczestników…',
+  english: 'Loading members…',
+};
+
+const FETCHERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać listy uczestników.',
+  english: 'Failed to load member list.',
+};
+
+const NICKNAMECOLUMN__TEXTLABEL = {
+  polish: 'Ksywka',
+  english: 'Nickname',
+};
+
+const SEARCHNICKNAME__TEXTLABEL = {
+  polish: 'Szukaj po ksywce',
+  english: 'Search by nickname',
+};
 
 function buildRows(students, preview, { role, profileAvatarUrl }) {
   const rows = [];
@@ -109,13 +145,14 @@ export default function GroupMainMembersContent() {
   const [members, setMembers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       if (!groupId) {
-        setError('Brak identyfikatora grupy.');
+        setError(NOGROUPDATA__TEXTLABEL[LANGUAGE]);
         setIsLoading(false);
         return;
       }
@@ -135,7 +172,7 @@ export default function GroupMainMembersContent() {
         }
 
         if (!preview.group && students.length === 0) {
-          setError('Nie udało się pobrać listy uczestników.');
+          setError(FETCHERROR__TEXTLABEL[LANGUAGE]);
           setMembers([]);
           return;
         }
@@ -147,7 +184,7 @@ export default function GroupMainMembersContent() {
       } catch (loadError) {
         if (!cancelled) {
           console.error('Failed to load group main members:', loadError);
-          setError('Nie udało się pobrać listy uczestników.');
+          setError(FETCHERROR__TEXTLABEL[LANGUAGE]);
           setMembers([]);
         }
       } finally {
@@ -170,7 +207,7 @@ export default function GroupMainMembersContent() {
     () => [
       {
         key: 'nickname',
-        label: 'Ksywka',
+        label: NICKNAMECOLUMN__TEXTLABEL[LANGUAGE],
         sort: 'text',
         cellClassName: 'group-main-members__cell--nickname',
         render: (row) => (
@@ -193,7 +230,7 @@ export default function GroupMainMembersContent() {
   );
 
   if (isLoading) {
-    return <p className="group-main-members__message">Ładowanie uczestników…</p>;
+    return <p className="group-main-members__message">{LOADINGMEMBERS__TEXTLABEL[LANGUAGE]}</p>;
   }
 
   if (error) {
@@ -206,7 +243,7 @@ export default function GroupMainMembersContent() {
 
   return (
     <div className="group-main-members">
-      <GroupMainSubpageHeader eyebrow="Poszukiwacze przygód" title="Uczestnicy" />
+      <GroupMainSubpageHeader eyebrow={EXPLORERSEYEBROW__TEXTLABEL[LANGUAGE]} title={MEMBERSTITLE__TEXTLABEL[LANGUAGE]} />
 
       <DataTable
         className="group-main-members__table"
@@ -217,7 +254,7 @@ export default function GroupMainMembersContent() {
           <GroupMainMembersTableRow {...props} canOpenProfiles={canOpenProfiles} />
         )}
         search={{
-          placeholder: 'Szukaj po ksywce',
+          placeholder: SEARCHNICKNAME__TEXTLABEL[LANGUAGE],
           filter: (row, query) => row.nickname.toLowerCase().includes(query.toLowerCase()),
         }}
       />

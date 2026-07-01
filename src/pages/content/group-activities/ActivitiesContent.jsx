@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Button, SearchBar } from '../../../components/ui/index.js';
 import { STAGE_NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { useGroupActivities } from './useGroupActivities.js';
 import ActivitiesTreeTable from './shared/ActivitiesTreeTable.jsx';
 import ActivityFormModal from './modals/ActivityFormModal.jsx';
@@ -58,10 +59,92 @@ export default function ActivitiesContent() {
   } = useGroupActivities();
   const { groupId } = useParams();
 
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [newStageName, setNewStageName] = useState('');
   const [activeModal, setActiveModal] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+
+  const ADDACTIVITY__TEXTLABEL = {
+    polish: 'Dodaj aktywność',
+    english: 'Add Activity',
+  };
+  const EDITSTAGE__TEXTLABEL = {
+    polish: 'Edytuj etap',
+    english: 'Edit Stage',
+  };
+  const EDITSTAGEDESCRIPTION__TEXTLABEL = {
+    polish: 'Zmień nazwę etapu.',
+    english: 'Change the stage name.',
+  };
+  const VISIBILITYTEXTLABEL__TEXTLABEL = {
+    polish: 'Ukryj / upublicznij etap',
+    english: 'Hide / make public',
+  };
+  const VISIBILITYDESCRIPTION__TEXTLABEL = {
+    polish: 'Zmień widoczność etapu dla studentów.',
+    english: 'Change stage visibility for students.',
+  };
+  const COPYSTAGE__TEXTLABEL = {
+    polish: 'Kopiuj etap',
+    english: 'Copy Stage',
+  };
+  const COPYSTAGEDESCRIPTION__TEXTLABEL = {
+    polish: 'Utwórz kopię etapu wraz z aktywnościami.',
+    english: 'Create a copy of the stage with activities.',
+  };
+  const DELETESTAGE__TEXTLABEL = {
+    polish: 'Usuń etap',
+    english: 'Delete Stage',
+  };
+  const ASSIGNACTIVITY__TEXTLABEL = {
+    polish: 'Przypisz aktywność',
+    english: 'Assign Activity',
+  };
+  const EDITACTIVITY__TEXTLABEL = {
+    polish: 'Edytuj aktywność',
+    english: 'Edit Activity',
+  };
+  const EDITACTIVITYDESCRIPTION__TEXTLABEL = {
+    polish: 'Zmień nazwę, opisy lub nagrodę.',
+    english: 'Change name, descriptions or reward.',
+  };
+  const DELETEACTIVITY__TEXTLABEL = {
+    polish: 'Usuń aktywność',
+    english: 'Delete Activity',
+  };
+  const NEWSTAGEPLACEHOLDER__TEXTLABEL = {
+    polish: 'Nazwa nowego etapu',
+    english: 'New stage name',
+  };
+  const ADDSTAGBUTTON__TEXTLABEL = {
+    polish: 'Dodaj etap',
+    english: 'Add Stage',
+  };
+  const STAGESCOUNT__TEXTLABEL = {
+    polish: 'Etapy',
+    english: 'Stages',
+  };
+  const SEARCHPLACEHOLDER__TEXTLABEL = {
+    polish: 'Szukaj etapów i aktywności...',
+    english: 'Search stages and activities...',
+  };
+  const SEARCH__TEXTLABEL = {
+    polish: 'Szukaj etapów i aktywności',
+    english: 'Search stages and activities',
+  };
+  const LOADING__TEXTLABEL = {
+    polish: 'Ładowanie etapów...',
+    english: 'Loading stages...',
+  };
+  const NOSTAGES__TEXTLABEL = {
+    polish: 'Brak etapów w tej grupie. Dodaj pierwszy etap powyżej.',
+    english: 'No stages in this group. Add the first stage above.',
+  };
+  const NOSEARCHRESULTS__TEXTLABEL = {
+    polish: 'Brak wyników wyszukiwania.',
+    english: 'No search results.',
+  };
 
   const openModal = useCallback((type, payload = {}) => {
     setActiveModal({ type, ...payload });
@@ -143,23 +226,23 @@ export default function ActivitiesContent() {
     inlineActions: [
       {
         id: 'addActivity',
-        label: 'Dodaj aktywność',
+        label: ADDACTIVITY__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.add,
-        ariaLabel: 'Dodaj aktywność do etapu',
+        ariaLabel: ADDACTIVITY__TEXTLABEL[LANGUAGE],
         onSelect: (stage) => openModal('createActivity', { stage }),
       },
     ],
     menuItems: [
       {
         id: 'edit',
-        label: 'Edytuj etap',
-        description: 'Zmień nazwę etapu.',
+        label: EDITSTAGE__TEXTLABEL[LANGUAGE],
+        description: EDITSTAGEDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: (stage) => openModal('editStage', { stage }),
       },
       {
         id: 'visibility',
-        label: 'Ukryj / upublicznij etap',
-        description: 'Zmień widoczność etapu dla studentów.',
+        label: VISIBILITYTEXTLABEL__TEXTLABEL[LANGUAGE],
+        description: VISIBILITYDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: async (stageItem) => {
           const nextStatus = stageItem.visibilityStatus === 1 ? 0 : 1;
           await updateStage(stageItem.id, { visibilityStatus: nextStatus });
@@ -167,8 +250,8 @@ export default function ActivitiesContent() {
       },
       {
         id: 'copy',
-        label: 'Kopiuj etap',
-        description: 'Utwórz kopię etapu wraz z aktywnościami.',
+        label: COPYSTAGE__TEXTLABEL[LANGUAGE],
+        description: COPYSTAGEDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: (stageItem) => {
           const defaultName = buildStageCloneName(
             stageItem.name,
@@ -179,32 +262,32 @@ export default function ActivitiesContent() {
       },
     ],
     onDelete: (stage) => openModal('deleteStage', { stage }),
-    deleteLabel: 'Usuń etap',
-    deleteAriaLabel: (stage) => `Usuń etap ${stage.name}`,
-  }), [openModal, copyStage, updateStage, stages]);
+    deleteLabel: DELETESTAGE__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (stage) => `${DELETESTAGE__TEXTLABEL[LANGUAGE]} ${stage.name}`,
+  }), [openModal, copyStage, updateStage, stages, LANGUAGE]);
 
   const activityRowActions = useMemo(() => ({
     inlineActions: [
       {
         id: 'assign',
-        label: 'Przypisz aktywność',
+        label: ASSIGNACTIVITY__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.assign,
-        ariaLabel: 'Przypisz aktywność uczestnikom',
+        ariaLabel: ASSIGNACTIVITY__TEXTLABEL[LANGUAGE],
         onSelect: ({ stage, activity }) => openModal('assignActivity', { stage, activity }),
       },
     ],
     menuItems: [
       {
         id: 'edit',
-        label: 'Edytuj aktywność',
-        description: 'Zmień nazwę, opisy lub nagrodę.',
+        label: EDITACTIVITY__TEXTLABEL[LANGUAGE],
+        description: EDITACTIVITYDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: ({ stage, activity }) => openModal('editActivity', { stage, activity }),
       },
     ],
     onDelete: ({ stage, activity }) => openModal('deleteActivity', { stage, activity }),
-    deleteLabel: 'Usuń aktywność',
-    deleteAriaLabel: ({ activity }) => `Usuń aktywność ${activity.name}`,
-  }), [openModal]);
+    deleteLabel: DELETEACTIVITY__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: ({ activity }) => `${DELETEACTIVITY__TEXTLABEL[LANGUAGE]} ${activity.name}`,
+  }), [openModal, LANGUAGE]);
 
   const modalStage = activeModal?.stage ?? null;
   const modalActivity = activeModal?.activity ?? null;
@@ -224,8 +307,8 @@ export default function ActivitiesContent() {
               className="activities-page__add-input"
               value={newStageName}
               onChange={(event) => setNewStageName(event.target.value)}
-              placeholder="Nazwa nowego etapu"
-              aria-label="Nazwa nowego etapu"
+              placeholder={NEWSTAGEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+              aria-label={NEWSTAGEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
               maxLength={STAGE_NAME_MAX_LENGTH}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
@@ -234,14 +317,14 @@ export default function ActivitiesContent() {
               }}
             />
             <Button variant="primary" size="md" onClick={handleAddStage}>
-              Dodaj etap
+              {ADDSTAGBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
           </div>
         </div>
 
         <div className="maq-section-page__toolbar-end">
           <span className="activities-page__count">
-            Etapy
+            {STAGESCOUNT__TEXTLABEL[LANGUAGE]}
             {' '}
             {stages.length}
           </span>
@@ -249,21 +332,21 @@ export default function ActivitiesContent() {
           <SearchBar
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj etapów i aktywności…"
+            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
             name="activities-search"
             className="activities-page__search"
-            aria-label="Szukaj etapów i aktywności"
+            aria-label={SEARCH__TEXTLABEL[LANGUAGE]}
           />
         </div>
       </div>
 
       {isLoading ? (
-        <p className="activities-page__loading">Ładowanie etapów…</p>
+        <p className="activities-page__loading">{LOADING__TEXTLABEL[LANGUAGE]}</p>
       ) : filteredStages.length === 0 ? (
         <p className="activities-page__empty">
           {stages.length === 0
-            ? 'Brak etapów w tej grupie. Dodaj pierwszy etap powyżej.'
-            : 'Brak wyników wyszukiwania.'}
+            ? NOSTAGES__TEXTLABEL[LANGUAGE]
+            : NOSEARCHRESULTS__TEXTLABEL[LANGUAGE]}
         </p>
       ) : (
         <ActivitiesTreeTable

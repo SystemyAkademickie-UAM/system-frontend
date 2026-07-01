@@ -1,7 +1,7 @@
 import { BADGE_RARITY } from '../../../components/ui/Badge/badgeRarity.js';
 import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
-/** Kolejność jakości od najniższej do najwyższej. */
+/** Kolejność rzadkości od najniższej do najwyższej. */
 export const BADGE_RARITY_ORDER = {
   [BADGE_RARITY.common]: 0,
   [BADGE_RARITY.uncommon]: 1,
@@ -21,8 +21,8 @@ export const TREASURY_SORT = {
 };
 
 export const LECTURER_SORT_OPTIONS = [
-  { id: TREASURY_SORT.qualityDesc, label: 'Jakość (od najwyższej)' },
-  { id: TREASURY_SORT.qualityAsc, label: 'Jakość (od najniższej)' },
+  { id: TREASURY_SORT.qualityDesc, label: 'Rzadkość (od najwyższej)' },
+  { id: TREASURY_SORT.qualityAsc, label: 'Rzadkość (od najniższej)' },
   { id: TREASURY_SORT.nameAsc, label: 'Nazwa A–Z' },
   { id: TREASURY_SORT.nameDesc, label: 'Nazwa Z–A' },
   { id: TREASURY_SORT.rewardDesc, label: 'Nagroda malejąco' },
@@ -32,8 +32,8 @@ export const LECTURER_SORT_OPTIONS = [
 export const STUDENT_SORT_OPTIONS = [
   { id: TREASURY_SORT.unlockFirst, label: 'Odblokowane → zablokowane' },
   { id: TREASURY_SORT.lockedFirst, label: 'Zablokowane → odblokowane' },
-  { id: TREASURY_SORT.qualityDesc, label: 'Jakość (od najwyższej)' },
-  { id: TREASURY_SORT.qualityAsc, label: 'Jakość (od najniższej)' },
+  { id: TREASURY_SORT.qualityDesc, label: 'Rzadkość (od najwyższej)' },
+  { id: TREASURY_SORT.qualityAsc, label: 'Rzadkość (od najniższej)' },
   { id: TREASURY_SORT.nameAsc, label: 'Nazwa A–Z' },
   { id: TREASURY_SORT.nameDesc, label: 'Nazwa Z–A' },
   { id: TREASURY_SORT.rewardDesc, label: 'Nagroda malejąco' },

@@ -1283,7 +1283,7 @@ export default function ShopItemFormContent({
                 <option value="">Dostępny dla wszystkich</option>
                 {ranks.map((rank) => (
                   <option key={`unlock-rank-${rank.id}`} value={String(rank.id)}>
-                    {`Zablokowany za rangę: ${rank.name}`}
+                    {`Dostępny po osiągnięciu rangi: ${rank.name}`}
                   </option>
                 ))}
               </select>
