@@ -7,6 +7,12 @@ import {
   markGroupBacklogItemRead,
 } from '../../services/backlog.api.js';
 import { formatBacklogNotification } from '../../utils/notifications/formatBacklogNotification.js';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+
+const FETCHERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać powiadomień.',
+  english: 'Failed to load notifications.',
+};
 
 /**
  * @param {string | number | null | undefined} groupId
@@ -22,6 +28,7 @@ export function useGroupBacklogNotifications(groupId, {
   const [totalCount, setTotalCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(Boolean(groupId));
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [error, setError] = useState('');
 
   const refetch = useCallback(async () => {
@@ -44,7 +51,7 @@ export function useGroupBacklogNotifications(groupId, {
       ]);
 
       if (!listResult.ok) {
-        setError(listResult.error ?? 'Nie udało się pobrać powiadomień.');
+        setError(listResult.error ?? FETCHERROR__TEXTLABEL[LANGUAGE]);
         setItems([]);
       } else {
         setItems(listResult.items);
@@ -58,7 +65,7 @@ export function useGroupBacklogNotifications(groupId, {
         setUnreadCount(countResult.count);
       }
     } catch {
-      setError('Nie udało się pobrać powiadomień.');
+      setError(FETCHERROR__TEXTLABEL[LANGUAGE]);
       setItems([]);
     } finally {
       setIsLoading(false);
