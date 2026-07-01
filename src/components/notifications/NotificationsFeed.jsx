@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  formatNotificationDate,
-} from '../../utils/notifications/formatBacklogNotification.js';
+import AssetSvg from '../ui/AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../constants/svgIcons.js';
+import { formatRelativeTimePl } from '../../utils/notifications/formatRelativeTimePl.js';
 import {
   getNotificationsLastSeen,
   isNotificationAfterLastSeen,
@@ -88,13 +88,25 @@ export default function NotificationsFeed({
     return index;
   }, [lastSeenAt, showDivider, visibleNotifications]);
 
-  const handleItemActivate = async (notification) => {
-    if (!notification.isRead && onMarkRead) {
-      await onMarkRead(notification.id);
+  const handleNavigate = (notification) => {
+    if (!notification.href) {
+      return;
     }
+    navigate(notification.href);
+  };
 
-    if (linkable && notification.href) {
-      navigate(notification.href);
+  const handleTileActivate = (notification) => {
+    if (!notification.isRead && onMarkRead) {
+      void onMarkRead(notification.id);
+    }
+    handleNavigate(notification);
+  };
+
+  const handleMarkReadClick = (event, notification) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!notification.isRead && onMarkRead) {
+      void onMarkRead(notification.id);
     }
   };
 
@@ -123,20 +135,22 @@ export default function NotificationsFeed({
     >
       <div className="notifications-feed__list" role="list">
         {visibleNotifications.map((notification, index) => {
+          const isNavigable = Boolean(notification.href);
           const itemClassName = [
             'notifications-feed__item',
             notification.isRead ? '' : 'notifications-feed__item--unread',
-            linkable && notification.href ? 'notifications-feed__item--linkable' : '',
+            isNavigable || linkable ? 'notifications-feed__item--linkable' : '',
           ].filter(Boolean).join(' ');
 
           const content = (
             <>
+              <p className="notifications-feed__item-type">{notification.typeLabel}</p>
               <p className="notifications-feed__item-title">{notification.title}</p>
               {notification.message && notification.message !== notification.title ? (
                 <p className="notifications-feed__item-message">{notification.message}</p>
               ) : null}
               <time className="notifications-feed__item-time" dateTime={notification.date}>
-                {formatNotificationDate(notification.date)}
+                {formatRelativeTimePl(notification.date)}
               </time>
             </>
           );
@@ -151,37 +165,52 @@ export default function NotificationsFeed({
                 </div>
               ) : null}
 
-              {linkable && notification.href ? (
-                <Link
-                  to={notification.href}
+              <div
+                className={[
+                  'notifications-feed__row',
+                  notification.isRead ? '' : 'notifications-feed__row--unread',
+                ].filter(Boolean).join(' ')}
+                role="listitem"
+              >
+                <div
                   className={itemClassName}
-                  role="listitem"
+                  tabIndex={isNavigable ? 0 : undefined}
                   onClick={() => {
-                    if (!notification.isRead && onMarkRead) {
-                      void onMarkRead(notification.id);
+                    if (isNavigable) {
+                      handleTileActivate(notification);
                     }
-                  }}
-                >
-                  {content}
-                </Link>
-              ) : (
-                <article
-                  className={itemClassName}
-                  role="listitem"
-                  tabIndex={onMarkRead ? 0 : undefined}
-                  onClick={() => {
-                    void handleItemActivate(notification);
                   }}
                   onKeyDown={(event) => {
+                    if (!isNavigable) {
+                      return;
+                    }
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
-                      void handleItemActivate(notification);
+                      handleTileActivate(notification);
                     }
                   }}
                 >
                   {content}
-                </article>
-              )}
+                </div>
+
+                {onMarkRead && !notification.isRead ? (
+                  <button
+                    type="button"
+                    className="notifications-feed__mark-read"
+                    aria-label="Oznacz jako przeczytane"
+                    title="Oznacz jako przeczytane"
+                    onClick={(event) => handleMarkReadClick(event, notification)}
+                  >
+                    <AssetSvg
+                      name={SVG_ICONS.status.checkCircle}
+                      className="notifications-feed__mark-read-icon"
+                      width={20}
+                      height={20}
+                      alt=""
+                    />
+                  </button>
+                ) : null}
+              </div>
             </div>
           );
         })}

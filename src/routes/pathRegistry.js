@@ -270,9 +270,14 @@ export function templatesPath() {
   return '/templates';
 }
 
-/** Publiczna galeria szablonów — `/templates/gallery`. */
+/** Moje szablony — `/templates/my`. */
+export function templatesMyPath() {
+  return '/templates/my';
+}
+
+/** @deprecated Galeria przeniesiona na {@link templatesPath}. */
 export function templatesGalleryPath() {
-  return '/templates/gallery';
+  return templatesPath();
 }
 
 // ============================================================================

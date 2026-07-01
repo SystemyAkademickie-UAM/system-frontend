@@ -47,6 +47,6 @@ export function sortShopItemsWithExtraLifeFirst(items) {
     if (!left.isExtraLife && right.isExtraLife) {
       return 1;
     }
-    return Number(left.id) - Number(right.id);
+    return 0;
   });
 }

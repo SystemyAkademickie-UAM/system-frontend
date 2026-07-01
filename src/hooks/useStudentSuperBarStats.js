@@ -89,7 +89,14 @@ export function useStudentSuperBarStats() {
 
   useEffect(() => {
     loadStats();
-  }, [loadStats, pathname]);
+  }, [loadStats, pathname, livesEnabled]);
+
+  useEffect(() => {
+    if (role !== APP_ROLE.STUDENT || !groupId) {
+      return;
+    }
+    setLivesLabel(groupLivesLabel?.trim() || DEFAULT_LIVES_LABEL);
+  }, [role, groupId, groupLivesLabel]);
 
   useEffect(() => {
     if (role !== APP_ROLE.STUDENT || !groupId) {

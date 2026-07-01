@@ -101,6 +101,7 @@ export function useGroupBadges() {
       storyDescription: values.storyDescription || '',
       rewardAmount: values.rewardAmount || 0,
       rarity: values.rarity || 'common',
+      isPublished: values.isPublished !== false,
     });
 
     if (result.ok && result.badge) {
@@ -126,6 +127,7 @@ export function useGroupBadges() {
       storyDescription: values.storyDescription,
       rewardAmount: values.rewardAmount,
       rarity: values.rarity,
+      ...(typeof values.isPublished === 'boolean' ? { isPublished: values.isPublished } : {}),
     });
 
     if (result.ok && result.badge) {

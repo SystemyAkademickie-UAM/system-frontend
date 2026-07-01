@@ -30,6 +30,8 @@ export const SVG_ICONS = {
     money: 'content/money.svg',
     settings: 'content/settings.svg',
     user: 'content/user.svg',
+    calendar: 'content/calendar.svg',
+    clock: 'content/clock.svg',
   },
   status: {
     check: 'status/check.svg',

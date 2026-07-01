@@ -4,7 +4,7 @@ import {
   appSettingsPath,
   groupsListPath,
   isGroupJoinPath,
-  templatesGalleryPath,
+  templatesMyPath,
   templatesPath,
 } from '../routes/pathRegistry.js';
 
@@ -13,7 +13,7 @@ const COMPACT_LAYOUT_PATHS = new Set([
   appSettingsPath(),
   appHelpPath(),
   templatesPath(),
-  templatesGalleryPath(),
+  templatesMyPath(),
 ]);
 
 export function useCompactAppLayout() {

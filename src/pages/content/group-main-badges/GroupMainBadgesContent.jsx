@@ -47,6 +47,9 @@ const UNLOCK_FILTERS = [
  * @param {string} [props.sortBy]
  * @param {(value: string) => void} [props.onRarityFilterChange]
  * @param {(value: string) => void} [props.onSortByChange]
+ * @param {boolean} [props.showLecturerActions]
+ * @param {(badge: import('./badgeTreasuryModel.js').TreasuryBadge) => void} [props.onEditBadge]
+ * @param {(badge: import('./badgeTreasuryModel.js').TreasuryBadge) => void} [props.onDeleteBadge]
  */
 export default function GroupMainBadgesContent({
   embedded = false,
@@ -55,6 +58,9 @@ export default function GroupMainBadgesContent({
   sortBy: externalSortBy,
   onRarityFilterChange,
   onSortByChange,
+  showLecturerActions = false,
+  onEditBadge,
+  onDeleteBadge,
 }) {
   const { groupId } = useParams();
   const {
@@ -197,6 +203,9 @@ export default function GroupMainBadgesContent({
               earnersByBadgeId={earnersByBadgeId}
               excludeAccountId={isStudentView ? studentAccountId : null}
               isStudentView={isStudentView}
+              showLecturerActions={showLecturerActions}
+              onEdit={onEditBadge ? () => onEditBadge(badge) : undefined}
+              onDelete={onDeleteBadge ? () => onDeleteBadge(badge) : undefined}
             />
           ))}
         </div>

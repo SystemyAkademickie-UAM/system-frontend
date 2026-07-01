@@ -12,6 +12,7 @@ import {
   sortShopItems,
 } from '../../../utils/shop/shopModel.js';
 import { buildShopCategoryFilters, resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
+import { sortShopItemsWithExtraLifeFirst } from '../../../utils/shop/extraLifeItem.js';
 import { useGroupShopItems, useGroupShopOpen } from '../../../hooks/shop/useGroupShop.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import './GroupShopContent.css';
@@ -55,10 +56,10 @@ export default function ShopStudentCatalogPanel({
   );
 
   const catalogItems = useMemo(() => {
-    if (!onlyPublished) {
-      return items;
-    }
-    return items.filter((item) => item.isPublished !== false);
+    const source = onlyPublished
+      ? items.filter((item) => item.isPublished !== false)
+      : items;
+    return sortShopItemsWithExtraLifeFirst(source);
   }, [items, onlyPublished]);
 
   const visibleItems = useMemo(() => {
@@ -66,7 +67,8 @@ export default function ShopStudentCatalogPanel({
       searchQuery,
       categoryFilter,
     });
-    return sortShopItems(filtered, sortBy);
+    const sorted = sortShopItems(filtered, sortBy);
+    return sortShopItemsWithExtraLifeFirst(sorted);
   }, [catalogItems, searchQuery, categoryFilter, sortBy]);
 
   const blockCatalog = !showLecturerActions && !isShopOpen;
@@ -124,6 +126,7 @@ export default function ShopStudentCatalogPanel({
                 hideActions={showLecturerActions}
                 onEdit={() => onEdit?.(item)}
                 onDelete={() => onDelete?.(item)}
+                isExtraLife={item.isExtraLife}
                 disabled={cardsDisabled || item.isLocked}
                 isRankLocked={!showLecturerActions && item.isLocked}
                 className="group-shop__card"

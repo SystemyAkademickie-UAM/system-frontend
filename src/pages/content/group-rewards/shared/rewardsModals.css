@@ -85,7 +85,28 @@
 
 .rewards-modal__row--icon-rarity {
   grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
+  align-items: center;
+}
+
+.rewards-modal__row--icon-only {
+  grid-template-columns: auto;
+  align-items: center;
+}
+
+.rewards-modal__label--with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.rewards-modal__field--inline-actions {
+  gap: 0.5rem;
+}
+
+.rewards-modal__inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .rewards-modal__field--icon {
@@ -160,6 +181,35 @@
 
 .rewards-modal__option-label--disabled .rewards-modal__option-text {
   color: var(--color-text-secondary);
+}
+
+.rewards-modal__datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.rewards-modal__datetime-row + .rewards-modal__datetime-row {
+  margin-top: 0.5rem;
+}
+
+.rewards-modal__datetime-icon {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.rewards-modal__input--date,
+.rewards-modal__input--time {
+  min-height: 2.75rem;
+  font-size: max(14px, var(--rewards-modal-input));
+}
+
+.rewards-modal__datetime-row--disabled {
+  opacity: 0.55;
+}
+
+.rewards-modal__datetime-row--disabled .rewards-modal__input:disabled {
+  cursor: not-allowed;
 }
 
 .rewards-modal__delete-text {

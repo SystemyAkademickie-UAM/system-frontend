@@ -178,8 +178,29 @@
   vertical-align: middle;
 }
 
+.data-table__th--actions,
+.data-table__cell--actions {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+  background: var(--color-bg-surface);
+  box-shadow: -6px 0 10px rgba(0, 0, 0, 0.18);
+}
+
+.data-table__th--actions {
+  z-index: 3;
+}
+
+.data-table-header-bar--sticky .data-table__th--actions {
+  z-index: 11;
+}
+
 .data-table__cell--actions {
   text-align: right;
+}
+
+.data-table__row:hover .data-table__cell--actions {
+  background: rgb(18, 28, 22);
 }
 
 .data-table__actions {

@@ -109,6 +109,21 @@ const SHOP_ITEM_COLUMNS = [
     render: () => '\u00A0',
   },
   {
+    key: 'icon',
+    label: 'Ikona',
+    sort: 'text',
+    width: '80px',
+    render: (item) => (
+      item.imageRef ? (
+        <span className="rewards-table__icon-emoji" aria-hidden="true">
+          {String(item.imageRef).split('*')[0]}
+        </span>
+      ) : (
+        <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+      )
+    ),
+  },
+  {
     key: 'priceAmount',
     label: 'Cena',
     sort: 'number',

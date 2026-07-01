@@ -85,6 +85,7 @@ import {
   devApiTestPath,
   homePath,
   loginPath,
+  templatesPath,
 } from './pathRegistry.js';
 
 // Helper: wraps element with RouteGuard
@@ -157,8 +158,9 @@ const appRouteTree = [
             path: 'templates',
             element: withGuard(<TemplatesLayout />, { allowedRoles: LECTURER_ONLY }),
             children: [
-              { index: true, element: <TemplatesMyPage /> },
-              { path: 'gallery', element: <TemplatesGalleryPage /> },
+              { index: true, element: <TemplatesGalleryPage /> },
+              { path: 'my', element: <TemplatesMyPage /> },
+              { path: 'gallery', element: <Navigate to={templatesPath()} replace /> },
             ],
           },
 

@@ -9,8 +9,38 @@ const EMPTY_FORM = {
   text: '',
   startHidden: false,
   schedulePublish: false,
-  publishAt: '',
+  publishDate: '',
+  publishTime: '',
 };
+
+function toLocalDateValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toLocalTimeValue(date) {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function splitPublishAt(value) {
+  if (!value) {
+    return { publishDate: '', publishTime: '' };
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return { publishDate: '', publishTime: '' };
+  }
+
+  return {
+    publishDate: toLocalDateValue(date),
+    publishTime: toLocalTimeValue(date),
+  };
+}
 
 function PostOptionCheckbox({
   id,
@@ -66,14 +96,14 @@ export default function PostFormModal({
 
     if (post) {
       const hasFuturePublishAt = post.publishAt && new Date(post.publishAt) > new Date();
+      const { publishDate, publishTime } = splitPublishAt(post.publishAt);
       setForm({
         title: post.title ?? '',
         text: post.text ?? '',
         startHidden: post.isPublished === false && !hasFuturePublishAt,
         schedulePublish: Boolean(hasFuturePublishAt),
-        publishAt: post.publishAt
-          ? new Date(post.publishAt).toISOString().slice(0, 16)
-          : '',
+        publishDate,
+        publishTime,
       });
       return;
     }
@@ -86,15 +116,22 @@ export default function PostFormModal({
     [form.title, form.text],
   );
 
+  const scheduleInputsDisabled = !form.schedulePublish;
+
   const handleConfirm = () => {
     if (!isValid || isLoading) return;
+
+    const hasScheduledDateTime = form.schedulePublish
+      && form.publishDate.trim().length > 0
+      && form.publishTime.trim().length > 0;
+
     onConfirm?.({
       title: form.title.trim(),
       text: form.text.trim(),
       startHidden: form.startHidden,
       schedulePublish: form.schedulePublish,
-      publishAt: form.schedulePublish && form.publishAt
-        ? new Date(form.publishAt).toISOString()
+      publishAt: hasScheduledDateTime
+        ? new Date(`${form.publishDate}T${form.publishTime}`).toISOString()
         : null,
       isPublished: !form.startHidden && !form.schedulePublish,
     });
@@ -139,7 +176,6 @@ export default function PostFormModal({
             onChange={(checked) => setForm((prev) => ({
               ...prev,
               startHidden: checked,
-              schedulePublish: checked ? false : prev.schedulePublish,
             }))}
           >
             Ukryj wpis (niepublikowany)
@@ -149,29 +185,64 @@ export default function PostFormModal({
           <PostOptionCheckbox
             id="post-schedule-publish"
             checked={form.schedulePublish}
-            disabled={form.startHidden}
             onChange={(checked) => setForm((prev) => ({
               ...prev,
               schedulePublish: checked,
+              startHidden: checked ? true : prev.startHidden,
             }))}
           >
             Opublikuj o wybranej dacie
           </PostOptionCheckbox>
         </div>
-        {form.schedulePublish && !form.startHidden ? (
-          <div className="rewards-modal__field">
-            <label htmlFor="post-publish-at" className="rewards-modal__label">
-              Data publikacji
-            </label>
+        <div className="rewards-modal__field">
+          <span className="rewards-modal__label">Data publikacji</span>
+          <div
+            className={[
+              'rewards-modal__datetime-row',
+              scheduleInputsDisabled ? 'rewards-modal__datetime-row--disabled' : '',
+            ].filter(Boolean).join(' ')}
+          >
+            <AssetSvg
+              name={SVG_ICONS.content.calendar}
+              width={20}
+              height={20}
+              alt=""
+              className="rewards-modal__datetime-icon"
+            />
             <input
-              id="post-publish-at"
-              type="datetime-local"
-              className="rewards-modal__input"
-              value={form.publishAt}
-              onChange={(event) => setForm((prev) => ({ ...prev, publishAt: event.target.value }))}
+              id="post-publish-date"
+              type="date"
+              className="rewards-modal__input rewards-modal__input--date"
+              value={form.publishDate}
+              disabled={scheduleInputsDisabled}
+              onChange={(event) => setForm((prev) => ({ ...prev, publishDate: event.target.value }))}
+              aria-label="Data publikacji"
             />
           </div>
-        ) : null}
+          <div
+            className={[
+              'rewards-modal__datetime-row',
+              scheduleInputsDisabled ? 'rewards-modal__datetime-row--disabled' : '',
+            ].filter(Boolean).join(' ')}
+          >
+            <AssetSvg
+              name={SVG_ICONS.content.clock}
+              width={20}
+              height={20}
+              alt=""
+              className="rewards-modal__datetime-icon"
+            />
+            <input
+              id="post-publish-time"
+              type="time"
+              className="rewards-modal__input rewards-modal__input--time"
+              value={form.publishTime}
+              disabled={scheduleInputsDisabled}
+              onChange={(event) => setForm((prev) => ({ ...prev, publishTime: event.target.value }))}
+              aria-label="Godzina publikacji"
+            />
+          </div>
+        </div>
       </div>
     </Modal>
   );

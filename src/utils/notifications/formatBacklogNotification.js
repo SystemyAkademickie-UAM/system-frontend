@@ -52,6 +52,191 @@ const TYPE_LABELS = {
   OTHER: 'Powiadomienie',
 };
 
+const LECTURER_STUDENT_EVENT_TYPES = new Set([
+  'STUDENT_JOINED',
+  'SHOP_PURCHASE',
+  'ITEM_USED',
+  'ACTIVITY_COMPLETED',
+  'BADGE_EARNED',
+  'RANK_UP',
+  'LIVES_CHANGED',
+  'CURRENCY_ADDED',
+]);
+
+/**
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+function readString(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+/**
+ * @param {unknown} value
+ * @returns {number | null}
+ */
+function readNumber(value) {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return null;
+  }
+  return value;
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {string | null}
+ */
+function resolveStudentLabel(payload) {
+  return readString(payload.nickname)
+    ?? readString(payload.studentNickname)
+    ?? readString(payload.studentName)
+    ?? readString(payload.displayName);
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {string[]}
+ */
+function collectPayloadDetails(payload, { excludeInMessage = [] } = {}) {
+  /** @type {string[]} */
+  const details = [];
+  const excluded = new Set(excludeInMessage.filter(Boolean));
+
+  const pushUnique = (value) => {
+    if (!value || excluded.has(value) || details.includes(value)) {
+      return;
+    }
+    details.push(value);
+  };
+
+  const itemName = readString(payload.itemName);
+  const badgeName = readString(payload.badgeName);
+  const rankName = readString(payload.rankName);
+  const stageName = readString(payload.stageName);
+  const postTitle = readString(payload.postTitle);
+  const activityName = readString(payload.activityName);
+
+  pushUnique(itemName);
+  pushUnique(badgeName);
+  pushUnique(rankName);
+  pushUnique(stageName);
+  pushUnique(postTitle);
+  pushUnique(activityName);
+
+  const price = readNumber(payload.price);
+  if (price != null) {
+    pushUnique(`Koszt: ${price}`);
+  }
+
+  const points = readNumber(payload.points);
+  if (points != null) {
+    pushUnique(`Punkty: +${points}`);
+  }
+
+  const rewardAmount = readNumber(payload.rewardAmount);
+  if (rewardAmount != null && rewardAmount !== points) {
+    pushUnique(`Nagroda: +${rewardAmount}`);
+  }
+
+  const currencyAmount = readNumber(payload.currencyAmount ?? payload.amount);
+  if (currencyAmount != null) {
+    pushUnique(`Waluta: +${currencyAmount}`);
+  }
+
+  const livesDelta = readNumber(payload.livesDelta);
+  if (livesDelta != null) {
+    pushUnique(livesDelta >= 0 ? `Życia: +${livesDelta}` : `Życia: ${livesDelta}`);
+  }
+
+  const newLives = readNumber(payload.newLives ?? payload.lives);
+  if (newLives != null && livesDelta == null) {
+    pushUnique(`Życia: ${newLives}`);
+  }
+
+  return details;
+}
+
+/**
+ * @param {string} type
+ * @param {Record<string, unknown>} payload
+ * @param {boolean} isStudentView
+ * @param {string | null} studentLabel
+ * @returns {string | null}
+ */
+function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
+  const itemName = readString(payload.itemName);
+  const badgeName = readString(payload.badgeName);
+  const rankName = readString(payload.rankName);
+  const stageName = readString(payload.stageName);
+  const postTitle = readString(payload.postTitle);
+  const activityName = readString(payload.activityName);
+  const price = readNumber(payload.price);
+
+  if (!isStudentView && studentLabel) {
+    switch (type) {
+      case 'STUDENT_JOINED':
+        return `${studentLabel} dołączył(a) do grupy`;
+      case 'SHOP_PURCHASE':
+        return price != null && itemName
+          ? `${studentLabel} kupił(a): ${itemName} (${price})`
+          : itemName
+            ? `${studentLabel} kupił(a): ${itemName}`
+            : `${studentLabel} dokonał(a) zakupu w sklepie`;
+      case 'ITEM_USED':
+        return itemName
+          ? `${studentLabel} użył(a): ${itemName}`
+          : `${studentLabel} użył(a) przedmiotu`;
+      case 'ACTIVITY_COMPLETED':
+        return activityName
+          ? `${studentLabel} zaliczył(a): ${activityName}`
+          : `${studentLabel} zaliczył(a) aktywność`;
+      case 'BADGE_EARNED':
+        return badgeName
+          ? `${studentLabel} zdobył(a) odznakę: ${badgeName}`
+          : `${studentLabel} zdobył(a) odznakę`;
+      case 'RANK_UP':
+        return rankName
+          ? `${studentLabel} awansował(a) na rangę: ${rankName}`
+          : `${studentLabel} awansował(a) rangę`;
+      default:
+        break;
+    }
+  }
+
+  switch (type) {
+    case 'SHOP_ITEM_ADDED':
+      return itemName ? `Nowy produkt: ${itemName}` : null;
+    case 'BADGE_ADDED':
+      return badgeName ? `Nowa odznaka: ${badgeName}` : null;
+    case 'RANK_ADDED':
+      return rankName ? `Nowa ranga: ${rankName}` : null;
+    case 'STAGE_ADDED':
+      return stageName ? `Nowy etap: ${stageName}` : null;
+    case 'POST_ADDED':
+      return postTitle ? `Nowy wpis: ${postTitle}` : null;
+    case 'BADGE_EARNED':
+      return badgeName ? `Zdobyto odznakę: ${badgeName}` : null;
+    case 'RANK_UP':
+      return rankName ? `Awans na rangę: ${rankName}` : null;
+    case 'ACTIVITY_COMPLETED':
+      return activityName ? `Zaliczono: ${activityName}` : null;
+    case 'SHOP_PURCHASE':
+      return itemName && price != null
+        ? `Zakup: ${itemName} (${price})`
+        : itemName
+          ? `Zakup: ${itemName}`
+          : null;
+    case 'ITEM_USED':
+      return itemName ? `Użyto: ${itemName}` : null;
+    default:
+      return null;
+  }
+}
+
 /**
  * @param {string | number} groupId
  * @param {import('../../services/backlog.api.js').BacklogItem} item
@@ -59,31 +244,17 @@ const TYPE_LABELS = {
  */
 export function formatBacklogNotification(groupId, item, isStudentView = false) {
   const payload = parseBacklogPayload(item.value);
-  const message = typeof payload.message === 'string' ? payload.message : '';
+  const message = readString(payload.message) ?? '';
   const typeLabel = TYPE_LABELS[item.type] ?? item.type;
-  const title = message || typeLabel;
+  const studentLabel = resolveStudentLabel(payload);
+  const fallbackTitle = buildFallbackTitle(item.type, payload, isStudentView, studentLabel);
+  const title = message || fallbackTitle || typeLabel;
 
-  const details = [];
-  if (typeof payload.price === 'number') {
-    details.push(`Cena: ${payload.price}`);
-  }
-  if (typeof payload.points === 'number') {
-    details.push(`Punkty: +${payload.points}`);
-  }
-  if (typeof payload.itemName === 'string' && !message.includes(payload.itemName)) {
-    details.push(payload.itemName);
-  }
-  if (typeof payload.badgeName === 'string' && !message.includes(payload.badgeName)) {
-    details.push(payload.badgeName);
-  }
-  if (typeof payload.rankName === 'string' && !message.includes(payload.rankName)) {
-    details.push(payload.rankName);
-  }
-  if (typeof payload.stageName === 'string' && !message.includes(payload.stageName)) {
-    details.push(payload.stageName);
-  }
-  if (typeof payload.postTitle === 'string' && !message.includes(payload.postTitle)) {
-    details.push(payload.postTitle);
+  const excludeInMessage = [message, title];
+  const details = collectPayloadDetails(payload, { excludeInMessage });
+
+  if (!isStudentView && LECTURER_STUDENT_EVENT_TYPES.has(item.type) && studentLabel && !title.includes(studentLabel)) {
+    details.unshift(studentLabel);
   }
 
   let href = null;
@@ -91,6 +262,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     switch (item.type) {
       case 'STAGE_ADDED':
       case 'ACTIVITY_COMPLETED':
+      case 'STAGE_COMPLETED':
         href = groupStudentActivityListPath(groupId);
         break;
       case 'BADGE_ADDED':
@@ -111,7 +283,11 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         href = groupStudentPostsPath(groupId);
         break;
       case 'LIVES_SYSTEM_CHANGED':
+      case 'LIVES_CHANGED':
         href = `${groupMainPath(groupId)}#group-notifications`;
+        break;
+      case 'CURRENCY_ADDED':
+        href = groupMainPath(groupId);
         break;
       default:
         href = `${groupMainPath(groupId)}#group-notifications`;
@@ -123,6 +299,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         break;
       case 'STAGE_ADDED':
       case 'ACTIVITY_COMPLETED':
+      case 'STAGE_COMPLETED':
         href = groupActivitiesPath(groupId);
         break;
       case 'BADGE_ADDED':
@@ -140,17 +317,23 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
       case 'POST_ADDED':
         href = groupPostsPath(groupId);
         break;
+      case 'LIVES_CHANGED':
+      case 'CURRENCY_ADDED':
+        href = groupMembersPath(groupId);
+        break;
       default:
         href = null;
     }
   }
+
+  const detailMessage = details.length > 0 ? details.join(' · ') : '';
 
   return {
     id: item.id,
     type: item.type,
     typeLabel,
     title,
-    message: details.length > 0 ? details.join(' · ') : typeLabel,
+    message: detailMessage && detailMessage !== title ? detailMessage : (message && message !== title ? '' : typeLabel),
     date: item.date,
     isRead: item.isRead,
     href,

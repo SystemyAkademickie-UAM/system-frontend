@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import AuthStepTransition from '../../../components/layout/AuthStepTransition.jsx';
+import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import {
   AUTH_LOGIN_ACCEPT_EULA_PATH,
@@ -34,6 +35,8 @@ import {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { showSuccess } = useToast();
   const session = useSessionOptional();
   const { refetchProfile } = useUserProfile();
   const [step, setStep] = useState(LOGIN_FLOW_STEP_PIONIER);
@@ -46,6 +49,15 @@ export default function LoginPage() {
   const [isLogoutBusy, setIsLogoutBusy] = useState(false);
   const [logoutError, setLogoutError] = useState(null);
   const samlRecoveryAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (searchParams.get('loggedOut') !== '1') {
+      return;
+    }
+
+    showSuccess('Wylogowano pomyślnie.');
+    setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams, showSuccess]);
 
   useEffect(() => {
     if (session?.isLoading || session?.isAuthenticated) {
@@ -153,10 +165,10 @@ export default function LoginPage() {
     setIsLogoutConfirmOpen(false);
   }, []);
 
-  const handleLogoutFailed = useCallback(async () => {
+  const handleLogoutFailed = useCallback(() => {
     setIsLogoutBusy(false);
-    await session?.refetchSession?.();
     resetLoginWizardAfterLogout();
+    void session?.refetchSession?.();
   }, [resetLoginWizardAfterLogout, session]);
 
   const handleLogoutConfirm = useCallback(() => {
@@ -167,9 +179,9 @@ export default function LoginPage() {
     }
     setIsLogoutBusy(true);
     void logoutUser(() => {
-      void handleLogoutFailed();
-    });
-  }, [handleLogoutFailed]);
+      handleLogoutFailed();
+    }, { navigate });
+  }, [handleLogoutFailed, navigate]);
 
   const handleProfileContinue = useCallback(async ({ nickname, avatarId }) => {
     setProfileError(null);

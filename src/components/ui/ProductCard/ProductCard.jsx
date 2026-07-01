@@ -244,6 +244,8 @@ export default function ProductCard({
 
   readOnly = false,
 
+  isExtraLife = false,
+
 }) {
 
   const icon = useMemo(
@@ -292,6 +294,8 @@ export default function ProductCard({
         disabled ? 'maq-product-card--disabled' : '',
 
         isRankLocked ? 'maq-product-card--rank-locked' : '',
+
+        isExtraLife ? 'maq-product-card--extra-life' : '',
 
         className,
 

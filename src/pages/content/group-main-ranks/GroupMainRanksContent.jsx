@@ -9,7 +9,13 @@ import '../group-main/shared/groupMainSubpageHeader.css';
 import '../group-main/GroupMainHomeContent.css';
 import './GroupMainRanksContent.css';
 
-export default function GroupMainRanksContent({ embedded = false, showMemberAvatars: showMemberAvatarsOverride }) {
+export default function GroupMainRanksContent({
+  embedded = false,
+  showMemberAvatars: showMemberAvatarsOverride,
+  showLecturerActions = false,
+  onEditRank,
+  onDeleteRank,
+}) {
   const { groupId } = useParams();
   const {
     ranks,
@@ -83,6 +89,9 @@ export default function GroupMainRanksContent({ embedded = false, showMemberAvat
           studentNickname={studentProfile?.nickname || studentProfile?.name || 'Student'}
           studentAvatarUrl={studentProfile?.avatarUrl ?? null}
           showHeader={false}
+          showLecturerActions={showLecturerActions}
+          onEditRank={onEditRank}
+          onDeleteRank={onDeleteRank}
         />
       )}
     </section>

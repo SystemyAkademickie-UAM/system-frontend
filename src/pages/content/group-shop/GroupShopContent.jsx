@@ -79,13 +79,22 @@ export default function GroupShopContent() {
     buyItem,
   } = useGroupShopItems(groupId);
 
-  const catalogItems = useMemo(() => {
-    const sourceItems = isStudentView
-      ? filterCatalogShopItems(items, true).filter((item) => item.isPublished !== false)
-      : sortShopItemsWithExtraLifeFirst(items);
+  const {
+    isGameOver,
+    showExtraLifeProduct,
+    refetch: refetchLives,
+  } = useGroupShopLivesSystem(groupId, { isStudentView });
 
-    return sourceItems;
-  }, [items, isStudentView]);
+  const catalogItems = useMemo(() => {
+    const publishedItems = items.filter((item) => item.isPublished !== false);
+    let sourceItems = publishedItems;
+
+    if (isStudentView && !showExtraLifeProduct) {
+      sourceItems = filterCatalogShopItems(publishedItems, true);
+    }
+
+    return sortShopItemsWithExtraLifeFirst(sourceItems);
+  }, [items, isStudentView, showExtraLifeProduct]);
 
   const extraLifeProduct = useMemo(
     () => findExtraLifeShopItem(items),
@@ -102,11 +111,6 @@ export default function GroupShopContent() {
     clearCart,
   } = useGroupShopCart(groupId, catalogItems);
   const { isShopOpen, toggleShopOpen, refetchShopOpen } = useGroupShopOpen(groupId);
-  const {
-    isGameOver,
-    showExtraLifeProduct,
-    refetch: refetchLives,
-  } = useGroupShopLivesSystem(groupId, { isStudentView });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -138,7 +142,8 @@ export default function GroupShopContent() {
 
   const visibleItems = useMemo(() => {
     const filtered = filterShopItems(catalogItems, { searchQuery, categoryFilter });
-    return sortShopItems(filtered, sortBy);
+    const sorted = sortShopItems(filtered, sortBy);
+    return sortShopItemsWithExtraLifeFirst(sorted);
   }, [catalogItems, searchQuery, categoryFilter, sortBy]);
 
   const pagination = useMemo(
@@ -438,10 +443,8 @@ export default function GroupShopContent() {
                     onAddToCart={() => addToCart(item.id)}
                     onEdit={() => setActiveModal({ type: 'itemForm', itemId: item.id })}
                     onDelete={item.isExtraLife ? undefined : () => setActiveModal({ type: 'delete', item })}
-                    className={[
-                      'group-shop__card',
-                      item.isExtraLife ? 'maq-product-card--extra-life' : '',
-                    ].filter(Boolean).join(' ')}
+                    isExtraLife={item.isExtraLife}
+                    className="group-shop__card"
                     hideAddToCart={item.isExtraLife}
                   />
                 ))}

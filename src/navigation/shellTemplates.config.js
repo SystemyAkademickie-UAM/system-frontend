@@ -97,8 +97,8 @@ export const HREF_BUILDERS = {
   COURSE_MANAGEMENT: () => paths.courseManagementPath(),
   STATISTICS: () => paths.statisticsPath(),
   ORG_MANAGEMENT: () => paths.organizationsPath(),
-  TEMPLATES_MY: () => paths.templatesPath(),
-  TEMPLATES_GALLERY: () => paths.templatesGalleryPath(),
+  TEMPLATES_MY: () => paths.templatesMyPath(),
+  TEMPLATES_GALLERY: () => paths.templatesPath(),
 
   // Legacy
   GROUP_CONTROL_PANEL: (ctx) => (ctx.groupId ? paths.groupControlPath(ctx.groupId) : null),

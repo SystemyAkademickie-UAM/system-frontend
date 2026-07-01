@@ -22,6 +22,10 @@ import { getStudentProgressPx, groupStudentsByRank } from './rankPathModel.js';
 
 import RankPathMembers from './RankPathMembers.jsx';
 
+import LecturerTileActions from '../group-rewards/shared/LecturerTileActions.jsx';
+
+import '../../../components/ui/ProductCard/ProductCard.css';
+
 import './RankPathBoard.css';
 
 
@@ -43,7 +47,9 @@ import './RankPathBoard.css';
  * @param {string | null | undefined} [props.studentAvatarUrl]
 
  * @param {boolean} [props.showHeader=true]
-
+ * @param {boolean} [props.showLecturerActions=false]
+ * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onEditRank]
+ * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onDeleteRank]
  */
 
 export default function RankPathBoard({
@@ -63,6 +69,12 @@ export default function RankPathBoard({
   showHeader = true,
 
   showMemberAvatars = true,
+
+  showLecturerActions = false,
+
+  onEditRank,
+
+  onDeleteRank,
 
 }) {
 
@@ -313,7 +325,19 @@ export default function RankPathBoard({
 
         <div key={rank.id} className="rank-path-row">
 
-          <div className="rank-path-row__rank">
+          <div className={[
+            'rank-path-row__rank',
+            showLecturerActions ? 'rank-path-row__rank--lecturer' : '',
+          ].filter(Boolean).join(' ')}>
+            {showLecturerActions ? (
+              <LecturerTileActions
+                entityLabel="rangę"
+                name={rank.name}
+                onEdit={onEditRank ? () => onEditRank(rank) : undefined}
+                onDelete={onDeleteRank ? () => onDeleteRank(rank) : undefined}
+                className="rank-path-row__actions"
+              />
+            ) : null}
 
             <Rank
 

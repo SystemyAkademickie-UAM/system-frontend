@@ -1,9 +1,10 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 import {Button, Divider, InfoTooltip, useToast} from '../../../components/ui/index.js';
 import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import RewardsCurrencyLabel from '../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import {createGroupShopItem, fetchGroupShopItems, updateGroupShopItem} from '../../../services/shop.api.js';
 import {syncShopItemRankUnlock, findRankUnlockingItem} from '../../../utils/ranks/rankShopItemUnlock.js';
 import '../group-shop/modals/ShopItemFormModal.css';
@@ -22,7 +23,7 @@ export default function ShopItemFormContent({
   const editingItemId = itemId != null && itemId !== '' ? String(itemId) : null;
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [currenticon, setCurrenticon] = useState('🍑');
+  const [currenticon, setCurrenticon] = useState('🥕');
   const [iconbackground, setIconbackground] = useState('rgb(40,40,52)');
 
   const [itemname, setItemname] = useState('');
@@ -1186,8 +1187,10 @@ export default function ShopItemFormContent({
                   onChange={(event) => setItemname(event.target.value)}
                 />
               </div>
-              <div className="shop-item-form__field">
-                <label className="shop-item-form__label" htmlFor="shop-item-price">Cena</label>
+              <div className="shop-item-form__field shop-item-form__field--price">
+                <RewardsCurrencyLabel htmlFor="shop-item-price" className="shop-item-form__label">
+                  Cena
+                </RewardsCurrencyLabel>
                 <input
                   id="shop-item-price"
                   className="shop-item-form__input"
@@ -1204,7 +1207,7 @@ export default function ShopItemFormContent({
               className="shop-item-form__icon-picker"
               label="Ikona przedmiotu"
               value={currenticon}
-              defaultEmoji="🍑"
+              defaultEmoji="🥕"
               onChange={setCurrenticon}
               ariaLabel="Wybierz ikonę przedmiotu"
             />

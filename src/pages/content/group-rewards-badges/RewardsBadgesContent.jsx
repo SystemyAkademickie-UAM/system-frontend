@@ -236,6 +236,20 @@ export default function RewardsBadgesContent() {
     }
   }, [showSuccess, showError]);
 
+  const handleTileEditBadge = useCallback((treasuryBadge) => {
+    const badge = badges.find((entry) => entry.dbId === treasuryBadge.dbId);
+    if (badge) {
+      openModal('edit', badge);
+    }
+  }, [badges, openModal]);
+
+  const handleTileDeleteBadge = useCallback((treasuryBadge) => {
+    const badge = badges.find((entry) => entry.dbId === treasuryBadge.dbId);
+    if (badge) {
+      openModal('delete', badge);
+    }
+  }, [badges, openModal]);
+
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
     deleteLabel: 'Usuń odznakę',
@@ -365,6 +379,9 @@ export default function RewardsBadgesContent() {
             sortBy={sortBy}
             onRarityFilterChange={setRarityFilter}
             onSortByChange={setSortBy}
+            showLecturerActions
+            onEditBadge={handleTileEditBadge}
+            onDeleteBadge={handleTileDeleteBadge}
           />
         </>
       ) : (

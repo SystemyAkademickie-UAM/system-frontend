@@ -5,6 +5,7 @@ import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidati
 import { fetchGroupRanks, createRank, updateRank, deleteRank } from '../../../services/ranks.api.js';
 import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/students.api.js';
 import { normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
+import { calculateDefaultRankDiscount } from '../../../utils/ranks/rankDiscount.js';
 import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
 /**
@@ -112,7 +113,7 @@ export function useGroupRanks() {
       icon,
       requiredPoints: values.costAmount || 0,
       storyDescription: values.storyDescription || '',
-      discount: values.discount ?? 0,
+      discount: values.discount ?? calculateDefaultRankDiscount(ranks),
       uniqueStoreItems: (values.shopItems || []).map(normalizeShopItemId),
     });
 
@@ -123,7 +124,7 @@ export function useGroupRanks() {
     }
 
     return result;
-  }, [groupId, loadData]);
+  }, [groupId, loadData, ranks]);
 
   const handleUpdate = useCallback(async (rankId, values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
@@ -132,14 +133,15 @@ export function useGroupRanks() {
     if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
 
     const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_RANK_EMOJI);
-    const result = await updateRank(groupId, rank.dbId, {
-      name: values.name,
-      icon,
-      requiredPoints: values.costAmount,
-      storyDescription: values.storyDescription,
-      discount: values.discount ?? 0,
-      uniqueStoreItems: (values.shopItems || []).map(normalizeShopItemId),
-    });
+    const payload = {
+      name: values.name ?? rank.name,
+      icon: values.icon != null ? icon : rank.icon,
+      requiredPoints: values.costAmount ?? rank.costAmount,
+      storyDescription: values.storyDescription ?? rank.storyDescription,
+      discount: values.discount ?? rank.discount ?? 0,
+      uniqueStoreItems: (values.shopItems ?? rank.shopItems ?? []).map(normalizeShopItemId),
+    };
+    const result = await updateRank(groupId, rank.dbId, payload);
 
     if (result.ok && result.rank) {
       setRanks((prev) => prev.map((r) =>

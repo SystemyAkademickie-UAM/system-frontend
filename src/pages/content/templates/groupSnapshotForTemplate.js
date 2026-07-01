@@ -7,6 +7,7 @@ import { fetchGroupLivesConfig } from '../../../services/groupLives.api.js';
 import { fetchGroupById } from '../../../services/groups.api.js';
 import { fetchGroupRanks } from '../../../services/ranks.api.js';
 import { fetchGroupShopItems } from '../../../services/shop.api.js';
+import { findExtraLifeShopItem } from '../../../utils/shop/extraLifeItem.js';
 
 /**
  * @typedef {import('../services/groupTemplates.api.js').GroupTemplateData} GroupTemplateData
@@ -117,13 +118,17 @@ export async function fetchGroupSnapshotForTemplate(groupId) {
   ]);
 
   const shopItems = shopResult.ok ? shopResult.items : [];
+  const extraLifeItem = findExtraLifeShopItem(shopItems);
+  const templateShopItems = shopItems.filter(
+    (item) => !item.isExtraLife && item.id !== extraLifeItem?.id,
+  );
   const currencyConfig = currencyResult.ok ? currencyResult.config : null;
   const livesConfig = livesResult.ok ? livesResult.config : null;
 
   if (!group) return null;
 
   const categoriesMap = new Map();
-  const items = (shopItems ?? []).map((item) => {
+  const items = templateShopItems.map((item) => {
     if (item.categoryId != null) {
       categoriesMap.set(item.categoryId, {
         id: item.categoryId,
