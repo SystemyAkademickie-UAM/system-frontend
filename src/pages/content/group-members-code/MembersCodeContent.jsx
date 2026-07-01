@@ -13,9 +13,125 @@ import SectionPageLayout from '../../../components/layout/sectionPage/SectionPag
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import '../../../components/page/PageUnavailable.css';
 import MembersCodeContentWindow from './MembersCodeContentWindow.jsx';
 import './MembersCodeContent.css';
+
+const FETCHERROR__TEXTLABEL = {
+  polish: 'Nie udało się odczytać listy kodów.',
+  english: 'Failed to read the list of codes.',
+};
+
+const FETCHSTATUSERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać kodów (status {status}).',
+  english: 'Failed to fetch codes (status {status}).',
+};
+
+const DELETESTATUSERROR__TEXTLABEL = {
+  polish: 'Nie udało się usunąć kodu (status {status}).',
+  english: 'Failed to delete code (status {status}).',
+};
+
+const DELETESUCCESS__TEXTLABEL = {
+  polish: 'Kod został usunięty.',
+  english: 'Code deleted.',
+};
+
+const COPYSUCCESS__TEXTLABEL = {
+  polish: 'Kod skopiowany do schowka.',
+  english: 'Code copied to clipboard.',
+};
+
+const COPYERROR__TEXTLABEL = {
+  polish: 'Nie udało się skopiować kodu.',
+  english: 'Failed to copy code.',
+};
+
+const CODECOLUMN__TEXTLABEL = {
+  polish: 'Kod',
+  english: 'Code',
+};
+
+const EXPIRESATCOLUMN__TEXTLABEL = {
+  polish: 'Wygaśnięcie',
+  english: 'Expires',
+};
+
+const USES__TEXTLABEL = {
+  polish: 'Użycia',
+  english: 'Uses',
+};
+
+const ACTIVECOLUMN__TEXTLABEL = {
+  polish: 'Aktywny',
+  english: 'Active',
+};
+
+const YES__TEXTLABEL = {
+  polish: 'Tak',
+  english: 'Yes',
+};
+
+const NO__TEXTLABEL = {
+  polish: 'Nie',
+  english: 'No',
+};
+
+const COPYCODELABEL__TEXTLABEL = {
+  polish: 'Skopiuj kod',
+  english: 'Copy code',
+};
+
+const COPYCODE__TEXTLABEL = {
+  polish: 'Skopiuj kod dostępu',
+  english: 'Copy access code',
+};
+
+const EDITCODE__TEXTLABEL = {
+  polish: 'Edytuj kod',
+  english: 'Edit code',
+};
+
+const EDITCODEDESCRIPTION__TEXTLABEL = {
+  polish: 'Zmień wygaśnięcie, limit użyć lub status aktywności.',
+  english: 'Change expiration, use limit, or activity status.',
+};
+
+const DELETECODE__TEXTLABEL = {
+  polish: 'Usuń kod',
+  english: 'Delete code',
+};
+
+const GENERATEBUTTON__TEXTLABEL = {
+  polish: 'Generuj nowy kod',
+  english: 'Generate new code',
+};
+
+const SEARCHPLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj kodu...',
+  english: 'Search code...',
+};
+
+const SEARCH__TEXTLABEL = {
+  polish: 'Szukaj kodu dostępu',
+  english: 'Search access code',
+};
+
+const LOADING__TEXTLABEL = {
+  polish: 'Ładowanie kodów dostępu...',
+  english: 'Loading access codes...',
+};
+
+const EMPTY__TEXTLABEL = {
+  polish: 'Brak kodów dostępu. Kliknij „{button}”, aby utworzyć pierwszy.',
+  english: 'No access codes. Click "{button}" to create the first one.',
+};
+
+const DELETE__TEMPLATE = {
+  polish: 'Usuń kod {code}',
+  english: 'Delete code {code}',
+};
 
 function formatExpiresAt(value) {
   if (value == null || value === '') {
@@ -71,6 +187,7 @@ export default function MembersCodeContent() {
   const { groupId } = useParams();
   const nav = useGroupSubNav('group-members');
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [codes, setCodes] = useState([]);
@@ -102,11 +219,11 @@ export default function MembersCodeContent() {
       try {
         data = JSON.parse(responseText);
       } catch {
-        throw new Error('Nie udało się odczytać listy kodów.');
+        throw new Error(FETCHERROR__TEXTLABEL[LANGUAGE]);
       }
 
       if (!response.ok) {
-        throw new Error(`Nie udało się pobrać kodów (status ${response.status}).`);
+        throw new Error(FETCHSTATUSERROR__TEXTLABEL[LANGUAGE].replace('{status}', response.status));
       }
 
       setCodes(Array.isArray(data) ? data : []);
@@ -116,7 +233,7 @@ export default function MembersCodeContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [groupId]);
+  }, [groupId, LANGUAGE]);
 
   useEffect(() => {
     fetchCodes();
@@ -140,17 +257,17 @@ export default function MembersCodeContent() {
       });
 
       if (response.status < 200 || response.status >= 300) {
-        setErrorMessage(`Nie udało się usunąć kodu (status ${response.status}).`);
+        setErrorMessage(DELETESTATUSERROR__TEXTLABEL[LANGUAGE].replace('{status}', response.status));
         return;
       }
 
-      showSuccess('Kod został usunięty.');
+      showSuccess(DELETESUCCESS__TEXTLABEL[LANGUAGE]);
       await fetchCodes();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
     }
-  }, [fetchCodes, groupId, showSuccess]);
+  }, [fetchCodes, groupId, LANGUAGE, showSuccess]);
 
   const openGenerateWindow = useCallback(() => {
     setEditCodeId(0);
@@ -174,16 +291,16 @@ export default function MembersCodeContent() {
   const handleCopyCode = useCallback(async (code) => {
     try {
       await navigator.clipboard.writeText(code.code);
-      showSuccess('Kod skopiowany do schowka.');
+      showSuccess(COPYSUCCESS__TEXTLABEL[LANGUAGE]);
     } catch {
-      showError('Nie udało się skopiować kodu.');
+      showError(COPYERROR__TEXTLABEL[LANGUAGE]);
     }
-  }, [showError, showSuccess]);
+  }, [showError, showSuccess, LANGUAGE]);
 
   const codeColumns = useMemo(() => [
     {
       key: 'code',
-      label: 'Kod',
+      label: CODECOLUMN__TEXTLABEL[LANGUAGE],
       sort: 'text',
       width: '28%',
       className: 'members-code-table__th--code',
@@ -195,7 +312,7 @@ export default function MembersCodeContent() {
     },
     {
       key: 'expiresAt',
-      label: 'Wygaśnięcie',
+      label: EXPIRESATCOLUMN__TEXTLABEL[LANGUAGE],
       sort: 'text',
       width: '168px',
       className: 'members-code-table__th--expires',
@@ -207,7 +324,7 @@ export default function MembersCodeContent() {
     },
     {
       key: 'uses',
-      label: 'Użycia',
+      label: USES__TEXTLABEL[LANGUAGE],
       sort: 'number',
       width: '108px',
       className: 'members-code-table__th--uses',
@@ -219,7 +336,7 @@ export default function MembersCodeContent() {
     },
     {
       key: 'isActive',
-      label: 'Aktywny',
+      label: ACTIVECOLUMN__TEXTLABEL[LANGUAGE],
       sort: 'text',
       width: '102px',
       className: 'members-code-table__th--active',
@@ -233,34 +350,34 @@ export default function MembersCodeContent() {
             code.isActive ? 'members-code-table__status--active' : 'members-code-table__status--inactive',
           ].join(' ')}
         >
-          {code.isActive ? 'Tak' : 'Nie'}
+          {code.isActive ? YES__TEXTLABEL[LANGUAGE] : NO__TEXTLABEL[LANGUAGE]}
         </span>
       ),
     },
-  ], []);
+  ], [LANGUAGE]);
 
   const rowActions = useMemo(() => ({
     inlineActions: [
       {
         id: 'copy',
-        label: 'Skopiuj kod',
+        label: COPYCODELABEL__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.copy,
-        ariaLabel: 'Skopiuj kod dostępu',
+        ariaLabel: COPYCODE__TEXTLABEL[LANGUAGE],
         onSelect: handleCopyCode,
       },
     ],
     menuItems: [
       {
         id: 'edit',
-        label: 'Edytuj kod',
-        description: 'Zmień wygaśnięcie, limit użyć lub status aktywności.',
+        label: EDITCODE__TEXTLABEL[LANGUAGE],
+        description: EDITCODEDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: (code) => openEditWindow(code.id),
       },
     ],
     onDelete: (code) => handleDeleteCode(code.id),
-    deleteLabel: 'Usuń kod',
-    deleteAriaLabel: (code) => `Usuń kod ${code.code}`,
-  }), [handleCopyCode, handleDeleteCode, openEditWindow]);
+    deleteLabel: DELETECODE__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (code) => DELETE__TEMPLATE[LANGUAGE].replace('{code}', code.code),
+  }), [handleCopyCode, handleDeleteCode, openEditWindow, LANGUAGE]);
 
   return (
     <SectionPageLayout
@@ -277,17 +394,17 @@ export default function MembersCodeContent() {
               className="members-code-page__add-btn"
               onClick={openGenerateWindow}
             >
-              Generuj nowy kod
+              {GENERATEBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
           </div>
           <div className="maq-section-page__toolbar-end">
             <SearchBar
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Szukaj kodu…"
+              placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
               name="enrollment-code-search"
               className="members-page__search"
-              aria-label="Szukaj kodu dostępu"
+              aria-label={SEARCH__TEXTLABEL[LANGUAGE]}
             />
           </div>
         </>
@@ -298,10 +415,10 @@ export default function MembersCodeContent() {
       ) : null}
 
       {isLoading ? (
-        <p className="members-code-page__loading page-unavailable__notice" role="status">Ładowanie kodów dostępu…</p>
+        <p className="members-code-page__loading page-unavailable__notice" role="status">{LOADING__TEXTLABEL[LANGUAGE]}</p>
       ) : codes.length === 0 ? (
         <p className="members-code-page__empty page-unavailable__notice">
-          Brak kodów dostępu. Kliknij „Generuj nowy kod”, aby utworzyć pierwszy.
+          {EMPTY__TEXTLABEL[LANGUAGE].replace('{button}', GENERATEBUTTON__TEXTLABEL[LANGUAGE])}
         </p>
       ) : (
         <DataTable

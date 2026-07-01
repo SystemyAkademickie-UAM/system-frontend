@@ -62,7 +62,14 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
     }
 
     onClose();
-    navigate(groupMainPath(String(result.groupId)));
+    navigate(groupMainPath(String(result.groupId)), {
+      state: {
+        templateCreatedPopup: {
+          groupName: groupName.trim(),
+          subjectName: subjectName.trim(),
+        },
+      },
+    });
   };
 
   return (

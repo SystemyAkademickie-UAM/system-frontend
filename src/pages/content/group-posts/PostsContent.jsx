@@ -9,7 +9,73 @@ import '../../../components/page/PageUnavailable.css';
 import { useGroupPosts } from './useGroupPosts.js';
 import PostFormModal from './PostFormModal.jsx';
 import PostDeleteModal from './PostDeleteModal.jsx';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './PostsContent.css';
+
+const PAGETITLE__TEXTLABEL = {
+  polish: 'Wpisy',
+  english: 'Posts',
+};
+
+const ADDPOSTBUTTON__TEXTLABEL = {
+  polish: 'Dodaj wpis',
+  english: 'Add Post',
+};
+
+const SEARCHPLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj wpisów...',
+  english: 'Search posts...',
+};
+
+const SEARCH__TEXTLABEL = {
+  polish: 'Szukaj wpisów',
+  english: 'Search posts',
+};
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie wpisów...',
+  english: 'Loading posts...',
+};
+
+const NOPOSTSMESSAGE__TEXTLABEL = {
+  polish: 'Brak wpisów w tej grupie. Dodaj pierwszy wpis powyżej.',
+  english: 'No posts in this group. Add the first post above.',
+};
+
+const NOSEARCHRESULTSMESSAGE__TEXTLABEL = {
+  polish: 'Brak wyników wyszukiwania.',
+  english: 'No search results.',
+};
+
+const PUBLISHEDSTATUS__TEXTLABEL = {
+  polish: 'Opublikowany',
+  english: 'Published',
+};
+
+const DRAFTSTATUS__TEXTLABEL = {
+  polish: 'Nieopublikowany',
+  english: 'Unpublished',
+};
+
+const EDITPOST__TEXTLABEL = {
+  polish: 'Edytuj wpis',
+  english: 'Edit Post',
+};
+
+const EDITPOSTDESCRIPTION__TEXTLABEL = {
+  polish: 'Zmień temat lub treść wpisu.',
+  english: 'Change post title or content.',
+};
+
+const DELETEPOST__TEXTLABEL = {
+  polish: 'Usuń wpis',
+  english: 'Delete Post',
+};
+
+const DELETEPOSTDEFAULTTITLE__TEXTLABEL = {
+  polish: 'bez tytułu',
+  english: 'untitled',
+};
 
 function formatPostDate(value) {
   if (!value) return null;
@@ -31,6 +97,7 @@ function filterPosts(posts, query) {
 }
 
 export default function PostsContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const nav = useGroupSubNav('group-activities');
   const {
     posts,
@@ -62,15 +129,15 @@ export default function PostsContent() {
     menuItems: [
       {
         id: 'edit',
-        label: 'Edytuj wpis',
-        description: 'Zmień temat lub treść wpisu.',
+        label: EDITPOST__TEXTLABEL[LANGUAGE],
+        description: EDITPOSTDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: (post) => openModal('edit', { post }),
       },
     ],
     onDelete: (post) => openModal('delete', { post }),
-    deleteLabel: 'Usuń wpis',
-    deleteAriaLabel: (post) => `Usuń wpis ${post.title || 'bez tytułu'}`,
-  }), [openModal]);
+    deleteLabel: DELETEPOST__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (post) => `${DELETEPOST__TEXTLABEL[LANGUAGE]} ${post.title || DELETEPOSTDEFAULTTITLE__TEXTLABEL[LANGUAGE]}`,
+  }), [openModal, LANGUAGE]);
 
   const handleCreateConfirm = useCallback(async (values) => {
     setModalLoading(true);
@@ -100,7 +167,7 @@ export default function PostsContent() {
   return (
     <SectionPageLayout
       className="page-unavailable posts-page"
-      title="Wpisy"
+      title={PAGETITLE__TEXTLABEL[LANGUAGE]}
       subNavItems={nav.items}
       subNavAriaLabel={nav.ariaLabel}
       toolbar={(
@@ -111,17 +178,17 @@ export default function PostsContent() {
               size="md"
               onClick={() => openModal('create')}
             >
-              Dodaj wpis
+              {ADDPOSTBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
           </div>
           <div className="maq-section-page__toolbar-end">
             <SearchBar
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Szukaj wpisów…"
+              placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
               name="posts-search"
               className="posts-page__search"
-              aria-label="Szukaj wpisów"
+              aria-label={SEARCH__TEXTLABEL[LANGUAGE]}
             />
           </div>
         </>
@@ -132,12 +199,12 @@ export default function PostsContent() {
       ) : null}
 
       {isLoading ? (
-        <p className="posts-page__loading page-unavailable__notice">Ładowanie wpisów…</p>
+        <p className="posts-page__loading page-unavailable__notice">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : filteredPosts.length === 0 ? (
         <p className="posts-page__empty page-unavailable__notice">
           {posts.length === 0
-            ? 'Brak wpisów w tej grupie. Dodaj pierwszy wpis powyżej.'
-            : 'Brak wyników wyszukiwania.'}
+            ? NOPOSTSMESSAGE__TEXTLABEL[LANGUAGE]
+            : NOSEARCHRESULTSMESSAGE__TEXTLABEL[LANGUAGE]}
         </p>
       ) : (
         <div className="posts-islands">
@@ -169,7 +236,7 @@ export default function PostsContent() {
                         post.isPublished ? 'posts-island__status--published' : 'posts-island__status--draft',
                       ].join(' ')}
                     >
-                      {post.isPublished ? 'Opublikowany' : 'Nieopublikowany'}
+                      {post.isPublished ? PUBLISHEDSTATUS__TEXTLABEL[LANGUAGE] : DRAFTSTATUS__TEXTLABEL[LANGUAGE]}
                     </span>
                   </div>
                   <div className="posts-island__actions">

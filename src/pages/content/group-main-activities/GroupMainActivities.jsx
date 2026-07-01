@@ -4,6 +4,7 @@ import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
 import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 import { Button } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
@@ -14,6 +15,76 @@ import '../group-main/GroupMainHomeContent.css';
 import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
 import '../group-main/shared/groupMainSubpageHeader.css';
 import './GroupMainActivities.css';
+
+const TITLE__TEXTLABEL = {
+  polish: 'Kampania',
+  english: 'Campaign',
+};
+
+const PAGETITLE__TEXTLABEL = {
+  polish: 'Aktywności',
+  english: 'Activities',
+};
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie aktywności…',
+  english: 'Loading activities…',
+};
+
+const COMPLETEDLABEL__TEXTLABEL = {
+  polish: 'ukończonych',
+  english: 'completed',
+};
+
+const TOTALACTIVITIES__TEXTLABEL = {
+  polish: 'aktywności',
+  english: 'activities',
+};
+
+const EARNEDLABEL__TEXTLABEL = {
+  polish: 'Zdobyto:',
+  english: 'Earned:',
+};
+
+const AVAILABLELABEL__TEXTLABEL = {
+  polish: 'możliwych do zdobycia',
+  english: 'available',
+};
+
+const ASSIGNBUTTON__TEXTLABEL = {
+  polish: 'Przypisz aktywność',
+  english: 'Assign activity',
+};
+
+const FIRSTSTAGEBUTTON__TEXTLABEL = {
+  polish: 'Pierwszy etap',
+  english: 'First stage',
+};
+
+const PREVIOUSESTAGEBUTTON__TEXTLABEL = {
+  polish: 'Poprzedni etap',
+  english: 'Previous stage',
+};
+
+const NEXTSTAGEBUTTON__TEXTLABEL = {
+  polish: 'Następny etap',
+  english: 'Next stage',
+};
+
+const LASTSTAGEBUTTON__TEXTLABEL = {
+  polish: 'Ostatni etap',
+  english: 'Last stage',
+};
+
+const SORTCOMPLETED__TEXTLABEL = {
+  polish: 'Ukończone na początku',
+  english: 'Completed first',
+};
+
+const SORTINCOMPLETE__TEXTLABEL = {
+  polish: 'Ukończone na końcu',
+  english: 'Completed last',
+};
 
 const arrowrighticon = PUBLIC_UI_ICONS.arrowRight;
 const arrowlefticon = PUBLIC_UI_ICONS.arrowLeft;
@@ -32,6 +103,7 @@ export default function GroupMainActivities() {
   const {groupId} = useParams();
   const {role} = useAppRole();
   const emptyLink = useGroupMainEmptyLink('activities', groupId);
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [errorMessage, setErrorMessage] = useState('');
 
   const [stages, setStages] = useState([]);
@@ -392,7 +464,6 @@ export default function GroupMainActivities() {
   var completedactivities = [];
   var incompleteactivities = [];
   var displayactivities = [];
-  var whichfirstlabel = 'Ukończone na początku';
   var isstudent = 0;
   var islecturer = 0;
   var atfirststage = 1;
@@ -405,10 +476,6 @@ export default function GroupMainActivities() {
 
   if (role == APP_ROLE.LECTURER) {
     islecturer = 1;
-  }
-
-  if (whichfirst == 1) {
-    whichfirstlabel = 'Ukończone na końcu';
   }
 
   if (stages.length > 0 && currentstageindex < stages.length) {
@@ -522,10 +589,10 @@ export default function GroupMainActivities() {
 
 
   return (
-    <section className="group-main-activities" aria-label="Aktywności">
+    <section className="group-main-activities" aria-label={PAGETITLE__TEXTLABEL[LANGUAGE]}>
       <GroupMainSubpageHeader
-        eyebrow="Kampania"
-        title="Aktywności"
+        eyebrow={TITLE__TEXTLABEL[LANGUAGE]}
+        title={PAGETITLE__TEXTLABEL[LANGUAGE]}
       />
 
       {errorMessage ? (
@@ -533,7 +600,7 @@ export default function GroupMainActivities() {
       ) : null}
 
       {!hasLoadedStages ? (
-        <p className="group-main-home__message">Ładowanie aktywności…</p>
+        <p className="group-main-home__message">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : stages.length === 0 ? (
         <GroupMainEmptyNotice
           message={emptyLink.message}
@@ -547,13 +614,13 @@ export default function GroupMainActivities() {
           <div className="group-main-activities__stage-stats">
             <span>
               {isstudent === 1
-                ? `${completedcount} / ${totalactivities} aktywności ukończonych`
-                : `${totalactivities} aktywności`}
+                ? `${completedcount} / ${totalactivities} ${COMPLETEDLABEL__TEXTLABEL[LANGUAGE]}`
+                : `${totalactivities} ${TOTALACTIVITIES__TEXTLABEL[LANGUAGE]}`}
             </span>
             <span>
               {isstudent === 1
-                ? `Zdobyto: ${earnedrewards} / ${totalrewards}`
-                : `${totalrewards} możliwych do zdobycia`}
+                ? `${EARNEDLABEL__TEXTLABEL[LANGUAGE]} ${earnedrewards} / ${totalrewards}`
+                : `${totalrewards} ${AVAILABLELABEL__TEXTLABEL[LANGUAGE]}`}
             </span>
           </div>
         </header>
@@ -581,7 +648,7 @@ export default function GroupMainActivities() {
                     type="button"
                     className="group-main-activities__assign-btn"
                     onClick={() => assign(activity.id)}
-                    aria-label="Przypisz aktywność"
+                    aria-label={ASSIGNBUTTON__TEXTLABEL[LANGUAGE]}
                   >
                     <img src={editicon} alt="" />
                   </button>
@@ -600,7 +667,7 @@ export default function GroupMainActivities() {
             className="group-main-activities__page-btn"
             onClick={atfirststage === 0 ? firststage : undefined}
             disabled={atfirststage !== 0}
-            aria-label="Pierwszy etap"
+            aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
             <img src={leftlefticon} alt="" />
           </button>
@@ -609,7 +676,7 @@ export default function GroupMainActivities() {
             className="group-main-activities__page-btn"
             onClick={atfirststage === 0 ? previousstage : undefined}
             disabled={atfirststage !== 0}
-            aria-label="Poprzedni etap"
+            aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
             <img src={lefticon} alt="" />
           </button>
@@ -619,7 +686,7 @@ export default function GroupMainActivities() {
             className="group-main-activities__page-btn"
             onClick={atlaststage === 0 ? nextstage : undefined}
             disabled={atlaststage !== 0}
-            aria-label="Następny etap"
+            aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
             <img src={righticon} alt="" />
           </button>
@@ -628,7 +695,7 @@ export default function GroupMainActivities() {
             className="group-main-activities__page-btn"
             onClick={atlaststage === 0 ? laststage : undefined}
             disabled={atlaststage !== 0}
-            aria-label="Ostatni etap"
+            aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
             <img src={rightrighticon} alt="" />
           </button>
@@ -642,7 +709,7 @@ export default function GroupMainActivities() {
             className="group-main-activities__sort-toggle"
             onClick={togglewhichfirst}
           >
-            {whichfirstlabel}
+            {whichfirst === 0 ? SORTCOMPLETED__TEXTLABEL[LANGUAGE] : SORTINCOMPLETE__TEXTLABEL[LANGUAGE]}
           </Button>
         ) : null}
       </div>

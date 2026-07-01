@@ -2,7 +2,28 @@ import { useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { buildPaginationItems } from './buildPaginationItems.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './Pagination.css';
+
+const PAG__TEXTLABEL = {
+  polish: 'Paginacja',
+  english: 'Pagination',
+};
+
+const PREVIOUSBUTTON__TEXTLABEL = {
+  polish: 'Poprzednia strona',
+  english: 'Previous page',
+};
+
+const NEXTBUTTON__TEXTLABEL = {
+  polish: 'Następna strona',
+  english: 'Next page',
+};
+
+const PAGELABEL__TEXTLABEL = {
+  polish: 'Strona',
+  english: 'Page',
+};
 
 /**
  * Paginacja list / tabel.
@@ -20,11 +41,14 @@ export default function Pagination({
   page: pageProp,
   defaultPage = 1,
   onPageChange,
-  ariaLabel = 'Paginacja',
+  ariaLabel,
   className = '',
 }) {
   const [internalPage, setInternalPage] = useState(defaultPage);
   const isControlled = pageProp !== undefined;
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+  const resolvedAriaLabel = ariaLabel ?? PAG__TEXTLABEL[LANGUAGE];
   const total = Math.max(0, Math.floor(totalPages));
 
   if (total <= 0) {
@@ -48,11 +72,11 @@ export default function Pagination({
   const items = buildPaginationItems(currentPage, total);
 
   return (
-    <nav className={['maq-pagination', className].filter(Boolean).join(' ')} aria-label={ariaLabel}>
+    <nav className={['maq-pagination', className].filter(Boolean).join(' ')} aria-label={resolvedAriaLabel}>
       <button
         type="button"
         className="maq-pagination__btn maq-pagination__btn--nav"
-        aria-label="Poprzednia strona"
+        aria-label={PREVIOUSBUTTON__TEXTLABEL[LANGUAGE]}
         disabled={currentPage <= 1}
         onClick={() => setPage(currentPage - 1)}
       >
@@ -83,7 +107,7 @@ export default function Pagination({
               className={['maq-pagination__btn', 'maq-pagination__btn--page', isActive ? 'maq-pagination__btn--active' : '']
                 .filter(Boolean)
                 .join(' ')}
-              aria-label={`Strona ${item.page}`}
+              aria-label={`${PAGELABEL__TEXTLABEL[LANGUAGE]} ${item.page}`}
               aria-current={isActive ? 'page' : undefined}
               onClick={() => setPage(item.page)}
             >
@@ -96,7 +120,7 @@ export default function Pagination({
       <button
         type="button"
         className="maq-pagination__btn maq-pagination__btn--nav"
-        aria-label="Następna strona"
+        aria-label={NEXTBUTTON__TEXTLABEL[LANGUAGE]}
         disabled={currentPage >= total}
         onClick={() => setPage(currentPage + 1)}
       >
