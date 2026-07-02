@@ -102,8 +102,7 @@ function ShopOptionCheckbox({
  * @param {boolean} props.isShopOpen
  * @param {string | null} [props.shopOpensAt]
  * @param {() => void} props.onClose
- * @param {() => Promise<{ ok: boolean, error?: string }>} props.onToggleShopOpen
- * @param {(isoDate: string | null) => Promise<{ ok: boolean, error?: string }>} props.onScheduleShopOpen
+ * @param {(payload: { shopOpen: boolean, shopOpensAtIso: string | null }) => Promise<{ ok: boolean, error?: string }>} props.onSave
  * @param {boolean} [props.isLoading]
  */
 export default function ShopAccessModal({
@@ -111,10 +110,10 @@ export default function ShopAccessModal({
   isShopOpen,
   shopOpensAt = null,
   onClose,
-  onToggleShopOpen,
-  onScheduleShopOpen,
+  onSave,
   isLoading = false,
 }) {
+  const [pendingShopOpen, setPendingShopOpen] = useState(false);
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [openDate, setOpenDate] = useState('');
   const [openTime, setOpenTime] = useState('');
@@ -127,7 +126,9 @@ export default function ShopAccessModal({
       return;
     }
 
-    if (shopOpensAt) {
+    setPendingShopOpen(isShopOpen);
+
+    if (shopOpensAt && !isShopOpen) {
       const { date, time } = splitIsoDateTime(shopOpensAt);
       setScheduleEnabled(true);
       setOpenDate(date);
@@ -138,39 +139,70 @@ export default function ShopAccessModal({
     setScheduleEnabled(false);
     setOpenDate('');
     setOpenTime('');
-  }, [isOpen, shopOpensAt]);
+  }, [isOpen, isShopOpen, shopOpensAt]);
 
-  const handleToggle = async () => {
-    setLocalLoading(true);
-    await onToggleShopOpen();
-    setLocalLoading(false);
+  const handleToggle = () => {
+    setPendingShopOpen((current) => {
+      const nextOpen = !current;
+      if (nextOpen) {
+        setScheduleEnabled(false);
+        setOpenDate('');
+        setOpenTime('');
+      }
+      return nextOpen;
+    });
   };
 
-  const handleSaveSchedule = async () => {
+  const handleSave = async () => {
     setLocalLoading(true);
-    const iso = scheduleEnabled && openDate && openTime
+
+    const shopOpensAtIso = !pendingShopOpen && scheduleEnabled && openDate && openTime
       ? new Date(`${openDate}T${openTime}`).toISOString()
       : null;
-    await onScheduleShopOpen(iso);
+
+    const result = await onSave({
+      shopOpen: pendingShopOpen,
+      shopOpensAtIso,
+    });
+
     setLocalLoading(false);
-    onClose();
+
+    if (result?.ok) {
+      onClose();
+    }
   };
 
   const busy = isLoading || localLoading;
-  const scheduleInputsDisabled = !scheduleEnabled || busy;
+  const scheduleSectionDisabled = pendingShopOpen || busy;
+  const scheduleInputsDisabled = scheduleSectionDisabled || !scheduleEnabled;
   const datetimeRowClassName = [
     'rewards-modal__datetime-row',
     scheduleInputsDisabled ? 'rewards-modal__datetime-row--disabled' : '',
   ].filter(Boolean).join(' ');
+
+  const shopStatusChanged = pendingShopOpen !== isShopOpen;
+  const currentScheduleIso = shopOpensAt ?? null;
+  const nextScheduleIso = !pendingShopOpen && scheduleEnabled && openDate && openTime
+    ? new Date(`${openDate}T${openTime}`).toISOString()
+    : null;
+  const scheduleChanged = !pendingShopOpen && (
+    (scheduleEnabled && nextScheduleIso !== currentScheduleIso)
+    || (!scheduleEnabled && currentScheduleIso != null)
+  );
+  const hasChanges = shopStatusChanged || scheduleChanged || (pendingShopOpen && currentScheduleIso != null);
+
+  const confirmDisabled = busy
+    || !hasChanges
+    || (!pendingShopOpen && scheduleEnabled && (!openDate || !openTime));
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title="Dostęp do sklepu"
-      onConfirm={handleSaveSchedule}
-      confirmLabel={busy ? 'Zapisywanie…' : 'Zapisz harmonogram'}
-      confirmDisabled={busy || (scheduleEnabled && (!openDate || !openTime))}
+      onConfirm={handleSave}
+      confirmLabel={busy ? 'Zapisywanie…' : 'Zapisz'}
+      confirmDisabled={confirmDisabled}
       size="sm"
       className="rewards-modal shop-access-modal"
     >
@@ -179,7 +211,7 @@ export default function ShopAccessModal({
           <div className="shop-access-modal__row">
             <p className="rewards-modal__label">Status sklepu</p>
             <ShopToggleButton
-              isShopOpen={isShopOpen}
+              isShopOpen={pendingShopOpen}
               onToggle={handleToggle}
               disabled={busy}
             />
@@ -188,12 +220,19 @@ export default function ShopAccessModal({
 
         <div className="shop-access-modal__divider" role="separator" aria-hidden="true" />
 
-        <section className="shop-access-modal__section" aria-label="Harmonogram otwarcia sklepu">
+        <section
+          className={[
+            'shop-access-modal__section',
+            scheduleSectionDisabled ? 'shop-access-modal__section--disabled' : '',
+          ].filter(Boolean).join(' ')}
+          aria-label="Harmonogram otwarcia sklepu"
+          aria-disabled={scheduleSectionDisabled}
+        >
           <div className="rewards-modal__field">
             <ShopOptionCheckbox
               id="shop-schedule-open"
               checked={scheduleEnabled}
-              disabled={busy}
+              disabled={scheduleSectionDisabled}
               onChange={setScheduleEnabled}
             >
               Ustal datę otwarcia sklepu

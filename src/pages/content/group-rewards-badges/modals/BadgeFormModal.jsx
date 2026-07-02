@@ -158,7 +158,7 @@ export default function BadgeFormModal({
 
           <div className="rewards-modal__field">
             <label htmlFor="badge-rarity" className="rewards-modal__label">
-              Jakość
+              Rzadkość
               <InfoTooltip text="Wpływa na rzadkość odznaki w skarbcu." />
             </label>
             <select

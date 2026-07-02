@@ -212,8 +212,8 @@ export default function RewardsShopItemsContent() {
     refetch,
     toggleAllPublished,
   } = useGroupShopItems(groupId);
-  const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
-  const { shopOpensAt, scheduleShopOpen } = useGroupShopSchedule(groupId);
+  const { isShopOpen, setShopOpenStatus } = useGroupShopOpen(groupId);
+  const { shopOpensAt, scheduleShopOpen, refetch: refetchShopSchedule } = useGroupShopSchedule(groupId);
   const {
     categories,
     categoriesById,
@@ -255,25 +255,46 @@ export default function RewardsShopItemsContent() {
     await refetchCategories();
   }, [closeModal, refetch, refetchCategories]);
 
-  const handleToggleShopOpen = useCallback(async () => {
-    const result = await toggleShopOpen();
-    if (!result?.ok) {
-      showError(result?.error ?? 'Nie udało się zmienić statusu sklepu.');
-      return { ok: false };
-    }
-    showSuccess(isShopOpen ? 'Sklep został zamknięty.' : 'Sklep został otwarty.');
-    return { ok: true };
-  }, [isShopOpen, showError, showSuccess, toggleShopOpen]);
+  const handleSaveShopAccess = useCallback(async ({ shopOpen, shopOpensAtIso }) => {
+    const shopStatusChanged = shopOpen !== isShopOpen;
+    const currentScheduleIso = shopOpensAt ?? null;
+    const shouldClearSchedule = shopOpen && currentScheduleIso != null;
+    const scheduleChanged = !shopOpen && (
+      shopOpensAtIso !== currentScheduleIso
+      || (shopOpensAtIso == null && currentScheduleIso != null)
+    );
 
-  const handleScheduleShopOpen = useCallback(async (isoDate) => {
-    const result = await scheduleShopOpen(isoDate);
-    if (!result.ok) {
-      showError(result.error ?? 'Nie udało się zapisać harmonogramu otwarcia.');
-    } else if (isoDate) {
-      showSuccess('Zapisano planowane otwarcie sklepu.');
+    if (shopStatusChanged) {
+      const statusResult = await setShopOpenStatus(shopOpen);
+      if (!statusResult?.ok) {
+        showError(statusResult?.error ?? 'Nie udało się zmienić statusu sklepu.');
+        return { ok: false };
+      }
+      showSuccess(shopOpen ? 'Sklep został otwarty.' : 'Sklep został zamknięty.');
     }
-    return result;
-  }, [scheduleShopOpen, showError, showSuccess]);
+
+    if (shouldClearSchedule || scheduleChanged) {
+      const scheduleResult = await scheduleShopOpen(shouldClearSchedule ? null : shopOpensAtIso);
+      if (!scheduleResult.ok) {
+        showError(scheduleResult.error ?? 'Nie udało się zapisać harmonogramu otwarcia.');
+        return { ok: false };
+      }
+      if (!shouldClearSchedule && shopOpensAtIso) {
+        showSuccess('Zapisano planowane otwarcie sklepu.');
+      }
+      await refetchShopSchedule();
+    }
+
+    return { ok: true };
+  }, [
+    isShopOpen,
+    refetchShopSchedule,
+    scheduleShopOpen,
+    setShopOpenStatus,
+    shopOpensAt,
+    showError,
+    showSuccess,
+  ]);
 
   const openDeleteModal = useCallback((item) => {
     setActiveModal({ type: 'delete', item });
@@ -511,8 +532,7 @@ export default function RewardsShopItemsContent() {
         isShopOpen={isShopOpen}
         shopOpensAt={shopOpensAt}
         onClose={() => setShopAccessOpen(false)}
-        onToggleShopOpen={handleToggleShopOpen}
-        onScheduleShopOpen={handleScheduleShopOpen}
+        onSave={handleSaveShopAccess}
       />
 
       <ShopCategoriesModal

@@ -202,7 +202,16 @@ export default function GroupMainHomeContent() {
             />
           </section>
         </TexturedSurface>
-      ) : null}
+      ) : (
+        <PaginatedNotificationsSection
+          groupId={groupId}
+          isStudentView
+          title={NOTIFICATIONSTITLE__TEXTLABEL[LANGUAGE]}
+          sectionId="group-notifications"
+          linkable
+          surfaceClassName="group-main-home__surface--notifications"
+        />
+      )}
 
       <TexturedSurface className="group-main-home__surface group-main-home__surface--overview">
         <section className="group-main-home__section group-main-home__section--description" aria-label={GROUPDESCRIPTION__TEXTLABEL[LANGUAGE]}>
@@ -225,17 +234,6 @@ export default function GroupMainHomeContent() {
           <InfoRow label={LIVESYSTEM__TEXTLABEL[LANGUAGE]} value={group?.lives != null ? String(group.lives) : null} />
         </section>
       </TexturedSurface>
-
-      {isStudentView ? (
-        <PaginatedNotificationsSection
-          groupId={groupId}
-          isStudentView
-          title={NOTIFICATIONSTITLE__TEXTLABEL[LANGUAGE]}
-          sectionId="group-notifications"
-          linkable
-          surfaceClassName="group-main-home__surface--notifications"
-        />
-      ) : null}
 
       {showTemplatePopup && templatePopupData != null ? (
         <GroupMainHomeContentWindow

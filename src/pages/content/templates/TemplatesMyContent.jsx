@@ -24,6 +24,7 @@ import {
 
 } from '../../../services/groupTemplates.api.js';
 
+import CreateGroupFromTemplateModal from './CreateGroupFromTemplateModal.jsx';
 import CreateTemplateModal from './CreateTemplateModal.jsx';
 
 import TemplateDetailsModal from './TemplateDetailsModal.jsx';
@@ -67,6 +68,8 @@ export default function TemplatesMyContent() {
   const { showSuccess, showError } = useToast();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  const [createGroupTemplate, setCreateGroupTemplate] = useState(null);
 
   const [activeModal, setActiveModal] = useState(null);
 
@@ -149,6 +152,11 @@ export default function TemplatesMyContent() {
   const rowActions = useMemo(() => ({
     menuItems: [
       {
+        id: 'createGroup',
+        label: 'Utwórz grupę ze szablonu',
+        onSelect: (template) => setCreateGroupTemplate(template),
+      },
+      {
         id: 'edit',
         label: 'Edytuj szablon',
         onSelect: (template) => openModal('edit', template),
@@ -162,7 +170,7 @@ export default function TemplatesMyContent() {
     onDelete: (template) => openModal('delete', template),
     deleteLabel: 'Usuń szablon',
     deleteAriaLabel: (template) => `Usuń szablon ${template.name}`,
-  }), [handleTogglePublic, openModal]);
+  }), [handleTogglePublic, openModal, setCreateGroupTemplate]);
 
 
 
@@ -300,6 +308,12 @@ export default function TemplatesMyContent() {
 
         onCreated={refetch}
 
+      />
+
+      <CreateGroupFromTemplateModal
+        isOpen={Boolean(createGroupTemplate)}
+        template={createGroupTemplate}
+        onClose={() => setCreateGroupTemplate(null)}
       />
 
 

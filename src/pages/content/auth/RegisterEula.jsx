@@ -39,7 +39,7 @@ function LegalDownloadLink({ documentKey }) {
       className="register-eula__download-link"
       onClick={handleClick}
     >
-      *kliknij tutaj*
+      pobierz
     </a>
   );
 }
