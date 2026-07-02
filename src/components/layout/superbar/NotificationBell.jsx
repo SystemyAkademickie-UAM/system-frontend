@@ -6,6 +6,7 @@ import { useGroupBacklogNotifications } from '../../../hooks/notifications/useGr
 import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { groupMainPath, groupMembersLogPath } from '../../../routes/pathRegistry.js';
+import { BACKLOG_LIST_POLL_MS } from '../../../constants/backlogNotifications.constants.js';
 import AssetSvg from '../../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import './NotificationBell.css';
@@ -32,7 +33,7 @@ export default function NotificationBell() {
   } = useGroupBacklogNotifications(groupId, {
     isStudentView,
     take: BELL_LIMIT,
-    pollMs: isOpen ? 30000 : 60000,
+    pollMs: isOpen ? BACKLOG_LIST_POLL_MS / 2 : BACKLOG_LIST_POLL_MS,
   });
 
   const viewAllTarget = isStudentView && groupId

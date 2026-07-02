@@ -16,6 +16,8 @@
 .super-bar__start {
   display: flex;
   align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
 .super-bar__end {
@@ -234,11 +236,23 @@
   margin: 0;
   padding: 0.35rem 0;
   min-width: 10rem;
+  max-width: min(18rem, calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
   list-style: none;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-overlay-actions-border);
   border-radius: 8px;
   box-shadow: var(--shadow-stat-badge);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.super-bar-user-menu__dropdown--portal {
+  position: fixed;
+  top: auto;
+  right: auto;
+  z-index: var(--z-index-page-overlay);
 }
 
 .super-bar-user-menu__dropdown-item {
@@ -281,12 +295,84 @@
 }
 
 @media (max-width: 899px) {
+  .super-bar {
+    gap: 0.5rem;
+    min-height: 3.25rem;
+    padding: 0 0.65rem;
+  }
+
+  .super-bar__start {
+    flex: 0 0 auto;
+  }
+
+  .super-bar__end {
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .super-bar__menu-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .super-bar__menu-icon,
+  .super-bar__menu-icon::before,
+  .super-bar__menu-icon::after {
+    width: 18px;
+  }
+
+  .super-bar-stat {
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .super-bar-stat__icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .super-bar-stat__icon svg,
+  .super-bar-stat__icon img {
+    width: 18px;
+    height: 18px;
+  }
+
   .super-bar-stat-badge {
-    padding: 0.25rem 0.65rem;
+    min-width: 2.1rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 7px;
+    font-size: 0.95rem;
+    line-height: 1.15;
+  }
+
+  .super-bar-settings {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .super-bar-settings__icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .super-bar-user-menu {
+    gap: 0;
+    flex-shrink: 0;
   }
 
   .super-bar-user-identity {
     display: none;
+  }
+
+  .super-bar-user-menu__avatar {
+    width: 32px;
+    height: 32px;
   }
 }
 
@@ -298,7 +384,7 @@
 .super-bar-stat-preview {
   position: fixed;
   z-index: var(--z-index-toast, 12000);
-  width: 240px;
+  width: min(240px, calc(100vw - 16px));
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -315,6 +401,8 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .super-bar-stat-preview__label {

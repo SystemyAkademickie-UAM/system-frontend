@@ -32,9 +32,19 @@ export function resolveShopCategoryLabels(categoryIds = [], categoriesById = new
  * @returns {import('../../services/itemCategories.api.js').ItemCategory[]}
  */
 export function resolveShopCategoryDetails(categoryIds = [], categoriesById = new Map()) {
+  const seenIds = new Set();
+
   return categoryIds
     .map((id) => categoriesById.get(String(id)) ?? null)
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((category) => {
+      const categoryKey = String(category.id);
+      if (seenIds.has(categoryKey)) {
+        return false;
+      }
+      seenIds.add(categoryKey);
+      return true;
+    });
 }
 
 /**

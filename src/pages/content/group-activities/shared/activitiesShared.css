@@ -94,7 +94,7 @@
 
   display: inline-flex;
 
-  align-items: center;
+  align-items: flex-start;
 
   gap: 0.75rem;
 
@@ -110,7 +110,7 @@
 
 
 
-.activities-page__add-input {
+.activities-page__add-field {
 
   flex: 0 1 16rem;
 
@@ -119,6 +119,14 @@
   max-width: min(16rem, 100%);
 
   min-width: 0;
+
+}
+
+
+
+.activities-page__add-input {
+
+  width: 100%;
 
   box-sizing: border-box;
 
@@ -490,7 +498,138 @@
   }
 
   .activities-island__header {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  .activities-island__drag-handle {
+    width: 1.35rem;
+    height: 2rem;
+    margin-right: 0;
+    font-size: 0.75rem;
+    letter-spacing: -0.2em;
+  }
+
+  .activities-island__header-start {
+    gap: 0;
+    min-width: 0;
+  }
+
+  .activities-island__icon,
+  .activities-island__count {
+    display: none;
+  }
+
+  .activities-island__heading {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .activities-island__title-row {
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .activities-island__title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: normal;
+  }
+
+  .activities-island__visibility-badge {
+    flex-shrink: 0;
+    padding: 0.1rem 0.4rem;
+    font-size: 0.62rem;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .activities-island__header-end {
+    gap: 0.2rem;
+    flex-shrink: 0;
+  }
+
+  .activities-island__actions .data-table__actions {
+    gap: 0.15rem;
+  }
+
+  .activities-island__actions .data-table__action-btn {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+
+  .activities-island__chevron {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .activities-island__body {
+    padding: 0 0.65rem 0.75rem;
+  }
+
+  .activities-island__table-wrap {
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.45rem;
+    overflow-x: hidden;
+  }
+
+  .activities-island__table {
+    min-width: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .activities-island__th {
+    padding: 0.4rem 0.35rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+  }
+
+  .activities-island__cell {
+    padding: 0.45rem 0.35rem;
+  }
+
+  .activities-island__cell--name {
+    width: auto;
+  }
+
+  .activities-island__th--reward,
+  .activities-island__cell--reward {
+    width: 5rem;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .activities-island__th--actions,
+  .activities-island__cell--actions {
+    width: 2.85rem;
+    padding-right: 0.15rem;
+  }
+
+  .activities-island__activity-name {
+    display: block;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: normal;
+  }
+
+  .activities-island__cell--reward .maq-currency-display {
+    justify-content: flex-end;
+  }
+
+  .activities-island__cell--actions .data-table__action-btn {
+    width: 1.75rem;
+    height: 1.75rem;
   }
 }
 
@@ -639,27 +778,32 @@
 
 
   .activities-page__add-island {
-
-    flex-direction: column;
-
-    align-items: stretch;
-
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    align-items: start;
   }
 
+  .activities-page .maq-section-page__toolbar-start {
+    width: 100%;
+  }
 
+  .activities-page__add-field {
+    width: 100%;
+    max-width: none;
+  }
 
   .activities-page__add-input {
-
     width: 100%;
-
     max-width: none;
-
   }
 
-
-
   .activities-page__add-island .maq-btn {
-    width: 100%;
+    justify-self: end;
+    width: auto;
+    margin-left: 0;
+    align-self: auto;
   }
 
   .activities-page__search {

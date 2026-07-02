@@ -3,6 +3,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
+  box-sizing: border-box;
   width: fit-content;
   max-width: 100%;
   gap: 0.25rem;
@@ -50,4 +51,22 @@
 
 .maq-sub-nav__item--active:hover {
   color: var(--color-accent);
+}
+
+@media (max-width: 639px) {
+  .maq-sub-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    width: 100%;
+    font-size: var(--font-size-body);
+  }
+
+  .maq-sub-nav__item {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.5em 0.375em;
+    font-size: 1em;
+    line-height: 1.25;
+  }
 }

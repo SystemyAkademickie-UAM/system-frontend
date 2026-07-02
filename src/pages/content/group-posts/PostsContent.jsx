@@ -57,6 +57,11 @@ const DRAFTSTATUS__TEXTLABEL = {
   english: 'Unpublished',
 };
 
+const SCHEDULEDPUBLICATION__TEXTLABEL = {
+  polish: 'Planowana publikacja:',
+  english: 'Scheduled publication:',
+};
+
 const EDITPOST__TEXTLABEL = {
   polish: 'Edytuj wpis',
   english: 'Edit Post',
@@ -77,13 +82,31 @@ const DELETEPOSTDEFAULTTITLE__TEXTLABEL = {
   english: 'untitled',
 };
 
-function formatPostDate(value) {
+function formatPostDateTime(value) {
   if (!value) return null;
-  return new Date(value).toLocaleDateString('pl-PL', {
+  return new Date(value).toLocaleString('pl-PL', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
+}
+
+function resolvePostDateDisplay(post, language) {
+  if (!post.isPublished && post.publishAt) {
+    return {
+      dateTime: post.publishAt,
+      label: SCHEDULEDPUBLICATION__TEXTLABEL[language],
+    };
+  }
+
+  const dateTime = post.publishedAt || post.createdAt;
+  if (!dateTime) {
+    return null;
+  }
+
+  return { dateTime, label: null };
 }
 
 function filterPosts(posts, query) {
@@ -209,7 +232,7 @@ export default function PostsContent() {
       ) : (
         <div className="posts-islands">
           {filteredPosts.map((post) => {
-            const publishedLabel = formatPostDate(post.publishedAt || post.createdAt);
+            const dateDisplay = resolvePostDateDisplay(post, LANGUAGE);
 
             return (
             <SmartPostCard
@@ -225,9 +248,12 @@ export default function PostsContent() {
               trailing={(
                 <div className="posts-island__meta">
                   <div className="posts-island__status-row">
-                    {publishedLabel ? (
-                      <time className="posts-island__date" dateTime={post.publishedAt || post.createdAt}>
-                        {publishedLabel}
+                    {dateDisplay ? (
+                      <time className="posts-island__date" dateTime={dateDisplay.dateTime}>
+                        {dateDisplay.label ? (
+                          <span className="posts-island__date-label">{dateDisplay.label} </span>
+                        ) : null}
+                        {formatPostDateTime(dateDisplay.dateTime)}
                       </time>
                     ) : null}
                     <span

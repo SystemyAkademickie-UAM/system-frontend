@@ -43,15 +43,17 @@
 }
 
 .groups-list__creator-overlay {
-  position: absolute;
-  inset: 0;
+  position: fixed;
   z-index: var(--z-index-page-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  padding:
+    max(1rem, env(safe-area-inset-top, 0px))
+    clamp(1rem, 3vw, 2.5rem)
+    max(1rem, env(safe-area-inset-bottom, 0px));
   background: rgba(8, 8, 16, 0.72);
-  overflow: hidden;
+  overflow-y: auto;
   overscroll-behavior: contain;
 }
 
@@ -145,6 +147,7 @@
   }
 
   .groups-list__section-title {
-    text-align: center;
+    width: 100%;
+    text-align: left;
   }
 }

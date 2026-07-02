@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BadgeMini, BADGE_RARITY, BADGE_RARITY_LABELS, Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
 import { fetchStudentBadges, toggleStudentBadge } from '../../../../services/students.api.js';
+import { normalizeRankBadgeIcon } from '../../../../utils/ranks/rankBadgeIcon.js';
 import './memberModals.css';
 
 const RARITY_FILTERS = [
@@ -150,12 +151,13 @@ export default function MemberBadgesModal({
   const allBadges = useMemo(() => {
     if (studentBadges.length > 0) {
       return studentBadges.map((sb) => {
-        const fullBadge = badges.find((b) => b.id === sb.id);
+        const fullBadge = badges.find((b) => b.id === sb.id || b.dbId === sb.id);
+        const icon = normalizeRankBadgeIcon(fullBadge?.icon ?? sb.icon, '');
         return {
           id: sb.id,
           name: sb.name || fullBadge?.name || 'Nieznana odznaka',
-          iconFile: fullBadge?.iconFile || sb.iconFile || '',
-          rarity: fullBadge?.rarity || 'common',
+          iconFile: icon || fullBadge?.iconFile || sb.iconFile || '',
+          rarity: fullBadge?.rarity || sb.rarity || 'common',
           storyDescription: fullBadge?.storyDescription || '',
           didacticDescription: fullBadge?.didacticDescription || fullBadge?.educationalDescription || '',
           rewardAmount: fullBadge?.rewardAmount || 0,

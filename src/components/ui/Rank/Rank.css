@@ -161,13 +161,32 @@
   .maq-rank__columns {
     grid-template-columns: 1fr;
     gap: 1rem;
+    padding-right: 0;
   }
 
   .maq-rank__header {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: var(--size-rank-icon-circle) 1fr;
+    grid-template-areas:
+      'icon name'
+      'cost cost';
+    column-gap: 14px;
+    row-gap: 10px;
+    align-items: center;
+    padding-right: 0;
+  }
+
+  .maq-rank__icon-circle {
+    grid-area: icon;
+  }
+
+  .maq-rank__name {
+    grid-area: name;
   }
 
   .maq-rank__cost {
-    margin-left: calc(var(--size-rank-icon-circle) + 14px);
+    grid-area: cost;
+    justify-self: end;
+    margin-left: 0;
   }
 }

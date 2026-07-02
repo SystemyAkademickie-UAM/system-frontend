@@ -1,14 +1,50 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Pagination from '../Pagination/Pagination.jsx';
 import SearchBar from '../SearchBar/SearchBar.jsx';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import { useFloatingPanelPosition } from '../../../hooks/useFloatingPanelPosition.js';
+import { positionDropdownMenu } from '../../../utils/ui/positionTooltipInViewport.js';
 import { cycleSortRule, sortRows } from './dataTableSort.js';
+import DataTableMobileRow from './DataTableMobileRow.jsx';
 import './DataTable.css';
 
 const SUPERBAR_HEIGHT = 63;
 const HEADER_BORDER_RADIUS = '12px 12px 0 0';
 const INLINE_ACTION_ICON_SIZE = 20;
+const MOBILE_TABLE_MAX_WIDTH = 639;
+
+/**
+ * @param {Object[]} inlineActions
+ * @returns {Object[]}
+ */
+function inlineActionsToMenuItems(inlineActions) {
+  return inlineActions.map((item) => ({
+    id: `__inline_${item.id}`,
+    label: item.label,
+    description: item.description,
+    onSelect: item.onSelect,
+    destructive: item.destructive,
+  }));
+}
+
+function useMaxWidth(maxWidthPx) {
+  const query = `(max-width: ${maxWidthPx}px)`;
+  const [matches, setMatches] = useState(() => (
+    typeof window !== 'undefined' && window.matchMedia(query).matches
+  ));
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    const handleChange = () => setMatches(mediaQuery.matches);
+    handleChange();
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [query]);
+
+  return matches;
+}
 
 function SortableHeader({ label, sortKey, sortRules, onSort, className = '' }) {
   const ruleIndex = sortRules.findIndex((rule) => rule.key === sortKey);
@@ -48,79 +84,77 @@ function SortableHeader({ label, sortKey, sortRules, onSort, className = '' }) {
   );
 }
 
-function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
+function DataTableRowActions({ row, rowActions, onMenuOpenChange, collapseInlineActions }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [menuStyle, setMenuStyle] = useState(null);
   const menuButtonRef = useRef(null);
   const menuRef = useRef(null);
+  const isMobileTableView = useMaxWidth(MOBILE_TABLE_MAX_WIDTH);
+  const shouldCollapseInlineActions = collapseInlineActions ?? isMobileTableView;
   const {
     onDelete,
+    canDelete,
     deleteLabel = 'Usuń',
     deleteAriaLabel,
     inlineActions = [],
     menuItems = [],
   } = rowActions ?? {};
 
-  const resolvedMenuItems = useMemo(() => {
-    const items = [...menuItems];
-    if (onDelete) {
-      items.push({
+  const { visibleInlineActions, mergedMenuItems } = useMemo(() => {
+    const deleteItem = onDelete && (canDelete == null || canDelete(row))
+      ? {
         id: '__delete',
         label: deleteLabel,
         destructive: true,
         onSelect: onDelete,
-      });
+      }
+      : null;
+
+    if (shouldCollapseInlineActions) {
+      return {
+        visibleInlineActions: [],
+        mergedMenuItems: [
+          ...inlineActionsToMenuItems(inlineActions),
+          ...menuItems,
+          ...(deleteItem ? [deleteItem] : []),
+        ],
+      };
     }
-    return items;
-  }, [menuItems, onDelete, deleteLabel]);
+
+    return {
+      visibleInlineActions: inlineActions,
+      mergedMenuItems: [
+        ...menuItems,
+        ...(deleteItem ? [deleteItem] : []),
+      ],
+    };
+  }, [
+    canDelete,
+    deleteLabel,
+    inlineActions,
+    menuItems,
+    onDelete,
+    row,
+    shouldCollapseInlineActions,
+  ]);
+
+  const getMenuLayout = useCallback(({ triggerRect, panelRect }) => positionDropdownMenu({
+    triggerRect,
+    panelRect,
+    align: 'end',
+  }), []);
+
+  const menuLayout = useFloatingPanelPosition({
+    open: menuOpen,
+    triggerRef: menuButtonRef,
+    panelRef: menuRef,
+    getLayout: getMenuLayout,
+    deps: [mergedMenuItems.length],
+  });
 
   const setMenuState = (nextOpen) => {
     setMenuOpen(nextOpen);
     onMenuOpenChange?.(nextOpen);
-    if (!nextOpen) {
-      setMenuStyle(null);
-    }
   };
-
-  const updateMenuPosition = useCallback(() => {
-    const buttonEl = menuButtonRef.current;
-    const menuEl = menuRef.current;
-    if (!buttonEl || !menuEl) {
-      return;
-    }
-
-    const rect = buttonEl.getBoundingClientRect();
-    const menuHeight = menuEl.offsetHeight;
-    const menuWidth = menuEl.offsetWidth;
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const openUpward = spaceBelow < menuHeight + 8 && rect.top > menuHeight + 8;
-    const left = Math.min(
-      Math.max(8, rect.right - menuWidth),
-      window.innerWidth - menuWidth - 8,
-    );
-
-    setMenuStyle({
-      position: 'fixed',
-      top: openUpward ? rect.top - menuHeight - 4 : rect.bottom + 4,
-      left,
-    });
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!menuOpen) {
-      return undefined;
-    }
-
-    updateMenuPosition();
-
-    window.addEventListener('resize', updateMenuPosition);
-    window.addEventListener('scroll', updateMenuPosition, true);
-
-    return () => {
-      window.removeEventListener('resize', updateMenuPosition);
-      window.removeEventListener('scroll', updateMenuPosition, true);
-    };
-  }, [menuOpen, resolvedMenuItems.length, updateMenuPosition]);
 
   const handleMenuToggle = () => setMenuState(!menuOpen);
   const handleMenuClose = () => setMenuState(false);
@@ -130,13 +164,13 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
     handleMenuClose();
   };
 
-  if (inlineActions.length === 0 && resolvedMenuItems.length === 0) {
+  if (visibleInlineActions.length === 0 && mergedMenuItems.length === 0) {
     return null;
   }
 
   return (
     <div className="data-table__actions">
-      {inlineActions.map((item) => (
+      {visibleInlineActions.map((item) => (
         <button
           key={item.id}
           type="button"
@@ -162,7 +196,7 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
           )}
         </button>
       ))}
-      {resolvedMenuItems.length > 0 ? (
+      {mergedMenuItems.length > 0 ? (
         <div className="data-table__menu-wrap">
           <button
             ref={menuButtonRef}
@@ -179,44 +213,51 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange }) {
               alt=""
             />
           </button>
-          {menuOpen ? (
-            <>
-              <div
-                className="data-table__menu-backdrop"
-                onClick={handleMenuClose}
-                aria-hidden="true"
-              />
-              <div
-                ref={menuRef}
-                className="data-table__menu data-table__menu--fixed"
-                role="menu"
-                style={menuStyle ?? { visibility: 'hidden' }}
-              >
-                {resolvedMenuItems.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className={[
-                      'data-table__menu-item',
-                      item.destructive ? 'data-table__menu-item--destructive' : '',
-                    ].filter(Boolean).join(' ')}
-                    role="menuitem"
-                    aria-label={item.destructive ? deleteAriaLabel?.(row) ?? item.label : undefined}
-                    onClick={() => handleAction(item)}
-                  >
-                    <span className="data-table__menu-item-content">
-                      <span className="data-table__menu-item-label">{item.label}</span>
-                      {item.description ? (
-                        <span className="data-table__menu-item-description">
-                          {item.description}
-                        </span>
-                      ) : null}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : null}
+          {menuOpen && typeof document !== 'undefined'
+            ? createPortal(
+              <>
+                <div
+                  className="data-table__menu-backdrop"
+                  onClick={handleMenuClose}
+                  aria-hidden="true"
+                />
+                <div
+                  ref={menuRef}
+                  className="data-table__menu data-table__menu--fixed"
+                  role="menu"
+                  style={{
+                    visibility: menuLayout ? 'visible' : 'hidden',
+                    left: menuLayout ? `${menuLayout.left}px` : 0,
+                    top: menuLayout ? `${menuLayout.top}px` : 0,
+                  }}
+                >
+                  {mergedMenuItems.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className={[
+                        'data-table__menu-item',
+                        item.destructive ? 'data-table__menu-item--destructive' : '',
+                      ].filter(Boolean).join(' ')}
+                      role="menuitem"
+                      aria-label={item.destructive ? deleteAriaLabel?.(row) ?? item.label : undefined}
+                      onClick={() => handleAction(item)}
+                    >
+                      <span className="data-table__menu-item-content">
+                        <span className="data-table__menu-item-label">{item.label}</span>
+                        {item.description ? (
+                          <span className="data-table__menu-item-description">
+                            {item.description}
+                          </span>
+                        ) : null}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </>,
+              document.body,
+            )
+            : null}
         </div>
       ) : null}
     </div>
@@ -269,6 +310,9 @@ export default function DataTable({
   stickyHeader = true,
   className = '',
   renderRow,
+  renderMobileRow,
+  getMobileItemClassName,
+  shouldRenderRowActions,
 }) {
   const [page, setPage] = useState(1);
   const [internalSearch, setInternalSearch] = useState('');
@@ -414,8 +458,19 @@ export default function DataTable({
       ? 'data-table--compact'
       : '';
   const RowComponent = renderRow ?? DefaultDataTableRow;
+  const MobileRowComponent = renderMobileRow ?? DataTableMobileRow;
+
+  const renderMobileActions = useCallback((row) => {
+    if (!rowActions) {
+      return null;
+    }
+    if (shouldRenderRowActions && !shouldRenderRowActions(row)) {
+      return null;
+    }
+    return <DataTableRowActions row={row} rowActions={rowActions} />;
+  }, [rowActions, shouldRenderRowActions]);
   const actionsCol = hasRowActions ? (
-    <col className="data-table__col data-table__col--actions" style={{ width: '100px' }} />
+    <col className="data-table__col data-table__col--actions" />
   ) : null;
   const actionsHeader = hasRowActions ? (
     <th className="data-table__th data-table__th--actions" scope="col">
@@ -443,10 +498,11 @@ export default function DataTable({
 
       <div className="data-table__content">
         <div ref={cardRef} className="data-table-card">
-          <div
-            ref={headerBarRef}
-            className={`data-table-header-bar${isHeaderSticky ? ' data-table-header-bar--sticky' : ''}`}
-          >
+          <div className="data-table-card__desktop">
+            <div
+              ref={headerBarRef}
+              className={`data-table-header-bar${isHeaderSticky ? ' data-table-header-bar--sticky' : ''}`}
+            >
             <div ref={headerScrollRef} className="data-table-header-scroll">
               <table className={['data-table', 'data-table--header', tableDensityClass].filter(Boolean).join(' ')}>
                 <colgroup>
@@ -544,6 +600,19 @@ export default function DataTable({
               </tbody>
             </table>
           </div>
+          </div>
+
+          <ul className="data-table-mobile" aria-label="Lista rekordów">
+            {paginatedRows.map((row) => (
+              <MobileRowComponent
+                key={getRowKey(row)}
+                row={row}
+                columns={columns}
+                renderActions={renderMobileActions}
+                className={getMobileItemClassName?.(row) ?? ''}
+              />
+            ))}
+          </ul>
         </div>
 
         {filteredRows.length > itemsPerPage ? (
@@ -562,3 +631,5 @@ export default function DataTable({
 }
 
 export { DataTableRowActions };
+export { default as DataTableMobileRow } from './DataTableMobileRow.jsx';
+export { getMobileColumnSlots, renderDataTableCell } from './dataTableMobile.js';

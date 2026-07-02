@@ -1,12 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import ActivityCard from './ActivityCard.jsx';
+import { positionCursorTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './ActivityProgressIcon.css';
-
-const PREVIEW_OFFSET = 16;
-const PREVIEW_WIDTH = 420;
 
 /**
  * Okrągła ikona postępu aktywności — klik przełącza stan, hover pokazuje ActivityCard.
@@ -23,28 +21,55 @@ export default function ActivityProgressIcon({
   onToggle,
   ariaLabel,
 }) {
+  const bubbleRef = useRef(null);
+  const cursorRef = useRef({ x: 0, y: 0 });
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewPos, setPreviewPos] = useState({ x: 0, y: 0 });
+  const [previewLayout, setPreviewLayout] = useState(null);
 
-  const updatePreviewPosition = useCallback((clientX, clientY) => {
-    const maxLeft = window.innerWidth - PREVIEW_WIDTH - PREVIEW_OFFSET;
-    const left = Math.min(clientX + PREVIEW_OFFSET, maxLeft);
-    const top = Math.min(clientY + PREVIEW_OFFSET, window.innerHeight - 24);
+  const updatePreviewPosition = useCallback(() => {
+    const bubble = bubbleRef.current;
+    if (!bubble) {
+      return;
+    }
 
-    setPreviewPos({
-      x: Math.max(PREVIEW_OFFSET, left),
-      y: Math.max(PREVIEW_OFFSET, top),
-    });
+    setPreviewLayout(positionCursorTooltip({
+      clientX: cursorRef.current.x,
+      clientY: cursorRef.current.y,
+      bubbleRect: bubble.getBoundingClientRect(),
+    }));
   }, []);
 
+  useLayoutEffect(() => {
+    if (!previewVisible) {
+      setPreviewLayout(null);
+      return undefined;
+    }
+
+    updatePreviewPosition();
+    const rafId = window.requestAnimationFrame(updatePreviewPosition);
+
+    window.addEventListener('resize', updatePreviewPosition);
+    window.addEventListener('scroll', updatePreviewPosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updatePreviewPosition);
+      window.removeEventListener('scroll', updatePreviewPosition, true);
+    };
+  }, [previewVisible, updatePreviewPosition, activity.name]);
+
   const handleMouseEnter = (event) => {
+    cursorRef.current = { x: event.clientX, y: event.clientY };
     setPreviewVisible(true);
-    updatePreviewPosition(event.clientX, event.clientY);
   };
 
   const handleMouseMove = (event) => {
-    if (!previewVisible) return;
-    updatePreviewPosition(event.clientX, event.clientY);
+    if (!previewVisible) {
+      return;
+    }
+
+    cursorRef.current = { x: event.clientX, y: event.clientY };
+    updatePreviewPosition();
   };
 
   const handleMouseLeave = () => {
@@ -78,8 +103,13 @@ export default function ActivityProgressIcon({
       {previewVisible
         ? createPortal(
           <div
+            ref={bubbleRef}
             className="maq-activity-card-preview"
-            style={{ left: `${previewPos.x}px`, top: `${previewPos.y}px` }}
+            style={{
+              visibility: previewLayout ? 'visible' : 'hidden',
+              left: previewLayout ? `${previewLayout.left}px` : 0,
+              top: previewLayout ? `${previewLayout.top}px` : 0,
+            }}
             aria-hidden="true"
           >
             <ActivityCard

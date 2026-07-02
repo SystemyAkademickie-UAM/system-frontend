@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BADGE_RARITY, BADGE_RARITY_LABELS, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
+import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import { DEFAULT_BADGE_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
-import { validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = {
@@ -12,7 +15,39 @@ const EMPTY_FORM = {
   storyDescription: '',
   didacticDescription: '',
   rewardAmount: '',
+  startHidden: false,
 };
+
+function BadgeOptionCheckbox({
+  id,
+  checked,
+  onChange,
+  children,
+}) {
+  return (
+    <label className="rewards-modal__option-label" htmlFor={id}>
+      <input
+        id={id}
+        type="checkbox"
+        className="rewards-modal__option-input"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span
+        className={[
+          'rewards-modal__option-checkbox',
+          checked ? 'rewards-modal__option-checkbox--checked' : '',
+        ].filter(Boolean).join(' ')}
+        aria-hidden="true"
+      >
+        {checked ? (
+          <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+        ) : null}
+      </span>
+      <span className="rewards-modal__option-text">{children}</span>
+    </label>
+  );
+}
 
 export default function BadgeFormModal({
   isOpen,
@@ -34,6 +69,7 @@ export default function BadgeFormModal({
         storyDescription: badge.storyDescription,
         didacticDescription: badge.didacticDescription,
         rewardAmount: String(badge.rewardAmount),
+        startHidden: badge.isPublished === false,
       });
       return;
     }
@@ -55,7 +91,10 @@ export default function BadgeFormModal({
   ), [form, rewardValidation.valid]);
 
   const handleChange = (field) => (event) => {
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+    const nextValue = field === 'rewardAmount'
+      ? sanitizeWholeNumberInput(event.target.value)
+      : event.target.value;
+    setForm((prev) => ({ ...prev, [field]: nextValue }));
   };
 
   const handleConfirm = () => {
@@ -69,6 +108,7 @@ export default function BadgeFormModal({
       storyDescription: form.storyDescription.trim(),
       didacticDescription: form.didacticDescription.trim(),
       rewardAmount: rewardValidation.value,
+      isPublished: !form.startHidden,
     });
   };
 
@@ -93,15 +133,17 @@ export default function BadgeFormModal({
             className="rewards-modal__field"
             inputClassName="rewards-modal__input"
           />
-          <TextField
-            id="badge-reward"
-            label="Nagroda*"
-            type="number"
-            value={form.rewardAmount}
-            onChange={handleChange('rewardAmount')}
-            className="rewards-modal__field"
-            inputClassName="rewards-modal__input"
-          />
+          <div className="rewards-modal__field">
+            <RewardsCurrencyLabel htmlFor="badge-reward">Nagroda*</RewardsCurrencyLabel>
+            <input
+              id="badge-reward"
+              type="text"
+              inputMode="numeric"
+              className="rewards-modal__input"
+              value={form.rewardAmount}
+              onChange={handleChange('rewardAmount')}
+            />
+          </div>
         </div>
 
         <div className="rewards-modal__row rewards-modal__row--icon-rarity">
@@ -116,7 +158,7 @@ export default function BadgeFormModal({
 
           <div className="rewards-modal__field">
             <label htmlFor="badge-rarity" className="rewards-modal__label">
-              Rzadkość
+              Jakość
               <InfoTooltip text="Wpływa na rzadkość odznaki w skarbcu." />
             </label>
             <select
@@ -151,6 +193,16 @@ export default function BadgeFormModal({
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
         />
+
+        <div className="rewards-modal__field">
+          <BadgeOptionCheckbox
+            id="badge-start-hidden"
+            checked={form.startHidden}
+            onChange={(checked) => setForm((prev) => ({ ...prev, startHidden: checked }))}
+          >
+            Ukryj odznakę (niewidoczna dla studentów)
+          </BadgeOptionCheckbox>
+        </div>
       </div>
     </Modal>
   );

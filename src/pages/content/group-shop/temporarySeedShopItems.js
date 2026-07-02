@@ -54,6 +54,29 @@ const CATEGORY_COLORS = [
   '#f37d42',
 ];
 
+const SHOP_ITEM_EMOJIS = [
+  '⚔️',
+  '🛡️',
+  '📚',
+  '🎯',
+  '🧪',
+  '🔮',
+  '🏆',
+  '💎',
+  '🎒',
+  '🧭',
+  '🗝️',
+  '🪄',
+  '🎲',
+  '🧲',
+  '🚀',
+  '🌟',
+  '🔥',
+  '💡',
+  '🎁',
+  '🧿',
+];
+
 /**
  * @template T
  * @param {T[]} items
@@ -146,6 +169,7 @@ export async function seedTemporaryShopItems({ groupId, count = 10, onLog }) {
       educationalDescription: DIDACTIC_SNIPPETS[index % DIDACTIC_SNIPPETS.length],
       stockQuantity: 20 + index,
       perStudentLimit: 2,
+      imageRef: `${pickRandom(SHOP_ITEM_EMOJIS)}*${pickRandom(CATEGORY_COLORS)}`,
     };
 
     if (selectedCategories.length > 0) {

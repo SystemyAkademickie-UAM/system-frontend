@@ -42,8 +42,52 @@ export default function Modal({
   const handleKeyDown = useCallback((event) => {
     if (event.key === 'Escape') {
       onClose();
+      return;
     }
-  }, [onClose]);
+
+    if (event.key !== 'Enter' || event.defaultPrevented) {
+      return;
+    }
+
+    if (!onConfirm || confirmDisabled || !showFooter) {
+      return;
+    }
+
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    if (target.tagName === 'TEXTAREA') {
+      return;
+    }
+
+    if (target.tagName === 'SELECT') {
+      return;
+    }
+
+    if (target.isContentEditable) {
+      return;
+    }
+
+    if (target instanceof HTMLInputElement) {
+      const inputType = target.type;
+      if (inputType === 'checkbox' || inputType === 'radio' || inputType === 'file' || inputType === 'button') {
+        return;
+      }
+    }
+
+    if (target.tagName === 'BUTTON' || target.tagName === 'A') {
+      return;
+    }
+
+    if (target.closest('[data-modal-enter-ignore]')) {
+      return;
+    }
+
+    event.preventDefault();
+    onConfirm();
+  }, [confirmDisabled, onClose, onConfirm, showFooter]);
 
   useEffect(() => {
     if (!isOpen) return undefined;

@@ -149,6 +149,40 @@ function formatMaxUses(maxUses, useCount) {
   return `${useCount} / ${maxUses}`;
 }
 
+function renderCodeTableCell(code, language) {
+  const statusClassName = [
+    'members-code-table__status',
+    code.isActive ? 'members-code-table__status--active' : 'members-code-table__status--inactive',
+  ].join(' ');
+
+  return (
+    <div className="members-code-table__code-cell">
+      <span className="members-code-table__code members-code-table__code--desktop">{code.code}</span>
+      <div className="members-code-table__code-mobile">
+        <div className="members-code-table__code-headline">
+          <span className="members-code-table__code">{code.code}</span>
+          <span className={statusClassName}>
+            {code.isActive ? YES__TEXTLABEL[language] : NO__TEXTLABEL[language]}
+          </span>
+        </div>
+        <p className="members-code-table__code-meta-line">
+          <span className="members-code-table__code-meta-part">
+            <span className="members-code-table__code-meta-label">{EXPIRESATCOLUMN__TEXTLABEL[language]}</span>
+            {' '}
+            <span className="members-code-table__code-meta-value">{formatExpiresAt(code.expiresAt)}</span>
+          </span>
+          <span className="members-code-table__code-meta-separator" aria-hidden="true"> · </span>
+          <span className="members-code-table__code-meta-part">
+            <span className="members-code-table__code-meta-label">{USES__TEXTLABEL[language]}</span>
+            {' '}
+            <span className="members-code-table__code-meta-value">{formatMaxUses(code.maxUses, code.useCount)}</span>
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function CodeTableRow({ row, columns, rowActions, rowActionsPosition = 'end' }) {
   const actionsCell = rowActions ? (
     <td className="data-table__cell data-table__cell--actions">
@@ -306,9 +340,7 @@ export default function MembersCodeContent() {
       className: 'members-code-table__th--code',
       colClassName: 'members-code-table__col--code',
       cellClassName: 'members-code-table__cell--code',
-      render: (code) => (
-        <span className="members-code-table__code">{code.code}</span>
-      ),
+      render: (code) => renderCodeTableCell(code, LANGUAGE),
     },
     {
       key: 'expiresAt',
@@ -317,6 +349,7 @@ export default function MembersCodeContent() {
       width: '168px',
       className: 'members-code-table__th--expires',
       colClassName: 'members-code-table__col--expires',
+      mobileHidden: true,
       accessor: (code) => formatExpiresAt(code.expiresAt),
       render: (code) => (
         <span className="members-code-table__meta">{formatExpiresAt(code.expiresAt)}</span>
@@ -329,6 +362,7 @@ export default function MembersCodeContent() {
       width: '108px',
       className: 'members-code-table__th--uses',
       colClassName: 'members-code-table__col--uses',
+      mobileHidden: true,
       accessor: (code) => code.useCount,
       render: (code) => (
         <span className="members-code-table__meta">{formatMaxUses(code.maxUses, code.useCount)}</span>
@@ -342,6 +376,7 @@ export default function MembersCodeContent() {
       className: 'members-code-table__th--active',
       colClassName: 'members-code-table__col--active',
       cellClassName: 'members-code-table__cell--active',
+      mobileHidden: true,
       accessor: (code) => (code.isActive ? 1 : 0),
       render: (code) => (
         <span
@@ -427,6 +462,9 @@ export default function MembersCodeContent() {
           rowKey="id"
           rowActions={rowActions}
           renderRow={CodeTableRow}
+          getMobileItemClassName={(code) => (
+            code.isActive ? 'members-code-table__row--active' : 'members-code-table__row--inactive'
+          )}
           search={{
             value: searchQuery,
             onChange: (event) => setSearchQuery(event.target.value),

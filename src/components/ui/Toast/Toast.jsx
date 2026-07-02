@@ -173,6 +173,7 @@ export function ToastProvider({ children }) {
     showToast,
     showSuccess: (message, durationMs) => showToast({ message, variant: 'success', durationMs }),
     showError: (message, durationMs) => showToast({ message, variant: 'error', durationMs }),
+    showInfo: (message, durationMs) => showToast({ message, variant: 'info', durationMs }),
     dismissToast: requestDismiss,
   }), [showToast, requestDismiss]);
 

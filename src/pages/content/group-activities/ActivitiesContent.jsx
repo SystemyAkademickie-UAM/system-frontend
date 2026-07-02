@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, SearchBar } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, SearchBar } from '../../../components/ui/index.js';
 import { STAGE_NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
@@ -301,21 +301,25 @@ export default function ActivitiesContent() {
       <div className="maq-section-page__toolbar">
         <div className="maq-section-page__toolbar-start">
           <div className="activities-page__add-island">
-            <input
-              id="new-stage-name"
-              type="text"
-              className="activities-page__add-input"
-              value={newStageName}
-              onChange={(event) => setNewStageName(event.target.value)}
-              placeholder={NEWSTAGEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-              aria-label={NEWSTAGEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-              maxLength={STAGE_NAME_MAX_LENGTH}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  handleAddStage();
-                }
-              }}
-            />
+            <div className="activities-page__add-field">
+              <CharacterLimitedField value={newStageName} maxLength={STAGE_NAME_MAX_LENGTH}>
+                <input
+                  id="new-stage-name"
+                  type="text"
+                  className="activities-page__add-input"
+                  value={newStageName}
+                  onChange={(event) => setNewStageName(event.target.value)}
+                  placeholder={NEWSTAGEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                  aria-label={NEWSTAGEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                  maxLength={STAGE_NAME_MAX_LENGTH}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      handleAddStage();
+                    }
+                  }}
+                />
+              </CharacterLimitedField>
+            </div>
             <Button variant="primary" size="md" onClick={handleAddStage}>
               {ADDSTAGBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>

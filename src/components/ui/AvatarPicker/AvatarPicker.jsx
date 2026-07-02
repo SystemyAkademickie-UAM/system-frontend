@@ -10,8 +10,8 @@ const AVATARPICKERLABELTEXT = {
 };
 
 const POPULARLABELTEXT = {
-  polish: 'Najczęściej używane',
-  english: 'Most used',
+  polish: 'Ostatnio najczęściej używane',
+  english: 'Recently most used',
 };
 
 const SHOWALLLABELTEXT = {

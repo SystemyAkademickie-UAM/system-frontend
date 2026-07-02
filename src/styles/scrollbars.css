@@ -1,0 +1,56 @@
+.maq-scroll,
+#main-content,
+.app-shell__main,
+.auth-shell__panel-inner,
+.maq-modal__body,
+.data-table-mobile__list,
+.data-table__scroll-wrap {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-nav-scrollbar-thumb) var(--color-nav-scrollbar-track);
+}
+
+.maq-scroll::-webkit-scrollbar,
+#main-content::-webkit-scrollbar,
+.app-shell__main::-webkit-scrollbar,
+.auth-shell__panel-inner::-webkit-scrollbar,
+.maq-modal__body::-webkit-scrollbar,
+.data-table-mobile__list::-webkit-scrollbar,
+.data-table__scroll-wrap::-webkit-scrollbar {
+  width: var(--shell-page-scrollbar-width, 10px);
+  height: var(--shell-page-scrollbar-width, 10px);
+}
+
+.maq-scroll::-webkit-scrollbar-track,
+#main-content::-webkit-scrollbar-track,
+.app-shell__main::-webkit-scrollbar-track,
+.auth-shell__panel-inner::-webkit-scrollbar-track,
+.maq-modal__body::-webkit-scrollbar-track,
+.data-table-mobile__list::-webkit-scrollbar-track,
+.data-table__scroll-wrap::-webkit-scrollbar-track {
+  background: var(--color-nav-scrollbar-track);
+  border-radius: 999px;
+}
+
+.maq-scroll::-webkit-scrollbar-thumb,
+#main-content::-webkit-scrollbar-thumb,
+.app-shell__main::-webkit-scrollbar-thumb,
+.auth-shell__panel-inner::-webkit-scrollbar-thumb,
+.maq-modal__body::-webkit-scrollbar-thumb,
+.data-table-mobile__list::-webkit-scrollbar-thumb,
+.data-table__scroll-wrap::-webkit-scrollbar-thumb {
+  background: var(--color-nav-scrollbar-thumb);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.maq-scroll::-webkit-scrollbar-thumb:hover,
+#main-content::-webkit-scrollbar-thumb:hover,
+.app-shell__main::-webkit-scrollbar-thumb:hover,
+.auth-shell__panel-inner::-webkit-scrollbar-thumb:hover,
+.maq-modal__body::-webkit-scrollbar-thumb:hover,
+.data-table-mobile__list::-webkit-scrollbar-thumb:hover,
+.data-table__scroll-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--color-nav-scrollbar-thumb-hover);
+  background-clip: padding-box;
+}

@@ -31,7 +31,8 @@
 }
 
 .group-settings-page__sub-nav {
-  flex: 0 0 auto;
+  width: 100%;
+  max-width: 100%;
 }
 
 .group-settings-form {
@@ -56,6 +57,10 @@
   gap: 1.25rem;
   max-width: none;
   align-self: stretch;
+}
+
+.group-settings-form--drive-layout.group-settings-form--currency {
+  padding-inline: clamp(0.75rem, 2vw, 1.25rem);
 }
 
 .group-settings-form--drive-layout .group-settings-form__panel {
@@ -115,6 +120,11 @@
   max-width: 100%;
 }
 
+.group-settings-form--lives .group-settings-form__stack > .group-settings-form__field--value {
+  width: 8.3333%;
+  min-width: 5.5rem;
+}
+
 .group-settings-form--drive-layout .group-settings-form__field--banner {
   width: 50%;
   max-width: 100%;
@@ -161,8 +171,22 @@
   gap: 0.5rem;
 }
 
-.group-settings-form__input--compact {
-  width: 6.5rem;
+.group-settings-form__input,
+.group-settings-form__textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--color-bg-surface);
+  font: inherit;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.group-settings-form__input.group-settings-form__input--compact {
+  width: 100%;
   max-width: 100%;
 }
 
@@ -181,20 +205,6 @@
   margin-left: 0.35rem;
   color: var(--color-input-error);
   font-weight: 400;
-}
-
-.group-settings-form__input,
-.group-settings-form__textarea {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 0.625rem 0.875rem;
-  border: 0;
-  border-radius: 10px;
-  background: var(--color-bg-surface);
-  font: inherit;
-  font-size: var(--font-size-body);
-  color: var(--color-text-primary);
-  outline: none;
 }
 
 .group-settings-form__textarea {
@@ -240,7 +250,8 @@
   }
 
   .group-settings-form--drive-layout .group-settings-form__stack > .group-settings-form__field,
-  .group-settings-form--drive-layout .group-settings-form__field--banner {
+  .group-settings-form--drive-layout .group-settings-form__field--banner,
+  .group-settings-form--lives .group-settings-form__stack > .group-settings-form__field--value {
     width: 100%;
   }
 

@@ -40,8 +40,8 @@ export default function ShopBuyModal({
         imageRef={item.imageRef}
         categoryDetails={categoryDetails}
         hideActions
+        isExtraLife={item.isExtraLife === true}
         className="shop-modal__preview"
-        disabled
       />
     </Modal>
   );

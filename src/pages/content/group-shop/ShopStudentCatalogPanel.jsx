@@ -12,6 +12,11 @@ import {
   sortShopItems,
 } from '../../../utils/shop/shopModel.js';
 import { buildShopCategoryFilters, resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
+import {
+  filterCatalogShopItems,
+  sortShopItemsWithExtraLifeFirst,
+} from '../../../utils/shop/extraLifeItem.js';
+import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import { useGroupShopItems, useGroupShopOpen } from '../../../hooks/shop/useGroupShop.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import './GroupShopContent.css';
@@ -47,6 +52,9 @@ export default function ShopStudentCatalogPanel({
 }) {
   const { items, isLoading, error } = useGroupShopItems(groupId);
   const { isShopOpen } = useGroupShopOpen(groupId);
+  const { showExtraLifeProduct } = useGroupShopLivesSystem(groupId, {
+    isStudentView: !showLecturerActions,
+  });
   const { categories, categoriesById } = useGroupItemCategories(groupId);
 
   const categoryFilters = useMemo(
@@ -55,18 +63,20 @@ export default function ShopStudentCatalogPanel({
   );
 
   const catalogItems = useMemo(() => {
-    if (!onlyPublished) {
-      return items;
-    }
-    return items.filter((item) => item.isPublished !== false);
-  }, [items, onlyPublished]);
+    const source = onlyPublished
+      ? items.filter((item) => item.isPublished !== false)
+      : items;
+    const filtered = filterCatalogShopItems(source, showExtraLifeProduct);
+    return sortShopItemsWithExtraLifeFirst(filtered);
+  }, [items, onlyPublished, showExtraLifeProduct]);
 
   const visibleItems = useMemo(() => {
     const filtered = filterShopItems(catalogItems, {
       searchQuery,
       categoryFilter,
     });
-    return sortShopItems(filtered, sortBy);
+    const sorted = sortShopItems(filtered, sortBy);
+    return sortShopItemsWithExtraLifeFirst(sorted);
   }, [catalogItems, searchQuery, categoryFilter, sortBy]);
 
   const blockCatalog = !showLecturerActions && !isShopOpen;
@@ -107,9 +117,9 @@ export default function ShopStudentCatalogPanel({
           <p className="group-shop__empty page-unavailable__notice">Brak produktów spełniających kryteria.</p>
         ) : (
           <div className="group-shop__grid">
-            {visibleItems.map((item) => (
+            {visibleItems.map((item, index) => (
               <ProductCard
-                key={item.id}
+                key={`${item.id}-${index}`}
                 itemId={item.id}
                 name={item.name}
                 storyDescription={item.storyDescription}
@@ -124,6 +134,7 @@ export default function ShopStudentCatalogPanel({
                 hideActions={showLecturerActions}
                 onEdit={() => onEdit?.(item)}
                 onDelete={() => onDelete?.(item)}
+                isExtraLife={item.isExtraLife}
                 disabled={cardsDisabled || item.isLocked}
                 isRankLocked={!showLecturerActions && item.isLocked}
                 className="group-shop__card"

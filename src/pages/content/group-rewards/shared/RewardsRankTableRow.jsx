@@ -7,10 +7,7 @@ import './rewardsTablePreview.css';
 
 export default function RewardsRankTableRow({ row, columns, rowActions }) {
   const rowRef = useRef(null);
-  const { previewVisible, previewPos, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview({
-    previewWidth: 520,
-    previewHeight: 320,
-  });
+  const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
   const handleMouseEnter = () => {
     showPreview(rowRef.current);
@@ -52,8 +49,13 @@ export default function RewardsRankTableRow({ row, columns, rowActions }) {
       {previewVisible
         ? createPortal(
           <div
+            ref={bubbleRef}
             className="rewards-table-preview rewards-table-preview--rank"
-            style={{ left: `${previewPos.x}px`, top: `${previewPos.y}px` }}
+            style={{
+              visibility: layout ? 'visible' : 'hidden',
+              left: layout ? `${layout.left}px` : 0,
+              top: layout ? `${layout.top}px` : 0,
+            }}
             aria-hidden="true"
           >
             <Rank

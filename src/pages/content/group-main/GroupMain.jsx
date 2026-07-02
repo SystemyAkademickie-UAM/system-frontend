@@ -466,10 +466,12 @@ export default function App() {
             const canSavePost = isPostFormValid(post);
 
             const publishedLabel = post.publishedAt
-              ? new Date(post.publishedAt).toLocaleDateString('pl-PL', {
+              ? new Date(post.publishedAt).toLocaleString('pl-PL', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
               })
               : null;
 

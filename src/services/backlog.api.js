@@ -1,4 +1,4 @@
-import { getJson, patchJson } from './api-client.js';
+import { getJson, patchJson, deleteJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
 /**
@@ -105,4 +105,22 @@ export async function markGroupBacklogItemRead(groupId, backlogId) {
     return { ok: false, error: extractApiError(result.data) };
   }
   return { ok: true };
+}
+
+/**
+ * @param {string | number} groupId
+ * @param {{ excludeItemUses?: boolean }} [options]
+ */
+export async function clearGroupBacklog(groupId, { excludeItemUses = false } = {}) {
+  const query = excludeItemUses ? '?excludeItemUses=true' : '';
+  const result = await deleteJson(`/groups/${groupId}/backlog/clear${query}`, { includeBrowserId: true });
+  if (!result.ok) {
+    return { ok: false, error: extractApiError(result.data), deleted: 0 };
+  }
+
+  const deleted = typeof result.data === 'object' && result.data !== null
+    ? Number(/** @type {{ deleted?: number }} */ (result.data).deleted ?? 0)
+    : 0;
+
+  return { ok: true, deleted: Number.isFinite(deleted) ? deleted : 0 };
 }

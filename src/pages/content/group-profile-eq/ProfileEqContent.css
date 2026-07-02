@@ -5,6 +5,20 @@
   width: 100%;
 }
 
+.profile-eq-page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-eq-page__title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: rgb(227, 224, 247);
+}
+
 .profile-eq-page__toolbar {
   align-items: center;
 }

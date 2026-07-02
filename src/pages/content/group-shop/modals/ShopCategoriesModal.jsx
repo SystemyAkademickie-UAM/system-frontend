@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Modal, useToast } from '../../../../components/ui/index.js';
+import { CharacterLimitedField, Modal, useToast } from '../../../../components/ui/index.js';
+import { ITEM_CATEGORY_NAME_MAX_LENGTH } from '../../../../constants/fieldLimits.js';
 import {
   createGroupItemCategory,
   deleteGroupItemCategory,
@@ -33,20 +34,24 @@ export default function ShopCategoriesModal({
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useEffect(() => {
     if (!isOpen) {
       setEditingId(null);
       setForm(EMPTY_FORM);
+      setDeleteTarget(null);
     }
   }, [isOpen]);
 
   const startCreate = () => {
+    setDeleteTarget(null);
     setEditingId('new');
     setForm(EMPTY_FORM);
   };
 
   const startEdit = (category) => {
+    setDeleteTarget(null);
     setEditingId(category.id);
     setForm({
       name: category.name,
@@ -84,9 +89,13 @@ export default function ShopCategoriesModal({
     onChanged?.();
   }, [editingId, form.color, form.name, groupId, onChanged, showError, showSuccess]);
 
-  const handleDelete = useCallback(async (categoryId) => {
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) {
+      return;
+    }
+
     setIsSubmitting(true);
-    const result = await deleteGroupItemCategory(groupId, categoryId);
+    const result = await deleteGroupItemCategory(groupId, deleteTarget.id);
     setIsSubmitting(false);
 
     if (!result.ok) {
@@ -95,8 +104,9 @@ export default function ShopCategoriesModal({
     }
 
     showSuccess('Kategoria została usunięta.');
+    setDeleteTarget(null);
     onChanged?.();
-  }, [groupId, onChanged, showError, showSuccess]);
+  }, [deleteTarget, groupId, onChanged, showError, showSuccess]);
 
   return (
     <Modal
@@ -124,7 +134,7 @@ export default function ShopCategoriesModal({
                 <button
                   type="button"
                   className="shop-categories-modal__btn shop-categories-modal__btn--danger"
-                  onClick={() => handleDelete(category.id)}
+                  onClick={() => setDeleteTarget(category)}
                   disabled={isSubmitting}
                 >
                   Usuń
@@ -137,15 +147,44 @@ export default function ShopCategoriesModal({
           ) : null}
         </ul>
 
+        {deleteTarget ? (
+          <div className="shop-categories-modal__confirm" role="alertdialog" aria-labelledby="shop-category-delete-title">
+            <p id="shop-category-delete-title" className="shop-categories-modal__confirm-text">
+              Czy na pewno chcesz usunąć kategorię „{deleteTarget.name}”?
+            </p>
+            <div className="shop-categories-modal__confirm-actions">
+              <button
+                type="button"
+                className="shop-categories-modal__btn"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isSubmitting}
+              >
+                Anuluj
+              </button>
+              <button
+                type="button"
+                className="shop-categories-modal__btn shop-categories-modal__btn--danger"
+                onClick={handleDeleteConfirm}
+                disabled={isSubmitting}
+              >
+                Usuń kategorię
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         {editingId ? (
           <div className="shop-categories-modal__editor">
             <label className="shop-categories-modal__field">
               <span>Nazwa*</span>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-              />
+              <CharacterLimitedField value={form.name} maxLength={ITEM_CATEGORY_NAME_MAX_LENGTH}>
+                <input
+                  type="text"
+                  value={form.name}
+                  maxLength={ITEM_CATEGORY_NAME_MAX_LENGTH}
+                  onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
+                />
+              </CharacterLimitedField>
             </label>
             <label className="shop-categories-modal__field shop-categories-modal__field--color">
               <span>Kolor</span>

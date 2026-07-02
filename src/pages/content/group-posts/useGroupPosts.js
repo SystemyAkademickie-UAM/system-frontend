@@ -119,7 +119,8 @@ export function useGroupPosts() {
         throw new Error('Nie udało się utworzyć wpisu.');
       }
 
-      showSuccess('Wpis został dodany.');      await fetchPosts();
+      showSuccess('Wpis został dodany.');
+      await fetchPosts();
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -141,11 +142,12 @@ export function useGroupPosts() {
     try {
       const patchBody = { title, content: text };
 
-      if (startHidden) {
+      if (schedulePublish && publishAt) {
+        patchBody.isPublished = false;
+        patchBody.publishAt = publishAt;
+      } else if (startHidden) {
         patchBody.isPublished = false;
         patchBody.publishAt = null;
-      } else if (schedulePublish && publishAt) {
-        patchBody.publishAt = publishAt;
       } else if (isPublished === false) {
         patchBody.isPublished = false;
         patchBody.publishAt = null;
@@ -154,7 +156,8 @@ export function useGroupPosts() {
         patchBody.publishAt = null;
       }
 
-      const data = await requestJson(`/groups/${groupId}/post/${postId}`, {        method: 'PATCH',
+      const data = await requestJson(`/groups/${groupId}/post/${postId}`, {
+        method: 'PATCH',
         body: JSON.stringify(patchBody),
       });
 

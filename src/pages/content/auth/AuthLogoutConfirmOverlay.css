@@ -1,11 +1,17 @@
 .auth-logout-confirm {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: var(--z-index-modal);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding:
+    max(1rem, env(safe-area-inset-top, 0px))
+    max(1rem, env(safe-area-inset-right, 0px))
+    max(1rem, env(safe-area-inset-bottom, 0px))
+    max(1rem, env(safe-area-inset-left, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .auth-logout-confirm__backdrop {
@@ -20,12 +26,15 @@
   position: relative;
   z-index: 1;
   box-sizing: border-box;
-  width: min(420px, 100%);
+  width: min(420px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto 0;
   padding: 32px 28px 24px;
   background: #343440;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.55);
+  overflow-y: auto;
 }
 
 .auth-logout-confirm__title {

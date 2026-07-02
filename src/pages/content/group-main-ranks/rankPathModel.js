@@ -1,5 +1,6 @@
 import { getRankGradientColor, RANK_LOCKED_COLOR } from '../../../utils/rankGradient.js';
 import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
+import { resolveRankIdFromTotalEarned } from '../../../utils/ranks/autoRankAssignment.js';
 
 /**
  * @typedef {Object} RankPathRank
@@ -31,6 +32,20 @@ import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks
 
 /**
  * @param {object} rank
+ * @returns {number}
+ */
+export function mapRankDiscountValue(rank) {
+  if (rank.globalDiscountType === 'percent') {
+    return Number(rank.globalDiscountValue ?? 0);
+  }
+  if (rank.globalDiscountType === 'fixed') {
+    return Number(rank.globalDiscountValue ?? 0);
+  }
+  return Number(rank.discount ?? 0);
+}
+
+/**
+ * @param {object} rank
  * @param {number} index
  * @returns {Omit<RankPathRank, 'accentColor' | 'isUnlocked'>}
  */
@@ -46,8 +61,8 @@ export function mapRankForPath(rank, index) {
     costAmount: rank.requiredPoints ?? 0,
     storyDescription: rank.storyDescription || '',
     shopItems: rank.uniqueStoreItems || [],
-    storeDiscount: rank.storeDiscount || 0,
-    discount: Number(rank.discount ?? 0),
+    storeDiscount: rank.globalDiscountValue ?? rank.storeDiscount ?? 0,
+    discount: mapRankDiscountValue(rank),
   };
 }
 
@@ -85,6 +100,46 @@ export function applyStudentRankStates(ranks, totalEarned) {
     ...rank,
     accentColor: rank.isUnlocked ? rank.accentColor : RANK_LOCKED_COLOR,
   }));
+}
+
+/**
+ * @param {ReturnType<typeof mapRankForPath>[]} ranks
+ * @param {number | null | undefined} assignedRankDbId
+ * @returns {ReturnType<typeof mapRankForPath>[]}
+ */
+export function applyManualStudentRankStates(ranks, assignedRankDbId) {
+  const assignedIndex = ranks.findIndex((rank) => rank.dbId === assignedRankDbId);
+  const total = ranks.length;
+
+  return ranks.map((rank, index) => {
+    const accentColor = getRankGradientColor(index, total);
+    const isUnlocked = assignedIndex >= 0 && index <= assignedIndex;
+
+    return {
+      ...rank,
+      accentColor: isUnlocked ? accentColor : RANK_LOCKED_COLOR,
+      isUnlocked,
+    };
+  });
+}
+
+/**
+ * @param {number[]} rowCenters
+ * @param {ReturnType<typeof mapRankForPath>[]} ranks
+ * @param {number | null | undefined} assignedRankDbId
+ * @returns {number}
+ */
+export function getStudentManualRankProgressPx(rowCenters, ranks, assignedRankDbId) {
+  if (rowCenters.length === 0) {
+    return 0;
+  }
+
+  const assignedIndex = ranks.findIndex((rank) => rank.dbId === assignedRankDbId);
+  if (assignedIndex < 0) {
+    return rowCenters[0];
+  }
+
+  return rowCenters[assignedIndex];
 }
 
 /**
@@ -192,14 +247,30 @@ export function groupStudentsByRank(ranks, students) {
  * @returns {RankPathStudent}
  */
 export function mapStudentForRankPath(student, ranks) {
-  const matchedRank = ranks.find((rank) => rank.dbId === student.rankId);
+  const ranksForResolve = ranks.map((rank) => ({
+    id: rank.dbId,
+    requiredPoints: rank.costAmount,
+  }));
+
+  let effectiveDbRankId = student.rankId ?? null;
+  if (student.autoRankEnabled !== false) {
+    const computedRankId = resolveRankIdFromTotalEarned(
+      ranksForResolve,
+      student.totalEarned ?? 0,
+    );
+    if (computedRankId != null) {
+      effectiveDbRankId = computedRankId;
+    }
+  }
+
+  const matchedRank = ranks.find((rank) => rank.dbId === effectiveDbRankId);
   return {
     id: `student-${student.accountId}`,
     accountId: student.accountId,
     nickname: (student.nickname || `${student.name} ${student.surname}`.trim() || 'Student').trim(),
     avatarUrl: student.avatarUrl ?? null,
     totalEarned: student.totalEarned ?? 0,
-    dbRankId: student.rankId ?? null,
+    dbRankId: effectiveDbRankId,
     rankId: matchedRank?.id ?? null,
   };
 }

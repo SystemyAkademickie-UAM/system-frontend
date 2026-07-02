@@ -380,21 +380,21 @@ export const ROUTE_TABLE = [
   },
 
   {
-    id: 'app.templates.my',
-    section: 'app',
-    pathPattern: '/templates',
-    pageTitle: 'Szablony — moje szablony',
-    pageModule: 'pages/links/templates/TemplatesMyPage.jsx',
-    contentModule: 'pages/content/templates/TemplatesMyContent.jsx',
-    roles: ['lecturer', 'admin', 'superadmin'],
-  },
-  {
     id: 'app.templates.gallery',
     section: 'app',
-    pathPattern: '/templates/gallery',
+    pathPattern: '/templates',
     pageTitle: 'Szablony — galeria publiczna',
     pageModule: 'pages/links/templates/TemplatesGalleryPage.jsx',
     contentModule: 'pages/content/templates/TemplatesGalleryContent.jsx',
+    roles: ['lecturer', 'admin', 'superadmin'],
+  },
+  {
+    id: 'app.templates.my',
+    section: 'app',
+    pathPattern: '/templates/my',
+    pageTitle: 'Szablony — moje szablony',
+    pageModule: 'pages/links/templates/TemplatesMyPage.jsx',
+    contentModule: 'pages/content/templates/TemplatesMyContent.jsx',
     roles: ['lecturer', 'admin', 'superadmin'],
   },
 

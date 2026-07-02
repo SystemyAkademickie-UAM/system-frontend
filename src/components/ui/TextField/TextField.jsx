@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import CharacterLimitedField from '../CharacterCounter/CharacterLimitedField.jsx';
 import { TEXT_FIELD_PRESETS } from '../../../constants/fieldLimits.js';
-import { validateWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
+import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
 import './TextField.css';
 
 /**
@@ -71,7 +71,17 @@ export default function TextField({
   const controlProps = {
     id,
     value: value ?? '',
-    onChange,
+    onChange: type === 'number'
+      ? (event) => {
+        onChange({
+          ...event,
+          target: {
+            ...event.target,
+            value: sanitizeWholeNumberInput(event.target.value),
+          },
+        });
+      }
+      : onChange,
     className: controlClassName,
     placeholder,
     disabled,

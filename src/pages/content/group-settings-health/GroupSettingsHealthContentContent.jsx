@@ -8,6 +8,7 @@ import { Button, CharacterLimitedField, Divider, InfoTooltip, useToast } from '.
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
 import { LIVES_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../../../constants/lives.constants.js';
+import { sanitizeWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
 import { fetchGroupLivesConfig, updateGroupLivesConfig } from '../../../services/groupLives.api.js';
 import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { invalidateGroupLives } from '../../../services/groupLivesEvents.js';
@@ -15,10 +16,6 @@ import { findExtraLifeShopItem } from '../../../utils/shop/extraLifeItem.js';
 import ShopItemFormModal from '../group-shop/modals/ShopItemFormModal.jsx';
 import GroupSettingsHealthContentWindow from './GroupSettingsHealthContentWindow.jsx';
 import '../group-settings/GroupSettingsForm.css';
-
-function filterDigits(value) {
-  return value.replace(/\D/g, '');
-}
 
 function buildSnapshot({
   livesIcon,
@@ -238,7 +235,7 @@ export default function GroupSettingsHealthContentContent() {
   ].filter(Boolean).join(' ');
 
   return (
-    <div className="group-settings-form group-settings-form--drive-layout">
+    <div className="group-settings-form group-settings-form--drive-layout group-settings-form--lives">
       <section className="group-settings-form__panel" aria-label="System żyć">
         <SettingsSectionHeader title="System żyć" id="group-lives-title" />
 
@@ -286,7 +283,7 @@ export default function GroupSettingsHealthContentContent() {
                 </CharacterLimitedField>
               </div>
 
-              <div className="group-settings-form__field">
+              <div className="group-settings-form__field group-settings-form__field--value">
                 <label className="group-settings-form__label" htmlFor="group-lives-limit">
                   Limit żyć*
                   <InfoTooltip text="Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." />
@@ -296,12 +293,12 @@ export default function GroupSettingsHealthContentContent() {
                   className="group-settings-form__input group-settings-form__input--compact"
                   inputMode="numeric"
                   value={livesLimit}
-                  onChange={(event) => setLivesLimit(filterDigits(event.target.value))}
+                  onChange={(event) => setLivesLimit(sanitizeWholeNumberInput(event.target.value))}
                   disabled={isSaving || !livesEnabled}
                 />
               </div>
 
-              <div className="group-settings-form__field">
+              <div className="group-settings-form__field group-settings-form__field--value">
                 <label className="group-settings-form__label" htmlFor="group-lives-start">
                   Startowa liczba żyć*
                   <InfoTooltip text="Liczba szans, jaką student otrzymuje po dołączeniu do grupy." />
@@ -311,7 +308,7 @@ export default function GroupSettingsHealthContentContent() {
                   className="group-settings-form__input group-settings-form__input--compact"
                   inputMode="numeric"
                   value={livesStart}
-                  onChange={(event) => setLivesStart(filterDigits(event.target.value))}
+                  onChange={(event) => setLivesStart(sanitizeWholeNumberInput(event.target.value))}
                   disabled={isSaving || !livesEnabled}
                 />
               </div>

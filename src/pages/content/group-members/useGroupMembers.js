@@ -381,6 +381,12 @@ export function useGroupMembers() {
         rank: rankName,
         autoRankEnabled: isAutomatic,
       });
+
+      return {
+        ok: true,
+        isAutomatic,
+        assignedRankName: rankName,
+      };
     }
 
     return result;

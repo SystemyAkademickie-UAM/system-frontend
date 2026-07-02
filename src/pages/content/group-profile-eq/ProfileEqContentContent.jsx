@@ -12,6 +12,7 @@ import {
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import { useProfileInventory } from '../../../hooks/shop/useProfileInventory.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
+import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
 
@@ -113,6 +114,7 @@ export default function ProfileEqContentContent({
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [usingItemId, setUsingItemId] = useState(null);
+  const [confirmUseItem, setConfirmUseItem] = useState(null);
 
   const {
     entries,
@@ -140,21 +142,37 @@ export default function ProfileEqContentContent({
     [entries, searchQuery, categoryFilter],
   );
 
-  const handleUseItem = async (itemId) => {
-    setUsingItemId(itemId);
-    const result = await useItem(itemId);
+  const handleConfirmUseItem = async () => {
+    if (!confirmUseItem?.itemId) {
+      return;
+    }
+
+    setUsingItemId(confirmUseItem.itemId);
+    const result = await useItem(confirmUseItem.itemId);
     setUsingItemId(null);
 
     if (result.ok) {
       showSuccess('Przedmiot został użyty.');
+      setConfirmUseItem(null);
       return;
     }
 
     showError(result.error ?? 'Nie udało się użyć przedmiotu.');
   };
 
+  const openUseItemConfirm = (itemId, itemName) => {
+    if (readOnly) {
+      return;
+    }
+    setConfirmUseItem({ itemId, itemName });
+  };
+
   return (
     <div className="profile-eq-page">
+      <header className="profile-eq-page__header">
+        <h2 className="profile-eq-page__title">Ekwipunek</h2>
+      </header>
+
       {error ? (
         <p className="profile-eq-page__error" role="alert">{error}</p>
       ) : null}
@@ -241,7 +259,7 @@ export default function ProfileEqContentContent({
                 ownedQuantity={entry.quantity}
                 readOnly={readOnly}
                 disabled={usingItemId === entry.itemId}
-                onUse={() => handleUseItem(entry.itemId)}
+                onUse={() => openUseItemConfirm(entry.itemId, item.name)}
                 hideAddToCart
                 hideActions={readOnly}
               />
@@ -249,6 +267,18 @@ export default function ProfileEqContentContent({
           })}
         </div>
       )}
+
+      <ProfileEqUseItemModal
+        isOpen={confirmUseItem != null}
+        itemName={confirmUseItem?.itemName}
+        isLoading={usingItemId != null}
+        onClose={() => {
+          if (usingItemId == null) {
+            setConfirmUseItem(null);
+          }
+        }}
+        onConfirm={handleConfirmUseItem}
+      />
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
   groupsListPath,
   organizationsPath,
   statisticsPath,
-  templatesGalleryPath,
+  templatesMyPath,
   templatesPath,
   userManagementPath,
 } from '../routes/pathRegistry.js';
@@ -24,15 +24,18 @@ export const BREADCRUMB_BY_PATH = {
   [groupsListPath()]: [{ label: 'Grupy' }],
 
   [appSettingsPath()]: [{ label: 'Ustawienia' }],
-  [appHelpPath()]: [{ label: 'Centrum pomocy' }],
+  [appHelpPath()]: [
+    { label: 'Ustawienia', path: () => appSettingsPath() },
+    { label: 'Centrum pomocy' },
+  ],
 
   [userManagementPath()]: [{ label: 'Zarządzanie dostępem' }],
   [courseManagementPath()]: [{ label: 'Zarządzanie grupami' }],
   [statisticsPath()]: [{ label: 'Statystyki' }],
   [organizationsPath()]: [{ label: 'Zarządzanie organizacjami' }],
 
-  [templatesPath()]: [{ label: 'Szablony' }, { label: 'Moje szablony' }],
-  [templatesGalleryPath()]: [{ label: 'Szablony' }, { label: 'Galeria szablonów' }],
+  [templatesPath()]: [{ label: 'Szablony' }, { label: 'Galeria szablonów' }],
+  [templatesMyPath()]: [{ label: 'Szablony' }, { label: 'Moje szablony' }],
 };
 
 /** Ścieżki grupowe — dopasowanie po regex (kolejność ma znaczenie). */

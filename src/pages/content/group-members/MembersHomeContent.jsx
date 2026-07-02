@@ -133,9 +133,14 @@ export default function MembersHomeContent() {
     setModalLoading(false);
 
     if (result.ok) {
+      if (result.isAutomatic) {
+        showSuccess(`Włączono rangę automatyczną. Aktualna ranga: ${result.assignedRankName}.`);
+      } else {
+        showSuccess(`Przyznano rangę: ${result.assignedRankName}.`);
+      }
       closeModal();
     }
-  }, [activeModal, updateMemberRank, closeModal]);
+  }, [activeModal, updateMemberRank, closeModal, showSuccess]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.member) return;
@@ -180,17 +185,24 @@ export default function MembersHomeContent() {
               loading="lazy"
             />
           </span>
-          <div className="members-table__user-info">
-            {!member.isLecturer && groupId && member.accountId ? (
-              <Link
-                className="members-table__profile-link"
-                to={groupStudentProfilePath(groupId, member.accountId)}
-              >
-                {renderMemberNameLines(member)}
-              </Link>
-            ) : (
-              renderMemberNameLines(member)
-            )}
+          <div className="members-table__user-main">
+            <div className="members-table__user-info">
+              {!member.isLecturer && groupId && member.accountId ? (
+                <Link
+                  className="members-table__profile-link"
+                  to={groupStudentProfilePath(groupId, member.accountId)}
+                >
+                  {renderMemberNameLines(member)}
+                </Link>
+              ) : (
+                renderMemberNameLines(member)
+              )}
+            </div>
+            {!member.isLecturer ? (
+              <span className="members-table__mobile-total">
+                <CurrencyDisplay amount={member.totalCurrency} size="sm" />
+              </span>
+            ) : null}
           </div>
         </div>
       ),
@@ -204,9 +216,10 @@ export default function MembersHomeContent() {
       colClassName: 'members-table__col--rank',
       cellClassName: 'members-table__cell--rank',
       hiddenBelow: 768,
+      mobileHidden: true,
       render: (member) => (
         <span className="members-table__rank-cell">
-          <span className="members-table__rank-badge" title={member.rank}>{member.rank}</span>
+          <span className="members-table__cell-text">{member.rank}</span>
           {member.autoRankEnabled === false ? (
             <span className="members-table__rank-manual-note">*przyznawana ręcznie</span>
           ) : null}
@@ -222,6 +235,7 @@ export default function MembersHomeContent() {
       colClassName: 'members-table__col--badges',
       cellClassName: 'members-table__cell--badges',
       hiddenBelow: 768,
+      mobileHidden: true,
       render: (member) => (
         <span className="members-table__stat">
           {member.isLecturer ? '—' : member.badgesCount}
@@ -237,6 +251,7 @@ export default function MembersHomeContent() {
       colClassName: 'members-table__col--currency',
       cellClassName: 'members-table__cell--currency',
       hiddenBelow: 480,
+      mobileHidden: true,
       render: (member) => (
         member.isLecturer
           ? <span className="members-table__stat">—</span>
@@ -252,6 +267,7 @@ export default function MembersHomeContent() {
       colClassName: 'members-table__col--total',
       cellClassName: 'members-table__cell--total',
       hiddenBelow: 768,
+      mobileHidden: true,
       render: (member) => (
         member.isLecturer
           ? <span className="members-table__stat">—</span>
@@ -362,6 +378,10 @@ export default function MembersHomeContent() {
           }}
           rowActions={rowActions}
           renderRow={MembersTableRow}
+          shouldRenderRowActions={(member) => !member.isLecturer}
+          getMobileItemClassName={(member) => (
+            member.isLecturer ? 'members-table__row--lecturer' : ''
+          )}
         />
       )}
 

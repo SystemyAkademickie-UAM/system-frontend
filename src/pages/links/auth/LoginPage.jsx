@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import AuthStepTransition from '../../../components/layout/AuthStepTransition.jsx';
+import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import {
   AUTH_LOGIN_ACCEPT_EULA_PATH,
@@ -21,6 +22,10 @@ import {
 } from '../../../constants/loginFlow.constants.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
+import {
+  clearClientAuthState,
+  endClientLogout,
+} from '../../../auth/clientAuthState.js';
 import { isLogoutAvailable, logoutUser } from '../../../services/authService.js';
 import { homePath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
@@ -32,8 +37,13 @@ import {
   RegisterProfile,
 } from '../../content/auth/index.js';
 
+/** Blokuje drugi toast po remouncie (StrictMode) lub ponownym uruchomieniu efektu. */
+let logoutSuccessToastHandled = false;
+
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { showSuccess } = useToast();
   const session = useSessionOptional();
   const { refetchProfile } = useUserProfile();
   const [step, setStep] = useState(LOGIN_FLOW_STEP_PIONIER);
@@ -46,12 +56,32 @@ export default function LoginPage() {
   const [isLogoutBusy, setIsLogoutBusy] = useState(false);
   const [logoutError, setLogoutError] = useState(null);
   const samlRecoveryAttemptedRef = useRef(false);
+  const postLogoutLandingRef = useRef(false);
+
+  useEffect(() => {
+    if (searchParams.get('loggedOut') !== '1') {
+      logoutSuccessToastHandled = false;
+      return;
+    }
+
+    postLogoutLandingRef.current = true;
+    clearClientAuthState();
+    endClientLogout();
+    setSearchParams({}, { replace: true });
+
+    if (!logoutSuccessToastHandled) {
+      logoutSuccessToastHandled = true;
+      showSuccess('Wylogowano pomyślnie.');
+    }
+
+    void session?.refetchSession?.({ force: true });
+  }, [searchParams, setSearchParams, showSuccess, session?.refetchSession]);
 
   useEffect(() => {
     if (session?.isLoading || session?.isAuthenticated) {
       return;
     }
-    if (samlRecoveryAttemptedRef.current) {
+    if (samlRecoveryAttemptedRef.current || postLogoutLandingRef.current) {
       return;
     }
 
@@ -61,6 +91,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (session?.isLoading) {
+      return;
+    }
+
+    if (postLogoutLandingRef.current) {
+      setRegistrationCheckDone(true);
+      if (!session?.isAuthenticated) {
+        postLogoutLandingRef.current = false;
+      }
       return;
     }
 
@@ -153,10 +191,10 @@ export default function LoginPage() {
     setIsLogoutConfirmOpen(false);
   }, []);
 
-  const handleLogoutFailed = useCallback(async () => {
+  const handleLogoutFailed = useCallback(() => {
     setIsLogoutBusy(false);
-    await session?.refetchSession?.();
     resetLoginWizardAfterLogout();
+    void session?.refetchSession?.();
   }, [resetLoginWizardAfterLogout, session]);
 
   const handleLogoutConfirm = useCallback(() => {
@@ -167,9 +205,9 @@ export default function LoginPage() {
     }
     setIsLogoutBusy(true);
     void logoutUser(() => {
-      void handleLogoutFailed();
-    });
-  }, [handleLogoutFailed]);
+      handleLogoutFailed();
+    }, { navigate });
+  }, [handleLogoutFailed, navigate]);
 
   const handleProfileContinue = useCallback(async ({ nickname, avatarId }) => {
     setProfileError(null);

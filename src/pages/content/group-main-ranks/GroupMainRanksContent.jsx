@@ -50,7 +50,14 @@ const EMPTYLINKLABEL__TEXTLABEL = {
   english: 'Add them in the rewards system',
 };
 
-export default function GroupMainRanksContent({ embedded = false, showMemberAvatars: showMemberAvatarsOverride }) {
+export default function GroupMainRanksContent({
+  embedded = false,
+  showMemberAvatars: showMemberAvatarsOverride,
+  showLecturerActions = false,
+  onEditRank,
+  onDeleteRank,
+  onAssignRank,
+}) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
   const {
@@ -79,7 +86,7 @@ export default function GroupMainRanksContent({ embedded = false, showMemberAvat
     }, 350);
 
     return () => window.clearTimeout(timer);
-  }, [isStudentView, isLoading, ranks.length, studentProfile?.totalEarned]);
+  }, [isStudentView, isLoading, ranks.length, studentProfile?.totalEarned, studentProfile?.rankId, studentProfile?.autoRankEnabled]);
 
   if (isLoading) {
     return <p className="group-main-ranks__message" role="status">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>;
@@ -122,12 +129,17 @@ export default function GroupMainRanksContent({ embedded = false, showMemberAvat
           isStudentView={isStudentView}
           showMemberAvatars={showMemberAvatars}
           totalEarned={studentProfile?.totalEarned ?? 0}
+          studentRankId={studentProfile?.rankId ?? null}
+          studentAutoRankEnabled={studentProfile?.autoRankEnabled !== false}
           studentNickname={studentProfile?.nickname || studentProfile?.name || STUDENTNAME__TEXTLABEL[LANGUAGE]}
           studentAvatarUrl={studentProfile?.avatarUrl ?? null}
           showHeader={false}
+          showLecturerActions={showLecturerActions}
+          onEditRank={onEditRank}
+          onDeleteRank={onDeleteRank}
+          onAssignRank={onAssignRank}
         />
       )}
     </section>
   );
 }
-

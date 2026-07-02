@@ -61,8 +61,8 @@ export default function Rank({
               />
               <span>{formatRankDiscountLabel(discountPercent)}</span>
             </li>
-            {shopItems.map((item) => (
-              <li key={item} className="maq-rank__shop-item">
+            {shopItems.map((item, index) => (
+              <li key={`rank-shop-item-${index}-${String(item)}`} className="maq-rank__shop-item">
                 <AssetSvg
                   name={SVG_ICONS.status.checkCircle}
                   className="maq-rank__check-icon"

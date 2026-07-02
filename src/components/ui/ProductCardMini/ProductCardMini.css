@@ -7,6 +7,9 @@
 
 .maq-product-card-mini__thumb-wrap {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 8px;
@@ -21,12 +24,9 @@
   object-fit: cover;
 }
 
-.maq-product-card-mini__thumb-fallback {
-  display: block;
-  width: 100%;
-  height: 100%;
-  padding: 0.35rem;
-  opacity: 0.65;
+.maq-product-card-mini__thumb-emoji {
+  font-size: 1.35rem;
+  line-height: 1;
 }
 
 .maq-product-card-mini__content {

@@ -23,6 +23,7 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {string | null} avatarUrl
  * @property {number | null} rankId
  * @property {string | null} rankName
+ * @property {boolean} [autoRankEnabled]
  * @property {number} currency
  * @property {number} totalEarned
  * @property {number} badgesCount

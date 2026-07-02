@@ -12,6 +12,7 @@ import {
   buildBannerImageRefPayload,
   createDefaultBannerPickerValue,
 } from '../../../utils/groupBannerRef.js';
+import { validateGroupBannerFile } from '../../../utils/groupBannerUpload.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupsListCreator.css';
 
@@ -231,6 +232,10 @@ export default function GroupsListCreator({ onClose, onCreated }) {
 
   async function resolveImageRefForSave(base, browserid) {
     if (bannerSelection.mode === 'file' && bannerSelection.file) {
+      const validation = validateGroupBannerFile(bannerSelection.file);
+      if (!validation.valid) {
+        throw new Error(validation.error ?? 'Plik banera jest nieprawidłowy.');
+      }
       return uploadBannerToDrive(base, browserid, bannerSelection.file);
     }
     return buildBannerImageRefPayload(bannerSelection);
@@ -350,7 +355,12 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               .filter(Boolean)
               .join(' ')}
           >
-            <section className="groups-list-creator__step" aria-label={GROUPDATALABEL__TEXTLABEL[LANGUAGE]} aria-hidden={step !== 1}>
+            <section
+              className="groups-list-creator__step"
+              aria-label={GROUPDATALABEL__TEXTLABEL[LANGUAGE]}
+              aria-hidden={step !== 1}
+              inert={step !== 1}
+            >
               <div className="groups-list-creator__panel groups-list-creator__panel--compact">
                 <div className="groups-list-creator__fields">
                   <div className="groups-list-creator__field">
@@ -415,6 +425,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               className="groups-list-creator__step groups-list-creator__step--banner"
               aria-label={BANNERLABEL__TEXTLABEL[LANGUAGE]}
               aria-hidden={step !== 2}
+              inert={step !== 2}
             >
               <div className="groups-list-creator__panel groups-list-creator__panel--banner">
                 <GroupBannerPicker

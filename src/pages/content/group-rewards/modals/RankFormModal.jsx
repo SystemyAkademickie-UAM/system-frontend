@@ -1,52 +1,28 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Modal } from '../../../../components/ui/index.js';
+import { useEffect, useMemo, useState } from 'react';
+import { Button, Modal, TextField } from '../../../../components/ui/index.js';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import { DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
-import { calculateDefaultRankDiscount } from '../../../../utils/ranks/rankDiscount.js';
-import { validateDiscountPercentInput, validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
-import RankUnlockItemChecklist from '../shared/RankUnlockItemChecklist.jsx';
+import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import RewardsCurrencyLabel from '../shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
 
 const EMPTY_FORM = {
   name: '',
   icon: DEFAULT_RANK_EMOJI,
   costAmount: '',
-  discount: '',
   storyDescription: '',
-  selectedShopItems: [],
 };
-
-function normalizeRankShopItemIds(items = []) {
-  return items.map((item) => String(item).trim()).filter(Boolean);
-}
 
 export default function RankFormModal({
   isOpen,
   rank,
-  existingRanks = [],
-  shopCatalogItems = [],
   onClose,
   onConfirm,
+  onOpenDiscountModal,
+  onOpenUnlockItemsModal,
 }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const isEdit = Boolean(rank);
-
-  const rankRefs = useMemo(
-    () => existingRanks.map((entry) => ({
-      dbId: entry.dbId,
-      name: entry.name,
-      shopItems: entry.shopItems ?? [],
-    })),
-    [existingRanks],
-  );
-
-  const catalogItems = useMemo(
-    () => shopCatalogItems.map((item) => ({
-      id: String(item.id),
-      name: item.name,
-    })),
-    [shopCatalogItems],
-  );
 
   useEffect(() => {
     if (!isOpen) return;
@@ -56,27 +32,17 @@ export default function RankFormModal({
         name: rank.name,
         icon: rank.icon || rank.iconFile || DEFAULT_RANK_EMOJI,
         costAmount: String(rank.costAmount),
-        discount: rank.discount === 0 || rank.discount ? String(rank.discount) : '',
         storyDescription: rank.storyDescription,
-        selectedShopItems: normalizeRankShopItemIds(rank.shopItems ?? []),
       });
       return;
     }
 
-    setForm({
-      ...EMPTY_FORM,
-      discount: String(calculateDefaultRankDiscount(existingRanks)),
-    });
-  }, [isOpen, rank, existingRanks]);
+    setForm(EMPTY_FORM);
+  }, [isOpen, rank]);
 
   const costValidation = useMemo(
     () => validateWholeNumberInput(form.costAmount),
     [form.costAmount],
-  );
-
-  const discountValidation = useMemo(
-    () => validateDiscountPercentInput(form.discount),
-    [form.discount],
   );
 
   const isValid = useMemo(() => (
@@ -84,42 +50,26 @@ export default function RankFormModal({
     && form.icon.trim()
     && form.storyDescription.trim()
     && costValidation.valid
-    && discountValidation.valid
-  ), [form, costValidation.valid, discountValidation.valid]);
+  ), [form, costValidation.valid]);
 
   const showCostError = form.costAmount.trim() !== '' && !costValidation.valid;
-  const showDiscountError = form.discount.trim() !== '' && !discountValidation.valid;
 
   const handleChange = (field) => (event) => {
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+    const nextValue = field === 'costAmount'
+      ? sanitizeWholeNumberInput(event.target.value)
+      : event.target.value;
+    setForm((prev) => ({ ...prev, [field]: nextValue }));
   };
-
-  const handleShopItemToggle = useCallback((itemId, checked) => {
-    setForm((prev) => {
-      const next = new Set(prev.selectedShopItems);
-      if (checked) {
-        next.add(itemId);
-      } else {
-        next.delete(itemId);
-      }
-      return { ...prev, selectedShopItems: Array.from(next) };
-    });
-  }, []);
 
   const handleConfirm = () => {
     if (!isValid) return;
-
-    const catalogIds = new Set(catalogItems.map((item) => String(item.id)));
-    const shopItems = form.selectedShopItems.filter((itemId) => catalogIds.has(itemId));
 
     onConfirm?.({
       name: form.name.trim(),
       icon: form.icon.trim(),
       iconFile: form.icon.trim(),
       costAmount: costValidation.value,
-      discount: discountValidation.value,
       storyDescription: form.storyDescription.trim(),
-      shopItems,
     });
   };
 
@@ -134,98 +84,89 @@ export default function RankFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        <div className="rewards-modal__field">
-          <label htmlFor="rank-name" className="rewards-modal__label">Nazwa*</label>
-          <input
+        <div className="rewards-modal__row rewards-modal__row--name-reward">
+          <TextField
             id="rank-name"
-            type="text"
-            className="rewards-modal__input"
+            label="Nazwa*"
+            fieldKind="name"
             value={form.name}
             onChange={handleChange('name')}
+            className="rewards-modal__field"
+            inputClassName="rewards-modal__input"
+          />
+
+          <div className="rewards-modal__field">
+            <RewardsCurrencyLabel htmlFor="rank-cost">Koszt*</RewardsCurrencyLabel>
+            <input
+              id="rank-cost"
+              type="text"
+              inputMode="numeric"
+              className={[
+                'rewards-modal__input',
+                showCostError ? 'rewards-modal__input--error' : '',
+              ].filter(Boolean).join(' ')}
+              value={form.costAmount}
+              onChange={handleChange('costAmount')}
+              placeholder="np. 100"
+              aria-invalid={showCostError}
+              aria-describedby={showCostError ? 'rank-cost-error' : undefined}
+            />
+            {showCostError ? (
+              <p id="rank-cost-error" className="rewards-modal__field-error" role="alert">
+                {costValidation.error}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="rewards-modal__row rewards-modal__row--icon-only">
+          <EmojiPickerField
+            className="rewards-modal__field rewards-modal__field--icon"
+            label="Ikona"
+            value={form.icon}
+            defaultEmoji={DEFAULT_RANK_EMOJI}
+            onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
+            ariaLabel="Wybierz emoji rangi"
           />
         </div>
 
-        <EmojiPickerField
+        <TextField
+          id="rank-story"
+          label="Status fabularny*"
+          fieldKind="shortDescription"
+          value={form.storyDescription}
+          onChange={handleChange('storyDescription')}
           className="rewards-modal__field"
-          label="Ikona"
-          value={form.icon}
-          defaultEmoji={DEFAULT_RANK_EMOJI}
-          onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
-          ariaLabel="Wybierz emoji rangi"
+          inputClassName="rewards-modal__textarea"
         />
 
-        <div className="rewards-modal__field">
-          <label htmlFor="rank-cost" className="rewards-modal__label">Całkowita waluta niezbędna do uzyskania rangi*</label>
-          <input
-            id="rank-cost"
-            type="text"
-            inputMode="numeric"
-            className={[
-              'rewards-modal__input',
-              showCostError ? 'rewards-modal__input--error' : '',
-            ].filter(Boolean).join(' ')}
-            value={form.costAmount}
-            onChange={handleChange('costAmount')}
-            placeholder="np. 100"
-            aria-invalid={showCostError}
-            aria-describedby={showCostError ? 'rank-cost-error' : undefined}
-          />
-          {showCostError ? (
-            <p id="rank-cost-error" className="rewards-modal__field-error" role="alert">
-              {costValidation.error}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="rewards-modal__field">
-          <label htmlFor="rank-discount" className="rewards-modal__label">Zniżka w sklepie (%)</label>
-          <input
-            id="rank-discount"
-            type="text"
-            inputMode="decimal"
-            className={[
-              'rewards-modal__input',
-              showDiscountError ? 'rewards-modal__input--error' : '',
-            ].filter(Boolean).join(' ')}
-            value={form.discount}
-            onChange={handleChange('discount')}
-            placeholder="np. 15"
-            aria-invalid={showDiscountError}
-            aria-describedby={showDiscountError ? 'rank-discount-error' : 'rank-discount-hint'}
-          />
-          <p id="rank-discount-hint" className="rewards-modal__field-hint">
-            Domyślnie: 5% + zniżka najwyższej rangi. Możesz wyczyścić pole.
-          </p>
-          {showDiscountError ? (
-            <p id="rank-discount-error" className="rewards-modal__field-error" role="alert">
-              {discountValidation.error}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="rewards-modal__field">
-          <label htmlFor="rank-story" className="rewards-modal__label">Opis fabularny*</label>
-          <textarea
-            id="rank-story"
-            className="rewards-modal__textarea"
-            value={form.storyDescription}
-            onChange={handleChange('storyDescription')}
-          />
-        </div>
-
-        <div className="rewards-modal__field">
-          <span className="rewards-modal__label">Odblokowane przedmioty</span>
-          <p className="rewards-modal__field-hint">
-            Przedmioty niezaznaczone są domyślnie dostępne dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang.
-          </p>
-          <RankUnlockItemChecklist
-            catalogItems={catalogItems}
-            ranks={rankRefs}
-            currentRankDbId={rank?.dbId ?? null}
-            selectedIds={form.selectedShopItems}
-            onToggle={handleShopItemToggle}
-          />
-        </div>
+        {isEdit && (onOpenDiscountModal || onOpenUnlockItemsModal) ? (
+          <div className="rewards-modal__field rewards-modal__field--inline-actions">
+            <span className="rewards-modal__label">Dodatkowe ustawienia</span>
+            <div className="rewards-modal__inline-actions">
+              {onOpenDiscountModal ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => onOpenDiscountModal(rank)}
+                >
+                  Zniżka w sklepie
+                </Button>
+              ) : null}
+              {onOpenUnlockItemsModal ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => onOpenUnlockItemsModal(rank)}
+                >
+                  Odblokowane przedmioty
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
       </div>
     </Modal>
   );

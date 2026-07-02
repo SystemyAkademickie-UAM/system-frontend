@@ -309,7 +309,7 @@
   align-items: center;
 }
 
-.maq-product-card__price-tooltip {
+.maq-product-card__price-hover {
   flex-shrink: 0;
 }
 
@@ -436,6 +436,14 @@
 }
 
 
+
+.maq-product-card--extra-life {
+  background: color-mix(in srgb, #7f1d1d 18%, var(--color-bg-surface));
+}
+
+.maq-product-card--extra-life .maq-product-card__header {
+  border-bottom-color: color-mix(in srgb, #f87171 45%, var(--product-card-stroke-color));
+}
 
 .maq-product-card--extra-life .maq-product-card__buy-btn,
 

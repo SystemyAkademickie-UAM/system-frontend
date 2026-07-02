@@ -1,0 +1,42 @@
+.super-bar-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.super-bar-back:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.super-bar-back:focus-visible {
+  outline: 2px solid var(--color-nav-link);
+  outline-offset: 2px;
+}
+
+.super-bar-back__icon {
+  display: block;
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 899px) {
+  .super-bar-back {
+    width: 38px;
+    height: 38px;
+  }
+
+  .super-bar-back__icon {
+    width: 24px;
+    height: 24px;
+  }
+}

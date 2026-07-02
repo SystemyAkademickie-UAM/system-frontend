@@ -41,6 +41,15 @@
   border-color: var(--color-input-error-border);
 }
 
+.maq-toast--info {
+  border-color: #4287f3;
+  background: color-mix(in srgb, #4287f3 16%, var(--color-bg-elevated));
+}
+
+.maq-toast--info .maq-toast__emphasis {
+  color: #93c5fd;
+}
+
 .maq-toast__content {
   flex: 1 1 auto;
   display: flex;

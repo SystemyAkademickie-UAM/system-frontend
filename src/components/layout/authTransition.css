@@ -3,7 +3,8 @@
   width: 100%;
   display: grid;
   justify-items: center;
-  overflow: hidden;
+  overflow: visible;
+  padding-bottom: 1rem;
 }
 
 .auth-shell__transition-pane {

@@ -160,3 +160,63 @@
 .notification-bell__view-all:hover {
   background: rgba(30, 204, 56, 0.25);
 }
+
+@media (max-width: 899px) {
+  .notification-bell {
+    flex-shrink: 0;
+  }
+
+  .notification-bell__trigger {
+    width: 26px;
+    height: 26px;
+  }
+
+  .notification-bell__icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .notification-bell__badge {
+    top: -0.2rem;
+    right: -0.3rem;
+    min-width: 0.95rem;
+    height: 0.95rem;
+    padding: 0 0.15rem;
+    font-size: 0.58rem;
+    line-height: 0.95rem;
+  }
+
+  .notification-bell__panel {
+    position: fixed;
+    top: calc(3.25rem + 0.35rem);
+    right: 0.65rem;
+    left: auto;
+    width: min(17rem, calc(100vw - 1.3rem));
+    max-width: none;
+    max-height: min(18rem, calc(100dvh - 3.25rem - 1.25rem));
+  }
+
+  .notification-bell__panel-head,
+  .notification-bell__footer {
+    padding: 0.55rem 0.75rem;
+  }
+
+  .notification-bell__list {
+    padding: 0.35rem;
+  }
+
+  .notification-bell__list .notifications-feed__item {
+    padding: 0.55rem 0.65rem;
+  }
+
+  .notification-bell__list .notifications-feed__item-title,
+  .notification-bell__list .notifications-feed__item-message {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .notification-bell__list .notifications-feed__mark-read {
+    width: 2rem;
+    height: 2rem;
+  }
+}

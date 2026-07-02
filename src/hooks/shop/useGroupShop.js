@@ -95,6 +95,42 @@ export function useGroupShopItems(groupId) {
     return { ok: true, item: result.item };
   }, [groupId]);
 
+  const toggleAllPublished = useCallback(async (itemsToUpdate) => {
+    if (!groupId || !Array.isArray(itemsToUpdate) || itemsToUpdate.length === 0) {
+      return { ok: false, error: 'Brak produktów do aktualizacji' };
+    }
+
+    const targetPublished = itemsToUpdate.some((item) => item.isPublished === false);
+    const itemsNeedingUpdate = itemsToUpdate.filter((item) => (
+      (item.isPublished !== false) !== targetPublished
+    ));
+
+    if (itemsNeedingUpdate.length === 0) {
+      return { ok: true, changed: 0, targetPublished };
+    }
+
+    const results = await Promise.all(
+      itemsNeedingUpdate.map((item) => updateGroupShopItem(groupId, item.id, {
+        isPublished: targetPublished,
+      })),
+    );
+
+    const failed = results.find((result) => !result.ok);
+    if (failed) {
+      return { ok: false, error: failed.error ?? 'Nie udało się zmienić widoczności produktów' };
+    }
+
+    const updatedById = new Map(
+      results
+        .filter((result) => result.ok && result.item)
+        .map((result) => [result.item.id, result.item]),
+    );
+
+    setItemsState((current) => current.map((item) => updatedById.get(item.id) ?? item));
+
+    return { ok: true, changed: itemsNeedingUpdate.length, targetPublished };
+  }, [groupId]);
+
   const buyItem = useCallback(async (itemId) => {
     if (!groupId || !itemId) {
       return { ok: false, error: 'Brak identyfikatora produktu' };
@@ -116,6 +152,7 @@ export function useGroupShopItems(groupId) {
     refetch,
     deleteItem,
     updateItem,
+    toggleAllPublished,
     buyItem,
   };
 }

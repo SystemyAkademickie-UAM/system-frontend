@@ -1,6 +1,7 @@
 import { getBrowserIdForAuth } from '../../../auth/browserIdStorage.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidation.js';
+import { calculateDefaultRankDiscount } from '../../../utils/ranks/rankDiscount.js';
 
 const STAGES_PATH = '/stages';
 const ACTIVITIES_PATH = '/activities';
@@ -314,7 +315,9 @@ export async function seedGroupData({
       const title = pickRandom(RANK_TITLES);
       const name = `${title} ${uniqueLabel('Ranga')}`;
       const requiredPoints = (index + 1) * randomInt(80, 120);
-      const discount = 5 + seededDiscounts.reduce((max, value) => Math.max(max, value), 0);
+      const discount = calculateDefaultRankDiscount(
+        seededDiscounts.map((value) => ({ discount: value })),
+      );
 
       const { ok, status, data } = await postJson(`${baseUrl}${getGroupRanksPath(publicGroupId)}`, {
         name,

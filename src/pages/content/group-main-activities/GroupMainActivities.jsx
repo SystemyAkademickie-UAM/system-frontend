@@ -6,7 +6,7 @@ import {useAppRole} from '../../../context/AppRoleContext.jsx';
 import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
-import { Button } from '../../../components/ui/index.js';
+import { Button, CurrencyDisplay } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
 import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
@@ -617,10 +617,22 @@ export default function GroupMainActivities() {
                 ? `${completedcount} / ${totalactivities} ${COMPLETEDLABEL__TEXTLABEL[LANGUAGE]}`
                 : `${totalactivities} ${TOTALACTIVITIES__TEXTLABEL[LANGUAGE]}`}
             </span>
-            <span>
-              {isstudent === 1
-                ? `${EARNEDLABEL__TEXTLABEL[LANGUAGE]} ${earnedrewards} / ${totalrewards}`
-                : `${totalrewards} ${AVAILABLELABEL__TEXTLABEL[LANGUAGE]}`}
+            <span className="group-main-activities__stage-stat">
+              {isstudent === 1 ? (
+                <>
+                  {EARNEDLABEL__TEXTLABEL[LANGUAGE]}
+                  {' '}
+                  <CurrencyDisplay amount={earnedrewards} size="sm" />
+                  {' / '}
+                  <CurrencyDisplay amount={totalrewards} size="sm" />
+                </>
+              ) : (
+                <>
+                  <CurrencyDisplay amount={totalrewards} size="sm" />
+                  {' '}
+                  {AVAILABLELABEL__TEXTLABEL[LANGUAGE]}
+                </>
+              )}
             </span>
           </div>
         </header>
@@ -652,10 +664,18 @@ export default function GroupMainActivities() {
                   >
                     <img src={editicon} alt="" />
                   </button>
-                  <span className="group-main-activities__item-reward">{activity.reward}</span>
+                  <CurrencyDisplay
+                    amount={activity.reward}
+                    size="sm"
+                    className="group-main-activities__item-reward"
+                  />
                 </div>
               ) : (
-                <span className="group-main-activities__item-reward">{activity.reward}</span>
+                <CurrencyDisplay
+                  amount={activity.reward}
+                  size="sm"
+                  className="group-main-activities__item-reward"
+                />
               )}
             </article>
           ))}

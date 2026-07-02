@@ -28,6 +28,8 @@ import { getShopItemEffectivePrice } from '../../../utils/shop/shopPricing.js';
 import {
   filterCatalogShopItems,
   findExtraLifeShopItem,
+  isExtraLifePurchaseAtLimit,
+  isShopItemPurchaseDisabled,
   sortShopItemsWithExtraLifeFirst,
 } from '../../../utils/shop/extraLifeItem.js';
 import {
@@ -72,6 +74,7 @@ function buildPurchaseSummaryItem(item) {
     categoryId: item.categoryId,
     priceAmount: Number(item.priceAmount ?? 0),
     effectivePrice: getShopItemEffectivePrice(item),
+    isExtraLife: item.isExtraLife === true,
   };
 }
 
@@ -95,13 +98,23 @@ export default function GroupShopContent() {
     buyItem,
   } = useGroupShopItems(groupId);
 
-  const catalogItems = useMemo(() => {
-    const sourceItems = isStudentView
-      ? filterCatalogShopItems(items, true).filter((item) => item.isPublished !== false)
-      : sortShopItemsWithExtraLifeFirst(items);
+  const {
+    isGameOver,
+    showExtraLifeProduct,
+    livesMax,
+    studentLives,
+    refetch: refetchLives,
+  } = useGroupShopLivesSystem(groupId, { isStudentView });
 
-    return sourceItems;
-  }, [items, isStudentView]);
+  const catalogItems = useMemo(() => {
+    if (isStudentView) {
+      const publishedItems = items.filter((item) => item.isPublished !== false);
+      const sourceItems = filterCatalogShopItems(publishedItems, showExtraLifeProduct);
+      return sortShopItemsWithExtraLifeFirst(sourceItems);
+    }
+
+    return sortShopItemsWithExtraLifeFirst(items);
+  }, [items, isStudentView, showExtraLifeProduct]);
 
   const extraLifeProduct = useMemo(
     () => findExtraLifeShopItem(items),
@@ -117,12 +130,7 @@ export default function GroupShopContent() {
     removeFromCart,
     clearCart,
   } = useGroupShopCart(groupId, catalogItems);
-  const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
-  const {
-    isGameOver,
-    showExtraLifeProduct,
-    refetch: refetchLives,
-  } = useGroupShopLivesSystem(groupId, { isStudentView });
+  const { isShopOpen, toggleShopOpen, refetchShopOpen } = useGroupShopOpen(groupId);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -131,6 +139,7 @@ export default function GroupShopContent() {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshingShop, setIsRefreshingShop] = useState(false);
 
   const {
     categories,
@@ -153,7 +162,8 @@ export default function GroupShopContent() {
 
   const visibleItems = useMemo(() => {
     const filtered = filterShopItems(catalogItems, { searchQuery, categoryFilter });
-    return sortShopItems(filtered, sortBy);
+    const sorted = sortShopItems(filtered, sortBy);
+    return sortShopItemsWithExtraLifeFirst(sorted);
   }, [catalogItems, searchQuery, categoryFilter, sortBy]);
 
   const pagination = useMemo(
@@ -171,16 +181,57 @@ export default function GroupShopContent() {
     }
   }, [page, pagination.totalPages]);
 
+  const handleRefreshShop = useCallback(async () => {
+    if (isRefreshingShop) {
+      return;
+    }
+
+    setIsRefreshingShop(true);
+
+    const [itemsResult, openResult] = await Promise.all([
+      refetch({ silent: true }),
+      refetchShopOpen({ silent: true }),
+    ]);
+
+    setIsRefreshingShop(false);
+
+    if (itemsResult.ok && openResult.ok) {
+      showSuccess('Sklep został odświeżony.');
+      return;
+    }
+
+    showError(
+      itemsResult.error
+      ?? openResult.error
+      ?? 'Nie udało się odświeżyć sklepu.',
+    );
+  }, [isRefreshingShop, refetch, refetchShopOpen, showError, showSuccess]);
+
+  const isExtraLifeAtLimit = useMemo(
+    () => isExtraLifePurchaseAtLimit(studentLives, livesMax),
+    [studentLives, livesMax],
+  );
+
   const shopInteractionDisabled = !isShopOpen || (isStudentView && isGameOver);
-  const purchaseDisabled = shopInteractionDisabled || isLecturerView;
+  const purchaseOptions = useMemo(() => ({
+    isLecturerView,
+    isShopOpen,
+    isGameOver,
+    isExtraLifeAtLimit,
+  }), [isExtraLifeAtLimit, isGameOver, isLecturerView, isShopOpen]);
 
   const redirectAfterPurchase = useCallback((purchasedItems) => {
     if (!isStudentView || !groupId || purchasedItems.length === 0) {
       return false;
     }
 
+    const inventoryItems = purchasedItems.filter((item) => !item.isExtraLife);
+    if (inventoryItems.length === 0) {
+      return false;
+    }
+
     setShopPurchaseSummary(groupId, {
-      items: purchasedItems,
+      items: inventoryItems,
       currencyEmoji,
     });
     navigate(groupProfileEqPath(groupId));
@@ -201,6 +252,8 @@ export default function GroupShopContent() {
       return;
     }
 
+    const wasGameOver = activeModal.item.isExtraLife && isGameOver;
+
     if (activeModal.item.isExtraLife) {
       await refetchLives();
     }
@@ -211,12 +264,15 @@ export default function GroupShopContent() {
     }
 
     if (activeModal.item.isExtraLife) {
-      await refetchLives();
-      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
+      showSuccess(
+        wasGameOver
+          ? 'Dodatkowe życie zakupione. Sklep został odblokowany.'
+          : 'Dodatkowe życie zakupione.',
+      );
     } else {
       showSuccess('Produkt został zakupiony.');
     }
-  }, [activeModal, buyItem, closeModal, redirectAfterPurchase, refetchLives, showError, showSuccess]);
+  }, [activeModal, buyItem, closeModal, isGameOver, redirectAfterPurchase, refetchLives, showError, showSuccess]);
 
   const handleBuyAllConfirm = useCallback(async () => {
     if (cartItems.length === 0) {
@@ -299,6 +355,15 @@ export default function GroupShopContent() {
                   type="button"
                   variant="secondary"
                   size="md"
+                  onClick={handleRefreshShop}
+                  disabled={isRefreshingShop}
+                >
+                  Odśwież sklep
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
                   onClick={() => setActiveModal({ type: 'categories' })}
                 >
                   Kategorie
@@ -324,10 +389,11 @@ export default function GroupShopContent() {
               id: item.id,
               name: item.name,
               priceAmount: getShopItemEffectivePrice(item),
+              imageRef: item.imageRef,
               imageUrl: item.imageUrl,
             }))}
             cartTotal={cartTotal}
-            disabled={purchaseDisabled}
+            disabled={shopInteractionDisabled || isLecturerView}
             onBuyAll={() => setActiveModal({ type: 'buyAll' })}
             onRemoveFromCart={removeFromCart}
             className="group-shop__cart"
@@ -377,8 +443,9 @@ export default function GroupShopContent() {
           isClosed={!isShopOpen}
           isGameOver={isShopOpen && isGameOver}
           extraLifeProduct={showExtraLifeProduct ? extraLifeProduct : null}
+          extraLifeDisabled={isExtraLifeAtLimit}
           onExtraLifeBuy={() => {
-            if (extraLifeProduct) {
+            if (extraLifeProduct && !isExtraLifeAtLimit) {
               setActiveModal({ type: 'buy', item: extraLifeProduct });
             }
           }}
@@ -412,9 +479,9 @@ export default function GroupShopContent() {
           ) : (
             <>
               <div className="group-shop__grid">
-                {pagination.pageItems.map((item) => (
+                {pagination.pageItems.map((item, index) => (
                   <ProductCard
-                    key={item.id}
+                    key={`${item.id}-${index}`}
                     itemId={item.id}
                     name={item.name}
                     storyDescription={item.storyDescription}
@@ -425,17 +492,15 @@ export default function GroupShopContent() {
                     imageRef={item.imageRef}
                     categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
                     showLecturerActions={isLecturerView}
-                    disabled={purchaseDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0) || item.isLocked}
+                    disabled={isShopItemPurchaseDisabled(item, purchaseOptions)}
                     isRankLocked={!isLecturerView && item.isLocked}
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}
                     onAddToCart={() => addToCart(item.id)}
                     onEdit={() => setActiveModal({ type: 'itemForm', itemId: item.id })}
                     onDelete={item.isExtraLife ? undefined : () => setActiveModal({ type: 'delete', item })}
-                    className={[
-                      'group-shop__card',
-                      item.isExtraLife ? 'maq-product-card--extra-life' : '',
-                    ].filter(Boolean).join(' ')}
+                    isExtraLife={item.isExtraLife}
+                    className="group-shop__card"
                     hideAddToCart={item.isExtraLife}
                   />
                 ))}

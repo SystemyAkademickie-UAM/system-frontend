@@ -60,11 +60,40 @@
 
 @media (max-width: 599px) {
   .groups-list-hero {
+    position: relative;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .groups-list-hero__content {
+    flex: 1 1 auto;
+    padding-right: 4.25rem;
+  }
+
+  .groups-list-hero__eyebrow {
+    margin-bottom: 0.2rem;
+    font-size: var(--font-size-min);
+    letter-spacing: 0.08em;
+  }
+
+  .groups-list-hero__title {
+    margin-bottom: 0.35rem;
+    font-size: 1.375rem;
+    line-height: 1.2;
+  }
+
+  .groups-list-hero__description {
+    font-size: var(--font-size-min);
+    line-height: 1.35;
   }
 
   .groups-list-hero__logo-wrap {
-    align-self: flex-end;
+    position: absolute;
+    top: 0.875rem;
+    right: 1rem;
+    width: 3.75rem;
+    height: 3.75rem;
   }
 }

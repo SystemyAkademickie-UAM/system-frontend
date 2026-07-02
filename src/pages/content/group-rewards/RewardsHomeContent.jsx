@@ -26,6 +26,8 @@ import { useViewLayoutPreference } from '../../../hooks/useViewLayoutPreference.
 import ViewLayoutToggle from '../../../components/ui/ViewLayoutToggle/ViewLayoutToggle.jsx';
 import GroupMainRanksContent from '../group-main-ranks/GroupMainRanksContent.jsx';
 import RankFormModal from './modals/RankFormModal.jsx';
+import RankDiscountModal from './modals/RankDiscountModal.jsx';
+import RankUnlockItemsModal from './modals/RankUnlockItemsModal.jsx';
 
 const RANK_COLUMNS = [
   {
@@ -219,6 +221,67 @@ export default function RewardsHomeContent() {
     }
   }, [activeModal, handleAssign, closeModal, showSuccess, showError]);
 
+  const handleDiscountConfirm = useCallback(async (values) => {
+    if (!activeModal?.rank) return;
+    setModalLoading(true);
+    const result = await handleUpdate(activeModal.rank.id, values);
+    setModalLoading(false);
+    if (result.ok) {
+      showSuccess('Zniżka rangi została zaktualizowana.');
+      closeModal();
+    } else {
+      showError(result.error || 'Nie udało się zaktualizować zniżki.');
+    }
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
+
+  const handleUnlockItemsConfirm = useCallback(async (values) => {
+    if (!activeModal?.rank) return;
+    setModalLoading(true);
+    const result = await handleUpdate(activeModal.rank.id, values);
+    setModalLoading(false);
+    if (result.ok) {
+      showSuccess('Odblokowane przedmioty zostały zaktualizowane.');
+      closeModal();
+    } else {
+      showError(result.error || 'Nie udało się zaktualizować przedmiotów.');
+    }
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
+
+  const resolveRankByDbId = useCallback((dbId) => (
+    ranks.find((entry) => entry.dbId === dbId) ?? null
+  ), [ranks]);
+
+  const handleTileEditRank = useCallback((pathRank) => {
+    const rank = resolveRankByDbId(pathRank.dbId);
+    if (rank) {
+      openModal('edit', rank);
+    }
+  }, [resolveRankByDbId, openModal]);
+
+  const handleTileDeleteRank = useCallback((pathRank) => {
+    const rank = resolveRankByDbId(pathRank.dbId);
+    if (rank) {
+      openModal('delete', rank);
+    }
+  }, [resolveRankByDbId, openModal]);
+
+  const handleTileAssignRank = useCallback((pathRank) => {
+    const rank = resolveRankByDbId(pathRank.dbId);
+    if (rank) {
+      openModal('assign', rank);
+    }
+  }, [resolveRankByDbId, openModal]);
+
+  const handleOpenDiscountFromForm = useCallback((rank) => {
+    closeModal();
+    openModal('discount', rank);
+  }, [closeModal, openModal]);
+
+  const handleOpenUnlockItemsFromForm = useCallback((rank) => {
+    closeModal();
+    openModal('unlockItems', rank);
+  }, [closeModal, openModal]);
+
   const rowActions = useMemo(() => ({
     onDelete: (rank) => openModal('delete', rank),
     deleteLabel: 'Usuń rangę',
@@ -238,6 +301,18 @@ export default function RewardsHomeContent() {
         label: 'Edytuj rangę',
         description: 'Zmień dane rangi w kreatorze.',
         onSelect: (rank) => openModal('edit', rank),
+      },
+      {
+        id: 'discount',
+        label: 'Zniżka w sklepie',
+        description: 'Ustaw procentową zniżkę dla posiadaczy rangi.',
+        onSelect: (rank) => openModal('discount', rank),
+      },
+      {
+        id: 'unlock-items',
+        label: 'Odblokowane przedmioty',
+        description: 'Wybierz przedmioty sklepu odblokowywane przez rangę.',
+        onSelect: (rank) => openModal('unlockItems', rank),
       },
     ],
   }), [openModal]);
@@ -317,7 +392,14 @@ export default function RewardsHomeContent() {
       ) : ranks.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">Brak rang w tej grupie. Kliknij „Dodaj rangę”, aby utworzyć pierwszą.</p>
       ) : isTileView ? (
-        <GroupMainRanksContent embedded showMemberAvatars={showMemberAvatars} />
+        <GroupMainRanksContent
+          embedded
+          showMemberAvatars={showMemberAvatars}
+          showLecturerActions
+          onEditRank={handleTileEditRank}
+          onDeleteRank={handleTileDeleteRank}
+          onAssignRank={handleTileAssignRank}
+        />
       ) : (
         <DataTable
           columns={rankColumns}
@@ -345,8 +427,6 @@ export default function RewardsHomeContent() {
 
       <RankFormModal
         isOpen={activeModal?.type === 'create'}
-        existingRanks={ranks}
-        shopCatalogItems={shopCatalogItems}
         onClose={closeModal}
         onConfirm={handleCreateConfirm}
         isLoading={modalLoading}
@@ -354,10 +434,27 @@ export default function RewardsHomeContent() {
       <RankFormModal
         isOpen={activeModal?.type === 'edit'}
         rank={modalRank}
+        onClose={closeModal}
+        onConfirm={handleEditConfirm}
+        onOpenDiscountModal={handleOpenDiscountFromForm}
+        onOpenUnlockItemsModal={handleOpenUnlockItemsFromForm}
+        isLoading={modalLoading}
+      />
+      <RankDiscountModal
+        isOpen={activeModal?.type === 'discount'}
+        rank={modalRank}
+        existingRanks={ranks}
+        onClose={closeModal}
+        onConfirm={handleDiscountConfirm}
+        isLoading={modalLoading}
+      />
+      <RankUnlockItemsModal
+        isOpen={activeModal?.type === 'unlockItems'}
+        rank={modalRank}
         existingRanks={ranks}
         shopCatalogItems={shopCatalogItems}
         onClose={closeModal}
-        onConfirm={handleEditConfirm}
+        onConfirm={handleUnlockItemsConfirm}
         isLoading={modalLoading}
       />
       <RankAssignModal

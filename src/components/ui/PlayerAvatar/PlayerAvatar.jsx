@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import { Link } from 'react-router-dom';
 
@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
+import { positionSideTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './PlayerAvatar.css';
 
 
@@ -68,107 +69,50 @@ export default function PlayerAvatar({
 }) {
 
   const triggerRef = useRef(null);
+  const bubbleRef = useRef(null);
 
   const [tooltipVisible, setTooltipVisible] = useState(tooltipAlwaysVisible);
-
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-
-
+  const [tooltipLayout, setTooltipLayout] = useState(null);
 
   const updateTooltipPosition = useCallback(() => {
-
-    if (!triggerRef.current) {
-
+    const trigger = triggerRef.current;
+    const bubble = bubbleRef.current;
+    if (!trigger || !bubble) {
       return;
-
     }
 
-
-
-    const rect = triggerRef.current.getBoundingClientRect();
-
-    const tooltipWidth = 220;
-
-    let left = rect.left + rect.width / 2 - tooltipWidth / 2;
-
-    let top = rect.bottom + 8;
-
-
-
-    if (tooltipPlacement === 'left') {
-
-      left = rect.left - tooltipWidth - 12;
-
-      top = rect.top + rect.height / 2 - 48;
-
-    } else if (tooltipPlacement === 'right') {
-
-      left = rect.right + 12;
-
-      top = rect.top + rect.height / 2 - 48;
-
-    }
-
-
-
-    left = Math.max(16, Math.min(left, window.innerWidth - tooltipWidth - 16));
-
-    top = Math.max(16, Math.min(top, window.innerHeight - 120));
-
-
-
-    setTooltipPos({ x: left, y: top });
-
+    setTooltipLayout(positionSideTooltip({
+      triggerRect: trigger.getBoundingClientRect(),
+      bubbleRect: bubble.getBoundingClientRect(),
+      placement: tooltipPlacement,
+    }));
   }, [tooltipPlacement]);
 
-
-
-  useEffect(() => {
-
-    if (!tooltipAlwaysVisible) {
-
+  useLayoutEffect(() => {
+    if (!tooltipVisible) {
+      setTooltipLayout(null);
       return undefined;
-
     }
 
-
-
     updateTooltipPosition();
+    const rafId = window.requestAnimationFrame(updateTooltipPosition);
 
     window.addEventListener('resize', updateTooltipPosition);
-
     window.addEventListener('scroll', updateTooltipPosition, true);
 
-
-
     return () => {
-
+      window.cancelAnimationFrame(rafId);
       window.removeEventListener('resize', updateTooltipPosition);
-
       window.removeEventListener('scroll', updateTooltipPosition, true);
-
     };
-
-  }, [tooltipAlwaysVisible, updateTooltipPosition, nickname, totalEarned, currencySymbol]);
-
-  useLayoutEffect(() => {
-    if (tooltipAlwaysVisible) {
-      updateTooltipPosition();
-    }
-  }, [tooltipAlwaysVisible, updateTooltipPosition]);
+  }, [tooltipVisible, updateTooltipPosition, nickname, totalEarned, currencySymbol]);
 
   const handleMouseEnter = () => {
-
     if (tooltipAlwaysVisible) {
-
       return;
-
     }
 
-    updateTooltipPosition();
-
     setTooltipVisible(true);
-
   };
 
 
@@ -243,25 +187,20 @@ export default function PlayerAvatar({
 
 
       {tooltipVisible
-
         ? createPortal(
-
           <div
-
+            ref={bubbleRef}
             className={[
-
               'maq-player-avatar__tooltip',
-
-              `maq-player-avatar__tooltip--${tooltipPlacement}`,
-
+              `maq-player-avatar__tooltip--${tooltipLayout?.placement ?? tooltipPlacement}`,
               tooltipPlain ? 'maq-player-avatar__tooltip--plain' : '',
-
             ].filter(Boolean).join(' ')}
-
-            style={{ left: `${tooltipPos.x}px`, top: `${tooltipPos.y}px` }}
-
+            style={{
+              visibility: tooltipLayout ? 'visible' : 'hidden',
+              left: tooltipLayout ? `${tooltipLayout.left}px` : 0,
+              top: tooltipLayout ? `${tooltipLayout.top}px` : 0,
+            }}
             role="tooltip"
-
           >
 
             <p className="maq-player-avatar__tooltip-name">{displayName}</p>

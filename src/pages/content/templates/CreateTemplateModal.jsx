@@ -5,6 +5,7 @@ import { Button, Modal, SearchBar, TextField } from '../../../components/ui/inde
 import TemplateDetailPanel from '../../../components/ui/TemplateDetailPanel/TemplateDetailPanel.jsx';
 import { fetchGroupSnapshotForTemplate } from './groupSnapshotForTemplate.js';
 import SelectGroupMiniCard from './SelectGroupMiniCard.jsx';
+import { buildDefaultTemplateName } from '../../../utils/templates/templateName.js';
 import './CreateTemplateModal.css';
 
 function CheckIcon({ className }) {
@@ -90,7 +91,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
 
   const handleSelectGroup = (group) => {
     setSelectedGroupId(group.id);
-    setTemplateName((current) => current || `${group.storyName} — szablon`);
+    setTemplateName((current) => current || buildDefaultTemplateName(group.storyName));
   };
 
   const handleConfirm = async () => {

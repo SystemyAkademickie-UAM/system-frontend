@@ -73,6 +73,22 @@ export function getShopItemPriceDisplay(item) {
 }
 
 /**
+ * @param {ShopItemPriceDisplay | null | undefined} display
+ * @returns {string | null}
+ */
+export function getShopCatalogPriceHint(display) {
+  if (!display || display.tooltipBasePrice == null) {
+    return null;
+  }
+
+  if (Number(display.tooltipBasePrice) === Number(display.displayPrice)) {
+    return null;
+  }
+
+  return `Cena katalogowa: ${display.tooltipBasePrice}`;
+}
+
+/**
  * @param {import('./shopItem.types.js').ShopItem | { priceAmount?: number, salePriceAmount?: number }} left
  * @param {import('./shopItem.types.js').ShopItem | { priceAmount?: number, salePriceAmount?: number }} right
  * @returns {number}

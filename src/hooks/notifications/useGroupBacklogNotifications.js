@@ -5,9 +5,19 @@ import {
   fetchGroupBacklogUnreadCount,
   markAllGroupBacklogRead,
   markGroupBacklogItemRead,
+  clearGroupBacklog,
 } from '../../services/backlog.api.js';
 import { formatBacklogNotification } from '../../utils/notifications/formatBacklogNotification.js';
+import {
+  notifyBacklogNotificationRead,
+  notifyBacklogNotificationsAllRead,
+  notifyBacklogNotificationsCleared,
+  notifyBacklogNotificationsPartiallyCleared,
+  reportBacklogUnreadCount,
+  subscribeBacklogNotificationSync,
+} from '../../utils/notifications/backlogNotificationsSync.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+import { BACKLOG_LIST_POLL_MS } from '../../constants/backlogNotifications.constants.js';
 
 const FETCHERROR__TEXTLABEL = {
   polish: 'Nie udało się pobrać powiadomień.',
@@ -22,7 +32,7 @@ export function useGroupBacklogNotifications(groupId, {
   isStudentView = false,
   take = 50,
   skip = 0,
-  pollMs = 60000,
+  pollMs = BACKLOG_LIST_POLL_MS,
 } = {}) {
   const [items, setItems] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -31,7 +41,7 @@ export function useGroupBacklogNotifications(groupId, {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [error, setError] = useState('');
 
-  const refetch = useCallback(async () => {
+  const refetch = useCallback(async ({ silent = false } = {}) => {
     if (!groupId) {
       setItems([]);
       setTotalCount(0);
@@ -40,7 +50,9 @@ export function useGroupBacklogNotifications(groupId, {
       return;
     }
 
-    setIsLoading(true);
+    if (!silent) {
+      setIsLoading(true);
+    }
     setError('');
 
     try {
@@ -63,14 +75,17 @@ export function useGroupBacklogNotifications(groupId, {
 
       if (countResult.ok) {
         setUnreadCount(countResult.count);
+        reportBacklogUnreadCount(groupId, countResult.count);
       }
     } catch {
       setError(FETCHERROR__TEXTLABEL[LANGUAGE]);
       setItems([]);
     } finally {
-      setIsLoading(false);
+      if (!silent) {
+        setIsLoading(false);
+      }
     }
-  }, [groupId, isStudentView, skip, take]);
+  }, [LANGUAGE, groupId, isStudentView, skip, take]);
 
   useEffect(() => {
     void refetch();
@@ -93,6 +108,66 @@ export function useGroupBacklogNotifications(groupId, {
     [groupId, isStudentView, items],
   );
 
+  const applySyncEvent = useCallback((event) => {
+    if (event.type === 'newArrived') {
+      setUnreadCount(event.unreadCount);
+      void refetch({ silent: true });
+      return;
+    }
+
+    if (event.type === 'itemRead') {
+      setItems((current) => {
+        const target = current.find((item) => item.id === event.backlogId);
+        if (!target || target.isRead) {
+          return current;
+        }
+
+        return current.map((item) => (
+          item.id === event.backlogId ? { ...item, isRead: true } : item
+        ));
+      });
+      setUnreadCount((count) => {
+        const nextCount = Math.max(0, count - 1);
+        if (groupId) {
+          reportBacklogUnreadCount(groupId, nextCount);
+        }
+        return nextCount;
+      });
+      return;
+    }
+
+    if (event.type === 'allRead') {
+      setItems((current) => current.map((item) => ({ ...item, isRead: true })));
+      setUnreadCount(0);
+      if (groupId) {
+        reportBacklogUnreadCount(groupId, 0);
+      }
+      return;
+    }
+
+    if (event.type === 'partiallyCleared') {
+      void refetch({ silent: true });
+      return;
+    }
+
+    if (event.type === 'cleared') {
+      setItems([]);
+      setTotalCount(0);
+      setUnreadCount(0);
+      if (groupId) {
+        reportBacklogUnreadCount(groupId, 0);
+      }
+    }
+  }, [groupId, refetch]);
+
+  useEffect(() => {
+    if (!groupId) {
+      return undefined;
+    }
+
+    return subscribeBacklogNotificationSync(groupId, applySyncEvent);
+  }, [applySyncEvent, groupId]);
+
   const markRead = useCallback(async (backlogId) => {
     if (!groupId) {
       return { ok: false };
@@ -100,10 +175,7 @@ export function useGroupBacklogNotifications(groupId, {
 
     const result = await markGroupBacklogItemRead(groupId, backlogId);
     if (result.ok) {
-      setItems((current) => current.map((item) => (
-        item.id === backlogId ? { ...item, isRead: true } : item
-      )));
-      setUnreadCount((current) => Math.max(0, current - 1));
+      notifyBacklogNotificationRead(groupId, backlogId);
     }
     return result;
   }, [groupId]);
@@ -115,8 +187,23 @@ export function useGroupBacklogNotifications(groupId, {
 
     const result = await markAllGroupBacklogRead(groupId);
     if (result.ok) {
-      setItems((current) => current.map((item) => ({ ...item, isRead: true })));
-      setUnreadCount(0);
+      notifyBacklogNotificationsAllRead(groupId);
+    }
+    return result;
+  }, [groupId]);
+
+  const clearNotifications = useCallback(async ({ excludeItemUses = false } = {}) => {
+    if (!groupId) {
+      return { ok: false, deleted: 0 };
+    }
+
+    const result = await clearGroupBacklog(groupId, { excludeItemUses });
+    if (result.ok) {
+      if (excludeItemUses) {
+        notifyBacklogNotificationsPartiallyCleared(groupId);
+      } else {
+        notifyBacklogNotificationsCleared(groupId);
+      }
     }
     return result;
   }, [groupId]);
@@ -131,5 +218,6 @@ export function useGroupBacklogNotifications(groupId, {
     refetch,
     markRead,
     markAllRead,
+    clearNotifications,
   };
 }

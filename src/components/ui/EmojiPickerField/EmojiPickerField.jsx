@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 import 'unicode-emoji-picker';
 import './EmojiPickerField.css';
 
@@ -50,23 +51,26 @@ export default function EmojiPickerField({
         <span className="maq-emoji-picker-field__emoji" aria-hidden="true">{displayEmoji}</span>
       </button>
 
-      {isOpen ? (
-        <div
-          className="maq-emoji-picker-field__backdrop"
-          onClick={() => setIsOpen(false)}
-          role="presentation"
-        >
+      {isOpen && typeof document !== 'undefined'
+        ? createPortal(
           <div
-            className="maq-emoji-picker-field__dialog"
-            onClick={(event) => event.stopPropagation()}
+            className="maq-emoji-picker-field__backdrop"
+            onClick={() => setIsOpen(false)}
+            role="presentation"
           >
-            <unicode-emoji-picker
-              ref={onPickerMounted}
-              className="maq-emoji-picker-field__picker"
-            />
-          </div>
-        </div>
-      ) : null}
+            <div
+              className="maq-emoji-picker-field__dialog"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <unicode-emoji-picker
+                ref={onPickerMounted}
+                className="maq-emoji-picker-field__picker"
+              />
+            </div>
+          </div>,
+          document.body,
+        )
+        : null}
     </div>
   );
 }

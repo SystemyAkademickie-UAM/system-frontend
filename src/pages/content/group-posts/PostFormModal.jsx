@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, TextField } from '../../../components/ui/index.js';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
@@ -65,8 +65,38 @@ const EMPTY_FORM = {
   text: '',
   startHidden: false,
   schedulePublish: false,
-  publishAt: '',
+  publishDate: '',
+  publishTime: '',
 };
+
+function toLocalDateValue(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toLocalTimeValue(date) {
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
+function splitPublishAt(value) {
+  if (!value) {
+    return { publishDate: '', publishTime: '' };
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return { publishDate: '', publishTime: '' };
+  }
+
+  return {
+    publishDate: toLocalDateValue(date),
+    publishTime: toLocalTimeValue(date),
+  };
+}
 
 function PostOptionCheckbox({
   id,
@@ -107,6 +137,29 @@ function PostOptionCheckbox({
   );
 }
 
+function openDateTimePicker(event, inputRef, disabled) {
+  event?.preventDefault?.();
+  event?.stopPropagation?.();
+
+  if (disabled || !inputRef.current) {
+    return;
+  }
+
+  const input = inputRef.current;
+  input.focus({ preventScroll: true });
+
+  if (typeof input.showPicker === 'function') {
+    try {
+      input.showPicker();
+      return;
+    } catch {
+      // Niektóre przeglądarki rzucają wyjątek poza bezpośrednim gestem użytkownika.
+    }
+  }
+
+  input.click();
+}
+
 export default function PostFormModal({
   isOpen,
   post,
@@ -116,6 +169,8 @@ export default function PostFormModal({
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [form, setForm] = useState(EMPTY_FORM);
+  const dateInputRef = useRef(null);
+  const timeInputRef = useRef(null);
   const isEdit = Boolean(post);
 
   useEffect(() => {
@@ -123,14 +178,14 @@ export default function PostFormModal({
 
     if (post) {
       const hasFuturePublishAt = post.publishAt && new Date(post.publishAt) > new Date();
+      const { publishDate, publishTime } = splitPublishAt(post.publishAt);
       setForm({
         title: post.title ?? '',
         text: post.text ?? '',
-        startHidden: post.isPublished === false && !hasFuturePublishAt,
+        startHidden: post.isPublished === false,
         schedulePublish: Boolean(hasFuturePublishAt),
-        publishAt: post.publishAt
-          ? new Date(post.publishAt).toISOString().slice(0, 16)
-          : '',
+        publishDate,
+        publishTime,
       });
       return;
     }
@@ -138,20 +193,33 @@ export default function PostFormModal({
     setForm(EMPTY_FORM);
   }, [isOpen, post]);
 
-  const isValid = useMemo(
-    () => form.title.trim().length > 0 && form.text.trim().length > 0,
-    [form.title, form.text],
-  );
+  const isValid = useMemo(() => {
+    const hasTitleAndText = form.title.trim().length > 0 && form.text.trim().length > 0;
+    const hasScheduleDateTime = !form.schedulePublish
+      || (form.publishDate.trim().length > 0 && form.publishTime.trim().length > 0);
+    return hasTitleAndText && hasScheduleDateTime;
+  }, [form.title, form.text, form.schedulePublish, form.publishDate, form.publishTime]);
+
+  const scheduleInputsDisabled = !form.schedulePublish;
+  const datetimeRowClassName = [
+    'rewards-modal__datetime-row',
+    scheduleInputsDisabled ? 'rewards-modal__datetime-row--disabled' : '',
+  ].filter(Boolean).join(' ');
 
   const handleConfirm = () => {
     if (!isValid || isLoading) return;
+
+    const hasScheduledDateTime = form.schedulePublish
+      && form.publishDate.trim().length > 0
+      && form.publishTime.trim().length > 0;
+
     onConfirm?.({
       title: form.title.trim(),
       text: form.text.trim(),
       startHidden: form.startHidden,
       schedulePublish: form.schedulePublish,
-      publishAt: form.schedulePublish && form.publishAt
-        ? new Date(form.publishAt).toISOString()
+      publishAt: hasScheduledDateTime
+        ? new Date(`${form.publishDate}T${form.publishTime}`).toISOString()
         : null,
       isPublished: !form.startHidden && !form.schedulePublish,
     });
@@ -196,7 +264,6 @@ export default function PostFormModal({
             onChange={(checked) => setForm((prev) => ({
               ...prev,
               startHidden: checked,
-              schedulePublish: checked ? false : prev.schedulePublish,
             }))}
           >
             {HIDEOPTION__TEXTLABEL[LANGUAGE]}
@@ -206,29 +273,45 @@ export default function PostFormModal({
           <PostOptionCheckbox
             id="post-schedule-publish"
             checked={form.schedulePublish}
-            disabled={form.startHidden}
             onChange={(checked) => setForm((prev) => ({
               ...prev,
               schedulePublish: checked,
+              startHidden: checked ? true : prev.startHidden,
             }))}
           >
             {SCHEDULEOPTION__TEXTLABEL[LANGUAGE]}
           </PostOptionCheckbox>
         </div>
-        {form.schedulePublish && !form.startHidden ? (
-          <div className="rewards-modal__field">
-            <label htmlFor="post-publish-at" className="rewards-modal__label">
-              {PUBLISH__TEXTLABEL[LANGUAGE]}
-            </label>
+        <div className="rewards-modal__field">
+          <span className="rewards-modal__label">{PUBLISH__TEXTLABEL[LANGUAGE]}</span>
+          <div className={datetimeRowClassName}>
             <input
-              id="post-publish-at"
-              type="datetime-local"
-              className="rewards-modal__input"
-              value={form.publishAt}
-              onChange={(event) => setForm((prev) => ({ ...prev, publishAt: event.target.value }))}
+              ref={dateInputRef}
+              id="post-publish-date"
+              type="date"
+              className="rewards-modal__input rewards-modal__input--date"
+              value={form.publishDate}
+              disabled={scheduleInputsDisabled}
+              onChange={(event) => setForm((prev) => ({ ...prev, publishDate: event.target.value }))}
+              onClick={(event) => openDateTimePicker(event, dateInputRef, scheduleInputsDisabled)}
+              aria-label="Wybierz datę publikacji"
             />
           </div>
-        ) : null}
+          <div className={datetimeRowClassName}>
+            <input
+              ref={timeInputRef}
+              id="post-publish-time"
+              type="time"
+              className="rewards-modal__input rewards-modal__input--time"
+              value={form.publishTime}
+              disabled={scheduleInputsDisabled}
+              onChange={(event) => setForm((prev) => ({ ...prev, publishTime: event.target.value }))}
+              onClick={(event) => openDateTimePicker(event, timeInputRef, scheduleInputsDisabled)}
+              step={60}
+              aria-label="Wybierz godzinę publikacji"
+            />
+          </div>
+        </div>
       </div>
     </Modal>
   );

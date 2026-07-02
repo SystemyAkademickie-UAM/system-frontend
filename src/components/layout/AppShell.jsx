@@ -37,10 +37,21 @@ function buildDisplayName(user) {
 }
 
 export default function AppShell() {
+  const { rawGroupId } = useShellGroupContext();
+
+  return (
+    <GroupCurrencySettingsProvider groupId={rawGroupId}>
+      <GroupLivesSettingsProvider groupId={rawGroupId}>
+        <AppShellLayout />
+      </GroupLivesSettingsProvider>
+    </GroupCurrencySettingsProvider>
+  );
+}
+
+function AppShellLayout() {
   const location = useLocation();
   const menuId = useId();
   const { role } = useAppRole();
-  const { rawGroupId } = useShellGroupContext();
   const { user, isLoading: isSessionLoading } = useSession();
   const { profile, avatarUrl, isLoading: isProfileLoading } = useUserProfile();
   const { showNickname: leaderShowsNickname } = useLeaderDisplayPreferences(profile?.showNickname);
@@ -102,9 +113,7 @@ export default function AppShell() {
   }, [isMobileNavOpen]);
 
   return (
-    <GroupCurrencySettingsProvider groupId={rawGroupId}>
-    <GroupLivesSettingsProvider groupId={rawGroupId}>
-      <div className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}>
+    <div className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}>
       <a className="app-shell__skip" href="#main-content">
         Przejdź do treści
       </a>
@@ -161,8 +170,6 @@ export default function AppShell() {
           </main>
         </div>
       </div>
-      </div>
-    </GroupLivesSettingsProvider>
-    </GroupCurrencySettingsProvider>
+    </div>
   );
 }
