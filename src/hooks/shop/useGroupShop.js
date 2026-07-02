@@ -256,18 +256,25 @@ export function useGroupShopOpen(groupId) {
     refetch();
   }, [refetch]);
 
-  const toggleShopOpen = useCallback(async () => {
+  const setShopOpenStatus = useCallback(async (nextOpen) => {
     if (!groupId) {
       return { ok: false };
     }
 
-    const nextValue = !isShopOpen;
-    const result = await updateGroupShopOpenStatus(groupId, nextValue);
+    if (nextOpen === isShopOpen) {
+      return { ok: true };
+    }
+
+    const result = await updateGroupShopOpenStatus(groupId, nextOpen);
     if (result.ok) {
-      setIsShopOpenState(nextValue);
+      setIsShopOpenState(nextOpen);
     }
     return result;
   }, [groupId, isShopOpen]);
+
+  const toggleShopOpen = useCallback(async () => {
+    return setShopOpenStatus(!isShopOpen);
+  }, [isShopOpen, setShopOpenStatus]);
 
   const openShop = useCallback(async () => {
     if (!groupId || isShopOpen) {
@@ -287,6 +294,7 @@ export function useGroupShopOpen(groupId) {
     isShopOpen,
     isLoading,
     toggleShopOpen,
+    setShopOpenStatus,
     openShop,
     closeShop,
   };

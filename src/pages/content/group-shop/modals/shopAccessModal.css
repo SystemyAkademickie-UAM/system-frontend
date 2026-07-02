@@ -16,10 +16,12 @@
   gap: 0.5rem;
 }
 
-.shop-access-modal__divider {
-  width: 100%;
-  height: 1px;
-  margin: 0;
-  border: 0;
-  background: rgba(255, 255, 255, 0.1);
+.shop-access-modal__section--disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.shop-access-modal__section--disabled .rewards-modal__label,
+.shop-access-modal__section--disabled .rewards-modal__option-text {
+  color: var(--color-text-secondary);
 }
