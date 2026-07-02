@@ -140,7 +140,7 @@ export default function ShopCategoriesModal({
         {editingId ? (
           <div className="shop-categories-modal__editor">
             <label className="shop-categories-modal__field">
-              <span>Nazwa</span>
+              <span>Nazwa*</span>
               <input
                 type="text"
                 value={form.name}
