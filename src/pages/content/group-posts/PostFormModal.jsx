@@ -182,7 +182,7 @@ export default function PostFormModal({
       setForm({
         title: post.title ?? '',
         text: post.text ?? '',
-        startHidden: post.isPublished === false && !hasFuturePublishAt,
+        startHidden: post.isPublished === false,
         schedulePublish: Boolean(hasFuturePublishAt),
         publishDate,
         publishTime,
@@ -193,10 +193,12 @@ export default function PostFormModal({
     setForm(EMPTY_FORM);
   }, [isOpen, post]);
 
-  const isValid = useMemo(
-    () => form.title.trim().length > 0 && form.text.trim().length > 0,
-    [form.title, form.text],
-  );
+  const isValid = useMemo(() => {
+    const hasTitleAndText = form.title.trim().length > 0 && form.text.trim().length > 0;
+    const hasScheduleDateTime = !form.schedulePublish
+      || (form.publishDate.trim().length > 0 && form.publishTime.trim().length > 0);
+    return hasTitleAndText && hasScheduleDateTime;
+  }, [form.title, form.text, form.schedulePublish, form.publishDate, form.publishTime]);
 
   const scheduleInputsDisabled = !form.schedulePublish;
   const datetimeRowClassName = [

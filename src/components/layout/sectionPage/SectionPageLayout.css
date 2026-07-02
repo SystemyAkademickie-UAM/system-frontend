@@ -57,7 +57,16 @@
 }
 
 .maq-section-page__sub-nav {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
   padding: 4px;
+}
+
+@media (max-width: 639px) {
+  .maq-section-page__sub-nav {
+    width: 100%;
+  }
 }
 
 .maq-section-page__divider {

@@ -11,7 +11,7 @@ import './ShopCartPanel.css';
  *
  * @param {Object} props
  * @param {number} props.cartCount
- * @param {Array<{ id: string, name: string, priceAmount: number, imageUrl?: string }>} props.cartItems
+ * @param {Array<{ id: string, name: string, priceAmount: number, imageRef?: string | null, imageUrl?: string }>} props.cartItems
  * @param {number} props.cartTotal
  * @param {() => void} props.onBuyAll
  * @param {(itemId: string) => void} [props.onRemoveFromCart]
@@ -112,6 +112,7 @@ export default function ShopCartPanel({
                     <ProductCardMini
                       name={item.name}
                       priceAmount={item.priceAmount}
+                      imageRef={item.imageRef}
                       imageUrl={item.imageUrl}
                       className="maq-shop-cart__item-card"
                     />

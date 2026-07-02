@@ -28,6 +28,8 @@ import { getShopItemEffectivePrice } from '../../../utils/shop/shopPricing.js';
 import {
   filterCatalogShopItems,
   findExtraLifeShopItem,
+  isExtraLifePurchaseAtLimit,
+  isShopItemPurchaseDisabled,
   sortShopItemsWithExtraLifeFirst,
 } from '../../../utils/shop/extraLifeItem.js';
 import {
@@ -72,6 +74,7 @@ function buildPurchaseSummaryItem(item) {
     categoryId: item.categoryId,
     priceAmount: Number(item.priceAmount ?? 0),
     effectivePrice: getShopItemEffectivePrice(item),
+    isExtraLife: item.isExtraLife === true,
   };
 }
 
@@ -98,6 +101,8 @@ export default function GroupShopContent() {
   const {
     isGameOver,
     showExtraLifeProduct,
+    livesMax,
+    studentLives,
     refetch: refetchLives,
   } = useGroupShopLivesSystem(groupId, { isStudentView });
 
@@ -202,16 +207,31 @@ export default function GroupShopContent() {
     );
   }, [isRefreshingShop, refetch, refetchShopOpen, showError, showSuccess]);
 
+  const isExtraLifeAtLimit = useMemo(
+    () => isExtraLifePurchaseAtLimit(studentLives, livesMax),
+    [studentLives, livesMax],
+  );
+
   const shopInteractionDisabled = !isShopOpen || (isStudentView && isGameOver);
-  const purchaseDisabled = shopInteractionDisabled || isLecturerView;
+  const purchaseOptions = useMemo(() => ({
+    isLecturerView,
+    isShopOpen,
+    isGameOver,
+    isExtraLifeAtLimit,
+  }), [isExtraLifeAtLimit, isGameOver, isLecturerView, isShopOpen]);
 
   const redirectAfterPurchase = useCallback((purchasedItems) => {
     if (!isStudentView || !groupId || purchasedItems.length === 0) {
       return false;
     }
 
+    const inventoryItems = purchasedItems.filter((item) => !item.isExtraLife);
+    if (inventoryItems.length === 0) {
+      return false;
+    }
+
     setShopPurchaseSummary(groupId, {
-      items: purchasedItems,
+      items: inventoryItems,
       currencyEmoji,
     });
     navigate(groupProfileEqPath(groupId));
@@ -232,6 +252,8 @@ export default function GroupShopContent() {
       return;
     }
 
+    const wasGameOver = activeModal.item.isExtraLife && isGameOver;
+
     if (activeModal.item.isExtraLife) {
       await refetchLives();
     }
@@ -242,12 +264,15 @@ export default function GroupShopContent() {
     }
 
     if (activeModal.item.isExtraLife) {
-      await refetchLives();
-      showSuccess('Dodatkowe życie zakupione. Sklep został odblokowany.');
+      showSuccess(
+        wasGameOver
+          ? 'Dodatkowe życie zakupione. Sklep został odblokowany.'
+          : 'Dodatkowe życie zakupione.',
+      );
     } else {
       showSuccess('Produkt został zakupiony.');
     }
-  }, [activeModal, buyItem, closeModal, redirectAfterPurchase, refetchLives, showError, showSuccess]);
+  }, [activeModal, buyItem, closeModal, isGameOver, redirectAfterPurchase, refetchLives, showError, showSuccess]);
 
   const handleBuyAllConfirm = useCallback(async () => {
     if (cartItems.length === 0) {
@@ -364,10 +389,11 @@ export default function GroupShopContent() {
               id: item.id,
               name: item.name,
               priceAmount: getShopItemEffectivePrice(item),
+              imageRef: item.imageRef,
               imageUrl: item.imageUrl,
             }))}
             cartTotal={cartTotal}
-            disabled={purchaseDisabled}
+            disabled={shopInteractionDisabled || isLecturerView}
             onBuyAll={() => setActiveModal({ type: 'buyAll' })}
             onRemoveFromCart={removeFromCart}
             className="group-shop__cart"
@@ -417,8 +443,9 @@ export default function GroupShopContent() {
           isClosed={!isShopOpen}
           isGameOver={isShopOpen && isGameOver}
           extraLifeProduct={showExtraLifeProduct ? extraLifeProduct : null}
+          extraLifeDisabled={isExtraLifeAtLimit}
           onExtraLifeBuy={() => {
-            if (extraLifeProduct) {
+            if (extraLifeProduct && !isExtraLifeAtLimit) {
               setActiveModal({ type: 'buy', item: extraLifeProduct });
             }
           }}
@@ -452,9 +479,9 @@ export default function GroupShopContent() {
           ) : (
             <>
               <div className="group-shop__grid">
-                {pagination.pageItems.map((item) => (
+                {pagination.pageItems.map((item, index) => (
                   <ProductCard
-                    key={item.id}
+                    key={`${item.id}-${index}`}
                     itemId={item.id}
                     name={item.name}
                     storyDescription={item.storyDescription}
@@ -465,7 +492,7 @@ export default function GroupShopContent() {
                     imageRef={item.imageRef}
                     categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
                     showLecturerActions={isLecturerView}
-                    disabled={purchaseDisabled || (item.stockQuantity !== null && item.stockQuantity <= 0) || item.isLocked}
+                    disabled={isShopItemPurchaseDisabled(item, purchaseOptions)}
                     isRankLocked={!isLecturerView && item.isLocked}
                     isInCart={cartItemIds.includes(item.id)}
                     onBuy={() => setActiveModal({ type: 'buy', item })}

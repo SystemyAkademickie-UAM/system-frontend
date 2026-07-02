@@ -66,6 +66,9 @@
   /** Akcent z przezroczystością (tła badge, highlight) */
   --color-accent-muted: rgba(30, 204, 56, 0.25);
 
+  --color-notification-item-used: #d4a017;
+  --color-notification-item-used-bright: #f0c940;
+
   /* --- Odznaki — rzadkość (pasek boczny, etykieta, nagłówki sekcji) --- */
   --color-badge-rarity-common: #00eeff;
   --color-badge-rarity-uncommon: #ddff00;

@@ -42,16 +42,28 @@
 .maq-emoji-picker-field__backdrop {
   position: fixed;
   inset: 0;
-  z-index: 10050;
+  z-index: var(--z-index-modal);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding:
+    max(1rem, env(safe-area-inset-top, 0px))
+    max(1rem, env(safe-area-inset-right, 0px))
+    max(1rem, env(safe-area-inset-bottom, 0px))
+    max(1rem, env(safe-area-inset-left, 0px));
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .maq-emoji-picker-field__dialog {
   position: relative;
+  width: min(420px, calc(100vw - 2rem));
+  max-height: min(480px, calc(100dvh - 2rem));
+  margin: auto 0;
+  overflow: auto;
+  overscroll-behavior: contain;
 }
 
 .maq-emoji-picker-field__picker {

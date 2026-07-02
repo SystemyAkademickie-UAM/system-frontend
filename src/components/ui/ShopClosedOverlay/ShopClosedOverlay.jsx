@@ -9,6 +9,7 @@ import './ShopClosedOverlay.css';
  * @param {boolean} props.isClosed
  * @param {boolean} [props.isGameOver=false]
  * @param {import('../../../utils/shop/shopItem.types.js').ShopItem} [props.extraLifeProduct]
+ * @param {boolean} [props.extraLifeDisabled=false]
  * @param {() => void} [props.onExtraLifeBuy]
  * @param {string} [props.className]
  */
@@ -16,6 +17,7 @@ export default function ShopClosedOverlay({
   isClosed,
   isGameOver = false,
   extraLifeProduct,
+  extraLifeDisabled = false,
   onExtraLifeBuy,
   className = '',
 }) {
@@ -45,15 +47,16 @@ export default function ShopClosedOverlay({
             <div className="maq-shop-closed-overlay__game-over-copy">
               <p className="maq-shop-closed-overlay__message">Koniec gry</p>
               <p className="maq-shop-closed-overlay__subtitle">.. dla Twoich zakupów</p>
-              <p className="maq-shop-closed-overlay__hint">
-                Aby odblokować ponownie sklep zakup dodatkowe życie
-              </p>
+              {extraLifeProduct ? (
+                <p className="maq-shop-closed-overlay__hint">
+                  Aby odblokować ponownie sklep zakup dodatkowe życie
+                </p>
+              ) : null}
             </div>
 
             {extraLifeProduct ? (
               <div className="maq-shop-closed-overlay__extra-life">
                 <ProductCard
-                  variant="extra-life"
                   itemId={extraLifeProduct.id}
                   name={extraLifeProduct.name}
                   storyDescription={extraLifeProduct.storyDescription}
@@ -62,7 +65,9 @@ export default function ShopClosedOverlay({
                   salePriceAmount={extraLifeProduct.salePriceAmount}
                   rankDiscountedPrice={extraLifeProduct.rankDiscountedPrice}
                   imageRef={extraLifeProduct.imageRef}
+                  isExtraLife
                   hideAddToCart
+                  disabled={extraLifeDisabled}
                   onBuy={onExtraLifeBuy}
                   className="maq-shop-closed-overlay__extra-life-card"
                 />

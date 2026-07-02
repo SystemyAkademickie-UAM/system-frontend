@@ -350,7 +350,12 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               .filter(Boolean)
               .join(' ')}
           >
-            <section className="groups-list-creator__step" aria-label={GROUPDATALABEL__TEXTLABEL[LANGUAGE]} aria-hidden={step !== 1}>
+            <section
+              className="groups-list-creator__step"
+              aria-label={GROUPDATALABEL__TEXTLABEL[LANGUAGE]}
+              aria-hidden={step !== 1}
+              inert={step !== 1}
+            >
               <div className="groups-list-creator__panel groups-list-creator__panel--compact">
                 <div className="groups-list-creator__fields">
                   <div className="groups-list-creator__field">
@@ -415,6 +420,7 @@ export default function GroupsListCreator({ onClose, onCreated }) {
               className="groups-list-creator__step groups-list-creator__step--banner"
               aria-label={BANNERLABEL__TEXTLABEL[LANGUAGE]}
               aria-hidden={step !== 2}
+              inert={step !== 2}
             >
               <div className="groups-list-creator__panel groups-list-creator__panel--banner">
                 <GroupBannerPicker

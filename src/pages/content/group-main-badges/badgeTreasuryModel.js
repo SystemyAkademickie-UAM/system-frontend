@@ -53,6 +53,7 @@ export const STUDENT_SORT_OPTIONS = [
  * @property {number} rewardAmount
  * @property {string} rewardEmoji
  * @property {boolean} isUnlocked
+ * @property {boolean} isPublished
  */
 
 /**
@@ -87,6 +88,7 @@ export function mapBadgeForTreasury(badge, index, earnedBadgeIds = null) {
     didacticDescription: badge.educationalDescription || '',
     rewardAmount: badge.rewardAmount ?? 0,
     isUnlocked,
+    isPublished: badge.isPublished !== false,
   };
 }
 

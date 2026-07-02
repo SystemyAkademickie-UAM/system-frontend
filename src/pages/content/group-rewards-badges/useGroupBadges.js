@@ -185,6 +185,50 @@ export function useGroupBadges() {
     return result;
   }, [groupId, badges]);
 
+  const handleToggleAllPublished = useCallback(async () => {
+    if (!groupId || badges.length === 0) {
+      return { ok: false, error: 'Brak odznak do aktualizacji' };
+    }
+
+    const targetPublished = badges.some((badge) => badge.isPublished === false);
+    const badgesToUpdate = badges.filter((badge) => (
+      (badge.isPublished !== false) !== targetPublished
+    ));
+
+    if (badgesToUpdate.length === 0) {
+      return { ok: true, changed: 0, targetPublished };
+    }
+
+    const results = await Promise.all(
+      badgesToUpdate.map((badge) => updateBadge(groupId, badge.dbId, {
+        isPublished: targetPublished,
+      })),
+    );
+
+    const failed = results.find((result) => !result.ok);
+    if (failed) {
+      return { ok: false, error: failed.error ?? 'Nie udało się zmienić widoczności odznak' };
+    }
+
+    const updatedByDbId = new Map(
+      results
+        .filter((result) => result.ok && result.badge)
+        .map((result) => [result.badge.id, result.badge]),
+    );
+
+    setBadges((prev) => prev.map((badge) => {
+      const updatedBadge = updatedByDbId.get(badge.dbId);
+      if (!updatedBadge) {
+        return badge;
+      }
+
+      return { ...badge, ...mapBadge(updatedBadge, badge.position - 1) };
+    }));
+    notifyGroupContentChanged(groupId, 'badges');
+
+    return { ok: true, changed: badgesToUpdate.length, targetPublished };
+  }, [groupId, badges]);
+
   return {
     groupId,
     badges,
@@ -196,5 +240,6 @@ export function useGroupBadges() {
     handleUpdate,
     handleDelete,
     handleTogglePublished,
+    handleToggleAllPublished,
   };
 }

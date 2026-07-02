@@ -4,8 +4,8 @@
   gap: 0;
   width: min(100%, 44rem);
   min-height: min(72vh, 520px);
-  max-height: min(92vh, 760px);
-  margin: 0 auto;
+  max-height: min(92vh, calc(100dvh - 2rem));
+  margin: auto 0;
   padding: 0;
   border-radius: 16px;
   background: var(--color-bg-app);
@@ -16,7 +16,7 @@
 .groups-list-creator--banner-step {
   width: min(100%, 54rem);
   min-height: min(86vh, 820px);
-  max-height: min(96vh, 900px);
+  max-height: min(96vh, calc(100dvh - 2rem));
 }
 
 .groups-list-creator__body {
@@ -59,6 +59,11 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.groups-list-creator__step[inert] {
+  pointer-events: none;
+  user-select: none;
 }
 
 .groups-list-creator__step--banner {

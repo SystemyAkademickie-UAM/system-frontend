@@ -6,6 +6,7 @@ import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
 import '../../../components/page/PageUnavailable.css';
 import '../group-main/shared/groupMainSubpageHeader.css';
+import CriticalValuesDevPanel from './CriticalValuesDevPanel.jsx';
 import TemporaryDevSeedPanel from './TemporaryDevSeedPanel.jsx';
 
 export default function RankingHomeContent() {
@@ -18,6 +19,7 @@ export default function RankingHomeContent() {
       <section className="page-unavailable group-ranking-page group-ranking-page--student maq-section-page">
         <GroupMainSubpageHeader eyebrow="Rywalizacja" title="Twoje informacje" />
         <Divider className="maq-section-page__divider" />
+        <CriticalValuesDevPanel isStudentView={isStudentView} />
         <TemporaryDevSeedPanel isStudentView={isStudentView} />
       </section>
     );
@@ -30,6 +32,7 @@ export default function RankingHomeContent() {
       subNavItems={nav.items}
       subNavAriaLabel={nav.ariaLabel}
     >
+      <CriticalValuesDevPanel isStudentView={isStudentView} />
       <TemporaryDevSeedPanel isStudentView={isStudentView} />
     </SectionPageLayout>
   );

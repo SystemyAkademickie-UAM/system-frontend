@@ -8,6 +8,7 @@ import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useGroupDetails } from '../../../hooks/groups/useGroupDetails.js';
 import { useGroupBacklogNotifications } from '../../../hooks/notifications/useGroupBacklogNotifications.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { BACKLOG_LIST_POLL_MS } from '../../../constants/backlogNotifications.constants.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { groupMembersLogPath } from '../../../routes/pathRegistry.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
@@ -119,7 +120,7 @@ export default function GroupMainHomeContent() {
   } = useGroupBacklogNotifications(groupId, {
     isStudentView: false,
     take: LECTURER_PREVIEW_LIMIT,
-    pollMs: 60000,
+    pollMs: BACKLOG_LIST_POLL_MS,
   });
 
   useEffect(() => {

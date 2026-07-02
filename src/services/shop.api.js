@@ -119,6 +119,7 @@ function mapShopBuyError(message) {
     'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.': 'Przedmiot jest zablokowany. Zdobądź wyższą rangę, aby go odblokować.',
     'Kupowanie dodatkowego życia jest wyłączone.': 'Kupowanie dodatkowego życia jest wyłączone.',
     'Dodatkowe życie można kupić tylko po utracie wszystkich żyć.': 'Dodatkowe życie można kupić tylko po utracie wszystkich żyć.',
+    'Osiągnięto maksymalną liczbę żyć. Nie można kupić więcej.': 'Osiągnięto maksymalną liczbę żyć. Nie można kupić więcej.',
     'Produkt „Dodatkowe życie” nie może zostać usunięty.': 'Produkt „Dodatkowe życie” nie może zostać usunięty.',
   };
 

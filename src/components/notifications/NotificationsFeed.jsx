@@ -155,9 +155,11 @@ export default function NotificationsFeed({
       <div className="notifications-feed__list" role="list">
         {visibleNotifications.map((notification, index) => {
           const isNavigable = Boolean(notification.href);
+          const isGoldHighlight = notification.highlightVariant === 'gold';
           const itemClassName = [
             'notifications-feed__item',
             notification.isRead ? '' : 'notifications-feed__item--unread',
+            isGoldHighlight ? 'notifications-feed__item--gold' : '',
             isNavigable || linkable ? 'notifications-feed__item--linkable' : '',
           ].filter(Boolean).join(' ');
 
@@ -188,6 +190,7 @@ export default function NotificationsFeed({
                 className={[
                   'notifications-feed__row',
                   notification.isRead ? '' : 'notifications-feed__row--unread',
+                  isGoldHighlight ? 'notifications-feed__row--gold' : '',
                 ].filter(Boolean).join(' ')}
                 role="listitem"
               >

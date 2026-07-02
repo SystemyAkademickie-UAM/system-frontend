@@ -17,7 +17,7 @@ export const SHORT_DESCRIPTION_MAX_LENGTH = 300;
 export const GROUP_DESCRIPTION_MAX_LENGTH = 500;
 
 /** Maks. długość treści wpisu (tablica ogłoszeń). */
-export const POST_CONTENT_MAX_LENGTH = 800;
+export const POST_CONTENT_MAX_LENGTH = 1500;
 
 /** Maks. długość tematu wpisu. */
 export const POST_TITLE_MAX_LENGTH = NAME_MAX_LENGTH;

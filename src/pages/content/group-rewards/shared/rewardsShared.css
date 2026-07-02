@@ -27,6 +27,18 @@
   align-items: flex-start;
 }
 
+.rewards-page__toolbar-start {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.rewards-page__bulk-visibility-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .rewards-page__add-btn {
   flex-shrink: 0;
   align-self: flex-start;
@@ -46,7 +58,8 @@
 }
 
 .rewards-page__sub-nav {
-  flex: 0 1 auto;
+  width: 100%;
+  max-width: 100%;
 }
 
 .rewards-page__search {

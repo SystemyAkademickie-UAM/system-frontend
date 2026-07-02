@@ -115,6 +115,9 @@
 }
 
 .profile-page-layout__sub-nav {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
   padding: 4px;
 }
 

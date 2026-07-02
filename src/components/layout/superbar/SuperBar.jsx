@@ -3,6 +3,7 @@ import SuperBarBackButton from './SuperBarBackButton.jsx';
 import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
 import SuperBarLivesStat from './SuperBarLivesStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
+import BacklogNewNotificationAlert from './BacklogNewNotificationAlert.jsx';
 import NotificationBell from './NotificationBell.jsx';
 import SuperBarUserMenu from './SuperBarUserMenu.jsx';
 import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
@@ -61,7 +62,9 @@ export default function SuperBar({
   const resolvedDisplayName = displayName || PLACEHOLDER_DISPLAY_NAME;
 
   return (
-    <header className="super-bar">
+    <>
+      <BacklogNewNotificationAlert />
+      <header className="super-bar">
       <div className="super-bar__start">
         {showMenuButton ? (
           <button
@@ -121,5 +124,6 @@ export default function SuperBar({
         />
       </div>
     </header>
+    </>
   );
 }

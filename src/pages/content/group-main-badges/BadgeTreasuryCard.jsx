@@ -2,6 +2,7 @@ import { Badge } from '../../../components/ui/index.js';
 import BadgeEarnersBar from './BadgeEarnersBar.jsx';
 import { getBadgeEarners } from './badgeTreasuryModel.js';
 import LecturerTileActions from '../group-rewards/shared/LecturerTileActions.jsx';
+import { getTileVisibilityLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
 import '../../../components/ui/ProductCard/ProductCard.css';
 import './BadgeTreasuryCard.css';
 
@@ -28,6 +29,7 @@ export default function BadgeTreasuryCard({
   const earners = getBadgeEarners(earnersByBadgeId, badge.dbId, excludeAccountId);
   const isLocked = isStudentView && !badge.isUnlocked;
   const hasEarners = earners.length > 0;
+  const isPublished = badge.isPublished !== false;
 
   return (
     <article className={[
@@ -36,13 +38,25 @@ export default function BadgeTreasuryCard({
       showLecturerActions ? 'badge-treasury-card--lecturer' : '',
     ].filter(Boolean).join(' ')}>
       {showLecturerActions ? (
-        <LecturerTileActions
-          entityLabel="odznakę"
-          name={badge.name}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          className="badge-treasury-card__actions"
-        />
+        <>
+          <span
+            className={[
+              'badge-treasury-card__visibility',
+              isPublished
+                ? 'badge-treasury-card__visibility--public'
+                : 'badge-treasury-card__visibility--hidden',
+            ].join(' ')}
+          >
+            {getTileVisibilityLabel(isPublished, 'badge')}
+          </span>
+          <LecturerTileActions
+            entityLabel="odznakę"
+            name={badge.name}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            className="badge-treasury-card__actions"
+          />
+        </>
       ) : null}
       <div className="badge-treasury-card__main">
         <Badge

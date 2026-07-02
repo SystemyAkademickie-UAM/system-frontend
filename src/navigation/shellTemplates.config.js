@@ -661,8 +661,8 @@ export const SUB_NAV_CONFIG = {
   ],
 
   'app-templates': [
-    { id: 'mine', label: 'Moje szablony', hrefKey: 'TEMPLATES_MY', end: true },
     { id: 'gallery', label: 'Galeria szablonów', hrefKey: 'TEMPLATES_GALLERY', end: true },
+    { id: 'mine', label: 'Moje szablony', hrefKey: 'TEMPLATES_MY', end: true },
   ],
 };
 

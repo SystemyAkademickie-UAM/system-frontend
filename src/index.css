@@ -31,6 +31,7 @@ body {
 
 
 select[data-sort-select],
+.catalog-filters__sort-select,
 .badge-treasury__sort-select,
 .group-shop__sort-select,
 .member-modal__sort-select {

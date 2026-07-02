@@ -1,8 +1,9 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CurrencyDisplay from '../../ui/Currency/CurrencyDisplay.jsx';
 import { CurrencyIcon } from '../../ui/Currency/CurrencyDisplay.jsx';
 import SuperBarStatBadge from './SuperBarStatBadge.jsx';
+import { positionCenteredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './SuperBar.css';
 
 /**
@@ -15,21 +16,43 @@ export default function SuperBarCurrencyStat({
   ariaLabel,
 }) {
   const triggerRef = useRef(null);
+  const bubbleRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewPos, setPreviewPos] = useState({ x: 0, y: 0 });
+  const [layout, setLayout] = useState(null);
 
   const updatePreviewPosition = useCallback(() => {
-    if (!triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    const previewWidth = 220;
-    let left = rect.left + rect.width / 2 - previewWidth / 2;
-    left = Math.max(16, Math.min(left, window.innerWidth - previewWidth - 16));
-    const top = rect.bottom + 8;
-    setPreviewPos({ x: left, y: top });
+    const trigger = triggerRef.current;
+    const bubble = bubbleRef.current;
+    if (!trigger || !bubble) {
+      return;
+    }
+
+    setLayout(positionCenteredTooltip({
+      triggerRect: trigger.getBoundingClientRect(),
+      bubbleRect: bubble.getBoundingClientRect(),
+    }));
   }, []);
 
-  const handleMouseEnter = () => {
+  useLayoutEffect(() => {
+    if (!previewVisible) {
+      setLayout(null);
+      return undefined;
+    }
+
     updatePreviewPosition();
+    const rafId = window.requestAnimationFrame(updatePreviewPosition);
+
+    window.addEventListener('resize', updatePreviewPosition);
+    window.addEventListener('scroll', updatePreviewPosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updatePreviewPosition);
+      window.removeEventListener('scroll', updatePreviewPosition, true);
+    };
+  }, [previewVisible, updatePreviewPosition, totalEarned]);
+
+  const handleMouseEnter = () => {
     setPreviewVisible(true);
   };
 
@@ -55,8 +78,17 @@ export default function SuperBarCurrencyStat({
       {previewVisible
         ? createPortal(
           <div
-            className="super-bar-stat-preview super-bar-stat-preview--currency"
-            style={{ left: `${previewPos.x}px`, top: `${previewPos.y}px` }}
+            ref={bubbleRef}
+            className={[
+              'super-bar-stat-preview',
+              'super-bar-stat-preview--currency',
+              layout?.placement === 'bottom' ? 'super-bar-stat-preview--below' : '',
+            ].filter(Boolean).join(' ')}
+            style={{
+              visibility: layout ? 'visible' : 'hidden',
+              left: layout ? `${layout.left}px` : 0,
+              top: layout ? `${layout.top}px` : 0,
+            }}
             aria-hidden="true"
           >
             <p className="super-bar-stat-preview__title">{currencyLabel}</p>

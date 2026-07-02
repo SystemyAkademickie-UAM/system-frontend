@@ -12,8 +12,11 @@
   color: var(--color-text-primary);
 }
 
-.shop-modal__preview {
-  max-width: none;
+.shop-modal .shop-modal__preview.maq-product-card {
+  width: 100%;
+  max-width: var(--product-card-max-width, 453px);
+  min-height: auto;
+  margin-inline: auto;
   pointer-events: none;
 }
 

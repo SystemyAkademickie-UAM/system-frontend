@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { useRef } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { useSubNavFitFontSize } from './useSubNavFitFontSize.js';
 import './SubNav.css';
 
 function itemClassName(isActive) {
@@ -16,8 +18,18 @@ function itemClassName(isActive) {
  * @param {string} [props.className]
  */
 export default function SubNav({ ariaLabel, items, activeId, onSelect, className = '' }) {
+  const navRef = useRef(null);
+  const location = useLocation();
+  const fitDeps = [...items.map((item) => `${item.id}:${item.label}`), location.pathname, activeId];
+
+  useSubNavFitFontSize(navRef, fitDeps);
+
   return (
-    <nav className={['maq-sub-nav', className].filter(Boolean).join(' ')} aria-label={ariaLabel}>
+    <nav
+      ref={navRef}
+      className={['maq-sub-nav', className].filter(Boolean).join(' ')}
+      aria-label={ariaLabel}
+    >
       {items.map((item) => {
         if (item.to !== undefined && activeId === undefined) {
           return (

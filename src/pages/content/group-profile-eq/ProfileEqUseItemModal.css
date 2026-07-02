@@ -1,0 +1,13 @@
+.profile-eq-use-item-modal__text {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.profile-eq-use-item-modal__hint {
+  margin: 0.75rem 0 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+}

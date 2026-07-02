@@ -63,6 +63,11 @@ const LECTURER_STUDENT_EVENT_TYPES = new Set([
   'CURRENCY_ADDED',
 ]);
 
+/** Powiadomienia wyróżniane dla prowadzącego (np. złoty akcent w dzienniku i dzwonku). */
+export const LECTURER_PRIORITY_NOTIFICATION_TYPES = new Set([
+  'ITEM_USED',
+]);
+
 /**
  * @param {unknown} value
  * @returns {string | null}
@@ -446,6 +451,9 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     isRead: item.isRead,
     href,
     accountId: item.accountId,
+    highlightVariant: !isStudentView && LECTURER_PRIORITY_NOTIFICATION_TYPES.has(item.type)
+      ? 'gold'
+      : null,
   };
 }
 

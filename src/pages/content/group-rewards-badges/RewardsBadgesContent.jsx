@@ -31,6 +31,7 @@ import { LECTURER_SORT_OPTIONS, TREASURY_SORT } from '../group-main-badges/badge
 import BadgeFormModal from './modals/BadgeFormModal.jsx';
 import BadgeGiveModal from './modals/BadgeGiveModal.jsx';
 import BadgeDeleteModal from './modals/BadgeDeleteModal.jsx';
+import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
 
 const RARITY_FILTERS = [
   { id: 'all', label: 'Wszystkie' },
@@ -171,6 +172,7 @@ export default function RewardsBadgesContent() {
     handleUpdate,
     handleDelete,
     handleTogglePublished,
+    handleToggleAllPublished,
   } = useGroupBadges();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,6 +181,7 @@ export default function RewardsBadgesContent() {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
 
   const openModal = useCallback((type, badge = null) => {
     setActiveModal({ type, badge });
@@ -250,6 +253,23 @@ export default function RewardsBadgesContent() {
     }
   }, [badges, openModal]);
 
+  const handleToggleAllVisibility = useCallback(async () => {
+    setBulkVisibilityLoading(true);
+    const result = await handleToggleAllPublished();
+    setBulkVisibilityLoading(false);
+
+    if (result.ok) {
+      showSuccess(
+        result.targetPublished
+          ? 'Wszystkie odznaki są teraz widoczne dla studentów.'
+          : 'Wszystkie odznaki są teraz ukryte przed studentami.',
+      );
+      return;
+    }
+
+    showError(result.error || 'Nie udało się zmienić widoczności odznak.');
+  }, [handleToggleAllPublished, showSuccess, showError]);
+
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
     deleteLabel: 'Usuń odznakę',
@@ -314,7 +334,7 @@ export default function RewardsBadgesContent() {
       headerAction={<ViewLayoutToggle layout={layout} onToggle={toggleLayout} />}
       toolbar={(
         <>
-          <div className="maq-section-page__toolbar-start">
+          <div className="maq-section-page__toolbar-start rewards-page__toolbar-start">
             <Button
               variant="primary"
               size="md"
@@ -323,6 +343,12 @@ export default function RewardsBadgesContent() {
             >
               Dodaj odznakę
             </Button>
+            <RewardsBulkVisibilityButton
+              items={badges}
+              isLoading={bulkVisibilityLoading}
+              disabled={isLoading}
+              onToggleAll={handleToggleAllVisibility}
+            />
           </div>
           <div className={[
             'maq-section-page__toolbar-end',

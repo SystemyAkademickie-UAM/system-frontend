@@ -1,0 +1,15 @@
+.clear-notifications-modal__text {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+}
+
+.clear-notifications-modal--partial .maq-modal__footer .maq-btn--primary {
+  background: var(--color-notification-item-used, #d4a017);
+  color: #1a1400;
+}
+
+.clear-notifications-modal--partial .maq-modal__footer .maq-btn--primary:hover:not(:disabled) {
+  background: var(--color-notification-item-used-bright, #f0c940);
+}

@@ -31,6 +31,37 @@
   border-left: 4px solid var(--color-accent);
 }
 
+.notifications-feed__row--gold .notifications-feed__item {
+  border-left-color: var(--color-notification-item-used, #d4a017);
+  background: rgba(212, 160, 23, 0.1);
+}
+
+.notifications-feed__row--gold.notifications-feed__row--unread .notifications-feed__item {
+  border-left-color: var(--color-notification-item-used-bright, #f0c940);
+}
+
+.notifications-feed__row--gold .notifications-feed__item-type {
+  color: var(--color-notification-item-used-bright, #f0c940);
+}
+
+.notifications-feed__row--gold .notifications-feed__item-title {
+  color: #f5e6b8;
+}
+
+.notifications-feed__item--gold.notifications-feed__item--linkable:hover,
+.notifications-feed__item--gold.notifications-feed__item--linkable:focus-visible {
+  background: rgba(212, 160, 23, 0.18);
+}
+
+.notifications-feed__row--gold .notifications-feed__mark-read {
+  background: rgba(212, 160, 23, 0.16);
+  color: var(--color-notification-item-used-bright, #f0c940);
+}
+
+.notifications-feed__row--gold .notifications-feed__mark-read:hover {
+  background: rgba(212, 160, 23, 0.28);
+}
+
 .notifications-feed__item {
   flex: 1 1 auto;
   min-width: 0;

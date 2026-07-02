@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ProductCard, Divider } from '../../../components/ui/index.js';
+import { ProductCard } from '../../../components/ui/index.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { DEFAULT_CURRENCY_SYMBOL } from '../../../constants/currency.constants.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
+import './ProfileEqContentWindow.css';
 
 const closeicon = PUBLIC_UI_ICONS.close;
 
@@ -41,15 +42,13 @@ export function clearShopPurchaseSummary(groupId) {
   sessionStorage.removeItem(`${SHOP_PURCHASE_SUMMARY_PREFIX}${groupId}`);
 }
 
-export default function ProfileEqContentWindow({popupclose, groupId, purchaseditems, currencyemoji}) {
-
+export default function ProfileEqContentWindow({ popupclose, groupId, purchaseditems, currencyemoji }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [currencyEmojiValue, setCurrencyEmojiValue] = useState(currencyemoji || DEFAULT_CURRENCY_SYMBOL);
 
   const { categoriesById } = useGroupItemCategories(groupId);
 
   async function onFetchCurrencyEmoji() {
-
     if (currencyemoji != null && currencyemoji != '') {
       setCurrencyEmojiValue(currencyemoji);
       return;
@@ -58,7 +57,6 @@ export default function ProfileEqContentWindow({popupclose, groupId, purchasedit
     setErrorMessage('');
 
     try {
-
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
@@ -69,8 +67,8 @@ export default function ProfileEqContentWindow({popupclose, groupId, purchasedit
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserid,
+        },
       });
 
       const responsetext = await response.text();
@@ -91,9 +89,7 @@ export default function ProfileEqContentWindow({popupclose, groupId, purchasedit
       if (data && data.currencyEmoji != null && data.currencyEmoji != '') {
         setCurrencyEmojiValue(data.currencyEmoji);
       }
-
     } catch (error) {
-
       let message;
 
       if (error instanceof Error) {
@@ -116,35 +112,30 @@ export default function ProfileEqContentWindow({popupclose, groupId, purchasedit
     onFetchCurrencyEmoji();
   }, []);
 
-  var totalvalue = 0;
-  var totalcost = 0;
+  let totalvalue = 0;
+  let totalcost = 0;
 
   let i = 0;
 
   while (i < purchaseditems.length) {
-
     totalvalue = totalvalue + Number(purchaseditems[i].priceAmount);
     totalcost = totalcost + Number(purchaseditems[i].effectivePrice);
-
     i = i + 1;
   }
 
-  var totalsaved = totalvalue - totalcost;
+  const totalsaved = totalvalue - totalcost;
 
-  var itemrows = [];
+  const itemrows = [];
 
   i = 0;
 
   while (i < purchaseditems.length) {
-
-    var rowitems = [];
+    const rowitems = [];
 
     let j = 0;
 
     while (j < 4 && i < purchaseditems.length) {
-
       rowitems.push(purchaseditems[i]);
-
       i = i + 1;
       j = j + 1;
     }
@@ -153,19 +144,24 @@ export default function ProfileEqContentWindow({popupclose, groupId, purchasedit
   }
 
   return (
-    <div style = {{width: '100%', height: '100%', position: 'fixed', top: '0%', left: '0%', backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-      <div onClick = {(event) => event.stopPropagation()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '70%', height: '70%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
-        <div onClick = {closepopupwindow} style = {{width: '5%', aspectRatio: '1 / 1', position: 'absolute', top: '2%', left: '94%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer', zIndex: 1}}>
-          <img src = {closeicon} style = {{width: '60%', height: '60%'}}/>
-        </div>
-        <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: '3%', gap: '0.5vh'}}>
-          <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>Podsumowanie zakupów</span></div>
-        </div>
+    <div className="purchase-summary-modal">
+      <div className="purchase-summary-modal__dialog" onClick={(event) => event.stopPropagation()}>
+        <button
+          type="button"
+          className="purchase-summary-modal__close"
+          onClick={closepopupwindow}
+          aria-label="Zamknij"
+        >
+          <img src={closeicon} alt="" />
+        </button>
 
-        <div style = {{width: '96%', position: 'relative', left: '2%', display: 'flex', flexDirection: 'column', gap: '1vh', overflowY: 'auto', flex: 1, paddingTop: '2%', paddingBottom: '2%'}}>
+        <header className="purchase-summary-modal__header">
+          Podsumowanie zakupów
+        </header>
 
+        <div className="purchase-summary-modal__items">
           {itemrows.map((rowitems, rowindex) => (
-            <div key = {'purchaserow' + rowindex} style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', gap: '1%', alignItems: 'stretch', justifyContent: 'flex-start'}}>
+            <div key={`purchaserow${rowindex}`} className="purchase-summary-modal__row">
               {rowitems.map((item) => {
                 const categoryIds = item.categories?.length
                   ? item.categories
@@ -173,17 +169,17 @@ export default function ProfileEqContentWindow({popupclose, groupId, purchasedit
                 const categoryDetails = resolveShopCategoryDetails(categoryIds, categoriesById);
 
                 return (
-                  <div key = {'purchaseitem' + item.id} style = {{width: '23.75%', position: 'relative', display: 'flex', flexDirection: 'column'}}>
+                  <div key={`purchaseitem${item.id}`} className="purchase-summary-modal__item">
                     <ProductCard
-                      itemId = {item.id}
-                      name = {item.name}
-                      storyDescription = {item.storyDescription}
-                      didacticDescription = {item.didacticDescription}
-                      imageRef = {item.imageRef}
-                      imageUrl = {item.imageUrl}
-                      categoryDetails = {categoryDetails}
+                      itemId={item.id}
+                      name={item.name}
+                      storyDescription={item.storyDescription}
+                      didacticDescription={item.didacticDescription}
+                      imageRef={item.imageRef}
+                      imageUrl={item.imageUrl}
+                      categoryDetails={categoryDetails}
                       inventoryMode
-                      ownedQuantity = {1}
+                      ownedQuantity={1}
                       readOnly
                       hideAddToCart
                       hideActions
@@ -193,39 +189,44 @@ export default function ProfileEqContentWindow({popupclose, groupId, purchasedit
               })}
             </div>
           ))}
-
-
-          <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', paddingTop: '2%'}}>
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: '2%', paddingRight: '2%'}}>
-              <div style = {{position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', width: '25%', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Wartość przedmiotów</span></div>
-              <div style = {{position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', width: '5%', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', gap: '0.5vh'}}><span>{totalvalue}</span></div>
-              <span>{currencyEmojiValue}</span>
-            </div>
-            <div style = {{width: '35%', height: '1px', backgroundColor: 'rgba(30, 204, 56, 0.5)'}} />
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: '2%', paddingRight: '2%'}}>
-              <div style = {{position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', width: '25%', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Koszt przedmiotów</span></div>
-              <div style = {{position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', width: '5%', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', gap: '0.5vh'}}><span>{totalcost}</span></div>
-              <span>{currencyEmojiValue}</span>
-            </div>
-            <div style = {{width: '35%', height: '1px', backgroundColor: 'rgb(30, 204, 56)'}} />
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', paddingLeft: '2%', paddingRight: '2%'}}>
-              <div style = {{position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', width: '25%', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start'}}><span>Zaoszczędzono</span></div>
-              <div style = {{position: 'relative', color: 'rgb(30, 204, 56)', fontSize: '16px', display: 'flex', width: '5%', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', gap: '0.5vh'}}><span>{totalsaved}</span></div>
-              <span>{currencyEmojiValue}</span>
-            </div>
-          </div>
-
-
-          {errorMessage ? (
-            <div style = {{width: '100%', position: 'relative', color: 'rgb(255, 120, 120)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '2%'}}><span>{errorMessage}</span></div>
-          ) : null}
-
-
         </div>
 
-        <div onClick = {closepopupwindow} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '12%', height: '6%', position: 'relative', bottom: '3%', left: '84%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>Potwierdź</div>
+        <footer className="purchase-summary-modal__footer">
+          <div className="purchase-summary-modal__summary-row">
+            <span className="purchase-summary-modal__summary-label">Wartość przedmiotów</span>
+            <span className="purchase-summary-modal__summary-value">{totalvalue}</span>
+            <span>{currencyEmojiValue}</span>
+          </div>
+          <div className="purchase-summary-modal__divider" />
+          <div className="purchase-summary-modal__summary-row">
+            <span className="purchase-summary-modal__summary-label">Koszt przedmiotów</span>
+            <span className="purchase-summary-modal__summary-value">{totalcost}</span>
+            <span>{currencyEmojiValue}</span>
+          </div>
+          <div className="purchase-summary-modal__divider purchase-summary-modal__divider--strong" />
+          <div className="purchase-summary-modal__summary-row">
+            <span className="purchase-summary-modal__summary-label">Zaoszczędzono</span>
+            <span className="purchase-summary-modal__summary-value purchase-summary-modal__summary-value--saved">
+              {totalsaved}
+            </span>
+            <span>{currencyEmojiValue}</span>
+          </div>
 
+          {errorMessage ? (
+            <p className="purchase-summary-modal__error" role="alert">{errorMessage}</p>
+          ) : null}
+
+          <div className="purchase-summary-modal__actions">
+            <button
+              type="button"
+              className="purchase-summary-modal__confirm"
+              onClick={closepopupwindow}
+            >
+              Potwierdź
+            </button>
+          </div>
+        </footer>
       </div>
     </div>
-  )
+  );
 }

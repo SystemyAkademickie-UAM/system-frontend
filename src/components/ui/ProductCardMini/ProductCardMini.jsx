@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import AssetSvg from '../AssetSvg/AssetSvg.jsx';
+import { useMemo, useState } from 'react';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
-import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
+import { parseShopItemImageRef } from '../../../utils/shop/shopItemIcon.js';
 import './ProductCardMini.css';
 
 /**
@@ -11,6 +10,7 @@ import './ProductCardMini.css';
  * @param {string} props.name
  * @param {number | string} props.priceAmount
  * @param {string} [props.priceEmoji]
+ * @param {string | null} [props.imageRef]
  * @param {string} [props.imageUrl]
  * @param {string} [props.className]
  */
@@ -18,27 +18,31 @@ export default function ProductCardMini({
   name,
   priceAmount,
   priceEmoji,
+  imageRef,
   imageUrl,
   className = '',
 }) {
-  const [imageFailed, setImageFailed] = useState(!imageUrl);
-  const showFallback = imageFailed || !imageUrl;
+  const icon = useMemo(
+    () => parseShopItemImageRef(imageRef ?? imageUrl),
+    [imageRef, imageUrl],
+  );
+  const [imageFailed, setImageFailed] = useState(!icon.imageUrl);
+  const showEmoji = !icon.imageUrl || imageFailed;
 
   return (
     <article className={['maq-product-card-mini', className].filter(Boolean).join(' ')}>
-      <div className="maq-product-card-mini__thumb-wrap">
-        {showFallback ? (
-          <AssetSvg
-            name={SVG_PLACEHOLDER}
-            className="maq-product-card-mini__thumb-fallback"
-            width={20}
-            height={20}
-            alt=""
-          />
+      <div
+        className="maq-product-card-mini__thumb-wrap"
+        style={showEmoji ? { background: icon.iconBackground } : undefined}
+      >
+        {showEmoji ? (
+          <span className="maq-product-card-mini__thumb-emoji" aria-hidden="true">
+            {icon.emoji}
+          </span>
         ) : (
           <img
             className="maq-product-card-mini__thumb"
-            src={imageUrl}
+            src={icon.imageUrl}
             alt=""
             loading="lazy"
             decoding="async"

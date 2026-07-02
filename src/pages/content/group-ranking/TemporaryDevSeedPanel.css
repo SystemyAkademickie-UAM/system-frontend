@@ -8,6 +8,28 @@
   background: rgba(66, 243, 125, 0.06);
 }
 
+.temporary-dev-seed--critical {
+  border-color: #f3426c;
+  background: rgba(243, 66, 108, 0.06);
+}
+
+.temporary-dev-seed--critical .temporary-dev-seed__badge {
+  background: rgba(243, 66, 108, 0.18);
+  color: #f3426c;
+}
+
+.temporary-dev-seed--critical .temporary-dev-seed__btn--primary {
+  border-color: #f3426c;
+  background: rgba(243, 66, 108, 0.14);
+  color: #f3426c;
+}
+
+.temporary-dev-seed--critical .temporary-dev-seed__btn:hover:not(:disabled),
+.temporary-dev-seed--critical .temporary-dev-seed__btn:focus-visible:not(:disabled) {
+  border-color: #f3426c;
+  color: #f3426c;
+}
+
 .temporary-dev-seed__badge {
   display: inline-block;
   margin: 0 0 0.5rem;

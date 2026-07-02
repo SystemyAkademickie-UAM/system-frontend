@@ -1,43 +1,57 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { positionRowCenteredPreview } from '../../../../utils/ui/positionTooltipInViewport.js';
 
-const VIEWPORT_MARGIN = 16;
-
-export function useRewardsTablePreview({
-  previewWidth = 360,
-  previewHeight = 260,
-} = {}) {
+export function useRewardsTablePreview() {
+  const bubbleRef = useRef(null);
+  const triggerRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewPos, setPreviewPos] = useState({ x: 0, y: 0 });
+  const [layout, setLayout] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const updatePreviewPosition = useCallback((element) => {
-    if (!element) return;
+  const updateLayout = useCallback(() => {
+    const trigger = triggerRef.current;
+    const bubble = bubbleRef.current;
+    if (!trigger || !bubble) {
+      return;
+    }
 
-    const rect = element.getBoundingClientRect();
+    setLayout(positionRowCenteredPreview({
+      triggerRect: trigger.getBoundingClientRect(),
+      bubbleRect: bubble.getBoundingClientRect(),
+    }));
+  }, []);
 
-    const left = Math.max(
-      VIEWPORT_MARGIN,
-      (window.innerWidth - previewWidth) / 2,
-    );
+  useLayoutEffect(() => {
+    if (!previewVisible || menuOpen) {
+      setLayout(null);
+      return undefined;
+    }
 
-    let top = rect.top;
-    top = Math.max(
-      VIEWPORT_MARGIN,
-      Math.min(top, window.innerHeight - previewHeight - VIEWPORT_MARGIN),
-    );
+    updateLayout();
+    const rafId = window.requestAnimationFrame(updateLayout);
 
-    setPreviewPos({ x: left, y: top });
-  }, [previewWidth, previewHeight]);
+    window.addEventListener('resize', updateLayout);
+    window.addEventListener('scroll', updateLayout, true);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updateLayout);
+      window.removeEventListener('scroll', updateLayout, true);
+    };
+  }, [previewVisible, menuOpen, updateLayout]);
 
   const showPreview = useCallback((element) => {
-    if (menuOpen) return;
+    if (menuOpen) {
+      return;
+    }
 
-    updatePreviewPosition(element);
+    triggerRef.current = element;
     setPreviewVisible(true);
-  }, [menuOpen, updatePreviewPosition]);
+  }, [menuOpen]);
 
   const hidePreview = useCallback(() => {
     setPreviewVisible(false);
+    triggerRef.current = null;
   }, []);
 
   const handleMenuOpenChange = useCallback((open) => {
@@ -50,7 +64,8 @@ export function useRewardsTablePreview({
 
   return {
     previewVisible: previewVisible && !menuOpen,
-    previewPos,
+    layout,
+    bubbleRef,
     showPreview,
     hidePreview,
     handleMenuOpenChange,

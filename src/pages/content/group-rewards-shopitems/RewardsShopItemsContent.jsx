@@ -32,6 +32,7 @@ import { getVisibilityStatusLabel } from '../../../utils/rewards/visibilityStatu
 import { filterCatalogShopItems } from '../../../utils/shop/extraLifeItem.js';
 import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import RewardsShopItemTableRow from '../group-rewards/shared/RewardsShopItemTableRow.jsx';
+import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
 import '../group-rewards/shared/rewardsShared.css';
 import '../group-rewards/shared/rewardsTablePreview.css';
 import './RewardsShopItemsContent.css';
@@ -209,6 +210,7 @@ export default function RewardsShopItemsContent() {
     error,
     deleteItem,
     refetch,
+    toggleAllPublished,
   } = useGroupShopItems(groupId);
   const { isShopOpen, toggleShopOpen } = useGroupShopOpen(groupId);
   const { shopOpensAt, scheduleShopOpen } = useGroupShopSchedule(groupId);
@@ -225,6 +227,7 @@ export default function RewardsShopItemsContent() {
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [sortBy, setSortBy] = useState(SHOP_SORT.nameAsc);
+  const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
 
   const categoryFilters = useMemo(
     () => buildShopCategoryFilters(categories),
@@ -235,6 +238,11 @@ export default function RewardsShopItemsContent() {
     () => filterCatalogShopItems(items, showExtraLifeProduct)
       .map((item, index) => mapShopItemToRow(item, index, categoriesById)),
     [items, categoriesById, showExtraLifeProduct],
+  );
+
+  const bulkVisibilityItems = useMemo(
+    () => filterCatalogShopItems(items, showExtraLifeProduct),
+    [items, showExtraLifeProduct],
   );
 
   const closeModal = useCallback(() => {
@@ -306,8 +314,26 @@ export default function RewardsShopItemsContent() {
     openAddModal();
   }, [groupId, openAddModal]);
 
+  const handleToggleAllVisibility = useCallback(async () => {
+    setBulkVisibilityLoading(true);
+    const result = await toggleAllPublished(bulkVisibilityItems);
+    setBulkVisibilityLoading(false);
+
+    if (result.ok) {
+      showSuccess(
+        result.targetPublished
+          ? 'Wszystkie produkty są teraz widoczne dla studentów.'
+          : 'Wszystkie produkty są teraz ukryte przed studentami.',
+      );
+      return;
+    }
+
+    showError(result.error || 'Nie udało się zmienić widoczności produktów.');
+  }, [bulkVisibilityItems, showError, showSuccess, toggleAllPublished]);
+
   const rowActions = useMemo(() => ({
     onDelete: openDeleteModal,
+    canDelete: (item) => !item.isExtraLife,
     deleteLabel: 'Usuń produkt',
     deleteAriaLabel: (item) => `Usuń produkt ${item.name}`,
     menuItems: [
@@ -353,6 +379,12 @@ export default function RewardsShopItemsContent() {
             >
               Dodaj produkt
             </Button>
+            <RewardsBulkVisibilityButton
+              items={bulkVisibilityItems}
+              isLoading={bulkVisibilityLoading}
+              disabled={isLoading}
+              onToggleAll={handleToggleAllVisibility}
+            />
           </div>
           <div className="maq-section-page__toolbar-end rewards-shop-items__toolbar-end">
             <div className="rewards-shop-items__toolbar-row">

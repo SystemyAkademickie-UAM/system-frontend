@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {useParams} from 'react-router-dom';
 import {getApiBaseUrl} from '../../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
-import {Button, Divider, InfoTooltip, useToast} from '../../../components/ui/index.js';
+import {Button, CharacterLimitedField, Divider, InfoTooltip, useToast} from '../../../components/ui/index.js';
+import { NAME_MAX_LENGTH, SHORT_DESCRIPTION_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
+import LivesIcon from '../../../components/ui/Lives/LivesIcon.jsx';
 import RewardsCurrencyLabel from '../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import {createGroupShopItem, fetchGroupShopItems, updateGroupShopItem} from '../../../services/shop.api.js';
 import {syncShopItemRankUnlock, findRankUnlockingItem} from '../../../utils/ranks/rankShopItemUnlock.js';
+import { EXTRA_LIFE_ICON_EDIT_TOOLTIP } from '../../../utils/shop/extraLifeItem.js';
 import '../group-shop/modals/ShopItemFormModal.css';
 
 export default function ShopItemFormContent({
@@ -21,6 +24,7 @@ export default function ShopItemFormContent({
   const routeParams = useParams();
   const groupId = groupIdProp ?? routeParams.groupId;
   const editingItemId = itemId != null && itemId !== '' ? String(itemId) : null;
+  const [isEditingExtraLife, setIsEditingExtraLife] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const [currenticon, setCurrenticon] = useState('🥕');
@@ -38,6 +42,8 @@ export default function ShopItemFormContent({
   const [studentlimitenabled, setStudentlimitenabled] = useState(0);
 
   const [categories, setCategories] = useState([]);
+  const editFormHydratedRef = useRef(null);
+  const pendingEditCategoryIdsRef = useRef(null);
 
   const [ranks, setRanks] = useState([]);
   const [ranksfrombackend, setRanksfrombackend] = useState(0);
@@ -47,6 +53,7 @@ export default function ShopItemFormContent({
   const [badgediscounts, setBadgediscounts] = useState([]);
   const [selectedbadge, setSelectedbadge] = useState('Wybierz odznakę');
   const [pendingdiscountvalue, setPendingdiscountvalue] = useState('');
+  const [rankDiscountsExpanded, setRankDiscountsExpanded] = useState(false);
 
 
 
@@ -146,23 +153,34 @@ export default function ShopItemFormContent({
         receiveddata = [];
       }
 
-      const receivedcategories = [];
+      setCategories((current) => {
+        const previousById = new Map(current.map((entry) => [String(entry.id), entry]));
+        const pendingCategoryIds = pendingEditCategoryIdsRef.current;
 
-      let i = 0;
+        return receiveddata.map((entry) => {
+          const previous = previousById.get(String(entry.id));
+          let checked = 0;
 
-      while (i < receiveddata.length) {
+          if (previous?.checked === 1) {
+            checked = 1;
+          } else if (pendingCategoryIds?.has(String(entry.id))) {
+            checked = 1;
+          }
 
-        receivedcategories.push({
-          id: receiveddata[i].id,
-          name: receiveddata[i].name,
-          color: receiveddata[i].color ?? null,
-          checked: 0,
+          return {
+            id: entry.id,
+            name: entry.name,
+            color: entry.color ?? null,
+            checked,
+            editmode: previous?.editmode ?? 0,
+            tempname: previous?.tempname ?? entry.name,
+          };
         });
+      });
 
-        i = i + 1;
+      if (pendingEditCategoryIdsRef.current && receiveddata.length > 0) {
+        pendingEditCategoryIdsRef.current = null;
       }
-
-      setCategories(receivedcategories);
 
     } catch (error) {
 
@@ -640,31 +658,16 @@ export default function ShopItemFormContent({
 
 
   function oncategorycheckchange(categoryId) {
-
-    const newcategories = [];
-
-    let i = 0;
-
-    while (i < categories.length) {
-
-      if (categories[i].id == categoryId) {
-
-        let newchecked = 1;
-
-        if (categories[i].checked == 1) {
-          newchecked = 0;
-        }
-
-        newcategories.push({id: categories[i].id, name: categories[i].name, checked: newchecked, editmode: categories[i].editmode, tempname: categories[i].tempname});
-
-      } else {
-        newcategories.push(categories[i]);
+    setCategories((current) => current.map((category) => {
+      if (String(category.id) !== String(categoryId)) {
+        return category;
       }
 
-      i = i + 1;
-    }
-
-    setCategories(newcategories);
+      return {
+        ...category,
+        checked: category.checked === 1 ? 0 : 1,
+      };
+    }));
   }
 
 
@@ -905,8 +908,11 @@ export default function ShopItemFormContent({
     const items = {
       name: itemname.trim(),
       basePrice: Number(cost),
-      imageRef: currenticon + '*' + iconbackground,
     };
+
+    if (!isEditingExtraLife) {
+      items.imageRef = currenticon + '*' + iconbackground;
+    }
 
     if (description0.trim().length > 0) {
       items.storyDescription = description0.trim();
@@ -1070,6 +1076,14 @@ export default function ShopItemFormContent({
 
 
   useEffect(() => {
+    if (!editingItemId) {
+      setIsEditingExtraLife(false);
+      editFormHydratedRef.current = null;
+      pendingEditCategoryIdsRef.current = null;
+    }
+  }, [editingItemId]);
+
+  useEffect(() => {
     if (!editingItemId || ranksfrombackend !== 1) {
       return undefined;
     }
@@ -1087,6 +1101,14 @@ export default function ShopItemFormContent({
         return;
       }
 
+      if (editFormHydratedRef.current === editingItemId) {
+        return;
+      }
+
+      editFormHydratedRef.current = editingItemId;
+
+      setIsEditingExtraLife(item.isExtraLife === true);
+
       const imageParts = String(item.imageRef ?? '').split('*');
       if (imageParts[0]) {
         setCurrenticon(imageParts[0]);
@@ -1095,11 +1117,13 @@ export default function ShopItemFormContent({
         setIconbackground(imageParts[1]);
       }
 
+      const priceAmount = String(item.priceAmount ?? '');
+      const baseCost = Number(priceAmount);
+
       setItemname(item.name ?? '');
       setDescription0(item.storyDescription ?? '');
       setDescription1(item.didacticDescription ?? '');
-      setCost(String(item.priceAmount ?? ''));
-      recalculatediscounts(String(item.priceAmount ?? ''));
+      setCost(priceAmount);
 
       if (item.stockQuantity != null) {
         setGrouplimitenabled(1);
@@ -1118,19 +1142,58 @@ export default function ShopItemFormContent({
       }
 
       const selectedCategoryIds = new Set((item.categories ?? []).map((categoryId) => String(categoryId)));
+      pendingEditCategoryIdsRef.current = selectedCategoryIds;
 
-      setCategories((current) => current.map((category) => ({
-        ...category,
-        checked: selectedCategoryIds.has(String(category.id)) ? 1 : 0,
-      })));
+      setCategories((current) => {
+        if (current.length === 0) {
+          return current;
+        }
 
-      const rankRefs = ranks.map((rankEntry) => ({
-        dbId: rankEntry.id,
-        name: rankEntry.name,
-        shopItems: rankEntry.uniqueStoreItems || [],
-      }));
-      const owningRank = findRankUnlockingItem(editingItemId, rankRefs);
-      setUnlockRankId(owningRank ? String(owningRank.dbId) : '');
+        return current.map((category) => ({
+          ...category,
+          checked: selectedCategoryIds.has(String(category.id)) ? 1 : 0,
+        }));
+      });
+
+      let unlockRankValue = '';
+
+      setRanks((current) => {
+        const rankRefs = current.map((rankEntry) => ({
+          dbId: rankEntry.id,
+          name: rankEntry.name,
+          shopItems: rankEntry.uniqueStoreItems || [],
+        }));
+        const owningRank = findRankUnlockingItem(editingItemId, rankRefs);
+        unlockRankValue = owningRank ? String(owningRank.dbId) : '';
+
+        return current.map((rankEntry) => {
+          const promo = (item.rankPromotions ?? []).find((entry) => (entry.rankId ?? entry.id) === rankEntry.id);
+          if (promo) {
+            const costafter = Math.max(0, baseCost - Number(promo.value ?? 0));
+            return {
+              ...rankEntry,
+              costafter: String(costafter),
+              isCustom: 1,
+            };
+          }
+
+          let costafter = '';
+          if (priceAmount !== '' && baseCost > 0) {
+            let discounted = baseCost - Math.round(baseCost * rankEntry.discount / 100);
+            if (discounted < 0) {
+              discounted = 0;
+            }
+            costafter = String(discounted);
+          }
+
+          return {
+            ...rankEntry,
+            costafter,
+            isCustom: 0,
+          };
+        });
+      });
+      setUnlockRankId(unlockRankValue);
 
       const loadedBadgeDiscounts = (item.badgePromotions ?? []).map((promo, index) => {
         const badgeId = promo.badgeId ?? promo.id;
@@ -1146,25 +1209,12 @@ export default function ShopItemFormContent({
         };
       });
       setBadgediscounts(loadedBadgeDiscounts);
-
-      setRanks((current) => current.map((rankEntry) => {
-        const promo = (item.rankPromotions ?? []).find((entry) => (entry.rankId ?? entry.id) === rankEntry.id);
-        if (!promo) {
-          return rankEntry;
-        }
-        const costafter = Math.max(0, Number(item.priceAmount ?? 0) - Number(promo.value ?? 0));
-        return {
-          ...rankEntry,
-          costafter: String(costafter),
-          isCustom: 1,
-        };
-      }));
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [badges, editingItemId, groupId, ranks, ranksfrombackend]);
+  }, [badges, editingItemId, groupId, ranksfrombackend]);
 
 
 
@@ -1180,12 +1230,15 @@ export default function ShopItemFormContent({
             <div className="shop-item-form__row shop-item-form__row--name-price">
               <div className="shop-item-form__field">
                 <label className="shop-item-form__label" htmlFor="shop-item-name">Nazwa przedmiotu</label>
-                <input
-                  id="shop-item-name"
-                  className="shop-item-form__input"
-                  value={itemname}
-                  onChange={(event) => setItemname(event.target.value)}
-                />
+                <CharacterLimitedField value={itemname} maxLength={NAME_MAX_LENGTH}>
+                  <input
+                    id="shop-item-name"
+                    className="shop-item-form__input"
+                    value={itemname}
+                    maxLength={NAME_MAX_LENGTH}
+                    onChange={(event) => setItemname(event.target.value)}
+                  />
+                </CharacterLimitedField>
               </div>
               <div className="shop-item-form__field shop-item-form__field--price">
                 <RewardsCurrencyLabel htmlFor="shop-item-price" className="shop-item-form__label">
@@ -1203,14 +1256,30 @@ export default function ShopItemFormContent({
               </div>
             </div>
 
-            <EmojiPickerField
-              className="shop-item-form__icon-picker"
-              label="Ikona przedmiotu"
-              value={currenticon}
-              defaultEmoji="🥕"
-              onChange={setCurrenticon}
-              ariaLabel="Wybierz ikonę przedmiotu"
-            />
+            {isEditingExtraLife ? (
+              <div className="shop-item-form__icon-picker shop-item-form__icon-picker--locked">
+                <span className="shop-item-form__label">
+                  Ikona przedmiotu
+                  <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP} />
+                </span>
+                <div
+                  className="shop-item-form__icon-locked"
+                  aria-disabled="true"
+                  title={EXTRA_LIFE_ICON_EDIT_TOOLTIP}
+                >
+                  <LivesIcon size="lg" ariaLabel="Ikona systemu żyć" />
+                </div>
+              </div>
+            ) : (
+              <EmojiPickerField
+                className="shop-item-form__icon-picker"
+                label="Ikona przedmiotu"
+                value={currenticon}
+                defaultEmoji="🥕"
+                onChange={setCurrenticon}
+                ariaLabel="Wybierz ikonę przedmiotu"
+              />
+            )}
 
             <div className="shop-item-form__field">
               <span className="shop-item-form__label shop-item-form__label--heading">
@@ -1248,21 +1317,27 @@ export default function ShopItemFormContent({
           <section className="shop-item-form__panel">
             <div className="shop-item-form__field">
               <label className="shop-item-form__label" htmlFor="shop-item-story">Opis fabularny</label>
-              <textarea
-                id="shop-item-story"
-                className="shop-item-form__textarea"
-                value={description0}
-                onChange={(event) => setDescription0(event.target.value)}
-              />
+              <CharacterLimitedField value={description0} maxLength={SHORT_DESCRIPTION_MAX_LENGTH}>
+                <textarea
+                  id="shop-item-story"
+                  className="shop-item-form__textarea"
+                  value={description0}
+                  maxLength={SHORT_DESCRIPTION_MAX_LENGTH}
+                  onChange={(event) => setDescription0(event.target.value)}
+                />
+              </CharacterLimitedField>
             </div>
             <div className="shop-item-form__field">
               <label className="shop-item-form__label" htmlFor="shop-item-edu">Opis dydaktyczny</label>
-              <textarea
-                id="shop-item-edu"
-                className="shop-item-form__textarea"
-                value={description1}
-                onChange={(event) => setDescription1(event.target.value)}
-              />
+              <CharacterLimitedField value={description1} maxLength={SHORT_DESCRIPTION_MAX_LENGTH}>
+                <textarea
+                  id="shop-item-edu"
+                  className="shop-item-form__textarea"
+                  value={description1}
+                  maxLength={SHORT_DESCRIPTION_MAX_LENGTH}
+                  onChange={(event) => setDescription1(event.target.value)}
+                />
+              </CharacterLimitedField>
             </div>
           </section>
 
@@ -1398,50 +1473,69 @@ export default function ShopItemFormContent({
               </div>
             ))}
           </section>
-
-          <div className="shop-item-form__footer">
-            <Button type="button" variant="secondary" size="md" onClick={goback}>
-              Cofnij
-            </Button>
-            <Button type="button" variant="primary" size="md" onClick={createitem}>
-              {editingItemId ? 'Zapisz zmiany' : 'Stwórz przedmiot'}
-            </Button>
-          </div>
         </div>
 
         <aside className="shop-item-form__sidebar">
-          <section className="shop-item-form__panel">
-            <span className="shop-item-form__label shop-item-form__label--heading">
-              Zniżki za rangi
-              {ranksfrombackend === 0 ? '*' : ''}
+          <section
+            className={[
+              'shop-item-form__panel',
+              'shop-item-form__panel--rank-discounts',
+              rankDiscountsExpanded ? 'shop-item-form__panel--rank-discounts-expanded' : '',
+            ].filter(Boolean).join(' ')}
+          >
+            <div className="shop-item-form__rank-discounts-header">
+              <button
+                type="button"
+                className="shop-item-form__rank-discounts-toggle"
+                onClick={() => setRankDiscountsExpanded((expanded) => !expanded)}
+                aria-expanded={rankDiscountsExpanded}
+                aria-controls="shop-item-rank-discounts-list"
+              >
+                <span className="shop-item-form__rank-discounts-chevron" aria-hidden="true" />
+                <span className="shop-item-form__label shop-item-form__label--heading shop-item-form__label--toggle">
+                  Zniżki za rangi
+                  {ranksfrombackend === 0 ? '*' : ''}
+                </span>
+              </button>
               <InfoTooltip text="Choć cena finalna w przypadku posiadania przez studenta danej rangi obliczana jest automatycznie, można ją nadpisać." />
-            </span>
+            </div>
 
-            {ranks.length === 0 ? (
-              <p className="shop-item-form__empty">Brak rang w grupie.</p>
-            ) : (
-              <div className="shop-item-form__rank-list">
-                {ranks.map((rank) => (
-                  <div key={`rank-${rank.id}`} className="shop-item-form__rank-card">
-                    <span className="shop-item-form__rank-icon" aria-hidden="true">
-                      {rank.icon || '⭐'}
-                    </span>
-                    <span className="shop-item-form__rank-name">{rank.name}</span>
-                    <input
-                      className="shop-item-form__input shop-item-form__rank-price-input"
-                      value={rank.costafter}
-                      onInput={(event) => onNumericinput(
-                        event.target.value,
-                        (value) => onrankcostchange(rank.id, value),
-                      )}
-                    />
-                    <span className="shop-item-form__rank-discount">{rank.discount}%</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            {rankDiscountsExpanded ? (
+              ranks.length === 0 ? (
+                <p className="shop-item-form__empty">Brak rang w grupie.</p>
+              ) : (
+                <div id="shop-item-rank-discounts-list" className="shop-item-form__rank-list">
+                  {ranks.map((rank) => (
+                    <div key={`rank-${rank.id}`} className="shop-item-form__rank-card">
+                      <span className="shop-item-form__rank-icon" aria-hidden="true">
+                        {rank.icon || '⭐'}
+                      </span>
+                      <span className="shop-item-form__rank-name">{rank.name}</span>
+                      <input
+                        className="shop-item-form__input shop-item-form__rank-price-input"
+                        value={rank.costafter}
+                        onInput={(event) => onNumericinput(
+                          event.target.value,
+                          (value) => onrankcostchange(rank.id, value),
+                        )}
+                      />
+                      <span className="shop-item-form__rank-discount">{rank.discount}%</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : null}
           </section>
         </aside>
+      </div>
+
+      <div className="shop-item-form__footer">
+        <Button type="button" variant="secondary" size="md" onClick={goback}>
+          Cofnij
+        </Button>
+        <Button type="button" variant="primary" size="md" onClick={createitem}>
+          {editingItemId ? 'Zapisz zmiany' : 'Stwórz przedmiot'}
+        </Button>
       </div>
     </div>
   );

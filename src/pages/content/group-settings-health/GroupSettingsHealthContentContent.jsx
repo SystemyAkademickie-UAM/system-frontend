@@ -238,7 +238,7 @@ export default function GroupSettingsHealthContentContent() {
   ].filter(Boolean).join(' ');
 
   return (
-    <div className="group-settings-form group-settings-form--drive-layout">
+    <div className="group-settings-form group-settings-form--drive-layout group-settings-form--lives">
       <section className="group-settings-form__panel" aria-label="System żyć">
         <SettingsSectionHeader title="System żyć" id="group-lives-title" />
 
@@ -286,7 +286,7 @@ export default function GroupSettingsHealthContentContent() {
                 </CharacterLimitedField>
               </div>
 
-              <div className="group-settings-form__field">
+              <div className="group-settings-form__field group-settings-form__field--value">
                 <label className="group-settings-form__label" htmlFor="group-lives-limit">
                   Limit żyć
                   <InfoTooltip text="Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." />
@@ -301,7 +301,7 @@ export default function GroupSettingsHealthContentContent() {
                 />
               </div>
 
-              <div className="group-settings-form__field">
+              <div className="group-settings-form__field group-settings-form__field--value">
                 <label className="group-settings-form__label" htmlFor="group-lives-start">
                   Startowa liczba żyć
                   <InfoTooltip text="Liczba szans, jaką student otrzymuje po dołączeniu do grupy." />

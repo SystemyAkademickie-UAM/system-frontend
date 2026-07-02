@@ -309,7 +309,7 @@
   align-items: center;
 }
 
-.maq-product-card__price-tooltip {
+.maq-product-card__price-hover {
   flex-shrink: 0;
 }
 

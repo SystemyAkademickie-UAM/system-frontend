@@ -117,9 +117,9 @@ export default function ShopStudentCatalogPanel({
           <p className="group-shop__empty page-unavailable__notice">Brak produktów spełniających kryteria.</p>
         ) : (
           <div className="group-shop__grid">
-            {visibleItems.map((item) => (
+            {visibleItems.map((item, index) => (
               <ProductCard
-                key={item.id}
+                key={`${item.id}-${index}`}
                 itemId={item.id}
                 name={item.name}
                 storyDescription={item.storyDescription}

@@ -31,7 +31,7 @@ export default function ProductCategoryStrip({ categories = [], className = '' }
 
           return (
           <li
-            key={category.id ?? `category-${index}`}
+            key={`${String(category.id ?? 'category')}-${index}`}
             className="maq-product-category-strip__item"
           >
             <span

@@ -1,13 +1,13 @@
-import { useCallback, useId, useRef, useState } from 'react';
+import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Badge from './Badge.jsx';
 import BadgeIcon from './BadgeIcon.jsx';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 import { getBadgeCssVars } from './badgeCssVars.js';
 import { BADGE_RARITY, getBadgeRarityConfig } from './badgeRarity.js';
+import { positionSideTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './BadgeMini.css';
 
-const PREVIEW_WIDTH = 533;
 const PREVIEW_GAP = 12;
 
 /**
@@ -33,9 +33,10 @@ export default function BadgeMini({
 }) {
   const labelId = useId();
   const buttonRef = useRef(null);
+  const bubbleRef = useRef(null);
   const [internalSelected, setInternalSelected] = useState(defaultSelected);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewPos, setPreviewPos] = useState({ x: 0, y: 0 });
+  const [previewLayout, setPreviewLayout] = useState(null);
 
   const isSelected = selected !== undefined ? selected : internalSelected;
   const config = getBadgeRarityConfig(rarity);
@@ -50,28 +51,41 @@ export default function BadgeMini({
   };
 
   const updatePreviewPosition = useCallback(() => {
-    if (!buttonRef.current) return;
-
-    const rect = buttonRef.current.getBoundingClientRect();
-    const previewHeight = 297;
-    let left = rect.right + PREVIEW_GAP;
-
-    if (left + PREVIEW_WIDTH > window.innerWidth - 16) {
-      left = rect.left - PREVIEW_WIDTH - PREVIEW_GAP;
+    const trigger = buttonRef.current;
+    const bubble = bubbleRef.current;
+    if (!trigger || !bubble) {
+      return;
     }
 
-    left = Math.max(16, left);
-    const top = Math.max(
-      16,
-      Math.min(rect.top, window.innerHeight - previewHeight - 16),
-    );
-
-    setPreviewPos({ x: left, y: top });
+    setPreviewLayout(positionSideTooltip({
+      triggerRect: trigger.getBoundingClientRect(),
+      bubbleRect: bubble.getBoundingClientRect(),
+      placement: 'right',
+      gap: PREVIEW_GAP,
+    }));
   }, []);
+
+  useLayoutEffect(() => {
+    if (!previewVisible || !canPreview) {
+      setPreviewLayout(null);
+      return undefined;
+    }
+
+    updatePreviewPosition();
+    const rafId = window.requestAnimationFrame(updatePreviewPosition);
+
+    window.addEventListener('resize', updatePreviewPosition);
+    window.addEventListener('scroll', updatePreviewPosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updatePreviewPosition);
+      window.removeEventListener('scroll', updatePreviewPosition, true);
+    };
+  }, [previewVisible, canPreview, updatePreviewPosition, name, storyDescription, didacticDescription]);
 
   const handleMouseEnter = () => {
     if (!canPreview) return;
-    updatePreviewPosition();
     setPreviewVisible(true);
   };
 
@@ -120,8 +134,13 @@ export default function BadgeMini({
       {canPreview && previewVisible
         ? createPortal(
           <div
+            ref={bubbleRef}
             className="maq-badge-mini-preview"
-            style={{ left: `${previewPos.x}px`, top: `${previewPos.y}px` }}
+            style={{
+              visibility: previewLayout ? 'visible' : 'hidden',
+              left: previewLayout ? `${previewLayout.left}px` : 0,
+              top: previewLayout ? `${previewLayout.top}px` : 0,
+            }}
             aria-hidden="true"
           >
             <Badge

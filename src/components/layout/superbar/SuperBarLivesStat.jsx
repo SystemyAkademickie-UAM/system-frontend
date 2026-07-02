@@ -1,7 +1,8 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import LivesIcon from '../../ui/Lives/LivesIcon.jsx';
 import SuperBarStatBadge from './SuperBarStatBadge.jsx';
+import { positionCenteredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './SuperBar.css';
 
 /**
@@ -16,16 +17,6 @@ function formatLivesMaxLabel(livesMax) {
 }
 
 /**
- * @param {boolean} livesShopEnabled
- * @returns {string}
- */
-function formatLivesShopLabel(livesShopEnabled) {
-  return livesShopEnabled
-    ? 'Można kupić w sklepie'
-    : 'Niedostępne w sklepie';
-}
-
-/**
  * Statystyka żyć z podglądem konfiguracji po najechaniu.
  */
 export default function SuperBarLivesStat({
@@ -36,21 +27,43 @@ export default function SuperBarLivesStat({
   ariaLabel,
 }) {
   const triggerRef = useRef(null);
+  const bubbleRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewPos, setPreviewPos] = useState({ x: 0, y: 0 });
+  const [layout, setLayout] = useState(null);
 
   const updatePreviewPosition = useCallback(() => {
-    if (!triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    const previewWidth = 240;
-    let left = rect.left + rect.width / 2 - previewWidth / 2;
-    left = Math.max(16, Math.min(left, window.innerWidth - previewWidth - 16));
-    const top = rect.bottom + 8;
-    setPreviewPos({ x: left, y: top });
+    const trigger = triggerRef.current;
+    const bubble = bubbleRef.current;
+    if (!trigger || !bubble) {
+      return;
+    }
+
+    setLayout(positionCenteredTooltip({
+      triggerRect: trigger.getBoundingClientRect(),
+      bubbleRect: bubble.getBoundingClientRect(),
+    }));
   }, []);
 
-  const handleMouseEnter = () => {
+  useLayoutEffect(() => {
+    if (!previewVisible) {
+      setLayout(null);
+      return undefined;
+    }
+
     updatePreviewPosition();
+    const rafId = window.requestAnimationFrame(updatePreviewPosition);
+
+    window.addEventListener('resize', updatePreviewPosition);
+    window.addEventListener('scroll', updatePreviewPosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updatePreviewPosition);
+      window.removeEventListener('scroll', updatePreviewPosition, true);
+    };
+  }, [previewVisible, updatePreviewPosition, livesMax, livesShopEnabled]);
+
+  const handleMouseEnter = () => {
     setPreviewVisible(true);
   };
 
@@ -76,13 +89,24 @@ export default function SuperBarLivesStat({
       {previewVisible
         ? createPortal(
           <div
-            className="super-bar-stat-preview super-bar-stat-preview--lives"
-            style={{ left: `${previewPos.x}px`, top: `${previewPos.y}px` }}
+            ref={bubbleRef}
+            className={[
+              'super-bar-stat-preview',
+              'super-bar-stat-preview--lives',
+              layout?.placement === 'bottom' ? 'super-bar-stat-preview--below' : '',
+            ].filter(Boolean).join(' ')}
+            style={{
+              visibility: layout ? 'visible' : 'hidden',
+              left: layout ? `${layout.left}px` : 0,
+              top: layout ? `${layout.top}px` : 0,
+            }}
             aria-hidden="true"
           >
             <p className="super-bar-stat-preview__title">{livesLabel}</p>
             <p className="super-bar-stat-preview__label">{formatLivesMaxLabel(livesMax)}</p>
-            <p className="super-bar-stat-preview__detail">{formatLivesShopLabel(livesShopEnabled)}</p>
+            {livesShopEnabled ? (
+              <p className="super-bar-stat-preview__detail">Można kupić w sklepie</p>
+            ) : null}
           </div>,
           document.body,
         )

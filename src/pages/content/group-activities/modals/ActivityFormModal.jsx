@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, TextField } from '../../../../components/ui/index.js';
+import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import { validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import '../../group-rewards/shared/rewardsModals.css';
@@ -104,6 +105,8 @@ export default function ActivityFormModal({
     && rewardValidation.valid
   ), [form, rewardValidation.valid]);
 
+  const showRewardError = form.reward.trim() !== '' && !rewardValidation.valid;
+
   const handleChange = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
   };
@@ -132,7 +135,7 @@ export default function ActivityFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        {isEdit ? (
+        <div className="rewards-modal__row rewards-modal__row--name-reward">
           <TextField
             id="activity-name"
             label={ACTIVITYNAME__TEXTLABEL[LANGUAGE]}
@@ -143,30 +146,32 @@ export default function ActivityFormModal({
             className="rewards-modal__field"
             inputClassName="rewards-modal__input"
           />
-        ) : (
-          <div className="rewards-modal__row rewards-modal__row--name-reward">
-            <TextField
-              id="activity-name"
-              label={ACTIVITYNAME__TEXTLABEL[LANGUAGE]}
-              fieldKind="name"
-              value={form.name}
-              onChange={handleChange('name')}
-              placeholder={ACTIVITYNAMEPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-              className="rewards-modal__field"
-              inputClassName="rewards-modal__input"
-            />
-            <TextField
+
+          <div className="rewards-modal__field">
+            <RewardsCurrencyLabel htmlFor="activity-reward">
+              {REWARD__TEXTLABEL[LANGUAGE]}
+            </RewardsCurrencyLabel>
+            <input
               id="activity-reward"
-              label={REWARD__TEXTLABEL[LANGUAGE]}
-              type="number"
+              type="text"
+              inputMode="numeric"
+              className={[
+                'rewards-modal__input',
+                showRewardError ? 'rewards-modal__input--error' : '',
+              ].filter(Boolean).join(' ')}
               value={form.reward}
               onChange={handleChange('reward')}
               placeholder={REWARDPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-              className="rewards-modal__field"
-              inputClassName="rewards-modal__input"
+              aria-invalid={showRewardError}
+              aria-describedby={showRewardError ? 'activity-reward-error' : undefined}
             />
+            {showRewardError ? (
+              <p id="activity-reward-error" className="rewards-modal__field-error" role="alert">
+                {rewardValidation.error}
+              </p>
+            ) : null}
           </div>
-        )}
+        </div>
 
         <TextField
           id="activity-story"
@@ -189,19 +194,6 @@ export default function ActivityFormModal({
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
         />
-
-        {isEdit ? (
-          <TextField
-            id="activity-reward"
-            label={REWARD__TEXTLABEL[LANGUAGE]}
-            type="number"
-            value={form.reward}
-            onChange={handleChange('reward')}
-            placeholder={REWARDPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-            className="rewards-modal__field"
-            inputClassName="rewards-modal__input"
-          />
-        ) : null}
       </div>
     </Modal>
   );

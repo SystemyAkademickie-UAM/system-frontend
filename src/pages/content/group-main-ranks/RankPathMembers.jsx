@@ -1,10 +1,11 @@
 import { Link, useParams } from 'react-router-dom';
-import { useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CurrencyDisplay from '../../../components/ui/Currency/CurrencyDisplay.jsx';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
 import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { positionAnchoredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './RankPathMembers.css';
 
 const DEFAULT_MAX_VISIBLE = 15;
@@ -27,17 +28,41 @@ const OVERFLOWBUTTON__TEXTLABEL = {
 function OverflowBadge({ hiddenStudents, groupId }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const triggerRef = useRef(null);
+  const bubbleRef = useRef(null);
   const [visible, setVisible] = useState(false);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [layout, setLayout] = useState(null);
 
-  const handleEnter = () => {
-    if (!triggerRef.current) {
+  const updateLayout = useCallback(() => {
+    const trigger = triggerRef.current;
+    const bubble = bubbleRef.current;
+    if (!trigger || !bubble) {
       return;
     }
-    const rect = triggerRef.current.getBoundingClientRect();
-    setPos({ x: rect.left, y: rect.bottom + 8 });
-    setVisible(true);
-  };
+
+    setLayout(positionAnchoredTooltip({
+      triggerRect: trigger.getBoundingClientRect(),
+      bubbleRect: bubble.getBoundingClientRect(),
+    }));
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!visible) {
+      setLayout(null);
+      return undefined;
+    }
+
+    updateLayout();
+    const rafId = window.requestAnimationFrame(updateLayout);
+
+    window.addEventListener('scroll', updateLayout, true);
+    window.addEventListener('resize', updateLayout);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', updateLayout, true);
+      window.removeEventListener('resize', updateLayout);
+    };
+  }, [visible, hiddenStudents.length, updateLayout]);
 
   return (
     <>
@@ -46,9 +71,9 @@ function OverflowBadge({ hiddenStudents, groupId }) {
         type="button"
         className="rank-path-members__overflow"
         aria-label={OVERFLOWBUTTON__TEXTLABEL[LANGUAGE](hiddenStudents.length)}
-        onMouseEnter={handleEnter}
+        onMouseEnter={() => setVisible(true)}
         onMouseLeave={() => setVisible(false)}
-        onFocus={handleEnter}
+        onFocus={() => setVisible(true)}
         onBlur={() => setVisible(false)}
       >
         …
@@ -57,8 +82,13 @@ function OverflowBadge({ hiddenStudents, groupId }) {
       {visible
         ? createPortal(
           <div
+            ref={bubbleRef}
             className="rank-path-members__overflow-tooltip"
-            style={{ left: `${pos.x}px`, top: `${pos.y}px` }}
+            style={{
+              visibility: layout ? 'visible' : 'hidden',
+              left: layout ? `${layout.left}px` : 0,
+              top: layout ? `${layout.top}px` : 0,
+            }}
             role="tooltip"
           >
             <p className="rank-path-members__overflow-title">{OVERFLOW__TEXTLABEL[LANGUAGE]}</p>
