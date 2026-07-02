@@ -219,7 +219,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
         <div className="group-settings-form__stack">
           <div className="group-settings-form__field">
             <label className="group-settings-form__label" htmlFor="group-settings-name">
-              Nazwa grupy
+              Nazwa grupy*
               {groupnamevalueerror ? (
                 <span className="group-settings-form__label-error">{groupnamevalueerror}</span>
               ) : null}

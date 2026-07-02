@@ -86,7 +86,7 @@ export default function BadgeFormModal({
         <div className="rewards-modal__row rewards-modal__row--name-reward">
           <TextField
             id="badge-name"
-            label="Nazwa"
+            label="Nazwa*"
             fieldKind="name"
             value={form.name}
             onChange={handleChange('name')}
@@ -95,7 +95,7 @@ export default function BadgeFormModal({
           />
           <TextField
             id="badge-reward"
-            label="Nagroda"
+            label="Nagroda*"
             type="number"
             value={form.rewardAmount}
             onChange={handleChange('rewardAmount')}
@@ -134,7 +134,7 @@ export default function BadgeFormModal({
 
         <TextField
           id="badge-story"
-          label="Opis fabularny"
+          label="Opis fabularny*"
           fieldKind="shortDescription"
           value={form.storyDescription}
           onChange={handleChange('storyDescription')}
@@ -144,7 +144,7 @@ export default function BadgeFormModal({
 
         <TextField
           id="badge-edu"
-          label="Opis dydaktyczny"
+          label="Opis dydaktyczny*"
           fieldKind="shortDescription"
           value={form.didacticDescription}
           onChange={handleChange('didacticDescription')}

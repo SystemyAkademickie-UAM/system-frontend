@@ -49,7 +49,7 @@ const CREATORTITLE__TEXTLABEL = {
 };
 const STEP1SUBTITLE__TEXTLABEL = {
   polish: 'Nazwa, przedmiot i opis na jednej planszy.',
-  english: 'Name, subject and description on one board.',
+  english: 'Name, subject, and description on one board.',
 };
 const STEP2SUBTITLE__TEXTLABEL = {
   polish: 'Wybierz baner: gotowy wzór, własny plik lub kolor tła.',
@@ -68,16 +68,16 @@ const BANNERLABEL__TEXTLABEL = {
   english: 'Group Banner',
 };
 const GROUPNAME__TEXTLABEL = {
-  polish: 'Nazwa grupy',
-  english: 'Group Name',
+  polish: 'Nazwa grupy*',
+  english: 'Group Name*',
 };
 const SUBJECTNAME__TEXTLABEL = {
-  polish: 'Nazwa przedmiotu',
-  english: 'Subject Name',
+  polish: 'Nazwa przedmiotu*',
+  english: 'Subject Name*',
 };
 const GROUPDESCRIPTION__TEXTLABEL = {
-  polish: 'Opis grupy',
-  english: 'Group Description',
+  polish: 'Opis grupy*',
+  english: 'Group Description*',
 };
 const DESCRIPTIONPLACEHOLDER__TEXTLABEL = {
   polish: 'Krótko opisz tło fabularne i cele grupy...',

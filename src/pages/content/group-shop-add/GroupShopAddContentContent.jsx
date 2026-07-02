@@ -1178,7 +1178,7 @@ export default function ShopItemFormContent({
           <section className="shop-item-form__panel">
             <div className="shop-item-form__row shop-item-form__row--name-price">
               <div className="shop-item-form__field">
-                <label className="shop-item-form__label" htmlFor="shop-item-name">Nazwa przedmiotu</label>
+                <label className="shop-item-form__label" htmlFor="shop-item-name">Nazwa przedmiotu*</label>
                 <input
                   id="shop-item-name"
                   className="shop-item-form__input"
@@ -1187,7 +1187,7 @@ export default function ShopItemFormContent({
                 />
               </div>
               <div className="shop-item-form__field">
-                <label className="shop-item-form__label" htmlFor="shop-item-price">Cena</label>
+                <label className="shop-item-form__label" htmlFor="shop-item-price">Cena*</label>
                 <input
                   id="shop-item-price"
                   className="shop-item-form__input"

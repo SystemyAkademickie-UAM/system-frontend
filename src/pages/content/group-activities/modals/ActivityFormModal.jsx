@@ -40,32 +40,32 @@ export default function ActivityFormModal({
     english: 'Add',
   };
   const ACTIVITYNAME__TEXTLABEL = {
-    polish: 'Nazwa aktywności',
-    english: 'Activity Name',
+    polish: 'Nazwa aktywności*',
+    english: 'Activity Name*',
   };
   const ACTIVITYNAMEPLACEHOLDER__TEXTLABEL = {
     polish: 'np. Zadanie wprowadzające',
     english: 'e.g. Introductory Task',
   };
   const REWARD__TEXTLABEL = {
-    polish: 'Nagroda',
-    english: 'Reward',
+    polish: 'Nagroda*',
+    english: 'Reward*',
   };
   const REWARDPLACEHOLDER__TEXTLABEL = {
     polish: 'np. 10',
     english: 'e.g. 10',
   };
   const STORYDESCRIPTION__TEXTLABEL = {
-    polish: 'Opis fabularny',
-    english: 'Story Description',
+    polish: 'Opis fabularny*',
+    english: 'Story Description*',
   };
   const STORYDESCRIPTIONPLACEHOLDER__TEXTLABEL = {
     polish: 'Krótki opis w kontekście fabuły kursu',
     english: 'Short description in the context of the course story',
   };
   const EDUCATIONALDESCRIPTION__TEXTLABEL = {
-    polish: 'Opis dydaktyczny',
-    english: 'Educational Description',
+    polish: 'Opis dydaktyczny*',
+    english: 'Educational Description*',
   };
   const EDUCATIONALDESCRIPTIONPLACEHOLDER__TEXTLABEL = {
     polish: 'Cele i wymagania edukacyjne',

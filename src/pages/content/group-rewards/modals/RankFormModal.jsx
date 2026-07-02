@@ -135,7 +135,7 @@ export default function RankFormModal({
     >
       <div className="rewards-modal__form">
         <div className="rewards-modal__field">
-          <label htmlFor="rank-name" className="rewards-modal__label">Nazwa</label>
+          <label htmlFor="rank-name" className="rewards-modal__label">Nazwa*</label>
           <input
             id="rank-name"
             type="text"
@@ -155,7 +155,7 @@ export default function RankFormModal({
         />
 
         <div className="rewards-modal__field">
-          <label htmlFor="rank-cost" className="rewards-modal__label">Koszt</label>
+          <label htmlFor="rank-cost" className="rewards-modal__label">Całkowita waluta niezbędna do uzyskania rangi*</label>
           <input
             id="rank-cost"
             type="text"
@@ -204,7 +204,7 @@ export default function RankFormModal({
         </div>
 
         <div className="rewards-modal__field">
-          <label htmlFor="rank-story" className="rewards-modal__label">Status fabularny</label>
+          <label htmlFor="rank-story" className="rewards-modal__label">Opis fabularny*</label>
           <textarea
             id="rank-story"
             className="rewards-modal__textarea"

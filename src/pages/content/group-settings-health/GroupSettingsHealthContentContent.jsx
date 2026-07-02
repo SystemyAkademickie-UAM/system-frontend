@@ -272,7 +272,7 @@ export default function GroupSettingsHealthContentContent() {
 
               <div className="group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="group-lives-label">
-                  Nazwa żyć
+                  Nazwa żyć*
                 </label>
                 <CharacterLimitedField value={livesLabel} maxLength={LIVES_LABEL_MAX_LENGTH}>
                   <input
@@ -288,7 +288,7 @@ export default function GroupSettingsHealthContentContent() {
 
               <div className="group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="group-lives-limit">
-                  Limit żyć
+                  Limit żyć*
                   <InfoTooltip text="Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." />
                 </label>
                 <input
@@ -303,7 +303,7 @@ export default function GroupSettingsHealthContentContent() {
 
               <div className="group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="group-lives-start">
-                  Startowa liczba żyć
+                  Startowa liczba żyć*
                   <InfoTooltip text="Liczba szans, jaką student otrzymuje po dołączeniu do grupy." />
                 </label>
                 <input
