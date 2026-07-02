@@ -270,6 +270,15 @@
 
 .rewards-modal__toolbar .maq-search-bar {
   max-width: none;
+  background: var(--color-bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.rewards-modal__toolbar .maq-search-bar:focus-within {
+  border-color: var(--color-accent);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-accent-muted);
 }
 
 .rewards-modal__item-list {

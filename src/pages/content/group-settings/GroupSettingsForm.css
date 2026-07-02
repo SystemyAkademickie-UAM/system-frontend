@@ -59,6 +59,10 @@
   align-self: stretch;
 }
 
+.group-settings-form--drive-layout.group-settings-form--currency {
+  padding-inline: clamp(0.75rem, 2vw, 1.25rem);
+}
+
 .group-settings-form--drive-layout .group-settings-form__panel {
   padding: 0;
   border: none;

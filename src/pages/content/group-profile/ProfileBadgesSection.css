@@ -19,9 +19,7 @@
 }
 
 .profile-badges-section__count {
-  font-size: 14px;
-  font-weight: 700;
-  color: rgb(66, 243, 125);
+  margin: 0;
 }
 
 .profile-badges-section__empty {

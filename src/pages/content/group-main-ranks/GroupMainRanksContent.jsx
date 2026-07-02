@@ -56,6 +56,7 @@ export default function GroupMainRanksContent({
   showLecturerActions = false,
   onEditRank,
   onDeleteRank,
+  onAssignRank,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
@@ -85,7 +86,7 @@ export default function GroupMainRanksContent({
     }, 350);
 
     return () => window.clearTimeout(timer);
-  }, [isStudentView, isLoading, ranks.length, studentProfile?.totalEarned]);
+  }, [isStudentView, isLoading, ranks.length, studentProfile?.totalEarned, studentProfile?.rankId, studentProfile?.autoRankEnabled]);
 
   if (isLoading) {
     return <p className="group-main-ranks__message" role="status">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>;
@@ -128,12 +129,15 @@ export default function GroupMainRanksContent({
           isStudentView={isStudentView}
           showMemberAvatars={showMemberAvatars}
           totalEarned={studentProfile?.totalEarned ?? 0}
+          studentRankId={studentProfile?.rankId ?? null}
+          studentAutoRankEnabled={studentProfile?.autoRankEnabled !== false}
           studentNickname={studentProfile?.nickname || studentProfile?.name || STUDENTNAME__TEXTLABEL[LANGUAGE]}
           studentAvatarUrl={studentProfile?.avatarUrl ?? null}
           showHeader={false}
           showLecturerActions={showLecturerActions}
           onEditRank={onEditRank}
           onDeleteRank={onDeleteRank}
+          onAssignRank={onAssignRank}
         />
       )}
     </section>

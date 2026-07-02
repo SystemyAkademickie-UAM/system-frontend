@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Modal, TextField } from '../../../../components/ui/index.js';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import { DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
-import { validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import RewardsCurrencyLabel from '../shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
 
@@ -55,7 +55,10 @@ export default function RankFormModal({
   const showCostError = form.costAmount.trim() !== '' && !costValidation.valid;
 
   const handleChange = (field) => (event) => {
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+    const nextValue = field === 'costAmount'
+      ? sanitizeWholeNumberInput(event.target.value)
+      : event.target.value;
+    setForm((prev) => ({ ...prev, [field]: nextValue }));
   };
 
   const handleConfirm = () => {

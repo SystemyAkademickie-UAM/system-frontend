@@ -59,14 +59,17 @@
 
 .maq-emoji-picker-field__dialog {
   position: relative;
-  width: min(420px, calc(100vw - 2rem));
-  max-height: min(480px, calc(100dvh - 2rem));
+  width: min(640px, calc(100vw - 2rem));
+  max-height: min(560px, calc(100dvh - 2rem));
   margin: auto 0;
   overflow: auto;
   overscroll-behavior: contain;
 }
 
 .maq-emoji-picker-field__picker {
+  display: block;
+  width: 100%;
+  min-width: min(640px, calc(100vw - 2rem));
   --fill-color: rgb(40, 40, 52);
   --text-color: rgb(227, 224, 247);
   --title-bar-fill-color: rgb(40, 40, 52);

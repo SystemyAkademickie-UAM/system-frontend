@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AssetSvg from '../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../constants/svgIcons.js';
 import { formatRelativeTimePl } from '../../utils/notifications/formatRelativeTimePl.js';
@@ -25,6 +25,20 @@ const NEWFROMLASTVISIT__TEXTLABEL = {
   polish: 'Nowe od ostatniej wizyty',
   english: 'New since last visit',
 };
+
+function isSameNavigationTarget(location, href) {
+  const hashIndex = href.indexOf('#');
+  const pathnameEnd = hashIndex === -1 ? href.length : hashIndex;
+  const targetPathWithSearch = href.slice(0, pathnameEnd);
+  const targetHash = hashIndex === -1 ? '' : href.slice(hashIndex);
+  const [targetPathname, targetSearch = ''] = targetPathWithSearch.split('?');
+
+  return (
+    location.pathname === targetPathname
+    && location.search === (targetSearch ? `?${targetSearch}` : '')
+    && location.hash === targetHash
+  );
+}
 
 /**
  * @typedef {import('../../utils/notifications/formatBacklogNotification.js').ReturnType<typeof import('../../utils/notifications/formatBacklogNotification.js').formatBacklogNotification>} FormattedNotification
@@ -63,6 +77,7 @@ export default function NotificationsFeed({
   persistLastSeenOnLeave = true,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const resolvedEmptyMessage = emptyMessage ?? EMPTYMESSAGE__TEXTLABEL[LANGUAGE];
@@ -111,6 +126,12 @@ export default function NotificationsFeed({
     if (!notification.href) {
       return;
     }
+
+    if (isSameNavigationTarget(location, notification.href)) {
+      window.location.assign(notification.href);
+      return;
+    }
+
     navigate(notification.href);
   };
 

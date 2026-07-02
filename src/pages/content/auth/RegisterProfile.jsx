@@ -100,6 +100,12 @@ export default function RegisterProfile({
               placeholder="MegaKrolik"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && isValid) {
+                  event.preventDefault();
+                  handleContinue();
+                }
+              }}
               maxLength={PROFILE_NICKNAME_MAX_LENGTH}
               autoComplete="nickname"
             />

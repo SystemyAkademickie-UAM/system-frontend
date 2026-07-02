@@ -16,6 +16,7 @@ import './BadgeTreasuryCard.css';
  * @param {boolean} [props.showLecturerActions]
  * @param {() => void} [props.onEdit]
  * @param {() => void} [props.onDelete]
+ * @param {() => void} [props.onAssign]
  */
 export default function BadgeTreasuryCard({
   badge,
@@ -25,6 +26,7 @@ export default function BadgeTreasuryCard({
   showLecturerActions = false,
   onEdit,
   onDelete,
+  onAssign,
 }) {
   const earners = getBadgeEarners(earnersByBadgeId, badge.dbId, excludeAccountId);
   const isLocked = isStudentView && !badge.isUnlocked;
@@ -54,6 +56,8 @@ export default function BadgeTreasuryCard({
             name={badge.name}
             onEdit={onEdit}
             onDelete={onDelete}
+            onAssign={onAssign}
+            assignLabel="Przydziel odznakę"
             className="badge-treasury-card__actions"
           />
         </>

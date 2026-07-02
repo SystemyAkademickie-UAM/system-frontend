@@ -24,6 +24,12 @@
   color: var(--color-text-secondary);
 }
 
+.group-banner-picker__error {
+  margin: 0.35rem 0 0;
+  font-size: var(--font-size-body);
+  color: var(--color-input-error);
+}
+
 .group-banner-picker__gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));

@@ -253,6 +253,13 @@ export default function RewardsBadgesContent() {
     }
   }, [badges, openModal]);
 
+  const handleTileAssignBadge = useCallback((treasuryBadge) => {
+    const badge = badges.find((entry) => entry.dbId === treasuryBadge.dbId);
+    if (badge) {
+      openModal('give', badge);
+    }
+  }, [badges, openModal]);
+
   const handleToggleAllVisibility = useCallback(async () => {
     setBulkVisibilityLoading(true);
     const result = await handleToggleAllPublished();
@@ -408,6 +415,7 @@ export default function RewardsBadgesContent() {
             showLecturerActions
             onEditBadge={handleTileEditBadge}
             onDeleteBadge={handleTileDeleteBadge}
+            onAssignBadge={handleTileAssignBadge}
           />
         </>
       ) : (

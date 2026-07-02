@@ -1,5 +1,8 @@
+/** Domyślny przyrost zniżki nowej rangi względem najwyższej istniejącej. */
+export const DEFAULT_RANK_DISCOUNT_INCREMENT = 1;
+
 /**
- * Domyślna zniżka nowej rangi: 5% + zniżka rangi z najwyższą wartością procentową.
+ * Domyślna zniżka nowej rangi: 1% + zniżka rangi z najwyższą wartością procentową.
  *
  * @param {Array<{ discount?: number | null }>} ranks
  * @returns {number}
@@ -13,7 +16,7 @@ export function calculateDefaultRankDiscount(ranks = []) {
     return Math.max(max, value);
   }, 0);
 
-  return 5 + highestDiscount;
+  return DEFAULT_RANK_DISCOUNT_INCREMENT + highestDiscount;
 }
 
 /**

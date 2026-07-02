@@ -16,7 +16,26 @@ export function validateDeltaInput(value) {
   };
 }
 
-export function validateCurrencyForm(deltaInput) {
+function validateResultingAmount(nextAmount, fieldLabel, max) {
+  if (nextAmount > max) {
+    return {
+      valid: false,
+      error: `${fieldLabel} nie może przekraczać ${max.toLocaleString('pl-PL')}.`,
+    };
+  }
+
+  return { valid: true, error: null };
+}
+
+export function validateCurrencyForm(deltaInput, options = {}) {
+  const {
+    currentAmount = 0,
+    currentTotalEarned = null,
+    max = null,
+    amountLabel = 'Wartość',
+    totalEarnedLabel = 'Zgromadzona waluta',
+  } = options;
+
   const deltaValidation = validateDeltaInput(deltaInput);
   if (!deltaValidation.valid) {
     return { ...deltaValidation, hasChange: false, mode: null };
@@ -36,6 +55,34 @@ export function validateCurrencyForm(deltaInput) {
       mode: null,
       error: null,
     };
+  }
+
+  if (max != null) {
+    const nextAmount = Math.max(0, currentAmount + deltaValidation.delta);
+    const amountCheck = validateResultingAmount(nextAmount, amountLabel, max);
+    if (!amountCheck.valid) {
+      return {
+        valid: false,
+        delta: deltaValidation.delta,
+        hasChange: true,
+        mode: 'delta',
+        error: amountCheck.error,
+      };
+    }
+
+    if (deltaValidation.delta > 0 && currentTotalEarned != null) {
+      const nextTotalEarned = currentTotalEarned + deltaValidation.delta;
+      const totalCheck = validateResultingAmount(nextTotalEarned, totalEarnedLabel, max);
+      if (!totalCheck.valid) {
+        return {
+          valid: false,
+          delta: deltaValidation.delta,
+          hasChange: true,
+          mode: 'delta',
+          error: totalCheck.error,
+        };
+      }
+    }
   }
 
   return {

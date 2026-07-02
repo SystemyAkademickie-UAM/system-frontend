@@ -98,6 +98,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
           label="Nazwa nowej grupy"
           value={groupName}
           onChange={(event) => setGroupName(event.target.value)}
+          fieldKind="name"
           required
         />
         <TextField
@@ -105,6 +106,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
           label="Przedmiot (opcjonalnie)"
           value={subjectName}
           onChange={(event) => setSubjectName(event.target.value)}
+          fieldKind="name"
         />
       </div>
 

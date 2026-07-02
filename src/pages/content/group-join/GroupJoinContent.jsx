@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button, PageHeader, CharacterLimitedField } from '../../../components/ui/index.js';
 import { ENROLLMENT_ENTRY_CODE_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import { groupMainPath } from '../../../routes/pathRegistry.js';
+import { groupMainPath, groupsListPath } from '../../../routes/pathRegistry.js';
 import { validateAlphanumericInput } from '../../../utils/validation/alphanumericValidation.js';
 import { useGroupPreview } from '../../../hooks/groups/useGroupPreview.js';
 import { enrollByCode } from '../../../services/enrollment.api.js';
@@ -97,10 +98,23 @@ const MISSINGGROUPID__TEXTLABEL = {
   english: 'Missing group ID.',
 };
 
+const BACKTOGROUPSLIST__TEXTLABEL = {
+  polish: 'Wróć do listy grup',
+  english: 'Back to groups list',
+};
+
 const INVALIDCODE__TEXTLABEL = {
   polish: 'Nieprawidłowy kod dostępu.',
   english: 'Invalid access code.',
 };
+
+function BackIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export default function GroupJoinContent() {
   const { groupId } = useParams();
@@ -181,9 +195,15 @@ export default function GroupJoinContent() {
       ) : null}
 
       {!isLoading && group && !hasAccess && !isStudent ? (
-        <p className="group-join__message group-join__message--error" role="alert">
-          {NOACCESSMESSAGE__TEXTLABEL[LANGUAGE]}
-        </p>
+        <>
+          <p className="group-join__message group-join__message--error" role="alert">
+            {NOACCESSMESSAGE__TEXTLABEL[LANGUAGE]}
+          </p>
+          <Link to={groupsListPath()} className="group-join__back-link">
+            <BackIcon className="group-join__back-icon" />
+            {BACKTOGROUPSLIST__TEXTLABEL[LANGUAGE]}
+          </Link>
+        </>
       ) : null}
 
       {!isLoading && group && !hasAccess && isStudent ? (

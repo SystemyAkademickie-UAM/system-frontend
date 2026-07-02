@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Divider, SubNav, CurrencyDisplay } from '../../../components/ui/index.js';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
+import { fetchGroupRanks } from '../../../services/ranks.api.js';
 import { formatProfileNumber } from '../../../services/studentProfile.api.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
+import { mapRankDiscountValue } from '../group-main-ranks/rankPathModel.js';
 import { ProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
 import { useGroupStudentProfile } from './useGroupStudentProfile.js';
 import './ProfilePageLayout.css';
@@ -29,14 +31,42 @@ function ProfileStatLine({ label, value }) {
 export default function ProfilePageLayout({ children }) {
   const nav = useGroupSubNav('group-profile');
   const profileState = useGroupStudentProfile();
-  const { profile, isLoading, error, refetch, studentId } = profileState;
+  const { groupId, profile, isLoading, error, refetch, studentId } = profileState;
   const { profile: userProfile, avatarUrl: userAvatarUrl } = useUserProfile();
+  const [shopDiscountPercent, setShopDiscountPercent] = useState(0);
 
   useEffect(() => {
     if (!studentId && userProfile) {
       refetch();
     }
   }, [studentId, userProfile?.nickname, userProfile?.avatarId, refetch, userProfile]);
+
+  useEffect(() => {
+    if (!groupId || profile?.rankId == null) {
+      setShopDiscountPercent(0);
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    fetchGroupRanks(groupId)
+      .then((ranks) => {
+        if (cancelled) {
+          return;
+        }
+        const rank = ranks.find((entry) => entry.id === profile.rankId);
+        setShopDiscountPercent(rank ? mapRankDiscountValue(rank) : 0);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setShopDiscountPercent(0);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [groupId, profile?.rankId]);
 
   const subNavItems = nav.items;
 
@@ -79,8 +109,7 @@ export default function ProfilePageLayout({ children }) {
               <div className="profile-page-layout__stats-column">
                 <ProfileCurrencyStat amount={profile.totalEarned} />
                 <ProfileStatLine label="Zdobyte odznaki" value={formatProfileNumber(profile.badgesCount)} />
-                <ProfileStatLine label="Obecny ranking" value="X" />
-                <ProfileStatLine label="Najwyższa pozycja" value="X" />
+                <ProfileStatLine label="Zniżka w sklepie" value={`${shopDiscountPercent}%`} />
               </div>
             </div>
 

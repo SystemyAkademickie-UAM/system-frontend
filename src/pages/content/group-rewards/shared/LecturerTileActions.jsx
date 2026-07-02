@@ -21,6 +21,8 @@ function EditIcon() {
  * @param {string} props.name
  * @param {() => void} [props.onEdit]
  * @param {() => void} [props.onDelete]
+ * @param {() => void} [props.onAssign]
+ * @param {string} [props.assignLabel='Przydziel']
  * @param {string} [props.className]
  */
 export default function LecturerTileActions({
@@ -28,10 +30,31 @@ export default function LecturerTileActions({
   name,
   onEdit,
   onDelete,
+  onAssign,
+  assignLabel = 'Przydziel',
   className = '',
 }) {
   return (
     <div className={['maq-product-card__lecturer-actions', className].filter(Boolean).join(' ')}>
+      {onAssign ? (
+        <button
+          type="button"
+          className="maq-product-card__action-btn"
+          aria-label={`${assignLabel} ${entityLabel} ${name}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAssign();
+          }}
+        >
+          <AssetSvg
+            name={SVG_ICONS.actions.assign}
+            className="maq-product-card__action-icon"
+            width={18}
+            height={18}
+            alt=""
+          />
+        </button>
+      ) : null}
       <button
         type="button"
         className="maq-product-card__action-btn"

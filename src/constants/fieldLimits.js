@@ -1,3 +1,6 @@
+/** Maks. długość nazwy kategorii przedmiotu sklepu. */
+export const ITEM_CATEGORY_NAME_MAX_LENGTH = 100;
+
 /** Maks. długość nazwy (grupa, aktywność, odznaka, ranga, produkt itd.). */
 export const NAME_MAX_LENGTH = 64;
 

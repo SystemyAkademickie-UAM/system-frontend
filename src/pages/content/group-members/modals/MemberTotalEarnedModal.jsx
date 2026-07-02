@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Modal } from '../../../../components/ui/index.js';
+import { REWARD_NUMERIC_MAX } from '../../../../utils/validation/rewardsNumericValidation.js';
 import { resolveNextAmount, validateCurrencyForm, validateDeltaInput } from './memberCurrencyForm.js';
 
 import './memberModals.css';
@@ -20,8 +21,12 @@ export default function MemberTotalEarnedModal({
   }, [isOpen, member]);
 
   const validation = useMemo(
-    () => validateCurrencyForm(deltaInput),
-    [deltaInput],
+    () => validateCurrencyForm(deltaInput, {
+      currentAmount: member?.totalCurrency ?? 0,
+      max: REWARD_NUMERIC_MAX,
+      amountLabel: 'Zgromadzona waluta',
+    }),
+    [deltaInput, member],
   );
 
   const previewTotalCurrency = useMemo(() => {

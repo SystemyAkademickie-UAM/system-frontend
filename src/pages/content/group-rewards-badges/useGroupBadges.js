@@ -94,6 +94,7 @@ export function useGroupBadges() {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
     const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_BADGE_EMOJI);
+    const shouldPublish = values.isPublished !== false;
     const result = await createBadge(groupId, {
       name: values.name,
       icon,
@@ -101,15 +102,21 @@ export function useGroupBadges() {
       storyDescription: values.storyDescription || '',
       rewardAmount: values.rewardAmount || 0,
       rarity: values.rarity || 'common',
-      isPublished: values.isPublished !== false,
     });
 
-    if (result.ok && result.badge) {
-      await loadData();
-      notifyGroupContentChanged(groupId, 'badges');
+    if (!result.ok || !result.badge) {
       return result;
     }
 
+    if (shouldPublish) {
+      const publishResult = await updateBadge(groupId, result.badge.id, { isPublished: true });
+      if (!publishResult.ok) {
+        return publishResult;
+      }
+    }
+
+    await loadData();
+    notifyGroupContentChanged(groupId, 'badges');
     return result;
   }, [groupId, loadData]);
 

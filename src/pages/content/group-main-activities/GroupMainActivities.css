@@ -39,6 +39,13 @@
   color: var(--color-text-secondary);
 }
 
+.group-main-activities__stage-stat {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
 .group-main-activities__list {
   display: flex;
   flex-direction: column;

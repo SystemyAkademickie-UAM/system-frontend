@@ -118,7 +118,7 @@ export default function GroupSettingsCurrencyContentContent() {
   });
 
   return (
-    <div className="group-settings-form group-settings-form--drive-layout">
+    <div className="group-settings-form group-settings-form--drive-layout group-settings-form--currency">
       <section className="group-settings-form__panel" aria-label="Waluta grupy">
         <SettingsSectionHeader title="Waluta" id="group-currency-title" />
 

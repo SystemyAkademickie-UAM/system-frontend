@@ -20,7 +20,7 @@ import {
 
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
-import { getStudentProgressPx, groupStudentsByRank } from './rankPathModel.js';
+import { getStudentManualRankProgressPx, getStudentProgressPx, groupStudentsByRank } from './rankPathModel.js';
 
 import RankPathMembers from './RankPathMembers.jsx';
 
@@ -58,6 +58,8 @@ const EMPTYMESSAGE__TEXTLABEL = {
  * @param {boolean} props.isStudentView
 
  * @param {number} [props.totalEarned]
+ * @param {number | null | undefined} [props.studentRankId]
+ * @param {boolean} [props.studentAutoRankEnabled=true]
 
  * @param {string | null | undefined} [props.studentNickname]
 
@@ -67,6 +69,7 @@ const EMPTYMESSAGE__TEXTLABEL = {
  * @param {boolean} [props.showLecturerActions=false]
  * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onEditRank]
  * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onDeleteRank]
+ * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onAssignRank]
  */
 
 export default function RankPathBoard({
@@ -78,6 +81,10 @@ export default function RankPathBoard({
 
   totalEarned = 0,
 
+  studentRankId = null,
+
+  studentAutoRankEnabled = true,
+
   studentNickname = 'Student',
 
   studentAvatarUrl = null,
@@ -87,11 +94,9 @@ export default function RankPathBoard({
   showMemberAvatars = true,
 
   showLecturerActions = false,
-
   onEditRank,
-
   onDeleteRank,
-
+  onAssignRank,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
@@ -167,7 +172,7 @@ export default function RankPathBoard({
 
     };
 
-  }, [ranks.length, isStudentView]);
+  }, [ranks.length, isStudentView, studentRankId, studentAutoRankEnabled]);
 
 
 
@@ -177,10 +182,14 @@ export default function RankPathBoard({
 
   const axisSpan = Math.max(0, axisBottom - axisTop);
 
+  const useManualRankPosition = isStudentView
+    && studentAutoRankEnabled === false
+    && studentRankId != null;
+
   const progressPx = isStudentView
-
-    ? getStudentProgressPx(rowCenters, ranks, totalEarned)
-
+    ? (useManualRankPosition
+      ? getStudentManualRankProgressPx(rowCenters, ranks, studentRankId)
+      : getStudentProgressPx(rowCenters, ranks, totalEarned))
     : axisBottom;
 
   const progressRatio = axisSpan > 0
@@ -352,6 +361,8 @@ export default function RankPathBoard({
                 name={rank.name}
                 onEdit={onEditRank ? () => onEditRank(rank) : undefined}
                 onDelete={onDeleteRank ? () => onDeleteRank(rank) : undefined}
+                onAssign={onAssignRank ? () => onAssignRank(rank) : undefined}
+                assignLabel="Przydziel rangę"
                 className="rank-path-row__actions"
               />
             ) : null}

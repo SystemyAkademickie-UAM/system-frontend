@@ -169,6 +169,10 @@ export default function ProfileEqContentContent({
 
   return (
     <div className="profile-eq-page">
+      <header className="profile-eq-page__header">
+        <h2 className="profile-eq-page__title">Ekwipunek</h2>
+      </header>
+
       {error ? (
         <p className="profile-eq-page__error" role="alert">{error}</p>
       ) : null}

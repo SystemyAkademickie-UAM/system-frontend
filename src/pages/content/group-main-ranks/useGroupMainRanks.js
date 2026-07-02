@@ -10,6 +10,7 @@ import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.j
 import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { resolveShopItemLabels } from '../../../utils/ranks/rankShopItemUnlock.js';
 import {
+  applyManualStudentRankStates,
   applyRankPathColors,
   applyStudentRankStates,
   mapStudentForRankPath,
@@ -63,7 +64,13 @@ export function useGroupMainRanks() {
 
         setStudentProfile(profileResult.profile);
         setStudents([]);
-        setRanks(applyStudentRankStates(mappedRanks, profileResult.profile.totalEarned ?? 0));
+        const profile = profileResult.profile;
+        const isManualRank = profile.autoRankEnabled === false;
+        if (isManualRank && profile.rankId != null) {
+          setRanks(applyManualStudentRankStates(mappedRanks, profile.rankId));
+        } else {
+          setRanks(applyStudentRankStates(mappedRanks, profile.totalEarned ?? 0));
+        }
         return;
       }
 

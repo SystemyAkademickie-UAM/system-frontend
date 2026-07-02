@@ -6,6 +6,10 @@ import {
   getPredefinedBannerPreviewUrl,
   serializeBannerPickerValue,
 } from '../../../../utils/groupBannerRef.js';
+import {
+  getGroupBannerMaxFileSizeLabel,
+  validateGroupBannerFile,
+} from '../../../../utils/groupBannerUpload.js';
 import './GroupBannerPicker.css';
 
 /** @typedef {import('../../../../utils/groupBannerRef.js').BannerPickerValue} BannerPickerValue */
@@ -26,6 +30,7 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
   const [galleryItems, setGalleryItems] = useState([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [activeMode, setActiveMode] = useState(value.mode);
+  const [uploadError, setUploadError] = useState('');
   const persistedSnapshotRef = useRef(null);
 
   useEffect(() => {
@@ -72,6 +77,14 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
       if (!file) {
         return;
       }
+
+      const validation = validateGroupBannerFile(file);
+      if (!validation.valid) {
+        setUploadError(validation.error ?? 'Nie udało się wczytać pliku.');
+        return;
+      }
+
+      setUploadError('');
       const reader = new FileReader();
       reader.onload = () => {
         onChange({
@@ -202,7 +215,14 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
             <Button type="button" variant="secondary" size="md" onClick={onUploadClick}>
               {value.previewUrl && value.mode === 'file' ? 'Zmień plik banera' : 'Wybierz plik banera'}
             </Button>
-            <p className="group-banner-picker__hint">Obsługiwane formaty graficzne (PNG, JPG, WebP…).</p>
+            <p className="group-banner-picker__hint">
+              Obsługiwane formaty graficzne (PNG, JPG, WebP…). Maksymalny rozmiar:
+              {' '}
+              {getGroupBannerMaxFileSizeLabel()}.
+            </p>
+            {uploadError ? (
+              <p className="group-banner-picker__error" role="alert">{uploadError}</p>
+            ) : null}
           </div>
         ) : null}
 

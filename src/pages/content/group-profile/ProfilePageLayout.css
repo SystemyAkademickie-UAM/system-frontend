@@ -101,7 +101,15 @@
 .profile-page-layout__stat-value {
   font-size: 1.125rem;
   font-weight: 700;
+  line-height: 1.25;
   color: var(--color-text-primary);
+}
+
+.profile-page-layout__stat-value.maq-currency-display .maq-currency-display__amount {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
 }
 
 .profile-page-layout__section-divider {
@@ -116,7 +124,7 @@
 
 .profile-page-layout__sub-nav {
   box-sizing: border-box;
-  width: 100%;
+  width: fit-content;
   max-width: 100%;
   padding: 4px;
 }

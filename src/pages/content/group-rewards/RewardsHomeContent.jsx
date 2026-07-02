@@ -265,6 +265,13 @@ export default function RewardsHomeContent() {
     }
   }, [resolveRankByDbId, openModal]);
 
+  const handleTileAssignRank = useCallback((pathRank) => {
+    const rank = resolveRankByDbId(pathRank.dbId);
+    if (rank) {
+      openModal('assign', rank);
+    }
+  }, [resolveRankByDbId, openModal]);
+
   const handleOpenDiscountFromForm = useCallback((rank) => {
     closeModal();
     openModal('discount', rank);
@@ -391,6 +398,7 @@ export default function RewardsHomeContent() {
           showLecturerActions
           onEditRank={handleTileEditRank}
           onDeleteRank={handleTileDeleteRank}
+          onAssignRank={handleTileAssignRank}
         />
       ) : (
         <DataTable

@@ -1,6 +1,7 @@
-import { Badge } from '../../../components/ui/index.js';
+import { Badge, CurrencyDisplay } from '../../../components/ui/index.js';
 import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 import { useProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
+import '../group-activities/shared/activitiesShared.css';
 import './ProfileBadgesSection.css';
 
 export default function ProfileBadgesSection() {
@@ -16,7 +17,7 @@ export default function ProfileBadgesSection() {
     <div className="profile-badges-section">
       <div className="profile-badges-section__header">
         <h2 className="profile-badges-section__title">Zdobyte odznaki</h2>
-        <span className="profile-badges-section__count">
+        <span className="activities-page__count profile-badges-section__count">
           {earnedBadges.length}
           {' '}
           zdobytych

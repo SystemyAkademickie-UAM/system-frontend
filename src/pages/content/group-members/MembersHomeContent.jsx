@@ -133,9 +133,14 @@ export default function MembersHomeContent() {
     setModalLoading(false);
 
     if (result.ok) {
+      if (result.isAutomatic) {
+        showSuccess(`Włączono rangę automatyczną. Aktualna ranga: ${result.assignedRankName}.`);
+      } else {
+        showSuccess(`Przyznano rangę: ${result.assignedRankName}.`);
+      }
       closeModal();
     }
-  }, [activeModal, updateMemberRank, closeModal]);
+  }, [activeModal, updateMemberRank, closeModal, showSuccess]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.member) return;
@@ -214,7 +219,7 @@ export default function MembersHomeContent() {
       mobileHidden: true,
       render: (member) => (
         <span className="members-table__rank-cell">
-          <span className="members-table__rank-badge" title={member.rank}>{member.rank}</span>
+          <span className="members-table__cell-text">{member.rank}</span>
           {member.autoRankEnabled === false ? (
             <span className="members-table__rank-manual-note">*przyznawana ręcznie</span>
           ) : null}

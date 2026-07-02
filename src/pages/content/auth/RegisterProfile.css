@@ -2,8 +2,13 @@
   box-sizing: border-box;
   width: var(--auth-card-max-width);
   max-width: calc(100% - 2rem);
-  padding: 16px clamp(1rem, 1.67vw, 32px) clamp(2rem, 3.3vw, 64px);
+  padding:
+    var(--auth-card-back-padding-top, 16px)
+    var(--auth-card-body-padding-x, clamp(1rem, 1.67vw, 32px))
+    var(--auth-card-body-padding-bottom, clamp(2rem, 3.3vw, 64px));
   gap: 0;
+  overflow: visible;
+  margin-bottom: 0.5rem;
 }
 
 .register-profile__avatar-section {

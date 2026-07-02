@@ -12,6 +12,7 @@ import {
   buildBannerImageRefPayload,
   createDefaultBannerPickerValue,
 } from '../../../utils/groupBannerRef.js';
+import { validateGroupBannerFile } from '../../../utils/groupBannerUpload.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupsListCreator.css';
 
@@ -231,6 +232,10 @@ export default function GroupsListCreator({ onClose, onCreated }) {
 
   async function resolveImageRefForSave(base, browserid) {
     if (bannerSelection.mode === 'file' && bannerSelection.file) {
+      const validation = validateGroupBannerFile(bannerSelection.file);
+      if (!validation.valid) {
+        throw new Error(validation.error ?? 'Plik banera jest nieprawidłowy.');
+      }
       return uploadBannerToDrive(base, browserid, bannerSelection.file);
     }
     return buildBannerImageRefPayload(bannerSelection);

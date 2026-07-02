@@ -71,7 +71,7 @@ export default function RankDiscountModal({
             aria-describedby={showDiscountError ? 'rank-discount-modal-error' : 'rank-discount-modal-hint'}
           />
           <p id="rank-discount-modal-hint" className="rewards-modal__field-hint">
-            Domyślnie: 5% + zniżka najwyższej rangi. Możesz wyczyścić pole.
+            Domyślnie: 1% + zniżka najwyższej rangi. Możesz wyczyścić pole.
           </p>
           {showDiscountError ? (
             <p id="rank-discount-modal-error" className="rewards-modal__field-error" role="alert">

@@ -10,6 +10,7 @@ import RewardsCurrencyLabel from '../group-rewards/shared/RewardsCurrencyLabel.j
 import {createGroupShopItem, fetchGroupShopItems, updateGroupShopItem} from '../../../services/shop.api.js';
 import {syncShopItemRankUnlock, findRankUnlockingItem} from '../../../utils/ranks/rankShopItemUnlock.js';
 import { EXTRA_LIFE_ICON_EDIT_TOOLTIP } from '../../../utils/shop/extraLifeItem.js';
+import { sanitizeWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
 import '../group-shop/modals/ShopItemFormModal.css';
 
 export default function ShopItemFormContent({
@@ -58,23 +59,7 @@ export default function ShopItemFormContent({
 
 
   function onNumericinput(stringvalue, setterfunction) {
-
-    let filtered = '';
-
-    let i = 0;
-
-    while (i < stringvalue.length) {
-
-      let character = stringvalue[i];
-
-      if (character == '0' || character == '1' || character == '2' || character == '3' || character == '4' || character == '5' || character == '6' || character == '7' || character == '8' || character == '9') {
-        filtered = filtered + character;
-      }
-
-      i = i + 1;
-    }
-
-    setterfunction(filtered);
+    setterfunction(sanitizeWholeNumberInput(stringvalue));
   }
 
 

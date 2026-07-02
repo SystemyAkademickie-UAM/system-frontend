@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { CurrencyDisplay } from '../../../components/ui/index.js';
 import { useProfileStudentProfileContext } from '../group-profile/ProfileStudentProfileContext.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ProfileActivitiesSection.css';
@@ -29,11 +30,6 @@ const TOGGLEBUTTON__TEXTLABEL = {
 const EMPTYMESSAGE__TEXTLABEL = {
   polish: 'Brak ukończonych aktywności w tej grupie.',
   english: 'No completed activities in this group.',
-};
-
-const POINTSSUFFIX__TEXTLABEL = {
-  polish: 'pkt',
-  english: 'pts',
 };
 
 export default function ProfileActivitiesContent() {
@@ -81,7 +77,7 @@ export default function ProfileActivitiesContent() {
                 </span>
               </div>
               <div className="profile-activities-section__item-meta">
-                <span>{activity.currency} {POINTSSUFFIX__TEXTLABEL[LANGUAGE]}</span>
+                <CurrencyDisplay amount={activity.currency} size="sm" />
                 <span>{formatCompletedAt(activity.completedAt)}</span>
               </div>
             </li>

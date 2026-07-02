@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, TextField } from '../../../../components/ui/index.js';
 import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
-import { validateWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import '../../group-rewards/shared/rewardsModals.css';
 
@@ -108,7 +108,10 @@ export default function ActivityFormModal({
   const showRewardError = form.reward.trim() !== '' && !rewardValidation.valid;
 
   const handleChange = (field) => (event) => {
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+    const nextValue = field === 'reward'
+      ? sanitizeWholeNumberInput(event.target.value)
+      : event.target.value;
+    setForm((prev) => ({ ...prev, [field]: nextValue }));
   };
 
   const handleConfirm = () => {
