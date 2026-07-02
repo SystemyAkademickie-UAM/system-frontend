@@ -44,7 +44,7 @@ function ProgressActivityRow({ activity, completed, onToggle }) {
           {activity.educationalDescription || '—'}
         </span>
       </td>
-      <td className="activities-island__cell">
+      <td className="activities-island__cell activities-island__cell--reward">
         <CurrencyDisplay amount={activity.currency ?? 0} size="sm" />
       </td>
       <td className="activities-island__cell activities-island__cell--actions member-progress-tree__cell--status">
@@ -138,7 +138,12 @@ function ProgressStageIsland({ stage, progress, isExpanded, onToggleExpand, onTo
                     <th className="activities-island__th activities-island__th--hide-mobile member-progress-tree__th--edu" scope="col">
                       Opis dydaktyczny
                     </th>
-                    <th className="activities-island__th member-progress-tree__th--reward" scope="col">Nagroda</th>
+                    <th
+                      className="activities-island__th activities-island__th--reward member-progress-tree__th--reward"
+                      scope="col"
+                    >
+                      Nagroda
+                    </th>
                     <th className="activities-island__th activities-island__th--actions member-progress-tree__th--status" scope="col">
                       <span className="visually-hidden">Ukończona</span>
                     </th>

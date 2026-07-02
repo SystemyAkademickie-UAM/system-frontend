@@ -3,7 +3,13 @@ import { useLocation } from 'react-router-dom';
 import { useOptionalGroupId } from './useOptionalGroupId.js';
 import { useGroupDetails } from '../hooks/groups/useGroupDetails.js';
 import { resolveAppBreadcrumb } from '../navigation/breadcrumb.config.js';
-import { appHelpPath, appSettingsPath, groupMainPath, groupsListPath } from '../routes/pathRegistry.js';
+import { appHelpPath, appSettingsPath, groupMainPath, groupMembersPath, groupsListPath } from '../routes/pathRegistry.js';
+
+const STUDENT_PROFILE_VIEW_PATTERN = /^\/groups\/[^/]+\/student-profile\/[^/]+\/?$/u;
+
+function isStudentProfileViewPath(pathname) {
+  return STUDENT_PROFILE_VIEW_PATTERN.test(pathname);
+}
 
 /**
  * Buduje klikalną ścieżkę nawigacji dla SuperBar.
@@ -28,6 +34,11 @@ export function useAppBreadcrumb() {
       back = {
         ariaLabel: 'Wróć do ustawień',
         fallbackTo: appSettingsPath(),
+      };
+    } else if (groupId && isStudentProfileViewPath(pathname)) {
+      back = {
+        ariaLabel: 'Wróć do poprzedniej strony',
+        fallbackTo: groupMembersPath(groupId),
       };
     }
 

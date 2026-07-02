@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getStudentProgressPx, getStudentProgressRatio, sortAndMapRanks } from './rankPathModel.js';
+import { getStudentProgressPx, getStudentProgressRatio, mapStudentForRankPath, sortAndMapRanks } from './rankPathModel.js';
 
 describe('rankPathModel', () => {
   it('sorts ranks by required points ascending', () => {
@@ -31,5 +31,24 @@ describe('rankPathModel', () => {
     expect(getStudentProgressPx(rowCenters, ranks, 100)).toBe(80);
     expect(getStudentProgressPx(rowCenters, ranks, 200)).toBe(240);
     expect(getStudentProgressPx(rowCenters, ranks, 150)).toBe(160);
+  });
+
+  it('resolves auto-rank students from totalEarned when grouping on path', () => {
+    const ranks = sortAndMapRanks([
+      { id: 1, name: 'Uczeń', requiredPoints: 100 },
+      { id: 2, name: 'Łowca', requiredPoints: 200 },
+    ]);
+
+    const mapped = mapStudentForRankPath({
+      accountId: 42,
+      nickname: 'Jan',
+      avatarUrl: null,
+      rankId: null,
+      totalEarned: 200,
+      autoRankEnabled: true,
+    }, ranks);
+
+    expect(mapped.rankId).toBe('rank-2');
+    expect(mapped.dbRankId).toBe(2);
   });
 });

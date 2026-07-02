@@ -181,11 +181,52 @@
 
 @media (max-width: 640px) {
   .login-institution {
-    padding: 1rem 20px 1.75rem;
+    max-width: calc(100% - 1rem);
+    padding: 0.5rem 1.25rem 1.75rem;
+  }
+
+  .login-institution .auth-card__back-button {
+    margin-left: -0.5rem;
+    margin-bottom: 1.25rem;
+    width: 44px;
+    height: 44px;
+  }
+
+  .login-institution .auth-card__back-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .login-institution__page-title,
+  .login-institution__logo,
+  .login-institution__field,
+  .login-institution__messages,
+  .login-institution__continue,
+  .login-institution__error,
+  .login-institution__success {
+    max-width: 100%;
+    align-self: stretch;
+  }
+
+  .login-institution__page-title {
+    margin-bottom: 1.75rem;
   }
 
   .login-institution__logo {
-    margin-bottom: 2rem;
+    width: auto;
+    max-width: 100%;
+    align-self: flex-start;
+    object-position: left center;
+    margin-bottom: 1.75rem;
+  }
+
+  .login-institution__continue {
+    min-height: 60px;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    line-height: 1.3;
+    white-space: normal;
+    text-wrap: balance;
   }
 }
 

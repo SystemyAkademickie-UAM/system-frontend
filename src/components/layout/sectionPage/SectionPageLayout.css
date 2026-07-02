@@ -133,4 +133,10 @@
   .maq-section-page__toolbar-start .maq-btn {
     width: 100%;
   }
+
+  .activities-page .maq-section-page__toolbar-start .activities-page__add-island .maq-btn {
+    width: auto;
+    align-self: flex-end;
+    margin-left: auto;
+  }
 }

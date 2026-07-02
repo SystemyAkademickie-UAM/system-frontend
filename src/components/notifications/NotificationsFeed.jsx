@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AssetSvg from '../ui/AssetSvg/AssetSvg.jsx';
+import CurrencyDisplay from '../ui/Currency/CurrencyDisplay.jsx';
 import { SVG_ICONS } from '../../constants/svgIcons.js';
 import { formatRelativeTimePl } from '../../utils/notifications/formatRelativeTimePl.js';
 import {
@@ -188,7 +189,11 @@ export default function NotificationsFeed({
             <>
               <p className="notifications-feed__item-type">{notification.typeLabel}</p>
               <p className="notifications-feed__item-title">{notification.title}</p>
-              {notification.message && notification.message !== notification.title ? (
+              {notification.currencyReward != null ? (
+                <p className="notifications-feed__item-message notifications-feed__item-message--currency">
+                  <CurrencyDisplay amount={`+${notification.currencyReward}`} size="sm" />
+                </p>
+              ) : notification.message && notification.message !== notification.title ? (
                 <p className="notifications-feed__item-message">{notification.message}</p>
               ) : null}
               <time className="notifications-feed__item-time" dateTime={notification.date}>

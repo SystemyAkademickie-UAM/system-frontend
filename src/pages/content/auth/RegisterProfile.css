@@ -89,11 +89,72 @@
   color: rgba(189, 202, 190, 0.6);
 }
 
-@media (max-width: 600px) {
-  .register-profile {
-    padding: 16px;
+.register-profile__input-container {
+  padding-left: 16px;
+}
+
+@media (max-width: 768px) {
+  .auth-shell:has(.register-profile) {
+    --auth-card-max-width: min(569px, calc(100% - 1rem));
+    --auth-content-max-width: 100%;
   }
 
+  .auth-shell__panel-inner:has(.register-profile) {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .register-profile.auth-card--left-aligned {
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem 1.25rem 1.5rem;
+  }
+
+  .register-profile .auth-card__back-button {
+    align-self: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .register-profile .auth-card__title {
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1.25rem;
+  }
+
+  .register-profile .auth-card__input-wrapper {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1.25rem;
+  }
+
+  .register-profile .maq-char-limited-field {
+    width: 100%;
+  }
+
+  .register-profile .auth-card__input-container {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    min-height: 48px;
+  }
+
+  .register-profile .auth-card__primary-btn {
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 0.625rem 0;
+    line-height: 1.25;
+  }
+
+  .register-profile__avatar-section {
+    align-items: center;
+    width: 100%;
+    margin: 1rem 0 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
   .register-profile__avatar-label {
     font-size: 28px;
   }

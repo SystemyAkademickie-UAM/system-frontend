@@ -159,7 +159,7 @@ function StageIsland({
                     <th className="activities-island__th activities-island__th--hide-mobile" scope="col">
                       {EDUCATIONAL__TEXTLABEL[LANGUAGE]}
                     </th>
-                    <th className="activities-island__th" scope="col">{REWARD__TEXTLABEL[LANGUAGE]}</th>
+                    <th className="activities-island__th activities-island__th--reward" scope="col">{REWARD__TEXTLABEL[LANGUAGE]}</th>
                     <th className="activities-island__th activities-island__th--hide-mobile" scope="col">{PARTICIPANTS__TEXTLABEL[LANGUAGE]}</th>
                     <th className="activities-island__th activities-island__th--actions" scope="col">
                       <span className="visually-hidden">{ACTIONS__TEXTLABEL[LANGUAGE]}</span>
@@ -182,7 +182,7 @@ function StageIsland({
                           {activity.description1 || '—'}
                         </span>
                       </td>
-                      <td className="activities-island__cell">
+                      <td className="activities-island__cell activities-island__cell--reward">
                         <CurrencyDisplay amount={activity.reward ?? 0} size="sm" />
                       </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--participants">

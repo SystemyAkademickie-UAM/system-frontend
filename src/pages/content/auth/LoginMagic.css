@@ -82,6 +82,14 @@
 
 @media (max-width: 640px) {
   .login-magic {
-    padding: 1rem 20px 1.75rem;
+    max-width: calc(100% - 1rem);
+    padding: 1rem 1.25rem 1.75rem;
+  }
+
+  .login-magic__title,
+  .login-magic__status,
+  .login-magic__actions {
+    max-width: 100%;
+    align-self: stretch;
   }
 }

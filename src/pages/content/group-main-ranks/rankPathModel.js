@@ -1,5 +1,6 @@
 import { getRankGradientColor, RANK_LOCKED_COLOR } from '../../../utils/rankGradient.js';
 import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
+import { resolveRankIdFromTotalEarned } from '../../../utils/ranks/autoRankAssignment.js';
 
 /**
  * @typedef {Object} RankPathRank
@@ -246,14 +247,30 @@ export function groupStudentsByRank(ranks, students) {
  * @returns {RankPathStudent}
  */
 export function mapStudentForRankPath(student, ranks) {
-  const matchedRank = ranks.find((rank) => rank.dbId === student.rankId);
+  const ranksForResolve = ranks.map((rank) => ({
+    id: rank.dbId,
+    requiredPoints: rank.costAmount,
+  }));
+
+  let effectiveDbRankId = student.rankId ?? null;
+  if (student.autoRankEnabled !== false) {
+    const computedRankId = resolveRankIdFromTotalEarned(
+      ranksForResolve,
+      student.totalEarned ?? 0,
+    );
+    if (computedRankId != null) {
+      effectiveDbRankId = computedRankId;
+    }
+  }
+
+  const matchedRank = ranks.find((rank) => rank.dbId === effectiveDbRankId);
   return {
     id: `student-${student.accountId}`,
     accountId: student.accountId,
     nickname: (student.nickname || `${student.name} ${student.surname}`.trim() || 'Student').trim(),
     avatarUrl: student.avatarUrl ?? null,
     totalEarned: student.totalEarned ?? 0,
-    dbRankId: student.rankId ?? null,
+    dbRankId: effectiveDbRankId,
     rankId: matchedRank?.id ?? null,
   };
 }

@@ -139,9 +139,26 @@ function formatLivesChangeLabel(delta, lives) {
 
 /**
  * @param {Record<string, unknown>} payload
+ * @returns {number | null}
+ */
+function resolveActivityRewardAmount(payload) {
+  return readNumber(payload.points ?? payload.currencyAmount ?? payload.rewardAmount);
+}
+
+/**
+ * @param {string} title
+ * @returns {string}
+ */
+function stripActivityPointsSuffix(title) {
+  return title.replace(/\s*\(\s*\+\s*\d+\s*pkt\s*\)\s*\.?/gi, '').trim();
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @param {{ excludeInMessage?: string[], skipPointsLabel?: boolean }} [options]
  * @returns {string[]}
  */
-function collectPayloadDetails(payload, { excludeInMessage = [] } = {}) {
+function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel = false } = {}) {
   /** @type {string[]} */
   const details = [];
   const excluded = new Set(excludeInMessage.filter(Boolean));
@@ -173,7 +190,7 @@ function collectPayloadDetails(payload, { excludeInMessage = [] } = {}) {
   }
 
   const points = readNumber(payload.points);
-  if (points != null) {
+  if (points != null && !skipPointsLabel) {
     pushUnique(`Punkty: +${points}`);
   }
 
@@ -283,12 +300,8 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
       return rankName ? `Awans na rangę: ${rankName}` : null;
     case 'ACTIVITY_COMPLETED':
       return activityName
-        ? points != null
-          ? `Zaliczono: ${activityName} (+${points} pkt)`
-          : `Zaliczono: ${activityName}`
-        : points != null
-          ? `Zaliczono aktywność (+${points} pkt)`
-          : null;
+        ? `Zaliczono: ${activityName}`
+        : 'Zaliczono aktywność';
     case 'SHOP_PURCHASE':
       if (isExtraLife) {
         return price != null ? `Kupiono dodatkowe życie (${price})` : 'Kupiono dodatkowe życie';
@@ -362,11 +375,20 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
   const message = readString(payload.message) ?? '';
   const typeLabel = TYPE_LABELS[item.type] ?? item.type;
   const studentLabel = resolveStudentLabel(payload);
+  const isStudentActivityReward = isStudentView && item.type === 'ACTIVITY_COMPLETED';
+  const activityRewardAmount = isStudentActivityReward ? resolveActivityRewardAmount(payload) : null;
   const fallbackTitle = buildFallbackTitle(item.type, payload, isStudentView, studentLabel);
-  const title = resolveNotificationTitle(fallbackTitle, message, typeLabel);
+  let title = resolveNotificationTitle(fallbackTitle, message, typeLabel);
+
+  if (isStudentActivityReward) {
+    title = stripActivityPointsSuffix(title);
+  }
 
   const excludeInMessage = [message, title, fallbackTitle, studentLabel].filter(Boolean);
-  const details = collectPayloadDetails(payload, { excludeInMessage });
+  const details = collectPayloadDetails(payload, {
+    excludeInMessage,
+    skipPointsLabel: isStudentActivityReward,
+  });
 
   if (!isStudentView && LECTURER_STUDENT_EVENT_TYPES.has(item.type) && studentLabel && !title.includes(studentLabel)) {
     details.unshift(studentLabel);
@@ -447,6 +469,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     typeLabel,
     title,
     message: resolveNotificationSubtitle(title, details),
+    currencyReward: activityRewardAmount,
     date: item.date,
     isRead: item.isRead,
     href,

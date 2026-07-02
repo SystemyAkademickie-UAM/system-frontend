@@ -268,6 +268,49 @@
   list-style: none;
 }
 
+.member-modal__rank-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member-modal__rank-tile {
+  display: block;
+  position: relative;
+  border: 1px solid var(--color-modal-border);
+  border-radius: 12px;
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+}
+
+.member-modal__rank-tile:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.member-modal__rank-tile--selected {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.member-modal__rank-tile-radio {
+  position: absolute;
+  top: 0.85rem;
+  left: 0.85rem;
+  z-index: 2;
+  accent-color: var(--color-accent);
+}
+
+.member-modal__rank-preview.maq-rank {
+  max-width: none;
+  width: 100%;
+  pointer-events: none;
+}
+
 .member-modal__rank-option {
   display: flex;
   align-items: center;
@@ -440,6 +483,46 @@
 .member-progress-tree__checkbox .maq-asset-svg--mask {
   width: 1.125rem;
   height: 1.125rem;
+}
+
+@media (max-width: 768px) {
+  .member-progress-tree__th--name,
+  .member-progress-tree .activities-island__cell--name {
+    width: auto;
+    min-width: 0;
+    text-align: right;
+  }
+
+  .member-progress-tree .activities-island__activity-name {
+    text-align: right;
+  }
+
+  .member-progress-tree__th--reward,
+  .member-progress-tree .activities-island__cell--reward {
+    width: 4.25rem;
+    min-width: 4.25rem;
+    max-width: 4.25rem;
+    white-space: nowrap;
+    text-align: right;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+  }
+
+  .member-progress-tree__th--status,
+  .member-progress-tree__cell--status {
+    width: 2.5rem;
+    min-width: 2.5rem;
+    padding-left: 0.15rem;
+    padding-right: 0.15rem;
+  }
+
+  .member-modal__rank-tile--collapsed .member-modal__rank-preview .maq-rank__columns {
+    display: none;
+  }
+
+  .member-modal__rank-tile--collapsed .member-modal__rank-preview.maq-rank {
+    padding-bottom: 16px;
+  }
 }
 
 @media (max-width: 640px) {

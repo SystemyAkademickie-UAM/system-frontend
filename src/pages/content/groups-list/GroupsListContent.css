@@ -43,16 +43,15 @@
 }
 
 .groups-list__creator-overlay {
-  position: absolute;
-  inset: 0;
+  position: fixed;
   z-index: var(--z-index-page-overlay);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding:
-    max(1.5rem, env(safe-area-inset-top, 0px))
+    max(1rem, env(safe-area-inset-top, 0px))
     clamp(1rem, 3vw, 2.5rem)
-    max(1.5rem, env(safe-area-inset-bottom, 0px));
+    max(1rem, env(safe-area-inset-bottom, 0px));
   background: rgba(8, 8, 16, 0.72);
   overflow-y: auto;
   overscroll-behavior: contain;

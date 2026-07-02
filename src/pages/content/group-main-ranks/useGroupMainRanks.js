@@ -5,7 +5,7 @@ import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { subscribeGroupContentChanges } from '../../../utils/groupContentInvalidation.js';
 import { fetchGroupPreview } from '../../../services/groups.api.js';
 import { fetchGroupRanks } from '../../../services/ranks.api.js';
-import { fetchGroupStudents } from '../../../services/students.api.js';
+import { fetchGroupStudents, fetchRankPathMembers } from '../../../services/students.api.js';
 import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.js';
 import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { resolveShopItemLabels } from '../../../utils/ranks/rankShopItemUnlock.js';
@@ -63,13 +63,18 @@ export function useGroupMainRanks() {
         }
 
         setStudentProfile(profileResult.profile);
-        setStudents([]);
         const profile = profileResult.profile;
         const isManualRank = profile.autoRankEnabled === false;
-        if (isManualRank && profile.rankId != null) {
-          setRanks(applyManualStudentRankStates(mappedRanks, profile.rankId));
+        const finalRanks = isManualRank && profile.rankId != null
+          ? applyManualStudentRankStates(mappedRanks, profile.rankId)
+          : applyStudentRankStates(mappedRanks, profile.totalEarned ?? 0);
+        setRanks(finalRanks);
+
+        if (memberAvatarsVisible) {
+          const studentsData = await fetchRankPathMembers(groupId);
+          setStudents(studentsData.map((student) => mapStudentForRankPath(student, finalRanks)));
         } else {
-          setRanks(applyStudentRankStates(mappedRanks, profile.totalEarned ?? 0));
+          setStudents([]);
         }
         return;
       }

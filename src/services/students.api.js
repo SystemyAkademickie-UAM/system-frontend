@@ -40,6 +40,27 @@ export async function fetchGroupStudents(groupId) {
 }
 
 /**
+ * Uczestnicy ścieżki rang (awatar + ranga) — dla studentów gdy włączone w grupie.
+ * GET /groups/:groupId/rank-path-members
+ *
+ * @param {string | number} groupId
+ * @returns {Promise<Pick<StudentListItem, 'accountId' | 'nickname' | 'avatarUrl' | 'rankId' | 'totalEarned'>[]>}
+ */
+export async function fetchRankPathMembers(groupId) {
+  const result = await getJson(`/groups/${groupId}/rank-path-members`, { includeBrowserId: true });
+  if (!result.ok) {
+    console.warn('Failed to fetch rank path members:', result.status, result.data);
+    return [];
+  }
+
+  const list = Array.isArray(result.data) ? result.data : [];
+  return list.map((student) => ({
+    ...student,
+    avatarUrl: getAssetUrl(student.avatarUrl),
+  }));
+}
+
+/**
  * Masowa aktualizacja studentów.
  * PATCH /groups/:groupId/students/bulk-update
  *

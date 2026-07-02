@@ -42,11 +42,26 @@
 }
 
 @media (max-width: 640px) {
+  .login-pionierid {
+    max-width: calc(100% - 1rem);
+  }
+
   .login-pionierid__body {
-    padding: 2rem 20px 1.75rem;
+    padding: 2rem 1.25rem 1.75rem;
   }
 
   .login-pionierid__actions {
     margin-top: 2.5rem;
+    max-width: 100%;
+    align-self: stretch;
+  }
+
+  .login-pionierid__btn {
+    min-height: 60px;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    line-height: 1.3;
+    white-space: normal;
+    text-wrap: balance;
   }
 }

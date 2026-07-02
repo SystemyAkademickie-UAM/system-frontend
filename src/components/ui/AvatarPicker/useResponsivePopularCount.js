@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Liczba awatarów w sekcji „Najczęściej używane” — dopasowana do szerokości ekranu.
+ * Liczba awatarów w sekcji „Ostatnio najczęściej używane” — dopasowana do szerokości ekranu.
  *
  * @returns {number}
  */

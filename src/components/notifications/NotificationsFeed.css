@@ -112,6 +112,14 @@
   color: var(--color-text-secondary);
 }
 
+.notifications-feed__item-message--currency {
+  color: var(--color-text-primary);
+}
+
+.notifications-feed__item-message--currency .maq-currency-display__amount {
+  color: var(--color-text-primary);
+}
+
 .notifications-feed__item-time {
   display: block;
   margin-top: 0.35rem;

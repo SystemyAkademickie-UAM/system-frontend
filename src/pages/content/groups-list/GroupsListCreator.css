@@ -338,6 +338,15 @@
     padding-right: 0.25rem;
   }
 
+  .groups-list-creator__banner-picker .group-banner-picker__preview,
+  .groups-list-creator__banner-picker .group-banner-picker__preview-empty {
+    width: min(100%, 10.5rem);
+  }
+
+  .groups-list-creator__banner-picker .group-banner-picker__sub-nav {
+    width: 100%;
+  }
+
   .groups-list-creator--banner-step .groups-list-creator__panel--banner,
   .groups-list-creator--banner-step .groups-list-creator__step--banner {
     overflow: auto;
