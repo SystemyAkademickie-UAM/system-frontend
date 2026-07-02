@@ -109,6 +109,31 @@ const UNSAVEDSAVELABELTEXT = {
   kana: 'ほぞん'
 };
 
+const EMPTYNICKNAMEERRORTEXT = {
+  polish: 'Podaj ksywkę, aby zapisać zmiany.',
+  english: 'Enter a nickname before saving your changes.',
+};
+
+function resolveProfileSaveErrorMessage(error, language) {
+  if (!error) {
+    return null;
+  }
+
+  const normalized = Array.isArray(error) ? error.join(' ') : String(error);
+  const lower = normalized.toLowerCase();
+
+  if (
+    lower.includes('pusty')
+    || lower.includes('empty')
+    || lower === 'forbidden'
+    || lower.includes('nickname must not be empty')
+  ) {
+    return EMPTYNICKNAMEERRORTEXT[language] ?? EMPTYNICKNAMEERRORTEXT.polish;
+  }
+
+  return normalized;
+}
+
 function RESOLVELANGUAGECODE(displayLANGUAGE) {
   if (displayLANGUAGE === 'polski') {
     return 'polish';
@@ -177,6 +202,15 @@ export default function SettingsContent() {
   }, [role]);
 
   const persistSettings = useCallback(async () => {
+    const trimmedNickname = nickname.trim();
+
+    if (!trimmedNickname) {
+      const message = EMPTYNICKNAMEERRORTEXT[LANGUAGE] ?? EMPTYNICKNAMEERRORTEXT.polish;
+      setErrorMessage(message);
+      showError(message);
+      return false;
+    }
+
     const SELECTEDLANGUAGE = RESOLVELANGUAGECODE(DIVLANGUAGE);
 
     document.cookie = `CURRENTLANGUAGE=${SELECTEDLANGUAGE};path=/`;
@@ -186,7 +220,7 @@ export default function SettingsContent() {
     setErrorMessage('');
 
     const payload = {
-      nickname: nickname.trim(),
+      nickname: trimmedNickname,
     };
 
     if (selectedAvatarId) {
@@ -201,12 +235,15 @@ export default function SettingsContent() {
 
     if (!result.ok) {
       setIsSaving(false);
-      showError(result.error || 'Nie udało się zapisać ustawień');
+      const message = resolveProfileSaveErrorMessage(result.error, LANGUAGE)
+        || 'Nie udało się zapisać ustawień';
+      setErrorMessage(message);
+      showError(message);
       return false;
     }
 
-    const trimmedNickname = result.profile?.nickname ?? nickname.trim();
-    setNickname(trimmedNickname);
+    const savedNickname = result.profile?.nickname ?? trimmedNickname;
+    setNickname(savedNickname);
 
     await refetchProfile();
 
@@ -217,7 +254,7 @@ export default function SettingsContent() {
     }
 
     setSavedSnapshot({
-      nickname: trimmedNickname,
+      nickname: savedNickname,
       avatarId: selectedAvatarId,
       LANGUAGE: SELECTEDLANGUAGE,
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
@@ -228,6 +265,7 @@ export default function SettingsContent() {
     return true;
   }, [
     DIVLANGUAGE,
+    LANGUAGE,
     draftShowNickname,
     nickname,
     refetchProfile,

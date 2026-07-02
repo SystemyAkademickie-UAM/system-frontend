@@ -17,6 +17,7 @@
   align-items: stretch;
   width: 100%;
   margin: 24px 0 32px;
+  min-height: 13.5rem;
 }
 
 .register-profile__avatar-picker {

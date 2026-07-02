@@ -1,28 +1,33 @@
 import { useEffect, useState } from 'react';
 
+function resolvePopularCount(width) {
+  if (width < 400) {
+    return 2;
+  }
+  if (width < 600) {
+    return 3;
+  }
+  return 4;
+}
+
 /**
  * Liczba awatarów w sekcji „Ostatnio najczęściej używane” — dopasowana do szerokości ekranu.
  *
  * @returns {number}
  */
 export function useResponsivePopularCount() {
-  const [count, setCount] = useState(4);
+  const [count, setCount] = useState(() => {
+    if (typeof window === 'undefined') {
+      return 4;
+    }
+    return resolvePopularCount(window.innerWidth);
+  });
 
   useEffect(() => {
     const update = () => {
-      const width = window.innerWidth;
-      if (width < 400) {
-        setCount(2);
-        return;
-      }
-      if (width < 600) {
-        setCount(3);
-        return;
-      }
-      setCount(4);
+      setCount(resolvePopularCount(window.innerWidth));
     };
 
-    update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
   }, []);

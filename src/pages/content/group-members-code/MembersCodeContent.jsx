@@ -11,6 +11,7 @@ import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { DataTableRowActions } from '../../../components/ui/DataTable/DataTable.jsx';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
+import { ENROLLMENT_CODES_MAX_COUNT } from '../../../constants/fieldLimits.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
@@ -106,6 +107,11 @@ const DELETECODE__TEXTLABEL = {
 const GENERATEBUTTON__TEXTLABEL = {
   polish: 'Generuj nowy kod',
   english: 'Generate new code',
+};
+
+const CODELLIMITREACHED__TEXTLABEL = {
+  polish: `Osiągnięto limit ${ENROLLMENT_CODES_MAX_COUNT} kodów dostępu. Usuń kod, aby wygenerować nowy.`,
+  english: `The limit of ${ENROLLMENT_CODES_MAX_COUNT} access codes has been reached. Delete a code to generate a new one.`,
 };
 
 const SEARCHPLACEHOLDER__TEXTLABEL = {
@@ -230,6 +236,8 @@ export default function MembersCodeContent() {
   const [windowOpen, setWindowOpen] = useState(false);
   const [editCodeId, setEditCodeId] = useState(0);
 
+  const isCodeLimitReached = codes.length >= ENROLLMENT_CODES_MAX_COUNT;
+
   const fetchCodes = useCallback(async () => {
     setErrorMessage('');
 
@@ -304,9 +312,13 @@ export default function MembersCodeContent() {
   }, [fetchCodes, groupId, LANGUAGE, showSuccess]);
 
   const openGenerateWindow = useCallback(() => {
+    if (isCodeLimitReached) {
+      showError(CODELLIMITREACHED__TEXTLABEL[LANGUAGE]);
+      return;
+    }
     setEditCodeId(0);
     setWindowOpen(true);
-  }, []);
+  }, [isCodeLimitReached, showError, LANGUAGE]);
 
   const openEditWindow = useCallback((codeId) => {
     setEditCodeId(codeId);
@@ -428,6 +440,8 @@ export default function MembersCodeContent() {
               size="md"
               className="members-code-page__add-btn"
               onClick={openGenerateWindow}
+              disabled={isCodeLimitReached}
+              title={isCodeLimitReached ? CODELLIMITREACHED__TEXTLABEL[LANGUAGE] : undefined}
             >
               {GENERATEBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
@@ -447,6 +461,12 @@ export default function MembersCodeContent() {
     >
       {errorMessage ? (
         <p className="members-code-page__error" role="alert">{errorMessage}</p>
+      ) : null}
+
+      {!isLoading && isCodeLimitReached ? (
+        <p className="members-code-page__limit-notice page-unavailable__notice" role="status">
+          {CODELLIMITREACHED__TEXTLABEL[LANGUAGE]}
+        </p>
       ) : null}
 
       {isLoading ? (

@@ -20,6 +20,17 @@
   min-width: 0;
 }
 
+.super-bar__brand {
+  flex-shrink: 0;
+  padding-right: 1rem;
+  margin-right: 0.25rem;
+}
+
+.super-bar__brand .sidebar-brand {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .super-bar__end {
   display: flex;
   flex-wrap: wrap;

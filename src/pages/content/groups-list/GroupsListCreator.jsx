@@ -13,6 +13,7 @@ import {
   createDefaultBannerPickerValue,
 } from '../../../utils/groupBannerRef.js';
 import { validateGroupBannerFile } from '../../../utils/groupBannerUpload.js';
+import { createGroup } from '../../../services/groups.api.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupsListCreator.css';
 
@@ -35,10 +36,6 @@ const SUBJECTNAMEMIN__TEXTLABEL = {
 const DESCRIPTIONREQUIRED__TEXTLABEL = {
   polish: 'Opis grupy jest wymagany.',
   english: 'Group description is required.',
-};
-const NOAUTHORITY__TEXTLABEL = {
-  polish: 'Brak uprawnień do tworzenia grup.',
-  english: 'No permission to create groups.',
 };
 const CREATIONFAILED__TEXTLABEL = {
   polish: 'Nie udało się utworzyć grupy.',
@@ -253,48 +250,26 @@ export default function GroupsListCreator({ onClose, onCreated }) {
       const browserid = getOrCreateBrowserId();
       const imageref = await resolveImageRefForSave(base, browserid);
 
-      const datatopost = {
-        group: {
-          name: groupnamevalue,
-          subjectName: subjectnamevalue,
-          description: groupdescriptionvalue,
-        },
+      const payload = {
+        name: groupnamevalue.trim(),
+        subjectName: subjectnamevalue.trim(),
+        description: groupdescriptionvalue.trim(),
       };
       if (imageref !== undefined) {
-        datatopost.group.imageRef = imageref;
+        payload.imageRef = imageref;
       }
 
-      const response = await fetch(`${base}/groups/new`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid,
-        },
-        body: JSON.stringify(datatopost),
+      const result = await createGroup(payload);
+      if (!result.ok) {
+        showError(result.error || CREATIONFAILED__TEXTLABEL[LANGUAGE]);
+        return;
+      }
+
+      onCreated?.({
+        groupId: result.groupId,
+        groupName: groupnamevalue.trim(),
+        subjectName: subjectnamevalue.trim(),
       });
-
-      const responsetext = await response.text();
-      let data;
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        throw new Error('/groups/new not JSON: ' + responsetext);
-      }
-
-      if (!response.ok) {
-        throw new Error('Error ' + response.status + ': ' + responsetext);
-      }
-      if (data.group === -1 || data.group === 1) {
-        showError(NOAUTHORITY__TEXTLABEL[LANGUAGE]);
-        return;
-      }
-      if (data.group === -2 || data.group === 0) {
-        showError(CREATIONFAILED__TEXTLABEL[LANGUAGE]);
-        return;
-      }
-
-      onCreated?.();
       resetForm();
       onClose?.();
     } catch (error) {

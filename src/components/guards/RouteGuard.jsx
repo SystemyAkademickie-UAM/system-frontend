@@ -2,7 +2,8 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { isClientLogoutInProgress } from '../../auth/clientAuthState.js';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
-import { groupsListPath, welcomePath } from '../../routes/pathRegistry.js';
+import { useRegistrationComplete } from '../../hooks/useRegistrationComplete.js';
+import { groupsListPath, loginPath, welcomePath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
 /**
@@ -23,6 +24,7 @@ export default function RouteGuard({
   const location = useLocation();
   const { isAuthenticated, isLoading } = useSession();
   const { role } = useAppRole();
+  const { isChecking: isRegistrationChecking, isComplete: isRegistrationComplete } = useRegistrationComplete();
 
   if (isClientLogoutInProgress()) {
     return (
@@ -42,6 +44,18 @@ export default function RouteGuard({
 
   if (requireAuth && !isAuthenticated) {
     return <Navigate to={redirectTo || welcomePath()} state={{ from: location }} replace />;
+  }
+
+  if (requireAuth && isAuthenticated && (isRegistrationChecking || !isRegistrationComplete)) {
+    if (isRegistrationChecking) {
+      return (
+        <div className="route-guard-loading" aria-busy="true" aria-label="Ładowanie...">
+          <span className="route-guard-loading__spinner" />
+        </div>
+      );
+    }
+
+    return <Navigate to={loginPath()} state={{ from: location }} replace />;
   }
 
   if (allowedRoles && allowedRoles.length > 0) {

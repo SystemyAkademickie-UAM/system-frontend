@@ -1,5 +1,6 @@
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
+import '../../../../components/ui/ProductCard/lecturerTileActions.css';
 
 function EditIcon() {
   return (

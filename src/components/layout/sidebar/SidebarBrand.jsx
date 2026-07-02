@@ -9,8 +9,9 @@ import '../navigation-shell.css';
  * @param {Object} props
  * @param {string | null | undefined} props.to
  * @param {() => void} [props.onNavigate]
+ * @param {boolean} [props.highlightActive=true] — obramowanie aktywnej trasy (wyłącz w SuperBar)
  */
-export default function SidebarBrand({ to, onNavigate }) {
+export default function SidebarBrand({ to, onNavigate, highlightActive = true }) {
   const content = (
     <>
       <span className="sidebar-brand__logo-wrap">
@@ -31,7 +32,7 @@ export default function SidebarBrand({ to, onNavigate }) {
       className={({ isActive }) => [
         'sidebar-brand',
         'sidebar-brand--link',
-        isActive ? 'sidebar-brand--active' : '',
+        isActive && highlightActive ? 'sidebar-brand--active' : '',
       ].filter(Boolean).join(' ')}
       onClick={onNavigate}
       aria-label="MyAcademyQuest — przejdź do listy grup"

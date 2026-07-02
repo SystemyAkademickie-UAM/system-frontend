@@ -1,0 +1,2 @@
+# PDF-y muszą pozostać binarne — inaczej zawartość stron znika (puste strony).
+public/documents/*.pdf binary

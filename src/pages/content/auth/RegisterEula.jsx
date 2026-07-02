@@ -1,5 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  AUTH_LEGAL_DOCUMENTS,
+  authLegalDocumentUrl,
+} from '../../../constants/authLegalDocuments.constants.js';
 import './AuthCard.css';
 import './RegisterEula.css';
 
@@ -16,6 +20,27 @@ function CheckIcon({ className }) {
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
+  );
+}
+
+function LegalDownloadLink({ documentKey }) {
+  const document = AUTH_LEGAL_DOCUMENTS[documentKey];
+
+  const handleClick = (event) => {
+    event.stopPropagation();
+  };
+
+  return (
+    <a
+      href={authLegalDocumentUrl(documentKey)}
+      target="_blank"
+      rel="noopener noreferrer"
+      download={document.fileName}
+      className="register-eula__download-link"
+      onClick={handleClick}
+    >
+      *kliknij tutaj*
+    </a>
   );
 }
 
@@ -75,7 +100,11 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
               {termsAccepted && <CheckIcon className="register-eula__check-icon" />}
             </span>
           </span>
-          <span className="register-eula__checkbox-label">Warunki użytkowania</span>
+          <span className="register-eula__checkbox-label">
+            Warunki użytkowania
+            {' '}
+            <LegalDownloadLink documentKey="termsOfUse" />
+          </span>
         </label>
 
         <label className="register-eula__checkbox-item">
@@ -90,7 +119,11 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
               {privacyAccepted && <CheckIcon className="register-eula__check-icon" />}
             </span>
           </span>
-          <span className="register-eula__checkbox-label">Polityka prywatności</span>
+          <span className="register-eula__checkbox-label">
+            Polityka prywatności
+            {' '}
+            <LegalDownloadLink documentKey="privacyPolicy" />
+          </span>
         </label>
       </div>
 

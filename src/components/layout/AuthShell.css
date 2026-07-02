@@ -59,25 +59,6 @@
   );
 }
 
-.auth-shell__skip {
-  position: absolute;
-  left: -9999px;
-  z-index: 100;
-  padding: 0.75rem 1rem;
-  background: var(--auth-accent);
-  color: var(--auth-accent-on);
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: 0 0 0.5rem 0;
-}
-
-.auth-shell__skip:focus {
-  left: 0;
-  top: 0;
-  outline: 2px solid #fff;
-  outline-offset: 2px;
-}
-
 .auth-shell__main {
   position: relative;
   z-index: 1;
@@ -185,23 +166,27 @@
 }
 
 .auth-shell--welcome {
-  min-height: 100vh;
-  height: auto;
-  overflow-x: hidden;
-  overflow-y: auto;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
   background: #02040a;
 }
 
 .auth-shell--welcome .auth-shell__main {
   flex: 1 1 auto;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
   padding: 0;
   align-items: stretch;
   justify-content: stretch;
+  overflow: hidden;
 }
 
 .auth-shell--welcome .auth-shell__welcome-outlet {
   flex: 1 1 auto;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }

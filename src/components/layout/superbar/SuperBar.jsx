@@ -1,5 +1,6 @@
 import SuperBarBreadcrumb from './SuperBarBreadcrumb.jsx';
 import SuperBarBackButton from './SuperBarBackButton.jsx';
+import SidebarBrand from '../sidebar/SidebarBrand.jsx';
 import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
 import SuperBarLivesStat from './SuperBarLivesStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
@@ -9,6 +10,7 @@ import SuperBarUserMenu from './SuperBarUserMenu.jsx';
 import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import { groupsListPath } from '../../../routes/pathRegistry.js';
 import './SuperBar.css';
 
 /** Placeholdery — używane gdy brak danych z sesji. */
@@ -32,10 +34,11 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
  * @param {string} [props.currencyLabel] — nazwa waluty grupy
  * @param {() => void} [props.onNavigate]
  * @param {boolean} [props.showMenuButton]
+ * @param {boolean} [props.showBrandLogo] — logo MAQ (układ compact bez sidebara)
  * @param {boolean} [props.menuExpanded]
  * @param {() => void} [props.onMenuToggle]
  * @param {boolean} [props.isLoading] — czy trwa ładowanie sesji
- * @param {{ groupName: string | null, groupPath: string | null, segments: { label: string, to?: string }[], back?: { ariaLabel?: string, fallbackTo: string } | null } | null} [props.breadcrumb]
+ * @param {{ groupName: string | null, groupPath: string | null, segments: { label: string, to?: string }[], back?: { ariaLabel?: string, fallbackTo: string } | null, homePath?: string } | null} [props.breadcrumb]
  */
 export default function SuperBar({
   displayName,
@@ -51,6 +54,7 @@ export default function SuperBar({
   currencyLabel = 'Waluta',
   onNavigate,
   showMenuButton = false,
+  showBrandLogo = false,
   menuExpanded = false,
   onMenuToggle,
   isLoading = false,
@@ -76,6 +80,15 @@ export default function SuperBar({
           >
             <span className="super-bar__menu-icon" aria-hidden="true" />
           </button>
+        ) : null}
+        {showBrandLogo ? (
+          <div className="super-bar__brand">
+            <SidebarBrand
+              to={groupsListPath()}
+              onNavigate={onNavigate}
+              highlightActive={false}
+            />
+          </div>
         ) : null}
         {breadcrumb?.back ? (
           <SuperBarBackButton

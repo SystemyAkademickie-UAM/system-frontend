@@ -4,7 +4,7 @@ import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { getRankCssVars } from './rankCssVars.js';
 import { RANK_THEME } from './rankTheme.js';
-import { formatRankDiscountLabel } from '../../../utils/ranks/rankDiscount.js';
+import { formatRankDiscountLabel, hasRankShopDiscount } from '../../../utils/ranks/rankDiscount.js';
 import './Rank.css';
 
 /**
@@ -51,16 +51,18 @@ export default function Rank({
         <section className="maq-rank__section">
           <span className="maq-rank__label">Odblokowane przedmioty w sklepie</span>
           <ul className="maq-rank__shop-list">
-            <li className="maq-rank__shop-item maq-rank__shop-item--discount">
-              <AssetSvg
-                name={SVG_ICONS.status.checkCircle}
-                className="maq-rank__check-icon maq-rank__check-icon--discount"
-                width={11}
-                height={11}
-                alt=""
-              />
-              <span>{formatRankDiscountLabel(discountPercent)}</span>
-            </li>
+            {hasRankShopDiscount(discountPercent) ? (
+              <li className="maq-rank__shop-item maq-rank__shop-item--discount">
+                <AssetSvg
+                  name={SVG_ICONS.status.checkCircle}
+                  className="maq-rank__check-icon maq-rank__check-icon--discount"
+                  width={11}
+                  height={11}
+                  alt=""
+                />
+                <span>{formatRankDiscountLabel(discountPercent)}</span>
+              </li>
+            ) : null}
             {shopItems.map((item, index) => (
               <li key={`rank-shop-item-${index}-${String(item)}`} className="maq-rank__shop-item">
                 <AssetSvg

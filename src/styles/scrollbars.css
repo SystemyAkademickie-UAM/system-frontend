@@ -3,6 +3,7 @@
 .app-shell__main,
 .auth-shell__panel-inner,
 .maq-modal__body,
+.shop-item-form-modal .shop-item-form__layout,
 .data-table-mobile__list,
 .data-table__scroll-wrap {
   scrollbar-width: thin;
@@ -14,6 +15,7 @@
 .app-shell__main::-webkit-scrollbar,
 .auth-shell__panel-inner::-webkit-scrollbar,
 .maq-modal__body::-webkit-scrollbar,
+.shop-item-form-modal .shop-item-form__layout::-webkit-scrollbar,
 .data-table-mobile__list::-webkit-scrollbar,
 .data-table__scroll-wrap::-webkit-scrollbar {
   width: var(--shell-page-scrollbar-width, 10px);
@@ -25,6 +27,7 @@
 .app-shell__main::-webkit-scrollbar-track,
 .auth-shell__panel-inner::-webkit-scrollbar-track,
 .maq-modal__body::-webkit-scrollbar-track,
+.shop-item-form-modal .shop-item-form__layout::-webkit-scrollbar-track,
 .data-table-mobile__list::-webkit-scrollbar-track,
 .data-table__scroll-wrap::-webkit-scrollbar-track {
   background: var(--color-nav-scrollbar-track);
@@ -36,6 +39,7 @@
 .app-shell__main::-webkit-scrollbar-thumb,
 .auth-shell__panel-inner::-webkit-scrollbar-thumb,
 .maq-modal__body::-webkit-scrollbar-thumb,
+.shop-item-form-modal .shop-item-form__layout::-webkit-scrollbar-thumb,
 .data-table-mobile__list::-webkit-scrollbar-thumb,
 .data-table__scroll-wrap::-webkit-scrollbar-thumb {
   background: var(--color-nav-scrollbar-thumb);
@@ -49,6 +53,7 @@
 .app-shell__main::-webkit-scrollbar-thumb:hover,
 .auth-shell__panel-inner::-webkit-scrollbar-thumb:hover,
 .maq-modal__body::-webkit-scrollbar-thumb:hover,
+.shop-item-form-modal .shop-item-form__layout::-webkit-scrollbar-thumb:hover,
 .data-table-mobile__list::-webkit-scrollbar-thumb:hover,
 .data-table__scroll-wrap::-webkit-scrollbar-thumb:hover {
   background: var(--color-nav-scrollbar-thumb-hover);
