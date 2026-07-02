@@ -5,7 +5,7 @@ import { notifyGroupContentChanged } from '../../../utils/groupContentInvalidati
 import { fetchGroupRanks, createRank, updateRank, deleteRank } from '../../../services/ranks.api.js';
 import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/students.api.js';
 import { normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
-import { calculateDefaultRankDiscount } from '../../../utils/ranks/rankDiscount.js';
+import { DEFAULT_RANK_DISCOUNT } from '../../../utils/ranks/rankDiscount.js';
 import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 
 /**
@@ -113,7 +113,7 @@ export function useGroupRanks() {
       icon,
       requiredPoints: values.costAmount || 0,
       storyDescription: values.storyDescription || '',
-      discount: values.discount ?? calculateDefaultRankDiscount(ranks),
+      discount: values.discount ?? DEFAULT_RANK_DISCOUNT,
       uniqueStoreItems: (values.shopItems || []).map(normalizeShopItemId),
     });
 
@@ -124,7 +124,7 @@ export function useGroupRanks() {
     }
 
     return result;
-  }, [groupId, loadData, ranks]);
+  }, [groupId, loadData]);
 
   const handleUpdate = useCallback(async (rankId, values) => {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };

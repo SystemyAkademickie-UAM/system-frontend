@@ -1,6 +1,6 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
-import { HomeRedirect, RouteGuard, GroupAccessGuard, GroupOwnerGuard } from '../components/guards/index.js';
+import { HomeRedirect, RouteGuard, GroupAccessGuard, GroupOwnerGuard, RankingDisabledRedirect } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 
 // Login/Auth pages
@@ -75,11 +75,7 @@ import ShopLayout from '../pages/links/groups/shop/ShopLayout.jsx';
 import ShopHomePage from '../pages/links/groups/shop/ShopHomePage.jsx';
 import ShopAddRedirect from '../pages/links/groups/shop/ShopAddRedirect.jsx';
 
-// Ranking - student + lecturer
-import RankingLayout from '../pages/links/groups/layouts/RankingLayout.jsx';
-import RankingHomePage from '../pages/links/groups/ranking/RankingHomePage.jsx';
-import RankingGroupPage from '../pages/links/groups/ranking/RankingGroupPage.jsx';
-import RankingActivitiesPage from '../pages/links/groups/ranking/RankingActivitiesPage.jsx';
+// Ranking — tymczasowo wyłączony (redirect do /main)
 
 import {
   devApiTestPath,
@@ -293,16 +289,11 @@ const appRouteTree = [
                   },
 
                   // ----------------------------------------
-                  // RANKING - student + lecturer
+                  // RANKING — wyłączony (redirect do ekranu głównego grupy)
                   // ----------------------------------------
                   {
-                    path: 'ranking',
-                    element: withGuard(<RankingLayout />),
-                    children: [
-                      { index: true, element: <RankingHomePage /> },
-                      { path: 'group', element: <RankingGroupPage /> },
-                      { path: 'activities', element: <RankingActivitiesPage /> },
-                    ],
+                    path: 'ranking/*',
+                    element: withGuard(<RankingDisabledRedirect />),
                   },
                     ],
                   },

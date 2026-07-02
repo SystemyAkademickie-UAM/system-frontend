@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { SearchBar, Button } from '../../../components/ui/index.js';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import { templatesPath } from '../../../routes/pathRegistry.js';
+import { templatesPath, groupMainPath } from '../../../routes/pathRegistry.js';
 import GroupCard from './GroupCard.jsx';
 import GroupsListCreator from './GroupsListCreator.jsx';
 import GroupsListHero from './GroupsListHero.jsx';
@@ -83,6 +84,7 @@ function GroupsGrid({ groups, emptyMessage }) {
 
 export default function GroupsListContent() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const navigate = useNavigate();
   const {
     myGroups,
     otherGroups,
@@ -104,9 +106,22 @@ export default function GroupsListContent() {
     setIsCreatorOpen(false);
   };
 
-  const handleGroupCreated = async () => {
-    await refetch();
+  const handleGroupCreated = ({ groupId, groupName, subjectName }) => {
     setIsCreatorOpen(false);
+
+    if (!groupId) {
+      void refetch();
+      return;
+    }
+
+    const trimmedSubject = subjectName?.trim();
+    const successMessage = trimmedSubject
+      ? `Grupa „${groupName}” (${trimmedSubject}) została utworzona.`
+      : `Grupa „${groupName}” została utworzona.`;
+
+    navigate(groupMainPath(String(groupId)), {
+      state: { joinSuccessMessage: successMessage },
+    });
   };
 
   // Portaluj overlay popupa do głównej sekcji treści (#main-content),

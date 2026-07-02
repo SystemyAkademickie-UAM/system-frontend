@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useOptionalGroupId } from './useOptionalGroupId.js';
 import { useGroupDetails } from '../hooks/groups/useGroupDetails.js';
 import { resolveAppBreadcrumb } from '../navigation/breadcrumb.config.js';
-import { appHelpPath, appSettingsPath, groupMainPath, groupMembersPath, groupsListPath } from '../routes/pathRegistry.js';
+import { appHelpPath, appSettingsPath, groupMainPath, groupMembersPath, groupsListPath, isGroupJoinPath } from '../routes/pathRegistry.js';
 
 const STUDENT_PROFILE_VIEW_PATTERN = /^\/groups\/[^/]+\/student-profile\/[^/]+\/?$/u;
 
@@ -25,6 +25,21 @@ export function useAppBreadcrumb() {
     const groupName = group?.name?.trim() || group?.storyName?.trim() || (groupId ? `Grupa ${groupId}` : null);
 
     let back = null;
+
+    if (isGroupJoinPath(pathname) && groupId) {
+      back = {
+        ariaLabel: 'Wróć do listy grup',
+        fallbackTo: homePath,
+      };
+      return {
+        homePath,
+        groupName,
+        groupPath: groupMainPath(groupId),
+        segments: [{ label: 'Dołączenie' }],
+        back,
+      };
+    }
+
     if (pathname === appSettingsPath()) {
       back = {
         ariaLabel: 'Wróć do poprzedniej strony',

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import AuthStepTransition from '../../../components/layout/AuthStepTransition.jsx';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
@@ -26,8 +26,10 @@ import {
   clearClientAuthState,
   endClientLogout,
 } from '../../../auth/clientAuthState.js';
+import { prefetchAvatarList } from '../../../services/avatarListCache.js';
 import { isLogoutAvailable, logoutUser } from '../../../services/authService.js';
-import { homePath } from '../../../routes/pathRegistry.js';
+import { invalidateRegistrationStatusCache } from '../../../hooks/useRegistrationComplete.js';
+import { homePath, loginPath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
 import {
   LoginInstitution,
@@ -35,6 +37,7 @@ import {
   LoginPionierId,
   RegisterEula,
   RegisterProfile,
+  AuthWizardResolvingPanel,
 } from '../../content/auth/index.js';
 
 /** Blokuje drugi toast po remouncie (StrictMode) lub ponownym uruchomieniu efektu. */
@@ -42,6 +45,7 @@ let logoutSuccessToastHandled = false;
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess } = useToast();
   const session = useSessionOptional();
@@ -57,6 +61,15 @@ export default function LoginPage() {
   const [logoutError, setLogoutError] = useState(null);
   const samlRecoveryAttemptedRef = useRef(false);
   const postLogoutLandingRef = useRef(false);
+  const registrationResolvedRef = useRef(false);
+
+  const postLoginPath = useMemo(() => {
+    const fromPath = location.state?.from?.pathname;
+    if (typeof fromPath === 'string' && fromPath.startsWith('/') && fromPath !== loginPath()) {
+      return fromPath;
+    }
+    return homePath();
+  }, [location.state]);
 
   useEffect(() => {
     if (searchParams.get('loggedOut') !== '1') {
@@ -103,11 +116,17 @@ export default function LoginPage() {
     }
 
     if (!session?.isAuthenticated) {
+      registrationResolvedRef.current = false;
       setRegistrationCheckDone(true);
       return;
     }
 
+    if (registrationResolvedRef.current) {
+      return;
+    }
+
     let cancelled = false;
+    prefetchAvatarList();
 
     async function resolveRegistrationStep() {
       const baseUrl = getApiBaseUrl();
@@ -115,6 +134,7 @@ export default function LoginPage() {
         if (!cancelled) {
           setStep(LOGIN_FLOW_STEP_REGISTER);
           setRegistrationCheckDone(true);
+          registrationResolvedRef.current = true;
         }
         return;
       }
@@ -123,7 +143,7 @@ export default function LoginPage() {
         const status = await fetchRegistrationStatus();
         if (!cancelled) {
           if (isRegistrationComplete(status)) {
-            navigate(homePath(), { replace: true });
+            navigate(postLoginPath, { replace: true });
             return;
           }
           setProfileData({
@@ -132,22 +152,23 @@ export default function LoginPage() {
           });
           setStep(resolveRegistrationWizardStep(status));
           setRegistrationCheckDone(true);
+          registrationResolvedRef.current = true;
         }
       } catch {
         if (!cancelled) {
           setStep(LOGIN_FLOW_STEP_REGISTER);
           setRegistrationCheckDone(true);
+          registrationResolvedRef.current = true;
         }
       }
     }
 
-    setRegistrationCheckDone(false);
-    resolveRegistrationStep();
+    void resolveRegistrationStep();
 
     return () => {
       cancelled = true;
     };
-  }, [session?.isAuthenticated, session?.isLoading, navigate]);
+  }, [session?.isAuthenticated, session?.isLoading, navigate, postLoginPath]);
 
   const handlePionierContinue = useCallback(() => {
     setStep(LOGIN_FLOW_STEP_INSTITUTION);
@@ -188,6 +209,7 @@ export default function LoginPage() {
     setProfileError(null);
     setStep(LOGIN_FLOW_STEP_PIONIER);
     setRegistrationCheckDone(true);
+    registrationResolvedRef.current = false;
     setIsLogoutConfirmOpen(false);
   }, []);
 
@@ -230,6 +252,7 @@ export default function LoginPage() {
       setProfileData({ nickname, avatarId });
       setStep(LOGIN_FLOW_STEP_EULA);
       setEulaError(null);
+      invalidateRegistrationStatusCache();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Nie udało się zapisać profilu.';
       setProfileError(message);
@@ -257,6 +280,7 @@ export default function LoginPage() {
 
       await session?.refetchSession?.({ force: true });
       await refetchProfile?.();
+      invalidateRegistrationStatusCache();
       navigate(homePath());
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Nie udało się utworzyć konta.';
@@ -267,8 +291,21 @@ export default function LoginPage() {
   }, [navigate, refetchProfile, session]);
 
   const stepContent = useMemo(() => {
+    if (session?.isLoading) {
+      return <AuthWizardResolvingPanel />;
+    }
+
     if (session?.isAuthenticated && !registrationCheckDone) {
-      return null;
+      return (
+        <RegisterProfile
+          isBootstrapping
+          onContinue={handleProfileContinue}
+          onBack={handleRegisterBack}
+          initialNickname={profileData.nickname}
+          initialAvatarId={profileData.avatarId}
+          errorMessage={profileError}
+        />
+      );
     }
 
     if (step === LOGIN_FLOW_STEP_INSTITUTION) {
@@ -322,9 +359,13 @@ export default function LoginPage() {
     profileError,
   ]);
 
+  const transitionKey = session?.isAuthenticated && !registrationCheckDone
+    ? LOGIN_FLOW_STEP_REGISTER
+    : step;
+
   return (
     <>
-      <AuthStepTransition activeKey={step} stepOrder={LOGIN_FLOW_STEP_ORDER}>
+      <AuthStepTransition activeKey={transitionKey} stepOrder={LOGIN_FLOW_STEP_ORDER}>
         {stepContent}
       </AuthStepTransition>
 

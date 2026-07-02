@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginPath } from '../../../routes/pathRegistry.js';
-import { fetchAvatars } from '../../../services/profile.api.js';
+import { getCachedAvatarList, loadAvatarList } from '../../../services/avatarListCache.js';
 import { PROFILE_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { CharacterLimitedField } from '../../../components/ui/index.js';
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
@@ -22,17 +22,22 @@ export default function RegisterProfile({
   initialNickname = '',
   initialAvatarId = 1,
   errorMessage = null,
+  isBootstrapping = false,
 }) {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
-  const [avatars, setAvatars] = useState([]);
+  const [avatars, setAvatars] = useState(() => getCachedAvatarList() ?? []);
   const [selectedAvatarId, setSelectedAvatarId] = useState(initialAvatarId);
-  const [isLoadingAvatars, setIsLoadingAvatars] = useState(true);
+  const [isLoadingAvatars, setIsLoadingAvatars] = useState(() => getCachedAvatarList() === null);
+
+  useEffect(() => {
+    setNickname(initialNickname);
+  }, [initialNickname]);
 
   useEffect(() => {
     let cancelled = false;
-    setIsLoadingAvatars(true);
-    fetchAvatars()
+
+    loadAvatarList()
       .then((list) => {
         if (cancelled) return;
         setAvatars(list);
@@ -43,6 +48,7 @@ export default function RegisterProfile({
       .finally(() => {
         if (!cancelled) setIsLoadingAvatars(false);
       });
+
     return () => { cancelled = true; };
   }, [initialAvatarId]);
 
@@ -63,7 +69,8 @@ export default function RegisterProfile({
     }
   }, [nickname, onContinue, selectedAvatarId]);
 
-  const isValid = nickname.trim().length > 0 && avatars.length > 0 && !isLoadingAvatars;
+  const isAvatarSectionLoading = isBootstrapping || isLoadingAvatars;
+  const isValid = nickname.trim().length > 0 && avatars.length > 0 && !isAvatarSectionLoading;
 
   return (
     <div className="auth-card auth-card--wizard-panel auth-card--left-aligned register-profile">
@@ -72,6 +79,7 @@ export default function RegisterProfile({
         className="auth-card__back-button"
         onClick={handleBack}
         aria-label="Wróć"
+        disabled={isBootstrapping}
       >
         <BackIcon className="auth-card__back-icon" />
       </button>
@@ -99,23 +107,21 @@ export default function RegisterProfile({
               }}
               maxLength={PROFILE_NICKNAME_MAX_LENGTH}
               autoComplete="nickname"
+              disabled={isBootstrapping}
             />
           </div>
         </CharacterLimitedField>
       </div>
 
       <div className="register-profile__avatar-section">
-        {isLoadingAvatars ? (
-          <p className="register-profile__avatar-label">Ładowanie awatarów…</p>
-        ) : (
-          <AvatarPicker
-            variant="compact"
-            avatars={avatars}
-            value={selectedAvatarId}
-            onChange={setSelectedAvatarId}
-            className="register-profile__avatar-picker"
-          />
-        )}
+        <AvatarPicker
+          variant="compact"
+          avatars={avatars}
+          value={selectedAvatarId}
+          onChange={setSelectedAvatarId}
+          isLoading={isAvatarSectionLoading}
+          className="register-profile__avatar-picker"
+        />
       </div>
 
       <button

@@ -1,169 +1,242 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import './WelcomeContent.css';
 
-function IntroParagraph() {
+const TAGLINE_WORDS = ['zabawa', 'przygoda', 'wyprawa', 'ekspedycja', 'podróż', 'eksploracja'];
+const PORTAL_WORDS = ['portalu', 'magii', 'przygodzie'];
+const INTRO_LINES = {
+  line0: ['sztuk', 'dziedzin', 'dyscyplin', 'rzemiosł', 'profesji'],
+  line1: ['umiejętności', 'talenty', 'kompetencje', 'moce', 'atuty'],
+  line2: ['wykładów i warsztatów', 'zajęć i seminariów', 'lekcji i ćwiczeń', 'kursów i treningów'],
+  line3: ['ekspedycje', 'wyprawy', 'misje', 'podróże', 'eskapady', 'kampanie'],
+  line4: ['jedno', 'jedność', 'całość', 'harmonię', 'nierozłączną całość'],
+};
+
+function pickRandom(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+/** Zapobiega wiszącym spójnikom na końcu linii (PL). */
+function withPolishLineBreaks(text) {
+  return text.replace(
+    /\s+(i|a|o|u|w|z|na|do|od|po|ze|że|by|co|się|oraz|czy|jak|gdy|to|już|też|więc|lub|albo|nad|pod|przy|bez|dla|ku|we|za|ani|niż|tym|gdyż|lecz|aby|gdyby|więc)\s+/gi,
+    (_, word) => `\u00A0${word} `,
+  );
+}
+
+function useCoarsePointer() {
+  const [isCoarsePointer, setIsCoarsePointer] = useState(
+    () => window.matchMedia('(hover: none) and (pointer: coarse)').matches,
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(hover: none) and (pointer: coarse)');
+    const onChange = () => setIsCoarsePointer(mediaQuery.matches);
+    mediaQuery.addEventListener('change', onChange);
+    return () => mediaQuery.removeEventListener('change', onChange);
+  }, []);
+
+  return isCoarsePointer;
+}
+
+function useWordSwapHandler(onSwap) {
+  const isCoarsePointer = useCoarsePointer();
+
+  return useCallback((event) => {
+    if (isCoarsePointer) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    onSwap();
+  }, [isCoarsePointer, onSwap]);
+}
+
+function SwapBlock({
+  className,
+  grayText,
+  greenText,
+  onSwap,
+}) {
+  const isCoarsePointer = useCoarsePointer();
+  const handleSwap = useWordSwapHandler(onSwap);
+
   return (
-    <p className="welcome-hero__intro">
-      Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich{' '}
-      <span className="welcome-hero__highlight">sztuk</span>
-      {' '}oraz nauk gotowych zdobywać wiedzę i poszerzać swoje{' '}
-      <span className="welcome-hero__highlight">umiejętności</span>
-      {' '}w najodleglejszych krainach i czasach. Po drugiej stronie próżno szukać{' '}
-      <span className="welcome-hero__highlight">wykładów i warsztatów</span>
-      . Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące{' '}
-      <span className="welcome-hero__highlight">ekspedycje</span>
-      . Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią{' '}
-      <span className="welcome-hero__highlight">jedno?</span>
-    </p>
+    <div
+      className={className}
+      onMouseEnter={isCoarsePointer ? undefined : onSwap}
+      onClick={isCoarsePointer ? handleSwap : undefined}
+      onKeyDown={isCoarsePointer ? (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          handleSwap(event);
+        }
+      } : undefined}
+      role={isCoarsePointer ? 'button' : undefined}
+      tabIndex={isCoarsePointer ? 0 : undefined}
+    >
+      <span className="welcome-hero__text-gray">{withPolishLineBreaks(grayText)}</span>
+      {'\u00A0'}
+      <span className="welcome-hero__text-green">{greenText}</span>
+    </div>
   );
 }
 
 export default function WelcomeContent() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess } = useToast();
-  const pickRandom = (array) => array[Math.floor(Math.random() * array.length)];
-  const words0 = ['zabawa', 'przygoda', 'wyprawa', 'ekspedycja', 'podróż', 'eksploracja'];
-  const [randomword0, setrandomword0] = useState('');
-  const words1 = ['portalu', 'magii', 'przygodzie'];
-  const [randomword1, setrandomword1] = useState('');
+  const isCoarsePointer = useCoarsePointer();
 
-  const lines0 = ['sztuk', 'dziedzin', 'dyscyplin', 'rzemiosł', 'profesji'];
-  const [randomline0, setrandomline0] = useState('');
-  const lines1 = ['umiejętności', 'talenty', 'kompetencje', 'moce', 'atuty'];
-  const [randomline1, setrandomline1] = useState('');
-  const lines2 = ['wykładów i warsztatów', 'zajęć i seminariów', 'lekcji i ćwiczeń', 'kursów i treningów'];
-  const [randomline2, setrandomline2] = useState('');
-  const lines3 = ['ekspedycje', 'wyprawy', 'misje', 'podróże', 'eskapady', 'kampanie'];
-  const [randomline3, setrandomline3] = useState('');
-  const lines4 = ['jedno', 'jedność', 'całość', 'harmonię', 'nierozłączną całość'];
-  const [randomline4, setrandomline4] = useState('');
+  const [taglineWord, setTaglineWord] = useState('');
+  const [portalWord, setPortalWord] = useState('');
+  const [introWords, setIntroWords] = useState({
+    line0: '',
+    line1: '',
+    line2: '',
+    line3: '',
+    line4: '',
+  });
+  const [ticks, setTicks] = useState(0);
+  const [tickDirection, setTickDirection] = useState(1);
 
-
-  const refreshRandomWords = () => {
-    setrandomword0(pickRandom(words0));
-    setrandomword1(pickRandom(words1));
-
-    setrandomline0(pickRandom(lines0));
-    setrandomline1(pickRandom(lines1));
-    setrandomline2(pickRandom(lines2));
-    setrandomline3(pickRandom(lines3));
-    setrandomline4(pickRandom(lines4));
-  };
-
-
-
-
-  const [screenwidth, setScreenwidth] = useState(window.innerWidth);
-
-  useEffect(() => {
-    const onResize = () => setScreenwidth(window.innerWidth);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+  const refreshPortalWord = useCallback(() => {
+    setPortalWord(pickRandom(PORTAL_WORDS));
   }, []);
 
-
+  useEffect(() => {
+    setTaglineWord(pickRandom(TAGLINE_WORDS));
+    setPortalWord(pickRandom(PORTAL_WORDS));
+    setIntroWords({
+      line0: pickRandom(INTRO_LINES.line0),
+      line1: pickRandom(INTRO_LINES.line1),
+      line2: pickRandom(INTRO_LINES.line2),
+      line3: pickRandom(INTRO_LINES.line3),
+      line4: pickRandom(INTRO_LINES.line4),
+    });
+  }, []);
 
   useEffect(() => {
-    if (searchParams.get('loggedOut') != '1') {
+    const interval = setInterval(() => {
+      setTicks((previous) => {
+        let next = previous + tickDirection;
+
+        if (next >= 50) {
+          next = 50;
+          setTickDirection(-1);
+        }
+
+        if (next <= 0) {
+          next = 0;
+          setTickDirection(1);
+        }
+
+        return next;
+      });
+    }, 25);
+
+    return () => clearInterval(interval);
+  }, [tickDirection]);
+
+  useEffect(() => {
+    if (searchParams.get('loggedOut') !== '1') {
       return;
     }
     showSuccess('Wylogowano pomyślnie.');
     setSearchParams({}, { replace: true });
   }, [searchParams, setSearchParams, showSuccess]);
 
-const [ticks, setTicks] = useState(0);
-const [change, setChange] = useState(1);
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    setTicks(previous => {
-      let next = previous + change;
-
-      if (next >= 50) {
-        next = 50;
-        setChange(-1);
-      }
-
-      if (next <= 0) {
-        next = 0;
-        setChange(1);
-      }
-
-      return next;
-    });
-  }, 25);
-
-  return () => clearInterval(interval);
-}, [change]);
-
-useEffect(() => {
-
-  setrandomword0(words0[Math.floor(Math.random() * words0.length)]);
-
-  setrandomword1(words1[Math.floor(Math.random() * words1.length)]);
-
-
-  setrandomline0(lines0[Math.floor(Math.random() * lines0.length)]);
-
-  setrandomline1(lines1[Math.floor(Math.random() * lines1.length)]);
-
-  setrandomline2(lines2[Math.floor(Math.random() * lines2.length)]);
-
-  setrandomline3(lines3[Math.floor(Math.random() * lines3.length)]);
-
-  setrandomline4(lines4[Math.floor(Math.random() * lines4.length)]);
-
-}, []);
-
   return (
-    <div className = "welcome-hero">
-      <div className = "welcome-hero__bg" aria-hidden = "true">
-        <div className = "welcome-hero__bg-image" />
-        <div className = "welcome-hero__bg-glow" />
-        <div className = "welcome-hero__stars" />
-        <div className = "welcome-hero__vignette" />
+    <div
+      className="welcome-hero"
+      style={{ '--welcome-tagline-scale': 1 - ticks * 0.01 }}
+    >
+      <div className="welcome-hero__bg" aria-hidden="true">
+        <div className="welcome-hero__bg-image" />
+        <div className="welcome-hero__bg-glow" />
+        <div className="welcome-hero__stars" />
+        <div className="welcome-hero__vignette" />
       </div>
 
       <div className="welcome-hero__content">
-
-
-
-        <div style = {{width: '100%', height: '10%', position: 'fixed', display: 'flex', top: '10%', alignItems: 'center', justifyContent: 'center'}}>
-          <div style = {{width: '50%', height: '20%', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'row'}}>
-
-              <img src = "/images/maq-logo.png" style = {{height: '1000%', objectFit: 'contain'}} />
-
-            <span style = {{color: 'rgb(187, 203, 185)', fontWeight: 900, fontSize: '172px'}}>A</span>
-            <span style = {{color: 'rgb(30, 204, 56)', fontWeight: 900, fontSize: '172px'}}>Q</span>
+        <Link
+          to={loginPath()}
+          className="welcome-hero__portal-link"
+          aria-label={`Zanurz się w ${portalWord}`}
+        >
+          <div className="welcome-hero__portal-btn">
+            <span className="welcome-hero__text-gray">{withPolishLineBreaks('Zanurz się w')}</span>
+            {' '}
+            <span
+              className="welcome-hero__text-green welcome-hero__portal-word"
+              onMouseEnter={isCoarsePointer ? undefined : refreshPortalWord}
+            >
+              {portalWord}
+            </span>
           </div>
+        </Link>
+
+        <div className="welcome-hero__brand">
+          <img
+            src="/images/maq-logo.png"
+            alt=""
+            className="welcome-hero__brand-logo"
+            aria-hidden="true"
+          />
+          <span className="welcome-hero__brand-a" aria-hidden="true">A</span>
+          <span className="welcome-hero__brand-q" aria-hidden="true">Q</span>
         </div>
 
-        <div onMouseEnter={() => setrandomword0(pickRandom(words0))} style = {{width: '30%', height: '10%', position: 'fixed', top: '20%', left: '70%', fontSize: 'clamp(21px, 2vw, 28px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', transform: `rotate(-15deg) scale(${1 - ticks * 0.01})`}}><span style = {{color: 'rgb(187, 203, 185)'}}>Nauka to</span> <span style = {{color: 'rgb(30, 204, 56)'}}>{randomword0}</span></div>
+        <SwapBlock
+          className="welcome-hero__tagline"
+          grayText="Nauka to"
+          greenText={taglineWord}
+          onSwap={() => setTaglineWord(pickRandom(TAGLINE_WORDS))}
+        />
 
+        <div className="welcome-hero__title">
+          <span className="welcome-hero__text-gray">MyAcademy</span>
+          <span className="welcome-hero__text-green">Quest</span>
+        </div>
 
-        <div onMouseEnter={() => setrandomline0(pickRandom(lines0))} style = {{width: '100%', height: '7.5%', position: 'fixed', top: '47.5%', left: '0%', fontSize: 'clamp(12px, 2vw, 28px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}><span style = {{color: 'rgb(187, 203, 185)'}}>Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich</span> <span style = {{color: 'rgb(30, 204, 56)'}}>{randomline0}</span></div>
-        <div onMouseEnter={() => setrandomline1(pickRandom(lines1))} style = {{width: '100%', height: '7.5%', position: 'fixed', top: '55%', left: '0%', fontSize: 'clamp(12px, 2vw, 28px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}><span style = {{color: 'rgb(187, 203, 185)'}}>oraz nauk gotowych zdobywać wiedzę i poszerzać swoje</span> <span style = {{color: 'rgb(30, 204, 56)'}}>{randomline1}</span></div>
-        <div onMouseEnter={() => setrandomline2(pickRandom(lines2))} style = {{width: '100%', height: '7.5%', position: 'fixed', top: '62.5%', left: '0%', fontSize: 'clamp(12px, 2vw, 28px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}><span style = {{color: 'rgb(187, 203, 185)'}}>w najodleglejszych krainach i czasach. Po drugiej stronie próżno szukać</span> <span style = {{color: 'rgb(30, 204, 56)'}}>{randomline2}.</span></div>
-        <div onMouseEnter={() => setrandomline3(pickRandom(lines3))} style = {{width: '100%', height: '7.5%', position: 'fixed', top: '70%', left: '0%', fontSize: 'clamp(12px, 2vw, 28px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}><span style = {{color: 'rgb(187, 203, 185)'}}>Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące</span> <span style = {{color: 'rgb(30, 204, 56)'}}>{randomline3}.</span></div>
+        <SwapBlock
+          className="welcome-hero__intro-line welcome-hero__intro-line--1"
+          grayText="Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich"
+          greenText={introWords.line0}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line0: pickRandom(INTRO_LINES.line0) }))}
+        />
 
-        <div onMouseEnter={() => setrandomline4(pickRandom(lines4))} style = {{width: '100%', height: '7.5%', position: 'fixed', top: '80%', left: '0%', fontSize: 'clamp(12px, 2vw, 28px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}><span style = {{color: 'rgb(187, 203, 185)'}}>Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią</span> <span style = {{color: 'rgb(30, 204, 56)'}}>{randomline4}?</span></div>
+        <SwapBlock
+          className="welcome-hero__intro-line welcome-hero__intro-line--2"
+          grayText="oraz nauk gotowych zdobywać wiedzę i poszerzać swoje"
+          greenText={introWords.line1}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line1: pickRandom(INTRO_LINES.line1) }))}
+        />
 
+        <SwapBlock
+          className="welcome-hero__intro-line welcome-hero__intro-line--3"
+          grayText="w najodleglejszych krainach i czasach. Po drugiej stronie próżno szukać"
+          greenText={`${introWords.line2}.`}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line2: pickRandom(INTRO_LINES.line2) }))}
+        />
 
-          <div style = {{width: '100%', height: '10%', position: 'fixed', top: '32.5%', left: '0%', fontSize: 'clamp(35px, 10vw, 70px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center'}}><span style = {{color: 'rgb(187, 203, 185)'}}>MyAcademy</span><span style = {{color: 'rgb(30, 204, 56)'}}>Quest</span></div>
-        <Link to = {loginPath()}>
-            <div onMouseEnter={(event) => {setrandomword1(pickRandom(words1)); event.currentTarget.style.backgroundColor = 'rgba(30, 204, 56, 0.2)';}} onMouseLeave={(event) => (event.currentTarget.style.backgroundColor = 'rgba(30, 204, 56, 0.1)')} style = {{backgroundColor: 'rgba(30, 204, 56, 0.1)', width: '20%', height: '10%', position: 'fixed', top: '2.5%', left: '77.5%', fontSize: 'clamp(10px, 1.5vw, 28px)', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', color: 'rgb(187, 203, 185)', borderRadius: '32px'}}><span style = {{color: 'rgb(187, 203, 185)'}}>Zanurz się w</span> <span style = {{color: 'rgb(30, 204, 56)'}}>{randomword1}</span></div>
-        </Link>
+        <SwapBlock
+          className="welcome-hero__intro-line welcome-hero__intro-line--4"
+          grayText="Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące"
+          greenText={`${introWords.line3}.`}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line3: pickRandom(INTRO_LINES.line3) }))}
+        />
+
+        <SwapBlock
+          className="welcome-hero__intro-line welcome-hero__intro-line--5"
+          grayText="Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią"
+          greenText={`${introWords.line4}?`}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line4: pickRandom(INTRO_LINES.line4) }))}
+        />
       </div>
 
-
-      <footer className = "welcome-hero__footer welcome-hero__reveal welcome-hero__reveal--4">
+      <footer className="welcome-hero__footer welcome-hero__reveal welcome-hero__reveal--4">
         MyAcademyQuest 2026 ©
       </footer>
     </div>
   );
 }
-
-

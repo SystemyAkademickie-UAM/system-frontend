@@ -121,7 +121,7 @@ export const STUDENT_ROUTE_TABLE = [
     hrefKey: 'GROUP_RANKING',
     pathPattern: '/groups/:groupId/ranking',
     breadcrumb: 'Ranking',
-    notes: 'Pozycja „unavailable” z nawigacją tymczasową',
+    notes: 'Pozycja „unavailable” — routing przekierowuje do /main',
   },
   {
     id: 'group.ranking.group',

@@ -64,16 +64,27 @@ function AvatarPlaceholder({ className }) {
   );
 }
 
-function pickPopularAvatars(avatars, count = 5) {
+function pickPopularAvatars(avatars, count = 5, selectedId = null) {
   if (avatars.length <= count) {
     return [...avatars];
   }
-  const pool = [...avatars];
-  const picked = [];
-  while (picked.length < count && pool.length > 0) {
-    const index = Math.floor(Math.random() * pool.length);
-    picked.push(pool.splice(index, 1)[0]);
+
+  const sorted = [...avatars].sort((left, right) => left.id - right.id);
+  const selected = selectedId === null
+    ? null
+    : sorted.find((avatar) => avatar.id === selectedId) ?? null;
+  const picked = selected ? [selected] : [];
+
+  for (const avatar of sorted) {
+    if (picked.length >= count) {
+      break;
+    }
+    if (avatar.id === selectedId) {
+      continue;
+    }
+    picked.push(avatar);
   }
+
   return picked;
 }
 
@@ -85,6 +96,7 @@ function pickPopularAvatars(avatars, count = 5) {
  * @param {number | null} props.value — wybrane `avatarId`
  * @param {(avatarId: number) => void} props.onChange
  * @param {boolean} [props.disabled]
+ * @param {boolean} [props.isLoading] — skeleton zamiast pustego przełączenia layoutu
  * @param {'default' | 'compact'} [props.variant='default'] — `compact` dla rejestracji (mniejszy podgląd, modal z pełną listą)
  * @param {string} [props.className]
  */
@@ -93,6 +105,7 @@ export default function AvatarPicker({
   value,
   onChange,
   disabled = false,
+  isLoading = false,
   variant = 'default',
   className = '',
   LANGUAGE = 'polish',
@@ -108,8 +121,8 @@ export default function AvatarPicker({
       setPopularAvatars([]);
       return;
     }
-    setPopularAvatars(pickPopularAvatars(avatars, popularLimit));
-  }, [avatars, popularLimit]);
+    setPopularAvatars(pickPopularAvatars(avatars, popularLimit, value));
+  }, [avatars, popularLimit, value]);
   const selectedAvatar = useMemo(
     () => avatars.find((avatar) => avatar.id === value) ?? null,
     [avatars, value],
@@ -172,9 +185,11 @@ export default function AvatarPicker({
     </div>
   );
 
-  const showAllButton = isCompact
+  const showAllButton = !isLoading && (isCompact
     ? avatars.length > popularAvatars.length
-    : remainingAvatars.length > 0;
+    : remainingAvatars.length > 0);
+
+  const skeletonTileCount = isCompact ? popularLimit : 5;
 
   return (
     <div
@@ -182,14 +197,34 @@ export default function AvatarPicker({
         'maq-avatar-picker',
         isCompact ? 'maq-avatar-picker--compact' : '',
         showGallery ? 'maq-avatar-picker--gallery-open' : '',
+        isLoading ? 'maq-avatar-picker--loading' : '',
         className,
       ].filter(Boolean).join(' ')}
+      aria-busy={isLoading || undefined}
     >
       <div className="maq-avatar-picker__current">
         <p className="maq-avatar-picker__label">{AVATARPICKERLABELTEXT[LANGUAGE]}</p>
-        {renderCurrentPreview()}
+        {isLoading ? (
+          <div className="maq-avatar-picker__current-preview" aria-hidden="true">
+            <div className="maq-avatar-picker__current-frame maq-avatar-picker__skeleton" />
+          </div>
+        ) : (
+          renderCurrentPreview()
+        )}
       </div>
-      {popularAvatars.length > 0 ? (
+      {isLoading ? (
+        <div className="maq-avatar-picker__popular">
+          <p className="maq-avatar-picker__label">{POPULARLABELTEXT[LANGUAGE]}</p>
+          <div className="maq-avatar-picker__popular-grid" aria-hidden="true">
+            {Array.from({ length: skeletonTileCount }, (_, index) => (
+              <span
+                key={`avatar-skeleton-${index}`}
+                className="maq-avatar-picker__tile maq-avatar-picker__tile--sm maq-avatar-picker__skeleton"
+              />
+            ))}
+          </div>
+        </div>
+      ) : popularAvatars.length > 0 ? (
         <div className="maq-avatar-picker__popular">
           <p className="maq-avatar-picker__label">{POPULARLABELTEXT[LANGUAGE]}</p>
           <div className="maq-avatar-picker__popular-grid" role="list">

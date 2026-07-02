@@ -78,6 +78,17 @@ function buildPurchaseSummaryItem(item) {
   };
 }
 
+function buildStudentPurchaseToastMessage(purchasedItems) {
+  const inventoryItems = purchasedItems.filter((item) => !item.isExtraLife);
+  if (inventoryItems.length === 0) {
+    return null;
+  }
+  if (inventoryItems.length === 1) {
+    return `Produkt „${inventoryItems[0].name}” został zakupiony.`;
+  }
+  return `Zakupiono ${inventoryItems.length} przedmioty.`;
+}
+
 export default function GroupShopContent() {
   const { groupId } = useParams();
   const navigate = useNavigate();
@@ -230,13 +241,18 @@ export default function GroupShopContent() {
       return false;
     }
 
+    const toastMessage = buildStudentPurchaseToastMessage(purchasedItems);
+    if (toastMessage) {
+      showSuccess(toastMessage);
+    }
+
     setShopPurchaseSummary(groupId, {
       items: inventoryItems,
       currencyEmoji,
     });
     navigate(groupProfileEqPath(groupId));
     return true;
-  }, [currencyEmoji, groupId, isStudentView, navigate]);
+  }, [currencyEmoji, groupId, isStudentView, navigate, showSuccess]);
 
   const handleBuyConfirm = useCallback(async () => {
     if (!activeModal?.item) {

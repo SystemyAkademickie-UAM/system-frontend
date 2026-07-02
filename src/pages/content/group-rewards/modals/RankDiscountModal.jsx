@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
-import { calculateDefaultRankDiscount } from '../../../../utils/ranks/rankDiscount.js';
 import { validateDiscountPercentInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
+
+const RANK_DISCOUNT_HINT = 'Procentowa obniżka ceny produktów w sklepie dla uczestników posiadających tę rangę. Ustaw 0, jeśli ranga nie przyznaje zniżki.';
 
 export default function RankDiscountModal({
   isOpen,
   rank,
-  existingRanks = [],
   onClose,
   onConfirm,
   isLoading = false,
@@ -15,15 +15,10 @@ export default function RankDiscountModal({
   const [discount, setDiscount] = useState('');
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || !rank) return;
 
-    if (rank) {
-      setDiscount(rank.discount === 0 || rank.discount ? String(rank.discount) : '');
-      return;
-    }
-
-    setDiscount(String(calculateDefaultRankDiscount(existingRanks)));
-  }, [isOpen, rank, existingRanks]);
+    setDiscount(String(rank.discount ?? 0));
+  }, [isOpen, rank]);
 
   const discountValidation = useMemo(
     () => validateDiscountPercentInput(discount),
@@ -66,12 +61,12 @@ export default function RankDiscountModal({
             ].filter(Boolean).join(' ')}
             value={discount}
             onChange={(event) => setDiscount(event.target.value)}
-            placeholder="np. 15"
+            placeholder="0"
             aria-invalid={showDiscountError}
             aria-describedby={showDiscountError ? 'rank-discount-modal-error' : 'rank-discount-modal-hint'}
           />
           <p id="rank-discount-modal-hint" className="rewards-modal__field-hint">
-            Domyślnie: 1% + zniżka najwyższej rangi. Możesz wyczyścić pole.
+            {RANK_DISCOUNT_HINT}
           </p>
           {showDiscountError ? (
             <p id="rank-discount-modal-error" className="rewards-modal__field-error" role="alert">

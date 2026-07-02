@@ -43,6 +43,9 @@ export const PROFILE_NICKNAME_MAX_LENGTH = NICKNAME_MAX_LENGTH;
 /** Maks. długość kodu wpisywanego przy dołączaniu do grupy. */
 export const ENROLLMENT_ENTRY_CODE_MAX_LENGTH = 6;
 
+/** Maks. liczba kodów dostępu na grupę — walidacja tylko po stronie frontendu. */
+export const ENROLLMENT_CODES_MAX_COUNT = 10;
+
 /** Presety pól tekstowych dla komponentu TextField. */
 export const TEXT_FIELD_PRESETS = {
   name: {

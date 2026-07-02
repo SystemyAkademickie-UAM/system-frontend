@@ -141,6 +141,37 @@
   cursor: not-allowed;
 }
 
+.maq-avatar-picker__skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(189, 202, 190, 0.08) 0%,
+    rgba(189, 202, 190, 0.18) 50%,
+    rgba(189, 202, 190, 0.08) 100%
+  );
+  background-size: 200% 100%;
+  animation: maq-avatar-picker-skeleton 1.2s ease-in-out infinite;
+}
+
+.maq-avatar-picker--loading .maq-avatar-picker__more {
+  display: none;
+}
+
+@keyframes maq-avatar-picker-skeleton {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .maq-avatar-picker__skeleton {
+    animation: none;
+  }
+}
+
 .maq-avatar-picker--compact {
   align-items: center;
   gap: 1rem;

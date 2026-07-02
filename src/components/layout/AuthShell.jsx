@@ -22,10 +22,6 @@ export default function AuthShell() {
         </>
       ) : null}
 
-      <a className="auth-shell__skip" href="#auth-main-content">
-        Przejdź do treści
-      </a>
-
       <main id="auth-main-content" className="auth-shell__main" tabIndex={-1}>
         {isWelcome ? (
           <div className="auth-shell__welcome-outlet">

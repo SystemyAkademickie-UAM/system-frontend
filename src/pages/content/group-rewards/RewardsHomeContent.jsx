@@ -443,7 +443,6 @@ export default function RewardsHomeContent() {
       <RankDiscountModal
         isOpen={activeModal?.type === 'discount'}
         rank={modalRank}
-        existingRanks={ranks}
         onClose={closeModal}
         onConfirm={handleDiscountConfirm}
         isLoading={modalLoading}

@@ -17,6 +17,7 @@ import { getProductCardColorVars } from '../../../utils/shop/shopCategoryColors.
 import { getShopCatalogPriceHint, getShopItemPriceDisplay } from '../../../utils/shop/shopPricing.js';
 
 import './ProductCard.css';
+import './lecturerTileActions.css';
 
 
 

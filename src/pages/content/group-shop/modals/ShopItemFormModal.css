@@ -10,7 +10,7 @@
   min-height: 0;
   max-height: none;
   overflow: hidden;
-  padding-bottom: 0;
+  padding: 0.75rem 0 0;
 }
 
 .shop-item-form-modal .shop-item-form {
@@ -20,16 +20,21 @@
   min-height: 0;
 }
 
+.shop-item-form-modal .shop-item-form__error {
+  margin: 0 1.5rem 0.75rem;
+}
+
 .shop-item-form-modal .shop-item-form__layout {
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
-  padding-bottom: 0.75rem;
+  box-sizing: border-box;
+  padding: 0 1.5rem 0.75rem;
 }
 
 .shop-item-form-modal .shop-item-form__footer {
   flex-shrink: 0;
-  margin: 0 -1.5rem 0;
+  margin: 0;
   padding: 0.75rem 1.5rem 1.25rem;
   border-top: 1px solid var(--color-modal-border);
   background: var(--color-modal-surface);
@@ -402,5 +407,46 @@
   .shop-item-form__row--name-price,
   .shop-item-form__row--limits {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .shop-item-form-modal.maq-modal {
+    align-items: stretch;
+    padding:
+      env(safe-area-inset-top, 0px)
+      0
+      env(safe-area-inset-bottom, 0px)
+      0;
+    overflow: hidden;
+  }
+
+  .shop-item-form-modal .maq-modal__dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .shop-item-form-modal .maq-modal__header {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .shop-item-form-modal .shop-item-form__error {
+    margin-inline: 1.25rem;
+  }
+
+  .shop-item-form-modal .shop-item-form__layout {
+    padding-inline: 1.25rem;
+    padding-bottom: 0.75rem;
+    scrollbar-gutter: stable;
+  }
+
+  .shop-item-form-modal .shop-item-form__footer {
+    padding: 0.75rem 1.25rem max(1.25rem, env(safe-area-inset-bottom));
   }
 }

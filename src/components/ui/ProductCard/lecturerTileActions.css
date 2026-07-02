@@ -1,0 +1,31 @@
+@media (max-width: 768px) {
+  .rank-path-row__rank--lecturer .rank-path-row__actions,
+  .badge-treasury-card--lecturer .badge-treasury-card__actions,
+  .maq-product-card .maq-product-card__lecturer-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .maq-product-card .maq-product-card__lecturer-actions {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    z-index: 3;
+    width: auto;
+    margin-left: 0;
+    padding-left: 0;
+    justify-content: flex-end;
+  }
+
+  .maq-product-card:has(.maq-product-card__lecturer-actions) .maq-product-card__header {
+    padding-right: 5.5rem;
+  }
+
+  .rank-path-row__rank--lecturer .maq-rank__header {
+    padding-right: 7rem;
+  }
+
+  .badge-treasury-card--lecturer .maq-badge__header {
+    padding-right: 7rem;
+  }
+}

@@ -114,10 +114,6 @@ function AppShellLayout() {
 
   return (
     <div className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}>
-      <a className="app-shell__skip" href="#main-content">
-        Przejdź do treści
-      </a>
-
       {isMobileNavOpen ? (
         <button
           type="button"
@@ -157,6 +153,7 @@ function AppShellLayout() {
             currencyLabel={currencyLabel}
             onNavigate={closeMobileNav}
             showMenuButton={!isCompactLayout}
+            showBrandLogo={isCompactLayout}
             menuExpanded={isMobileNavOpen}
             onMenuToggle={() => setIsMobileNavOpen((open) => !open)}
             isLoading={isHeaderLoading}
