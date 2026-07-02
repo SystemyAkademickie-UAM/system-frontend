@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import './WelcomeContent.css';
 
@@ -20,6 +22,17 @@ function IntroParagraph() {
 }
 
 export default function WelcomeContent() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { showSuccess } = useToast();
+
+  useEffect(() => {
+    if (searchParams.get('loggedOut') !== '1') {
+      return;
+    }
+    showSuccess('Wylogowano pomyślnie.');
+    setSearchParams({}, { replace: true });
+  }, [searchParams, setSearchParams, showSuccess]);
+
   return (
     <div className="welcome-hero">
       <div className="welcome-hero__bg" aria-hidden="true">
