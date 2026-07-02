@@ -26,8 +26,8 @@ const SAVEBUTTON__TEXTLABEL = {
 };
 
 const TITLE__TEXTLABEL = {
-  polish: 'Temat',
-  english: 'Title',
+  polish: 'Temat*',
+  english: 'Title*',
 };
 
 const TITLEPLACEHOLDER__TEXTLABEL = {
@@ -36,8 +36,8 @@ const TITLEPLACEHOLDER__TEXTLABEL = {
 };
 
 const TEXTCONTENT__TEXTLABEL = {
-  polish: 'Treść',
-  english: 'Content',
+  polish: 'Treść*',
+  english: 'Content*',
 };
 
 const TEXTPLACEHOLDER__TEXTLABEL = {

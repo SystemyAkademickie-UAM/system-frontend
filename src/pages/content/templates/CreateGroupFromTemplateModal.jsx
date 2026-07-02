@@ -95,7 +95,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
       <div className="create-group-from-template-modal__form">
         <TextField
           id="new-group-name"
-          label="Nazwa nowej grupy"
+          label="Nazwa nowej grupy*"
           value={groupName}
           onChange={(event) => setGroupName(event.target.value)}
           fieldKind="name"

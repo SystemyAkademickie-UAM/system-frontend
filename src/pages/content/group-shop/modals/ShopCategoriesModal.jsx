@@ -176,7 +176,7 @@ export default function ShopCategoriesModal({
         {editingId ? (
           <div className="shop-categories-modal__editor">
             <label className="shop-categories-modal__field">
-              <span>Nazwa</span>
+              <span>Nazwa*</span>
               <CharacterLimitedField value={form.name} maxLength={ITEM_CATEGORY_NAME_MAX_LENGTH}>
                 <input
                   type="text"

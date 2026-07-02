@@ -127,7 +127,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
       isOpen={isOpen}
       onClose={onClose}
       title="Nowy szablon"
-      subtitle="Wybierz grupę źródłową i nadaj szablonowi nazwę."
+      subtitle="Wybierz grupę źródłową i nadaj szablonowi nazwę*"
       size="xl"
       showFooter={false}
       className="create-template-modal"

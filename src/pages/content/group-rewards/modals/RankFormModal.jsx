@@ -87,7 +87,7 @@ export default function RankFormModal({
         <div className="rewards-modal__row rewards-modal__row--name-reward">
           <TextField
             id="rank-name"
-            label="Nazwa"
+            label="Nazwa*"
             fieldKind="name"
             value={form.name}
             onChange={handleChange('name')}
@@ -96,7 +96,7 @@ export default function RankFormModal({
           />
 
           <div className="rewards-modal__field">
-            <RewardsCurrencyLabel htmlFor="rank-cost">Koszt</RewardsCurrencyLabel>
+            <RewardsCurrencyLabel htmlFor="rank-cost">Koszt*</RewardsCurrencyLabel>
             <input
               id="rank-cost"
               type="text"
@@ -132,7 +132,7 @@ export default function RankFormModal({
 
         <TextField
           id="rank-story"
-          label="Status fabularny"
+          label="Status fabularny*"
           fieldKind="shortDescription"
           value={form.storyDescription}
           onChange={handleChange('storyDescription')}
