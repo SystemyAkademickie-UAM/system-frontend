@@ -13,6 +13,7 @@ import {
 } from '../../../components/ui/index.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { buildShopCategoryFilters, resolveShopCategoryLabels } from '../../../utils/shop/shopCategories.js';
 import ShopDeleteModal from '../group-shop/modals/ShopDeleteModal.jsx';
 import ShopItemFormModal from '../group-shop/modals/ShopItemFormModal.jsx';
@@ -26,7 +27,7 @@ import { useGroupShopItems, useGroupShopOpen } from '../../../hooks/shop/useGrou
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import {
   SHOP_SORT,
-  SHOP_SORT_OPTIONS,
+  getShopSortOptions,
 } from '../../../utils/shop/shopModel.js';
 import { getVisibilityStatusLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
 import { filterCatalogShopItems } from '../../../utils/shop/extraLifeItem.js';
@@ -37,13 +38,179 @@ import '../group-rewards/shared/rewardsShared.css';
 import '../group-rewards/shared/rewardsTablePreview.css';
 import './RewardsShopItemsContent.css';
 
+const LIMITNOVALUE__TEXTLABEL = {
+  polish: 'Bez limitu',
+  english: ''
+};
+
+const COLUMNNUMBER__TEXTLABEL = {
+  polish: 'Numer',
+  english: 'Number'
+};
+
+const COLUMNNAME__TEXTLABEL = {
+  polish: 'Nazwa',
+  english: 'Name'
+};
+
+const COLUMNVISIBILITY__TEXTLABEL = {
+  polish: 'Widoczność',
+  english: 'Visibility'
+};
+
+const COLUMNICON__TEXTLABEL = {
+  polish: 'Ikona',
+  english: 'Icon'
+};
+
+const COLUMNPRICE__TEXTLABEL = {
+  polish: 'Cena',
+  english: 'Price'
+};
+
+const COLUMNSTORYDESCRIPTION__TEXTLABEL = {
+  polish: 'Opis fabularny',
+  english: 'Story Description'
+};
+
+const COLUMNDIDACTICDESCRIPTION__TEXTLABEL = {
+  polish: 'Opis dydaktyczny',
+  english: 'Didactic Description'
+};
+
+const COLUMNCATEGORY__TEXTLABEL = {
+  polish: 'Kategoria',
+  english: 'Category'
+};
+
+const COLUMNSTOCK__TEXTLABEL = {
+  polish: 'Stan magazynu',
+  english: 'Stock'
+};
+
+const COLUMNSTUDENTLIMIT__TEXTLABEL = {
+  polish: 'Limit / student',
+  english: 'Limit / Student'
+};
+
+const ADDBUTTON__TEXTLABEL = {
+  polish: 'Dodaj produkt',
+  english: 'Add Product'
+};
+
+const CATEGORIESBUTTON__TEXTLABEL = {
+  polish: 'Kategorie',
+  english: 'Categories'
+};
+
+const ACCESSBUTTON__TEXTLABEL = {
+  polish: 'Dostęp do sklepu',
+  english: 'Shop Access'
+};
+
+const SEARCHPLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj produktu…',
+  english: 'Search product…'
+};
+
+const SEARCHARIALABEL__TEXTLABEL = {
+  polish: 'Szukaj produktu',
+  english: 'Search product'
+};
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie produktów…',
+  english: 'Loading products…'
+};
+
+const EMPTYMESSAGE__TEXTLABEL = {
+  polish: 'Brak produktów w sklepie. Kliknij "Dodaj produkt", aby utworzyć pierwszy.',
+  english: 'No products in the shop. Click "Add Product" to create the first one.'
+};
+
+const CATEOGYFILTERLABEL__TEXTLABEL = {
+  polish: 'Filtr kategorii produktu',
+  english: 'Product category filter'
+};
+
+const DELETEPRODUCT__TEXTLABEL = {
+  polish: 'Usuń produkt',
+  english: 'Delete Product'
+};
+
+const EDITPRODUCT__TEXTLABEL = {
+  polish: 'Edytuj produkt',
+  english: 'Edit Product'
+};
+
+const EDITDESCRIPTION__TEXTLABEL = {
+  polish: 'Otwórz formularz dodawania produktu.',
+  english: 'Open the product add form.'
+};
+
+const PAGINATIONARIALABEL__TEXTLABEL = {
+  polish: 'Nawigacja stron listy produktów sklepowych',
+  english: 'Shop product list page navigation'
+};
+
+const TOGGLEALLVISIBLE__TEXTLABEL = {
+  polish: 'Wszystkie produkty są teraz widoczne dla studentów.',
+  english: 'All products are now visible to students.'
+};
+
+const TOGGLEALLHIDDEN__TEXTLABEL = {
+  polish: 'Wszystkie produkty są teraz ukryte przed studentami.',
+  english: 'All products are now hidden from students.'
+};
+
+const DELETESUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Produkt został usunięty.',
+  english: 'Product has been deleted.'
+};
+
+const DELETEERRORMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się usunąć produktu.',
+  english: 'Failed to delete product.'
+};
+
+const SCHEDULESUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Zapisano planowane otwarcie sklepu.',
+  english: 'Scheduled shop opening saved.'
+};
+
+const STATUSERRORMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zmienić statusu sklepu.',
+  english: 'Failed to change shop status.'
+};
+
+const TOGGLEALLERRORMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zmienić widoczności produktów.',
+  english: 'Failed to change product visibility.'
+};
+
+const SHOPSHOPACCESSTITLE__TEXTLABEL = {
+  polish: 'Sklep został otwarty.',
+  english: 'Shop has been opened.'
+};
+
+const SHOPCLOSEDTITLE__TEXTLABEL = {
+  polish: 'Sklep został zamknięty.',
+  english: 'Shop has been closed.'
+};
+
+const SCHEDULEERRORMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zapisać harmonogramu otwarcia.',
+  english: 'Failed to save the opening schedule.'
+};
+
 /**
  * @param {number | null | undefined} value
+ * @param {string} language
  * @returns {string}
  */
-function formatLimitValue(value) {
+function formatLimitValue(value, language) {
   if (value === null || value === undefined) {
-    return 'Bez limitu';
+    return LIMITNOVALUE__TEXTLABEL[language] || '';
   }
   return String(value);
 }
@@ -51,155 +218,164 @@ function formatLimitValue(value) {
 /**
  * @param {import('../../../utils/shop/shopItem.types.js').ShopItem} item
  * @param {number} index
+ * @param {Map<string, any>} categoriesById
+ * @param {string} language
  */
-function mapShopItemToRow(item, index, categoriesById) {
+function mapShopItemToRow(item, index, categoriesById, language) {
   const categoryLabels = resolveShopCategoryLabels(item.categories, categoriesById);
   return {
     ...item,
     position: index + 1,
     categoryLabel: categoryLabels.join(', ') || '—',
-    stockLabel: formatLimitValue(item.stockQuantity),
-    studentLimitLabel: formatLimitValue(item.perStudentLimit),
+    stockLabel: formatLimitValue(item.stockQuantity, language),
+    studentLimitLabel: formatLimitValue(item.perStudentLimit, language),
   };
 }
 
-const SHOP_ITEM_COLUMNS = [
-  {
-    key: 'position',
-    label: 'Numer',
-    sort: 'number',
-    width: '90px',
-    className: 'rewards-table__th--position',
-    render: (item) => (
-      <span className="rewards-table__position">#{item.position}</span>
-    ),
-  },
-  {
-    key: 'name',
-    label: 'Nazwa',
-    sort: 'text',
-    width: '240px',
-    render: (item) => (
-      <span className="rewards-table__name">{item.name}</span>
-    ),
-  },
-  {
-    key: 'visibility',
-    label: 'Widoczność',
-    sort: 'text',
-    width: '110px',
-    accessor: (item) => getVisibilityStatusLabel(item.isPublished),
-    render: (item) => (
-      <span
-        className={[
-          'rewards-table__visibility',
-          item.isPublished === false
-            ? 'rewards-table__visibility--hidden'
-            : 'rewards-table__visibility--public',
-        ].join(' ')}
-      >
-        {getVisibilityStatusLabel(item.isPublished)}
-      </span>
-    ),
-  },
-  {
-    key: '_spacer',
-    label: '',
-    sort: false,
-    className: 'rewards-table__th--spacer',
-    colClassName: 'rewards-table__col--spacer',
-    cellClassName: 'rewards-table__cell--spacer',
-    render: () => '\u00A0',
-  },
-  {
-    key: 'icon',
-    label: 'Ikona',
-    sort: 'text',
-    width: '80px',
-    render: (item) => (
-      item.imageRef ? (
-        <span className="rewards-table__icon-emoji" aria-hidden="true">
-          {String(item.imageRef).split('*')[0]}
+/**
+ * @param {string} language
+ * @returns {Array<any>}
+ */
+function getShopItemColumns(language) {
+  return [
+    {
+      key: 'position',
+      label: COLUMNNUMBER__TEXTLABEL[language],
+      sort: 'number',
+      width: '90px',
+      className: 'rewards-table__th--position',
+      render: (item) => (
+        <span className="rewards-table__position">#{item.position}</span>
+      ),
+    },
+    {
+      key: 'name',
+      label: COLUMNNAME__TEXTLABEL[language],
+      sort: 'text',
+      width: '240px',
+      render: (item) => (
+        <span className="rewards-table__name">{item.name}</span>
+      ),
+    },
+    {
+      key: 'visibility',
+      label: COLUMNVISIBILITY__TEXTLABEL[language],
+      sort: 'text',
+      width: '110px',
+      accessor: (item) => getVisibilityStatusLabel(item.isPublished),
+      render: (item) => (
+        <span
+          className={[
+            'rewards-table__visibility',
+            item.isPublished === false
+              ? 'rewards-table__visibility--hidden'
+              : 'rewards-table__visibility--public',
+          ].join(' ')}
+        >
+          {getVisibilityStatusLabel(item.isPublished)}
         </span>
-      ) : (
-        <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
-      )
-    ),
-  },
-  {
-    key: 'priceAmount',
-    label: 'Cena',
-    sort: 'number',
-    width: '120px',
-    render: (item) => (
-      <CurrencyDisplay
-        amount={item.priceAmount}
-        size="sm"
-      />
-    ),
-  },
-  {
-    key: 'storyDescription',
-    label: 'Opis fabularny',
-    sort: 'text',
-    width: '220px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-    render: (item) => (
-      <span className="rewards-table__cell-text rewards-table__cell-text--truncate">
-        {item.storyDescription || '—'}
-      </span>
-    ),
-  },
-  {
-    key: 'didacticDescription',
-    label: 'Opis dydaktyczny',
-    sort: 'text',
-    width: '200px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-    render: (item) => (
-      <span className="rewards-table__cell-text rewards-table__cell-text--truncate">
-        {item.didacticDescription || '—'}
-      </span>
-    ),
-  },
-  {
-    key: 'categoryLabel',
-    label: 'Kategoria',
-    sort: 'text',
-    width: '160px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-    render: (item) => (
-      <span className="rewards-table__cell-text rewards-table__cell-text--truncate">
-        {item.categoryLabel}
-      </span>
-    ),
-  },
-  {
-    key: 'stockLabel',
-    label: 'Stan magazynu',
-    sort: 'text',
-    width: '130px',
-    hiddenBelow: 768,
-    render: (item) => (
-      <span className="rewards-table__cell-text">{item.stockLabel}</span>
-    ),
-  },
-  {
-    key: 'studentLimitLabel',
-    label: 'Limit / student',
-    sort: 'text',
-    width: '130px',
-    hiddenBelow: 768,
-    render: (item) => (
-      <span className="rewards-table__cell-text">{item.studentLimitLabel}</span>
-    ),
-  },
-];
+      ),
+    },
+    {
+      key: '_spacer',
+      label: '',
+      sort: false,
+      className: 'rewards-table__th--spacer',
+      colClassName: 'rewards-table__col--spacer',
+      cellClassName: 'rewards-table__cell--spacer',
+      render: () => '\u00A0',
+    },
+    {
+      key: 'icon',
+      label: COLUMNICON__TEXTLABEL[language],
+      sort: 'text',
+      width: '80px',
+      render: (item) => (
+        item.imageRef ? (
+          <span className="rewards-table__icon-emoji" aria-hidden="true">
+            {String(item.imageRef).split('*')[0]}
+          </span>
+        ) : (
+          <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+        )
+      ),
+    },
+    {
+      key: 'priceAmount',
+      label: COLUMNPRICE__TEXTLABEL[language],
+      sort: 'number',
+      width: '120px',
+      render: (item) => (
+        <CurrencyDisplay
+          amount={item.priceAmount}
+          size="sm"
+        />
+      ),
+    },
+    {
+      key: 'storyDescription',
+      label: COLUMNSTORYDESCRIPTION__TEXTLABEL[language],
+      sort: 'text',
+      width: '220px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+      render: (item) => (
+        <span className="rewards-table__cell-text rewards-table__cell-text--truncate">
+          {item.storyDescription || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'didacticDescription',
+      label: COLUMNDIDACTICDESCRIPTION__TEXTLABEL[language],
+      sort: 'text',
+      width: '200px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+      render: (item) => (
+        <span className="rewards-table__cell-text rewards-table__cell-text--truncate">
+          {item.didacticDescription || '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'categoryLabel',
+      label: COLUMNCATEGORY__TEXTLABEL[language],
+      sort: 'text',
+      width: '160px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+      render: (item) => (
+        <span className="rewards-table__cell-text rewards-table__cell-text--truncate">
+          {item.categoryLabel}
+        </span>
+      ),
+    },
+    {
+      key: 'stockLabel',
+      label: COLUMNSTOCK__TEXTLABEL[language],
+      sort: 'text',
+      width: '130px',
+      hiddenBelow: 768,
+      render: (item) => (
+        <span className="rewards-table__cell-text">{item.stockLabel}</span>
+      ),
+    },
+    {
+      key: 'studentLimitLabel',
+      label: COLUMNSTUDENTLIMIT__TEXTLABEL[language],
+      sort: 'text',
+      width: '130px',
+      hiddenBelow: 768,
+      render: (item) => (
+        <span className="rewards-table__cell-text">{item.studentLimitLabel}</span>
+      ),
+    },
+  ];
+}
 
 export default function RewardsShopItemsContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const nav = useGroupSubNav('group-rewards');
   const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-shop-view');
   const { groupId } = useParams();
@@ -230,14 +406,24 @@ export default function RewardsShopItemsContent() {
   const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
 
   const categoryFilters = useMemo(
-    () => buildShopCategoryFilters(categories),
-    [categories],
+    () => buildShopCategoryFilters(categories, LANGUAGE),
+    [categories, LANGUAGE],
   );
 
   const catalogItems = useMemo(
     () => filterCatalogShopItems(items, showExtraLifeProduct)
-      .map((item, index) => mapShopItemToRow(item, index, categoriesById)),
-    [items, categoriesById, showExtraLifeProduct],
+      .map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE)),
+    [items, categoriesById, showExtraLifeProduct, LANGUAGE],
+  );
+
+  const columns = useMemo(
+    () => getShopItemColumns(LANGUAGE),
+    [LANGUAGE],
+  );
+
+  const sortOptions = useMemo(
+    () => getShopSortOptions(LANGUAGE),
+    [LANGUAGE],
   );
 
   const bulkVisibilityItems = useMemo(
@@ -267,20 +453,20 @@ export default function RewardsShopItemsContent() {
     if (shopStatusChanged) {
       const statusResult = await setShopOpenStatus(shopOpen);
       if (!statusResult?.ok) {
-        showError(statusResult?.error ?? 'Nie udało się zmienić statusu sklepu.');
+        showError(statusResult?.error ?? STATUSERRORMESSAGE__TEXTLABEL[LANGUAGE]);
         return { ok: false };
       }
-      showSuccess(shopOpen ? 'Sklep został otwarty.' : 'Sklep został zamknięty.');
+      showSuccess(shopOpen ? SHOPSHOPACCESSTITLE__TEXTLABEL[LANGUAGE] : SHOPCLOSEDTITLE__TEXTLABEL[LANGUAGE]);
     }
 
     if (shouldClearSchedule || scheduleChanged) {
       const scheduleResult = await scheduleShopOpen(shouldClearSchedule ? null : shopOpensAtIso);
       if (!scheduleResult.ok) {
-        showError(scheduleResult.error ?? 'Nie udało się zapisać harmonogramu otwarcia.');
+        showError(scheduleResult.error ?? SCHEDULEERRORMESSAGE__TEXTLABEL[LANGUAGE]);
         return { ok: false };
       }
       if (!shouldClearSchedule && shopOpensAtIso) {
-        showSuccess('Zapisano planowane otwarcie sklepu.');
+        showSuccess(SCHEDULESUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
       }
       await refetchShopSchedule();
     }
@@ -294,6 +480,7 @@ export default function RewardsShopItemsContent() {
     shopOpensAt,
     showError,
     showSuccess,
+    LANGUAGE,
   ]);
 
   const openDeleteModal = useCallback((item) => {
@@ -316,12 +503,12 @@ export default function RewardsShopItemsContent() {
     const result = await deleteItem(activeModal.item.id);
 
     if (result.ok) {
-      showSuccess('Produkt został usunięty.');
+      showSuccess(DELETESUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
       closeModal();
       return;
     }
 
-    showError(result.error ?? 'Nie udało się usunąć produktu.');
+    showError(result.error ?? DELETEERRORMESSAGE__TEXTLABEL[LANGUAGE]);
   }, [activeModal, deleteItem, closeModal, showSuccess, showError]);
 
   const handleEdit = useCallback((item) => {
@@ -343,29 +530,29 @@ export default function RewardsShopItemsContent() {
     if (result.ok) {
       showSuccess(
         result.targetPublished
-          ? 'Wszystkie produkty są teraz widoczne dla studentów.'
-          : 'Wszystkie produkty są teraz ukryte przed studentami.',
+          ? TOGGLEALLVISIBLE__TEXTLABEL[LANGUAGE]
+          : TOGGLEALLHIDDEN__TEXTLABEL[LANGUAGE],
       );
       return;
     }
 
-    showError(result.error || 'Nie udało się zmienić widoczności produktów.');
-  }, [bulkVisibilityItems, showError, showSuccess, toggleAllPublished]);
+    showError(result.error || TOGGLEALLERRORMESSAGE__TEXTLABEL[LANGUAGE]);
+  }, [bulkVisibilityItems, showError, showSuccess, toggleAllPublished, LANGUAGE]);
 
   const rowActions = useMemo(() => ({
     onDelete: openDeleteModal,
     canDelete: (item) => !item.isExtraLife,
-    deleteLabel: 'Usuń produkt',
-    deleteAriaLabel: (item) => `Usuń produkt ${item.name}`,
+    deleteLabel: DELETEPRODUCT__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (item) => `${DELETEPRODUCT__TEXTLABEL[LANGUAGE]} ${item.name}`,
     menuItems: [
       {
         id: 'edit',
-        label: 'Edytuj produkt',
-        description: 'Otwórz formularz dodawania produktu.',
+        label: EDITPRODUCT__TEXTLABEL[LANGUAGE],
+        description: EDITDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: handleEdit,
       },
     ],
-  }), [openDeleteModal, handleEdit]);
+  }), [openDeleteModal, handleEdit, LANGUAGE]);
 
   const modalItem = activeModal?.item ?? null;
 
@@ -398,7 +585,7 @@ export default function RewardsShopItemsContent() {
               className="rewards-page__add-btn rewards-shop-items__add-btn"
               onClick={handleAddProduct}
             >
-              Dodaj produkt
+              {ADDBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
             <RewardsBulkVisibilityButton
               items={bulkVisibilityItems}
@@ -416,7 +603,7 @@ export default function RewardsShopItemsContent() {
                 className="rewards-shop-items__access-btn"
                 onClick={() => setActiveModal({ type: 'categories' })}
               >
-                Kategorie
+                {CATEGORIESBUTTON__TEXTLABEL[LANGUAGE]}
               </Button>
               <Button
                 type="button"
@@ -425,15 +612,15 @@ export default function RewardsShopItemsContent() {
                 className="rewards-shop-items__access-btn"
                 onClick={() => setShopAccessOpen(true)}
               >
-                Dostęp do sklepu
+                {ACCESSBUTTON__TEXTLABEL[LANGUAGE]}
               </Button>
               <SearchBar
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Szukaj produktu…"
+                placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                 name="shop-item-catalog-search"
                 className="rewards-page__search rewards-shop-items__search"
-                aria-label="Szukaj produktu"
+                aria-label={SEARCHARIALABEL__TEXTLABEL[LANGUAGE]}
               />
             </div>
             {isTileView ? (
@@ -450,17 +637,17 @@ export default function RewardsShopItemsContent() {
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">Ładowanie produktów…</p>
+        <p className="rewards-page__loading page-unavailable__notice">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : catalogItems.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">
-          Brak produktów w sklepie. Kliknij „Dodaj produkt”, aby utworzyć pierwszy.
+          {EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}
         </p>
       ) : isTileView ? (
         <>
           {filtersExpanded ? (
             <CatalogFiltersPanel className="rewards-page__filters">
               <CatalogFilterGroup
-                ariaLabel="Filtr kategorii produktu"
+                ariaLabel={CATEOGYFILTERLABEL__TEXTLABEL[LANGUAGE]}
                 filters={categoryFilters}
                 activeId={categoryFilter}
                 onSelect={setCategoryFilter}
@@ -468,7 +655,7 @@ export default function RewardsShopItemsContent() {
               <CatalogSortSelect
                 value={sortBy}
                 onChange={setSortBy}
-                options={SHOP_SORT_OPTIONS}
+                options={sortOptions}
               />
             </CatalogFiltersPanel>
           ) : null}
@@ -488,12 +675,12 @@ export default function RewardsShopItemsContent() {
         </>
       ) : (
         <DataTable
-          columns={SHOP_ITEM_COLUMNS}
+          columns={columns}
           data={catalogItems}
           rowKey="id"
           tiebreakerKey="position"
           itemsPerPage={10}
-          paginationAriaLabel="Nawigacja stron listy produktów sklepowych"
+          paginationAriaLabel={PAGINATIONARIALABEL__TEXTLABEL[LANGUAGE]}
           className="rewards-table rewards-table--shop-items"
           search={{
             external: true,

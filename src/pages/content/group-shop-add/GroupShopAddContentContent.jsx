@@ -11,7 +11,238 @@ import {createGroupShopItem, fetchGroupShopItems, updateGroupShopItem} from '../
 import {syncShopItemRankUnlock, findRankUnlockingItem} from '../../../utils/ranks/rankShopItemUnlock.js';
 import { EXTRA_LIFE_ICON_EDIT_TOOLTIP } from '../../../utils/shop/extraLifeItem.js';
 import { sanitizeWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import '../group-shop/modals/ShopItemFormModal.css';
+
+const ITEMNAMELABEL__TEXTLABEL = {
+  polish: 'Nazwa przedmiotu*',
+  english: 'Item Name*'
+};
+
+const PRICELABEL__TEXTLABEL = {
+  polish: 'Cena*',
+  english: 'Price*'
+};
+
+const ITEMICONLABEL__TEXTLABEL = {
+  polish: 'Ikona przedmiotu',
+  english: 'Item Icon'
+};
+
+const ITEMICONSELECT__TEXTLABEL = {
+  polish: 'Wybierz ikonę przedmiotu',
+  english: 'Select item icon'
+};
+
+const ITEMICONLIVES__TEXTLABEL = {
+  polish: 'Ikona systemu żyć',
+  english: 'Lives system icon'
+};
+
+const CATEGORYLABEL__TEXTLABEL = {
+  polish: 'Kategoria',
+  english: 'Category'
+};
+
+const CATEGORYTOOLTIP__TEXTLABEL = {
+  polish: 'Przedmiot może należeć do wielu kategorii — kolory kategorii mieszają się na kafelku produktu.',
+  english: 'An item can belong to multiple categories — category colors mix on the product tile.'
+};
+
+const NOCATEGORIES__TEXTLABEL = {
+  polish: 'Brak kategorii — dodaj je w sklepie.',
+  english: 'No categories — add them in the shop.'
+};
+
+const STORYDESCLABEL__TEXTLABEL = {
+  polish: 'Opis fabularny',
+  english: 'Story Description'
+};
+
+const EDUCDESCLABEL__TEXTLABEL = {
+  polish: 'Opis dydaktyczny',
+  english: 'Didactic Description'
+};
+
+const AVAILABILITYLABEL__TEXTLABEL = {
+  polish: 'Dostępność',
+  english: 'Availability'
+};
+
+const AVAILABILITYTOOLTIP__TEXTLABEL = {
+  polish: 'Domyślnie przedmiot jest dostępny dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang.',
+  english: 'By default, the item is available to everyone. A higher rank also unlocks items from lower ranks.'
+};
+
+const ALLUSERS__TEXTLABEL = {
+  polish: 'Dostępny dla wszystkich',
+  english: 'Available to all'
+};
+
+const RANKACCESS__TEXTLABEL = {
+  polish: 'Dostępny po osiągnięciu rangi: {rank}',
+  english: 'Available after reaching rank: {rank}'
+};
+
+const GROUPLIMITLABEL__TEXTLABEL = {
+  polish: 'Limit sztuk na grupę',
+  english: 'Items per group limit'
+};
+
+const GROUPLIMITTOOLTIP__TEXTLABEL = {
+  polish: 'Ogranicza łączną liczbę sztuk dostępnych w sklepie.',
+  english: 'Limits the total number of items available in the shop.'
+};
+
+const STUDENTLIMITLABEL__TEXTLABEL = {
+  polish: 'Limit sztuk na studenta',
+  english: 'Items per student limit'
+};
+
+const STUDENTLIMITTOOLTIP__TEXTLABEL = {
+  polish: 'Ogranicza ile razy każdy z użytkowników może kupić ten przedmiot.',
+  english: 'Limits how many times each user can purchase this item.'
+};
+
+const BADGEDISCOUNTLABEL__TEXTLABEL = {
+  polish: 'Zniżki za odznaki',
+  english: 'Badge Discounts'
+};
+
+const BADGEDISCOUNTTOOLTIP__TEXTLABEL = {
+  polish: "Wpisanie znaku '%' w wartości sprawia, że zniżka staje się procentowa.",
+  english: "Entering '%' in the value makes the discount percentage-based."
+};
+
+const SELECTBADGE__TEXTLABEL = {
+  polish: 'Wybierz odznakę',
+  english: 'Select Badge'
+};
+
+const ADDDISCOUNT__TEXTLABEL = {
+  polish: 'Dodaj zniżkę',
+  english: 'Add Discount'
+};
+
+const REMOVE__TEXTLABEL = {
+  polish: 'Usuń',
+  english: 'Remove'
+};
+
+const RANKDISCOUNTLABEL__TEXTLABEL = {
+  polish: 'Zniżki za rangi',
+  english: 'Rank Discounts'
+};
+
+const RANKDISCOUNTTOOLTIP__TEXTLABEL = {
+  polish: 'Choć cena finalna w przypadku posiadania przez studenta danej rangi obliczana jest automatycznie, można ją nadpisać.',
+  english: 'Although the final price for a student with a given rank is calculated automatically, it can be overridden.'
+};
+
+const NORANKS__TEXTLABEL = {
+  polish: 'Brak rang w grupie.',
+  english: 'No ranks in the group.'
+};
+
+const BACKBUTTON__TEXTLABEL = {
+  polish: 'Cofnij',
+  english: 'Back'
+};
+
+const SAVEDISCHANGE__TEXTLABEL = {
+  polish: 'Zapisz zmiany',
+  english: 'Save Changes'
+};
+
+const CREATEITEM__TEXTLABEL = {
+  polish: 'Stwórz przedmiot',
+  english: 'Create Item'
+};
+
+const CATEGORYCREATED__TEXTLABEL = {
+  polish: 'Kategoria została utworzona.',
+  english: 'Category has been created.'
+};
+
+const CATEGORYDELETED__TEXTLABEL = {
+  polish: 'Kategoria została usunięta.',
+  english: 'Category has been deleted.'
+};
+
+const CATEGORYNAMEEMPTY__TEXTLABEL = {
+  polish: 'Prosze wpisac nazwe kategorii.',
+  english: 'Please enter a category name.'
+};
+
+const BADGESELECTEMPTY__TEXTLABEL = {
+  polish: 'Prosze wybrac odznake.',
+  english: 'Please select a badge.'
+};
+
+const BADGEALREADYUSED__TEXTLABEL = {
+  polish: 'Znizka zwiazana z ta odznaka juz istnieje.',
+  english: 'A discount for this badge already exists.'
+};
+
+const DISCOUNTVALUEEMPTY__TEXTLABEL = {
+  polish: 'Prosze wpisac wartosc znizki.',
+  english: 'Please enter a discount value.'
+};
+
+const BADGEDISCOUNTCREATED__TEXTLABEL = {
+  polish: 'Zniżka dla odznaki została utworzona.',
+  english: 'Badge discount has been created.'
+};
+
+const BADGEDISCOUNTDELETED__TEXTLABEL = {
+  polish: 'Zniżka za odznakę została usunięta.',
+  english: 'Badge discount has been deleted.'
+};
+
+const ITEMNAMEEMPTY__TEXTLABEL = {
+  polish: 'Proszę wpisać nazwę przedmiotu.',
+  english: 'Please enter the item name.'
+};
+
+const COSTINVALID__TEXTLABEL = {
+  polish: 'Proszę wpisać poprawny koszt przedmiotu.',
+  english: 'Please enter a valid item cost.'
+};
+
+const GROUPLIMITEMPTY__TEXTLABEL = {
+  polish: 'Proszę wpisać limit sztuk na grupę lub odznaczyć limit.',
+  english: 'Please enter the group item limit or uncheck the limit.'
+};
+
+const STUDENTLIMITEMPTY__TEXTLABEL = {
+  polish: 'Proszę wpisać limit sztuk na studenta lub odznaczyć limit.',
+  english: 'Please enter the student item limit or uncheck the limit.'
+};
+
+const SAVEFAILED__TEXTLABEL = {
+  polish: 'Nie udało się zapisać przedmiotu.',
+  english: 'Failed to save the item.'
+};
+
+const RANKUNLOCKFAILED__TEXTLABEL = {
+  polish: 'Przedmiot zapisany, ale nie udało się przypisać blokady rangi.',
+  english: 'Item saved, but failed to assign rank unlock.'
+};
+
+const ITEMUPDATED__TEXTLABEL = {
+  polish: 'Przedmiot został zaktualizowany!',
+  english: 'Item has been updated!'
+};
+
+const ITEMCREATED__TEXTLABEL = {
+  polish: 'Przedmiot został utworzony!',
+  english: 'Item has been created!'
+};
+
+const BADGEFALLBACK__TEXTLABEL = {
+  polish: 'Odznaka {id}',
+  english: 'Badge {id}'
+};
 
 export default function ShopItemFormContent({
   groupId: groupIdProp,
@@ -20,6 +251,7 @@ export default function ShopItemFormContent({
   onSaved,
 }) {
 
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const {showSuccess, showError} = useToast();
 
   const routeParams = useParams();
@@ -227,7 +459,7 @@ export default function ShopItemFormContent({
       onFetchcategories();
       setAddingcategory(0);
       setNewcategoryname('');
-      showSuccess('Kategoria została utworzona.');
+      showSuccess(CATEGORYCREATED__TEXTLABEL[LANGUAGE]);
 
     } catch (error) {
 
@@ -338,7 +570,7 @@ export default function ShopItemFormContent({
       console.log('DELETE /groups/' + groupId + '/item-categories/' + categoryId + ' JSON:', data);
 
       onFetchcategories();
-      showSuccess('Kategoria została usunięta.');
+      showSuccess(CATEGORYDELETED__TEXTLABEL[LANGUAGE]);
 
     } catch (error) {
 
@@ -675,7 +907,7 @@ export default function ShopItemFormContent({
   function confirmaddcategory() {
 
     if (newcategoryname.trim().length == 0) {
-      showError('Prosze wpisac nazwe kategorii.');
+      showError(CATEGORYNAMEEMPTY__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -796,8 +1028,8 @@ export default function ShopItemFormContent({
 
   function addbadgediscount() {
 
-    if (selectedbadge == 'Wybierz odznakę') {
-      showError('Prosze wybrac odznake.');
+    if (selectedbadge == SELECTBADGE__TEXTLABEL[LANGUAGE]) {
+      showError(BADGESELECTEMPTY__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -815,12 +1047,12 @@ export default function ShopItemFormContent({
     }
 
     if (alreadyused == 1) {
-      showError('Znizka zwiazana z ta odznaka juz istnieje.');
+      showError(BADGEALREADYUSED__TEXTLABEL[LANGUAGE]);
       return;
     }
 
     if (pendingdiscountvalue.length == 0) {
-      showError('Prosze wpisac wartosc znizki.');
+      showError(DISCOUNTVALUEEMPTY__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -849,9 +1081,9 @@ export default function ShopItemFormContent({
     newdiscounts.push({id: badgediscounts.length, badgeid: badgeid, badgename: selectedbadge, value: pendingdiscountvalue});
 
     setBadgediscounts(newdiscounts);
-    setSelectedbadge('Wybierz odznakę');
+    setSelectedbadge(SELECTBADGE__TEXTLABEL[LANGUAGE]);
     setPendingdiscountvalue('');
-    showSuccess('Zniżka dla odznaki została utworzona.');
+    showSuccess(BADGEDISCOUNTCREATED__TEXTLABEL[LANGUAGE]);
   }
 
 
@@ -874,7 +1106,7 @@ export default function ShopItemFormContent({
     }
 
     setBadgediscounts(newdiscounts);
-    showSuccess('Zniżka za odznakę została usunięta.');
+    showSuccess(BADGEDISCOUNTDELETED__TEXTLABEL[LANGUAGE]);
   }
 
 
@@ -973,22 +1205,22 @@ export default function ShopItemFormContent({
   async function createitem() {
 
     if (itemname.trim().length == 0) {
-      showError('Proszę wpisać nazwę przedmiotu.');
+      showError(ITEMNAMEEMPTY__TEXTLABEL[LANGUAGE]);
       return;
     }
 
     if (cost == '' || Number(cost) < 0) {
-      showError('Proszę wpisać poprawny koszt przedmiotu.');
+      showError(COSTINVALID__TEXTLABEL[LANGUAGE]);
       return;
     }
 
     if (grouplimitenabled == 1 && grouplimit == '') {
-      showError('Proszę wpisać limit sztuk na grupę lub odznaczyć limit.');
+      showError(GROUPLIMITEMPTY__TEXTLABEL[LANGUAGE]);
       return;
     }
 
     if (studentlimitenabled == 1 && studentlimit == '') {
-      showError('Proszę wpisać limit sztuk na studenta lub odznaczyć limit.');
+      showError(STUDENTLIMITEMPTY__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -1001,7 +1233,7 @@ export default function ShopItemFormContent({
         : await createGroupShopItem(groupId, items);
 
       if (!saveResult.ok) {
-        showError(saveResult.error ?? 'Nie udało się zapisać przedmiotu.');
+        showError(saveResult.error ?? SAVEFAILED__TEXTLABEL[LANGUAGE]);
         return;
       }
 
@@ -1019,12 +1251,12 @@ export default function ShopItemFormContent({
           rankRefs,
         );
         if (!rankResult.ok) {
-          showError(rankResult.error ?? 'Przedmiot zapisany, ale nie udało się przypisać blokady rangi.');
+          showError(rankResult.error ?? RANKUNLOCKFAILED__TEXTLABEL[LANGUAGE]);
           return;
         }
       }
 
-      showSuccess(editingItemId ? 'Przedmiot został zaktualizowany!' : 'Przedmiot został utworzony!');
+      showSuccess(editingItemId ? ITEMUPDATED__TEXTLABEL[LANGUAGE] : ITEMCREATED__TEXTLABEL[LANGUAGE]);
       if (onSaved) {
         onSaved();
       } else {
@@ -1189,7 +1421,7 @@ export default function ShopItemFormContent({
         return {
           id: index,
           badgeid: badgeId,
-          badgename: badge?.name ?? `Odznaka ${badgeId}`,
+          badgename: badge?.name ?? BADGEFALLBACK__TEXTLABEL[LANGUAGE].replace('{id}', String(badgeId)),
           value,
         };
       });
@@ -1214,7 +1446,7 @@ export default function ShopItemFormContent({
           <section className="shop-item-form__panel">
             <div className="shop-item-form__row shop-item-form__row--name-price">
               <div className="shop-item-form__field">
-                <label className="shop-item-form__label" htmlFor="shop-item-name">Nazwa przedmiotu*</label>
+                <label className="shop-item-form__label" htmlFor="shop-item-name">{ITEMNAMELABEL__TEXTLABEL[LANGUAGE]}</label>
                 <CharacterLimitedField value={itemname} maxLength={NAME_MAX_LENGTH}>
                   <input
                     id="shop-item-name"
@@ -1227,7 +1459,7 @@ export default function ShopItemFormContent({
               </div>
               <div className="shop-item-form__field shop-item-form__field--price">
                 <RewardsCurrencyLabel htmlFor="shop-item-price" className="shop-item-form__label">
-                  Cena*
+                  {PRICELABEL__TEXTLABEL[LANGUAGE]}
                 </RewardsCurrencyLabel>
                 <input
                   id="shop-item-price"
@@ -1244,7 +1476,7 @@ export default function ShopItemFormContent({
             {isEditingExtraLife ? (
               <div className="shop-item-form__icon-picker shop-item-form__icon-picker--locked">
                 <span className="shop-item-form__label">
-                  Ikona przedmiotu
+                  {ITEMICONLABEL__TEXTLABEL[LANGUAGE]}
                   <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP} />
                 </span>
                 <div
@@ -1252,27 +1484,27 @@ export default function ShopItemFormContent({
                   aria-disabled="true"
                   title={EXTRA_LIFE_ICON_EDIT_TOOLTIP}
                 >
-                  <LivesIcon size="lg" ariaLabel="Ikona systemu żyć" />
+                  <LivesIcon size="lg" ariaLabel={ITEMICONLIVES__TEXTLABEL[LANGUAGE]} />
                 </div>
               </div>
             ) : (
               <EmojiPickerField
                 className="shop-item-form__icon-picker"
-                label="Ikona przedmiotu"
+                label={ITEMICONLABEL__TEXTLABEL[LANGUAGE]}
                 value={currenticon}
                 defaultEmoji="🥕"
                 onChange={setCurrenticon}
-                ariaLabel="Wybierz ikonę przedmiotu"
+                ariaLabel={ITEMICONSELECT__TEXTLABEL[LANGUAGE]}
               />
             )}
 
             <div className="shop-item-form__field">
               <span className="shop-item-form__label shop-item-form__label--heading">
-                Kategoria
-                <InfoTooltip text="Przedmiot może należeć do wielu kategorii — kolory kategorii mieszają się na kafelku produktu." />
+                {CATEGORYLABEL__TEXTLABEL[LANGUAGE]}
+                <InfoTooltip text={CATEGORYTOOLTIP__TEXTLABEL[LANGUAGE]} />
               </span>
               {categories.length === 0 ? (
-                <p className="shop-item-form__empty">Brak kategorii — dodaj je w sklepie.</p>
+                <p className="shop-item-form__empty">{NOCATEGORIES__TEXTLABEL[LANGUAGE]}</p>
               ) : (
                 <ul className="shop-item-form__category-list">
                   {categories.map((category) => (
@@ -1301,7 +1533,7 @@ export default function ShopItemFormContent({
 
           <section className="shop-item-form__panel">
             <div className="shop-item-form__field">
-              <label className="shop-item-form__label" htmlFor="shop-item-story">Opis fabularny</label>
+              <label className="shop-item-form__label" htmlFor="shop-item-story">{STORYDESCLABEL__TEXTLABEL[LANGUAGE]}</label>
               <CharacterLimitedField value={description0} maxLength={SHORT_DESCRIPTION_MAX_LENGTH}>
                 <textarea
                   id="shop-item-story"
@@ -1313,7 +1545,7 @@ export default function ShopItemFormContent({
               </CharacterLimitedField>
             </div>
             <div className="shop-item-form__field">
-              <label className="shop-item-form__label" htmlFor="shop-item-edu">Opis dydaktyczny</label>
+              <label className="shop-item-form__label" htmlFor="shop-item-edu">{EDUCDESCLABEL__TEXTLABEL[LANGUAGE]}</label>
               <CharacterLimitedField value={description1} maxLength={SHORT_DESCRIPTION_MAX_LENGTH}>
                 <textarea
                   id="shop-item-edu"
@@ -1331,8 +1563,8 @@ export default function ShopItemFormContent({
           <section className="shop-item-form__panel">
             <div className="shop-item-form__field">
               <label className="shop-item-form__label" htmlFor="shop-item-unlock-rank">
-                Dostępność
-                <InfoTooltip text="Domyślnie przedmiot jest dostępny dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang." />
+                {AVAILABILITYLABEL__TEXTLABEL[LANGUAGE]}
+                <InfoTooltip text={AVAILABILITYTOOLTIP__TEXTLABEL[LANGUAGE]} />
               </label>
               <select
                 id="shop-item-unlock-rank"
@@ -1340,10 +1572,10 @@ export default function ShopItemFormContent({
                 value={unlockRankId}
                 onChange={(event) => setUnlockRankId(event.target.value)}
               >
-                <option value="">Dostępny dla wszystkich</option>
+                <option value="">{ALLUSERS__TEXTLABEL[LANGUAGE]}</option>
                 {ranks.map((rank) => (
                   <option key={`unlock-rank-${rank.id}`} value={String(rank.id)}>
-                    {`Dostępny po osiągnięciu rangi: ${rank.name}`}
+                    {RANKACCESS__TEXTLABEL[LANGUAGE].replace('{rank}', rank.name)}
                   </option>
                 ))}
               </select>
@@ -1366,8 +1598,8 @@ export default function ShopItemFormContent({
                     }}
                   />
                   <span>
-                    Limit sztuk na grupę
-                    <InfoTooltip text="Ogranicza łączną liczbę sztuk dostępnych w sklepie." />
+                    {GROUPLIMITLABEL__TEXTLABEL[LANGUAGE]}
+                    <InfoTooltip text={GROUPLIMITTOOLTIP__TEXTLABEL[LANGUAGE]} />
                   </span>
                 </label>
                 <input
@@ -1393,8 +1625,8 @@ export default function ShopItemFormContent({
                     }}
                   />
                   <span>
-                    Limit sztuk na studenta
-                    <InfoTooltip text="Ogranicza ile razy każdy z użytkowników może kupić ten przedmiot." />
+                    {STUDENTLIMITLABEL__TEXTLABEL[LANGUAGE]}
+                    <InfoTooltip text={STUDENTLIMITTOOLTIP__TEXTLABEL[LANGUAGE]} />
                   </span>
                 </label>
                 <input
@@ -1411,8 +1643,8 @@ export default function ShopItemFormContent({
 
           <section className="shop-item-form__panel">
             <span className="shop-item-form__label shop-item-form__label--heading">
-              Zniżki za odznaki
-              <InfoTooltip text="Wpisanie znaku '%' w wartości sprawia, że zniżka staje się procentowa." />
+              {BADGEDISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
+              <InfoTooltip text={BADGEDISCOUNTTOOLTIP__TEXTLABEL[LANGUAGE]} />
             </span>
 
             <div className="shop-item-form__badge-toolbar">
@@ -1421,7 +1653,7 @@ export default function ShopItemFormContent({
                 value={selectedbadge}
                 onChange={(event) => setSelectedbadge(event.target.value)}
               >
-                <option value="Wybierz odznakę">Wybierz odznakę</option>
+                <option value={SELECTBADGE__TEXTLABEL[LANGUAGE]}>{SELECTBADGE__TEXTLABEL[LANGUAGE]}</option>
                 {badges.map((badge) => (
                   <option key={`badgeoption-${badge.id}`} value={badge.name}>{badge.name}</option>
                 ))}
@@ -1432,7 +1664,7 @@ export default function ShopItemFormContent({
                 onInput={(event) => onDiscountinput(event.target.value, setPendingdiscountvalue)}
               />
               <Button type="button" variant="primary" size="md" onClick={addbadgediscount}>
-                Dodaj zniżkę
+                {ADDDISCOUNT__TEXTLABEL[LANGUAGE]}
               </Button>
             </div>
 
@@ -1453,7 +1685,7 @@ export default function ShopItemFormContent({
                   size="sm"
                   onClick={() => deletebadgediscount(discount.id)}
                 >
-                  Usuń
+                  {REMOVE__TEXTLABEL[LANGUAGE]}
                 </Button>
               </div>
             ))}
@@ -1478,16 +1710,16 @@ export default function ShopItemFormContent({
               >
                 <span className="shop-item-form__rank-discounts-chevron" aria-hidden="true" />
                 <span className="shop-item-form__label shop-item-form__label--heading shop-item-form__label--toggle">
-                  Zniżki za rangi
+                  {RANKDISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
                   {ranksfrombackend === 0 ? '*' : ''}
                 </span>
               </button>
-              <InfoTooltip text="Choć cena finalna w przypadku posiadania przez studenta danej rangi obliczana jest automatycznie, można ją nadpisać." />
+              <InfoTooltip text={RANKDISCOUNTTOOLTIP__TEXTLABEL[LANGUAGE]} />
             </div>
 
             {rankDiscountsExpanded ? (
               ranks.length === 0 ? (
-                <p className="shop-item-form__empty">Brak rang w grupie.</p>
+                <p className="shop-item-form__empty">{NORANKS__TEXTLABEL[LANGUAGE]}</p>
               ) : (
                 <div id="shop-item-rank-discounts-list" className="shop-item-form__rank-list">
                   {ranks.map((rank) => (
@@ -1516,10 +1748,10 @@ export default function ShopItemFormContent({
 
       <div className="shop-item-form__footer">
         <Button type="button" variant="secondary" size="md" onClick={goback}>
-          Cofnij
+          {BACKBUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
         <Button type="button" variant="primary" size="md" onClick={createitem}>
-          {editingItemId ? 'Zapisz zmiany' : 'Stwórz przedmiot'}
+          {editingItemId ? SAVEDISCHANGE__TEXTLABEL[LANGUAGE] : CREATEITEM__TEXTLABEL[LANGUAGE]}
         </Button>
       </div>
     </div>

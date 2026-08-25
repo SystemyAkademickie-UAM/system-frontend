@@ -3,10 +3,61 @@ import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import './GroupSettingsHealthContentWindow.css';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 const closeicon = PUBLIC_UI_ICONS.close;
 const decreaseicon = PUBLIC_UI_ICONS.decrease;
 const increaseicon = PUBLIC_UI_ICONS.increase;
+
+const DEFAULTTITLE__TEXTLABEL = {
+  polish: 'Życia',
+  english: 'Lives'
+};
+
+const CLOSEARIALABEL__TEXTLABEL = {
+  polish: 'Zamknij panel zarządzania',
+  english: 'Close management panel'
+};
+
+const SUBTITLEPREFIX__TEXTLABEL = {
+  polish: 'Panel pozwalający zwiększać i zmniejszać',
+  english: 'Panel allowing to increase and decrease'
+};
+
+const SUBTITLESUFFIX__TEXTLABEL = {
+  polish: 'uczestników.',
+  english: 'participants.'
+};
+
+const COLUMNID__TEXTLABEL = {
+  polish: 'Nr',
+  english: '#'
+};
+
+const COLUMNNAME__TEXTLABEL = {
+  polish: 'Imię i nazwisko',
+  english: 'Full name'
+};
+
+const COLUMNNICKNAME__TEXTLABEL = {
+  polish: 'Nickname',
+  english: 'Nickname'
+};
+
+const COLUMNOPERATIONS__TEXTLABEL = {
+  polish: 'Operacje',
+  english: 'Operations'
+};
+
+const EMPTYSTATE__TEXTLABEL = {
+  polish: 'Brak zapisanych uczestników w grupie.',
+  english: 'No participants registered in the group.'
+};
+
+const FOOTNOTE__TEXTLABEL = {
+  polish: 'Kolumna po prawej pokazuje bieżącą wartość oraz zmianę wprowadzoną w tej sesji (+ / −).',
+  english: 'The rightmost column shows the current value and the change made in this session (+ / −).'
+};
 
 function sortStudents(students, sortField, sortReverse) {
   const sorted = [...students];
@@ -48,8 +99,9 @@ export default function GroupSettingsHealthContentWindow({
   const [students, setStudents] = useState([]);
   const [sortField, setSortField] = useState('nr');
   const [sortReverse, setSortReverse] = useState(false);
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
-  const titleText = liveslabel?.trim() || 'Życia';
+  const titleText = liveslabel?.trim() || DEFAULTTITLE__TEXTLABEL[LANGUAGE];
 
   async function onFetchStudents() {
     setErrorMessage('');
@@ -180,7 +232,7 @@ export default function GroupSettingsHealthContentWindow({
           type="button"
           className="lives-manage-dialog__close"
           onClick={hideLivesPopup}
-          aria-label="Zamknij panel zarządzania"
+          aria-label={CLOSEARIALABEL__TEXTLABEL[LANGUAGE]}
         >
           <img src={closeicon} alt="" className="lives-manage-dialog__close-icon" />
         </button>
@@ -191,11 +243,11 @@ export default function GroupSettingsHealthContentWindow({
             <span className="lives-manage-dialog__title-text">{titleText}</span>
           </h2>
           <p className="lives-manage-dialog__subtitle">
-            Panel pozwalający zwiększać i zmniejszać
+            {SUBTITLEPREFIX__TEXTLABEL[LANGUAGE]}
             {' '}
             {titleText.toLowerCase()}
             {' '}
-            uczestników.
+            {SUBTITLESUFFIX__TEXTLABEL[LANGUAGE]}
           </p>
         </header>
 
@@ -215,7 +267,7 @@ export default function GroupSettingsHealthContentWindow({
                   ].filter(Boolean).join(' ')}
                   onClick={() => sortBy('nr')}
                 >
-                  {getSortLabel('Nr', 'nr', sortField, sortReverse)}
+                  {getSortLabel(COLUMNID__TEXTLABEL[LANGUAGE], 'nr', sortField, sortReverse)}
                 </button>
               </div>
               <div className="lives-manage-table__head-cell">
@@ -227,7 +279,7 @@ export default function GroupSettingsHealthContentWindow({
                   ].filter(Boolean).join(' ')}
                   onClick={() => sortBy('name')}
                 >
-                  {getSortLabel('Imię i nazwisko', 'name', sortField, sortReverse)}
+                  {getSortLabel(COLUMNNAME__TEXTLABEL[LANGUAGE], 'name', sortField, sortReverse)}
                 </button>
               </div>
               <div className="lives-manage-table__head-cell lives-manage-table__head-cell--nickname">
@@ -239,16 +291,16 @@ export default function GroupSettingsHealthContentWindow({
                   ].filter(Boolean).join(' ')}
                   onClick={() => sortBy('nickname')}
                 >
-                  {getSortLabel('Nickname', 'nickname', sortField, sortReverse)}
+                  {getSortLabel(COLUMNNICKNAME__TEXTLABEL[LANGUAGE], 'nickname', sortField, sortReverse)}
                 </button>
               </div>
               <div className="lives-manage-table__head-cell lives-manage-table__head-cell--actions">
-                Operacje
+                {COLUMNOPERATIONS__TEXTLABEL[LANGUAGE]}
               </div>
             </div>
 
             {displayStudents.length === 0 ? (
-              <p className="lives-manage-table__empty">Brak zapisanych uczestników w grupie.</p>
+              <p className="lives-manage-table__empty">{EMPTYSTATE__TEXTLABEL[LANGUAGE]}</p>
             ) : (
               displayStudents.map((student) => (
                 <div
@@ -316,7 +368,7 @@ export default function GroupSettingsHealthContentWindow({
 
         <footer className="lives-manage-dialog__footer">
           <p className="lives-manage-dialog__footnote">
-            Kolumna po prawej pokazuje bieżącą wartość oraz zmianę wprowadzoną w tej sesji (+ / −).
+            {FOOTNOTE__TEXTLABEL[LANGUAGE]}
           </p>
         </footer>
       </div>

@@ -1,10 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 
 import { Modal } from '../../../../components/ui/index.js';
 import { REWARD_NUMERIC_MAX } from '../../../../utils/validation/rewardsNumericValidation.js';
 import { resolveNextAmount, validateCurrencyForm, validateDeltaInput } from './memberCurrencyForm.js';
 
 import './memberModals.css';
+
+const MODAL_TITLE__TEXTLABEL = { polish: 'Edytuj zgromadzoną walutę', english: 'Edit Total Earned Currency' };
+const SAVING_BUTTON__TEXTLABEL = { polish: 'Zapisywanie…', english: 'Saving…' };
+const SAVE_BUTTON__TEXTLABEL = { polish: 'Zapisz', english: 'Save' };
+const CURRENCY_LABEL__TEXTLABEL = { polish: 'Zmiana zgromadzonej waluty (dodatnia lub ujemna)', english: 'Total earned currency change (positive or negative)' };
+const CURRENCY_PLACEHOLDER__TEXTLABEL = { polish: 'np. 50 lub -20', english: 'e.g. 50 or -20' };
+const INTEGER_ERROR__TEXTLABEL = { polish: 'Wpisz liczbę całkowitą (dodatnią lub ujemną).', english: 'Enter a whole number (positive or negative).' };
+const TOTAL_EARNED_STAT_LABEL__TEXTLABEL = { polish: 'Zgromadzona', english: 'Total earned' };
 
 export default function MemberTotalEarnedModal({
   isOpen,
@@ -13,6 +22,7 @@ export default function MemberTotalEarnedModal({
   onConfirm,
   isLoading = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [deltaInput, setDeltaInput] = useState('');
 
   useEffect(() => {
@@ -53,10 +63,10 @@ export default function MemberTotalEarnedModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Edytuj zgromadzoną walutę"
+      title={MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       subtitle={member.name}
       onConfirm={handleConfirm}
-      confirmLabel={isLoading ? 'Zapisywanie…' : 'Zapisz'}
+      confirmLabel={isLoading ? SAVING_BUTTON__TEXTLABEL[LANGUAGE] : SAVE_BUTTON__TEXTLABEL[LANGUAGE]}
       confirmDisabled={!validation.valid || !validation.hasChange || isLoading}
       size="sm"
       className="member-modal"
@@ -64,7 +74,7 @@ export default function MemberTotalEarnedModal({
       <div className="member-modal__currency-form">
         <div className="member-modal__currency-input-wrap">
           <label htmlFor="total-earned-delta" className="member-modal__currency-label">
-            Zmiana zgromadzonej waluty (dodatnia lub ujemna)
+            {CURRENCY_LABEL__TEXTLABEL[LANGUAGE]}
           </label>
           <input
             id="total-earned-delta"
@@ -76,12 +86,12 @@ export default function MemberTotalEarnedModal({
             ].filter(Boolean).join(' ')}
             value={deltaInput}
             onChange={(event) => setDeltaInput(event.target.value)}
-            placeholder="np. 50 lub -20"
+            placeholder={CURRENCY_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
             aria-invalid={showDeltaError || showFormError}
           />
           {showDeltaError ? (
             <p className="member-modal__currency-error" role="alert">
-              Wpisz liczbę całkowitą (dodatnią lub ujemną).
+              {INTEGER_ERROR__TEXTLABEL[LANGUAGE]}
             </p>
           ) : null}
           {showFormError ? (
@@ -93,7 +103,7 @@ export default function MemberTotalEarnedModal({
 
         <div className="member-modal__currency-preview">
           <div className="member-modal__currency-stat">
-            <span className="member-modal__currency-stat-label">Zgromadzona</span>
+            <span className="member-modal__currency-stat-label">{TOTAL_EARNED_STAT_LABEL__TEXTLABEL[LANGUAGE]}</span>
             <span
               className={[
                 'member-modal__currency-stat-value',

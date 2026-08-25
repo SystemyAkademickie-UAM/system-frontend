@@ -4,8 +4,39 @@ import {
   AUTH_LEGAL_DOCUMENTS,
   authLegalDocumentUrl,
 } from '../../../constants/authLegalDocuments.constants.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthCard.css';
 import './RegisterEula.css';
+
+const BACK_ARIALABEL__TEXTLABEL = {
+  polish: 'Wróć',
+  english: 'Back'
+};
+
+const SUBTITLE__TEXTLABEL = {
+  polish: 'Tworząc nowe konto zgadzasz się z poniższą polityką MyAcademyQuest',
+  english: 'By creating a new account you agree to the MyAcademyQuest policy below'
+};
+
+const TERMS_CHECKBOX__TEXTLABEL = {
+  polish: 'Warunki użytkowania',
+  english: 'Terms of use'
+};
+
+const PRIVACY_CHECKBOX__TEXTLABEL = {
+  polish: 'Polityka prywatności',
+  english: 'Privacy policy'
+};
+
+const SUBMIT_CREATING__TEXTLABEL = {
+  polish: 'Tworzenie konta...',
+  english: 'Creating account...'
+};
+
+const SUBMIT_CREATE__TEXTLABEL = {
+  polish: 'Utwórz nowe konto',
+  english: 'Create new account'
+};
 
 function BackIcon({ className }) {
   return (
@@ -23,8 +54,13 @@ function CheckIcon({ className }) {
   );
 }
 
-function LegalDownloadLink({ documentKey }) {
+function LegalDownloadLink({ documentKey, LANGUAGE }) {
   const document = AUTH_LEGAL_DOCUMENTS[documentKey];
+
+  const DOWNLOAD_LINK__TEXTLABEL = {
+    polish: 'pobierz',
+    english: 'download'
+  };
 
   const handleClick = (event) => {
     event.stopPropagation();
@@ -39,12 +75,13 @@ function LegalDownloadLink({ documentKey }) {
       className="register-eula__download-link"
       onClick={handleClick}
     >
-      pobierz
+      {DOWNLOAD_LINK__TEXTLABEL[LANGUAGE]}
     </a>
   );
 }
 
 export default function RegisterEula({ onAccept, onBack, errorMessage = null, isSubmitting = false }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const navigate = useNavigate();
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
@@ -71,14 +108,14 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
         type="button"
         className="auth-card__back-button"
         onClick={handleBack}
-        aria-label="Wróć"
+        aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
         disabled={isSubmitting}
       >
         <BackIcon className="auth-card__back-icon" />
       </button>
 
       <p className="auth-card__subtitle register-eula__subtitle">
-        Tworząc nowe konto zgadzasz się z poniższą polityką MyAcademyQuest
+        {SUBTITLE__TEXTLABEL[LANGUAGE]}
       </p>
 
       {errorMessage && (
@@ -101,9 +138,9 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
             </span>
           </span>
           <span className="register-eula__checkbox-label">
-            Warunki użytkowania
+            {TERMS_CHECKBOX__TEXTLABEL[LANGUAGE]}
             {' '}
-            <LegalDownloadLink documentKey="termsOfUse" />
+            <LegalDownloadLink documentKey="termsOfUse" LANGUAGE={LANGUAGE} />
           </span>
         </label>
 
@@ -120,9 +157,9 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
             </span>
           </span>
           <span className="register-eula__checkbox-label">
-            Polityka prywatności
+            {PRIVACY_CHECKBOX__TEXTLABEL[LANGUAGE]}
             {' '}
-            <LegalDownloadLink documentKey="privacyPolicy" />
+            <LegalDownloadLink documentKey="privacyPolicy" LANGUAGE={LANGUAGE} />
           </span>
         </label>
       </div>
@@ -133,7 +170,7 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
         onClick={handleAccept}
         disabled={!isValid}
       >
-        {isSubmitting ? 'Tworzenie konta...' : 'Utwórz nowe konto'}
+        {isSubmitting ? SUBMIT_CREATING__TEXTLABEL[LANGUAGE] : SUBMIT_CREATE__TEXTLABEL[LANGUAGE]}
       </button>
     </div>
   );

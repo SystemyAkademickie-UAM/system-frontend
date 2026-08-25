@@ -16,6 +16,107 @@ import { findExtraLifeShopItem } from '../../../utils/shop/extraLifeItem.js';
 import ShopItemFormModal from '../group-shop/modals/ShopItemFormModal.jsx';
 import GroupSettingsHealthContentWindow from './GroupSettingsHealthContentWindow.jsx';
 import '../group-settings/GroupSettingsForm.css';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+const LOADSETTINGSERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać ustawień systemu żyć.',
+  english: 'Failed to load lives settings.'
+};
+
+const SAVESETTINGSERROR__TEXTLABEL = {
+  polish: 'Nie udało się zapisać ustawień systemu żyć.',
+  english: 'Failed to save lives settings.'
+};
+
+const SUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Zmiany zostały zapisane.',
+  english: 'Changes have been saved.'
+};
+
+const PANELAILABEL__TEXTLABEL = {
+  polish: 'System żyć',
+  english: 'Lives System'
+};
+
+const SECTIONHEADER__TEXTLABEL = {
+  polish: 'System żyć',
+  english: 'Lives System'
+};
+
+const LOADINGHINT__TEXTLABEL = {
+  polish: 'Ładowanie ustawień systemu żyć…',
+  english: 'Loading lives settings…'
+};
+
+const TOGGLELABEL__TEXTLABEL = {
+  polish: 'Włącz system żyć',
+  english: 'Enable lives system'
+};
+
+const TOGGLETOOLTIP__TEXTLABEL = {
+  polish: 'Pozwala włączyć i wyłączyć system szans.',
+  english: 'Allows enabling and disabling the lives system.'
+};
+
+const EMOJIPICKERLABEL__TEXTLABEL = {
+  polish: 'Ikona żyć',
+  english: 'Lives icon'
+};
+
+const EMOJIPICKERARIA__TEXTLABEL = {
+  polish: 'Wybierz ikonę żyć',
+  english: 'Choose lives icon'
+};
+
+const LIVESLABELLABEL__TEXTLABEL = {
+  polish: 'Nazwa żyć*',
+  english: 'Lives name*'
+};
+
+const LIVESLIMITLABEL__TEXTLABEL = {
+  polish: 'Limit żyć*',
+  english: 'Lives limit*'
+};
+
+const LIVESLIMITTOOLTIP__TEXTLABEL = {
+  polish: 'Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości.',
+  english: 'The number of lives a student has cannot exceed this value.'
+};
+
+const LIVESSTARTLABEL__TEXTLABEL = {
+  polish: 'Startowa liczba żyć*',
+  english: 'Starting lives*'
+};
+
+const LIVESSTARTTOOLTIP__TEXTLABEL = {
+  polish: 'Liczba szans, jaką student otrzymuje po dołączeniu do grupy.',
+  english: 'The number of lives a student receives after joining the group.'
+};
+
+const SHOPTOGGLELABEL__TEXTLABEL = {
+  polish: 'Możliwość kupowania żyć w sklepie',
+  english: 'Ability to buy lives in the shop'
+};
+
+const SHOPTOGGLETTOOLTIP__TEXTLABEL = {
+  polish: 'Umożliwia kupowanie szans w sklepie.',
+  english: 'Allows buying lives in the shop.'
+};
+
+const EDITEXTRALIFEBUTTON__TEXTLABEL = {
+  polish: 'Edytuj produkt: Dodatkowe życie',
+  english: 'Edit item: Extra life'
+};
+
+const MANAGEBUTTON__TEXTLABEL = {
+  polish: 'Zarządzanie życiami studentów',
+  english: 'Manage student lives'
+};
+
+const SAVEBUTTON__TEXTLABEL = {
+  polish: 'Zapisz zmiany',
+  english: 'Save changes'
+};
 
 function buildSnapshot({
   livesIcon,
@@ -72,6 +173,7 @@ function applyConfigToState(config, setters) {
 export default function GroupSettingsHealthContentContent() {
   const { groupId } = useParams();
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const [livesIcon, setLivesIcon] = useState(DEFAULT_LIVES_SYMBOL);
   const [livesLabel, setLivesLabel] = useState('');
@@ -114,7 +216,7 @@ export default function GroupSettingsHealthContentContent() {
     try {
       const result = await fetchGroupLivesConfig(groupId);
       if (!result.ok || !result.config) {
-        throw new Error('Nie udało się pobrać ustawień systemu żyć.');
+        throw new Error(LOADSETTINGSERROR__TEXTLABEL[LANGUAGE]);
       }
 
       applyConfigToState(result.config, {
@@ -127,13 +229,13 @@ export default function GroupSettingsHealthContentContent() {
         setSavedSnapshot,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Nie udało się pobrać ustawień systemu żyć.';
+      const message = error instanceof Error ? error.message : LOADSETTINGSERROR__TEXTLABEL[LANGUAGE];
       setErrorMessage(message);
       showError(message);
     } finally {
       setIsLoading(false);
     }
-  }, [groupId, showError]);
+  }, [groupId, showError, LANGUAGE]);
 
   useEffect(() => {
     void loadSettings();
@@ -167,15 +269,15 @@ export default function GroupSettingsHealthContentContent() {
     try {
       const result = await updateGroupLivesConfig(groupId, payload);
       if (!result.ok) {
-        throw new Error('Nie udało się zapisać ustawień systemu żyć.');
+        throw new Error(SAVESETTINGSERROR__TEXTLABEL[LANGUAGE]);
       }
 
       invalidateGroupLives(groupId);
       await loadSettings();
-      showSuccess('Zmiany zostały zapisane.');
+      showSuccess(SUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Nie udało się zapisać ustawień systemu żyć.';
+      const message = error instanceof Error ? error.message : SAVESETTINGSERROR__TEXTLABEL[LANGUAGE];
       setErrorMessage(message);
       showError(message);
       return false;
@@ -193,6 +295,7 @@ export default function GroupSettingsHealthContentContent() {
     loadSettings,
     showError,
     showSuccess,
+    LANGUAGE,
   ]);
 
   const isDirty = useMemo(() => {
@@ -236,11 +339,11 @@ export default function GroupSettingsHealthContentContent() {
 
   return (
     <div className="group-settings-form group-settings-form--drive-layout group-settings-form--lives">
-      <section className="group-settings-form__panel" aria-label="System żyć">
-        <SettingsSectionHeader title="System żyć" id="group-lives-title" />
+      <section className="group-settings-form__panel" aria-label={PANELAILABEL__TEXTLABEL[LANGUAGE]}>
+        <SettingsSectionHeader title={SECTIONHEADER__TEXTLABEL[LANGUAGE]} id="group-lives-title" />
 
         {isLoading ? (
-          <p className="group-settings-form__hint">Ładowanie ustawień systemu żyć…</p>
+          <p className="group-settings-form__hint">{LOADINGHINT__TEXTLABEL[LANGUAGE]}</p>
         ) : (
           <>
             <div className="group-settings-form__field">
@@ -250,8 +353,8 @@ export default function GroupSettingsHealthContentContent() {
                 onChange={setLivesEnabled}
                 disabled={isSaving}
               >
-                Włącz system żyć
-                <InfoTooltip text="Pozwala włączyć i wyłączyć system szans." />
+                {TOGGLELABEL__TEXTLABEL[LANGUAGE]}
+                <InfoTooltip text={TOGGLETOOLTIP__TEXTLABEL[LANGUAGE]} />
               </SettingsCheckboxField>
             </div>
 
@@ -260,16 +363,16 @@ export default function GroupSettingsHealthContentContent() {
             <div className={detailsSectionClassName}>
               <EmojiPickerField
                 className="group-settings-form__field"
-                label="Ikona żyć"
+                label={EMOJIPICKERLABEL__TEXTLABEL[LANGUAGE]}
                 value={livesIcon}
                 defaultEmoji={DEFAULT_LIVES_SYMBOL}
                 onChange={setLivesIcon}
-                ariaLabel="Wybierz ikonę żyć"
+                ariaLabel={EMOJIPICKERARIA__TEXTLABEL[LANGUAGE]}
               />
 
               <div className="group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="group-lives-label">
-                  Nazwa żyć*
+                  {LIVESLABELLABEL__TEXTLABEL[LANGUAGE]}
                 </label>
                 <CharacterLimitedField value={livesLabel} maxLength={LIVES_LABEL_MAX_LENGTH}>
                   <input
@@ -285,8 +388,8 @@ export default function GroupSettingsHealthContentContent() {
 
               <div className="group-settings-form__field group-settings-form__field--value">
                 <label className="group-settings-form__label" htmlFor="group-lives-limit">
-                  Limit żyć*
-                  <InfoTooltip text="Liczba szans posiadanych przez studenta nie może przekroczyć tej wartości." />
+                  {LIVESLIMITLABEL__TEXTLABEL[LANGUAGE]}
+                  <InfoTooltip text={LIVESLIMITTOOLTIP__TEXTLABEL[LANGUAGE]} />
                 </label>
                 <input
                   id="group-lives-limit"
@@ -300,8 +403,8 @@ export default function GroupSettingsHealthContentContent() {
 
               <div className="group-settings-form__field group-settings-form__field--value">
                 <label className="group-settings-form__label" htmlFor="group-lives-start">
-                  Startowa liczba żyć*
-                  <InfoTooltip text="Liczba szans, jaką student otrzymuje po dołączeniu do grupy." />
+                  {LIVESSTARTLABEL__TEXTLABEL[LANGUAGE]}
+                  <InfoTooltip text={LIVESSTARTTOOLTIP__TEXTLABEL[LANGUAGE]} />
                 </label>
                 <input
                   id="group-lives-start"
@@ -320,8 +423,8 @@ export default function GroupSettingsHealthContentContent() {
                   onChange={setLivesShopEnabled}
                   disabled={isSaving || !livesEnabled}
                 >
-                  Możliwość kupowania żyć w sklepie
-                  <InfoTooltip text="Umożliwia kupowanie szans w sklepie." />
+                  {SHOPTOGGLELABEL__TEXTLABEL[LANGUAGE]}
+                  <InfoTooltip text={SHOPTOGGLETTOOLTIP__TEXTLABEL[LANGUAGE]} />
                 </SettingsCheckboxField>
               </div>
 
@@ -335,7 +438,7 @@ export default function GroupSettingsHealthContentContent() {
                   onClick={() => setIsExtraLifeModalOpen(true)}
                   disabled={!livesEnabled || !livesShopEnabled || !extraLifeItemId}
                 >
-                  Edytuj produkt: Dodatkowe życie
+                  {EDITEXTRALIFEBUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
               </div>
 
@@ -347,7 +450,7 @@ export default function GroupSettingsHealthContentContent() {
                   onClick={() => setIsManageOpen(true)}
                   disabled={!livesEnabled}
                 >
-                  Zarządzanie życiami studentów
+                  {MANAGEBUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
               </div>
             </div>
@@ -368,7 +471,7 @@ export default function GroupSettingsHealthContentContent() {
           onClick={persistSettings}
           disabled={isSaving}
         >
-          Zapisz zmiany
+          {SAVEBUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       ) : null}
 

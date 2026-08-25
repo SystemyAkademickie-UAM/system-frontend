@@ -2,8 +2,22 @@ import { useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
 import { validateDiscountPercentInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import '../../group-rewards/shared/rewardsModals.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 
-const RANK_DISCOUNT_HINT = 'Procentowa obniżka ceny produktów w sklepie dla uczestników posiadających tę rangę. Ustaw 0, jeśli ranga nie przyznaje zniżki.';
+const DISCOUNTMODALTITLE__TEXTLABEL = {
+  polish: 'Zniżka w sklepie',
+  english: 'Shop discount'
+};
+
+const DISCOUNTFIELDLABEL__TEXTLABEL = {
+  polish: 'Zniżka w sklepie (%)',
+  english: 'Shop discount (%)'
+};
+
+const DISCOUNTHINT__TEXTLABEL = {
+  polish: 'Procentowa obniżka ceny produktów w sklepie dla uczestników posiadających tę rangę. Ustaw 0, jeśli ranga nie przyznaje zniżki.',
+  english: 'Percentage price reduction for shop products for participants who have this rank. Set 0 if the rank does not provide a discount.'
+};
 
 export default function RankDiscountModal({
   isOpen,
@@ -12,6 +26,7 @@ export default function RankDiscountModal({
   onConfirm,
   isLoading = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [discount, setDiscount] = useState('');
 
   useEffect(() => {
@@ -39,7 +54,7 @@ export default function RankDiscountModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Zniżka w sklepie"
+      title={DISCOUNTMODALTITLE__TEXTLABEL[LANGUAGE]}
       subtitle={rank.name}
       onConfirm={handleConfirm}
       confirmDisabled={!isValid || isLoading}
@@ -49,7 +64,7 @@ export default function RankDiscountModal({
       <div className="rewards-modal__form">
         <div className="rewards-modal__field">
           <label htmlFor="rank-discount-modal" className="rewards-modal__label">
-            Zniżka w sklepie (%)
+            {DISCOUNTFIELDLABEL__TEXTLABEL[LANGUAGE]}
           </label>
           <input
             id="rank-discount-modal"
@@ -66,7 +81,7 @@ export default function RankDiscountModal({
             aria-describedby={showDiscountError ? 'rank-discount-modal-error' : 'rank-discount-modal-hint'}
           />
           <p id="rank-discount-modal-hint" className="rewards-modal__field-hint">
-            {RANK_DISCOUNT_HINT}
+            {DISCOUNTHINT__TEXTLABEL[LANGUAGE]}
           </p>
           {showDiscountError ? (
             <p id="rank-discount-modal-error" className="rewards-modal__field-error" role="alert">

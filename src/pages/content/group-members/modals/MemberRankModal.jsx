@@ -3,7 +3,14 @@ import { Modal, Rank } from '../../../../components/ui/index.js';
 import { AUTO_RANK_OPTION } from '../../../../utils/ranks/autoRankAssignment.js';
 import { mapRankDiscountValue } from '../../group-main-ranks/rankPathModel.js';
 import { normalizeRankBadgeIcon, DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import './memberModals.css';
+
+const MODAL_TITLE__TEXTLABEL = { polish: 'Edytuj rangę', english: 'Edit Rank' };
+const NO_RANKS_EMPTY__TEXTLABEL = { polish: 'Brak zdefiniowanych rang w tej grupie.', english: 'No ranks defined in this group.' };
+const RANK_PICKER_ARIA__TEXTLABEL = { polish: 'Wybierz rangę', english: 'Select rank' };
+const AUTOMATIC_RANK_LABEL__TEXTLABEL = { polish: 'Automatyczna', english: 'Automatic' };
+const SAVING_MESSAGE__TEXTLABEL = { polish: 'Zapisywanie...', english: 'Saving...' };
 
 const MOBILE_RANK_PICKER_MAX_WIDTH_PX = 768;
 
@@ -31,6 +38,7 @@ export default function MemberRankModal({
   onConfirm,
   isLoading = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [selectedRank, setSelectedRank] = useState('');
   const [expandedRankName, setExpandedRankName] = useState(null);
   const isMobilePicker = useMobileRankPickerLayout();
@@ -71,7 +79,7 @@ export default function MemberRankModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Edytuj rangę"
+      title={MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       subtitle={member.name}
       onConfirm={handleConfirm}
       confirmDisabled={isLoading || (rankOptions.length === 0 && selectedRank !== AUTO_RANK_OPTION)}
@@ -79,9 +87,9 @@ export default function MemberRankModal({
       className="member-modal member-modal--rank-picker"
     >
       {rankOptions.length === 0 ? (
-        <p className="member-modal__empty">Brak zdefiniowanych rang w tej grupie.</p>
+        <p className="member-modal__empty">{NO_RANKS_EMPTY__TEXTLABEL[LANGUAGE]}</p>
       ) : (
-        <ul className="member-modal__rank-grid" role="radiogroup" aria-label="Wybierz rangę">
+        <ul className="member-modal__rank-grid" role="radiogroup" aria-label={RANK_PICKER_ARIA__TEXTLABEL[LANGUAGE]}>
           <li>
             <label
               className={[
@@ -98,7 +106,7 @@ export default function MemberRankModal({
                 onChange={handleSelectAutomatic}
                 disabled={isLoading}
               />
-              <span className="member-modal__rank-name">Automatyczna</span>
+              <span className="member-modal__rank-name">{AUTOMATIC_RANK_LABEL__TEXTLABEL[LANGUAGE]}</span>
             </label>
           </li>
           {rankOptions.map((rank) => {
@@ -139,7 +147,7 @@ export default function MemberRankModal({
           })}
         </ul>
       )}
-      {isLoading ? <p className="member-modal__loading">Zapisywanie...</p> : null}
+      {isLoading ? <p className="member-modal__loading">{SAVING_MESSAGE__TEXTLABEL[LANGUAGE]}</p> : null}
     </Modal>
   );
 }

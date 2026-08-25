@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 import { DataTable, CurrencyDisplay, SearchBar, useToast } from '../../../components/ui/index.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
@@ -22,6 +23,35 @@ import MemberRankModal from './modals/MemberRankModal.jsx';
 
 import './MembersHomeContent.css';
 
+const PARTICIPANT_PROMOTED__TEXTLABEL = { polish: 'Uczestnik awansował na rangę: ${rankName}.', english: 'Participant promoted to rank: ${rankName}.' };
+const CURRENCY_UPDATED__TEXTLABEL = { polish: 'Waluta uczestnika została zaktualizowana.', english: 'Participant currency has been updated.' };
+const TOTAL_CURRENCY_UPDATED__TEXTLABEL = { polish: 'Zgromadzona waluta uczestnika została zaktualizowana.', english: 'Participant total earned currency has been updated.' };
+const AUTO_RANK_ENABLED__TEXTLABEL = { polish: 'Włączono rangę automatyczną. Aktualna ranga: ${rankName}.', english: 'Automatic rank enabled. Current rank: ${rankName}.' };
+const RANK_ASSIGNED__TEXTLABEL = { polish: 'Przyznano rangę: ${rankName}.', english: 'Rank assigned: ${rankName}.' };
+const PARTICIPANT_REMOVED__TEXTLABEL = { polish: 'Uczestnik został usunięty z grupy.', english: 'Participant has been removed from the group.' };
+const COLUMN_POSITION__TEXTLABEL = { polish: 'Numer', english: 'Number' };
+const COLUMN_MEMBER__TEXTLABEL = { polish: 'Członek grupy', english: 'Group member' };
+const COLUMN_RANK__TEXTLABEL = { polish: 'Ranga', english: 'Rank' };
+const COLUMN_BADGES__TEXTLABEL = { polish: 'Odznaki', english: 'Badges' };
+const COLUMN_CURRENCY__TEXTLABEL = { polish: 'Waluta', english: 'Currency' };
+const COLUMN_TOTAL_CURRENCY__TEXTLABEL = { polish: 'Zgromadzona', english: 'Total earned' };
+const ROW_DELETE_LABEL__TEXTLABEL = { polish: 'Usuń uczestnika', english: 'Remove participant' };
+const ROW_BADGES_LABEL__TEXTLABEL = { polish: 'Przydziel odznakę', english: 'Assign badge' };
+const ROW_BADGES_ARIA__TEXTLABEL = { polish: 'Przydziel odznakę uczestnikowi', english: 'Assign badge to participant' };
+const ROW_PROGRESS_LABEL__TEXTLABEL = { polish: 'Edytuj postęp', english: 'Edit progress' };
+const ROW_PROGRESS_ARIA__TEXTLABEL = { polish: 'Edytuj postęp uczestnika', english: 'Edit participant progress' };
+const ROW_RANK_LABEL__TEXTLABEL = { polish: 'Zmień rangę', english: 'Change rank' };
+const ROW_RANK_DESC__TEXTLABEL = { polish: 'Ustaw ręcznie rangę uczestnikowi.', english: 'Manually set participant rank.' };
+const ROW_CURRENCY_LABEL__TEXTLABEL = { polish: 'Zarządzaj walutą', english: 'Manage currency' };
+const ROW_CURRENCY_DESC__TEXTLABEL = { polish: 'Dodaj lub odejmij ręcznie walutę uczestnikowi.', english: 'Add or subtract participant currency manually.' };
+const ROW_TOTAL_EARNED_LABEL__TEXTLABEL = { polish: 'Edytuj zgromadzoną walutę', english: 'Edit total earned currency' };
+const ROW_TOTAL_EARNED_DESC__TEXTLABEL = { polish: 'Zmień tylko zgromadzoną walutę uczestnika.', english: 'Change only participant total earned currency.' };
+const SEARCH_PLACEHOLDER__TEXTLABEL = { polish: 'Szukaj członka grupy…', english: 'Search group member…' };
+const SEARCH_ARIA_LABEL__TEXTLABEL = { polish: 'Szukaj członka grupy', english: 'Search group member' };
+const LOADING_MESSAGE__TEXTLABEL = { polish: 'Ładowanie członków grupy…', english: 'Loading group members…' };
+const EMPTY_MESSAGE__TEXTLABEL = { polish: 'Brak członków w tej grupie.', english: 'No members in this group.' };
+const PAGINATION_ARIA_LABEL__TEXTLABEL = { polish: 'Nawigacja stron listy uczestników', english: 'Participants list page navigation' };
+
 function renderMemberNameLines(member) {
   const nickname = member.nickname?.trim() || '';
   const legalName = member.legalName?.trim() || '';
@@ -39,6 +69,7 @@ function renderMemberNameLines(member) {
 }
 
 export default function MembersHomeContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const nav = useGroupSubNav('group-members');
   const { showSuccess } = useToast();
   const {
@@ -70,8 +101,8 @@ export default function MembersHomeContent() {
 
   const notifyRankPromotion = useCallback((promotedRankName) => {
     if (!promotedRankName) return;
-    showSuccess(`Uczestnik awansował na rangę: ${promotedRankName}.`);
-  }, [showSuccess]);
+    showSuccess(PARTICIPANT_PROMOTED__TEXTLABEL[LANGUAGE].replace('${rankName}', promotedRankName));
+  }, [showSuccess, LANGUAGE]);
 
   const handleBadgesConfirm = useCallback(async () => {
     const member = activeModal?.member ?? null;
@@ -100,11 +131,11 @@ export default function MembersHomeContent() {
     setModalLoading(false);
 
     if (result.ok) {
-      showSuccess('Waluta uczestnika została zaktualizowana.');
+      showSuccess(CURRENCY_UPDATED__TEXTLABEL[LANGUAGE]);
       notifyRankPromotion(result.promotedRankName);
       closeModal();
     }
-  }, [activeModal, updateMemberCurrency, closeModal, notifyRankPromotion, showSuccess]);
+  }, [activeModal, updateMemberCurrency, closeModal, notifyRankPromotion, showSuccess, LANGUAGE]);
 
   const handleTotalEarnedConfirm = useCallback(async ({ delta, setValue }) => {
     if (!activeModal?.member) return;
@@ -119,11 +150,11 @@ export default function MembersHomeContent() {
     setModalLoading(false);
 
     if (result.ok) {
-      showSuccess('Zgromadzona waluta uczestnika została zaktualizowana.');
+      showSuccess(TOTAL_CURRENCY_UPDATED__TEXTLABEL[LANGUAGE]);
       notifyRankPromotion(result.promotedRankName);
       closeModal();
     }
-  }, [activeModal, updateMemberTotalEarned, closeModal, notifyRankPromotion, showSuccess]);
+  }, [activeModal, updateMemberTotalEarned, closeModal, notifyRankPromotion, showSuccess, LANGUAGE]);
 
   const handleRankConfirm = useCallback(async (selection) => {
     if (!activeModal?.member) return;
@@ -134,13 +165,13 @@ export default function MembersHomeContent() {
 
     if (result.ok) {
       if (result.isAutomatic) {
-        showSuccess(`Włączono rangę automatyczną. Aktualna ranga: ${result.assignedRankName}.`);
+        showSuccess(AUTO_RANK_ENABLED__TEXTLABEL[LANGUAGE].replace('${rankName}', result.assignedRankName));
       } else {
-        showSuccess(`Przyznano rangę: ${result.assignedRankName}.`);
+        showSuccess(RANK_ASSIGNED__TEXTLABEL[LANGUAGE].replace('${rankName}', result.assignedRankName));
       }
       closeModal();
     }
-  }, [activeModal, updateMemberRank, closeModal, showSuccess]);
+  }, [activeModal, updateMemberRank, closeModal, showSuccess, LANGUAGE]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.member) return;
@@ -150,15 +181,15 @@ export default function MembersHomeContent() {
     setModalLoading(false);
 
     if (result.ok) {
-      showSuccess('Uczestnik został usunięty z grupy.');
+      showSuccess(PARTICIPANT_REMOVED__TEXTLABEL[LANGUAGE]);
       closeModal();
     }
-  }, [activeModal, deleteMember, closeModal, showSuccess]);
+  }, [activeModal, deleteMember, closeModal, showSuccess, LANGUAGE]);
 
   const memberColumns = useMemo(() => [
     {
       key: 'position',
-      label: 'Numer',
+      label: COLUMN_POSITION__TEXTLABEL[LANGUAGE],
       sort: 'number',
       width: '108px',
       className: 'members-table__th--position',
@@ -170,7 +201,7 @@ export default function MembersHomeContent() {
     },
     {
       key: 'name',
-      label: 'Członek grupy',
+      label: COLUMN_MEMBER__TEXTLABEL[LANGUAGE],
       sort: 'text',
       className: 'members-table__th--user',
       colClassName: 'members-table__col--user',
@@ -209,7 +240,7 @@ export default function MembersHomeContent() {
     },
     {
       key: 'rank',
-      label: 'Ranga',
+      label: COLUMN_RANK__TEXTLABEL[LANGUAGE],
       sort: { type: 'custom', order: rankNames },
       width: '140px',
       className: 'members-table__th--rank',
@@ -228,7 +259,7 @@ export default function MembersHomeContent() {
     },
     {
       key: 'badgesCount',
-      label: 'Odznaki',
+      label: COLUMN_BADGES__TEXTLABEL[LANGUAGE],
       sort: 'number',
       width: '100px',
       className: 'members-table__th--badges',
@@ -244,7 +275,7 @@ export default function MembersHomeContent() {
     },
     {
       key: 'currency',
-      label: 'Waluta',
+      label: COLUMN_CURRENCY__TEXTLABEL[LANGUAGE],
       sort: 'number',
       width: '110px',
       className: 'members-table__th--currency',
@@ -260,7 +291,7 @@ export default function MembersHomeContent() {
     },
     {
       key: 'totalCurrency',
-      label: 'Zgromadzona',
+      label: COLUMN_TOTAL_CURRENCY__TEXTLABEL[LANGUAGE],
       sort: 'number',
       width: '110px',
       className: 'members-table__th--total',
@@ -278,47 +309,47 @@ export default function MembersHomeContent() {
 
   const rowActions = useMemo(() => ({
     onDelete: (member) => openModal('delete', member),
-    deleteLabel: 'Usuń uczestnika',
-    deleteAriaLabel: (member) => `Usuń ${member.name}`,
+    deleteLabel: ROW_DELETE_LABEL__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (member) => `${ROW_DELETE_LABEL__TEXTLABEL[LANGUAGE]} ${member.name}`,
     inlineActions: [
       {
         id: 'badges',
-        label: 'Przydziel odznakę',
+        label: ROW_BADGES_LABEL__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.nav.profileBadges,
         iconClassName: 'data-table__inline-icon--badge-award',
         iconSize: 40,
-        ariaLabel: 'Przydziel odznakę uczestnikowi',
+        ariaLabel: ROW_BADGES_ARIA__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('badges', member),
       },
       {
         id: 'progress',
-        label: 'Edytuj postęp',
+        label: ROW_PROGRESS_LABEL__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.manageProgress,
-        ariaLabel: 'Edytuj postęp uczestnika',
+        ariaLabel: ROW_PROGRESS_ARIA__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('progress', member),
       },
     ],
     menuItems: [
       {
         id: 'rank',
-        label: 'Zmień rangę',
-        description: 'Ustaw ręcznie rangę uczestnikowi.',
+        label: ROW_RANK_LABEL__TEXTLABEL[LANGUAGE],
+        description: ROW_RANK_DESC__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('rank', member),
       },
       {
         id: 'currency',
-        label: 'Zarządzaj walutą',
-        description: 'Dodaj lub odejmij ręcznie walutę uczestnikowi.',
+        label: ROW_CURRENCY_LABEL__TEXTLABEL[LANGUAGE],
+        description: ROW_CURRENCY_DESC__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('currency', member),
       },
       {
         id: 'totalEarned',
-        label: 'Edytuj zgromadzoną walutę',
-        description: 'Zmień tylko zgromadzoną walutę uczestnika.',
+        label: ROW_TOTAL_EARNED_LABEL__TEXTLABEL[LANGUAGE],
+        description: ROW_TOTAL_EARNED_DESC__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('totalEarned', member),
       },
     ],
-  }), [openModal]);
+  }), [openModal, LANGUAGE]);
 
   const modalMember = activeModal?.member ?? null;
 
@@ -346,19 +377,19 @@ export default function MembersHomeContent() {
           <SearchBar
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj członka grupy…"
+            placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
             name="member-search"
             className="members-page__search"
-            aria-label="Szukaj członka grupy"
+            aria-label={SEARCH_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
           />
         </div>
       )}
     >
 
       {isLoading ? (
-        <p className="members-page__loading page-unavailable__notice">Ładowanie członków grupy…</p>
+        <p className="members-page__loading page-unavailable__notice">{LOADING_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : members.length === 0 ? (
-        <p className="members-page__empty page-unavailable__notice">Brak członków w tej grupie.</p>
+        <p className="members-page__empty page-unavailable__notice">{EMPTY_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : (
         <DataTable
           columns={memberColumns}
@@ -366,7 +397,7 @@ export default function MembersHomeContent() {
           rowKey="id"
           tiebreakerKey="position"
           itemsPerPage={10}
-          paginationAriaLabel="Nawigacja stron listy uczestników"
+          paginationAriaLabel={PAGINATION_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
           search={{
             external: true,
             value: searchQuery,

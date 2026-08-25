@@ -7,6 +7,17 @@ import {
   setGroupTemplateFavorite,
 } from '../../../services/groupTemplates.api.js';
 import { getTemplateBannerUrl, getTemplateSummaryStats } from './groupSnapshotForTemplate.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+const FETCH_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać szablonów.',
+  english: 'Failed to fetch templates.'
+};
+
+const TEMPLATE_NOT_FOUND__TEXTLABEL = {
+  polish: 'Nie znaleziono szablonu.',
+  english: 'Template not found.'
+};
 
 export const TEMPLATES_PAGE_SIZE = 10;
 
@@ -34,7 +45,7 @@ export function useTemplatesPage(scope, { favoritesOnly = false } = {}) {
       });
       setTemplates(result.items);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać szablonów.');
+      setErrorMessage(error instanceof Error ? error.message : FETCH_ERROR__TEXTLABEL[READLANGUAGECOOKIE()]);
       setTemplates([]);
     } finally {
       setIsLoading(false);
@@ -107,7 +118,7 @@ export function useTemplatesPage(scope, { favoritesOnly = false } = {}) {
   const toggleFavorite = useCallback(async (templateId) => {
     const current = templates.find((template) => template.id === templateId);
     if (!current) {
-      return { ok: false, error: 'Nie znaleziono szablonu.' };
+      return { ok: false, error: TEMPLATE_NOT_FOUND__TEXTLABEL[READLANGUAGECOOKIE()] };
     }
 
     const nextFavorite = !current.isFavorite;

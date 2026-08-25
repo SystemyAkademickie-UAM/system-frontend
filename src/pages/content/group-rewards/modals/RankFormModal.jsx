@@ -5,6 +5,62 @@ import { DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import RewardsCurrencyLabel from '../shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const EDITMODALTITLE__TEXTLABEL = {
+  polish: 'Edytuj rangę',
+  english: 'Edit rank'
+};
+
+const ADDMODALTITLE__TEXTLABEL = {
+  polish: 'Dodaj rangę',
+  english: 'Add rank'
+};
+
+const NAMELABEL__TEXTLABEL = {
+  polish: 'Nazwa*',
+  english: 'Name*'
+};
+
+const COSTLABEL__TEXTLABEL = {
+  polish: 'Koszt*',
+  english: 'Cost*'
+};
+
+const COSTPLACEHOLDER__TEXTLABEL = {
+  polish: 'np. 100',
+  english: 'e.g. 100'
+};
+
+const ICONLABEL__TEXTLABEL = {
+  polish: 'Ikona',
+  english: 'Icon'
+};
+
+const ICONARIA__TEXTLABEL = {
+  polish: 'Wybierz emoji rangi',
+  english: 'Choose rank emoji'
+};
+
+const STORYLABEL__TEXTLABEL = {
+  polish: 'Status fabularny*',
+  english: 'Story status*'
+};
+
+const EXTRASETTINGS__TEXTLABEL = {
+  polish: 'Dodatkowe ustawienia',
+  english: 'Additional settings'
+};
+
+const DISCOUNTBTN__TEXTLABEL = {
+  polish: 'Zniżka w sklepie',
+  english: 'Shop discount'
+};
+
+const UNLOCKBTN__TEXTLABEL = {
+  polish: 'Odblokowane przedmioty',
+  english: 'Unlocked items'
+};
 
 const EMPTY_FORM = {
   name: '',
@@ -21,6 +77,7 @@ export default function RankFormModal({
   onOpenDiscountModal,
   onOpenUnlockItemsModal,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [form, setForm] = useState(EMPTY_FORM);
   const isEdit = Boolean(rank);
 
@@ -77,7 +134,7 @@ export default function RankFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edytuj rangę' : 'Dodaj rangę'}
+      title={isEdit ? EDITMODALTITLE__TEXTLABEL[LANGUAGE] : ADDMODALTITLE__TEXTLABEL[LANGUAGE]}
       onConfirm={handleConfirm}
       confirmDisabled={!isValid}
       size="md"
@@ -87,7 +144,7 @@ export default function RankFormModal({
         <div className="rewards-modal__row rewards-modal__row--name-reward">
           <TextField
             id="rank-name"
-            label="Nazwa*"
+            label={NAMELABEL__TEXTLABEL[LANGUAGE]}
             fieldKind="name"
             value={form.name}
             onChange={handleChange('name')}
@@ -96,7 +153,7 @@ export default function RankFormModal({
           />
 
           <div className="rewards-modal__field">
-            <RewardsCurrencyLabel htmlFor="rank-cost">Koszt*</RewardsCurrencyLabel>
+            <RewardsCurrencyLabel htmlFor="rank-cost">{COSTLABEL__TEXTLABEL[LANGUAGE]}</RewardsCurrencyLabel>
             <input
               id="rank-cost"
               type="text"
@@ -107,7 +164,7 @@ export default function RankFormModal({
               ].filter(Boolean).join(' ')}
               value={form.costAmount}
               onChange={handleChange('costAmount')}
-              placeholder="np. 100"
+              placeholder={COSTPLACEHOLDER__TEXTLABEL[LANGUAGE]}
               aria-invalid={showCostError}
               aria-describedby={showCostError ? 'rank-cost-error' : undefined}
             />
@@ -122,17 +179,17 @@ export default function RankFormModal({
         <div className="rewards-modal__row rewards-modal__row--icon-only">
           <EmojiPickerField
             className="rewards-modal__field rewards-modal__field--icon"
-            label="Ikona"
+            label={ICONLABEL__TEXTLABEL[LANGUAGE]}
             value={form.icon}
             defaultEmoji={DEFAULT_RANK_EMOJI}
             onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
-            ariaLabel="Wybierz emoji rangi"
+            ariaLabel={ICONARIA__TEXTLABEL[LANGUAGE]}
           />
         </div>
 
         <TextField
           id="rank-story"
-          label="Status fabularny*"
+          label={STORYLABEL__TEXTLABEL[LANGUAGE]}
           fieldKind="shortDescription"
           value={form.storyDescription}
           onChange={handleChange('storyDescription')}
@@ -142,7 +199,7 @@ export default function RankFormModal({
 
         {isEdit && (onOpenDiscountModal || onOpenUnlockItemsModal) ? (
           <div className="rewards-modal__field rewards-modal__field--inline-actions">
-            <span className="rewards-modal__label">Dodatkowe ustawienia</span>
+            <span className="rewards-modal__label">{EXTRASETTINGS__TEXTLABEL[LANGUAGE]}</span>
             <div className="rewards-modal__inline-actions">
               {onOpenDiscountModal ? (
                 <Button
@@ -151,7 +208,7 @@ export default function RankFormModal({
                   size="sm"
                   onClick={() => onOpenDiscountModal(rank)}
                 >
-                  Zniżka w sklepie
+                  {DISCOUNTBTN__TEXTLABEL[LANGUAGE]}
                 </Button>
               ) : null}
               {onOpenUnlockItemsModal ? (
@@ -161,7 +218,7 @@ export default function RankFormModal({
                   size="sm"
                   onClick={() => onOpenUnlockItemsModal(rank)}
                 >
-                  Odblokowane przedmioty
+                  {UNLOCKBTN__TEXTLABEL[LANGUAGE]}
                 </Button>
               ) : null}
             </div>

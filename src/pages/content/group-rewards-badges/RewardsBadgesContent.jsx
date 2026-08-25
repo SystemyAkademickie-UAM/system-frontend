@@ -32,6 +32,143 @@ import BadgeFormModal from './modals/BadgeFormModal.jsx';
 import BadgeGiveModal from './modals/BadgeGiveModal.jsx';
 import BadgeDeleteModal from './modals/BadgeDeleteModal.jsx';
 import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+const CREATENEWBADGE__TEXTLABEL = {
+  polish: 'Dodaj odznakę',
+  english: 'Add Badge'
+};
+
+const LOADINBADGES__TEXTLABEL = {
+  polish: 'Ładowanie odznak…',
+  english: 'Loading badges…'
+};
+
+const NOBADGESMESSAGE__TEXTLABEL = {
+  polish: 'Brak odznak w tej grupie. Kliknij "Dodaj odznakę", aby utworzyć pierwszą.',
+  english: 'No badges in this group. Click "Add Badge" to create the first one.'
+};
+
+const BADGESEARCH__TEXTLABEL = {
+  polish: {
+    placeholder: 'Szukaj odznaki…',
+    label: 'Szukaj odznaki'
+  },
+  english: {
+    placeholder: 'Search badges…',
+    label: 'Search badges'
+  }
+};
+
+const BADGEUPDATEDMESSAGE__TEXTLABEL = {
+  polish: 'Zaktualizowano odznakę u {count} studentów.',
+  english: 'Badge updated for {count} students.'
+};
+
+const CREATECONFIRMMESSAGE__TEXTLABEL = {
+  polish: 'Odznaka została utworzona.',
+  english: 'Badge created successfully.'
+};
+
+const CREATEFAILMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się utworzyć odznaki.',
+  english: 'Failed to create badge.'
+};
+
+const EDITCONFIRMMESSAGE__TEXTLABEL = {
+  polish: 'Odznaka została zaktualizowana.',
+  english: 'Badge updated successfully.'
+};
+
+const EDITFAILMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zaktualizować odznaki.',
+  english: 'Failed to update badge.'
+};
+
+const DELETECONFIRMMESSAGE__TEXTLABEL = {
+  polish: 'Odznaka została usunięta.',
+  english: 'Badge deleted successfully.'
+};
+
+const DELETEFAILMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się usunąć odznaki.',
+  english: 'Failed to delete badge.'
+};
+
+const ALLOPUBLISHEDMESSAGE__TEXTLABEL = {
+  polish: 'Wszystkie odznaki są teraz widoczne dla studentów.',
+  english: 'All badges are now visible to students.'
+};
+
+const ALLHIDDENMESSAGE__TEXTLABEL = {
+  polish: 'Wszystkie odznaki są teraz ukryte przed studentami.',
+  english: 'All badges are now hidden from students.'
+};
+
+const ALLTOGGLEFAILMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zmienić widoczności odznak.',
+  english: 'Failed to change badge visibility.'
+};
+
+const PUBLISHMESSAGE__TEXTLABEL = {
+  polish: 'Odznaka jest teraz widoczna dla studentów.',
+  english: 'Badge is now visible to students.'
+};
+
+const UNPUBLISHMESSAGE__TEXTLABEL = {
+  polish: 'Odznaka jest teraz ukryta przed studentami.',
+  english: 'Badge is now hidden from students.'
+};
+
+const VISIBILITYTOGGLEFAILMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zmienić widoczności odznaki.',
+  english: 'Failed to change badge visibility.'
+};
+
+const ROWACTIONDELETETEXT__TEXTLABEL = {
+  polish: 'Usuń odznakę',
+  english: 'Delete badge'
+};
+
+const ROWACTIONASSIGNTEXT__TEXTLABEL = {
+  polish: 'Przydziel odznakę',
+  english: 'Assign badge'
+};
+
+const ROWACTIONASSIGNARIA__TEXTLABEL = {
+  polish: 'Przydziel odznakę studentom',
+  english: 'Assign badge to students'
+};
+
+const ROWACTIONEDITTEXT__TEXTLABEL = {
+  polish: 'Edytuj odznakę',
+  english: 'Edit badge'
+};
+
+const ROWACTIONEDITDESC__TEXTLABEL = {
+  polish: 'Zmień dane odznaki w kreatorze.',
+  english: 'Change badge details in the wizard.'
+};
+
+const ROWACTIONVISIBILITYTEXT__TEXTLABEL = {
+  polish: 'Ukryj / Pokaż odznakę',
+  english: 'Hide / Show badge'
+};
+
+const ROWACTIONVISIBILITYDESC__TEXTLABEL = {
+  polish: 'Zmienia widoczność odznaki dla studenta.',
+  english: 'Changes badge visibility for students.'
+};
+
+const RARITYFILTERLABEL__TEXTLABEL = {
+  polish: 'Filtr rzadkości odznaki',
+  english: 'Badge rarity filter'
+};
+
+const TABLEPAGINATIONLABEL__TEXTLABEL = {
+  polish: 'Nawigacja stron listy odznak',
+  english: 'Badge list page navigation'
+};
 
 const RARITY_FILTERS = [
   { id: 'all', label: 'Wszystkie' },
@@ -159,6 +296,7 @@ const BADGE_COLUMNS = [
 ];
 
 export default function RewardsBadgesContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const nav = useGroupSubNav('group-rewards');
   const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-badges-view');
   const { showSuccess, showError } = useToast();
@@ -196,10 +334,10 @@ export default function RewardsBadgesContent() {
     const result = await handleCreate(values);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Odznaka została utworzona.');
+      showSuccess(CREATECONFIRMMESSAGE__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się utworzyć odznaki.');
+      showError(result.error || CREATEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
   }, [handleCreate, closeModal, showSuccess, showError]);
 
@@ -209,10 +347,10 @@ export default function RewardsBadgesContent() {
     const result = await handleUpdate(activeModal.badge.id, values);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Odznaka została zaktualizowana.');
+      showSuccess(EDITCONFIRMMESSAGE__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się zaktualizować odznaki.');
+      showError(result.error || EDITFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
   }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
 
@@ -222,10 +360,10 @@ export default function RewardsBadgesContent() {
     const result = await handleDelete(activeModal.badge.id);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Odznaka została usunięta.');
+      showSuccess(DELETECONFIRMMESSAGE__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się usunąć odznaki.');
+      showError(result.error || DELETEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
   }, [activeModal, handleDelete, closeModal, showSuccess, showError]);
 
@@ -235,7 +373,7 @@ export default function RewardsBadgesContent() {
       return;
     }
     if (changed > 0) {
-      showSuccess(`Zaktualizowano odznakę u ${changed} studentów.`);
+      showSuccess(BADGEUPDATEDMESSAGE__TEXTLABEL[LANGUAGE].replace('{count}', changed));
     }
   }, [showSuccess, showError]);
 
@@ -268,54 +406,54 @@ export default function RewardsBadgesContent() {
     if (result.ok) {
       showSuccess(
         result.targetPublished
-          ? 'Wszystkie odznaki są teraz widoczne dla studentów.'
-          : 'Wszystkie odznaki są teraz ukryte przed studentami.',
+          ? ALLOPUBLISHEDMESSAGE__TEXTLABEL[LANGUAGE]
+          : ALLHIDDENMESSAGE__TEXTLABEL[LANGUAGE],
       );
       return;
     }
 
-    showError(result.error || 'Nie udało się zmienić widoczności odznak.');
-  }, [handleToggleAllPublished, showSuccess, showError]);
+    showError(result.error || ALLTOGGLEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
+  }, [handleToggleAllPublished, showSuccess, showError, LANGUAGE]);
 
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
-    deleteLabel: 'Usuń odznakę',
-    deleteAriaLabel: (badge) => `Usuń odznakę ${badge.name}`,
+    deleteLabel: ROWACTIONDELETETEXT__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (badge) => `${ROWACTIONDELETETEXT__TEXTLABEL[LANGUAGE]} ${badge.name}`,
     inlineActions: [
       {
         id: 'give',
-        label: 'Przydziel odznakę',
+        label: ROWACTIONASSIGNTEXT__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.assign,
-        ariaLabel: 'Przydziel odznakę studentom',
+        ariaLabel: ROWACTIONASSIGNARIA__TEXTLABEL[LANGUAGE],
         onSelect: (badge) => openModal('give', badge),
       },
     ],
     menuItems: [
       {
         id: 'edit',
-        label: 'Edytuj odznakę',
-        description: 'Zmień dane odznaki w kreatorze.',
+        label: ROWACTIONEDITTEXT__TEXTLABEL[LANGUAGE],
+        description: ROWACTIONEDITDESC__TEXTLABEL[LANGUAGE],
         onSelect: (badge) => openModal('edit', badge),
       },
       {
         id: 'visibility',
-        label: 'Ukryj / Pokaż odznakę',
-        description: 'Zmienia widoczność odznaki dla studenta.',
+        label: ROWACTIONVISIBILITYTEXT__TEXTLABEL[LANGUAGE],
+        description: ROWACTIONVISIBILITYDESC__TEXTLABEL[LANGUAGE],
         onSelect: async (badge) => {
           const result = await handleTogglePublished(badge.id);
           if (result.ok) {
             showSuccess(
               badge.isPublished === false
-                ? 'Odznaka jest teraz widoczna dla studentów.'
-                : 'Odznaka jest teraz ukryta przed studentami.',
+                ? PUBLISHMESSAGE__TEXTLABEL[LANGUAGE]
+                : UNPUBLISHMESSAGE__TEXTLABEL[LANGUAGE],
             );
           } else {
-            showError(result.error || 'Nie udało się zmienić widoczności odznaki.');
+            showError(result.error || VISIBILITYTOGGLEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
           }
         },
       },
     ],
-  }), [openModal, handleTogglePublished, showSuccess, showError]);
+  }), [openModal, handleTogglePublished, showSuccess, showError, LANGUAGE]);
 
   const modalBadge = activeModal?.badge ?? null;
 
@@ -348,7 +486,7 @@ export default function RewardsBadgesContent() {
               className="rewards-page__add-btn"
               onClick={() => openModal('create')}
             >
-              Dodaj odznakę
+              {CREATENEWBADGE__TEXTLABEL[LANGUAGE]}
             </Button>
             <RewardsBulkVisibilityButton
               items={badges}
@@ -365,10 +503,10 @@ export default function RewardsBadgesContent() {
             <SearchBar
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Szukaj odznaki…"
+              placeholder={BADGESEARCH__TEXTLABEL[LANGUAGE].placeholder}
               name="badge-catalog-search"
               className="rewards-page__search"
-              aria-label="Szukaj odznaki"
+              aria-label={BADGESEARCH__TEXTLABEL[LANGUAGE].label}
             />
             {isTileView ? (
               <div className="rewards-page__toolbar-filters-row">
@@ -384,15 +522,15 @@ export default function RewardsBadgesContent() {
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">Ładowanie odznak…</p>
+        <p className="rewards-page__loading page-unavailable__notice">{LOADINBADGES__TEXTLABEL[LANGUAGE]}</p>
       ) : badges.length === 0 ? (
-        <p className="rewards-page__empty page-unavailable__notice">Brak odznak w tej grupie. Kliknij „Dodaj odznakę”, aby utworzyć pierwszą.</p>
+        <p className="rewards-page__empty page-unavailable__notice">{NOBADGESMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : isTileView ? (
         <>
           {filtersExpanded ? (
             <CatalogFiltersPanel className="rewards-page__filters">
               <CatalogFilterGroup
-                ariaLabel="Filtr rzadkości odznaki"
+                ariaLabel={RARITYFILTERLABEL__TEXTLABEL[LANGUAGE]}
                 filters={RARITY_FILTERS}
                 activeId={rarityFilter}
                 onSelect={setRarityFilter}
@@ -425,7 +563,7 @@ export default function RewardsBadgesContent() {
           rowKey="id"
           tiebreakerKey="position"
           itemsPerPage={10}
-          paginationAriaLabel="Nawigacja stron listy odznak"
+          paginationAriaLabel={TABLEPAGINATIONLABEL__TEXTLABEL[LANGUAGE]}
           className="rewards-table"
           search={{
             external: true,

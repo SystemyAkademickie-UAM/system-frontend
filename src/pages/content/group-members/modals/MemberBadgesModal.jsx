@@ -2,7 +2,31 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BadgeMini, BADGE_RARITY, BADGE_RARITY_LABELS, Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
 import { fetchStudentBadges, toggleStudentBadge } from '../../../../services/students.api.js';
 import { normalizeRankBadgeIcon } from '../../../../utils/ranks/rankBadgeIcon.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import './memberModals.css';
+
+const MODAL_TITLE__TEXTLABEL = { polish: 'Przydziel odznakę', english: 'Assign Badge' };
+const SEARCH_PLACEHOLDER__TEXTLABEL = { polish: 'Szukaj odznak…', english: 'Search badges…' };
+const SEARCH_ARIA_LABEL__TEXTLABEL = { polish: 'Szukaj odznak', english: 'Search badges' };
+const SHOW_FILTERS_TOGGLE__TEXTLABEL = { polish: 'Pokaż filtry i sortowanie', english: 'Show filters and sorting' };
+const HIDE_FILTERS_TOGGLE__TEXTLABEL = { polish: 'Ukryj filtry i sortowanie', english: 'Hide filters and sorting' };
+const FILTERS_SECTION_ARIA__TEXTLABEL = { polish: 'Filtry odznak', english: 'Badge filters' };
+const FILTERS_HEADING__TEXTLABEL = { polish: 'Filtry', english: 'Filters' };
+const RARITY_SUBLABEL__TEXTLABEL = { polish: 'Rzadkość', english: 'Rarity' };
+const RARITY_FILTER_ARIA__TEXTLABEL = { polish: 'Filtr rzadkości', english: 'Rarity filter' };
+const STATUS_SUBLABEL__TEXTLABEL = { polish: 'Status', english: 'Status' };
+const STATUS_FILTER_ARIA__TEXTLABEL = { polish: 'Filtr statusu zdobycia', english: 'Earned status filter' };
+const SORTING_SECTION_ARIA__TEXTLABEL = { polish: 'Sortowanie odznak', english: 'Badge sorting' };
+const SORTING_HEADING__TEXTLABEL = { polish: 'Sortowanie', english: 'Sorting' };
+const ORDER_SUBLABEL__TEXTLABEL = { polish: 'Kolejność', english: 'Order' };
+const LOADING_MESSAGE__TEXTLABEL = { polish: 'Ładowanie odznak...', english: 'Loading badges...' };
+const NO_BADGES_EMPTY__TEXTLABEL = { polish: 'Brak odznak w tej grupie.', english: 'No badges in this group.' };
+const NO_FILTER_BADGES_EMPTY__TEXTLABEL = { polish: 'Brak odznak spełniających wybrane filtry.', english: 'No badges matching selected filters.' };
+const SAVING_ERROR_BADGE__TEXTLABEL = { polish: 'Nie udało się zmienić odznaki.', english: 'Failed to change badge.' };
+const SAVED_SUCCESS__TEXTLABEL = { polish: 'Odznaki uczestnika zostały zapisane.', english: 'Participant badges have been saved.' };
+const SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać odznak.', english: 'Failed to save badges.' };
+const SAVING_BUTTON__TEXTLABEL = { polish: 'Zapisywanie…', english: 'Saving…' };
+const SAVE_BUTTON__TEXTLABEL = { polish: 'Zapisz', english: 'Save' };
 
 const RARITY_FILTERS = [
   { id: 'all', label: 'Wszystkie' },
@@ -108,6 +132,7 @@ export default function MemberBadgesModal({
   onConfirm,
 }) {
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState('all');
   const [earnedFilter, setEarnedFilter] = useState('all');
@@ -215,16 +240,16 @@ export default function MemberBadgesModal({
       for (const badgeId of badgeIdsToToggle) {
         const result = await toggleStudentBadge(groupId, member.accountId, badgeId);
         if (!result.ok) {
-          throw new Error(result.error || 'Nie udało się zmienić odznaki.');
+          throw new Error(result.error || SAVING_ERROR_BADGE__TEXTLABEL[LANGUAGE]);
         }
       }
 
       initialSelectedIdsRef.current = [...selectedIds];
-      showSuccess('Odznaki uczestnika zostały zapisane.');
+      showSuccess(SAVED_SUCCESS__TEXTLABEL[LANGUAGE]);
       onConfirm?.(selectedIds);
       onClose();
     } catch (err) {
-      showError(err instanceof Error ? err.message : 'Nie udało się zapisać odznak.');
+      showError(err instanceof Error ? err.message : SAVE_ERROR__TEXTLABEL[LANGUAGE]);
     } finally {
       setIsSaving(false);
     }
@@ -238,10 +263,10 @@ export default function MemberBadgesModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Przydziel odznakę"
+      title={MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       subtitle={member.name}
       onConfirm={handleConfirm}
-      confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}
+      confirmLabel={isSaving ? SAVING_BUTTON__TEXTLABEL[LANGUAGE] : SAVE_BUTTON__TEXTLABEL[LANGUAGE]}
       confirmDisabled={isSaving || isLoading}
       size="xl"
       className="member-modal"
@@ -250,10 +275,10 @@ export default function MemberBadgesModal({
         <SearchBar
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj odznak…"
+          placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
           name="badge-search"
           className="member-modal__search member-modal__search--prominent"
-          aria-label="Szukaj odznak"
+          aria-label={SEARCH_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
         />
       </div>
 
@@ -264,18 +289,18 @@ export default function MemberBadgesModal({
           aria-expanded={filtersExpanded}
           onClick={() => setFiltersExpanded((prev) => !prev)}
         >
-          {filtersExpanded ? 'Ukryj filtry i sortowanie' : 'Pokaż filtry i sortowanie'}
+          {filtersExpanded ? HIDE_FILTERS_TOGGLE__TEXTLABEL[LANGUAGE] : SHOW_FILTERS_TOGGLE__TEXTLABEL[LANGUAGE]}
         </button>
       </div>
 
       {filtersExpanded ? (
         <div className="member-modal__controls">
-        <section className="member-modal__control-group" aria-label="Filtry odznak">
-          <h3 className="member-modal__control-heading">Filtry</h3>
+        <section className="member-modal__control-group" aria-label={FILTERS_SECTION_ARIA__TEXTLABEL[LANGUAGE]}>
+          <h3 className="member-modal__control-heading">{FILTERS_HEADING__TEXTLABEL[LANGUAGE]}</h3>
 
           <div className="member-modal__control-row">
-            <span className="member-modal__control-sublabel">Rzadkość</span>
-            <div className="member-modal__filters" role="group" aria-label="Filtr rzadkości">
+            <span className="member-modal__control-sublabel">{RARITY_SUBLABEL__TEXTLABEL[LANGUAGE]}</span>
+            <div className="member-modal__filters" role="group" aria-label={RARITY_FILTER_ARIA__TEXTLABEL[LANGUAGE]}>
               {RARITY_FILTERS.map((filter) => (
                 <button
                   key={filter.id}
@@ -293,8 +318,8 @@ export default function MemberBadgesModal({
           </div>
 
           <div className="member-modal__control-row">
-            <span className="member-modal__control-sublabel">Status</span>
-            <div className="member-modal__filters" role="group" aria-label="Filtr statusu zdobycia">
+            <span className="member-modal__control-sublabel">{STATUS_SUBLABEL__TEXTLABEL[LANGUAGE]}</span>
+            <div className="member-modal__filters" role="group" aria-label={STATUS_FILTER_ARIA__TEXTLABEL[LANGUAGE]}>
               {EARNED_FILTERS.map((filter) => (
                 <button
                   key={filter.id}
@@ -312,12 +337,12 @@ export default function MemberBadgesModal({
           </div>
         </section>
 
-        <section className="member-modal__control-group" aria-label="Sortowanie odznak">
-          <h3 className="member-modal__control-heading">Sortowanie</h3>
+        <section className="member-modal__control-group" aria-label={SORTING_SECTION_ARIA__TEXTLABEL[LANGUAGE]}>
+          <h3 className="member-modal__control-heading">{SORTING_HEADING__TEXTLABEL[LANGUAGE]}</h3>
 
           <div className="member-modal__control-row">
             <label htmlFor="badge-sort" className="member-modal__control-sublabel">
-              Kolejność
+              {ORDER_SUBLABEL__TEXTLABEL[LANGUAGE]}
             </label>
             <select
               id="badge-sort"
@@ -337,7 +362,7 @@ export default function MemberBadgesModal({
       ) : null}
 
       {isLoading ? (
-        <p className="member-modal__loading">Ładowanie odznak...</p>
+        <p className="member-modal__loading">{LOADING_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : visibleBadges.length > 0 ? (
         <div className="member-modal__badge-grid">
           {visibleBadges.map((badge) => (
@@ -357,9 +382,9 @@ export default function MemberBadgesModal({
           ))}
         </div>
       ) : allBadges.length === 0 ? (
-        <p className="member-modal__empty">Brak odznak w tej grupie.</p>
+        <p className="member-modal__empty">{NO_BADGES_EMPTY__TEXTLABEL[LANGUAGE]}</p>
       ) : (
-        <p className="member-modal__empty">Brak odznak spełniających wybrane filtry.</p>
+        <p className="member-modal__empty">{NO_FILTER_BADGES_EMPTY__TEXTLABEL[LANGUAGE]}</p>
       )}
     </Modal>
   );

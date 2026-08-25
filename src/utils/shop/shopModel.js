@@ -1,4 +1,5 @@
 import { compareShopItemsByEffectivePrice } from './shopPricing.js';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 
 export const SHOP_SORT = {
   nameAsc: 'nameAsc',
@@ -7,11 +8,45 @@ export const SHOP_SORT = {
   priceDesc: 'priceDesc',
 };
 
+const SORTNAMEASC__TEXTLABEL = {
+  polish: 'Nazwa A–Z',
+  english: 'Name A–Z'
+};
+
+const SORTNAMEDESC__TEXTLABEL = {
+  polish: 'Nazwa Z–A',
+  english: 'Name Z–A'
+};
+
+const SORTPRICEASC__TEXTLABEL = {
+  polish: 'Cena rosnąco',
+  english: 'Price ascending'
+};
+
+const SORTPRICEDESC__TEXTLABEL = {
+  polish: 'Cena malejąco',
+  english: 'Price descending'
+};
+
+/**
+ * @param {string} [language]
+ * @returns {Array<{id: string, label: string}>}
+ */
+export function getShopSortOptions(language) {
+  const lang = language ?? READLANGUAGECOOKIE();
+  return [
+    { id: SHOP_SORT.nameAsc, label: SORTNAMEASC__TEXTLABEL[lang] || SORTNAMEASC__TEXTLABEL.english },
+    { id: SHOP_SORT.nameDesc, label: SORTNAMEDESC__TEXTLABEL[lang] || SORTNAMEDESC__TEXTLABEL.english },
+    { id: SHOP_SORT.priceAsc, label: SORTPRICEASC__TEXTLABEL[lang] || SORTPRICEASC__TEXTLABEL.english },
+    { id: SHOP_SORT.priceDesc, label: SORTPRICEDESC__TEXTLABEL[lang] || SORTPRICEDESC__TEXTLABEL.english },
+  ];
+}
+
 export const SHOP_SORT_OPTIONS = [
-  { id: SHOP_SORT.nameAsc, label: 'Nazwa A–Z' },
-  { id: SHOP_SORT.nameDesc, label: 'Nazwa Z–A' },
-  { id: SHOP_SORT.priceAsc, label: 'Cena rosnąco' },
-  { id: SHOP_SORT.priceDesc, label: 'Cena malejąco' },
+  { id: SHOP_SORT.nameAsc, label: SORTNAMEASC__TEXTLABEL.english },
+  { id: SHOP_SORT.nameDesc, label: SORTNAMEDESC__TEXTLABEL.english },
+  { id: SHOP_SORT.priceAsc, label: SORTPRICEASC__TEXTLABEL.english },
+  { id: SHOP_SORT.priceDesc, label: SORTPRICEDESC__TEXTLABEL.english },
 ];
 
 /**

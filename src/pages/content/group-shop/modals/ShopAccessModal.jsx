@@ -2,8 +2,54 @@ import { useEffect, useRef, useState } from 'react';
 import { Modal, ShopToggleButton } from '../../../../components/ui/index.js';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import '../../group-rewards/shared/rewardsModals.css';
 import './shopAccessModal.css';
+
+const ACCESS_MODAL_TITLE__TEXTLABEL = {
+  polish: 'Dostęp do sklepu',
+  english: 'Shop Access'
+};
+
+const SAVING_LABEL__TEXTLABEL = {
+  polish: 'Zapisywanie…',
+  english: 'Saving…'
+};
+
+const SAVE_BUTTON__TEXTLABEL = {
+  polish: 'Zapisz',
+  english: 'Save'
+};
+
+const SHOP_STATUS_SECTION_LABEL__TEXTLABEL = {
+  polish: 'Status sklepu',
+  english: 'Shop Status'
+};
+
+const SCHEDULE_SECTION_LABEL__TEXTLABEL = {
+  polish: 'Harmonogram otwarcia sklepu',
+  english: 'Shop Opening Schedule'
+};
+
+const SCHEDULE_CHECKBOX_LABEL__TEXTLABEL = {
+  polish: 'Ustal datę otwarcia sklepu',
+  english: 'Set shop opening date'
+};
+
+const OPEN_DATE_LABEL__TEXTLABEL = {
+  polish: 'Data otwarcia sklepu',
+  english: 'Shop opening date'
+};
+
+const OPEN_DATE_ARIA_LABEL__TEXTLABEL = {
+  polish: 'Wybierz datę otwarcia sklepu',
+  english: 'Select shop opening date'
+};
+
+const OPEN_TIME_ARIA_LABEL__TEXTLABEL = {
+  polish: 'Wybierz godzinę otwarcia sklepu',
+  english: 'Select shop opening time'
+};
 
 function toLocalDateValue(date) {
   const year = date.getFullYear();
@@ -113,6 +159,7 @@ export default function ShopAccessModal({
   onSave,
   isLoading = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [pendingShopOpen, setPendingShopOpen] = useState(false);
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
   const [openDate, setOpenDate] = useState('');
@@ -195,21 +242,25 @@ export default function ShopAccessModal({
     || !hasChanges
     || (!pendingShopOpen && scheduleEnabled && (!openDate || !openTime));
 
+  const confirmLabel = busy
+    ? SAVING_LABEL__TEXTLABEL[LANGUAGE]
+    : SAVE_BUTTON__TEXTLABEL[LANGUAGE];
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Dostęp do sklepu"
+      title={ACCESS_MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       onConfirm={handleSave}
-      confirmLabel={busy ? 'Zapisywanie…' : 'Zapisz'}
+      confirmLabel={confirmLabel}
       confirmDisabled={confirmDisabled}
       size="sm"
       className="rewards-modal shop-access-modal"
     >
       <div className="shop-access-modal__body">
-        <section className="shop-access-modal__section" aria-label="Status sklepu">
+        <section className="shop-access-modal__section" aria-label={SHOP_STATUS_SECTION_LABEL__TEXTLABEL[LANGUAGE]}>
           <div className="shop-access-modal__row">
-            <p className="rewards-modal__label">Status sklepu</p>
+            <p className="rewards-modal__label">{SHOP_STATUS_SECTION_LABEL__TEXTLABEL[LANGUAGE]}</p>
             <ShopToggleButton
               isShopOpen={pendingShopOpen}
               onToggle={handleToggle}
@@ -225,7 +276,7 @@ export default function ShopAccessModal({
             'shop-access-modal__section',
             scheduleSectionDisabled ? 'shop-access-modal__section--disabled' : '',
           ].filter(Boolean).join(' ')}
-          aria-label="Harmonogram otwarcia sklepu"
+          aria-label={SCHEDULE_SECTION_LABEL__TEXTLABEL[LANGUAGE]}
           aria-disabled={scheduleSectionDisabled}
         >
           <div className="rewards-modal__field">
@@ -235,12 +286,12 @@ export default function ShopAccessModal({
               disabled={scheduleSectionDisabled}
               onChange={setScheduleEnabled}
             >
-              Ustal datę otwarcia sklepu
+              {SCHEDULE_CHECKBOX_LABEL__TEXTLABEL[LANGUAGE]}
             </ShopOptionCheckbox>
           </div>
 
           <div className="rewards-modal__field">
-            <span className="rewards-modal__label">Data otwarcia sklepu</span>
+            <span className="rewards-modal__label">{OPEN_DATE_LABEL__TEXTLABEL[LANGUAGE]}</span>
             <div className={datetimeRowClassName}>
               <input
                 ref={dateInputRef}
@@ -251,7 +302,7 @@ export default function ShopAccessModal({
                 disabled={scheduleInputsDisabled}
                 onChange={(event) => setOpenDate(event.target.value)}
                 onClick={(event) => openDateTimePicker(event, dateInputRef, scheduleInputsDisabled)}
-                aria-label="Wybierz datę otwarcia sklepu"
+                aria-label={OPEN_DATE_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
               />
             </div>
             <div className={datetimeRowClassName}>
@@ -265,7 +316,7 @@ export default function ShopAccessModal({
                 onChange={(event) => setOpenTime(event.target.value)}
                 onClick={(event) => openDateTimePicker(event, timeInputRef, scheduleInputsDisabled)}
                 step={60}
-                aria-label="Wybierz godzinę otwarcia sklepu"
+                aria-label={OPEN_TIME_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
               />
             </div>
           </div>

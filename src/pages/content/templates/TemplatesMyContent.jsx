@@ -33,7 +33,114 @@ import TemplateFieldEditModal from './TemplateFieldEditModal.jsx';
 
 import { useTemplatesPage } from './useTemplatesPage.js';
 
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
 import './TemplatesPageLayout.css';
+
+const VISIBLE_CHANGE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się zmienić widoczności szablonu.',
+  english: 'Failed to change template visibility.'
+};
+
+const VISIBLE_SET_PRIVATE__TEXTLABEL = {
+  polish: 'Szablon ustawiony jako prywatny',
+  english: 'Template set as private'
+};
+
+const VISIBLE_SET_PUBLIC__TEXTLABEL = {
+  polish: 'Szablon udostępniony w galerii',
+  english: 'Template shared in gallery'
+};
+
+const DELETE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się usunąć szablonu.',
+  english: 'Failed to delete template.'
+};
+
+const DELETE_SUCCESS__TEXTLABEL = {
+  polish: 'Szablon został usunięty',
+  english: 'Template has been deleted'
+};
+
+const CREATE_GROUP_LABEL__TEXTLABEL = {
+  polish: 'Utwórz grupę ze szablonu',
+  english: 'Create group from template'
+};
+
+const EDIT_LABEL__TEXTLABEL = {
+  polish: 'Edytuj szablon',
+  english: 'Edit template'
+};
+
+const TOGGLE_PUBLIC_LABEL__TEXTLABEL = {
+  polish: 'Opublikuj bądź ukryj szablon w galerii',
+  english: 'Publish or hide template in gallery'
+};
+
+const DELETE_ACTION_LABEL__TEXTLABEL = {
+  polish: 'Usuń szablon',
+  english: 'Delete template'
+};
+
+const DELETE_ACTION_ARIA__TEXTLABEL = {
+  polish: (name) => `Usuń szablon ${name}`,
+  english: (name) => `Delete template ${name}`
+};
+
+const EMPTY_SEARCH_MESSAGE__TEXTLABEL = {
+  polish: 'Nie znaleziono szablonów pasujących do wyszukiwania.',
+  english: 'No templates matching search found.'
+};
+
+const EMPTY_MESSAGE__TEXTLABEL = {
+  polish: 'Nie masz jeszcze zapisanych szablonów. Utwórz pierwszy szablon na podstawie swojej grupy.',
+  english: 'You do not have any saved templates yet. Create your first template based on your group.'
+};
+
+const NEW_TEMPLATE_BUTTON__TEXTLABEL = {
+  polish: 'Nowy szablon',
+  english: 'New template'
+};
+
+const SEARCH_PLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj po nazwie…',
+  english: 'Search by name…'
+};
+
+const SEARCH_ARIA__TEXTLABEL = {
+  polish: 'Szukaj szablonów po nazwie',
+  english: 'Search templates by name'
+};
+
+const LOADING_MESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie szablonów…',
+  english: 'Loading templates…'
+};
+
+const PAGINATION_ARIA__TEXTLABEL = {
+  polish: 'Paginacja moich szablonów',
+  english: 'Pagination of my templates'
+};
+
+const DELETE_DIALOG_TITLE__TEXTLABEL = {
+  polish: 'Usuń szablon',
+  english: 'Delete template'
+};
+
+const DELETE_CONFIRM_MESSAGE__TEXTLABEL = {
+  polish: 'Czy na pewno chcesz usunąć ten szablon? Tej operacji nie można cofnąć.',
+  english: 'Are you sure you want to delete this template? This operation cannot be undone.'
+};
+
+const CANCEL_BUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
+
+const DELETE_BUTTON__TEXTLABEL = {
+  polish: 'Usuń szablon',
+  english: 'Delete template'
+};
 
 
 
@@ -64,6 +171,8 @@ export default function TemplatesMyContent() {
     getTemplateCardProps,
 
   } = useTemplatesPage('my');
+
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const { showSuccess, showError } = useToast();
 
@@ -101,7 +210,7 @@ export default function TemplatesMyContent() {
 
     if (!result.ok) {
 
-      showError(result.error || 'Nie udało się zmienić widoczności szablonu.');
+      showError(result.error || VISIBLE_CHANGE_ERROR__TEXTLABEL[LANGUAGE]);
 
       return;
 
@@ -111,15 +220,15 @@ export default function TemplatesMyContent() {
 
       template.isPublic
 
-        ? 'Szablon ustawiony jako prywatny'
+        ? VISIBLE_SET_PRIVATE__TEXTLABEL[LANGUAGE]
 
-        : 'Szablon udostępniony w galerii',
+        : VISIBLE_SET_PUBLIC__TEXTLABEL[LANGUAGE],
 
     );
 
     await refetch();
 
-  }, [refetch, showError, showSuccess]);
+  }, [refetch, showError, showSuccess, LANGUAGE]);
 
 
 
@@ -133,19 +242,19 @@ export default function TemplatesMyContent() {
 
     if (!result.ok) {
 
-      showError(result.error || 'Nie udało się usunąć szablonu.');
+      showError(result.error || DELETE_ERROR__TEXTLABEL[LANGUAGE]);
 
       return;
 
     }
 
-    showSuccess('Szablon został usunięty');
+    showSuccess(DELETE_SUCCESS__TEXTLABEL[LANGUAGE]);
 
     closeModal();
 
     await refetch();
 
-  }, [activeModal, closeModal, refetch, showError, showSuccess]);
+  }, [activeModal, closeModal, refetch, showError, showSuccess, LANGUAGE]);
 
 
 
@@ -153,32 +262,32 @@ export default function TemplatesMyContent() {
     menuItems: [
       {
         id: 'createGroup',
-        label: 'Utwórz grupę ze szablonu',
+        label: CREATE_GROUP_LABEL__TEXTLABEL[LANGUAGE],
         onSelect: (template) => setCreateGroupTemplate(template),
       },
       {
         id: 'edit',
-        label: 'Edytuj szablon',
+        label: EDIT_LABEL__TEXTLABEL[LANGUAGE],
         onSelect: (template) => openModal('edit', template),
       },
       {
         id: 'togglePublic',
-        label: 'Opublikuj bądź ukryj szablon w galerii',
+        label: TOGGLE_PUBLIC_LABEL__TEXTLABEL[LANGUAGE],
         onSelect: (template) => handleTogglePublic(template),
       },
     ],
     onDelete: (template) => openModal('delete', template),
-    deleteLabel: 'Usuń szablon',
-    deleteAriaLabel: (template) => `Usuń szablon ${template.name}`,
-  }), [handleTogglePublic, openModal, setCreateGroupTemplate]);
+    deleteLabel: DELETE_ACTION_LABEL__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (template) => DELETE_ACTION_ARIA__TEXTLABEL[LANGUAGE](template.name),
+  }), [handleTogglePublic, openModal, setCreateGroupTemplate, LANGUAGE]);
 
 
 
   const emptyMessage = searchQuery.trim()
 
-    ? 'Nie znaleziono szablonów pasujących do wyszukiwania.'
+    ? EMPTY_SEARCH_MESSAGE__TEXTLABEL[LANGUAGE]
 
-    : 'Nie masz jeszcze zapisanych szablonów. Utwórz pierwszy szablon na podstawie swojej grupy.';
+    : EMPTY_MESSAGE__TEXTLABEL[LANGUAGE];
 
 
 
@@ -190,7 +299,7 @@ export default function TemplatesMyContent() {
 
         <Button type="button" variant="primary" onClick={() => setIsCreateOpen(true)}>
 
-          Nowy szablon
+          {NEW_TEMPLATE_BUTTON__TEXTLABEL[LANGUAGE]}
 
         </Button>
 
@@ -202,9 +311,9 @@ export default function TemplatesMyContent() {
 
           onChange={(event) => setSearchQuery(event.target.value)}
 
-          placeholder="Szukaj po nazwie…"
+          placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
 
-          aria-label="Szukaj szablonów po nazwie"
+          aria-label={SEARCH_ARIA__TEXTLABEL[LANGUAGE]}
 
         />
 
@@ -226,7 +335,7 @@ export default function TemplatesMyContent() {
 
       {isLoading ? (
 
-        <p className="templates-page-content__message" aria-live="polite">Ładowanie szablonów…</p>
+        <p className="templates-page-content__message" aria-live="polite">{LOADING_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
 
       ) : totalTemplates === 0 ? (
 
@@ -290,7 +399,7 @@ export default function TemplatesMyContent() {
 
             onPageChange={setPage}
 
-            ariaLabel="Paginacja moich szablonów"
+            ariaLabel={PAGINATION_ARIA__TEXTLABEL[LANGUAGE]}
 
           />
 
@@ -362,7 +471,7 @@ export default function TemplatesMyContent() {
 
         onClose={closeModal}
 
-        title="Usuń szablon"
+        title={DELETE_DIALOG_TITLE__TEXTLABEL[LANGUAGE]}
 
         subtitle={activeModal?.template?.name}
 
@@ -374,7 +483,7 @@ export default function TemplatesMyContent() {
 
         <p className="templates-page-content__message">
 
-          Czy na pewno chcesz usunąć ten szablon? Tej operacji nie można cofnąć.
+          {DELETE_CONFIRM_MESSAGE__TEXTLABEL[LANGUAGE]}
 
         </p>
 
@@ -382,13 +491,13 @@ export default function TemplatesMyContent() {
 
           <Button type="button" variant="secondary" onClick={closeModal}>
 
-            Anuluj
+            {CANCEL_BUTTON__TEXTLABEL[LANGUAGE]}
 
           </Button>
 
           <Button type="button" variant="danger" onClick={handleDelete}>
 
-            Usuń szablon
+            {DELETE_BUTTON__TEXTLABEL[LANGUAGE]}
 
           </Button>
 

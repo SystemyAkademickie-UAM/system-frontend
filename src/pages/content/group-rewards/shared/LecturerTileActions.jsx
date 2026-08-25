@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import '../../../../components/ui/ProductCard/lecturerTileActions.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 
 function EditIcon() {
   return (
@@ -16,6 +18,21 @@ function EditIcon() {
   );
 }
 
+const EDITLABEL__TEXTLABEL = {
+  polish: 'Edytuj',
+  english: 'Edit'
+};
+
+const DELETETEXT__TEXTLABEL = {
+  polish: 'Usuń',
+  english: 'Delete'
+};
+
+const ASSIGNLABEL__TEXTLABEL = {
+  polish: 'Przydziel',
+  english: 'Assign'
+};
+
 /**
  * @param {Object} props
  * @param {string} props.entityLabel — np. „odznakę”, „rangę”
@@ -23,7 +40,6 @@ function EditIcon() {
  * @param {() => void} [props.onEdit]
  * @param {() => void} [props.onDelete]
  * @param {() => void} [props.onAssign]
- * @param {string} [props.assignLabel='Przydziel']
  * @param {string} [props.className]
  */
 export default function LecturerTileActions({
@@ -32,9 +48,14 @@ export default function LecturerTileActions({
   onEdit,
   onDelete,
   onAssign,
-  assignLabel = 'Przydziel',
   className = '',
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE());
+
+  const assignLabel = ASSIGNLABEL__TEXTLABEL[LANGUAGE] || ASSIGNLABEL__TEXTLABEL.english;
+  const editLabel = EDITLABEL__TEXTLABEL[LANGUAGE] || EDITLABEL__TEXTLABEL.english;
+  const deleteLabel = DELETETEXT__TEXTLABEL[LANGUAGE] || DELETETEXT__TEXTLABEL.english;
+
   return (
     <div className={['maq-product-card__lecturer-actions', className].filter(Boolean).join(' ')}>
       {onAssign ? (
@@ -59,7 +80,7 @@ export default function LecturerTileActions({
       <button
         type="button"
         className="maq-product-card__action-btn"
-        aria-label={`Edytuj ${entityLabel} ${name}`}
+        aria-label={`${editLabel} ${entityLabel} ${name}`}
         onClick={(event) => {
           event.stopPropagation();
           onEdit?.();
@@ -70,7 +91,7 @@ export default function LecturerTileActions({
       <button
         type="button"
         className="maq-product-card__action-btn maq-product-card__action-btn--danger"
-        aria-label={`Usuń ${entityLabel} ${name}`}
+        aria-label={`${deleteLabel} ${entityLabel} ${name}`}
         onClick={(event) => {
           event.stopPropagation();
           onDelete?.();

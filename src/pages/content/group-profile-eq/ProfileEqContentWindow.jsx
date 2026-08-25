@@ -6,9 +6,40 @@ import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ProfileEqContentWindow.css';
 
 const closeicon = PUBLIC_UI_ICONS.close;
+
+const CLOSEBUTTONARIA__TEXTLABEL = {
+  polish: 'Zamknij',
+  english: 'Close'
+};
+
+const PURCHASESUMMARYTITLE__TEXTLABEL = {
+  polish: 'Podsumowanie zakupów',
+  english: 'Purchase Summary'
+};
+
+const TOTALVALUELABEL__TEXTLABEL = {
+  polish: 'Wartość przedmiotów',
+  english: 'Item Value'
+};
+
+const TOTALCOSTLABEL__TEXTLABEL = {
+  polish: 'Koszt przedmiotów',
+  english: 'Item Cost'
+};
+
+const SAVINGSLABEL__TEXTLABEL = {
+  polish: 'Zaoszczędzono',
+  english: 'Saved'
+};
+
+const CONFIRMBUTTON__TEXTLABEL = {
+  polish: 'Potwierdź',
+  english: 'Confirm'
+};
 
 const SHOP_PURCHASE_SUMMARY_PREFIX = 'maq-shop-purchase-summary:';
 
@@ -43,6 +74,7 @@ export function clearShopPurchaseSummary(groupId) {
 }
 
 export default function ProfileEqContentWindow({ popupclose, groupId, purchaseditems, currencyemoji }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [errorMessage, setErrorMessage] = useState('');
   const [currencyEmojiValue, setCurrencyEmojiValue] = useState(currencyemoji || DEFAULT_CURRENCY_SYMBOL);
 
@@ -150,13 +182,13 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
           type="button"
           className="purchase-summary-modal__close"
           onClick={closepopupwindow}
-          aria-label="Zamknij"
+          aria-label={CLOSEBUTTONARIA__TEXTLABEL[LANGUAGE]}
         >
           <img src={closeicon} alt="" />
         </button>
 
         <header className="purchase-summary-modal__header">
-          Podsumowanie zakupów
+          {PURCHASESUMMARYTITLE__TEXTLABEL[LANGUAGE]}
         </header>
 
         <div className="purchase-summary-modal__items">
@@ -193,19 +225,19 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
 
         <footer className="purchase-summary-modal__footer">
           <div className="purchase-summary-modal__summary-row">
-            <span className="purchase-summary-modal__summary-label">Wartość przedmiotów</span>
+            <span className="purchase-summary-modal__summary-label">{TOTALVALUELABEL__TEXTLABEL[LANGUAGE]}</span>
             <span className="purchase-summary-modal__summary-value">{totalvalue}</span>
             <span>{currencyEmojiValue}</span>
           </div>
           <div className="purchase-summary-modal__divider" />
           <div className="purchase-summary-modal__summary-row">
-            <span className="purchase-summary-modal__summary-label">Koszt przedmiotów</span>
+            <span className="purchase-summary-modal__summary-label">{TOTALCOSTLABEL__TEXTLABEL[LANGUAGE]}</span>
             <span className="purchase-summary-modal__summary-value">{totalcost}</span>
             <span>{currencyEmojiValue}</span>
           </div>
           <div className="purchase-summary-modal__divider purchase-summary-modal__divider--strong" />
           <div className="purchase-summary-modal__summary-row">
-            <span className="purchase-summary-modal__summary-label">Zaoszczędzono</span>
+            <span className="purchase-summary-modal__summary-label">{SAVINGSLABEL__TEXTLABEL[LANGUAGE]}</span>
             <span className="purchase-summary-modal__summary-value purchase-summary-modal__summary-value--saved">
               {totalsaved}
             </span>
@@ -222,7 +254,7 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
               className="purchase-summary-modal__confirm"
               onClick={closepopupwindow}
             >
-              Potwierdź
+              {CONFIRMBUTTON__TEXTLABEL[LANGUAGE]}
             </button>
           </div>
         </footer>

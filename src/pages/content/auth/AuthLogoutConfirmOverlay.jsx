@@ -1,4 +1,36 @@
+import { useState } from 'react';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthLogoutConfirmOverlay.css';
+
+const BACKDROP_ARIALABEL__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
+
+const DIALOGTITLE__TEXTLABEL = {
+  polish: 'Wylogować się?',
+  english: 'Log out?'
+};
+
+const DIALOGMESSAGE__TEXTLABEL = {
+  polish: 'Wrócisz do ekranu logowania. Twoja sesja zostanie zakończona.',
+  english: 'You will return to the login screen. Your session will end.'
+};
+
+const CONFIRMIDLE__TEXTLABEL = {
+  polish: 'Wyloguj',
+  english: 'Log out'
+};
+
+const CONFIRMBUSY__TEXTLABEL = {
+  polish: 'Wylogowywanie...',
+  english: 'Logging out...'
+};
+
+const CANCELBUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
 
 /**
  * @param {Object} props
@@ -15,6 +47,8 @@ export default function AuthLogoutConfirmOverlay({
   onConfirm,
   onCancel,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
   if (!isOpen) {
     return null;
   }
@@ -24,7 +58,7 @@ export default function AuthLogoutConfirmOverlay({
       <button
         type="button"
         className="auth-logout-confirm__backdrop"
-        aria-label="Anuluj"
+        aria-label={BACKDROP_ARIALABEL__TEXTLABEL[LANGUAGE]}
         onClick={onCancel}
         disabled={isBusy}
       />
@@ -37,11 +71,11 @@ export default function AuthLogoutConfirmOverlay({
         aria-describedby="auth-logout-confirm-message"
       >
         <h2 id="auth-logout-confirm-title" className="auth-logout-confirm__title">
-          Wylogować się?
+          {DIALOGTITLE__TEXTLABEL[LANGUAGE]}
         </h2>
 
         <p id="auth-logout-confirm-message" className="auth-logout-confirm__message">
-          Wrócisz do ekranu logowania. Twoja sesja zostanie zakończona.
+          {DIALOGMESSAGE__TEXTLABEL[LANGUAGE]}
         </p>
 
         {errorMessage && (
@@ -57,7 +91,7 @@ export default function AuthLogoutConfirmOverlay({
             onClick={onConfirm}
             disabled={isBusy}
           >
-            {isBusy ? 'Wylogowywanie...' : 'Wyloguj'}
+            {isBusy ? CONFIRMBUSY__TEXTLABEL[LANGUAGE] : CONFIRMIDLE__TEXTLABEL[LANGUAGE]}
           </button>
           <button
             type="button"
@@ -65,7 +99,7 @@ export default function AuthLogoutConfirmOverlay({
             onClick={onCancel}
             disabled={isBusy}
           >
-            Anuluj
+            {CANCELBUTTON__TEXTLABEL[LANGUAGE]}
           </button>
         </div>
       </div>
