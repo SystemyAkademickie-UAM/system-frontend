@@ -225,109 +225,114 @@ const PAGINATIONARIA__TEXTLABEL = {
   english: 'Rank list page navigation'
 };
 
-const RANK_COLUMNS = [
-  {
-    key: 'position',
-    label: COLNUMBER__TEXTLABEL,
-    sort: 'number',
-    width: '90px',
-    render: (rank) => (
-      <span className="rewards-table__position">#{rank.position}</span>
-    ),
-  },
-  {
-    key: 'name',
-    label: COLNAME__TEXTLABEL,
-    sort: 'text',
-    width: '240px',
-    render: (rank) => (
-      <span className="rewards-table__name">{rank.name}</span>
-    ),
-  },
-  {
-    key: '_spacer',
-    label: '',
-    sort: false,
-    className: 'rewards-table__th--spacer',
-    colClassName: 'rewards-table__col--spacer',
-    cellClassName: 'rewards-table__cell--spacer',
-    render: () => '\u00A0',
-  },
-  {
-    key: 'icon',
-    label: COLICON__TEXTLABEL,
-    sort: 'text',
-    width: '140px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-    render: (rank) => (
-      rank.icon ? (
-        <span className="rewards-table__icon-emoji" aria-hidden="true">{rank.icon}</span>
-      ) : (
-        <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
-      )
-    ),
-  },
-  {
-    key: 'costAmount',
-    label: COLCOST__TEXTLABEL,
-    sort: 'number',
-    width: '120px',
-    render: (rank) => (
-      <CurrencyDisplay amount={rank.costAmount} size="sm" />
-    ),
-  },
-  {
-    key: 'discount',
-    label: COLDISCOUNT__TEXTLABEL,
-    sort: 'number',
-    width: '100px',
-    render: (rank) => (
-      <span className="rewards-table__cell-text rewards-table__cell-text--discount">
-        {Number(rank.discount ?? 0)}%
-      </span>
-    ),
-  },
-  {
-    key: 'storyDescription',
-    label: COLSTATUS__TEXTLABEL,
-    sort: 'text',
-    width: '240px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-    render: (rank) => (
-      <span className="rewards-table__cell-text">
-        {rank.storyDescription}
-      </span>
-    ),
-  },
-  {
-    key: 'shopItems',
-    label: COLSHOPITEMS__TEXTLABEL,
-    sort: 'text',
-    width: '220px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-  },
-];
 
-function createRankColumns(resolveShopItems) {
-  return RANK_COLUMNS.map((column) => (
-    column.key === 'shopItems'
-      ? {
-        ...column,
-        render: (rank) => (
-          <span className="rewards-table__cell-text">
-            {resolveShopItems(rank.shopItems).join(', ') || '—'}
-          </span>
-        ),
-      }
-      : column
-  ));
-}
+
+
 
 export default function RewardsHomeContent() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+
+  const RANK_COLUMNS = [
+    {
+      key: 'position',
+      label: COLNUMBER__TEXTLABEL[LANGUAGE],
+      sort: 'number',
+      width: '90px',
+      render: (rank) => (
+        <span className="rewards-table__position">#{rank.position}</span>
+      ),
+    },
+    {
+      key: 'name',
+      label: COLNAME__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '240px',
+      render: (rank) => (
+        <span className="rewards-table__name">{rank.name}</span>
+      ),
+    },
+    {
+      key: '_spacer',
+      label: '',
+      sort: false,
+      className: 'rewards-table__th--spacer',
+      colClassName: 'rewards-table__col--spacer',
+      cellClassName: 'rewards-table__cell--spacer',
+      render: () => '\u00A0',
+    },
+    {
+      key: 'icon',
+      label: COLICON__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '140px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+      render: (rank) => (
+        rank.icon ? (
+          <span className="rewards-table__icon-emoji" aria-hidden="true">{rank.icon}</span>
+        ) : (
+          <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+        )
+      ),
+    },
+    {
+      key: 'costAmount',
+      label: COLCOST__TEXTLABEL[LANGUAGE],
+      sort: 'number',
+      width: '120px',
+      render: (rank) => (
+        <CurrencyDisplay amount={rank.costAmount} size="sm" />
+      ),
+    },
+    {
+      key: 'discount',
+      label: COLDISCOUNT__TEXTLABEL[LANGUAGE],
+      sort: 'number',
+      width: '100px',
+      render: (rank) => (
+        <span className="rewards-table__cell-text rewards-table__cell-text--discount">
+          {Number(rank.discount ?? 0)}%
+        </span>
+      ),
+    },
+    {
+      key: 'storyDescription',
+      label: COLSTATUS__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '240px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+      render: (rank) => (
+        <span className="rewards-table__cell-text">
+          {rank.storyDescription}
+        </span>
+      ),
+    },
+    {
+      key: 'shopItems',
+      label: COLSHOPITEMS__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '220px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+    },
+  ];
+  function createRankColumns(resolveShopItems) {
+    return RANK_COLUMNS.map((column) => (
+      column.key === 'shopItems'
+        ? {
+          ...column,
+          render: (rank) => (
+            <span className="rewards-table__cell-text">
+              {resolveShopItems(rank.shopItems).join(', ') || '—'}
+            </span>
+          ),
+        }
+        : column
+    ));
+  }
+
   const nav = useGroupSubNav('group-rewards');
   const { groupId } = useParams();
   const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-ranks-view');
@@ -671,3 +676,4 @@ export default function RewardsHomeContent() {
     </SectionPageLayout>
   );
 }
+

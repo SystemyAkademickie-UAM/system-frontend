@@ -198,11 +198,14 @@ export function useGroupActivities() {
       await Promise.all(
         receivedStages.map((stage) => fetchActivitiesForStage(stage.id)),
       );
+
+      return receivedStages;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
       showError(message);
       setIsLoading(false);
+
     }
   }, [groupId, fetchActivitiesForStage, showError]);
 
@@ -303,19 +306,28 @@ export function useGroupActivities() {
 
   const deleteStage = useCallback(async (stageId) => {
     try {
+      var activities = await fetchActivitiesForStage(stageId);
+      var i = 0;
+      while (i < activities.length) {
+        await postJson('/activities', {
+          method: 'remove',
+          activityId: activities[i].id,
+        });
+        i = i + 1;
+      }
       await postJson('/stages', {
         method: 'remove',
-        stageId,
+        stageId: stageId,
       });
-      showSuccess(STAGEDELETED__TEXTLABEL[LANGUAGE]);
       await fetchStages();
+      showSuccess(STAGEDELETED__TEXTLABEL[LANGUAGE]);
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       showError(message);
       return { ok: false, error: message };
     }
-  }, [fetchStages, showSuccess, showError]);
+  }, [fetchStages, fetchActivitiesForStage, showSuccess, showError]);
 
   const copyStage = useCallback(async (stageId, cloneName) => {
     const sourceStage = stages.find((stage) => stage.id === stageId);

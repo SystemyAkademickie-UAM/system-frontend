@@ -71,7 +71,7 @@ function LegalDownloadLink({ documentKey, LANGUAGE }) {
       href={authLegalDocumentUrl(documentKey)}
       target="_blank"
       rel="noopener noreferrer"
-      download={document.fileName}
+
       className="register-eula__download-link"
       onClick={handleClick}
     >

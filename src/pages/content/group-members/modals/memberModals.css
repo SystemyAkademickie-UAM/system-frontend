@@ -35,6 +35,7 @@
 
 .member-modal__toolbar--search {
   margin-bottom: 1.25rem;
+
 }
 
 .member-modal__controls {
@@ -112,6 +113,7 @@
 .member-modal__filter {
   padding: 0.375rem 0.75rem;
   border: 1px solid var(--color-modal-border);
+
   border-radius: 9999px;
   background: transparent;
   font-size: var(--font-size-body);
@@ -436,6 +438,7 @@
 .member-progress-tree__row {
   cursor: pointer;
   transition: background 0.15s ease, box-shadow 0.15s ease;
+
 }
 
 .member-progress-tree__row:hover {
@@ -483,6 +486,11 @@
 .member-progress-tree__checkbox .maq-asset-svg--mask {
   width: 1.125rem;
   height: 1.125rem;
+}
+
+.member-progress-tree .activities-island__th:nth-child(2),
+.member-progress-tree .activities-island__cell:nth-child(2) {
+  font-style: italic;
 }
 
 @media (max-width: 768px) {
