@@ -20,6 +20,10 @@
   pointer-events: none;
 }
 
+.shop-modal .shop-modal__preview.maq-product-card .maq-product-card__footer {
+  padding-bottom: 20px;
+}
+
 .shop-modal__summary-list {
   list-style: none;
   margin: 0 0 1rem;

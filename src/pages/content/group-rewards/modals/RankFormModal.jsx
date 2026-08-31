@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Modal, TextField } from '../../../../components/ui/index.js';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import { DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
-import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import { validateWholeNumberInput, sanitizeWholeNumberInput, validateDiscountPercentInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import RewardsCurrencyLabel from '../shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -62,11 +62,22 @@ const UNLOCKBTN__TEXTLABEL = {
   english: 'Unlocked items'
 };
 
+const DISCOUNTLABEL__TEXTLABEL = {
+  polish: 'Zniżka w sklepie (%)',
+  english: 'Shop discount (%)'
+};
+
+const DISCOUNTHINT__TEXTLABEL = {
+  polish: 'Procentowa obniżka ceny produktów w sklepie dla uczestników posiadających tę rangę. Ustaw 0, jeśli ranga nie przyznaje zniżki.',
+  english: 'Percentage price reduction for shop products for participants who have this rank. Set 0 if the rank does not provide a discount.'
+};
+
 const EMPTY_FORM = {
   name: '',
   icon: DEFAULT_RANK_EMOJI,
   costAmount: '',
   storyDescription: '',
+  discount: '0',
 };
 
 export default function RankFormModal({
@@ -90,6 +101,7 @@ export default function RankFormModal({
         icon: rank.icon || rank.iconFile || DEFAULT_RANK_EMOJI,
         costAmount: String(rank.costAmount),
         storyDescription: rank.storyDescription,
+        discount: String(rank.discount ?? 0),
       });
       return;
     }
@@ -102,14 +114,21 @@ export default function RankFormModal({
     [form.costAmount],
   );
 
+  const discountValidation = useMemo(
+    () => validateDiscountPercentInput(form.discount),
+    [form.discount],
+  );
+
   const isValid = useMemo(() => (
     form.name.trim()
     && form.icon.trim()
     && form.storyDescription.trim()
     && costValidation.valid
-  ), [form, costValidation.valid]);
+    && discountValidation.valid
+  ), [form, costValidation.valid, discountValidation.valid]);
 
   const showCostError = form.costAmount.trim() !== '' && !costValidation.valid;
+  const showDiscountError = form.discount.trim() !== '' && !discountValidation.valid;
 
   const handleChange = (field) => (event) => {
     const nextValue = field === 'costAmount'
@@ -127,6 +146,7 @@ export default function RankFormModal({
       iconFile: form.icon.trim(),
       costAmount: costValidation.value,
       storyDescription: form.storyDescription.trim(),
+      discount: discountValidation.value,
     });
   };
 
@@ -196,6 +216,36 @@ export default function RankFormModal({
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
         />
+
+        {!isEdit && (
+          <div className="rewards-modal__field">
+            <label htmlFor="rank-discount" className="rewards-modal__label">
+              {DISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
+            </label>
+            <input
+              id="rank-discount"
+              type="text"
+              inputMode="decimal"
+              className={[
+                'rewards-modal__input',
+                showDiscountError ? 'rewards-modal__input--error' : '',
+              ].filter(Boolean).join(' ')}
+              value={form.discount}
+              onChange={handleChange('discount')}
+              placeholder='0'
+              aria-invalid={showDiscountError}
+              aria-describedby={showDiscountError ? 'rank-discount-error' : 'rank-discount-hint'}
+            />
+            <p id="rank-discount-hint" className="rewards-modal__field-hint">
+              {DISCOUNTHINT__TEXTLABEL[LANGUAGE]}
+            </p>
+            {showDiscountError ? (
+              <p id="rank-discount-error" className="rewards-modal__field-error" role="alert">
+                {discountValidation.error}
+              </p>
+            ) : null}
+          </div>
+        )}
 
         {isEdit && (onOpenDiscountModal || onOpenUnlockItemsModal) ? (
           <div className="rewards-modal__field rewards-modal__field--inline-actions">

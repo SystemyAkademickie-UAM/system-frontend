@@ -304,7 +304,7 @@ function buildPurchaseSummaryItem(item) {
   };
 }
 
-function buildStudentPurchaseToastMessage(purchasedItems) {
+function buildStudentPurchaseToastMessage(purchasedItems, LANGUAGE) {
   const inventoryItems = purchasedItems.filter((item) => !item.isExtraLife);
   if (inventoryItems.length === 0) {
     return null;
@@ -470,7 +470,7 @@ export default function GroupShopContent() {
       return false;
     }
 
-    const toastMessage = buildStudentPurchaseToastMessage(purchasedItems);
+    const toastMessage = buildStudentPurchaseToastMessage(purchasedItems, LANGUAGE);
     if (toastMessage) {
       showSuccess(toastMessage);
     }

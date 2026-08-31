@@ -321,7 +321,7 @@ function getShopItemColumns(language) {
       hiddenBelow: 768,
       render: (item) => (
         <span className="rewards-table__cell-text rewards-table__cell-text--truncate">
-          {item.storyDescription || '—'}
+          <em>{item.storyDescription || '—'}</em>
         </span>
       ),
     },

@@ -25,8 +25,8 @@ const GROUPCREATEDINFO2__TEXTLABEL = {
 };
 
 const CONFIRMBUTTON__TEXTLABEL = {
-  polish: 'Potwierdź',
-  english: 'Confirm'
+  polish: 'Rozumiem',
+  english: 'OK'
 };
 
 export default function GroupMainHomeContentWindow({popupclose, groupname, subjectname}) {

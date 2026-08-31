@@ -34,7 +34,7 @@ const BUYALL_TOTAL_LABEL__TEXTLABEL = {
   english: 'Total'
 };
 
-function getQueryProductLabel(count) {
+function getQueryProductLabel(count, LANGUAGE) {
   return count === 1
     ? BUYALL_QUERY_PRODUCT_SINGULAR__TEXTLABEL[LANGUAGE]
     : BUYALL_QUERY_PRODUCT_PLURAL__TEXTLABEL[LANGUAGE];
@@ -59,7 +59,7 @@ export default function ShopBuyAllModal({
 
   const queryText = BUYALL_QUERY_TEXT__TEXTLABEL[LANGUAGE]
     .replace('{count}', cartItems.length)
-    .replace('{countPlural}', getQueryProductLabel(cartItems.length));
+    .replace('{countPlural}', getQueryProductLabel(cartItems.length, LANGUAGE));
 
   return (
     <Modal

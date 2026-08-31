@@ -22,13 +22,13 @@ const PURCHASESUMMARYTITLE__TEXTLABEL = {
 };
 
 const TOTALVALUELABEL__TEXTLABEL = {
-  polish: 'Wartość przedmiotów',
-  english: 'Item Value'
+  polish: 'Koszt bez zniżek',
+  english: 'Cost without discounts'
 };
 
 const TOTALCOSTLABEL__TEXTLABEL = {
-  polish: 'Koszt przedmiotów',
-  english: 'Item Cost'
+  polish: 'Koszt ze zniżkami',
+  english: 'Cost with discounts'
 };
 
 const SAVINGSLABEL__TEXTLABEL = {
@@ -37,8 +37,8 @@ const SAVINGSLABEL__TEXTLABEL = {
 };
 
 const CONFIRMBUTTON__TEXTLABEL = {
-  polish: 'Potwierdź',
-  english: 'Confirm'
+  polish: 'OK',
+  english: 'OK'
 };
 
 const SHOP_PURCHASE_SUMMARY_PREFIX = 'maq-shop-purchase-summary:';
@@ -166,7 +166,7 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
 
     let j = 0;
 
-    while (j < 4 && i < purchaseditems.length) {
+    while (j < 3 && i < purchaseditems.length) {
       rowitems.push(purchaseditems[i]);
       i = i + 1;
       j = j + 1;

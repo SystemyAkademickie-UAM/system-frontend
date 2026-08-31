@@ -305,7 +305,7 @@ export default function RewardsHomeContent() {
       hiddenBelow: 768,
       render: (rank) => (
         <span className="rewards-table__cell-text">
-          {rank.storyDescription}
+          <em>{rank.storyDescription}</em>
         </span>
       ),
     },

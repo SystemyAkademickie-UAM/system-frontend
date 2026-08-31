@@ -267,7 +267,7 @@ const BADGE_COLUMNS = [
     hiddenBelow: 768,
     render: (badge) => (
       <span className="rewards-table__cell-text">
-        {badge.storyDescription}
+        <em>{badge.storyDescription}</em>
       </span>
     ),
   },

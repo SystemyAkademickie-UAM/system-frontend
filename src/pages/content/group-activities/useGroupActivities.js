@@ -95,7 +95,7 @@ function mapActivity(raw) {
 }
 
 function sortByNewestFirst(items) {
-  return [...items].sort((a, b) => b.id - a.id);
+  return [...items].sort((a, b) => a.id - b.id);
 }
 
 function mapStage(raw) {
@@ -221,7 +221,7 @@ export function useGroupActivities() {
     )));
   }, []);
 
-  const createStage = useCallback(async (name, { visibilityStatus = 1 } = {}) => {
+  const createStage = useCallback(async (name, { visibilityStatus = 0 } = {}) => {
     const nameCheck = assertStageName(name, LANGUAGE);
     if (!nameCheck.ok) {
       showError(nameCheck.message);

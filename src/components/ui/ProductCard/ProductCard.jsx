@@ -487,7 +487,7 @@ export default function ProductCard({
           {isInventory ? (
             <>
               <div className="maq-product-card__price-bar">
-                <span className="maq-product-card__section-label">Posiadane</span>
+                <span className="maq-product-card__section-label">Posiadane sztuki</span>
                 <span className="maq-product-card__owned-count">{ownedQuantity}</span>
               </div>
 
