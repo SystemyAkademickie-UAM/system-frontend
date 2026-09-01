@@ -1,8 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
 import { fetchStudentProgress, toggleStudentActivity } from '../../../../services/students.api.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import MemberProgressTree from './MemberProgressTree.jsx';
 import './memberModals.css';
+
+const MODAL_TITLE__TEXTLABEL = { polish: 'Edytuj postęp', english: 'Edit Progress' };
+const SAVING_BUTTON__TEXTLABEL = { polish: 'Zapisywanie…', english: 'Saving…' };
+const SAVE_BUTTON__TEXTLABEL = { polish: 'Zapisz', english: 'Save' };
+const SEARCH_PLACEHOLDER__TEXTLABEL = { polish: 'Szukaj etapów lub aktywności…', english: 'Search stages or activities…' };
+const SEARCH_ARIA_LABEL__TEXTLABEL = { polish: 'Szukaj etapów lub aktywności', english: 'Search stages or activities' };
+const LOADING_MESSAGE__TEXTLABEL = { polish: 'Ładowanie aktywności…', english: 'Loading activities…' };
+const NO_ACTIVITIES_EMPTY__TEXTLABEL = { polish: 'Brak aktywności w tej grupie.', english: 'No activities in this group.' };
+const NO_SEARCH_ACTIVITIES_EMPTY__TEXTLABEL = { polish: 'Brak etapów spełniających kryteria wyszukiwania.', english: 'No stages matching search criteria.' };
+const SAVED_SUCCESS__TEXTLABEL = { polish: 'Postęp uczestnika został zapisany.', english: 'Participant progress has been saved.' };
+const SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać postępu', english: 'Failed to save progress' };
+const ACTIVITY_SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać postępu aktywności', english: 'Failed to save activity progress' };
 
 function sortProgressStagesNewestFirst(stages) {
   return [...stages]
@@ -21,6 +34,7 @@ export default function MemberProgressModal({
   onConfirm,
 }) {
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [progress, setProgress] = useState({});
   const [stages, setStages] = useState([]);
@@ -104,16 +118,16 @@ export default function MemberProgressModal({
       for (const activityId of changedActivityIds) {
         const result = await toggleStudentActivity(groupId, member.accountId, Number(activityId));
         if (!result.ok) {
-          throw new Error(result.error || 'Nie udało się zapisać postępu aktywności');
+          throw new Error(result.error || ACTIVITY_SAVE_ERROR__TEXTLABEL[LANGUAGE]);
         }
       }
 
       const completedCount = Object.values(progress).filter(Boolean).length;
       onConfirm?.({ completedCount, progress });
-      showSuccess('Postęp uczestnika został zapisany.');
+      showSuccess(SAVED_SUCCESS__TEXTLABEL[LANGUAGE]);
       onClose();
     } catch (err) {
-      showError(err instanceof Error ? err.message : 'Nie udało się zapisać postępu');
+      showError(err instanceof Error ? err.message : SAVE_ERROR__TEXTLABEL[LANGUAGE]);
     } finally {
       setIsSaving(false);
     }
@@ -127,10 +141,10 @@ export default function MemberProgressModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Edytuj postęp"
+      title={MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       subtitle={member.name}
       onConfirm={handleConfirm}
-      confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}
+      confirmLabel={isSaving ? SAVING_BUTTON__TEXTLABEL[LANGUAGE] : SAVE_BUTTON__TEXTLABEL[LANGUAGE]}
       confirmDisabled={isSaving || isLoading}
       size="xl"
       className="member-modal member-modal--progress"
@@ -139,15 +153,15 @@ export default function MemberProgressModal({
         <SearchBar
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj etapów lub aktywności…"
+          placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
           name="progress-search"
           className="member-modal__search"
-          aria-label="Szukaj etapów lub aktywności"
+          aria-label={SEARCH_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
         />
       </div>
 
       {isLoading ? (
-        <p className="member-modal__empty">Ładowanie aktywności…</p>
+        <p className="member-modal__empty">{LOADING_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : null}
 
       {!isLoading && visibleStages.length > 0 ? (
@@ -161,8 +175,8 @@ export default function MemberProgressModal({
       {!isLoading && visibleStages.length === 0 ? (
         <p className="member-modal__empty">
           {stages.length === 0
-            ? 'Brak aktywności w tej grupie.'
-            : 'Brak etapów spełniających kryteria wyszukiwania.'}
+            ? NO_ACTIVITIES_EMPTY__TEXTLABEL[LANGUAGE]
+            : NO_SEARCH_ACTIVITIES_EMPTY__TEXTLABEL[LANGUAGE]}
         </p>
       ) : null}
     </Modal>

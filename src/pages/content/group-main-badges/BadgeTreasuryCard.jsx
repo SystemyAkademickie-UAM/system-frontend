@@ -3,8 +3,19 @@ import BadgeEarnersBar from './BadgeEarnersBar.jsx';
 import { getBadgeEarners } from './badgeTreasuryModel.js';
 import LecturerTileActions from '../group-rewards/shared/LecturerTileActions.jsx';
 import { getTileVisibilityLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import '../../../components/ui/ProductCard/ProductCard.css';
 import './BadgeTreasuryCard.css';
+
+const ENTITYLABEL__TEXTLABEL = {
+  polish: 'odznakę',
+  english: 'badge'
+};
+
+const ASSIGNLABEL__TEXTLABEL = {
+  polish: 'Przydziel odznakę',
+  english: 'Assign badge'
+};
 
 /**
  * @param {Object} props
@@ -24,6 +35,7 @@ export default function BadgeTreasuryCard({
   excludeAccountId = null,
   isStudentView = false,
   showLecturerActions = false,
+  LANGUAGE,
   onEdit,
   onDelete,
   onAssign,
@@ -52,12 +64,12 @@ export default function BadgeTreasuryCard({
             {getTileVisibilityLabel(isPublished, 'badge')}
           </span>
           <LecturerTileActions
-            entityLabel="odznakę"
+            entityLabel={ENTITYLABEL__TEXTLABEL[LANGUAGE]}
             name={badge.name}
             onEdit={onEdit}
             onDelete={onDelete}
             onAssign={onAssign}
-            assignLabel="Przydziel odznakę"
+            assignLabel={ASSIGNLABEL__TEXTLABEL[LANGUAGE]}
             className="badge-treasury-card__actions"
           />
         </>
@@ -77,6 +89,7 @@ export default function BadgeTreasuryCard({
         <BadgeEarnersBar
           students={earners}
           className="badge-treasury-card__earners"
+          LANGUAGE={LANGUAGE}
         />
       </div>
     </article>

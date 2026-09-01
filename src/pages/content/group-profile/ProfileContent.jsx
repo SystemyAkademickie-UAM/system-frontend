@@ -2,15 +2,82 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ProfileContent.css';
+
+const ALL_ACTIVITIES_LABEL__TEXTLABEL = {
+  polish: 'WSZYSTKIE AKTYWNOŚCI',
+  english: 'ALL ACTIVITIES'
+};
+
+const ALL_BADGES_LABEL__TEXTLABEL = {
+  polish: 'WSZYSTKIE ODZNAKI',
+  english: 'ALL BADGES'
+};
+
+const HIDE_ACTIVITIES_LABEL__TEXTLABEL = {
+  polish: 'UKRYJ AKTYWNOŚCI',
+  english: 'HIDE ACTIVITIES'
+};
+
+const HIDE_BADGES_LABEL__TEXTLABEL = {
+  polish: 'UKRYJ ODZNAKI',
+  english: 'HIDE BADGES'
+};
+
+const DEFAULT_NICKNAME__TEXTLABEL = {
+  polish: 'Nick',
+  english: 'Nickname'
+};
+
+const CURRENCY_STAT_LABEL__TEXTLABEL = {
+  polish: 'ZDOBYTA WALUTA',
+  english: 'EARNED CURRENCY'
+};
+
+const BADGES_STAT_LABEL__TEXTLABEL = {
+  polish: 'ZDOBYTE ODZNAKI',
+  english: 'EARNED BADGES'
+};
+
+const CURRENT_RANKING_LABEL__TEXTLABEL = {
+  polish: 'OBECNY RANKING',
+  english: 'CURRENT RANKING'
+};
+
+const HIGHEST_POSITION_LABEL__TEXTLABEL = {
+  polish: 'NAJWYZSZA POZYCJA',
+  english: 'HIGHEST POSITION'
+};
+
+const BADGES_SECTION_TITLE__TEXTLABEL = {
+  polish: 'Odznaki',
+  english: 'Badges'
+};
+
+const STORY_DESCRIPTION_LABEL__TEXTLABEL = {
+  polish: 'OPIS FABULARNY',
+  english: 'STORY DESCRIPTION'
+};
+
+const DIDACTIC_DESCRIPTION_LABEL__TEXTLABEL = {
+  polish: 'OPIS DYDAKTYCZNY',
+  english: 'DIDACTIC DESCRIPTION'
+};
+
+const REWARD_LABEL__TEXTLABEL = {
+  polish: 'NAGRODA',
+  english: 'REWARD'
+};
 
 export default function ProfileContent() {
   const { groupId } = useParams();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [errorMessage, setErrorMessage] = useState('');
   const [allactivities, setAllactivities] = useState(0);
   const [allbadges, setAllbadges] = useState(0);
-  const [activitieslabel, setActivitieslabel] = useState('WSZYSTKIE AKTYWNOŚCI');
-  const [badgeslabel, setBadgeslabel] = useState('WSZYSTKIE ODZNAKI');
+  const [activitieslabel, setActivitieslabel] = useState(ALL_ACTIVITIES_LABEL__TEXTLABEL[LANGUAGE]);
+  const [badgeslabel, setBadgeslabel] = useState(ALL_BADGES_LABEL__TEXTLABEL[LANGUAGE]);
   const [livesslots, setLivesslots] = useState([]);
   const [currency, setCurrency] = useState(0);
   const [title, setTitle] = useState('');
@@ -18,7 +85,7 @@ export default function ProfileContent() {
 
   var role = '';
   var rank = '';
-  var nickname = 'Nickname';
+  var nickname = DEFAULT_NICKNAME__TEXTLABEL[LANGUAGE];
   var position = 1;
   var total = 123;
   var totalcurrency = 987654321;
@@ -181,21 +248,21 @@ export default function ProfileContent() {
       if (allactivities == 0) {
         setAllactivities(1);
         setActivities(receivedactivities);
-        setActivitieslabel('UKRYJ AKTYWNOŚCI');
+        setActivitieslabel(HIDE_ACTIVITIES_LABEL__TEXTLABEL[LANGUAGE]);
       } else {
         setAllactivities(0);
         setActivities(receivedactivities.slice(0, 5));
-        setActivitieslabel('WSZYSTKIE AKTYWNOŚCI');
+        setActivitieslabel(ALL_ACTIVITIES_LABEL__TEXTLABEL[LANGUAGE]);
       }
     } else {
       if (allbadges == 0) {
         setAllbadges(1);
         setBadges(receivedbadges);
-        setBadgeslabel('UKRYJ ODZNAKI');
+        setBadgeslabel(HIDE_BADGES_LABEL__TEXTLABEL[LANGUAGE]);
       } else {
         setAllbadges(0);
         setBadges(receivedbadges.slice(0, 3));
-        setBadgeslabel('WSZYSTKIE ODZNAKI');
+        setBadgeslabel(ALL_BADGES_LABEL__TEXTLABEL[LANGUAGE]);
       }
     }
     setBackgroundheight(Math.max(100, activitiesheight, badgesheight) + '%');
@@ -222,20 +289,20 @@ export default function ProfileContent() {
         <div style = {{width: '98%', height: '15%', position: 'absolute', top: '33%', left: '1%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6%'}}>
 
           <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '20%', height: '80%', position: 'relative', borderRadius: '16px'}}>
-            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>ZDOBYTA WALUTA</div>
+            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>{CURRENCY_STAT_LABEL__TEXTLABEL[LANGUAGE]}</div>
             <div style = {{width: '90%', height: '50%', position: 'absolute', top: '45%', left: '5%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingLeft: '1%'}}>{totalcurrency}</div>
           </div>
           <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '20%', height: '80%', position: 'relative', borderRadius: '16px'}}>
-            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>ZDOBYTE ODZNAKI</div>
+            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>{BADGES_STAT_LABEL__TEXTLABEL[LANGUAGE]}</div>
             <div style = {{width: '90%', height: '50%', position: 'absolute', top: '45%', left: '5%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingLeft: '1%'}}>{totalbadges}</div>
           </div>
           <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '20%', height: '80%', position: 'relative', borderRadius: '16px'}}>
-            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>OBECNY RANKING</div>
+            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>{CURRENT_RANKING_LABEL__TEXTLABEL[LANGUAGE]}</div>
             <div style = {{width: '50%', height: '50%', position: 'absolute', top: '45%', left: '5%', color: 'rgb(227, 224, 247)', fontSize: '42px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-end', textAlign: 'center', paddingLeft: '1%'}}>#{position}</div>
             <div style = {{width: '40%', height: '50%', position: 'absolute', top: '45%', left: '55%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: '17px', paddingLeft: '1%'}}>/{total}</div>
           </div>
           <div style = {{backgroundColor: 'rgb(26, 26, 42)', width: '20%', height: '80%', position: 'relative', borderRadius: '16px'}}>
-            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>NAJWYZSZA POZYCJA</div>
+            <div style = {{width: '90%', height: '30%', position: 'absolute', top: '5%', left: '5%', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', paddingLeft: '1%'}}>{HIGHEST_POSITION_LABEL__TEXTLABEL[LANGUAGE]}</div>
             <div style = {{width: '50%', height: '50%', position: 'absolute', top: '45%', left: '5%', color: 'rgb(227, 224, 247)', fontSize: '42px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-end', textAlign: 'center', paddingLeft: '1%'}}>#{position}</div>
             <div style = {{width: '40%', height: '50%', position: 'absolute', top: '45%', left: '55%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: '17px', paddingLeft: '1%'}}>/{total}</div>
           </div>
@@ -245,7 +312,7 @@ export default function ProfileContent() {
         </div>
 
 
-        <div style = {{width: '49%', height: '7%', position: 'absolute', top: '48%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>Odznaki</div>
+        <div style = {{width: '49%', height: '7%', position: 'absolute', top: '48%', left: '1%', color: 'rgb(227, 224, 247)', fontSize: '28px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}>{BADGES_SECTION_TITLE__TEXTLABEL[LANGUAGE]}</div>
         <div style = {{width: '49%', height: '7%', position: 'absolute', top: '48%', left: '50%', color: 'rgb(66, 243, 125)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-end', paddingRight: '1%'}}><span onClick={() => toggleAll('badges')} style={{cursor: 'pointer'}}>{badgeslabel}</span></div>
 
 
@@ -259,12 +326,12 @@ export default function ProfileContent() {
                 </div>
                 <div style = {{width: '87%', display: 'flex', flexDirection: 'column', paddingTop: '1vh', paddingBottom: '1vh', gap: '2vh'}}>
                   <div style = {{width: '100%', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{badge.name}</span></div>
-                  <div style = {{width: '100%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>OPIS FABULARNY</span></div>
+                  <div style = {{width: '100%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{STORY_DESCRIPTION_LABEL__TEXTLABEL[LANGUAGE]}</span></div>
                   <div style = {{width: '100%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{badge.description0}</span></div>
-                  <div style = {{width: '100%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>OPIS DYDAKTYCZNY</span></div>
+                  <div style = {{width: '100%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{DIDACTIC_DESCRIPTION_LABEL__TEXTLABEL[LANGUAGE]}</span></div>
                   <div style = {{width: '100%', color: 'rgb(227, 224, 247)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3, overflow: 'hidden'}}>{badge.description1}</span></div>
                   <div style = {{width: '100%', display: 'flex', flexDirection: 'row'}}>
-                    <div style = {{width: '75%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>NAGRODA</span></div>
+                    <div style = {{width: '75%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{REWARD_LABEL__TEXTLABEL[LANGUAGE]}</span></div>
                     <div style = {{width: '17.5%', color: badge.colour, fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingLeft: '1%'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{badge.reward}</span></div>
                     <div style = {{backgroundColor: 'rgb(255, 0, 255)', width: '7.5%', aspectRatio: '1 / 1', position: 'relative'}}></div>
                   </div>

@@ -12,11 +12,87 @@ import {
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import { useProfileInventory } from '../../../hooks/shop/useProfileInventory.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
 
 const UNCATEGORIZED_FILTER_ID = '0';
+
+const CATEGORYFILTERALL__TEXTLABEL = {
+  polish: 'Wszystkie',
+  english: 'All'
+};
+
+const CATEGORYFILTERUNCATEGORIZED__TEXTLABEL = {
+  polish: '- - -',
+  english: '- - -'
+};
+
+const CATEGORYFALLBACK__TEXTLABEL = {
+  polish: 'Kategoria',
+  english: 'Category'
+};
+
+const USEITEMSUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Przedmiot został użyty.',
+  english: 'Item has been used.'
+};
+
+const USEITEMERRORMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się użyć przedmiotu.',
+  english: 'Failed to use item.'
+};
+
+const INVENTORYTITLE__TEXTLABEL = {
+  polish: 'Ekwipunek',
+  english: 'Inventory'
+};
+
+const PURCHASEDCOUNT__TEXTLABEL = {
+  polish: 'Zakupione',
+  english: 'Purchased'
+};
+
+const UNIQUECOUNT__TEXTLABEL = {
+  polish: 'Unikatowe',
+  english: 'Unique'
+};
+
+const SEARCHPLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj przedmiotów…',
+  english: 'Search items…'
+};
+
+const SEARCHBARIALABEL__TEXTLABEL = {
+  polish: 'Szukaj przedmiotów w ekwipunku',
+  english: 'Search items in inventory'
+};
+
+const FILTERGROUPALABEL__TEXTLABEL = {
+  polish: 'Filtr kategorii przedmiotu',
+  english: 'Item category filter'
+};
+
+const SHOWALLBUTTON__TEXTLABEL = {
+  polish: 'Pokaż wszystkie',
+  english: 'Show all'
+};
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie ekwipunku…',
+  english: 'Loading inventory…'
+};
+
+const EMPTYINVENTORYMESSAGE__TEXTLABEL = {
+  polish: 'Brak zakupionych przedmiotów.',
+  english: 'No purchased items.'
+};
+
+const NORESULTSMESSAGE__TEXTLABEL = {
+  polish: 'Brak wyników wyszukiwania.',
+  english: 'No search results.'
+};
 
 /**
  * @param {import('../../../utils/shop/shopItem.types.js').InventoryEntry[]} entries
@@ -57,8 +133,9 @@ function filterInventoryEntries(entries, searchQuery, categoryFilter) {
 /**
  * @param {import('../../../utils/shop/shopItem.types.js').InventoryEntry[]} entries
  * @param {Map<string, import('../../../services/itemCategories.api.js').ItemCategory>} categoriesById
+ * @param {string} language
  */
-function buildInventoryCategoryFilters(entries, categoriesById) {
+function buildInventoryCategoryFilters(entries, categoriesById, language) {
   const usedCategoryIds = new Set();
 
   entries.forEach((entry) => {
@@ -75,10 +152,10 @@ function buildInventoryCategoryFilters(entries, categoriesById) {
     categoryIds.forEach((id) => usedCategoryIds.add(String(id)));
   });
 
-  const filters = [{ id: 'all', label: 'Wszystkie' }];
+  const filters = [{ id: 'all', label: CATEGORYFILTERALL__TEXTLABEL[language] }];
 
   if (usedCategoryIds.has(UNCATEGORIZED_FILTER_ID)) {
-    filters.push({ id: UNCATEGORIZED_FILTER_ID, label: '- - -' });
+    filters.push({ id: UNCATEGORIZED_FILTER_ID, label: CATEGORYFILTERUNCATEGORIZED__TEXTLABEL[language] });
   }
 
   [...usedCategoryIds]
@@ -92,7 +169,7 @@ function buildInventoryCategoryFilters(entries, categoriesById) {
       const category = categoriesById.get(id);
       filters.push({
         id,
-        label: category?.name ?? `Kategoria ${id}`,
+        label: category?.name ?? `${CATEGORYFALLBACK__TEXTLABEL[language]} ${id}`,
         color: category?.color ?? undefined,
       });
     });
@@ -110,6 +187,7 @@ export default function ProfileEqContentContent({
   readOnly = false,
 }) {
   const { groupId } = useParams();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -133,8 +211,8 @@ export default function ProfileEqContentContent({
   const uniqueCount = entries.length;
 
   const categoryFilters = useMemo(
-    () => buildInventoryCategoryFilters(entries, categoriesById),
-    [entries, categoriesById],
+    () => buildInventoryCategoryFilters(entries, categoriesById, LANGUAGE),
+    [entries, categoriesById, LANGUAGE],
   );
 
   const filteredEntries = useMemo(
@@ -152,12 +230,12 @@ export default function ProfileEqContentContent({
     setUsingItemId(null);
 
     if (result.ok) {
-      showSuccess('Przedmiot został użyty.');
+      showSuccess(USEITEMSUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
       setConfirmUseItem(null);
       return;
     }
 
-    showError(result.error ?? 'Nie udało się użyć przedmiotu.');
+    showError(result.error ?? USEITEMERRORMESSAGE__TEXTLABEL[LANGUAGE]);
   };
 
   const openUseItemConfirm = (itemId, itemName) => {
@@ -170,7 +248,7 @@ export default function ProfileEqContentContent({
   return (
     <div className="profile-eq-page">
       <header className="profile-eq-page__header">
-        <h2 className="profile-eq-page__title">Ekwipunek</h2>
+        <h2 className="profile-eq-page__title">{INVENTORYTITLE__TEXTLABEL[LANGUAGE]}</h2>
       </header>
 
       {error ? (
@@ -180,12 +258,12 @@ export default function ProfileEqContentContent({
       <div className="maq-section-page__toolbar profile-eq-page__toolbar">
         <div className="maq-section-page__toolbar-start profile-eq-page__counts">
           <span className="activities-page__count">
-            Zakupione
+            {PURCHASEDCOUNT__TEXTLABEL[LANGUAGE]}
             {' '}
             {totalPurchased}
           </span>
           <span className="activities-page__count">
-            Unikatowe
+            {UNIQUECOUNT__TEXTLABEL[LANGUAGE]}
             {' '}
             {uniqueCount}
           </span>
@@ -195,10 +273,10 @@ export default function ProfileEqContentContent({
           <SearchBar
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj przedmiotów…"
+            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
             name="profile-eq-search"
             className="profile-eq-page__search"
-            aria-label="Szukaj przedmiotów w ekwipunku"
+            aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
           />
         </div>
       </div>
@@ -208,7 +286,7 @@ export default function ProfileEqContentContent({
           <CatalogFiltersPanel className="profile-eq-page__filters">
             <div className="profile-eq-page__filters-row">
               <CatalogFilterGroup
-                ariaLabel="Filtr kategorii przedmiotu"
+                ariaLabel={FILTERGROUPALABEL__TEXTLABEL[LANGUAGE]}
                 filters={categoryFilters}
                 activeId={categoryFilter}
                 onSelect={setCategoryFilter}
@@ -220,7 +298,7 @@ export default function ProfileEqContentContent({
                 className="profile-eq-page__toggle-categories"
                 onClick={() => setCategoryFilter('all')}
               >
-                Pokaż wszystkie
+                {SHOWALLBUTTON__TEXTLABEL[LANGUAGE]}
               </Button>
             </div>
           </CatalogFiltersPanel>
@@ -229,12 +307,12 @@ export default function ProfileEqContentContent({
       ) : null}
 
       {isLoading ? (
-        <p className="profile-eq-page__message">Ładowanie ekwipunku…</p>
+        <p className="profile-eq-page__message">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : filteredEntries.length === 0 ? (
         <p className="profile-eq-page__message">
           {entries.length === 0
-            ? 'Brak zakupionych przedmiotów.'
-            : 'Brak wyników wyszukiwania.'}
+            ? EMPTYINVENTORYMESSAGE__TEXTLABEL[LANGUAGE]
+            : NORESULTSMESSAGE__TEXTLABEL[LANGUAGE]}
         </p>
       ) : (
         <div className="profile-eq-page__grid">

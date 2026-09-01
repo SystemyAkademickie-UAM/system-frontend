@@ -4,7 +4,18 @@ import TemplateDetailPanel from '../../../components/ui/TemplateDetailPanel/Temp
 import TemplateListingCard from '../../../components/ui/TemplateListingCard/TemplateListingCard.jsx';
 import { fetchGroupTemplateDetails } from '../../../services/groupTemplates.api.js';
 import { getTemplateBannerUrl, getTemplateSummaryStats } from './groupSnapshotForTemplate.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './TemplateDetailsModal.css';
+
+const MODAL_TITLE__TEXTLABEL = {
+  polish: 'Szczegóły szablonu',
+  english: 'Template details'
+};
+
+const CLOSE_BUTTON__TEXTLABEL = {
+  polish: 'Zamknij',
+  english: 'Close'
+};
 
 /**
  * @param {Object} props
@@ -13,6 +24,7 @@ import './TemplateDetailsModal.css';
  * @param {() => void} props.onClose
  */
 export default function TemplateDetailsModal({ isOpen, template, onClose }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [details, setDetails] = useState(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
@@ -37,7 +49,7 @@ export default function TemplateDetailsModal({ isOpen, template, onClose }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Szczegóły szablonu"
+      title={MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       subtitle={template?.name}
       size="xl"
       showFooter={false}
@@ -69,7 +81,7 @@ export default function TemplateDetailsModal({ isOpen, template, onClose }) {
 
       <div className="template-details-modal__footer">
         <Button type="button" variant="secondary" onClick={onClose}>
-          Zamknij
+          {CLOSE_BUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       </div>
     </Modal>

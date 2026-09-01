@@ -4,10 +4,51 @@ import { getSamlLoginUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ORGANIZATIONS_PATH, AUTH_SAML_STATUS_PATH } from '../../../constants/authPaths.constants.js';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { getJson } from '../../../services/api-client.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthCard.css';
 import './LoginInstitution.css';
 
 /** @typedef {{ id: number, name: string }} SamlOrganizationOption */
+
+const BACK_ARIALABEL__TEXTLABEL = {
+  polish: 'Wróć',
+  english: 'Back'
+};
+
+const SELECTIONLABEL__TEXTLABEL = {
+  polish: 'Wybierz uczelnię',
+  english: 'Select institution'
+};
+
+const LOADINGOPTION__TEXTLABEL = {
+  polish: 'Ładowanie…',
+  english: 'Loading…'
+};
+
+const NOINSTITUTIONS__TEXTLABEL = {
+  polish: 'Brak zarejestrowanych uczelni',
+  english: 'No registered institutions'
+};
+
+const ERROR_NOSELECTION__TEXTLABEL = {
+  polish: 'Wybierz uczelnię z listy.',
+  english: 'Select an institution from the list.'
+};
+
+const ERROR_SAMLNOTCONFIGURED__TEXTLABEL = {
+  polish: 'Logowanie SAML nie jest skonfigurowane (brak certyfikatów SP w backendzie).',
+  english: 'SAML login is not configured (missing SP certificates in backend).'
+};
+
+const ERROR_NOURL__TEXTLABEL = {
+  polish: 'Brak adresu logowania SAML.',
+  english: 'No SAML login URL available.'
+};
+
+const CONTINUE_BUTTON__TEXTLABEL = {
+  polish: 'Kontynuuj',
+  english: 'Continue'
+};
 
 function BackIcon({ className }) {
   return (
@@ -18,6 +59,7 @@ function BackIcon({ className }) {
 }
 
 export default function LoginInstitution({ onBack }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const navigate = useNavigate();
   const [organizations, setOrganizations] = useState(/** @type {SamlOrganizationOption[]} */ ([]));
   const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
@@ -58,7 +100,7 @@ export default function LoginInstitution({ onBack }) {
     setErrorMessage(null);
     const organizationId = Number.parseInt(selectedOrganizationId, 10);
     if (!Number.isFinite(organizationId) || organizationId <= 0) {
-      setErrorMessage('Wybierz uczelnię z listy.');
+      setErrorMessage(ERROR_NOSELECTION__TEXTLABEL[LANGUAGE]);
       return;
     }
     setIsBusy(true);
@@ -70,17 +112,17 @@ export default function LoginInstitution({ onBack }) {
       statusResult.data.configured !== true
     ) {
       setIsBusy(false);
-      setErrorMessage('Logowanie SAML nie jest skonfigurowane (brak certyfikatów SP w backendzie).');
+      setErrorMessage(ERROR_SAMLNOTCONFIGURED__TEXTLABEL[LANGUAGE]);
       return;
     }
     const samlLoginUrl = getSamlLoginUrl(organizationId);
     if (samlLoginUrl.length === 0) {
       setIsBusy(false);
-      setErrorMessage('Brak adresu logowania SAML.');
+      setErrorMessage(ERROR_NOURL__TEXTLABEL[LANGUAGE]);
       return;
     }
     window.location.assign(samlLoginUrl);
-  }, [selectedOrganizationId]);
+  }, [selectedOrganizationId, LANGUAGE]);
 
   const isSelectDisabled = isOrganizationsLoading || organizations.length === 0 || isBusy;
 
@@ -90,7 +132,7 @@ export default function LoginInstitution({ onBack }) {
         type="button"
         className="auth-card__back-button"
         onClick={handleBack}
-        aria-label="Wróć"
+        aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
       >
         <BackIcon className="auth-card__back-icon" />
       </button>
@@ -103,7 +145,7 @@ export default function LoginInstitution({ onBack }) {
 
       <div className="login-institution__field">
         <label className="login-institution__field-label" htmlFor="institution-select">
-          Wybierz uczelnię
+          {SELECTIONLABEL__TEXTLABEL[LANGUAGE]}
         </label>
         <div className="login-institution__select-wrap">
           <select
@@ -114,10 +156,10 @@ export default function LoginInstitution({ onBack }) {
             onChange={(event) => setSelectedOrganizationId(event.target.value)}
           >
             {isOrganizationsLoading && (
-              <option value="">Ładowanie…</option>
+              <option value="">{LOADINGOPTION__TEXTLABEL[LANGUAGE]}</option>
             )}
             {!isOrganizationsLoading && organizations.length === 0 && (
-              <option value="">Brak zarejestrowanych uczelni</option>
+              <option value="">{NOINSTITUTIONS__TEXTLABEL[LANGUAGE]}</option>
             )}
             {organizations.map((organization) => (
               <option key={organization.id} value={String(organization.id)}>
@@ -140,7 +182,7 @@ export default function LoginInstitution({ onBack }) {
         onClick={handleContinue}
         disabled={isBusy || isOrganizationsLoading || organizations.length === 0}
       >
-        Kontynuuj
+        {CONTINUE_BUTTON__TEXTLABEL[LANGUAGE]}
       </button>
     </div>
   );

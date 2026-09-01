@@ -59,8 +59,234 @@ import '../shared/groupSectionPage.css';
 import '../group-members/MembersHomeContent.css';
 import './GroupShopContent.css';
 import '../group-main/shared/groupMainSubpageHeader.css';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 const ITEMS_PER_PAGE = 10;
+
+const SHOP_TITLE_STUDENT__TEXTLABEL = {
+  polish: 'Sklep',
+  english: 'Shop'
+};
+
+const SHOP_EYEBROW__TEXTLABEL = {
+  polish: 'Targowisko',
+  english: 'Marketplace'
+};
+
+const SHOP_SECTION_LABEL__TEXTLABEL = {
+  polish: 'Sklep grupy',
+  english: 'Group Shop'
+};
+
+const SEARCH_PLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj produktu…',
+  english: 'Search product…'
+};
+
+const SEARCH_ARIA_LABEL__TEXTLABEL = {
+  polish: 'Szukaj produktu po nazwie lub opisie',
+  english: 'Search product by name or description'
+};
+
+const REFRESH_BUTTON__TEXTLABEL = {
+  polish: 'Odśwież sklep',
+  english: 'Refresh Shop'
+};
+
+const CATEGORIES_BUTTON__TEXTLABEL = {
+  polish: 'Kategorie',
+  english: 'Categories'
+};
+
+const ADD_PRODUCT_BUTTON__TEXTLABEL = {
+  polish: 'Dodaj produkt',
+  english: 'Add Product'
+};
+
+const LOADING_TEXT__TEXTLABEL = {
+  polish: 'Ładowanie produktów sklepu…',
+  english: 'Loading shop products…'
+};
+
+const EMPTY_SHOP_STUDENT__TEXTLABEL = {
+  polish: 'Sklep jest pusty — prowadzący nie dodał jeszcze żadnych produktów.',
+  english: 'The shop is empty — the lecturer has not added any products yet.'
+};
+
+const EMPTY_SHOP_LECTURER__TEXTLABEL = {
+  polish: 'W sklepie nie ma jeszcze żadnych produktów.',
+  english: 'There are no products in the shop yet.'
+};
+
+const ADD_FIRST_PRODUCT__TEXTLABEL = {
+  polish: 'Dodaj pierwszy produkt',
+  english: 'Add first product'
+};
+
+const NO_FILTER_RESULTS__TEXTLABEL = {
+  polish: 'Brak produktów spełniających wybrane filtry.',
+  english: 'No products match the selected filters.'
+};
+
+const PAGINATION_ARIA_LABEL__TEXTLABEL = {
+  polish: 'Nawigacja stron listy produktów',
+  english: 'Product list page navigation'
+};
+
+const SECTION_TITLE__TEXTLABEL = {
+  polish: 'Sklep',
+  english: 'Shop'
+};
+
+const PRODUCT_PURCHASED_SINGLE__TEXTLABEL = {
+  polish: 'Produkt „{name}" został zakupiony.',
+  english: 'Product "{name}" has been purchased.'
+};
+
+const PRODUCT_PURCHASED_MULTI__TEXTLABEL = {
+  polish: 'Zakupiono {count} przedmioty.',
+  english: '{count} items have been purchased.'
+};
+
+const CART_PURCHASE_CONFIRMED__TEXTLABEL = {
+  polish: 'Zakup produktów z koszyka został potwierdzony.',
+  english: 'Cart purchase has been confirmed.'
+};
+
+const PRODUCT_DELETE_SUCCESS__TEXTLABEL = {
+  polish: 'Produkt został usunięty ze sklepu.',
+  english: 'Product has been deleted from the shop.'
+};
+
+const SHOP_CLOSE_SUCCESS__TEXTLABEL = {
+  polish: 'Sklep został zamknięty.',
+  english: 'The shop has been closed.'
+};
+
+const SHOP_OPEN_SUCCESS__TEXTLABEL = {
+  polish: 'Sklep został otwarty.',
+  english: 'The shop has been opened.'
+};
+
+const EXTRA_LIFE_PURCHASED__TEXTLABEL = {
+  polish: 'Dodatkowe życie zakupione.',
+  english: 'Extra life purchased.'
+};
+
+const EXTRA_LIFE_PURCHASED_UNLOCKED__TEXTLABEL = {
+  polish: 'Dodatkowe życie zakupione. Sklep został odblokowany.',
+  english: 'Extra life purchased. The shop has been unlocked.'
+};
+
+const BUY_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się kupić produktu.',
+  english: 'Failed to buy product.'
+};
+
+const DELETE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się usunąć produktu.',
+  english: 'Failed to delete product.'
+};
+
+const SHOP_REFRESH_SUCCESS__TEXTLABEL = {
+  polish: 'Sklep został odświeżony.',
+  english: 'The shop has been refreshed.'
+};
+
+const SHOP_REFRESH_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się odświeżyć sklepu.',
+  english: 'Failed to refresh the shop.'
+};
+
+const BUY_ALL_ERROR_TEMPLATE__TEXTLABEL = {
+  polish: 'Nie udało się kupić: {name}',
+  english: 'Failed to buy: {name}'
+};
+
+const CATEGORY_SAVE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się zapisać kategorii.',
+  english: 'Failed to save category.'
+};
+
+const CATEGORY_DELETE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się usunąć kategorii.',
+  english: 'Failed to delete category.'
+};
+
+const CATEGORY_CREATE_SUCCESS__TEXTLABEL = {
+  polish: 'Kategoria została utworzona.',
+  english: 'Category has been created.'
+};
+
+const CATEGORY_UPDATE_SUCCESS__TEXTLABEL = {
+  polish: 'Kategoria została zaktualizowana.',
+  english: 'Category has been updated.'
+};
+
+const CATEGORY_DELETE_SUCCESS__TEXTLABEL = {
+  polish: 'Kategoria została usunięta.',
+  english: 'Category has been deleted.'
+};
+
+const ACCESS_CHANGE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się zmienić statusu sklepu.',
+  english: 'Failed to change shop status.'
+};
+
+const FILTER_CATEGORY_LABEL__TEXTLABEL = {
+  polish: 'Filtr kategorii produktu',
+  english: 'Product category filter'
+};
+
+const SHOP_STATUS_ARIA_LABEL__TEXTLABEL = {
+  polish: 'Status sklepu',
+  english: 'Shop status'
+};
+
+const SHOP_SCHEDULE_ARIA_LABEL__TEXTLABEL = {
+  polish: 'Harmonogram otwarcia sklepu',
+  english: 'Shop opening schedule'
+};
+
+const SCHEDULE_CHECKBOX__TEXTLABEL = {
+  polish: 'Ustal datę otwarcia sklepu',
+  english: 'Set shop opening date'
+};
+
+const OPEN_DATE_LABEL__TEXTLABEL = {
+  polish: 'Data otwarcia sklepu',
+  english: 'Shop opening date'
+};
+
+const OPEN_DATE_ARIA__TEXTLABEL = {
+  polish: 'Wybierz datę otwarcia sklepu',
+  english: 'Select shop opening date'
+};
+
+const OPEN_TIME_ARIA__TEXTLABEL = {
+  polish: 'Wybierz godzinę otwarcia sklepu',
+  english: 'Select shop opening time'
+};
+
+const SAVING_LABEL__TEXTLABEL = {
+  polish: 'Zapisywanie…',
+  english: 'Saving…'
+};
+
+const SAVE_BUTTON__TEXTLABEL = {
+  polish: 'Zapisz',
+  english: 'Save'
+};
+
+const PURCHASE_PRODUCT_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się kupić produktu.',
+  english: 'Failed to buy product.'
+};
+
+const STATUS_LOADING__TEXTLABEL = {
+  polish: 'Ładowanie produktów sklepu…',
+  english: 'Loading shop products…'
+};
 
 function buildPurchaseSummaryItem(item) {
   return {
@@ -78,18 +304,21 @@ function buildPurchaseSummaryItem(item) {
   };
 }
 
-function buildStudentPurchaseToastMessage(purchasedItems) {
+function buildStudentPurchaseToastMessage(purchasedItems, LANGUAGE) {
   const inventoryItems = purchasedItems.filter((item) => !item.isExtraLife);
   if (inventoryItems.length === 0) {
     return null;
   }
   if (inventoryItems.length === 1) {
-    return `Produkt „${inventoryItems[0].name}” został zakupiony.`;
+    return PRODUCT_PURCHASED_SINGLE__TEXTLABEL[LANGUAGE]
+      .replace('{name}', inventoryItems[0].name);
   }
-  return `Zakupiono ${inventoryItems.length} przedmioty.`;
+  return PRODUCT_PURCHASED_MULTI__TEXTLABEL[LANGUAGE]
+    .replace('{count}', inventoryItems.length);
 }
 
 export default function GroupShopContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
   const navigate = useNavigate();
   const { role } = useAppRole();
@@ -207,14 +436,14 @@ export default function GroupShopContent() {
     setIsRefreshingShop(false);
 
     if (itemsResult.ok && openResult.ok) {
-      showSuccess('Sklep został odświeżony.');
+      showSuccess(SHOP_REFRESH_SUCCESS__TEXTLABEL[LANGUAGE]);
       return;
     }
 
     showError(
       itemsResult.error
       ?? openResult.error
-      ?? 'Nie udało się odświeżyć sklepu.',
+      ?? SHOP_REFRESH_ERROR__TEXTLABEL[LANGUAGE],
     );
   }, [isRefreshingShop, refetch, refetchShopOpen, showError, showSuccess]);
 
@@ -241,7 +470,7 @@ export default function GroupShopContent() {
       return false;
     }
 
-    const toastMessage = buildStudentPurchaseToastMessage(purchasedItems);
+    const toastMessage = buildStudentPurchaseToastMessage(purchasedItems, LANGUAGE);
     if (toastMessage) {
       showSuccess(toastMessage);
     }
@@ -264,7 +493,7 @@ export default function GroupShopContent() {
     setIsSubmitting(false);
 
     if (!result.ok) {
-      showError(result.error ?? 'Nie udało się kupić produktu.');
+      showError(result.error ?? BUY_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -282,11 +511,12 @@ export default function GroupShopContent() {
     if (activeModal.item.isExtraLife) {
       showSuccess(
         wasGameOver
-          ? 'Dodatkowe życie zakupione. Sklep został odblokowany.'
-          : 'Dodatkowe życie zakupione.',
+          ? EXTRA_LIFE_PURCHASED_UNLOCKED__TEXTLABEL[LANGUAGE]
+          : EXTRA_LIFE_PURCHASED__TEXTLABEL[LANGUAGE],
       );
     } else {
-      showSuccess('Produkt został zakupiony.');
+      showSuccess(PRODUCT_PURCHASED_SINGLE__TEXTLABEL[LANGUAGE]
+        .replace('{name}', activeModal.item.name));
     }
   }, [activeModal, buyItem, closeModal, isGameOver, redirectAfterPurchase, refetchLives, showError, showSuccess]);
 
@@ -302,7 +532,8 @@ export default function GroupShopContent() {
       const result = await buyItem(item.id);
       if (!result.ok) {
         setIsSubmitting(false);
-        showError(result.error ?? `Nie udało się kupić: ${item.name}`);
+        showError(result.error ?? BUY_ALL_ERROR_TEMPLATE__TEXTLABEL[LANGUAGE]
+          .replace('{name}', item.name));
         return;
       }
       purchasedItems.push(buildPurchaseSummaryItem(item));
@@ -315,7 +546,7 @@ export default function GroupShopContent() {
       return;
     }
 
-    showSuccess('Zakup produktów z koszyka został potwierdzony.');
+    showSuccess(CART_PURCHASE_CONFIRMED__TEXTLABEL[LANGUAGE]);
   }, [buyItem, cartItems, clearCart, closeModal, redirectAfterPurchase, showError, showSuccess]);
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -328,21 +559,23 @@ export default function GroupShopContent() {
     setIsSubmitting(false);
 
     if (!result.ok) {
-      showError(result.error ?? 'Nie udało się usunąć produktu.');
+      showError(result.error ?? DELETE_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
-    showSuccess('Produkt został usunięty ze sklepu.');
+    showSuccess(PRODUCT_DELETE_SUCCESS__TEXTLABEL[LANGUAGE]);
     closeModal();
   }, [activeModal, closeModal, deleteItem, showError, showSuccess]);
 
   const handleToggleShopOpen = useCallback(async () => {
     const result = await toggleShopOpen();
     if (!result.ok) {
-      showError(result.error ?? 'Nie udało się zmienić statusu sklepu.');
+      showError(result.error ?? ACCESS_CHANGE_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
-    showSuccess(isShopOpen ? 'Sklep został zamknięty.' : 'Sklep został otwarty.');
+    showSuccess(isShopOpen
+      ? SHOP_CLOSE_SUCCESS__TEXTLABEL[LANGUAGE]
+      : SHOP_OPEN_SUCCESS__TEXTLABEL[LANGUAGE]);
   }, [isShopOpen, showError, showSuccess, toggleShopOpen]);
 
   const modalItem = activeModal?.type === 'delete'
@@ -356,10 +589,10 @@ export default function GroupShopContent() {
         <SearchBar
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj produktu…"
+          placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
           name="shop-search"
           className="group-shop__search"
-          aria-label="Szukaj produktu po nazwie lub opisie"
+          aria-label={SEARCH_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
         />
       </div>
       <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
@@ -374,7 +607,7 @@ export default function GroupShopContent() {
                   onClick={handleRefreshShop}
                   disabled={isRefreshingShop}
                 >
-                  Odśwież sklep
+                  {REFRESH_BUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
                 <Button
                   type="button"
@@ -382,7 +615,7 @@ export default function GroupShopContent() {
                   size="md"
                   onClick={() => setActiveModal({ type: 'categories' })}
                 >
-                  Kategorie
+                  {CATEGORIES_BUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
                 <Button
                   type="button"
@@ -390,7 +623,7 @@ export default function GroupShopContent() {
                   size="md"
                   onClick={() => setActiveModal({ type: 'itemForm', itemId: null })}
                 >
-                  Dodaj produkt
+                  {ADD_PRODUCT_BUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
               </>
             ) : null}
@@ -429,7 +662,7 @@ export default function GroupShopContent() {
       {filtersExpanded ? (
         <CatalogFiltersPanel>
           <CatalogFilterGroup
-            ariaLabel="Filtr kategorii produktu"
+            ariaLabel={FILTER_CATEGORY_LABEL__TEXTLABEL[LANGUAGE]}
             filters={categoryFilters}
             activeId={categoryFilter}
             onSelect={setCategoryFilter}
@@ -469,12 +702,12 @@ export default function GroupShopContent() {
 
         <div className="group-shop__catalog-surface">
           {isLoading ? (
-            <p className="group-shop__empty page-unavailable__notice" role="status">Ładowanie produktów sklepu…</p>
+            <p className="group-shop__empty page-unavailable__notice" role="status">{STATUS_LOADING__TEXTLABEL[LANGUAGE]}</p>
           ) : catalogItems.length === 0 ? (
             <p className="group-shop__empty page-unavailable__notice" role="status">
               {isStudentView
-                ? 'Sklep jest pusty — prowadzący nie dodał jeszcze żadnych produktów.'
-                : 'W sklepie nie ma jeszcze żadnych produktów.'}
+                ? EMPTY_SHOP_STUDENT__TEXTLABEL[LANGUAGE]
+                : EMPTY_SHOP_LECTURER__TEXTLABEL[LANGUAGE]}
               {isLecturerView ? (
                 <>
                   {' '}
@@ -483,14 +716,14 @@ export default function GroupShopContent() {
                     className="group-shop__empty-link"
                     onClick={() => setActiveModal({ type: 'itemForm', itemId: null })}
                   >
-                    Dodaj pierwszy produkt
+                    {ADD_FIRST_PRODUCT__TEXTLABEL[LANGUAGE]}
                   </button>
                 </>
               ) : null}
             </p>
           ) : visibleItems.length === 0 ? (
             <p className="group-shop__empty page-unavailable__notice" role="status">
-              Brak produktów spełniających wybrane filtry.
+              {NO_FILTER_RESULTS__TEXTLABEL[LANGUAGE]}
             </p>
           ) : (
             <>
@@ -527,7 +760,7 @@ export default function GroupShopContent() {
                   totalPages={pagination.totalPages}
                   page={pagination.page}
                   onPageChange={setPage}
-                  ariaLabel="Nawigacja stron listy produktów"
+                  ariaLabel={PAGINATION_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
                   className="group-shop__pagination"
                 />
               ) : null}
@@ -579,11 +812,11 @@ export default function GroupShopContent() {
 
   if (isStudentView) {
     return (
-      <section className="group-shop-page group-shop-page--student" aria-label="Sklep grupy">
+      <section className="group-shop-page group-shop-page--student" aria-label={SHOP_SECTION_LABEL__TEXTLABEL[LANGUAGE]}>
         <div className="group-shop-page__title-row">
           <header className="group-shop-page__page-header">
-            <p className="group-main-subpage__eyebrow">Targowisko</p>
-            <h1 className="group-main-subpage__title">Sklep</h1>
+            <p className="group-main-subpage__eyebrow">{SHOP_EYEBROW__TEXTLABEL[LANGUAGE]}</p>
+            <h1 className="group-main-subpage__title">{SHOP_TITLE_STUDENT__TEXTLABEL[LANGUAGE]}</h1>
           </header>
         </div>
 
@@ -601,7 +834,7 @@ export default function GroupShopContent() {
   return (
     <SectionPageLayout
       className="page-unavailable group-shop-page"
-      title="Sklep"
+      title={SECTION_TITLE__TEXTLABEL[LANGUAGE]}
       toolbar={toolbar}
     >
       {shopBody}

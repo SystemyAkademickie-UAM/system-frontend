@@ -10,6 +10,7 @@ import {
   Divider,
   SearchBar,
 } from '../../../components/ui/index.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import BadgeTreasuryCard from './BadgeTreasuryCard.jsx';
 import {
   filterTreasuryBadges,
@@ -25,19 +26,81 @@ import '../group-main/shared/groupMainSubpageHeader.css';
 import '../group-main/GroupMainHomeContent.css';
 import './GroupMainBadgesContent.css';
 
-const RARITY_FILTERS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
-  { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
-  { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
-  { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
-];
+const LOADINGTREASURY__TEXTLABEL = {
+  polish: 'Ładowanie skarbca odznak…',
+  english: 'Loading badge treasury…'
+};
 
-const UNLOCK_FILTERS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: 'earned', label: 'Odblokowane' },
-  { id: 'unearned', label: 'Zablokowane' },
-];
+const BADGETREASURYSEARCH__TEXTLABEL = {
+  polish: {
+    placeholder: 'Szukaj odznaki…',
+    label: 'Szukaj odznaki po nazwie'
+  },
+  english: {
+    placeholder: 'Search badges…',
+    label: 'Search badges by name'
+  }
+};
+
+const RARITYFILTERARIA__TEXTLABEL = {
+  polish: 'Filtr rzadkości',
+  english: 'Rarity filter'
+};
+
+const UNLOCKFILTERARIA__TEXTLABEL = {
+  polish: 'Filtr odblokowania',
+  english: 'Unlock filter'
+};
+
+const EMPTYFILTERMESSAGE__TEXTLABEL = {
+  polish: 'Brak odznak spełniających wybrane filtry.',
+  english: 'No badges match the selected filters.'
+};
+
+const SECTIONARIA__TEXTLABEL = {
+  polish: 'Skarbiec odznak',
+  english: 'Badge Treasury'
+};
+
+const EYEBROW__TEXTLABEL = {
+  polish: 'Skarbiec',
+  english: 'Treasury'
+};
+
+const TITLE__TEXTLABEL = {
+  polish: 'Odznaki',
+  english: 'Badges'
+};
+
+const RARITY_FILTERS__TEXTLABEL = {
+  polish: [
+    { id: 'all', label: 'Wszystkie' },
+    { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
+    { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
+    { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
+    { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
+  ],
+  english: [
+    { id: 'all', label: 'All' },
+    { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
+    { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
+    { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
+    { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
+  ],
+};
+
+const UNLOCK_FILTERS__TEXTLABEL = {
+  polish: [
+    { id: 'all', label: 'Wszystkie' },
+    { id: 'earned', label: 'Odblokowane' },
+    { id: 'unearned', label: 'Zablokowane' },
+  ],
+  english: [
+    { id: 'all', label: 'All' },
+    { id: 'earned', label: 'Unlocked' },
+    { id: 'unearned', label: 'Locked' },
+  ],
+};
 
 /**
  * @param {Object} props
@@ -64,6 +127,7 @@ export default function GroupMainBadgesContent({
   onDeleteBadge,
   onAssignBadge,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
   const {
     badges,
@@ -102,7 +166,7 @@ export default function GroupMainBadgesContent({
   }, [badges, searchQuery, rarityFilter, unlockFilter, sortBy, isStudentView]);
 
   if (isLoading) {
-    return <p className="badge-treasury__message" role="status">Ładowanie skarbca odznak…</p>;
+    return <p className="badge-treasury__message" role="status">{LOADINGTREASURY__TEXTLABEL[LANGUAGE]}</p>;
   }
 
   if (error) {
@@ -117,13 +181,13 @@ export default function GroupMainBadgesContent({
   const showStudentFiltersPanel = showStudentToolbar && filtersExpanded;
 
   return (
-    <section className="badge-treasury" aria-label="Skarbiec odznak">
+    <section className="badge-treasury" aria-label={SECTIONARIA__TEXTLABEL[LANGUAGE]}>
       {!embedded ? (
         <>
           <div className="badge-treasury__title-row">
             <header className="badge-treasury__page-header">
-              <p className="badge-treasury__eyebrow">Skarbiec</p>
-              <h1 className="badge-treasury__title">Odznaki</h1>
+              <p className="badge-treasury__eyebrow">{EYEBROW__TEXTLABEL[LANGUAGE]}</p>
+              <h1 className="badge-treasury__title">{TITLE__TEXTLABEL[LANGUAGE]}</h1>
             </header>
           </div>
           <Divider className="group-main-subpage__divider" />
@@ -136,10 +200,10 @@ export default function GroupMainBadgesContent({
             <SearchBar
               value={internalSearchQuery}
               onChange={(event) => setInternalSearchQuery(event.target.value)}
-              placeholder="Szukaj odznaki…"
+              placeholder={BADGETREASURYSEARCH__TEXTLABEL[LANGUAGE].placeholder}
               name="badge-treasury-search"
               className="group-shop__search badge-treasury__search"
-              aria-label="Szukaj odznaki po nazwie"
+              aria-label={BADGETREASURYSEARCH__TEXTLABEL[LANGUAGE].label}
             />
           </div>
           <div className="maq-section-page__toolbar-end badge-treasury__toolbar-end">
@@ -156,8 +220,8 @@ export default function GroupMainBadgesContent({
           <div className="badge-treasury__filters-layout">
             <div className="badge-treasury__filter-group-wrap badge-treasury__filter-group-wrap--rarity">
               <CatalogFilterGroup
-                ariaLabel="Filtr rzadkości"
-                filters={RARITY_FILTERS}
+                ariaLabel={RARITYFILTERARIA__TEXTLABEL[LANGUAGE]}
+                filters={RARITY_FILTERS__TEXTLABEL[LANGUAGE]}
                 activeId={rarityFilter}
                 onSelect={setRarityFilter}
               />
@@ -170,8 +234,8 @@ export default function GroupMainBadgesContent({
 
             <div className="badge-treasury__filter-group-wrap badge-treasury__filter-group-wrap--unlock">
               <CatalogFilterGroup
-                ariaLabel="Filtr odblokowania"
-                filters={UNLOCK_FILTERS}
+                ariaLabel={UNLOCKFILTERARIA__TEXTLABEL[LANGUAGE]}
+                filters={UNLOCK_FILTERS__TEXTLABEL[LANGUAGE]}
                 activeId={unlockFilter}
                 onSelect={setUnlockFilter}
               />
@@ -195,7 +259,7 @@ export default function GroupMainBadgesContent({
           linkTo={emptyLink.linkTo}
         />
       ) : visibleBadges.length === 0 ? (
-        <p className="badge-treasury__empty">Brak odznak spełniających wybrane filtry.</p>
+        <p className="badge-treasury__empty">{EMPTYFILTERMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : (
         <div className="badge-treasury__grid">
           {visibleBadges.map((badge) => (
@@ -206,6 +270,7 @@ export default function GroupMainBadgesContent({
               excludeAccountId={isStudentView ? studentAccountId : null}
               isStudentView={isStudentView}
               showLecturerActions={showLecturerActions}
+              LANGUAGE={LANGUAGE}
               onEdit={onEditBadge ? () => onEditBadge(badge) : undefined}
               onDelete={onDeleteBadge ? () => onDeleteBadge(badge) : undefined}
               onAssign={onAssignBadge ? () => onAssignBadge(badge) : undefined}

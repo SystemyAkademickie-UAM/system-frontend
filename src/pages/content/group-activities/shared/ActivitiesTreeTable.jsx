@@ -174,7 +174,7 @@ function StageIsland({
                       </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--truncate">
                         <span className="activities-island__cell-text" title={activity.description0}>
-                          {activity.description0 || '—'}
+                          <em>{activity.description0 || '—'}</em>
                         </span>
                       </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--truncate">

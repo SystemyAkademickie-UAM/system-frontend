@@ -10,12 +10,69 @@ import TemplateListingCard from '../../../components/ui/TemplateListingCard/Temp
 import CreateGroupFromTemplateModal from './CreateGroupFromTemplateModal.jsx';
 import { resolveTemplateCreatorDisplay } from './templateCreatorDisplay.js';
 import { useTemplatesPage } from './useTemplatesPage.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './TemplatesPageLayout.css';
 
-const GALLERY_FILTERS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: 'favorites', label: 'Ulubione' },
-];
+const GALLERY_FILTER_OPTIONS__TEXTLABEL = {
+  polish: [
+    { id: 'all', label: 'Wszystkie' },
+    { id: 'favorites', label: 'Ulubione' }
+  ],
+  english: [
+    { id: 'all', label: 'All' },
+    { id: 'favorites', label: 'Favorites' }
+  ]
+};
+
+const FAVORITE_UPDATE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się zaktualizować ulubionych',
+  english: 'Failed to update favorites'
+};
+
+const FAVORITE_ADDED_SUCCESS__TEXTLABEL = {
+  polish: 'Szablon dodany do ulubionych',
+  english: 'Template added to favorites'
+};
+
+const NO_SEARCH_RESULTS__TEXTLABEL = {
+  polish: 'Nie znaleziono szablonów pasujących do wyszukiwania.',
+  english: 'No templates matching the search.'
+};
+
+const NO_FAVORITES__TEXTLABEL = {
+  polish: 'Brak ulubionych szablonów w galerii.',
+  english: 'No favorite templates in the gallery.'
+};
+
+const NO_PUBLIC_TEMPLATES__TEXTLABEL = {
+  polish: 'Brak publicznych szablonów w galerii.',
+  english: 'No public templates in the gallery.'
+};
+
+const GALLERY_FILTER_ARIA__TEXTLABEL = {
+  polish: 'Filtr galerii szablonów',
+  english: 'Template gallery filter'
+};
+
+const GALLERY_SEARCH_PLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj po nazwie lub prowadzącym…',
+  english: 'Search by name or instructor…'
+};
+
+const GALLERY_SEARCH_ARIA__TEXTLABEL = {
+  polish: 'Szukaj szablonów po nazwie, ksywce lub imieniu i nazwisku prowadzącego',
+  english: 'Search templates by name, nickname or instructor first and last name'
+};
+
+const GALLERY_LOADING__TEXTLABEL = {
+  polish: 'Ładowanie galerii…',
+  english: 'Loading gallery…'
+};
+
+const GALLERY_PAGINATION_ARIA__TEXTLABEL = {
+  polish: 'Paginacja galerii szablonów',
+  english: 'Template gallery pagination'
+};
 
 export default function TemplatesGalleryContent() {
   const [listFilter, setListFilter] = useState('all');
@@ -34,6 +91,7 @@ export default function TemplatesGalleryContent() {
     getTemplateCardProps,
   } = useTemplatesPage('public', { favoritesOnly });
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const creatorLabelsById = useMemo(() => {
@@ -50,27 +108,27 @@ export default function TemplatesGalleryContent() {
     const result = await toggleFavorite(templateId);
 
     if (!result.ok) {
-      showError(result.error ?? 'Nie udało się zaktualizować ulubionych');
+      showError(result.error ?? FAVORITE_UPDATE_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
     if (!wasFavorite) {
-      showSuccess('Szablon dodany do ulubionych');
+      showSuccess(FAVORITE_ADDED_SUCCESS__TEXTLABEL[LANGUAGE]);
     }
   }, [templates, showError, showSuccess, toggleFavorite]);
 
   const emptyMessage = searchQuery.trim()
-    ? 'Nie znaleziono szablonów pasujących do wyszukiwania.'
+    ? NO_SEARCH_RESULTS__TEXTLABEL[LANGUAGE]
     : favoritesOnly
-      ? 'Brak ulubionych szablonów w galerii.'
-      : 'Brak publicznych szablonów w galerii.';
+      ? NO_FAVORITES__TEXTLABEL[LANGUAGE]
+      : NO_PUBLIC_TEMPLATES__TEXTLABEL[LANGUAGE];
 
   return (
     <div className="templates-page-content">
       <div className="templates-page-content__controls">
         <CatalogFilterGroup
-          ariaLabel="Filtr galerii szablonów"
-          filters={GALLERY_FILTERS}
+          ariaLabel={GALLERY_FILTER_ARIA__TEXTLABEL[LANGUAGE]}
+          filters={GALLERY_FILTER_OPTIONS__TEXTLABEL[LANGUAGE]}
           activeId={listFilter}
           onSelect={setListFilter}
         />
@@ -78,8 +136,8 @@ export default function TemplatesGalleryContent() {
           className="templates-page-content__search"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj po nazwie lub prowadzącym…"
-          aria-label="Szukaj szablonów po nazwie, ksywce lub imieniu i nazwisku prowadzącego"
+          placeholder={GALLERY_SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
+          aria-label={GALLERY_SEARCH_ARIA__TEXTLABEL[LANGUAGE]}
         />
       </div>
 
@@ -90,7 +148,7 @@ export default function TemplatesGalleryContent() {
       ) : null}
 
       {isLoading ? (
-        <p className="templates-page-content__message" aria-live="polite">Ładowanie galerii…</p>
+        <p className="templates-page-content__message" aria-live="polite">{GALLERY_LOADING__TEXTLABEL[LANGUAGE]}</p>
       ) : totalTemplates === 0 ? (
         <p className="templates-page-content__message" aria-live="polite">{emptyMessage}</p>
       ) : (
@@ -124,7 +182,7 @@ export default function TemplatesGalleryContent() {
             totalPages={totalPages}
             page={page}
             onPageChange={setPage}
-            ariaLabel="Paginacja galerii szablonów"
+            ariaLabel={GALLERY_PAGINATION_ARIA__TEXTLABEL[LANGUAGE]}
           />
         </>
       )}

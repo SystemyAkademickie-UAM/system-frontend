@@ -7,6 +7,7 @@ import {
   deleteGroupItemCategory,
   updateGroupItemCategory,
 } from '../../../../services/itemCategories.api.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import './ShopCategoriesModal.css';
 
 const EMPTY_FORM = {
@@ -14,15 +15,86 @@ const EMPTY_FORM = {
   color: '#42f37d',
 };
 
-/**
- * @param {{
- *   isOpen: boolean,
- *   groupId: string | number,
- *   categories: import('../../../services/itemCategories.api.js').ItemCategory[],
- *   onClose: () => void,
- *   onChanged?: () => void,
- * }} props
- */
+const CATEGORIES_MODAL_TITLE__TEXTLABEL = {
+  polish: 'Kategorie przedmiotów',
+  english: 'Item Categories'
+};
+
+const EDIT_BUTTON__TEXTLABEL = {
+  polish: 'Edytuj',
+  english: 'Edit'
+};
+
+const DELETE_BUTTON__TEXTLABEL = {
+  polish: 'Usuń',
+  english: 'Delete'
+};
+
+const NO_CATEGORIES__TEXTLABEL = {
+  polish: 'Brak kategorii w tej grupie.',
+  english: 'No categories in this group.'
+};
+
+const DELETE_CONFIRM_TEXT__TEXTLABEL = {
+  polish: 'Czy na pewno chcesz usunąć kategorię "{name}"?',
+  english: 'Are you sure you want to delete category "{name}"?'
+};
+
+const CANCEL_BUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
+
+const DELETE_CATEGORY_BUTTON__TEXTLABEL = {
+  polish: 'Usuń kategorię',
+  english: 'Delete Category'
+};
+
+const NAME_FIELD_LABEL__TEXTLABEL = {
+  polish: 'Nazwa*',
+  english: 'Name*'
+};
+
+const COLOR_FIELD_LABEL__TEXTLABEL = {
+  polish: 'Kolor',
+  english: 'Color'
+};
+
+const SAVE_BUTTON__TEXTLABEL = {
+  polish: 'Zapisz',
+  english: 'Save'
+};
+
+const ADD_CATEGORY_BUTTON__TEXTLABEL = {
+  polish: 'Dodaj kategorię',
+  english: 'Add Category'
+};
+
+const SUCCESS_CREATE__TEXTLABEL = {
+  polish: 'Kategoria została utworzona.',
+  english: 'Category has been created.'
+};
+
+const SUCCESS_UPDATE__TEXTLABEL = {
+  polish: 'Kategoria została zaktualizowana.',
+  english: 'Category has been updated.'
+};
+
+const SUCCESS_DELETE__TEXTLABEL = {
+  polish: 'Kategoria została usunięta.',
+  english: 'Category has been deleted.'
+};
+
+const ERROR_SAVE__TEXTLABEL = {
+  polish: 'Nie udało się zapisać kategorii.',
+  english: 'Failed to save category.'
+};
+
+const ERROR_DELETE__TEXTLABEL = {
+  polish: 'Nie udało się usunąć kategorii.',
+  english: 'Failed to delete category.'
+};
+
 export default function ShopCategoriesModal({
   isOpen,
   groupId,
@@ -30,6 +102,7 @@ export default function ShopCategoriesModal({
   onClose,
   onChanged,
 }) {
+  const LANGUAGE = READLANGUAGECOOKIE;
   const { showSuccess, showError } = useToast();
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -79,15 +152,17 @@ export default function ShopCategoriesModal({
     setIsSubmitting(false);
 
     if (!result.ok) {
-      showError(result.error ?? 'Nie udało się zapisać kategorii.');
+      showError(ERROR_SAVE__TEXTLABEL[LANGUAGE]);
       return;
     }
 
-    showSuccess(editingId === 'new' ? 'Kategoria została utworzona.' : 'Kategoria została zaktualizowana.');
+    showSuccess(editingId === 'new'
+      ? SUCCESS_CREATE__TEXTLABEL[LANGUAGE]
+      : SUCCESS_UPDATE__TEXTLABEL[LANGUAGE]);
     setEditingId(null);
     setForm(EMPTY_FORM);
     onChanged?.();
-  }, [editingId, form.color, form.name, groupId, onChanged, showError, showSuccess]);
+  }, [editingId, form.color, form.name, groupId, onChanged, showError, showSuccess, LANGUAGE]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteTarget) {
@@ -99,20 +174,24 @@ export default function ShopCategoriesModal({
     setIsSubmitting(false);
 
     if (!result.ok) {
-      showError(result.error ?? 'Nie udało się usunąć kategorii.');
+      showError(ERROR_DELETE__TEXTLABEL[LANGUAGE]);
       return;
     }
 
-    showSuccess('Kategoria została usunięta.');
+    showSuccess(SUCCESS_DELETE__TEXTLABEL[LANGUAGE]);
     setDeleteTarget(null);
     onChanged?.();
-  }, [deleteTarget, groupId, onChanged, showError, showSuccess]);
+  }, [deleteTarget, groupId, onChanged, showError, showSuccess, LANGUAGE]);
+
+  const deleteConfirmText = deleteTarget
+    ? DELETE_CONFIRM_TEXT__TEXTLABEL[LANGUAGE].replace('{name}', deleteTarget.name)
+    : '';
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Kategorie przedmiotów"
+      title={CATEGORIES_MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       size="md"
       showFooter={false}
       className="shop-categories-modal"
@@ -129,7 +208,7 @@ export default function ShopCategoriesModal({
               <span className="shop-categories-modal__name">{category.name}</span>
               <div className="shop-categories-modal__actions">
                 <button type="button" className="shop-categories-modal__btn" onClick={() => startEdit(category)}>
-                  Edytuj
+                  {EDIT_BUTTON__TEXTLABEL[LANGUAGE]}
                 </button>
                 <button
                   type="button"
@@ -137,20 +216,20 @@ export default function ShopCategoriesModal({
                   onClick={() => setDeleteTarget(category)}
                   disabled={isSubmitting}
                 >
-                  Usuń
+                  {DELETE_BUTTON__TEXTLABEL[LANGUAGE]}
                 </button>
               </div>
             </li>
           ))}
           {categories.length === 0 ? (
-            <li className="shop-categories-modal__empty">Brak kategorii w tej grupie.</li>
+            <li className="shop-categories-modal__empty">{NO_CATEGORIES__TEXTLABEL[LANGUAGE]}</li>
           ) : null}
         </ul>
 
         {deleteTarget ? (
           <div className="shop-categories-modal__confirm" role="alertdialog" aria-labelledby="shop-category-delete-title">
             <p id="shop-category-delete-title" className="shop-categories-modal__confirm-text">
-              Czy na pewno chcesz usunąć kategorię „{deleteTarget.name}”?
+              {deleteConfirmText}
             </p>
             <div className="shop-categories-modal__confirm-actions">
               <button
@@ -159,7 +238,7 @@ export default function ShopCategoriesModal({
                 onClick={() => setDeleteTarget(null)}
                 disabled={isSubmitting}
               >
-                Anuluj
+                {CANCEL_BUTTON__TEXTLABEL[LANGUAGE]}
               </button>
               <button
                 type="button"
@@ -167,7 +246,7 @@ export default function ShopCategoriesModal({
                 onClick={handleDeleteConfirm}
                 disabled={isSubmitting}
               >
-                Usuń kategorię
+                {DELETE_CATEGORY_BUTTON__TEXTLABEL[LANGUAGE]}
               </button>
             </div>
           </div>
@@ -176,7 +255,7 @@ export default function ShopCategoriesModal({
         {editingId ? (
           <div className="shop-categories-modal__editor">
             <label className="shop-categories-modal__field">
-              <span>Nazwa*</span>
+              <span>{NAME_FIELD_LABEL__TEXTLABEL[LANGUAGE]}</span>
               <CharacterLimitedField value={form.name} maxLength={ITEM_CATEGORY_NAME_MAX_LENGTH}>
                 <input
                   type="text"
@@ -187,7 +266,7 @@ export default function ShopCategoriesModal({
               </CharacterLimitedField>
             </label>
             <label className="shop-categories-modal__field shop-categories-modal__field--color">
-              <span>Kolor</span>
+              <span>{COLOR_FIELD_LABEL__TEXTLABEL[LANGUAGE]}</span>
               <input
                 type="color"
                 value={form.color}
@@ -196,7 +275,7 @@ export default function ShopCategoriesModal({
             </label>
             <div className="shop-categories-modal__editor-actions">
               <button type="button" className="shop-categories-modal__btn" onClick={() => setEditingId(null)}>
-                Anuluj
+                {CANCEL_BUTTON__TEXTLABEL[LANGUAGE]}
               </button>
               <button
                 type="button"
@@ -204,13 +283,13 @@ export default function ShopCategoriesModal({
                 onClick={handleSave}
                 disabled={isSubmitting}
               >
-                Zapisz
+                {SAVE_BUTTON__TEXTLABEL[LANGUAGE]}
               </button>
             </div>
           </div>
         ) : (
           <button type="button" className="shop-categories-modal__add" onClick={startCreate}>
-            Dodaj kategorię
+            {ADD_CATEGORY_BUTTON__TEXTLABEL[LANGUAGE]}
           </button>
         )}
       </div>

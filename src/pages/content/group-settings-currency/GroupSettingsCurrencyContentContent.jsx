@@ -9,7 +9,58 @@ import { DEFAULT_CURRENCY_SYMBOL } from '../../../constants/currency.constants.j
 import { CURRENCY_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { invalidateGroupCurrency } from '../../../services/groupCurrencyEvents.js';
 import { fetchGroupCurrencyConfig, updateGroupCurrencyConfig } from '../../../services/groupCurrency.api.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import '../group-settings/GroupSettingsForm.css';
+
+const LOADERRORMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się pobrać ustawień waluty.',
+  english: 'Failed to load currency settings.'
+};
+
+const SAVEERRORMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zapisać ustawień waluty.',
+  english: 'Failed to save currency settings.'
+};
+
+const SUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Zmiany zostały zapisane.',
+  english: 'Changes have been saved.'
+};
+
+const PANELAriaLabel__TEXTLABEL = {
+  polish: 'Waluta grupy',
+  english: 'Group currency'
+};
+
+const SECTIONTITLE__TEXTLABEL = {
+  polish: 'Waluta',
+  english: 'Currency'
+};
+
+const LOADINGTEXT__TEXTLABEL = {
+  polish: 'Ładowanie ustawień waluty…',
+  english: 'Loading currency settings…'
+};
+
+const ICONFIELDLABEL__TEXTLABEL = {
+  polish: 'Ikona waluty',
+  english: 'Currency icon'
+};
+
+const ICONFIELDARIALABEL__TEXTLABEL = {
+  polish: 'Wybierz ikonę waluty',
+  english: 'Choose currency icon'
+};
+
+const NAMEFIELDLABEL__TEXTLABEL = {
+  polish: 'Nazwa waluty',
+  english: 'Currency name'
+};
+
+const SAVEBUTTON__TEXTLABEL = {
+  polish: 'Zapisz zmiany',
+  english: 'Save changes'
+};
 
 function buildSnapshot(currencyName, currencyIcon) {
   return {
@@ -19,6 +70,7 @@ function buildSnapshot(currencyName, currencyIcon) {
 }
 
 export default function GroupSettingsCurrencyContentContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
   const { showSuccess, showError } = useToast();
 
@@ -50,10 +102,10 @@ export default function GroupSettingsCurrencyContentContent() {
       if (result.ok && result.config) {
         applyConfig(result.config);
       } else {
-        throw new Error('Nie udało się pobrać ustawień waluty.');
+        throw new Error(LOADERRORMESSAGE__TEXTLABEL[LANGUAGE]);
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Nie udało się pobrać ustawień waluty.';
+      const message = error instanceof Error ? error.message : LOADERRORMESSAGE__TEXTLABEL[LANGUAGE];
       setErrorMessage(message);
       showError(message);
     } finally {
@@ -80,15 +132,15 @@ export default function GroupSettingsCurrencyContentContent() {
       });
 
       if (!result.ok || !result.config) {
-        throw new Error('Nie udało się zapisać ustawień waluty.');
+        throw new Error(SAVEERRORMESSAGE__TEXTLABEL[LANGUAGE]);
       }
 
       applyConfig(result.config);
       invalidateGroupCurrency(groupId);
-      showSuccess('Zmiany zostały zapisane.');
+      showSuccess(SUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
       return true;
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Nie udało się zapisać ustawień waluty.';
+      const message = error instanceof Error ? error.message : SAVEERRORMESSAGE__TEXTLABEL[LANGUAGE];
       setErrorMessage(message);
       showError(message);
       return false;
@@ -119,25 +171,25 @@ export default function GroupSettingsCurrencyContentContent() {
 
   return (
     <div className="group-settings-form group-settings-form--drive-layout group-settings-form--currency">
-      <section className="group-settings-form__panel" aria-label="Waluta grupy">
-        <SettingsSectionHeader title="Waluta" id="group-currency-title" />
+      <section className="group-settings-form__panel" aria-label={PANELAriaLabel__TEXTLABEL[LANGUAGE]}>
+        <SettingsSectionHeader title={SECTIONTITLE__TEXTLABEL[LANGUAGE]} id="group-currency-title" />
 
         {isLoading ? (
-          <p className="group-settings-form__hint">Ładowanie ustawień waluty…</p>
+          <p className="group-settings-form__hint">{LOADINGTEXT__TEXTLABEL[LANGUAGE]}</p>
         ) : (
           <div className="group-settings-form__stack">
             <EmojiPickerField
               className="group-settings-form__field"
-              label="Ikona waluty"
+              label={ICONFIELDLABEL__TEXTLABEL[LANGUAGE]}
               value={currencyIcon}
               defaultEmoji={DEFAULT_CURRENCY_SYMBOL}
               onChange={setCurrencyIcon}
-              ariaLabel="Wybierz ikonę waluty"
+              ariaLabel={ICONFIELDARIALABEL__TEXTLABEL[LANGUAGE]}
             />
 
             <div className="group-settings-form__field">
               <label className="group-settings-form__label" htmlFor="group-currency-name">
-                Nazwa waluty
+                {NAMEFIELDLABEL__TEXTLABEL[LANGUAGE]}
               </label>
               <CharacterLimitedField value={currencyName} maxLength={CURRENCY_LABEL_MAX_LENGTH}>
                 <input
@@ -167,7 +219,7 @@ export default function GroupSettingsCurrencyContentContent() {
           onClick={persistSettings}
           disabled={isSaving}
         >
-          Zapisz zmiany
+          {SAVEBUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       ) : null}
 

@@ -4,7 +4,53 @@ import { Button, Modal, TextField } from '../../../components/ui/index.js';
 import TemplateDetailPanel from '../../../components/ui/TemplateDetailPanel/TemplateDetailPanel.jsx';
 import { createGroupFromTemplate, fetchGroupTemplateDetails } from '../../../services/groupTemplates.api.js';
 import { groupMainPath } from '../../../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './CreateGroupFromTemplateModal.css';
+
+const MODAL_TITLE__TEXTLABEL = {
+  polish: 'Utwórz grupę ze szablonu',
+  english: 'Create group from template'
+};
+
+const LEAD_TEXT__TEXTLABEL = {
+  polish: 'Sprawdź zawartość szablonu i potwierdź utworzenie nowej grupy.',
+  english: 'Review the template content and confirm creating a new group.'
+};
+
+const GROUP_NAME_LABEL__TEXTLABEL = {
+  polish: 'Nazwa nowej grupy*',
+  english: 'New group name*'
+};
+
+const SUBJECT_NAME_LABEL__TEXTLABEL = {
+  polish: 'Przedmiot (opcjonalnie)',
+  english: 'Subject (optional)'
+};
+
+const GROUP_NAME_ERROR__TEXTLABEL = {
+  polish: 'Podaj nazwę nowej grupy.',
+  english: 'Enter the new group name.'
+};
+
+const CREATE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się utworzyć grupy.',
+  english: 'Failed to create group.'
+};
+
+const CANCEL_BUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
+
+const CREATING_BUTTON__TEXTLABEL = {
+  polish: 'Tworzenie…',
+  english: 'Creating…'
+};
+
+const CREATE_BUTTON__TEXTLABEL = {
+  polish: 'Utwórz grupę',
+  english: 'Create group'
+};
 
 /**
  * @param {Object} props
@@ -14,6 +60,7 @@ import './CreateGroupFromTemplateModal.css';
  */
 export default function CreateGroupFromTemplateModal({ isOpen, template, onClose }) {
   const navigate = useNavigate();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [details, setDetails] = useState(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [groupName, setGroupName] = useState('');
@@ -44,7 +91,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
   const handleConfirm = async () => {
     if (!template) return;
     if (!groupName.trim()) {
-      setErrorMessage('Podaj nazwę nowej grupy.');
+      setErrorMessage(GROUP_NAME_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -57,7 +104,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
     setIsSaving(false);
 
     if (!result.ok || !result.groupId) {
-      setErrorMessage(result.error || 'Nie udało się utworzyć grupy.');
+      setErrorMessage(result.error || CREATE_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -76,14 +123,14 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Utwórz grupę ze szablonu"
+      title={MODAL_TITLE__TEXTLABEL[LANGUAGE]}
       subtitle={template?.name}
       size="lg"
       showFooter={false}
       className="create-group-from-template-modal"
     >
       <p className="create-group-from-template-modal__lead">
-        Sprawdź zawartość szablonu i potwierdź utworzenie nowej grupy.
+        {LEAD_TEXT__TEXTLABEL[LANGUAGE]}
       </p>
 
       <TemplateDetailPanel
@@ -95,7 +142,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
       <div className="create-group-from-template-modal__form">
         <TextField
           id="new-group-name"
-          label="Nazwa nowej grupy*"
+          label={GROUP_NAME_LABEL__TEXTLABEL[LANGUAGE]}
           value={groupName}
           onChange={(event) => setGroupName(event.target.value)}
           fieldKind="name"
@@ -103,7 +150,7 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
         />
         <TextField
           id="new-group-subject"
-          label="Przedmiot (opcjonalnie)"
+          label={SUBJECT_NAME_LABEL__TEXTLABEL[LANGUAGE]}
           value={subjectName}
           onChange={(event) => setSubjectName(event.target.value)}
           fieldKind="name"
@@ -116,10 +163,10 @@ export default function CreateGroupFromTemplateModal({ isOpen, template, onClose
 
       <div className="create-group-from-template-modal__footer">
         <Button type="button" variant="secondary" onClick={onClose} disabled={isSaving}>
-          Anuluj
+          {CANCEL_BUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
         <Button type="button" variant="primary" onClick={handleConfirm} disabled={isSaving || isLoadingDetails}>
-          {isSaving ? 'Tworzenie…' : 'Utwórz grupę'}
+          {isSaving ? CREATING_BUTTON__TEXTLABEL[LANGUAGE] : CREATE_BUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       </div>
     </Modal>

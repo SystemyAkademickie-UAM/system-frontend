@@ -1,5 +1,6 @@
 import { BADGE_RARITY } from '../../../components/ui/Badge/badgeRarity.js';
 import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 /** Kolejność rzadkości od najniższej do najwyższej. */
 export const BADGE_RARITY_ORDER = {
@@ -20,25 +21,82 @@ export const TREASURY_SORT = {
   rewardAsc: 'reward-asc',
 };
 
-export const LECTURER_SORT_OPTIONS = [
-  { id: TREASURY_SORT.qualityDesc, label: 'Rzadkość (od najwyższej)' },
-  { id: TREASURY_SORT.qualityAsc, label: 'Rzadkość (od najniższej)' },
-  { id: TREASURY_SORT.nameAsc, label: 'Nazwa A–Z' },
-  { id: TREASURY_SORT.nameDesc, label: 'Nazwa Z–A' },
-  { id: TREASURY_SORT.rewardDesc, label: 'Nagroda malejąco' },
-  { id: TREASURY_SORT.rewardAsc, label: 'Nagroda rosnąco' },
-];
+const SORTQUALITYDESC__TEXTLABEL = {
+  polish: 'Rzadkość (od najwyższej)',
+  english: 'Quality (highest first)'
+};
 
-export const STUDENT_SORT_OPTIONS = [
-  { id: TREASURY_SORT.unlockFirst, label: 'Odblokowane → zablokowane' },
-  { id: TREASURY_SORT.lockedFirst, label: 'Zablokowane → odblokowane' },
-  { id: TREASURY_SORT.qualityDesc, label: 'Rzadkość (od najwyższej)' },
-  { id: TREASURY_SORT.qualityAsc, label: 'Rzadkość (od najniższej)' },
-  { id: TREASURY_SORT.nameAsc, label: 'Nazwa A–Z' },
-  { id: TREASURY_SORT.nameDesc, label: 'Nazwa Z–A' },
-  { id: TREASURY_SORT.rewardDesc, label: 'Nagroda malejąco' },
-  { id: TREASURY_SORT.rewardAsc, label: 'Nagroda rosnąco' },
-];
+const SORTQUALITYASC__TEXTLABEL = {
+  polish: 'Rzadkość (od najniższej)',
+  english: 'Quality (lowest first)'
+};
+
+const SORTNAMEASC__TEXTLABEL = {
+  polish: 'Nazwa A–Z',
+  english: 'Name A–Z'
+};
+
+const SORTNAMEDESC__TEXTLABEL = {
+  polish: 'Nazwa Z–A',
+  english: 'Name Z–A'
+};
+
+const SORTREWARDDESC__TEXTLABEL = {
+  polish: 'Nagroda malejąco',
+  english: 'Reward descending'
+};
+
+const SORTREWARDASC__TEXTLABEL = {
+  polish: 'Nagroda rosnąco',
+  english: 'Reward ascending'
+};
+
+const SORTUNLOCKFIRST__TEXTLABEL = {
+  polish: 'Odblokowane → zablokowane',
+  english: 'Unlocked → locked'
+};
+
+const SORTLOCKEDFIRST__TEXTLABEL = {
+  polish: 'Zablokowane → odblokowane',
+  english: 'Locked → unlocked'
+};
+
+/**
+ * @param {string} [language]
+ * @returns {Array<{id: string, label: string}>}
+ */
+export function getLecturerSortOptions(language) {
+  const lang = language ?? READLANGUAGECOOKIE();
+  return [
+    { id: TREASURY_SORT.qualityDesc, label: lang === 'polish' ? SORTQUALITYDESC__TEXTLABEL.polish : SORTQUALITYDESC__TEXTLABEL.english },
+    { id: TREASURY_SORT.qualityAsc, label: lang === 'polish' ? SORTQUALITYASC__TEXTLABEL.polish : SORTQUALITYASC__TEXTLABEL.english },
+    { id: TREASURY_SORT.nameAsc, label: lang === 'polish' ? SORTNAMEASC__TEXTLABEL.polish : SORTNAMEASC__TEXTLABEL.english },
+    { id: TREASURY_SORT.nameDesc, label: lang === 'polish' ? SORTNAMEDESC__TEXTLABEL.polish : SORTNAMEDESC__TEXTLABEL.english },
+    { id: TREASURY_SORT.rewardDesc, label: lang === 'polish' ? SORTREWARDDESC__TEXTLABEL.polish : SORTREWARDDESC__TEXTLABEL.english },
+    { id: TREASURY_SORT.rewardAsc, label: lang === 'polish' ? SORTREWARDASC__TEXTLABEL.polish : SORTREWARDASC__TEXTLABEL.english },
+  ];
+}
+
+/**
+ * @param {string} [language]
+ * @returns {Array<{id: string, label: string}>}
+ */
+export function getStudentSortOptions(language) {
+  const lang = language ?? READLANGUAGECOOKIE();
+  return [
+    { id: TREASURY_SORT.unlockFirst, label: lang === 'polish' ? SORTUNLOCKFIRST__TEXTLABEL.polish : SORTUNLOCKFIRST__TEXTLABEL.english },
+    { id: TREASURY_SORT.lockedFirst, label: lang === 'polish' ? SORTLOCKEDFIRST__TEXTLABEL.polish : SORTLOCKEDFIRST__TEXTLABEL.english },
+    { id: TREASURY_SORT.qualityDesc, label: lang === 'polish' ? SORTQUALITYDESC__TEXTLABEL.polish : SORTQUALITYDESC__TEXTLABEL.english },
+    { id: TREASURY_SORT.qualityAsc, label: lang === 'polish' ? SORTQUALITYASC__TEXTLABEL.polish : SORTQUALITYASC__TEXTLABEL.english },
+    { id: TREASURY_SORT.nameAsc, label: lang === 'polish' ? SORTNAMEASC__TEXTLABEL.polish : SORTNAMEASC__TEXTLABEL.english },
+    { id: TREASURY_SORT.nameDesc, label: lang === 'polish' ? SORTNAMEDESC__TEXTLABEL.polish : SORTNAMEDESC__TEXTLABEL.english },
+    { id: TREASURY_SORT.rewardDesc, label: lang === 'polish' ? SORTREWARDDESC__TEXTLABEL.polish : SORTREWARDDESC__TEXTLABEL.english },
+    { id: TREASURY_SORT.rewardAsc, label: lang === 'polish' ? SORTREWARDASC__TEXTLABEL.polish : SORTREWARDASC__TEXTLABEL.english },
+  ];
+}
+
+export const LECTURER_SORT_OPTIONS = getLecturerSortOptions();
+export const STUDENT_SORT_OPTIONS = getStudentSortOptions();
 
 /**
  * @typedef {Object} TreasuryBadge

@@ -3,11 +3,22 @@ import { createPortal } from 'react-dom';
 import CurrencyDisplay from '../../../components/ui/Currency/CurrencyDisplay.jsx';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
 import { positionAnchoredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './BadgeEarnersBar.css';
 
 const DEFAULT_MAX_VISIBLE = 15;
 
-function OverflowBadge({ hiddenStudents }) {
+const OVERFLOWARIA__TEXTLABEL = {
+  polish: 'dodatkowych uczestników',
+  english: 'additional participants'
+};
+
+const OVERFLOWTITLE__TEXTLABEL = {
+  polish: 'Pozostali uczestnicy',
+  english: 'Other participants'
+};
+
+function OverflowBadge({ hiddenStudents, LANGUAGE }) {
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -51,7 +62,7 @@ function OverflowBadge({ hiddenStudents }) {
         ref={triggerRef}
         type="button"
         className="badge-earners-bar__overflow"
-        aria-label={`${hiddenStudents.length} dodatkowych uczestników`}
+        aria-label={`${hiddenStudents.length} ${OVERFLOWARIA__TEXTLABEL[LANGUAGE]}`}
         onMouseEnter={() => setVisible(true)}
         onMouseLeave={() => setVisible(false)}
         onFocus={() => setVisible(true)}
@@ -72,7 +83,7 @@ function OverflowBadge({ hiddenStudents }) {
             }}
             role="tooltip"
           >
-            <p className="badge-earners-bar__overflow-title">Pozostali uczestnicy</p>
+            <p className="badge-earners-bar__overflow-title">{OVERFLOWTITLE__TEXTLABEL[LANGUAGE]}</p>
             <ul className="badge-earners-bar__overflow-list">
               {hiddenStudents.map((student) => (
                 <li key={student.id}>
@@ -93,17 +104,23 @@ function OverflowBadge({ hiddenStudents }) {
   );
 }
 
+const BARIARIA__TEXTLABEL = {
+  polish: 'uczestników z tą odznaką',
+  english: 'participants with this badge'
+};
+
 /**
- * Awatary studentów, którzy zdobyli odznakę.
- *
- * @param {Object} props
- * @param {import('./badgeTreasuryModel.js').TreasuryStudent[]} props.students
- * @param {number} [props.maxVisible]
- */
-export default function BadgeEarnersBar({
+  * Awatary studentów, którzy zdobyli odznakę.
+  *
+  * @param {Object} props
+  * @param {import('./badgeTreasuryModel.js').TreasuryStudent[]} props.students
+  * @param {number} [props.maxVisible]
+  */
+  export default function BadgeEarnersBar({
   students,
   maxVisible = DEFAULT_MAX_VISIBLE,
   className = '',
+  LANGUAGE,
 }) {
   if (!students.length) {
     return <div className={['badge-earners-bar', 'badge-earners-bar--empty', className].filter(Boolean).join(' ')} aria-hidden="true" />;
@@ -115,7 +132,7 @@ export default function BadgeEarnersBar({
   return (
     <div
       className={['badge-earners-bar', className].filter(Boolean).join(' ')}
-      aria-label={`${students.length} uczestników z tą odznaką`}
+      aria-label={`${students.length} ${BARIARIA__TEXTLABEL[LANGUAGE]}`}
     >
       {visibleStudents.map((student) => (
         <PlayerAvatar
@@ -128,7 +145,7 @@ export default function BadgeEarnersBar({
         />
       ))}
       {hiddenStudents.length > 0 ? (
-        <OverflowBadge hiddenStudents={hiddenStudents} />
+        <OverflowBadge hiddenStudents={hiddenStudents} LANGUAGE={LANGUAGE} />
       ) : null}
     </div>
   );

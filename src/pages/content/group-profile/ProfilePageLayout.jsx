@@ -8,12 +8,48 @@ import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { mapRankDiscountValue } from '../group-main-ranks/rankPathModel.js';
 import { ProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
 import { useGroupStudentProfile } from './useGroupStudentProfile.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ProfilePageLayout.css';
 
-function ProfileCurrencyStat({ amount }) {
+const CURRENCY_LABEL__TEXTLABEL = {
+  polish: 'Zdobyta waluta',
+  english: 'Earned currency'
+};
+
+const LOADING_MESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie profilu…',
+  english: 'Loading profile…'
+};
+
+const EYEBROW_LABEL__TEXTLABEL = {
+  polish: 'Profil',
+  english: 'Profile'
+};
+
+const DEFAULT_STUDENT_NAME__TEXTLABEL = {
+  polish: 'Student',
+  english: 'Student'
+};
+
+const NO_RANK_TEXT__TEXTLABEL = {
+  polish: 'Brak rangi',
+  english: 'No rank'
+};
+
+const BADGES_COUNT_LABEL__TEXTLABEL = {
+  polish: 'Zdobyte odznaki',
+  english: 'Earned badges'
+};
+
+const SHOP_DISCOUNT_LABEL__TEXTLABEL = {
+  polish: 'Zniżka w sklepie',
+  english: 'Shop discount'
+};
+
+function ProfileCurrencyStat({ amount, LANGUAGE }) {
   return (
     <div className="profile-page-layout__stat-line">
-      <span className="profile-page-layout__stat-label">Zdobyta waluta</span>
+      <span className="profile-page-layout__stat-label">{CURRENCY_LABEL__TEXTLABEL[LANGUAGE]}</span>
       <CurrencyDisplay amount={amount} size="sm" className="profile-page-layout__stat-value" />
     </div>
   );
@@ -30,6 +66,7 @@ function ProfileStatLine({ label, value }) {
 
 export default function ProfilePageLayout({ children }) {
   const nav = useGroupSubNav('group-profile');
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const profileState = useGroupStudentProfile();
   const { groupId, profile, isLoading, error, refetch, studentId } = profileState;
   const { profile: userProfile, avatarUrl: userAvatarUrl } = useUserProfile();
@@ -72,19 +109,19 @@ export default function ProfilePageLayout({ children }) {
 
   const nickname = (profile?.nickname || userProfile?.nickname || '').trim();
   const legalName = [profile?.name, profile?.surname].filter(Boolean).join(' ').trim();
-  const displayName = nickname || legalName || 'Student';
+  const displayName = nickname || legalName || DEFAULT_STUDENT_NAME__TEXTLABEL[LANGUAGE];
   const avatarUrl = profile?.avatarUrl || userAvatarUrl;
 
   return (
     <ProfileStudentProfileContext.Provider value={profileState}>
       <section className="profile-page profile-page-layout" aria-label={nav.sectionTitle}>
-        {isLoading ? <p className="profile-page-layout__message">Ładowanie profilu…</p> : null}
+        {isLoading ? <p className="profile-page-layout__message">{LOADING_MESSAGE__TEXTLABEL[LANGUAGE]}</p> : null}
         {error ? <p className="profile-page-layout__error" role="alert">{error}</p> : null}
 
         {profile ? (
           <>
             <header className="profile-page-layout__header">
-              <p className="profile-page-layout__eyebrow">Profil</p>
+              <p className="profile-page-layout__eyebrow">{EYEBROW_LABEL__TEXTLABEL[LANGUAGE]}</p>
               <h1 className="profile-page-layout__title">{displayName}</h1>
             </header>
 
@@ -101,15 +138,15 @@ export default function ProfilePageLayout({ children }) {
                 ) : (
                   <div className="profile-page-layout__avatar profile-page-layout__avatar--placeholder" />
                 )}
-                <p className="profile-page-layout__rank-caption">{profile.rankName || 'Brak rangi'}</p>
+                <p className="profile-page-layout__rank-caption">{profile.rankName || NO_RANK_TEXT__TEXTLABEL[LANGUAGE]}</p>
               </div>
 
               <Divider orientation="vertical" className="profile-page-layout__summary-divider" />
 
               <div className="profile-page-layout__stats-column">
-                <ProfileCurrencyStat amount={profile.totalEarned} />
-                <ProfileStatLine label="Zdobyte odznaki" value={formatProfileNumber(profile.badgesCount)} />
-                <ProfileStatLine label="Zniżka w sklepie" value={`${shopDiscountPercent}%`} />
+                <ProfileCurrencyStat amount={profile.totalEarned} LANGUAGE={LANGUAGE} />
+                <ProfileStatLine label={BADGES_COUNT_LABEL__TEXTLABEL[LANGUAGE]} value={formatProfileNumber(profile.badgesCount)} />
+                <ProfileStatLine label={SHOP_DISCOUNT_LABEL__TEXTLABEL[LANGUAGE]} value={`${shopDiscountPercent}%`} />
               </div>
             </div>
 
