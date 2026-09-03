@@ -28,9 +28,11 @@ import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategori
 import {
   SHOP_SORT,
   getShopSortOptions,
+  sortShopItems,
 } from '../../../utils/shop/shopModel.js';
 import { getVisibilityStatusLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
-import { filterCatalogShopItems } from '../../../utils/shop/extraLifeItem.js';
+import { filterCatalogShopItems, resolveExtraLifeItemIcon, sortShopItemsWithExtraLifeFirst } from '../../../utils/shop/extraLifeItem.js';
+import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
 import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import RewardsShopItemTableRow from '../group-rewards/shared/RewardsShopItemTableRow.jsx';
 import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
@@ -221,13 +223,14 @@ function formatLimitValue(value, language) {
  * @param {Map<string, any>} categoriesById
  * @param {string} language
  */
-function mapShopItemToRow(item, index, categoriesById, language) {
+function mapShopItemToRow(item, index, categoriesById, language, livesSymbol) {
   const categoryLabels = resolveShopCategoryLabels(item.categories, categoriesById);
   return {
     ...item,
     position: index + 1,
     categoryLabel: categoryLabels.join(', ') || '—',
     stockLabel: formatLimitValue(item.stockQuantity, language),
+    livesSymbol: livesSymbol,
     studentLimitLabel: formatLimitValue(item.perStudentLimit, language),
   };
 }
@@ -290,15 +293,26 @@ function getShopItemColumns(language) {
       label: COLUMNICON__TEXTLABEL[language],
       sort: 'text',
       width: '80px',
-      render: (item) => (
-        item.imageRef ? (
-          <span className="rewards-table__icon-emoji" aria-hidden="true">
-            {String(item.imageRef).split('*')[0]}
-          </span>
-        ) : (
+      render: (item) => {
+        if (item.isExtraLife) {
+          const { emoji } = resolveExtraLifeItemIcon(item.livesSymbol);
+          return (
+            <span className="rewards-table__icon-emoji" aria-hidden="true">
+              {emoji}
+            </span>
+          );
+        }
+        if (item.imageRef) {
+          return (
+            <span className="rewards-table__icon-emoji" aria-hidden="true">
+              {String(item.imageRef).split('*')[0]}
+            </span>
+          );
+        }
+        return (
           <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
-        )
-      ),
+        );
+      },
     },
     {
       key: 'priceAmount',
@@ -410,11 +424,14 @@ export default function RewardsShopItemsContent() {
     [categories, LANGUAGE],
   );
 
-  const catalogItems = useMemo(
-    () => filterCatalogShopItems(items, showExtraLifeProduct)
-      .map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE)),
-    [items, categoriesById, showExtraLifeProduct, LANGUAGE],
-  );
+  const { symbol: livesSymbol } = useGroupLives();
+
+  const catalogItems = useMemo(() => {
+    const filtered = filterCatalogShopItems(items, showExtraLifeProduct);
+    const sorted = sortShopItems(filtered, sortBy);
+    const withExtraLifeFirst = sortShopItemsWithExtraLifeFirst(sorted);
+    return withExtraLifeFirst.map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE, livesSymbol));
+  }, [items, categoriesById, showExtraLifeProduct, LANGUAGE, livesSymbol, sortBy]);
 
   const columns = useMemo(
     () => getShopItemColumns(LANGUAGE),
@@ -671,6 +688,7 @@ export default function RewardsShopItemsContent() {
             onSortByChange={setSortBy}
             onEdit={handleEdit}
             onDelete={openDeleteModal}
+            onDoubleClick={handleEdit}
           />
         </>
       ) : (
@@ -696,6 +714,7 @@ export default function RewardsShopItemsContent() {
           }}
           rowActions={rowActions}
           renderRow={RewardsShopItemTableRow}
+          onRowDoubleClick={(item) => openEditModal(item)}
         />
       )}
 

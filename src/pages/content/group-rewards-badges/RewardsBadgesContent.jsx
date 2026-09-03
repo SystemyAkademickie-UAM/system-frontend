@@ -576,6 +576,7 @@ export default function RewardsBadgesContent() {
           }}
           rowActions={rowActions}
           renderRow={RewardsBadgeTableRow}
+          onRowDoubleClick={(badge) => openModal('edit', badge)}
         />
       )}
 

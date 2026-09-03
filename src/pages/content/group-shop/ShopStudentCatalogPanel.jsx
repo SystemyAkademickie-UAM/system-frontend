@@ -65,6 +65,8 @@ export default function ShopStudentCatalogPanel({
   onSortByChange,
   onEdit,
   onDelete,
+  onDoubleClick,
+  
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { items, isLoading, error } = useGroupShopItems(groupId);
@@ -156,6 +158,7 @@ export default function ShopStudentCatalogPanel({
                 hideActions={showLecturerActions}
                 onEdit={() => onEdit?.(item)}
                 onDelete={() => onDelete?.(item)}
+                onDoubleClick={() => onDoubleClick(item)}
                 isExtraLife={item.isExtraLife}
                 disabled={cardsDisabled || item.isLocked}
                 isRankLocked={!showLecturerActions && item.isLocked}

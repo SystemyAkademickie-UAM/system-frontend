@@ -18,6 +18,7 @@ export default function SmartPostCard({
   textClassName = '',
   titleTag = 'h3',
   trailing = null,
+  onDoubleClick = null,
   emptyTitle = 'Bez tytułu',
   emptyText = 'Brak treści.',
 }) {
@@ -36,7 +37,7 @@ export default function SmartPostCard({
       className={['smart-post-card', surfaceClassName].filter(Boolean).join(' ')}
       style={cardWidth ? { width: `${cardWidth}px`, maxWidth: '100%' } : { maxWidth: '100%' }}
     >
-      <article ref={innerRef} className={innerClassName}>
+      <article ref={innerRef} className={innerClassName} onDoubleClick={onDoubleClick}>
         <div className={['smart-post-card__body', bodyClassName].filter(Boolean).join(' ')}>
           <TitleWithDivider
             title={displayTitle}

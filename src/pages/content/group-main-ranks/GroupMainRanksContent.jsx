@@ -57,6 +57,7 @@ export default function GroupMainRanksContent({
   onEditRank,
   onDeleteRank,
   onAssignRank,
+  onRankDoubleClick,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
@@ -138,6 +139,7 @@ export default function GroupMainRanksContent({
           onEditRank={onEditRank}
           onDeleteRank={onDeleteRank}
           onAssignRank={onAssignRank}
+          onRankDoubleClick={onRankDoubleClick}
         />
       )}
     </section>

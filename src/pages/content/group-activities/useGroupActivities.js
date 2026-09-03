@@ -205,7 +205,7 @@ export function useGroupActivities() {
       setError(message);
       showError(message);
       setIsLoading(false);
-
+      return [];
     }
   }, [groupId, fetchActivitiesForStage, showError]);
 
@@ -306,28 +306,19 @@ export function useGroupActivities() {
 
   const deleteStage = useCallback(async (stageId) => {
     try {
-      var activities = await fetchActivitiesForStage(stageId);
-      var i = 0;
-      while (i < activities.length) {
-        await postJson('/activities', {
-          method: 'remove',
-          activityId: activities[i].id,
-        });
-        i = i + 1;
-      }
       await postJson('/stages', {
         method: 'remove',
-        stageId: stageId,
+        stageId,
       });
-      await fetchStages();
       showSuccess(STAGEDELETED__TEXTLABEL[LANGUAGE]);
+      await fetchStages();
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       showError(message);
       return { ok: false, error: message };
     }
-  }, [fetchStages, fetchActivitiesForStage, showSuccess, showError]);
+  }, [fetchStages, showSuccess, showError]);
 
   const copyStage = useCallback(async (stageId, cloneName) => {
     const sourceStage = stages.find((stage) => stage.id === stageId);
@@ -352,16 +343,18 @@ export function useGroupActivities() {
 
       const newStageId = data?.stage;
       if (typeof newStageId === 'number' && newStageId > 0) {
-        await Promise.all(
-          sourceStage.activities.map((activity) => postJson('/activities', {
+        var i = 0;
+        while (i < sourceStage.activities.length) {
+          await postJson('/activities', {
             method: 'post',
             stageId: newStageId,
-            name: activity.name,
-            currency: activity.reward,
-            educationalDescription: activity.description1,
-            storyDescription: activity.description0,
-          })),
-        );
+            name: sourceStage.activities[i].name,
+            currency: sourceStage.activities[i].reward,
+            educationalDescription: sourceStage.activities[i].description1,
+            storyDescription: sourceStage.activities[i].description0,
+          });
+          i = i + 1;
+        }
 
         const orderedStageIds = [newStageId, ...stages.map((stage) => stage.id)];
         await postJson('/stages', {

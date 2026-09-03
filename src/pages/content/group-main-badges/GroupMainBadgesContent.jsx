@@ -274,6 +274,7 @@ export default function GroupMainBadgesContent({
               onEdit={onEditBadge ? () => onEditBadge(badge) : undefined}
               onDelete={onDeleteBadge ? () => onDeleteBadge(badge) : undefined}
               onAssign={onAssignBadge ? () => onAssignBadge(badge) : undefined}
+              onDoubleClick={onEditBadge ? () => onEditBadge(badge) : undefined}
             />
           ))}
         </div>

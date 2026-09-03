@@ -256,6 +256,8 @@ export default function ProductCard({
 
   isExtraLife = false,
 
+  onDoubleClick = null,
+
 }) {
 
   const { symbol: livesSymbol } = useGroupLives();
@@ -280,7 +282,7 @@ export default function ProductCard({
 
   const showCartButton = !hideAddToCart && !hideActions && !isInventory;
 
-  const showFooter = isInventory || !hideActions || isPreview;
+  const showFooter = isInventory || !hideActions || isPreview || (priceAmount != null);
 
   const resolvedCategories = categoryDetails.length > 0
     ? categoryDetails
@@ -323,6 +325,8 @@ export default function ProductCard({
 
       style={cardStyle}
       title={isRankLocked ? lockedReason : undefined}
+      onDoubleClick={() => onDoubleClick() }
+
 
     >
 

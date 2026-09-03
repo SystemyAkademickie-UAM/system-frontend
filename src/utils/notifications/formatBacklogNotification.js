@@ -9,6 +9,7 @@ import {
   groupStudentBadgesPath,
   groupStudentPostsPath,
   groupStudentRanksPath,
+  groupStudentProfilePath,
 } from '../../routes/pathRegistry.js';
 
 /**
@@ -420,6 +421,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         href = groupStudentPostsPath(groupId);
         break;
       case 'LIVES_SYSTEM_CHANGED':
+        href = groupMainPath(groupId);
       case 'LIVES_CHANGED':
         href = `${groupMainPath(groupId)}#group-notifications`;
         break;
@@ -447,7 +449,19 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         break;
       case 'SHOP_ITEM_ADDED':
       case 'SHOP_PURCHASE':
+        if (item.accountId) {
+          href = groupStudentProfilePath(groupId, item.accountId);
+        } else {
+          href = groupShopPath(groupId);
+        }
+        break;
       case 'ITEM_USED':
+        if (item.accountId) {
+          href = groupStudentProfilePath(groupId, item.accountId);
+        } else {
+          href = groupShopPath(groupId);
+        }
+        break;
       case 'SHOP_STATUS_CHANGED':
         href = groupShopPath(groupId);
         break;
@@ -458,8 +472,11 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
       case 'CURRENCY_ADDED':
         href = groupMembersPath(groupId);
         break;
+      case 'LIVES_SYSTEM_CHANGED':
+        href = groupMainPath(groupId);
+        break;
       default:
-        href = null;
+        href = `${groupMainPath(groupId)}#group-notifications`;
     }
   }
 
