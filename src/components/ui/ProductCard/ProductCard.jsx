@@ -15,6 +15,7 @@ import { resolveExtraLifeItemIcon } from '../../../utils/shop/extraLifeItem.js';
 import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
 import { getProductCardColorVars } from '../../../utils/shop/shopCategoryColors.js';
 import { getShopCatalogPriceHint, getShopItemPriceDisplay } from '../../../utils/shop/shopPricing.js';
+import { getTileVisibilityLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
 
 import './ProductCard.css';
 import './lecturerTileActions.css';
@@ -258,9 +259,13 @@ export default function ProductCard({
 
   onDoubleClick = null,
 
+  isPublished,
+
 }) {
 
   const { symbol: livesSymbol } = useGroupLives();
+
+  const showLecturerTile = showLecturerActions && isPublished !== undefined;
 
   const icon = useMemo(
 
@@ -365,6 +370,19 @@ export default function ProductCard({
           </div>
 
 
+
+          {showLecturerTile ? (
+            <span
+              className={[
+                'maq-product-card__visibility',
+                isPublished
+                  ? 'maq-product-card__visibility--public'
+                  : 'maq-product-card__visibility--hidden',
+              ].join(' ')}
+            >
+              {getTileVisibilityLabel(isPublished, 'item')}
+            </span>
+          ) : null}
 
           {showLecturerActions ? (
 
@@ -598,4 +616,5 @@ export default function ProductCard({
   );
 
 }
+
 

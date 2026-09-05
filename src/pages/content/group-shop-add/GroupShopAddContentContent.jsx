@@ -114,6 +114,16 @@ const BADGEDISCOUNTTOOLTIP__TEXTLABEL = {
   english: "Entering '%' in the value makes the discount percentage-based."
 };
 
+const PUBLISHLABEL__TEXTLABEL = {
+  polish: 'Opublikuj w sklepie',
+  english: 'Publish in shop'
+};
+
+const PUBLISHTOOLTIP__TEXTLABEL = {
+  polish: 'Opublikowane w sklepie przedmioty mogą zostać zakupione przez studentów.',
+  english: 'Items published in the shop can be purchased by students.'
+};
+
 const SELECTBADGE__TEXTLABEL = {
   polish: 'Wybierz odznakę',
   english: 'Select Badge'
@@ -273,6 +283,8 @@ export default function ShopItemFormContent({
   const [grouplimitenabled, setGrouplimitenabled] = useState(0);
   const [studentlimit, setStudentlimit] = useState('');
   const [studentlimitenabled, setStudentlimitenabled] = useState(0);
+
+  const [ispublished, setIspublished] = useState(0);
 
   const [categories, setCategories] = useState([]);
   const editFormHydratedRef = useRef(null);
@@ -1166,6 +1178,12 @@ export default function ShopItemFormContent({
       items.perStudentLimit = null;
     }
 
+    if (ispublished == 1) {
+      items.isPublished = true;
+    } else if (editingItemId) {
+      items.isPublished = false;
+    }
+
     const badgePromotions = [];
     i = 0;
     while (i < badgediscounts.length) {
@@ -1356,6 +1374,12 @@ export default function ShopItemFormContent({
       } else {
         setStudentlimitenabled(0);
         setStudentlimit('');
+      }
+
+      if (item.isPublished === true) {
+        setIspublished(1);
+      } else {
+        setIspublished(0);
       }
 
       const selectedCategoryIds = new Set((item.categories ?? []).map((categoryId) => String(categoryId)));
@@ -1637,6 +1661,29 @@ export default function ShopItemFormContent({
                 />
               </div>
             </div>
+          </section>
+
+          <Divider />
+
+          <section className="shop-item-form__panel">
+            <label className="shop-item-form__limit-toggle" htmlFor="shop-item-published-toggle">
+              <input
+                id="shop-item-published-toggle"
+                type="checkbox"
+                checked={ispublished === 1}
+                onChange={() => {
+                  if (ispublished === 0) {
+                    setIspublished(1);
+                  } else {
+                    setIspublished(0);
+                  }
+                }}
+              />
+              <span>
+                {PUBLISHLABEL__TEXTLABEL[LANGUAGE]}
+                <InfoTooltip text={PUBLISHTOOLTIP__TEXTLABEL[LANGUAGE]} />
+              </span>
+            </label>
           </section>
 
           <Divider />

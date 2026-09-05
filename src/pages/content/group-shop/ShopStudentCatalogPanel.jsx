@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import {
   CatalogFilterGroup,
   CatalogFiltersPanel,
@@ -160,6 +161,7 @@ export default function ShopStudentCatalogPanel({
                 onDelete={() => onDelete?.(item)}
                 onDoubleClick={() => onDoubleClick(item)}
                 isExtraLife={item.isExtraLife}
+                isPublished={item.isPublished}
                 disabled={cardsDisabled || item.isLocked}
                 isRankLocked={!showLecturerActions && item.isLocked}
                 className="group-shop__card"

@@ -65,13 +65,13 @@ const TILEHIDDENBADGE__TEXTLABEL = {
 };
 
 const TILEVISIBLEITEM__TEXTLABEL = {
-  polish: 'Odkryty',
-  english: 'Unlocked'
+  polish: 'Publiczny',
+  english: 'Public'
 };
 
 const TILEHIDDENITEM__TEXTLABEL = {
   polish: 'Ukryty',
-  english: 'Locked'
+  english: 'Hidden'
 };
 
 export function getTileVisibilityLabel(isPublished, entity = 'item', language) {

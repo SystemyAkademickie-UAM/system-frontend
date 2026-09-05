@@ -550,11 +550,12 @@ export default function RewardsShopItemsContent() {
           ? TOGGLEALLVISIBLE__TEXTLABEL[LANGUAGE]
           : TOGGLEALLHIDDEN__TEXTLABEL[LANGUAGE],
       );
+      await refetch();
       return;
     }
 
     showError(result.error || TOGGLEALLERRORMESSAGE__TEXTLABEL[LANGUAGE]);
-  }, [bulkVisibilityItems, showError, showSuccess, toggleAllPublished, LANGUAGE]);
+  }, [bulkVisibilityItems, showError, showSuccess, toggleAllPublished, refetch, LANGUAGE]);
 
   const rowActions = useMemo(() => ({
     onDelete: openDeleteModal,
