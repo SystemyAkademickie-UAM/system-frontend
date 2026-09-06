@@ -418,6 +418,7 @@ export default function RewardsShopItemsContent() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [sortBy, setSortBy] = useState(SHOP_SORT.nameAsc);
   const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
+  const [value, setValue] = useState(0);
 
   const categoryFilters = useMemo(
     () => buildShopCategoryFilters(categories, LANGUAGE),
@@ -517,10 +518,13 @@ export default function RewardsShopItemsContent() {
       return;
     }
 
-    const result = await deleteItem(activeModal.item.id);
+    var result = await deleteItem(activeModal.item.id);
 
     if (result.ok) {
       showSuccess(DELETESUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
+      setValue(function(currentvalue) {
+        return currentvalue + 1;
+      });
       closeModal();
       return;
     }
@@ -678,6 +682,7 @@ export default function RewardsShopItemsContent() {
             </CatalogFiltersPanel>
           ) : null}
           <ShopStudentCatalogPanel
+            key={value}
             groupId={groupId}
             showLecturerActions
             onlyPublished={false}

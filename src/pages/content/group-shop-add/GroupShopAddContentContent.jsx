@@ -1178,10 +1178,12 @@ export default function ShopItemFormContent({
       items.perStudentLimit = null;
     }
 
-    if (ispublished == 1) {
-      items.isPublished = true;
-    } else if (editingItemId) {
-      items.isPublished = false;
+    if (editingItemId) {
+      if (ispublished == 1) {
+        items.isPublished = true;
+      } else {
+        items.isPublished = false;
+      }
     }
 
     const badgePromotions = [];
@@ -1255,8 +1257,18 @@ export default function ShopItemFormContent({
         return;
       }
 
-      const savedItemId = editingItemId ?? saveResult.item?.id ?? null;
-      if (savedItemId) {
+      let savedItemId = editingItemId ?? saveResult.item?.id ?? null;
+      
+      if (ispublished == 0) {
+        const publishResult = await updateGroupShopItem(groupId, saveResult.item.id, { isPublished: false });
+        if (!publishResult.ok) {
+          showError(saveResult.error ?? SAVEFAILED__TEXTLABEL[LANGUAGE]);
+          return;
+        }
+      }
+
+      const publishSavedItemId = editingItemId ?? saveResult.item?.id ?? null;
+      if (publishSavedItemId) {
         const rankRefs = ranks.map((rankEntry) => ({
           dbId: rankEntry.id,
           name: rankEntry.name,
@@ -1264,7 +1276,7 @@ export default function ShopItemFormContent({
         }));
         const rankResult = await syncShopItemRankUnlock(
           groupId,
-          String(savedItemId),
+          String(publishSavedItemId),
           unlockRankId === '' ? null : Number(unlockRankId),
           rankRefs,
         );

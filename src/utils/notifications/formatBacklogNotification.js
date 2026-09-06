@@ -177,6 +177,8 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
   const stageName = readString(payload.stageName);
   const postTitle = readString(payload.postTitle);
   const activityName = readString(payload.activityName);
+  const storyDescription = readString(payload.storyDescription);
+  const educationalDescription = readString(payload.educationalDescription);
 
   pushUnique(itemName);
   pushUnique(badgeName);
@@ -184,6 +186,8 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
   pushUnique(stageName);
   pushUnique(postTitle);
   pushUnique(activityName);
+  pushUnique(storyDescription);
+  pushUnique(educationalDescription);
 
   const price = resolvePrice(payload);
   if (price != null) {
