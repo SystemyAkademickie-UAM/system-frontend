@@ -13,6 +13,7 @@ import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategori
 import { useProfileInventory } from '../../../hooks/shop/useProfileInventory.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
 import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
+import ProfileEqHistory from './ProfileEqHistory.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
 
@@ -115,6 +116,7 @@ export default function ProfileEqContentContent({
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [usingItemId, setUsingItemId] = useState(null);
   const [confirmUseItem, setConfirmUseItem] = useState(null);
+  const [activeTab, setActiveTab] = useState('inventory');
 
   const {
     entries,
@@ -171,37 +173,57 @@ export default function ProfileEqContentContent({
     <div className="profile-eq-page">
       <header className="profile-eq-page__header">
         <h2 className="profile-eq-page__title">Ekwipunek</h2>
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+          <Button
+            type="button"
+            variant={activeTab === 'inventory' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setActiveTab('inventory')}
+          >
+            Posiadane przedmioty
+          </Button>
+          <Button
+            type="button"
+            variant={activeTab === 'history' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setActiveTab('history')}
+          >
+            Historia operacji
+          </Button>
+        </div>
       </header>
 
       {error ? (
         <p className="profile-eq-page__error" role="alert">{error}</p>
       ) : null}
 
-      <div className="maq-section-page__toolbar profile-eq-page__toolbar">
-        <div className="maq-section-page__toolbar-start profile-eq-page__counts">
-          <span className="activities-page__count">
-            Zakupione
-            {' '}
-            {totalPurchased}
-          </span>
-          <span className="activities-page__count">
-            Unikatowe
-            {' '}
-            {uniqueCount}
-          </span>
-        </div>
+      {activeTab === 'inventory' ? (
+        <>
+          <div className="maq-section-page__toolbar profile-eq-page__toolbar">
+            <div className="maq-section-page__toolbar-start profile-eq-page__counts">
+              <span className="activities-page__count">
+                Zakupione
+                {' '}
+                {totalPurchased}
+              </span>
+              <span className="activities-page__count">
+                Unikatowe
+                {' '}
+                {uniqueCount}
+              </span>
+            </div>
 
-        <div className="maq-section-page__toolbar-end">
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj przedmiotów…"
-            name="profile-eq-search"
-            className="profile-eq-page__search"
-            aria-label="Szukaj przedmiotów w ekwipunku"
-          />
-        </div>
-      </div>
+            <div className="maq-section-page__toolbar-end">
+              <SearchBar
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Szukaj przedmiotów…"
+                name="profile-eq-search"
+                className="profile-eq-page__search"
+                aria-label="Szukaj przedmiotów w ekwipunku"
+              />
+            </div>
+          </div>
 
       {categoryFilters.length > 1 ? (
         <>
@@ -266,6 +288,10 @@ export default function ProfileEqContentContent({
             );
           })}
         </div>
+      )}
+      </>
+      ) : (
+        <ProfileEqHistory groupId={groupId} studentAccountId={studentAccountId} />
       )}
 
       <ProfileEqUseItemModal
