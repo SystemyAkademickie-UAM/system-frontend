@@ -162,6 +162,22 @@ export async function fetchStudentInventory(groupId, accountId) {
   return { ok: true, entries: mapBackendInventory(result.data) };
 }
 
+export async function fetchStudentInventoryHistory(groupId, accountId) {
+  const result = await getJson(`/groups/${groupId}/students/${accountId}/inventory-history`);
+  if (!result.ok) {
+    return { ok: false, history: [], error: extractApiError(result.data) };
+  }
+  return { ok: true, history: result.data };
+}
+
+export async function fetchGroupInventoryHistory(groupId) {
+  const result = await getJson(`/groups/${groupId}/inventory-history`, { includeBrowserId: true });
+  if (!result.ok) {
+    return { ok: false, history: [], error: extractApiError(result.data) };
+  }
+  return { ok: true, history: result.data };
+}
+
 /**
  * @param {string | number} groupId
  * @param {string | number} itemId
