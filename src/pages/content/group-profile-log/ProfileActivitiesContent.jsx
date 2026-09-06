@@ -4,11 +4,17 @@ import { useProfileStudentProfileContext } from '../group-profile/ProfileStudent
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ProfileActivitiesSection.css';
 
-function formatCompletedAt(value) {
+const COMPLETED_AT_LOCALE = {
+  polish: 'pl-PL',
+  english: 'en-GB',
+};
+
+function formatCompletedAt(value, language) {
   if (!value) return '—';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleString('pl-PL');
+  const locale = COMPLETED_AT_LOCALE[language] ?? COMPLETED_AT_LOCALE.polish;
+  return date.toLocaleString(locale);
 }
 
 const ACTIVITIESTITLE__TEXTLABEL = {
@@ -32,10 +38,15 @@ const EMPTYMESSAGE__TEXTLABEL = {
   english: 'No completed activities in this group.',
 };
 
+const STAGELABEL__TEXTLABEL = {
+  polish: 'Etap',
+  english: 'Stage',
+};
+
 export default function ProfileActivitiesContent() {
   const { profile, isLoading } = useProfileStudentProfileContext();
   const [showAll, setShowAll] = useState(false);
-  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const LANGUAGE = READLANGUAGECOOKIE();
 
   const activities = profile?.completedActivities ?? [];
   const visibleActivities = useMemo(
@@ -72,13 +83,18 @@ export default function ProfileActivitiesContent() {
             <li key={activity.id} className="profile-activities-section__item">
               <div className="profile-activities-section__item-main">
                 <span className="profile-activities-section__item-name">{activity.name}</span>
+                {activity.stageName ? (
+                  <span className="profile-activities-section__item-stage">
+                    {STAGELABEL__TEXTLABEL[LANGUAGE]}: {activity.stageName}
+                  </span>
+                ) : null}
                 <span className="profile-activities-section__item-description">
                   {activity.educationalDescription || activity.storyDescription || '—'}
                 </span>
               </div>
               <div className="profile-activities-section__item-meta">
                 <CurrencyDisplay amount={activity.currency} size="sm" />
-                <span>{formatCompletedAt(activity.completedAt)}</span>
+                <span>{formatCompletedAt(activity.completedAt, LANGUAGE)}</span>
               </div>
             </li>
           ))}

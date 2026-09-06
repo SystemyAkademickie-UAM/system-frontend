@@ -65,6 +65,12 @@
   color: rgb(227, 224, 247);
 }
 
+.profile-activities-section__item-stage {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgb(66, 243, 125);
+}
+
 .profile-activities-section__item-description {
   color: rgb(187, 203, 185);
   font-size: 14px;

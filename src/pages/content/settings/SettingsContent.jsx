@@ -22,7 +22,8 @@ import '../group-members/MembersHomeContent.css';
 import '../group-settings/GroupSettingsForm.css';
 import './SettingsContent.css';
 
-const LANGUAGESDICTIONARY = { polish: 'polski', english: 'English' };
+const LANGUAGESDICTIONARY = { polish: 'Polish', english: 'English' };
+const LANGUAGE_SELECT_OPTIONS = [LANGUAGESDICTIONARY.polish, LANGUAGESDICTIONARY.english];
 
 const SETTINGSLABELTEXT = {
   polish: 'Ustawienia',
@@ -37,8 +38,8 @@ const AVATARLABELTEXT = {
   kana: 'アバタ'
 };
 const LANGUAGELABELTEXT = {
-  polish: 'Jezyk',
-  english: 'LANGUAGE',
+  polish: 'Język',
+  english: 'Language',
   japanese: '言語',
   kana: 'げんご'
 };
@@ -135,10 +136,10 @@ function resolveProfileSaveErrorMessage(error, language) {
 }
 
 function RESOLVELANGUAGECODE(displayLANGUAGE) {
-  if (displayLANGUAGE === 'polski') {
+  if (displayLANGUAGE === LANGUAGESDICTIONARY.polish || displayLANGUAGE === 'polski') {
     return 'polish';
   }
-  if (displayLANGUAGE === 'English') {
+  if (displayLANGUAGE === LANGUAGESDICTIONARY.english) {
     return 'english';
   }
   return 'english';
@@ -158,7 +159,7 @@ export default function SettingsContent() {
   const [avatars, setAvatars] = useState([]);
   const [selectedAvatarId, setSelectedAvatarId] = useState(null);
   const [savedSnapshot, setSavedSnapshot] = useState(null);
-  const [DIVLANGUAGE, SETDIVLANGUAGE] = useState('polski');
+  const [DIVLANGUAGE, SETDIVLANGUAGE] = useState(LANGUAGESDICTIONARY.polish);
   const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish');
 
   const loadSettings = useCallback(async () => {
@@ -332,11 +333,11 @@ export default function SettingsContent() {
     const COOKIELANGUAGE = READLANGUAGECOOKIE();
 
     if (COOKIELANGUAGE) {
-      SETDIVLANGUAGE(LANGUAGESDICTIONARY[COOKIELANGUAGE] || 'polski');
+      SETDIVLANGUAGE(LANGUAGESDICTIONARY[COOKIELANGUAGE] || LANGUAGESDICTIONARY.polish);
       SETLANGUAGE(COOKIELANGUAGE);
     } else {
       document.cookie = 'CURRENTLANGUAGE=polish;path=/';
-      SETDIVLANGUAGE('polski');
+      SETDIVLANGUAGE(LANGUAGESDICTIONARY.polish);
       SETLANGUAGE('polish');
     }
 
@@ -418,9 +419,9 @@ export default function SettingsContent() {
                   onChange={(event) => SETDIVLANGUAGE(event.target.value)}
                   disabled={isSaving}
                 >
-                  {['polski', 'English'].map((LANGUAGEchosen) => (
-                                      <option key={LANGUAGEchosen} value={LANGUAGEchosen}>{LANGUAGEchosen}</option>
-                                    ))}
+                  {LANGUAGE_SELECT_OPTIONS.map((languageOption) => (
+                    <option key={languageOption} value={languageOption}>{languageOption}</option>
+                  ))}
                 </select>
               </div>
             </section>

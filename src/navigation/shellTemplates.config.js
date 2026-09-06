@@ -97,6 +97,7 @@ export const HREF_BUILDERS = {
   COURSE_MANAGEMENT: () => paths.courseManagementPath(),
   STATISTICS: () => paths.statisticsPath(),
   ORG_MANAGEMENT: () => paths.organizationsPath(),
+  SYSTEM_LOGS: () => paths.superadminLogsPath(),
   TEMPLATES_MY: () => paths.templatesMyPath(),
   TEMPLATES_GALLERY: () => paths.templatesPath(),
 
@@ -568,6 +569,15 @@ const superadminView = {
       label: 'Statystyki',
       iconId: 'nav/stats',
       hrefKey: 'STATISTICS',
+      requiresGroup: false,
+    },
+    {
+      id: 'logi-produkcyjne',
+      enabled: true,
+      kind: 'navlink',
+      label: 'Logi produkcyjne',
+      iconId: 'nav/stats',
+      hrefKey: 'SYSTEM_LOGS',
       requiresGroup: false,
     },
   ],

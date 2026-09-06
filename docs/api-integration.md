@@ -66,6 +66,16 @@ Production helpers: `src/services/enrollment.api.js` (used by group members UI).
 
 Legacy **`POST /groups/generate-code`** and **`GET /groups/:groupId/access-code`** still exist on the API but are not used by the main UI; prefer enrollment-codes CRUD.
 
+## Production logs (superadmin)
+
+| Method / path | Role | Purpose |
+| ------------- | ---- | ------- |
+| `GET /admin/logs` | super | Dates that have live or archived files |
+| `POST /admin/logs/export` | super | Encrypted day (`clientPublicKey` + `day`); decrypt in the browser |
+| `POST /client-logs` | any session | Browser `error` / `warn` line (started from `main.jsx`) |
+
+UI: **`/system-logs`**. Decrypt helper: `src/utils/decryptProductionLogExport.js`.
+
 ## Dev API test workspace
 
 When **`NODE_ENV=development`** at build time, **`/dev/api-test`** exposes manual panels for login/logout, registration, groups, enrollment codes, and other endpoints. Login panel: **`POST /login`** and **`POST /logout`** only (no dev SAML bypass).

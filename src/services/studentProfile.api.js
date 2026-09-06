@@ -33,7 +33,7 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {string | null} livesIcon
  * @property {boolean} [shopOpen]
  * @property {GroupStudentProfileBadge[]} earnedBadges
- * @property {Array<{ id: number, name: string, storyDescription: string | null, educationalDescription: string | null, currency: number, completedAt: string | null }>} completedActivities
+ * @property {Array<{ id: number, name: string, stageId: number | null, stageName: string | null, storyDescription: string | null, educationalDescription: string | null, currency: number, completedAt: string | null }>} completedActivities
  */
 
 /**
