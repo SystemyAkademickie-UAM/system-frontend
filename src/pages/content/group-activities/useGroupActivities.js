@@ -4,6 +4,7 @@ import { STAGE_NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 async function postJson(path, body) {
   const base = getApiBaseUrl();
   const browserid = getOrCreateBrowserId();
@@ -40,25 +41,42 @@ const ACTIVITY_ERROR_IDS = {
   NOT_FOUND: -3,
 };
 
-function assertStageName(name) {
+const NAMEVALIDATION__TEXTLABEL = {
+  polish: 'Podaj nazwę etapu.',
+  english: 'Please provide a stage name.'
+};
+const NAMETOOLONG__TEXTLABEL = {
+  polish: 'Nazwa etapu może mieć maksymalnie',
+  english: 'Stage name can have maximum'
+};
+const CHARACTERS__TEXTLABEL = {
+  polish: 'znaków.',
+  english: 'characters.'
+};
+const NOAUTH__TEXTLABEL = {
+  polish: 'Brak uprawnień do wykonania tej operacji.',
+  english: 'No permission to perform this operation.'
+};
+
+function assertStageName(name, language) {
   const trimmed = name.trim();
   if (!trimmed) {
-    return { ok: false, message: 'Podaj nazwę etapu.' };
+    return { ok: false, message: NAMEVALIDATION__TEXTLABEL[language] };
   }
   if (trimmed.length > STAGE_NAME_MAX_LENGTH) {
     return {
       ok: false,
-      message: `Nazwa etapu może mieć maksymalnie ${STAGE_NAME_MAX_LENGTH} znaków.`,
+      message: `${NAMETOOLONG__TEXTLABEL[language]} ${STAGE_NAME_MAX_LENGTH} ${CHARACTERS__TEXTLABEL[language]}`,
     };
   }
   return { ok: true, value: trimmed };
 }
 
-function assertActivityResponse(data, failureMessage) {
+function assertActivityResponse(data, failureMessage, language) {
   const activityId = data?.activity;
   if (typeof activityId !== 'number' || activityId <= 0) {
     if (activityId === ACTIVITY_ERROR_IDS.NOT_AUTHORIZED) {
-      throw new Error('Brak uprawnień do wykonania tej operacji.');
+      throw new Error(NOAUTH__TEXTLABEL[language]);
     }
     throw new Error(failureMessage);
   }
@@ -77,7 +95,7 @@ function mapActivity(raw) {
 }
 
 function sortByNewestFirst(items) {
-  return [...items].sort((a, b) => b.id - a.id);
+  return [...items].sort((a, b) => a.id - b.id);
 }
 
 function mapStage(raw) {
@@ -93,6 +111,49 @@ function mapStage(raw) {
 export function useGroupActivities() {
   const { groupId } = useParams();
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+  const HTTPERROR__TEXTLABEL = {
+    polish: 'Błąd HTTP',
+    english: 'HTTP error'
+  };
+  const NOGROUPID__TEXTLABEL = {
+    polish: 'Brak ID grupy',
+    english: 'Group ID missing'
+  };
+  const STAGEADDED__TEXTLABEL = {
+    polish: 'Etap został dodany.',
+    english: 'Stage has been added.'
+  };
+  const STAGEUPDATED__TEXTLABEL = {
+    polish: 'Etap został zaktualizowany.',
+    english: 'Stage has been updated.'
+  };
+  const STAGEDELETED__TEXTLABEL = {
+    polish: 'Etap został usunięty.',
+    english: 'Stage has been deleted.'
+  };
+  const STAGECOPIED__TEXTLABEL = {
+    polish: 'Etap został skopiowany.',
+    english: 'Stage has been copied.'
+  };
+  const ACTIVITYADDED__TEXTLABEL = {
+    polish: 'Aktywność została dodana.',
+    english: 'Activity has been added.'
+  };
+  const ACTIVITYUPDATED__TEXTLABEL = {
+    polish: 'Aktywność została zaktualizowana.',
+    english: 'Activity has been updated.'
+  };
+  const ACTIVITYDELETEFAILED__TEXTLABEL = {
+    polish: 'Nie udało się usunąć aktywności.',
+    english: 'Failed to delete activity.'
+  };
+  const ACTIVITYDELETED__TEXTLABEL = {
+    polish: 'Aktywność została usunięta.',
+    english: 'Activity has been deleted.'
+  };
+
   const [stages, setStages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -116,7 +177,7 @@ export function useGroupActivities() {
 
   const fetchStages = useCallback(async () => {
     if (!groupId) {
-      setError('Brak ID grupy');
+      setError(NOGROUPID__TEXTLABEL[LANGUAGE]);
       setIsLoading(false);
       return;
     }
@@ -137,11 +198,14 @@ export function useGroupActivities() {
       await Promise.all(
         receivedStages.map((stage) => fetchActivitiesForStage(stage.id)),
       );
+
+      return receivedStages;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
       showError(message);
       setIsLoading(false);
+
     }
   }, [groupId, fetchActivitiesForStage, showError]);
 
@@ -157,8 +221,8 @@ export function useGroupActivities() {
     )));
   }, []);
 
-  const createStage = useCallback(async (name, { visibilityStatus = 1 } = {}) => {
-    const nameCheck = assertStageName(name);
+  const createStage = useCallback(async (name, { visibilityStatus = 0 } = {}) => {
+    const nameCheck = assertStageName(name, LANGUAGE);
     if (!nameCheck.ok) {
       showError(nameCheck.message);
       return { ok: false };
@@ -182,7 +246,7 @@ export function useGroupActivities() {
         });
       }
 
-      showSuccess('Etap został dodany.');
+      showSuccess(STAGEADDED__TEXTLABEL[LANGUAGE]);
       await fetchStages();
       return { ok: true };
     } catch (err) {
@@ -199,7 +263,7 @@ export function useGroupActivities() {
 
     let trimmed;
     if (values.name !== undefined) {
-      const nameCheck = assertStageName(values.name);
+      const nameCheck = assertStageName(values.name, LANGUAGE);
       if (!nameCheck.ok) {
         showError(nameCheck.message);
         return { ok: false };
@@ -231,7 +295,7 @@ export function useGroupActivities() {
           }
           : stage
       )));
-      showSuccess('Etap został zaktualizowany.');
+      showSuccess(STAGEUPDATED__TEXTLABEL[LANGUAGE]);
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -242,19 +306,28 @@ export function useGroupActivities() {
 
   const deleteStage = useCallback(async (stageId) => {
     try {
+      var activities = await fetchActivitiesForStage(stageId);
+      var i = 0;
+      while (i < activities.length) {
+        await postJson('/activities', {
+          method: 'remove',
+          activityId: activities[i].id,
+        });
+        i = i + 1;
+      }
       await postJson('/stages', {
         method: 'remove',
-        stageId,
+        stageId: stageId,
       });
-      showSuccess('Etap został usunięty.');
       await fetchStages();
+      showSuccess(STAGEDELETED__TEXTLABEL[LANGUAGE]);
       return { ok: true };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       showError(message);
       return { ok: false, error: message };
     }
-  }, [fetchStages, showSuccess, showError]);
+  }, [fetchStages, fetchActivitiesForStage, showSuccess, showError]);
 
   const copyStage = useCallback(async (stageId, cloneName) => {
     const sourceStage = stages.find((stage) => stage.id === stageId);
@@ -263,7 +336,7 @@ export function useGroupActivities() {
     }
 
     const trimmedName = cloneName?.trim() || sourceStage.name;
-    const nameCheck = assertStageName(trimmedName);
+    const nameCheck = assertStageName(trimmedName, LANGUAGE);
     if (!nameCheck.ok) {
       showError(nameCheck.message);
       return { ok: false };
@@ -298,7 +371,7 @@ export function useGroupActivities() {
         });
       }
 
-      showSuccess('Etap został skopiowany.');
+      showSuccess(STAGECOPIED__TEXTLABEL[LANGUAGE]);
       await fetchStages();
       return { ok: true };
     } catch (err) {
@@ -339,7 +412,7 @@ export function useGroupActivities() {
         educationalDescription: values.description1,
         storyDescription: values.description0,
       });
-      showSuccess('Aktywność została dodana.');
+      showSuccess(ACTIVITYADDED__TEXTLABEL[LANGUAGE]);
       await fetchActivitiesForStage(stageId);
       return { ok: true };
     } catch (err) {
@@ -359,7 +432,7 @@ export function useGroupActivities() {
         educationalDescription: values.description1,
         storyDescription: values.description0,
       });
-      showSuccess('Aktywność została zaktualizowana.');
+      showSuccess(ACTIVITYUPDATED__TEXTLABEL[LANGUAGE]);
       await fetchActivitiesForStage(stageId);
       return { ok: true };
     } catch (err) {
@@ -375,8 +448,8 @@ export function useGroupActivities() {
         method: 'remove',
         activityId,
       });
-      assertActivityResponse(data, 'Nie udało się usunąć aktywności.');
-      showSuccess('Aktywność została usunięta.');
+      assertActivityResponse(data, ACTIVITYDELETEFAILED__TEXTLABEL[LANGUAGE], LANGUAGE);
+      showSuccess(ACTIVITYDELETED__TEXTLABEL[LANGUAGE]);
       await fetchActivitiesForStage(stageId);
       return { ok: true };
     } catch (err) {

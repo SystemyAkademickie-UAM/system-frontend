@@ -1,6 +1,57 @@
 import { useEffect, useState } from 'react';
 import { Button, Modal, TextField } from '../../../components/ui/index.js';
 import { updateGroupTemplate } from '../../../services/groupTemplates.api.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+const EDIT_NAME_TITLE__TEXTLABEL = {
+  polish: 'Edytuj nazwę szablonu',
+  english: 'Edit template name'
+};
+
+const EDIT_DESCRIPTION_TITLE__TEXTLABEL = {
+  polish: 'Edytuj opis szablonu',
+  english: 'Edit template description'
+};
+
+const EDIT_BOTH_TITLE__TEXTLABEL = {
+  polish: 'Edytuj szablon',
+  english: 'Edit template'
+};
+
+const NAME_ERROR__TEXTLABEL = {
+  polish: 'Podaj nazwę szablonu.',
+  english: 'Enter the template name.'
+};
+
+const SAVE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się zapisać zmian.',
+  english: 'Failed to save changes.'
+};
+
+const NAME_LABEL__TEXTLABEL = {
+  polish: 'Nazwa szablonu',
+  english: 'Template name'
+};
+
+const DESCRIPTION_LABEL__TEXTLABEL = {
+  polish: 'Opis szablonu (opcjonalny)',
+  english: 'Template description (optional)'
+};
+
+const CANCEL_BUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
+
+const SAVING_BUTTON__TEXTLABEL = {
+  polish: 'Zapisywanie…',
+  english: 'Saving…'
+};
+
+const SAVE_BUTTON__TEXTLABEL = {
+  polish: 'Zapisz',
+  english: 'Save'
+};
 
 /**
  * @param {Object} props
@@ -17,6 +68,7 @@ export default function TemplateFieldEditModal({
   onClose,
   onSaved,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [nameValue, setNameValue] = useState('');
   const [descriptionValue, setDescriptionValue] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -36,16 +88,16 @@ export default function TemplateFieldEditModal({
   }, [isOpen, template, field]);
 
   const title = field === 'name'
-    ? 'Edytuj nazwę szablonu'
+    ? EDIT_NAME_TITLE__TEXTLABEL[LANGUAGE]
     : field === 'description'
-      ? 'Edytuj opis szablonu'
-      : 'Edytuj szablon';
+      ? EDIT_DESCRIPTION_TITLE__TEXTLABEL[LANGUAGE]
+      : EDIT_BOTH_TITLE__TEXTLABEL[LANGUAGE];
 
   const handleConfirm = async () => {
     if (!template) return;
     const trimmedName = nameValue.trim();
     if ((field === 'name' || field === 'both') && !trimmedName) {
-      setErrorMessage('Podaj nazwę szablonu.');
+      setErrorMessage(NAME_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -63,7 +115,7 @@ export default function TemplateFieldEditModal({
     setIsSaving(false);
 
     if (!result.ok) {
-      setErrorMessage(result.error || 'Nie udało się zapisać zmian.');
+      setErrorMessage(result.error || SAVE_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -82,7 +134,7 @@ export default function TemplateFieldEditModal({
       {(field === 'name' || field === 'both') ? (
         <TextField
           id="template-edit-name"
-          label="Nazwa szablonu"
+          label={NAME_LABEL__TEXTLABEL[LANGUAGE]}
           value={nameValue}
           onChange={(event) => setNameValue(event.target.value)}
           fieldKind="name"
@@ -93,7 +145,7 @@ export default function TemplateFieldEditModal({
       {(field === 'description' || field === 'both') ? (
         <TextField
           id="template-edit-description"
-          label="Opis szablonu (opcjonalny)"
+          label={DESCRIPTION_LABEL__TEXTLABEL[LANGUAGE]}
           value={descriptionValue}
           onChange={(event) => setDescriptionValue(event.target.value)}
           fieldKind="groupDescription"
@@ -109,10 +161,10 @@ export default function TemplateFieldEditModal({
 
       <div className="templates-page-content__modal-footer">
         <Button type="button" variant="secondary" onClick={onClose} disabled={isSaving}>
-          Anuluj
+          {CANCEL_BUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
         <Button type="button" variant="primary" onClick={handleConfirm} disabled={isSaving}>
-          {isSaving ? 'Zapisywanie…' : 'Zapisz'}
+          {isSaving ? SAVING_BUTTON__TEXTLABEL[LANGUAGE] : SAVE_BUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       </div>
     </Modal>

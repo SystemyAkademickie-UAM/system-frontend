@@ -63,7 +63,7 @@ const PUBLISH__TEXTLABEL = {
 const EMPTY_FORM = {
   title: '',
   text: '',
-  startHidden: false,
+  startHidden: true,
   schedulePublish: false,
   publishDate: '',
   publishTime: '',

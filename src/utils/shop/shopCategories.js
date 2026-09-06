@@ -1,12 +1,21 @@
 import { mixCategoryColors } from './shopCategoryColors.js';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+
+const ALLCATEGORY__TEXTLABEL = {
+  polish: 'Wszystkie',
+  english: 'All'
+};
 
 /**
  * Buduje filtry kategorii sklepu na podstawie danych z API.
  *
  * @param {import('../../services/itemCategories.api.js').ItemCategory[]} categories
+ * @param {string} [language]
  */
-export function buildShopCategoryFilters(categories = []) {  return [
-    { id: 'all', label: 'Wszystkie' },
+export function buildShopCategoryFilters(categories = [], language) {
+  const lang = language ?? READLANGUAGECOOKIE();
+  return [
+    { id: 'all', label: ALLCATEGORY__TEXTLABEL[lang] || 'All' },
     ...categories.map((category) => ({
       id: String(category.id),
       label: category.name,

@@ -7,6 +7,62 @@ import { DEFAULT_BADGE_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const MODALTITLEEDIT__TEXTLABEL = {
+  polish: 'Edytuj odznakę',
+  english: 'Edit Badge'
+};
+
+const MODALTITLECREATE__TEXTLABEL = {
+  polish: 'Dodaj odznakę',
+  english: 'Add Badge'
+};
+
+const NAMELABEL__TEXTLABEL = {
+  polish: 'Nazwa*',
+  english: 'Name*'
+};
+
+const REWARDLABEL__TEXTLABEL = {
+  polish: 'Nagroda*',
+  english: 'Reward*'
+};
+
+const ICONLABEL__TEXTLABEL = {
+  polish: 'Ikona',
+  english: 'Icon'
+};
+
+const ICONARIALABEL__TEXTLABEL = {
+  polish: 'Wybierz emoji odznaki',
+  english: 'Choose badge emoji'
+};
+
+const RARITYLABEL__TEXTLABEL = {
+  polish: 'Rzadkość',
+  english: 'Rarity'
+};
+
+const RARITYTOOLTIPTEXT__TEXTLABEL = {
+  polish: 'Wpływa na rzadkość odznaki w skarbcu.',
+  english: 'Affects badge rarity in the treasury.'
+};
+
+const STORYDESCRIPTIONLABEL__TEXTLABEL = {
+  polish: 'Opis fabularny*',
+  english: 'Story Description*'
+};
+
+const DIDACTICDESCRIPTIONLABEL__TEXTLABEL = {
+  polish: 'Opis dydaktyczny*',
+  english: 'Didactic Description*'
+};
+
+const HIDDENOPTIONTEXT__TEXTLABEL = {
+  polish: 'Ukryj odznakę (niewidoczna dla studentów)',
+  english: 'Hide badge (hidden from students)'
+};
 
 const EMPTY_FORM = {
   name: '',
@@ -55,6 +111,7 @@ export default function BadgeFormModal({
   onClose,
   onConfirm,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [form, setForm] = useState(EMPTY_FORM);
   const isEdit = Boolean(badge);
 
@@ -116,7 +173,7 @@ export default function BadgeFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edytuj odznakę' : 'Dodaj odznakę'}
+      title={isEdit ? MODALTITLEEDIT__TEXTLABEL[LANGUAGE] : MODALTITLECREATE__TEXTLABEL[LANGUAGE]}
       onConfirm={handleConfirm}
       confirmDisabled={!isValid}
       size="md"
@@ -126,7 +183,7 @@ export default function BadgeFormModal({
         <div className="rewards-modal__row rewards-modal__row--name-reward">
           <TextField
             id="badge-name"
-            label="Nazwa*"
+            label={NAMELABEL__TEXTLABEL[LANGUAGE]}
             fieldKind="name"
             value={form.name}
             onChange={handleChange('name')}
@@ -134,7 +191,7 @@ export default function BadgeFormModal({
             inputClassName="rewards-modal__input"
           />
           <div className="rewards-modal__field">
-            <RewardsCurrencyLabel htmlFor="badge-reward">Nagroda*</RewardsCurrencyLabel>
+            <RewardsCurrencyLabel htmlFor="badge-reward">{REWARDLABEL__TEXTLABEL[LANGUAGE]}</RewardsCurrencyLabel>
             <input
               id="badge-reward"
               type="text"
@@ -149,17 +206,17 @@ export default function BadgeFormModal({
         <div className="rewards-modal__row rewards-modal__row--icon-rarity">
           <EmojiPickerField
             className="rewards-modal__field rewards-modal__field--icon"
-            label="Ikona"
+            label={ICONLABEL__TEXTLABEL[LANGUAGE]}
             value={form.icon}
             defaultEmoji={DEFAULT_BADGE_EMOJI}
             onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
-            ariaLabel="Wybierz emoji odznaki"
+            ariaLabel={ICONARIALABEL__TEXTLABEL[LANGUAGE]}
           />
 
           <div className="rewards-modal__field">
             <label htmlFor="badge-rarity" className="rewards-modal__label">
-              Rzadkość
-              <InfoTooltip text="Wpływa na rzadkość odznaki w skarbcu." />
+              {RARITYLABEL__TEXTLABEL[LANGUAGE]}
+              <InfoTooltip text={RARITYTOOLTIPTEXT__TEXTLABEL[LANGUAGE]} />
             </label>
             <select
               id="badge-rarity"
@@ -176,7 +233,7 @@ export default function BadgeFormModal({
 
         <TextField
           id="badge-story"
-          label="Opis fabularny*"
+          label={STORYDESCRIPTIONLABEL__TEXTLABEL[LANGUAGE]}
           fieldKind="shortDescription"
           value={form.storyDescription}
           onChange={handleChange('storyDescription')}
@@ -186,7 +243,7 @@ export default function BadgeFormModal({
 
         <TextField
           id="badge-edu"
-          label="Opis dydaktyczny*"
+          label={DIDACTICDESCRIPTIONLABEL__TEXTLABEL[LANGUAGE]}
           fieldKind="shortDescription"
           value={form.didacticDescription}
           onChange={handleChange('didacticDescription')}
@@ -200,7 +257,7 @@ export default function BadgeFormModal({
             checked={form.startHidden}
             onChange={(checked) => setForm((prev) => ({ ...prev, startHidden: checked }))}
           >
-            Ukryj odznakę (niewidoczna dla studentów)
+            {HIDDENOPTIONTEXT__TEXTLABEL[LANGUAGE]}
           </BadgeOptionCheckbox>
         </div>
       </div>

@@ -1,5 +1,32 @@
+import { useState } from 'react';
 import { Button, Modal } from '../../../components/ui/index.js';
 import '../settings/SettingsContent.css';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+const MODALTITLE__TEXTLABEL = {
+  polish: 'Niezapisane zmiany',
+  english: 'Unsaved changes'
+};
+
+const MODALSUBTITLE__TEXTLABEL = {
+  polish: 'Masz niezapisane zmiany na tej stronie. Czy chcesz je zapisać przed opuszczeniem?',
+  english: 'You have unsaved changes on this page. Do you want to save them before leaving?'
+};
+
+const CANCELBUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
+
+const DISCARDBUTTON__TEXTLABEL = {
+  polish: 'Odrzuć zmiany',
+  english: 'Discard changes'
+};
+
+const SAVEBUTTON__TEXTLABEL = {
+  polish: 'Zapisz',
+  english: 'Save'
+};
 
 /**
  * @param {{
@@ -17,21 +44,23 @@ export default function GroupSettingsUnsavedModal({
   onDiscard,
   onSave,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Niezapisane zmiany"
-      subtitle="Masz niezapisane zmiany na tej stronie. Czy chcesz je zapisać przed opuszczeniem?"
+      title={MODALTITLE__TEXTLABEL[LANGUAGE]}
+      subtitle={MODALSUBTITLE__TEXTLABEL[LANGUAGE]}
       showFooter={false}
       className="settings-page__unsaved-modal"
     >
       <div className="settings-page__unsaved-actions">
         <Button type="button" variant="secondary" size="md" onClick={onClose}>
-          Anuluj
+          {CANCELBUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
         <Button type="button" variant="secondary" size="md" onClick={onDiscard}>
-          Odrzuć zmiany
+          {DISCARDBUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
         <Button
           type="button"
@@ -40,7 +69,7 @@ export default function GroupSettingsUnsavedModal({
           onClick={onSave}
           disabled={isSaving}
         >
-          Zapisz
+          {SAVEBUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       </div>
     </Modal>

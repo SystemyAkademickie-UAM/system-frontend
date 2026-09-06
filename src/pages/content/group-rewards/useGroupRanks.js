@@ -7,6 +7,22 @@ import { fetchGroupStudents, bulkUpdateStudents } from '../../../services/studen
 import { normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
 import { DEFAULT_RANK_DISCOUNT } from '../../../utils/ranks/rankDiscount.js';
 import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+const NOGROUPID__TEXTLABEL = {
+  polish: 'Brak ID grupy',
+  english: 'Group ID missing'
+};
+
+const LOADERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać rang',
+  english: 'Failed to fetch ranks'
+};
+
+const RANKNOTEXIST__TEXTLABEL = {
+  polish: 'Ranga nie istnieje',
+  english: 'Rank does not exist'
+};
 
 /**
  * @typedef {Object} RankData
@@ -62,6 +78,7 @@ function mapRank(rank, index) {
  */
 export function useGroupRanks() {
   const { groupId } = useParams();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [ranks, setRanks] = useState([]);
   const [students, setStudents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -69,7 +86,7 @@ export function useGroupRanks() {
 
   const loadData = useCallback(async () => {
     if (!groupId) {
-      setError('Brak ID grupy');
+      setError(NOGROUPID__TEXTLABEL[LANGUAGE]);
       setIsLoading(false);
       return;
     }
@@ -94,7 +111,7 @@ export function useGroupRanks() {
       })));
     } catch (err) {
       console.error('Failed to load ranks:', err);
-      setError('Nie udało się pobrać rang');
+      setError(LOADERROR__TEXTLABEL[LANGUAGE]);
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +122,7 @@ export function useGroupRanks() {
   }, [loadData]);
 
   const handleCreate = useCallback(async (values) => {
-    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+    if (!groupId) return { ok: false, error: NOGROUPID__TEXTLABEL[LANGUAGE] };
 
     const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_RANK_EMOJI);
     const result = await createRank(groupId, {
@@ -127,10 +144,10 @@ export function useGroupRanks() {
   }, [groupId, loadData]);
 
   const handleUpdate = useCallback(async (rankId, values) => {
-    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+    if (!groupId) return { ok: false, error: NOGROUPID__TEXTLABEL[LANGUAGE] };
 
     const rank = ranks.find((r) => r.id === rankId);
-    if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
+    if (!rank) return { ok: false, error: RANKNOTEXIST__TEXTLABEL[LANGUAGE] };
 
     const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_RANK_EMOJI);
     const payload = {
@@ -154,10 +171,10 @@ export function useGroupRanks() {
   }, [groupId, ranks]);
 
   const handleDelete = useCallback(async (rankId) => {
-    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+    if (!groupId) return { ok: false, error: NOGROUPID__TEXTLABEL[LANGUAGE] };
 
     const rank = ranks.find((r) => r.id === rankId);
-    if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
+    if (!rank) return { ok: false, error: RANKNOTEXIST__TEXTLABEL[LANGUAGE] };
 
     const result = await deleteRank(groupId, rank.dbId);
 
@@ -176,10 +193,10 @@ export function useGroupRanks() {
   }, [groupId, ranks]);
 
   const handleAssign = useCallback(async (rankId, selectedStudentIds) => {
-    if (!groupId) return { ok: false, error: 'Brak ID grupy' };
+    if (!groupId) return { ok: false, error: NOGROUPID__TEXTLABEL[LANGUAGE] };
 
     const rank = ranks.find((r) => r.id === rankId);
-    if (!rank) return { ok: false, error: 'Ranga nie istnieje' };
+    if (!rank) return { ok: false, error: RANKNOTEXIST__TEXTLABEL[LANGUAGE] };
 
     const selectedSet = new Set(selectedStudentIds);
     const studentsToUpdate = students.reduce((updates, student) => {

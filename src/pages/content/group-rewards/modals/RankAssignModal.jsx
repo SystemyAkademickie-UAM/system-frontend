@@ -1,6 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, SearchBar } from '../../../../components/ui/index.js';
 import '../../group-rewards/shared/rewardsModals.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const ASSIGNMODALTITLE__TEXTLABEL = {
+  polish: 'Zmień rangę',
+  english: 'Change rank'
+};
+
+const SEARCHPLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj studenta…',
+  english: 'Search student…'
+};
+
+const SEARCHARIA__TEXTLABEL = {
+  polish: 'Szukaj studenta',
+  english: 'Search student'
+};
 
 export default function RankAssignModal({
   isOpen,
@@ -9,6 +25,7 @@ export default function RankAssignModal({
   onClose,
   onConfirm,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
 
@@ -49,7 +66,7 @@ export default function RankAssignModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Zmień rangę"
+      title={ASSIGNMODALTITLE__TEXTLABEL[LANGUAGE]}
       subtitle={rank.name}
       onConfirm={handleConfirm}
       size="md"
@@ -59,9 +76,9 @@ export default function RankAssignModal({
         <SearchBar
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj studenta…"
+          placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
           name="rank-assign-search"
-          aria-label="Szukaj studenta"
+          aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
         />
       </div>
 

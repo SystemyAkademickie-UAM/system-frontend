@@ -1,11 +1,29 @@
+import { useState } from 'react';
 import { Badge, CurrencyDisplay } from '../../../components/ui/index.js';
 import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
 import { useProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileBadgesSection.css';
 
+const BADGES_TITLE__TEXTLABEL = {
+  polish: 'Zdobyte odznaki',
+  english: 'Earned badges'
+};
+
+const EARNED_COUNT_SUFFIX__TEXTLABEL = {
+  polish: 'zdobytych',
+  english: 'earned'
+};
+
+const EMPTY_BADGES_MESSAGE__TEXTLABEL = {
+  polish: 'Nie masz jeszcze żadnych odznak w tej grupie.',
+  english: 'You don\'t have any badges in this group yet.'
+};
+
 export default function ProfileBadgesSection() {
   const { profile, isLoading } = useProfileStudentProfileContext();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   if (isLoading) {
     return null;
@@ -16,16 +34,16 @@ export default function ProfileBadgesSection() {
   return (
     <div className="profile-badges-section">
       <div className="profile-badges-section__header">
-        <h2 className="profile-badges-section__title">Zdobyte odznaki</h2>
+        <h2 className="profile-badges-section__title">{BADGES_TITLE__TEXTLABEL[LANGUAGE]}</h2>
         <span className="activities-page__count profile-badges-section__count">
           {earnedBadges.length}
           {' '}
-          zdobytych
+          {EARNED_COUNT_SUFFIX__TEXTLABEL[LANGUAGE]}
         </span>
       </div>
 
       {earnedBadges.length === 0 ? (
-        <p className="profile-badges-section__empty">Nie masz jeszcze żadnych odznak w tej grupie.</p>
+        <p className="profile-badges-section__empty">{EMPTY_BADGES_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : (
         <div className="profile-badges-section__grid">
           {earnedBadges.map((badge) => (

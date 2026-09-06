@@ -162,7 +162,7 @@
   font-weight: 800;
   line-height: 1.25rem;
   letter-spacing: -0.35px;
-  text-transform: uppercase;
+
   color: var(--color-nav-user-name);
   white-space: nowrap;
   overflow: hidden;

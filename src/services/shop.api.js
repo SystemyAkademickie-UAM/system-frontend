@@ -58,12 +58,11 @@ export async function createGroupShopItem(groupId, payload) {
     return { ok: false, error: extractApiError(result.data) };
   }
 
-  const item = mapBackendShopItem(result.data);
-  if (item.isPublished === false) {
-    const publishResult = await updateGroupShopItem(groupId, item.id, { isPublished: true });
-    if (publishResult.ok && publishResult.item) {
-      return { ok: true, item: publishResult.item };
-    }
+
+  let item = mapBackendShopItem(result.data);
+  if (item.isPublished === true) {
+    const updateResult = await updateGroupShopItem(groupId, item.id, { isPublished: false });
+    item = updateResult.item;
   }
 
   return { ok: true, item };

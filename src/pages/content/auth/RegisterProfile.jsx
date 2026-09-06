@@ -5,8 +5,29 @@ import { getCachedAvatarList, loadAvatarList } from '../../../services/avatarLis
 import { PROFILE_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { CharacterLimitedField } from '../../../components/ui/index.js';
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthCard.css';
 import './RegisterProfile.css';
+
+const BACK_ARIALABEL__TEXTLABEL = {
+  polish: 'Wróć',
+  english: 'Back'
+};
+
+const PAGE_TITLE__TEXTLABEL = {
+  polish: 'Jak Cię nazywać?',
+  english: 'What should we call you?'
+};
+
+const NICKNAME_PLACEHOLDER__TEXTLABEL = {
+  polish: 'MegaKrolik',
+  english: 'MegaRabbit'
+};
+
+const CONTINUE_BUTTON__TEXTLABEL = {
+  polish: 'Kontynuuj',
+  english: 'Continue'
+};
 
 function BackIcon({ className }) {
   return (
@@ -24,6 +45,7 @@ export default function RegisterProfile({
   errorMessage = null,
   isBootstrapping = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const navigate = useNavigate();
   const [nickname, setNickname] = useState(initialNickname);
   const [avatars, setAvatars] = useState(() => getCachedAvatarList() ?? []);
@@ -78,13 +100,13 @@ export default function RegisterProfile({
         type="button"
         className="auth-card__back-button"
         onClick={handleBack}
-        aria-label="Wróć"
+        aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
         disabled={isBootstrapping}
       >
         <BackIcon className="auth-card__back-icon" />
       </button>
 
-      <h1 className="auth-card__title">Jak Cię nazywać?</h1>
+      <h1 className="auth-card__title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
 
       {errorMessage ? (
         <p className="login-institution__error" role="alert">{errorMessage}</p>
@@ -96,7 +118,7 @@ export default function RegisterProfile({
             <input
               type="text"
               className="auth-card__input"
-              placeholder="MegaKrolik"
+              placeholder={NICKNAME_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               onKeyDown={(event) => {
@@ -130,7 +152,7 @@ export default function RegisterProfile({
         onClick={handleContinue}
         disabled={!isValid}
       >
-        Kontynuuj
+        {CONTINUE_BUTTON__TEXTLABEL[LANGUAGE]}
       </button>
     </div>
   );

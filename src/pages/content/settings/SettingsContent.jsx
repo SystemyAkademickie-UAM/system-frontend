@@ -67,10 +67,10 @@ const SHOWNICKNAMELABELTEXT = {
   kana: 'ニックネームをひょうじ',
 };
 const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
-  polish: 'Gdy wyłączone, uczniowie i inni prowadzący widzą imię i nazwisko zamiast ksywki (lista grup, strona główna, galeria szablonów itd.).',
-  english: 'When disabled, students and other lecturers see your legal name instead of nickname (group list, home page, template gallery, etc.).',
-  japanese: 'オフにすると、他の利用者にはニックネームではなく氏名が表示されます。',
-  kana: 'オフにすると、ほかの利用者にはニックネームではなく氏名が表示されます。',
+  polish: 'Ksywka staje się widoczna dla innych użytkowników (wyświetlana jest dodatkowo obok imienia i nazwiska).',
+  english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
+  japanese: 'ニックネームが他の利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
+  kana: 'ニックネームがほかの利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
 };
 const SAVEBUTTONLABELTEXT = {
   polish: 'Zapisz zmiany',

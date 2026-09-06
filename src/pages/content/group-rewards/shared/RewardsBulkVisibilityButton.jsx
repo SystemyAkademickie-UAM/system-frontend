@@ -1,8 +1,15 @@
+import { useState } from 'react';
 import { Button } from '../../../../components/ui/index.js';
 import {
   areAllRewardsItemsPublished,
   getBulkVisibilityToggleLabel,
 } from '../../../../utils/rewards/bulkVisibilityToggle.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const SAVINGLABEL__TEXTLABEL = {
+  polish: 'Zapisywanie…',
+  english: 'Saving…'
+};
 
 /**
  * @param {{
@@ -20,6 +27,7 @@ export default function RewardsBulkVisibilityButton({
   onToggleAll,
   className = '',
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const allPublished = areAllRewardsItemsPublished(items);
   const label = getBulkVisibilityToggleLabel(items);
 
@@ -32,7 +40,7 @@ export default function RewardsBulkVisibilityButton({
       disabled={disabled || isLoading || items.length === 0}
       onClick={onToggleAll}
     >
-      {isLoading ? 'Zapisywanie…' : label}
+      {isLoading ? SAVINGLABEL__TEXTLABEL[LANGUAGE] : label}
     </Button>
   );
 }

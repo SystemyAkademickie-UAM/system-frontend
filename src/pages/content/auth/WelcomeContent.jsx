@@ -2,28 +2,91 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { loginPath } from '../../../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './WelcomeContent.css';
 
-const TAGLINE_WORDS = ['zabawa', 'przygoda', 'wyprawa', 'ekspedycja', 'podróż', 'eksploracja'];
-const PORTAL_WORDS = ['portalu', 'magii', 'przygodzie'];
-const INTRO_LINES = {
-  line0: ['sztuk', 'dziedzin', 'dyscyplin', 'rzemiosł', 'profesji'],
-  line1: ['umiejętności', 'talenty', 'kompetencje', 'moce', 'atuty'],
-  line2: ['wykładów i warsztatów', 'zajęć i seminariów', 'lekcji i ćwiczeń', 'kursów i treningów'],
-  line3: ['ekspedycje', 'wyprawy', 'misje', 'podróże', 'eskapady', 'kampanie'],
-  line4: ['jedno', 'jedność', 'całość', 'harmonię', 'nierozłączną całość'],
+const TAGLINE_WORDS__TEXTLABEL = {
+  polish: ['zabawa', 'przygoda', 'wyprawa', 'ekspedycja', 'podróż', 'eksploracja'],
+  english: ['fun', 'adventure', 'expedition', 'campaign', 'journey', 'exploration']
+};
+
+const PORTAL_WORDS__TEXTLABEL = {
+  polish: ['portalu', 'magii', 'przygodzie'],
+  english: ['portal', 'magic', 'adventure']
+};
+
+const INTRO_LINE0_WORDS__TEXTLABEL = {
+  polish: ['sztuk', 'dziedzin', 'dyscyplin', 'rzemiosł', 'profesji'],
+  english: ['arts', 'disciplines', 'fields', 'crafts', 'professions']
+};
+
+const INTRO_LINE1_WORDS__TEXTLABEL = {
+  polish: ['umiejętności', 'talenty', 'kompetencje', 'moce', 'atuty'],
+  english: ['skills', 'talents', 'abilities', 'powers', 'advantages']
+};
+
+const INTRO_LINE2_WORDS__TEXTLABEL = {
+  polish: ['wykładów i warsztatów', 'zajęć i seminariów', 'lekcji i ćwiczeń', 'kursów i treningów'],
+  english: ['lectures and workshops', 'classes and seminars', 'lessons and exercises', 'courses and training']
+};
+
+const INTRO_LINE3_WORDS__TEXTLABEL = {
+  polish: ['ekspedycje', 'wyprawy', 'misje', 'podróże', 'eskapady', 'kampanie'],
+  english: ['expeditions', 'journeys', 'missions', 'travels', 'escapades', 'campaigns']
+};
+
+const INTRO_LINE4_WORDS__TEXTLABEL = {
+  polish: ['jedno', 'jedność', 'całość', 'harmonię', 'nierozłączną całość'],
+  english: ['unity', 'oneness', 'wholeness', 'harmony', 'indivisible whole']
+};
+
+const TAGLINE_PREFIX__TEXTLABEL = {
+  polish: 'Nauka to',
+  english: 'Learning is'
+};
+
+const PORTAL_PREFIX__TEXTLABEL = {
+  polish: 'Zanurz się w',
+  english: 'Immerse yourself in'
+};
+
+const INTRO_LINE1_PREFIX__TEXTLABEL = {
+  polish: 'Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich',
+  english: 'Welcome, Traveler. You stand at the gates of a portal connecting universities gathering adepts of all'
+};
+
+const INTRO_LINE2_PREFIX__TEXTLABEL = {
+  polish: 'oraz nauk gotowych zdobywać wiedzę i poszerzać swoje',
+  english: 'and sciences ready to gain knowledge and expand their'
+};
+
+const INTRO_LINE3_PREFIX__TEXTLABEL = {
+  polish: 'w najodleglejszych krainach i czasach. Po drugiej stronie próżno szukać',
+  english: 'in the most distant realms and times. On the other side, you will not find'
+};
+
+const INTRO_LINE4_PREFIX__TEXTLABEL = {
+  polish: 'Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące',
+  english: 'Instead, there are epic campaigns, secret missions, and exciting'
+};
+
+const INTRO_LINE5_PREFIX__TEXTLABEL = {
+  polish: 'Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią',
+  english: 'Do you not lack wit and courage to enter a world where learning and adventure form'
+};
+
+const LOGGEDOUT_SUCCESS__TEXTLABEL = {
+  polish: 'Wylogowano pomyślnie.',
+  english: 'Logged out successfully.'
+};
+
+const FOOTER_TEXT__TEXTLABEL = {
+  polish: 'MyAcademyQuest 2026 ©',
+  english: 'MyAcademyQuest 2026 ©'
 };
 
 function pickRandom(items) {
   return items[Math.floor(Math.random() * items.length)];
-}
-
-/** Zapobiega wiszącym spójnikom na końcu linii (PL). */
-function withPolishLineBreaks(text) {
-  return text.replace(
-    /\s+(i|a|o|u|w|z|na|do|od|po|ze|że|by|co|się|oraz|czy|jak|gdy|to|już|też|więc|lub|albo|nad|pod|przy|bez|dla|ku|we|za|ani|niż|tym|gdyż|lecz|aby|gdyby|więc)\s+/gi,
-    (_, word) => `\u00A0${word} `,
-  );
 }
 
 function useCoarsePointer() {
@@ -75,7 +138,7 @@ function SwapBlock({
       role={isCoarsePointer ? 'button' : undefined}
       tabIndex={isCoarsePointer ? 0 : undefined}
     >
-      <span className="welcome-hero__text-gray">{withPolishLineBreaks(grayText)}</span>
+      <span className="welcome-hero__text-gray">{grayText}</span>
       {'\u00A0'}
       <span className="welcome-hero__text-green">{greenText}</span>
     </div>
@@ -83,37 +146,54 @@ function SwapBlock({
 }
 
 export default function WelcomeContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess } = useToast();
   const isCoarsePointer = useCoarsePointer();
 
-  const [taglineWord, setTaglineWord] = useState('');
-  const [portalWord, setPortalWord] = useState('');
-  const [introWords, setIntroWords] = useState({
-    line0: '',
-    line1: '',
-    line2: '',
-    line3: '',
-    line4: '',
-  });
+  const [taglineWord, setTaglineWord] = useState(() =>
+    pickRandom(TAGLINE_WORDS__TEXTLABEL[LANGUAGE]));
+  const [portalWord, setPortalWord] = useState(() =>
+    pickRandom(PORTAL_WORDS__TEXTLABEL[LANGUAGE]));
+  const [introWords, setIntroWords] = useState(() => ({
+    line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]),
+    line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]),
+    line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]),
+    line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]),
+    line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]),
+  }));
   const [ticks, setTicks] = useState(0);
   const [tickDirection, setTickDirection] = useState(1);
 
   const refreshPortalWord = useCallback(() => {
-    setPortalWord(pickRandom(PORTAL_WORDS));
-  }, []);
+    setPortalWord(pickRandom(PORTAL_WORDS__TEXTLABEL[LANGUAGE]));
+  }, [LANGUAGE]);
+
+  const refreshTaglineWord = useCallback(() => {
+    setTaglineWord(pickRandom(TAGLINE_WORDS__TEXTLABEL[LANGUAGE]));
+  }, [LANGUAGE]);
+
+  const refreshIntroWords = useCallback(() => {
+    setIntroWords({
+      line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]),
+      line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]),
+      line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]),
+      line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]),
+      line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]),
+    });
+  }, [LANGUAGE]);
 
   useEffect(() => {
-    setTaglineWord(pickRandom(TAGLINE_WORDS));
-    setPortalWord(pickRandom(PORTAL_WORDS));
+    setTaglineWord(pickRandom(TAGLINE_WORDS__TEXTLABEL[LANGUAGE]));
+    setPortalWord(pickRandom(PORTAL_WORDS__TEXTLABEL[LANGUAGE]));
     setIntroWords({
-      line0: pickRandom(INTRO_LINES.line0),
-      line1: pickRandom(INTRO_LINES.line1),
-      line2: pickRandom(INTRO_LINES.line2),
-      line3: pickRandom(INTRO_LINES.line3),
-      line4: pickRandom(INTRO_LINES.line4),
+      line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]),
+      line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]),
+      line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]),
+      line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]),
+      line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]),
     });
-  }, []);
+  }, [LANGUAGE]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -141,9 +221,9 @@ export default function WelcomeContent() {
     if (searchParams.get('loggedOut') !== '1') {
       return;
     }
-    showSuccess('Wylogowano pomyślnie.');
+    showSuccess(LOGGEDOUT_SUCCESS__TEXTLABEL[LANGUAGE]);
     setSearchParams({}, { replace: true });
-  }, [searchParams, setSearchParams, showSuccess]);
+  }, [searchParams, setSearchParams, showSuccess, LANGUAGE]);
 
   return (
     <div
@@ -161,10 +241,10 @@ export default function WelcomeContent() {
         <Link
           to={loginPath()}
           className="welcome-hero__portal-link"
-          aria-label={`Zanurz się w ${portalWord}`}
+          aria-label={PORTAL_PREFIX__TEXTLABEL[LANGUAGE]}
         >
           <div className="welcome-hero__portal-btn">
-            <span className="welcome-hero__text-gray">{withPolishLineBreaks('Zanurz się w')}</span>
+            <span className="welcome-hero__text-gray">{PORTAL_PREFIX__TEXTLABEL[LANGUAGE]}</span>
             {' '}
             <span
               className="welcome-hero__text-green welcome-hero__portal-word"
@@ -188,9 +268,9 @@ export default function WelcomeContent() {
 
         <SwapBlock
           className="welcome-hero__tagline"
-          grayText="Nauka to"
+          grayText={TAGLINE_PREFIX__TEXTLABEL[LANGUAGE]}
           greenText={taglineWord}
-          onSwap={() => setTaglineWord(pickRandom(TAGLINE_WORDS))}
+          onSwap={refreshTaglineWord}
         />
 
         <div className="welcome-hero__title">
@@ -200,42 +280,42 @@ export default function WelcomeContent() {
 
         <SwapBlock
           className="welcome-hero__intro-line welcome-hero__intro-line--1"
-          grayText="Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich"
+          grayText={INTRO_LINE1_PREFIX__TEXTLABEL[LANGUAGE]}
           greenText={introWords.line0}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line0: pickRandom(INTRO_LINES.line0) }))}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]) }))}
         />
 
         <SwapBlock
           className="welcome-hero__intro-line welcome-hero__intro-line--2"
-          grayText="oraz nauk gotowych zdobywać wiedzę i poszerzać swoje"
+          grayText={INTRO_LINE2_PREFIX__TEXTLABEL[LANGUAGE]}
           greenText={introWords.line1}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line1: pickRandom(INTRO_LINES.line1) }))}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]) }))}
         />
 
         <SwapBlock
           className="welcome-hero__intro-line welcome-hero__intro-line--3"
-          grayText="w najodleglejszych krainach i czasach. Po drugiej stronie próżno szukać"
+          grayText={INTRO_LINE3_PREFIX__TEXTLABEL[LANGUAGE]}
           greenText={`${introWords.line2}.`}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line2: pickRandom(INTRO_LINES.line2) }))}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]) }))}
         />
 
         <SwapBlock
           className="welcome-hero__intro-line welcome-hero__intro-line--4"
-          grayText="Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące"
+          grayText={INTRO_LINE4_PREFIX__TEXTLABEL[LANGUAGE]}
           greenText={`${introWords.line3}.`}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line3: pickRandom(INTRO_LINES.line3) }))}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]) }))}
         />
 
         <SwapBlock
           className="welcome-hero__intro-line welcome-hero__intro-line--5"
-          grayText="Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią"
+          grayText={INTRO_LINE5_PREFIX__TEXTLABEL[LANGUAGE]}
           greenText={`${introWords.line4}?`}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line4: pickRandom(INTRO_LINES.line4) }))}
+          onSwap={() => setIntroWords((prev) => ({ ...prev, line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]) }))}
         />
       </div>
 
       <footer className="welcome-hero__footer welcome-hero__reveal welcome-hero__reveal--4">
-        MyAcademyQuest 2026 ©
+        {FOOTER_TEXT__TEXTLABEL[LANGUAGE]}
       </footer>
     </div>
   );

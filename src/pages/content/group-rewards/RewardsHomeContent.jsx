@@ -28,109 +28,311 @@ import GroupMainRanksContent from '../group-main-ranks/GroupMainRanksContent.jsx
 import RankFormModal from './modals/RankFormModal.jsx';
 import RankDiscountModal from './modals/RankDiscountModal.jsx';
 import RankUnlockItemsModal from './modals/RankUnlockItemsModal.jsx';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
-const RANK_COLUMNS = [
-  {
-    key: 'position',
-    label: 'Numer',
-    sort: 'number',
-    width: '90px',
-    render: (rank) => (
-      <span className="rewards-table__position">#{rank.position}</span>
-    ),
-  },
-  {
-    key: 'name',
-    label: 'Nazwa',
-    sort: 'text',
-    width: '240px',
-    render: (rank) => (
-      <span className="rewards-table__name">{rank.name}</span>
-    ),
-  },
-  {
-    key: '_spacer',
-    label: '',
-    sort: false,
-    className: 'rewards-table__th--spacer',
-    colClassName: 'rewards-table__col--spacer',
-    cellClassName: 'rewards-table__cell--spacer',
-    render: () => '\u00A0',
-  },
-  {
-    key: 'icon',
-    label: 'Ikona',
-    sort: 'text',
-    width: '140px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-    render: (rank) => (
-      rank.icon ? (
-        <span className="rewards-table__icon-emoji" aria-hidden="true">{rank.icon}</span>
-      ) : (
-        <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
-      )
-    ),
-  },
-  {
-    key: 'costAmount',
-    label: 'Wymagane pkt',
-    sort: 'number',
-    width: '120px',
-    render: (rank) => (
-      <CurrencyDisplay amount={rank.costAmount} size="sm" />
-    ),
-  },
-  {
-    key: 'discount',
-    label: 'Zniżka',
-    sort: 'number',
-    width: '100px',
-    render: (rank) => (
-      <span className="rewards-table__cell-text rewards-table__cell-text--discount">
-        {Number(rank.discount ?? 0)}%
-      </span>
-    ),
-  },
-  {
-    key: 'storyDescription',
-    label: 'Status fabularny',
-    sort: 'text',
-    width: '240px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-    render: (rank) => (
-      <span className="rewards-table__cell-text">
-        {rank.storyDescription}
-      </span>
-    ),
-  },
-  {
-    key: 'shopItems',
-    label: 'Przedmioty sklepu',
-    sort: 'text',
-    width: '220px',
-    cellClassName: 'rewards-table__cell--truncate',
-    hiddenBelow: 768,
-  },
-];
+const CREATEDSUCCESS__TEXTLABEL = {
+  polish: 'Ranga została utworzona.',
+  english: 'Rank has been created.'
+};
 
-function createRankColumns(resolveShopItems) {
-  return RANK_COLUMNS.map((column) => (
-    column.key === 'shopItems'
-      ? {
-        ...column,
-        render: (rank) => (
-          <span className="rewards-table__cell-text">
-            {resolveShopItems(rank.shopItems).join(', ') || '—'}
-          </span>
-        ),
-      }
-      : column
-  ));
-}
+const UPDATEDSUCCESS__TEXTLABEL = {
+  polish: 'Ranga została zaktualizowana.',
+  english: 'Rank has been updated.'
+};
+
+const DELETEDSUCCESS__TEXTLABEL = {
+  polish: 'Ranga została usunięta.',
+  english: 'Rank has been deleted.'
+};
+
+const ASSIGNEDSUCCESS__TEXTLABEL = {
+  polish: 'Przypisanie rangi zostało zapisane.',
+  english: 'Rank assignment has been saved.'
+};
+
+const DISCOUNTUPDATEDSUCCESS__TEXTLABEL = {
+  polish: 'Zniżka rangi została zaktualizowana.',
+  english: 'Rank discount has been updated.'
+};
+
+const ITEMSUPDATEDSUCCESS__TEXTLABEL = {
+  polish: 'Odblokowane przedmioty zostały zaktualizowane.',
+  english: 'Unlocked items have been updated.'
+};
+
+const CREATIONERROR__TEXTLABEL = {
+  polish: 'Nie udało się utworzyć rangi.',
+  english: 'Failed to create rank.'
+};
+
+const UPDATEERROR__TEXTLABEL = {
+  polish: 'Nie udało się zaktualizować rangi.',
+  english: 'Failed to update rank.'
+};
+
+const DELETEERROR__TEXTLABEL = {
+  polish: 'Nie udało się usunąć rangi.',
+  english: 'Failed to delete rank.'
+};
+
+const ASSIGNERROR__TEXTLABEL = {
+  polish: 'Nie udało się przypisać rangi.',
+  english: 'Failed to assign rank.'
+};
+
+const DISCOUNTUPDATEERROR__TEXTLABEL = {
+  polish: 'Nie udało się zaktualizować zniżki.',
+  english: 'Failed to update discount.'
+};
+
+const ITEMSUPDATEERROR__TEXTLABEL = {
+  polish: 'Nie udało się zaktualizować przedmiotów.',
+  english: 'Failed to update items.'
+};
+
+const MEMBERSHIDDEN__TEXTLABEL = {
+  polish: 'Uczestnicy zostali ukryci na ścieżce rang.',
+  english: 'Participants have been hidden from the rank path.'
+};
+
+const MEMBERSVISIBLE__TEXTLABEL = {
+  polish: 'Uczestnicy są widoczni na ścieżce rang.',
+  english: 'Participants are visible on the rank path.'
+};
+
+const LOADING__TEXTLABEL = {
+  polish: 'Ładowanie rang…',
+  english: 'Loading ranks…'
+};
+
+const EMPTYMESSAGE__TEXTLABEL = {
+  polish: 'Brak rang w tej grupie. Kliknij „Dodaj rangę”, aby utworzyć pierwszą.',
+  english: 'No ranks in this group. Click "Add rank" to create the first one.'
+};
+
+const ADDRANKBUTTON__TEXTLABEL = {
+  polish: 'Dodaj rangę',
+  english: 'Add rank'
+};
+
+const HIDEMEMBERSBUTTON__TEXTLABEL = {
+  polish: 'Ukryj uczestników',
+  english: 'Hide participants'
+};
+
+const SHOWMEMBERSBUTTON__TEXTLABEL = {
+  polish: 'Pokaż uczestników',
+  english: 'Show participants'
+};
+
+const MEMBERAVATARTOOLTIP__TEXTLABEL = {
+  polish: 'Steruje widocznością awatarów uczestników na ścieżce rang w widoku kafelkowym.',
+  english: 'Controls participant avatar visibility on the rank path in tile view.'
+};
+
+const SEARCHPLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj rangi…',
+  english: 'Search rank…'
+};
+
+const SEARCHARIA__TEXTLABEL = {
+  polish: 'Szukaj rangi',
+  english: 'Search rank'
+};
+
+const COLNUMBER__TEXTLABEL = {
+  polish: 'Numer',
+  english: '#'
+};
+
+const COLNAME__TEXTLABEL = {
+  polish: 'Nazwa',
+  english: 'Name'
+};
+
+const COLICON__TEXTLABEL = {
+  polish: 'Ikona',
+  english: 'Icon'
+};
+
+const COLCOST__TEXTLABEL = {
+  polish: 'Wymagane pkt',
+  english: 'Points needed'
+};
+
+const COLDISCOUNT__TEXTLABEL = {
+  polish: 'Zniżka',
+  english: 'Discount'
+};
+
+const COLSTATUS__TEXTLABEL = {
+  polish: 'Status fabularny',
+  english: 'Story status'
+};
+
+const COLSHOPITEMS__TEXTLABEL = {
+  polish: 'Przedmioty sklepu',
+  english: 'Shop items'
+};
+
+const DELETERANKLABEL__TEXTLABEL = {
+  polish: 'Usuń rangę',
+  english: 'Delete rank'
+};
+
+const ASSIGNLABEL__TEXTLABEL = {
+  polish: 'Przydziel rangę',
+  english: 'Assign rank'
+};
+
+const ASSIGNARIA__TEXTLABEL = {
+  polish: 'Przypisz rangę studentom',
+  english: 'Assign rank to students'
+};
+
+const EDITLABEL__TEXTLABEL = {
+  polish: 'Edytuj rangę',
+  english: 'Edit rank'
+};
+
+const EDITDESC__TEXTLABEL = {
+  polish: 'Zmień dane rangi w kreatorze.',
+  english: 'Change rank details in the editor.'
+};
+
+const DISCOUNTLABEL__TEXTLABEL = {
+  polish: 'Zniżka w sklepie',
+  english: 'Shop discount'
+};
+
+const DISCOUNTDESC__TEXTLABEL = {
+  polish: 'Ustaw procentową zniżkę dla posiadaczy rangi.',
+  english: 'Set a percentage discount for rank holders.'
+};
+
+const UNLOCKITEMSLABEL__TEXTLABEL = {
+  polish: 'Odblokowane przedmioty',
+  english: 'Unlocked items'
+};
+
+const UNLOCKITEMSDESC__TEXTLABEL = {
+  polish: 'Wybierz przedmioty sklepu odblokowywane przez rangę.',
+  english: 'Select shop items unlocked by the rank.'
+};
+
+const PAGINATIONARIA__TEXTLABEL = {
+  polish: 'Nawigacja stron listy rang',
+  english: 'Rank list page navigation'
+};
+
+
+
+
 
 export default function RewardsHomeContent() {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+
+  const RANK_COLUMNS = [
+    {
+      key: 'position',
+      label: COLNUMBER__TEXTLABEL[LANGUAGE],
+      sort: 'number',
+      width: '90px',
+      render: (rank) => (
+        <span className="rewards-table__position">#{rank.position}</span>
+      ),
+    },
+    {
+      key: 'name',
+      label: COLNAME__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '240px',
+      render: (rank) => (
+        <span className="rewards-table__name">{rank.name}</span>
+      ),
+    },
+    {
+      key: '_spacer',
+      label: '',
+      sort: false,
+      className: 'rewards-table__th--spacer',
+      colClassName: 'rewards-table__col--spacer',
+      cellClassName: 'rewards-table__cell--spacer',
+      render: () => '\u00A0',
+    },
+    {
+      key: 'icon',
+      label: COLICON__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '140px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+      render: (rank) => (
+        rank.icon ? (
+          <span className="rewards-table__icon-emoji" aria-hidden="true">{rank.icon}</span>
+        ) : (
+          <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+        )
+      ),
+    },
+    {
+      key: 'costAmount',
+      label: COLCOST__TEXTLABEL[LANGUAGE],
+      sort: 'number',
+      width: '120px',
+      render: (rank) => (
+        <CurrencyDisplay amount={rank.costAmount} size="sm" />
+      ),
+    },
+    {
+      key: 'discount',
+      label: COLDISCOUNT__TEXTLABEL[LANGUAGE],
+      sort: 'number',
+      width: '100px',
+      render: (rank) => (
+        <span className="rewards-table__cell-text rewards-table__cell-text--discount">
+          {Number(rank.discount ?? 0)}%
+        </span>
+      ),
+    },
+    {
+      key: 'storyDescription',
+      label: COLSTATUS__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '240px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+      render: (rank) => (
+        <span className="rewards-table__cell-text">
+          <em>{rank.storyDescription}</em>
+        </span>
+      ),
+    },
+    {
+      key: 'shopItems',
+      label: COLSHOPITEMS__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      width: '220px',
+      cellClassName: 'rewards-table__cell--truncate',
+      hiddenBelow: 768,
+    },
+  ];
+  function createRankColumns(resolveShopItems) {
+    return RANK_COLUMNS.map((column) => (
+      column.key === 'shopItems'
+        ? {
+          ...column,
+          render: (rank) => (
+            <span className="rewards-table__cell-text">
+              {resolveShopItems(rank.shopItems).join(', ') || '—'}
+            </span>
+          ),
+        }
+        : column
+    ));
+  }
+
   const nav = useGroupSubNav('group-rewards');
   const { groupId } = useParams();
   const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-ranks-view');
@@ -175,12 +377,12 @@ export default function RewardsHomeContent() {
     const result = await handleCreate(values);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Ranga została utworzona.');
+      showSuccess(CREATEDSUCCESS__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się utworzyć rangi.');
+      showError(result.error || CREATIONERROR__TEXTLABEL[LANGUAGE]);
     }
-  }, [handleCreate, closeModal, showSuccess, showError]);
+  }, [handleCreate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleEditConfirm = useCallback(async (values) => {
     if (!activeModal?.rank) return;
@@ -188,12 +390,12 @@ export default function RewardsHomeContent() {
     const result = await handleUpdate(activeModal.rank.id, values);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Ranga została zaktualizowana.');
+      showSuccess(UPDATEDSUCCESS__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się zaktualizować rangi.');
+      showError(result.error || UPDATEERROR__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.rank) return;
@@ -201,12 +403,12 @@ export default function RewardsHomeContent() {
     const result = await handleDelete(activeModal.rank.id);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Ranga została usunięta.');
+      showSuccess(DELETEDSUCCESS__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się usunąć rangi.');
+      showError(result.error || DELETEERROR__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleDelete, closeModal, showSuccess, showError]);
+  }, [activeModal, handleDelete, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleAssignConfirm = useCallback(async (selectedStudentIds) => {
     if (!activeModal?.rank) return;
@@ -214,12 +416,12 @@ export default function RewardsHomeContent() {
     const result = await handleAssign(activeModal.rank.id, selectedStudentIds);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Przypisanie rangi zostało zapisane.');
+      showSuccess(ASSIGNEDSUCCESS__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się przypisać rangi.');
+      showError(result.error || ASSIGNERROR__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleAssign, closeModal, showSuccess, showError]);
+  }, [activeModal, handleAssign, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleDiscountConfirm = useCallback(async (values) => {
     if (!activeModal?.rank) return;
@@ -227,12 +429,12 @@ export default function RewardsHomeContent() {
     const result = await handleUpdate(activeModal.rank.id, values);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Zniżka rangi została zaktualizowana.');
+      showSuccess(DISCOUNTUPDATEDSUCCESS__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się zaktualizować zniżki.');
+      showError(result.error || DISCOUNTUPDATEERROR__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleUnlockItemsConfirm = useCallback(async (values) => {
     if (!activeModal?.rank) return;
@@ -240,12 +442,12 @@ export default function RewardsHomeContent() {
     const result = await handleUpdate(activeModal.rank.id, values);
     setModalLoading(false);
     if (result.ok) {
-      showSuccess('Odblokowane przedmioty zostały zaktualizowane.');
+      showSuccess(ITEMSUPDATEDSUCCESS__TEXTLABEL[LANGUAGE]);
       closeModal();
     } else {
-      showError(result.error || 'Nie udało się zaktualizować przedmiotów.');
+      showError(result.error || ITEMSUPDATEERROR__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const resolveRankByDbId = useCallback((dbId) => (
     ranks.find((entry) => entry.dbId === dbId) ?? null
@@ -284,48 +486,48 @@ export default function RewardsHomeContent() {
 
   const rowActions = useMemo(() => ({
     onDelete: (rank) => openModal('delete', rank),
-    deleteLabel: 'Usuń rangę',
-    deleteAriaLabel: (rank) => `Usuń rangę ${rank.name}`,
+    deleteLabel: DELETERANKLABEL__TEXTLABEL[LANGUAGE],
+    deleteAriaLabel: (rank) => `${DELETERANKLABEL__TEXTLABEL[LANGUAGE]} ${rank.name}`,
     inlineActions: [
       {
         id: 'assign',
-        label: 'Przydziel rangę',
+        label: ASSIGNLABEL__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.assign,
-        ariaLabel: 'Przypisz rangę studentom',
+        ariaLabel: ASSIGNARIA__TEXTLABEL[LANGUAGE],
         onSelect: (rank) => openModal('assign', rank),
       },
     ],
     menuItems: [
       {
         id: 'edit',
-        label: 'Edytuj rangę',
-        description: 'Zmień dane rangi w kreatorze.',
+        label: EDITLABEL__TEXTLABEL[LANGUAGE],
+        description: EDITDESC__TEXTLABEL[LANGUAGE],
         onSelect: (rank) => openModal('edit', rank),
       },
       {
         id: 'discount',
-        label: 'Zniżka w sklepie',
-        description: 'Ustaw procentową zniżkę dla posiadaczy rangi.',
+        label: DISCOUNTLABEL__TEXTLABEL[LANGUAGE],
+        description: DISCOUNTDESC__TEXTLABEL[LANGUAGE],
         onSelect: (rank) => openModal('discount', rank),
       },
       {
         id: 'unlock-items',
-        label: 'Odblokowane przedmioty',
-        description: 'Wybierz przedmioty sklepu odblokowywane przez rangę.',
+        label: UNLOCKITEMSLABEL__TEXTLABEL[LANGUAGE],
+        description: UNLOCKITEMSDESC__TEXTLABEL[LANGUAGE],
         onSelect: (rank) => openModal('unlockItems', rank),
       },
     ],
-  }), [openModal]);
+  }), [openModal, LANGUAGE]);
 
   const handleToggleMemberAvatars = useCallback(async () => {
     const wasVisible = showMemberAvatars;
     const result = await toggleShowMemberAvatars();
     if (result.ok) {
       showSuccess(wasVisible
-        ? 'Uczestnicy zostali ukryci na ścieżce rang.'
-        : 'Uczestnicy są widoczni na ścieżce rang.');
+        ? MEMBERSHIDDEN__TEXTLABEL[LANGUAGE]
+        : MEMBERSVISIBLE__TEXTLABEL[LANGUAGE]);
     }
-  }, [toggleShowMemberAvatars, showMemberAvatars, showSuccess]);
+  }, [toggleShowMemberAvatars, showMemberAvatars, showSuccess, LANGUAGE]);
 
   const modalRank = activeModal?.rank ?? null;
 
@@ -358,7 +560,7 @@ export default function RewardsHomeContent() {
               className="rewards-page__add-btn"
               onClick={() => openModal('create')}
             >
-              Dodaj rangę
+              {ADDRANKBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
           </div>
           <div className="maq-section-page__toolbar-end rewards-page__toolbar-end rewards-page__toolbar-end--ranks">
@@ -370,17 +572,17 @@ export default function RewardsHomeContent() {
                 className="rewards-ranks__members-toggle"
                 onClick={handleToggleMemberAvatars}
               >
-                {showMemberAvatars ? 'Ukryj uczestników' : 'Pokaż uczestników'}
+                {showMemberAvatars ? HIDEMEMBERSBUTTON__TEXTLABEL[LANGUAGE] : SHOWMEMBERSBUTTON__TEXTLABEL[LANGUAGE]}
               </Button>
-              <InfoTooltip text="Steruje widocznością awatarów uczestników na ścieżce rang w widoku kafelkowym." />
+              <InfoTooltip text={MEMBERAVATARTOOLTIP__TEXTLABEL[LANGUAGE]} />
             </div>
             <SearchBar
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Szukaj rangi…"
+              placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
               name="rank-catalog-search"
               className="rewards-page__search"
-              aria-label="Szukaj rangi"
+              aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
             />
           </div>
         </>
@@ -388,9 +590,9 @@ export default function RewardsHomeContent() {
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">Ładowanie rang…</p>
+        <p className="rewards-page__loading page-unavailable__notice">{LOADING__TEXTLABEL[LANGUAGE]}</p>
       ) : ranks.length === 0 ? (
-        <p className="rewards-page__empty page-unavailable__notice">Brak rang w tej grupie. Kliknij „Dodaj rangę”, aby utworzyć pierwszą.</p>
+        <p className="rewards-page__empty page-unavailable__notice">{EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : isTileView ? (
         <GroupMainRanksContent
           embedded
@@ -407,7 +609,7 @@ export default function RewardsHomeContent() {
           rowKey="id"
           tiebreakerKey="position"
           itemsPerPage={10}
-          paginationAriaLabel="Nawigacja stron listy rang"
+          paginationAriaLabel={PAGINATIONARIA__TEXTLABEL[LANGUAGE]}
           className="rewards-table rewards-table--ranks"
           search={{
             external: true,
@@ -474,3 +676,4 @@ export default function RewardsHomeContent() {
     </SectionPageLayout>
   );
 }
+
