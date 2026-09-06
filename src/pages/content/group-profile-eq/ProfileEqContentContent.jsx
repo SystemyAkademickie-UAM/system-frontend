@@ -14,6 +14,7 @@ import { useProfileInventory } from '../../../hooks/shop/useProfileInventory.js'
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
+import ProfileEqHistory from './ProfileEqHistory.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
 
@@ -47,6 +48,16 @@ const USEITEMERRORMESSAGE__TEXTLABEL = {
 const INVENTORYTITLE__TEXTLABEL = {
   polish: 'Ekwipunek',
   english: 'Inventory'
+};
+
+const TABINVENTORY__TEXTLABEL = {
+  polish: 'Posiadane przedmioty',
+  english: 'Inventory items'
+};
+
+const TABHISTORY__TEXTLABEL = {
+  polish: 'Historia operacji',
+  english: 'Operation history'
 };
 
 const PURCHASEDCOUNT__TEXTLABEL = {
@@ -193,6 +204,7 @@ export default function ProfileEqContentContent({
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [usingItemId, setUsingItemId] = useState(null);
   const [confirmUseItem, setConfirmUseItem] = useState(null);
+  const [activeTab, setActiveTab] = useState('inventory');
 
   const {
     entries,
@@ -249,37 +261,57 @@ export default function ProfileEqContentContent({
     <div className="profile-eq-page">
       <header className="profile-eq-page__header">
         <h2 className="profile-eq-page__title">{INVENTORYTITLE__TEXTLABEL[LANGUAGE]}</h2>
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+          <Button
+            type="button"
+            variant={activeTab === 'inventory' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setActiveTab('inventory')}
+          >
+            {TABINVENTORY__TEXTLABEL[LANGUAGE]}
+          </Button>
+          <Button
+            type="button"
+            variant={activeTab === 'history' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setActiveTab('history')}
+          >
+            {TABHISTORY__TEXTLABEL[LANGUAGE]}
+          </Button>
+        </div>
       </header>
 
       {error ? (
         <p className="profile-eq-page__error" role="alert">{error}</p>
       ) : null}
 
-      <div className="maq-section-page__toolbar profile-eq-page__toolbar">
-        <div className="maq-section-page__toolbar-start profile-eq-page__counts">
-          <span className="activities-page__count">
-            {PURCHASEDCOUNT__TEXTLABEL[LANGUAGE]}
-            {' '}
-            {totalPurchased}
-          </span>
-          <span className="activities-page__count">
-            {UNIQUECOUNT__TEXTLABEL[LANGUAGE]}
-            {' '}
-            {uniqueCount}
-          </span>
-        </div>
+      {activeTab === 'inventory' ? (
+        <>
+          <div className="maq-section-page__toolbar profile-eq-page__toolbar">
+            <div className="maq-section-page__toolbar-start profile-eq-page__counts">
+              <span className="activities-page__count">
+                {PURCHASEDCOUNT__TEXTLABEL[LANGUAGE]}
+                {' '}
+                {totalPurchased}
+              </span>
+              <span className="activities-page__count">
+                {UNIQUECOUNT__TEXTLABEL[LANGUAGE]}
+                {' '}
+                {uniqueCount}
+              </span>
+            </div>
 
-        <div className="maq-section-page__toolbar-end">
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-            name="profile-eq-search"
-            className="profile-eq-page__search"
-            aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
-          />
-        </div>
-      </div>
+            <div className="maq-section-page__toolbar-end">
+              <SearchBar
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                name="profile-eq-search"
+                className="profile-eq-page__search"
+                aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
+              />
+            </div>
+          </div>
 
       {categoryFilters.length > 1 ? (
         <>
@@ -344,6 +376,10 @@ export default function ProfileEqContentContent({
             );
           })}
         </div>
+      )}
+      </>
+      ) : (
+        <ProfileEqHistory groupId={groupId} studentAccountId={studentAccountId} />
       )}
 
       <ProfileEqUseItemModal
