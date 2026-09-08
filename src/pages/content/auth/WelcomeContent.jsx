@@ -2,6 +2,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { loginPath } from '../../../routes/pathRegistry.js';
+import { authLegalDocumentUrl } from '../../../constants/authLegalDocuments.constants.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './WelcomeContent.css';
 
@@ -76,7 +77,6 @@ function useCoarsePointer() {
 
 function SwapWord({
   word,
-  slotClass,
   onSwap,
   suffix = '',
 }) {
@@ -84,20 +84,11 @@ function SwapWord({
 
   return (
     <span
-      className={`welcome-swap-word ${slotClass}`}
+      className="welcome-swap-word"
       onMouseEnter={isCoarsePointer ? undefined : onSwap}
-      onClick={onSwap}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSwap();
-        }
-      }}
     >
       <span className="welcome-swap-word__inner">{word}</span>
-      {suffix}
+      {suffix ? <span className="welcome-swap-word__suffix">{suffix}</span> : null}
     </span>
   );
 }
@@ -159,15 +150,17 @@ export default function WelcomeContent() {
       </header>
 
       <div className="welcome-scroll-container">
-        {/* SEKCJA 1: Główna z wycentrowanym logo i podpisem */}
+        {/* SEKCJA 1: Główna z wycentrowanym logo MAQ (ikona + AQ) i podpisem */}
         <section className="welcome-section welcome-section--hero">
           <div className="welcome-hero__main-brand">
-            <div className="welcome-hero__logo-wrapper">
+            <div className="welcome-hero__brand">
               <img
                 src="/images/maq-logo.png"
                 alt="MyAcademyQuest Logo"
                 className="welcome-hero__brand-logo"
               />
+              <span className="welcome-hero__brand-a" aria-hidden="true">A</span>
+              <span className="welcome-hero__brand-q" aria-hidden="true">Q</span>
             </div>
             <p className="welcome-hero__subtitle">
               {SUBTITLE__TEXTLABEL[LANGUAGE]}
@@ -180,12 +173,11 @@ export default function WelcomeContent() {
             onClick={scrollToStory}
             aria-label={SCROLL_HINT__TEXTLABEL[LANGUAGE]}
           >
-            <span className="welcome-hero__scroll-text">{SCROLL_HINT__TEXTLABEL[LANGUAGE]}</span>
             <span className="welcome-hero__scroll-chevron" aria-hidden="true">↓</span>
           </button>
         </section>
 
-        {/* SEKCJA 2: Fabuła — tekst wycentrowany na ekranie z mechaniką słów */}
+        {/* SEKCJA 2: Fabuła — linie kończące się na wybranych słowach */}
         <section
           ref={storySectionRef}
           className="welcome-section welcome-section--story"
@@ -193,46 +185,56 @@ export default function WelcomeContent() {
           <div className="welcome-story-card">
             <div className="welcome-story-card__narrative">
               <p className="welcome-story-paragraph">
-                Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich{' '}
-                <SwapWord
-                  word={introWords.line0}
-                  slotClass="welcome-swap-word--disciplines"
-                  onSwap={() => setIntroWords((prev) => ({ ...prev, line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]) }))}
-                />
-                {' '}oraz nauk gotowych zdobywać wiedzę i poszerzać swoje{' '}
-                <SwapWord
-                  word={introWords.line1}
-                  slotClass="welcome-swap-word--skills"
-                  onSwap={() => setIntroWords((prev) => ({ ...prev, line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]) }))}
-                />
-                {' '}w najodleglejszych krainach i czasach.
+                <span className="welcome-story-line">
+                  Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich{' '}
+                  <SwapWord
+                    word={introWords.line0}
+                    onSwap={() => setIntroWords((prev) => ({ ...prev, line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                  />
+                </span>
+                <span className="welcome-story-line">
+                  oraz nauk gotowych zdobywać wiedzę i poszerzać swoje{' '}
+                  <SwapWord
+                    word={introWords.line1}
+                    onSwap={() => setIntroWords((prev) => ({ ...prev, line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                  />
+                </span>
+                <span className="welcome-story-line">
+                  w najodleglejszych krainach i czasach.
+                </span>
               </p>
 
               <p className="welcome-story-paragraph">
-                Po drugiej stronie próżno szukać{' '}
-                <SwapWord
-                  word={introWords.line2}
-                  slotClass="welcome-swap-word--lectures"
-                  suffix="."
-                  onSwap={() => setIntroWords((prev) => ({ ...prev, line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]) }))}
-                />
-                {' '}Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące{' '}
-                <SwapWord
-                  word={introWords.line3}
-                  slotClass="welcome-swap-word--missions"
-                  suffix="."
-                  onSwap={() => setIntroWords((prev) => ({ ...prev, line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]) }))}
-                />
+                <span className="welcome-story-line">
+                  Po drugiej stronie próżno szukać{' '}
+                  <SwapWord
+                    word={introWords.line2}
+                    suffix="."
+                    onSwap={() => setIntroWords((prev) => ({ ...prev, line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                  />
+                </span>
+                <span className="welcome-story-line">
+                  Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące{' '}
+                  <SwapWord
+                    word={introWords.line3}
+                    suffix="."
+                    onSwap={() => setIntroWords((prev) => ({ ...prev, line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                  />
+                </span>
               </p>
 
               <p className="welcome-story-paragraph">
-                Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią{' '}
-                <SwapWord
-                  word={introWords.line4}
-                  slotClass="welcome-swap-word--unity"
-                  suffix="?"
-                  onSwap={() => setIntroWords((prev) => ({ ...prev, line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]) }))}
-                />
+                <span className="welcome-story-line">
+                  Czy nie brak Ci sprytu i odwagi by przejść
+                </span>
+                <span className="welcome-story-line">
+                  do świata, gdzie nauka i przygoda stanowią{' '}
+                  <SwapWord
+                    word={introWords.line4}
+                    suffix="?"
+                    onSwap={() => setIntroWords((prev) => ({ ...prev, line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                  />
+                </span>
               </p>
             </div>
 
@@ -263,17 +265,32 @@ export default function WelcomeContent() {
                 <ul className="welcome-footer__list">
                   <li>Email: kontakt@myacademyquest.pl</li>
                   <li>Wsparcie: support@myacademyquest.pl</li>
-                  <li>Dział wdrożeń dla uczelni</li>
                 </ul>
               </div>
 
               <div className="welcome-footer__column">
                 <h3 className="welcome-footer__heading">Informacje</h3>
                 <ul className="welcome-footer__list">
-                  <li><Link to="/help" className="welcome-footer__link">Centrum Pomocy</Link></li>
-                  <li><span className="welcome-footer__link-disabled">Dokumentacja</span></li>
-                  <li><span className="welcome-footer__link-disabled">Polityka Prywatności</span></li>
-                  <li><span className="welcome-footer__link-disabled">Regulamin Serwisu</span></li>
+                  <li>
+                    <a
+                      href={authLegalDocumentUrl('documentation')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="welcome-footer__link"
+                    >
+                      Dokumentacja
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={authLegalDocumentUrl('privacyPolicy')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="welcome-footer__link"
+                    >
+                      Polityka Prywatności
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>

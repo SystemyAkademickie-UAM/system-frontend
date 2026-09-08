@@ -161,30 +161,51 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   max-width: 90vw;
 }
 
-.welcome-hero__logo-wrapper {
+.welcome-hero__brand {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 0.15rem;
 }
 
 .welcome-hero__brand-logo {
-  height: clamp(6.5rem, 15vw, 11rem);
+  height: clamp(5.5rem, 12vw, 8.5rem);
   max-width: min(85vw, 420px);
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 0 36px rgba(30, 204, 56, 0.3));
+  filter: drop-shadow(0 0 36px rgba(30, 204, 56, 0.35));
   animation: welcome-logo-float 5s ease-in-out infinite;
+}
+
+.welcome-hero__brand-a,
+.welcome-hero__brand-q {
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 900;
+  font-size: clamp(5rem, 11vw, 7.8rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  user-select: none;
+}
+
+.welcome-hero__brand-a {
+  color: #ffffff;
+}
+
+.welcome-hero__brand-q {
+  color: var(--welcome-accent);
+  text-shadow: 0 0 32px rgba(30, 204, 56, 0.5);
 }
 
 .welcome-hero__subtitle {
   margin: 0;
   font-family: 'Manrope', var(--font-family-app);
   font-weight: 600;
-  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
   color: rgba(220, 230, 222, 0.9);
   letter-spacing: 0.03em;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
@@ -252,62 +273,45 @@
 .welcome-story-paragraph {
   margin: 0;
   font-family: 'Manrope', var(--font-family-app);
-  font-size: clamp(1.15rem, 1.9vw, 1.45rem);
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
   font-weight: 600;
-  line-height: 1.8;
+  line-height: 1.85;
   color: var(--welcome-text);
-  text-wrap: balance;
+  text-align: center;
+}
+
+.welcome-story-line {
+  display: block;
 }
 
 .welcome-swap-word {
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
-  cursor: pointer;
+  cursor: default;
   vertical-align: baseline;
   font-weight: 800;
   color: var(--welcome-accent);
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
+  text-decoration: none;
   transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.welcome-swap-word__inner {
+  display: inline;
+}
+
+.welcome-swap-word__suffix {
+  display: inline;
+  color: var(--welcome-text);
+  text-decoration: none;
+  font-weight: 600;
+  padding-left: 1px;
 }
 
 .welcome-swap-word:hover,
 .welcome-swap-word:focus-visible {
   color: #4df068;
   outline: none;
-}
-
-/* Stabilne min-width per slot słów – eliminacja przesunięć layoutu */
-.welcome-swap-word--disciplines .welcome-swap-word__inner {
-  display: inline-block;
-  min-width: 9ch;
-  text-align: center;
-}
-
-.welcome-swap-word--skills .welcome-swap-word__inner {
-  display: inline-block;
-  min-width: 12ch;
-  text-align: center;
-}
-
-.welcome-swap-word--lectures .welcome-swap-word__inner {
-  display: inline-block;
-  min-width: 22ch;
-  text-align: center;
-}
-
-.welcome-swap-word--missions .welcome-swap-word__inner {
-  display: inline-block;
-  min-width: 11ch;
-  text-align: center;
-}
-
-.welcome-swap-word--unity .welcome-swap-word__inner {
-  display: inline-block;
-  min-width: 18ch;
-  text-align: center;
 }
 
 .welcome-story-card__cta {
