@@ -2,41 +2,138 @@
   box-sizing: border-box;
   width: var(--auth-card-max-width);
   max-width: calc(100% - 2rem);
-  padding: 16px clamp(1rem, 1.67vw, 32px) 32px;
+  padding:
+    var(--auth-card-back-padding-top, 16px)
+    var(--auth-card-body-padding-x, clamp(1rem, 1.67vw, 32px))
+    var(--auth-card-body-padding-bottom, clamp(2rem, 3.3vw, 64px));
   gap: 0;
-  align-items: center;
+  align-items: stretch;
+  margin-bottom: 0.5rem;
 }
 
-.register-eula__subtitle {
-  max-width: 451px;
-  margin-bottom: 48px;
+.register-eula__title {
+  margin-bottom: 0;
 }
 
 .register-eula__error {
   width: 100%;
-  max-width: var(--auth-content-max-width);
-  margin: -32px 0 24px;
-  font-family: 'Manrope', sans-serif;
+  margin: -0.5rem 0 1rem;
+  font-family: var(--font-family-app);
   font-size: 14px;
   line-height: 20px;
-  color: #ff8a8a;
-  text-align: center;
+  color: var(--color-input-error, #f87171);
+  text-align: left;
+}
+
+.register-eula__theme-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  margin-bottom: 1.75rem;
+}
+
+.register-eula__section-label {
+  font-family: var(--font-family-app);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.register-eula__theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.register-eula__theme-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(13, 13, 24, 0.4);
+  border: 1.5px solid rgba(189, 202, 190, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  user-select: none;
+}
+
+.register-eula__theme-card:hover {
+  border-color: rgba(30, 204, 56, 0.4);
+  background: rgba(13, 13, 24, 0.6);
+}
+
+.register-eula__theme-card--selected {
+  border-color: var(--color-accent);
+  background: rgba(30, 204, 56, 0.08);
+}
+
+.register-eula__theme-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.register-eula__theme-radio-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(189, 202, 190, 0.4);
+  flex-shrink: 0;
+  transition: border-color 0.15s ease;
+}
+
+.register-eula__theme-card--selected .register-eula__theme-radio-circle {
+  border-color: var(--color-accent);
+}
+
+.register-eula__theme-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.register-eula__theme-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.register-eula__theme-name {
+  font-family: var(--font-family-app);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.register-eula__theme-desc {
+  font-family: var(--font-family-app);
+  font-size: 12px;
+  color: var(--color-text-secondary);
 }
 
 .register-eula__checkboxes {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 1rem;
   width: 100%;
-  max-width: 451px;
-  margin-bottom: 64px;
+  margin-bottom: 2rem;
 }
 
 .register-eula__checkbox-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 16px;
+  gap: 0.75rem;
   cursor: pointer;
   user-select: none;
 }
@@ -46,7 +143,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .register-eula__checkbox-input {
@@ -54,6 +153,7 @@
   opacity: 0;
   width: 0;
   height: 0;
+  margin: 0;
 }
 
 .register-eula__checkbox-custom {
@@ -61,79 +161,67 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #BDCABE;
-  border-radius: 2px;
-  background: transparent;
-  transition: background-color 0.2s, border-color 0.2s;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(189, 202, 190, 0.4);
+  border-radius: 4px;
+  background: rgba(13, 13, 24, 0.4);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .register-eula__checkbox-input:checked + .register-eula__checkbox-custom {
-  background: #44E286;
-  border-color: #44E286;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 .register-eula__checkbox-input:focus-visible + .register-eula__checkbox-custom {
-  outline: 2px solid #44E286;
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
 .register-eula__check-icon {
-  width: 12px;
-  height: 12px;
-  color: #00391F;
+  width: 14px;
+  height: 14px;
+  color: var(--color-accent-on);
 }
 
 .register-eula__checkbox-label {
-  font-family: 'Manrope', sans-serif;
-  font-weight: 600;
-  font-size: 22px;
-  line-height: 28px;
-  color: #BDCABE;
-  opacity: 0.6;
+  font-family: var(--font-family-app);
+  font-weight: 500;
+  font-size: var(--font-size-body);
+  line-height: 22px;
+  color: var(--color-text-primary);
 }
 
-.register-eula__download-link {
-  display: inline-block;
-  margin-left: 0.35rem;
-  padding: 0.1rem 0.45rem;
-  font-size: 0.72em;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #4da3ff;
-  text-decoration: none;
-  white-space: nowrap;
-  border: 1px solid rgba(77, 163, 255, 0.45);
-  border-radius: 4px;
-}
-
-.register-eula__download-link:hover {
-  color: #7bb8ff;
+.register-eula__document-link {
+  color: var(--color-text-primary);
   text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(189, 202, 190, 0.5);
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 
-.register-eula__download-link:focus-visible {
-  outline: 2px solid #4da3ff;
+.register-eula__document-link:hover {
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
+}
+
+.register-eula__document-link:focus-visible {
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: 2px;
 }
 
 .register-eula__submit {
   width: 100%;
-  max-width: var(--auth-content-max-width);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .register-eula {
-    padding: 16px;
+    padding: 1rem 1.25rem 1.5rem;
   }
 
-  .register-eula__checkbox-label {
-    font-size: 18px;
-  }
-
-  .register-eula__checkboxes {
-    margin-bottom: 32px;
+  .register-eula .auth-card__header {
+    margin-bottom: 1.25rem;
   }
 }

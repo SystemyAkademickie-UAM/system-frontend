@@ -55,6 +55,7 @@ export const HREF_BUILDERS = {
     ctx.groupId && ctx.studentId ? paths.groupStudentProfilePath(ctx.groupId, ctx.studentId) : null,
   GROUP_PROFILE_LOG: (ctx) => (ctx.groupId ? paths.groupProfileActivityPath(ctx.groupId) : null),
   GROUP_PROFILE_EQ: (ctx) => (ctx.groupId ? paths.groupProfileEqPath(ctx.groupId) : null),
+  GROUP_PROFILE_PURCHASES: (ctx) => (ctx.groupId ? paths.groupProfilePurchasesPath(ctx.groupId) : null),
 
   // Użytkownicy (lecturer) + podstrony
   GROUP_MEMBERS: (ctx) => (ctx.groupId ? paths.groupMembersPath(ctx.groupId) : null),
@@ -150,16 +151,6 @@ const studentView = {
       requiresGroup: true,
       children: [
         {
-          id: 'profil-odznaki',
-          enabled: true,
-          kind: 'tree-item',
-          label: 'Zdobyte odznaki',
-          iconId: 'nav/profile-badges',
-          hrefKey: 'GROUP_PROFILE',
-          requiresGroup: true,
-          matchEnd: true,
-        },
-        {
           id: 'profil-aktywnosci',
           enabled: true,
           kind: 'tree-item',
@@ -170,12 +161,32 @@ const studentView = {
           matchEnd: true,
         },
         {
+          id: 'profil-odznaki',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Zdobyte odznaki',
+          iconId: 'nav/profile-badges',
+          hrefKey: 'GROUP_PROFILE',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
           id: 'profil-ekwipunek',
           enabled: true,
           kind: 'tree-item',
           label: 'Ekwipunek',
           iconId: 'nav/profile-inventory',
           hrefKey: 'GROUP_PROFILE_EQ',
+          requiresGroup: true,
+          matchEnd: true,
+        },
+        {
+          id: 'profil-zakupy',
+          enabled: true,
+          kind: 'tree-item',
+          label: 'Historia zakupów',
+          iconId: 'nav/shop',
+          hrefKey: 'GROUP_PROFILE_PURCHASES',
           requiresGroup: true,
           matchEnd: true,
         },
@@ -620,9 +631,10 @@ export const SUB_NAV_CONFIG = {
 
   // Profil studenta
   'group-profile': [
-    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE', end: true },
     { id: 'log', label: 'Dziennik aktywności', hrefKey: 'GROUP_PROFILE_LOG', end: true },
+    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE', end: true },
     { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_PROFILE_EQ', end: true },
+    { id: 'purchases', label: 'Historia zakupów', hrefKey: 'GROUP_PROFILE_PURCHASES', end: true },
   ],
 
   // Użytkownicy (lecturer)

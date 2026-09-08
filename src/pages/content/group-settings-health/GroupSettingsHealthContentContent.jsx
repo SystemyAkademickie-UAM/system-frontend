@@ -43,6 +43,11 @@ const SECTIONHEADER__TEXTLABEL = {
   english: 'Lives System'
 };
 
+const CUSTOMIZESECTION__TEXTLABEL = {
+  polish: 'Dostosuj',
+  english: 'Customize'
+};
+
 const LOADINGHINT__TEXTLABEL = {
   polish: 'Ładowanie ustawień systemu żyć…',
   english: 'Loading lives settings…'
@@ -358,9 +363,23 @@ export default function GroupSettingsHealthContentContent() {
               </SettingsCheckboxField>
             </div>
 
+            <div className="group-settings-form__field" style={{ marginTop: '0.5rem' }}>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsManageOpen(true)}
+                disabled={!livesEnabled || isSaving}
+              >
+                {MANAGEBUTTON__TEXTLABEL[LANGUAGE]}
+              </Button>
+            </div>
+
             <Divider className="group-settings-form__section-divider" />
 
             <div className={detailsSectionClassName}>
+              <SettingsSectionHeader title={CUSTOMIZESECTION__TEXTLABEL[LANGUAGE]} id="group-lives-customize-title" />
+
               <EmojiPickerField
                 className="group-settings-form__field"
                 label={EMOJIPICKERLABEL__TEXTLABEL[LANGUAGE]}
@@ -428,8 +447,6 @@ export default function GroupSettingsHealthContentContent() {
                 </SettingsCheckboxField>
               </div>
 
-              <Divider className="group-settings-form__section-divider" />
-
               <div className="group-settings-form__field">
                 <Button
                   type="button"
@@ -439,18 +456,6 @@ export default function GroupSettingsHealthContentContent() {
                   disabled={!livesEnabled || !livesShopEnabled || !extraLifeItemId}
                 >
                   {EDITEXTRALIFEBUTTON__TEXTLABEL[LANGUAGE]}
-                </Button>
-              </div>
-
-              <div className="group-settings-form__field">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setIsManageOpen(true)}
-                  disabled={!livesEnabled}
-                >
-                  {MANAGEBUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
               </div>
             </div>

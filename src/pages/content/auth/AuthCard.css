@@ -23,23 +23,43 @@
   }
 }
 
-.auth-card__back-button {
+.auth-card__header {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.auth-card__header .auth-card__back-button {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.auth-card__header .auth-card__title {
+  margin-bottom: 0;
+}
+
+.auth-card__back-button {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   background: transparent;
-  border: none;
+  border: 1px solid rgba(189, 202, 190, 0.25);
   cursor: pointer;
-  border-radius: 50%;
-  transition: background-color 0.2s;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   align-self: flex-start;
   margin-bottom: 16px;
+  color: var(--auth-text-primary, var(--color-text-primary));
 }
 
 .auth-card__back-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(189, 202, 190, 0.45);
 }
 
 .auth-card__back-button:focus-visible {
@@ -48,9 +68,9 @@
 }
 
 .auth-card__back-icon {
-  width: 32px;
-  height: 32px;
-  color: var(--auth-text-primary, var(--color-text-primary));
+  width: 18px;
+  height: 18px;
+  color: currentColor;
 }
 
 .auth-card__logo {

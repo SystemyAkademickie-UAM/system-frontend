@@ -256,6 +256,12 @@ export default function ProductCard({
 
   isExtraLife = false,
 
+  isUsed = false,
+
+  isPurchasedHistory = false,
+
+  dateLabel = null,
+
 }) {
 
   const { symbol: livesSymbol } = useGroupLives();
@@ -278,9 +284,9 @@ export default function ProductCard({
 
   const isInventory = inventoryMode === true;
 
-  const showCartButton = !hideAddToCart && !hideActions && !isInventory;
+  const showCartButton = !hideAddToCart && !hideActions && !isInventory && !isUsed && !isPurchasedHistory;
 
-  const showFooter = isInventory || !hideActions || isPreview;
+  const showFooter = isInventory || !hideActions || isPreview || isUsed || isPurchasedHistory;
 
   const resolvedCategories = categoryDetails.length > 0
     ? categoryDetails
@@ -312,6 +318,10 @@ export default function ProductCard({
         isRankLocked ? 'maq-product-card--rank-locked' : '',
 
         isExtraLife ? 'maq-product-card--extra-life' : '',
+
+        isUsed ? 'maq-product-card--used' : '',
+
+        isPurchasedHistory ? 'maq-product-card--purchased' : '',
 
         className,
 
@@ -484,7 +494,26 @@ export default function ProductCard({
 
         <footer className="maq-product-card__footer">
 
-          {isInventory ? (
+          {isUsed ? (
+            <div className="maq-product-card__price-bar">
+              <span className="maq-product-card__section-label">{dateLabel || 'Przedmiot zużyty'}</span>
+            </div>
+          ) : isPurchasedHistory ? (
+            <>
+              <div className="maq-product-card__price-bar">
+                <span className="maq-product-card__section-label">Cena</span>
+                <ProductCardPrice
+                  priceAmount={priceAmount}
+                  priceEmoji={priceEmoji}
+                />
+              </div>
+              {dateLabel ? (
+                <div className="maq-product-card__date-bar">
+                  <span className="maq-product-card__section-label">{dateLabel}</span>
+                </div>
+              ) : null}
+            </>
+          ) : isInventory ? (
             <>
               <div className="maq-product-card__price-bar">
                 <span className="maq-product-card__section-label">Posiadane sztuki</span>

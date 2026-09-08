@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   Button,
   CatalogFilterGroup,
@@ -321,6 +321,8 @@ export default function GroupShopContent() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { role } = useAppRole();
   const { isOwner } = useGroupPreview(groupId);
   const { showSuccess, showError, showToast } = useToast();
@@ -380,6 +382,13 @@ export default function GroupShopContent() {
   const [activeModal, setActiveModal] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRefreshingShop, setIsRefreshingShop] = useState(false);
+  const [highlightedItemId, setHighlightedItemId] = useState(null);
+
+  const highlightParam = searchParams.get('highlight');
+  const highlightFromState = location.state?.highlightItemId;
+  const highlightNameFromState = location.state?.highlightItemName;
+  const isExtraLifeHighlight = location.state?.isExtraLife || highlightParam === 'extra-life';
+  const targetHighlightId = highlightFromState ?? highlightParam;
 
   const {
     categories,
@@ -420,6 +429,65 @@ export default function GroupShopContent() {
       setPage(pagination.totalPages);
     }
   }, [page, pagination.totalPages]);
+
+  useEffect(() => {
+    if (!targetHighlightId && !highlightNameFromState && !isExtraLifeHighlight) {
+      return;
+    }
+    if (catalogItems.length === 0) {
+      return;
+    }
+
+    let targetItem = null;
+    if (isExtraLifeHighlight) {
+      targetItem = catalogItems.find((it) => it.isExtraLife === true) ?? null;
+    }
+    if (!targetItem && targetHighlightId) {
+      targetItem = catalogItems.find((it) => String(it.id) === String(targetHighlightId)) ?? null;
+    }
+    if (!targetItem && highlightNameFromState) {
+      const norm = String(highlightNameFromState).trim().toLowerCase();
+      targetItem = catalogItems.find((it) => it.name && it.name.trim().toLowerCase() === norm) ?? null;
+    }
+
+    if (!targetItem) {
+      return;
+    }
+
+    if (searchQuery) {
+      setSearchQuery('');
+    }
+    if (categoryFilter !== 'all') {
+      setCategoryFilter('all');
+    }
+
+    const itemIndex = visibleItems.findIndex((it) => String(it.id) === String(targetItem.id));
+    if (itemIndex !== -1) {
+      const targetPage = Math.floor(itemIndex / ITEMS_PER_PAGE) + 1;
+      if (page !== targetPage) {
+        setPage(targetPage);
+      }
+    }
+
+    const targetId = targetItem.id;
+    setHighlightedItemId(targetId);
+
+    const scrollTimer = setTimeout(() => {
+      const el = document.getElementById(`shop-item-${targetId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 120);
+
+    const clearTimer = setTimeout(() => {
+      setHighlightedItemId(null);
+    }, 3200);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [catalogItems, visibleItems, targetHighlightId, highlightNameFromState, isExtraLifeHighlight, page, searchQuery, categoryFilter]);
 
   const handleRefreshShop = useCallback(async () => {
     if (isRefreshingShop) {
@@ -728,31 +796,45 @@ export default function GroupShopContent() {
           ) : (
             <>
               <div className="group-shop__grid">
-                {pagination.pageItems.map((item, index) => (
-                  <ProductCard
-                    key={`${item.id}-${index}`}
-                    itemId={item.id}
-                    name={item.name}
-                    storyDescription={item.storyDescription}
-                    didacticDescription={item.didacticDescription}
-                    priceAmount={item.priceAmount}
-                    salePriceAmount={item.salePriceAmount}
-                    rankDiscountedPrice={item.rankDiscountedPrice}
-                    imageRef={item.imageRef}
-                    categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
-                    showLecturerActions={isLecturerView}
-                    disabled={isShopItemPurchaseDisabled(item, purchaseOptions)}
-                    isRankLocked={!isLecturerView && item.isLocked}
-                    isInCart={cartItemIds.includes(item.id)}
-                    onBuy={() => setActiveModal({ type: 'buy', item })}
-                    onAddToCart={() => addToCart(item.id)}
-                    onEdit={() => setActiveModal({ type: 'itemForm', itemId: item.id })}
-                    onDelete={item.isExtraLife ? undefined : () => setActiveModal({ type: 'delete', item })}
-                    isExtraLife={item.isExtraLife}
-                    className="group-shop__card"
-                    hideAddToCart={item.isExtraLife}
-                  />
-                ))}
+                {pagination.pageItems.map((item, index) => {
+                  const isCardHighlighted = String(item.id) === String(highlightedItemId);
+                  return (
+                    <div
+                      key={`${item.id}-${index}`}
+                      id={`shop-item-${item.id}`}
+                      className={[
+                        'group-shop__card-wrapper',
+                        isCardHighlighted ? 'group-shop__card-wrapper--highlighted' : '',
+                      ].filter(Boolean).join(' ')}
+                    >
+                      <ProductCard
+                        itemId={item.id}
+                        name={item.name}
+                        storyDescription={item.storyDescription}
+                        didacticDescription={item.didacticDescription}
+                        priceAmount={item.priceAmount}
+                        salePriceAmount={item.salePriceAmount}
+                        rankDiscountedPrice={item.rankDiscountedPrice}
+                        imageRef={item.imageRef}
+                        categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
+                        showLecturerActions={isLecturerView}
+                        disabled={isShopItemPurchaseDisabled(item, purchaseOptions)}
+                        isRankLocked={!isLecturerView && item.isLocked}
+                        isInCart={cartItemIds.includes(item.id)}
+                        onBuy={() => setActiveModal({ type: 'buy', item })}
+                        onAddToCart={() => addToCart(item.id)}
+                        onEdit={() => setActiveModal({ type: 'itemForm', itemId: item.id })}
+                        onDelete={item.isExtraLife ? undefined : () => setActiveModal({ type: 'delete', item })}
+                        isExtraLife={item.isExtraLife}
+                        className={[
+                          'group-shop__card',
+                          isCardHighlighted ? 'group-shop__card--highlighted' : '',
+                        ].filter(Boolean).join(' ')}
+                        hideAddToCart={item.isExtraLife}
+                      />
+                    </div>
+                  );
+                })}
               </div>
 
               {visibleItems.length > ITEMS_PER_PAGE ? (

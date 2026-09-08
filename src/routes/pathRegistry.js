@@ -124,6 +124,11 @@ export function groupProfileEqPath(groupId) {
   return `/groups/${groupId}/profile/eq`;
 }
 
+/** Historia zakupów profilu — `/groups/:groupId/profile/purchases`. */
+export function groupProfilePurchasesPath(groupId) {
+  return `/groups/${groupId}/profile/purchases`;
+}
+
 // ============================================================================
 // MEMBERS (Użytkownicy) - lecturer only
 // ============================================================================

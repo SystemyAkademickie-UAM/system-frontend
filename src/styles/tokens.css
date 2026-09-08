@@ -262,3 +262,28 @@
   --text-page-description: var(--font-size-page-description);
   --text-nav-stat: var(--font-size-nav-stat);
 }
+
+[data-theme="light"] {
+  --color-bg-app: #f1f3f5;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #e6e9ec;
+  --color-divider: #d8dde2;
+
+  --color-text-primary: #181824;
+  --color-text-secondary: #4a5568;
+
+  --color-nav-primary: #1e3b24;
+  --color-nav-stat-bg: #e6e9ec;
+  --color-nav-sub-active-bg: #e6e9ec;
+
+  --color-modal-backdrop: rgba(0, 0, 0, 0.45);
+  --color-modal-surface: #ffffff;
+  --color-modal-border: rgba(0, 0, 0, 0.1);
+
+  --color-overlay-actions-bg: rgba(245, 247, 250, 0.9);
+  --color-overlay-actions-border: rgba(0, 0, 0, 0.08);
+
+  --color-badge-text: #181824;
+  --color-rank-text: #181824;
+}
+

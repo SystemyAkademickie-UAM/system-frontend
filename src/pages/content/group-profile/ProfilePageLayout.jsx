@@ -2,19 +2,18 @@ import { useEffect, useState } from 'react';
 import { Divider, SubNav, CurrencyDisplay } from '../../../components/ui/index.js';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
-import { fetchGroupRanks } from '../../../services/ranks.api.js';
 import { formatProfileNumber } from '../../../services/studentProfile.api.js';
+import { fetchGroupInventoryHistory, fetchStudentInventoryHistory } from '../../../services/shop.api.js';
+import {
+  GROUP_INVENTORY_INVALIDATED,
+  STUDENT_PROFILE_INVALIDATED,
+  subscribeGroupScopedEvent,
+} from '../../../services/studentProfileEvents.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
-import { mapRankDiscountValue } from '../group-main-ranks/rankPathModel.js';
 import { ProfileStudentProfileContext } from './ProfileStudentProfileContext.js';
 import { useGroupStudentProfile } from './useGroupStudentProfile.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ProfilePageLayout.css';
-
-const CURRENCY_LABEL__TEXTLABEL = {
-  polish: 'Zdobyta waluta',
-  english: 'Earned currency'
-};
 
 const LOADING_MESSAGE__TEXTLABEL = {
   polish: 'Ładowanie profilu…',
@@ -36,30 +35,25 @@ const NO_RANK_TEXT__TEXTLABEL = {
   english: 'No rank'
 };
 
-const BADGES_COUNT_LABEL__TEXTLABEL = {
-  polish: 'Zdobyte odznaki',
-  english: 'Earned badges'
+const STATS_LABELS = {
+  currency: { polish: 'Stan konta', english: 'Balance' },
+  totalEarned: { polish: 'Łącznie zdobyta waluta', english: 'Total earned' },
+  badgesCount: { polish: 'Liczba odznak', english: 'Badges count' },
+  purchasedItems: { polish: 'Zakupione przedmioty', english: 'Purchased items' },
+  usedItems: { polish: 'Użyte przedmioty', english: 'Used items' },
+  lives: { polish: 'Liczba żyć', english: 'Lives' },
+  lostLives: { polish: 'Utracone życia', english: 'Lost lives' },
 };
 
-const SHOP_DISCOUNT_LABEL__TEXTLABEL = {
-  polish: 'Zniżka w sklepie',
-  english: 'Shop discount'
-};
-
-function ProfileCurrencyStat({ amount, LANGUAGE }) {
-  return (
-    <div className="profile-page-layout__stat-line">
-      <span className="profile-page-layout__stat-label">{CURRENCY_LABEL__TEXTLABEL[LANGUAGE]}</span>
-      <CurrencyDisplay amount={amount} size="sm" className="profile-page-layout__stat-value" />
-    </div>
-  );
-}
-
-function ProfileStatLine({ label, value }) {
+function ProfileStatLine({ label, value, isCurrency = false }) {
   return (
     <div className="profile-page-layout__stat-line">
       <span className="profile-page-layout__stat-label">{label}</span>
-      <span className="profile-page-layout__stat-value">{value}</span>
+      {isCurrency ? (
+        <CurrencyDisplay amount={value} size="sm" className="profile-page-layout__stat-value" />
+      ) : (
+        <span className="profile-page-layout__stat-value">{value}</span>
+      )}
     </div>
   );
 }
@@ -70,7 +64,24 @@ export default function ProfilePageLayout({ children }) {
   const profileState = useGroupStudentProfile();
   const { groupId, profile, isLoading, error, refetch, studentId } = profileState;
   const { profile: userProfile, avatarUrl: userAvatarUrl } = useUserProfile();
-  const [shopDiscountPercent, setShopDiscountPercent] = useState(0);
+
+  const [historyStats, setHistoryStats] = useState({ purchasedCount: 0, usedCount: 0 });
+
+  const loadHistoryStats = async () => {
+    if (!groupId) return;
+    try {
+      const res = studentId
+        ? await fetchStudentInventoryHistory(groupId, studentId)
+        : await fetchGroupInventoryHistory(groupId);
+      if (res.ok && Array.isArray(res.history)) {
+        const purchased = res.history.filter((h) => h.type === 'SHOP_PURCHASE').length;
+        const used = res.history.filter((h) => h.type === 'ITEM_USED').length;
+        setHistoryStats({ purchasedCount: purchased, usedCount: used });
+      }
+    } catch {
+      // Ignored
+    }
+  };
 
   useEffect(() => {
     if (!studentId && userProfile) {
@@ -79,31 +90,26 @@ export default function ProfilePageLayout({ children }) {
   }, [studentId, userProfile?.nickname, userProfile?.avatarId, refetch, userProfile]);
 
   useEffect(() => {
-    if (!groupId || profile?.rankId == null) {
-      setShopDiscountPercent(0);
-      return undefined;
-    }
+    loadHistoryStats();
+  }, [groupId, studentId]);
 
-    let cancelled = false;
-
-    fetchGroupRanks(groupId)
-      .then((ranks) => {
-        if (cancelled) {
-          return;
-        }
-        const rank = ranks.find((entry) => entry.id === profile.rankId);
-        setShopDiscountPercent(rank ? mapRankDiscountValue(rank) : 0);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setShopDiscountPercent(0);
-        }
-      });
-
+  useEffect(() => {
+    if (!groupId) return undefined;
+    const unsubInv = subscribeGroupScopedEvent(GROUP_INVENTORY_INVALIDATED, (evGroupId) => {
+      if (evGroupId === String(groupId)) {
+        loadHistoryStats();
+      }
+    });
+    const unsubProf = subscribeGroupScopedEvent(STUDENT_PROFILE_INVALIDATED, (evGroupId) => {
+      if (evGroupId === String(groupId)) {
+        loadHistoryStats();
+      }
+    });
     return () => {
-      cancelled = true;
+      unsubInv();
+      unsubProf();
     };
-  }, [groupId, profile?.rankId]);
+  }, [groupId]);
 
   const subNavItems = nav.items;
 
@@ -111,6 +117,17 @@ export default function ProfilePageLayout({ children }) {
   const legalName = [profile?.name, profile?.surname].filter(Boolean).join(' ').trim();
   const displayName = nickname || legalName || DEFAULT_STUDENT_NAME__TEXTLABEL[LANGUAGE];
   const avatarUrl = profile?.avatarUrl || userAvatarUrl;
+
+  const purchasedDisplay = profile?.purchasedItemsCount != null
+    ? formatProfileNumber(profile.purchasedItemsCount)
+    : formatProfileNumber(historyStats.purchasedCount);
+
+  const usedDisplay = profile?.usedItemsCount != null
+    ? formatProfileNumber(profile.usedItemsCount)
+    : formatProfileNumber(historyStats.usedCount);
+
+  const livesDisplay = profile?.lives != null ? formatProfileNumber(profile.lives) : '-';
+  const lostLivesDisplay = profile?.lostLivesCount != null ? formatProfileNumber(profile.lostLivesCount) : '-';
 
   return (
     <ProfileStudentProfileContext.Provider value={profileState}>
@@ -144,9 +161,36 @@ export default function ProfilePageLayout({ children }) {
               <Divider orientation="vertical" className="profile-page-layout__summary-divider" />
 
               <div className="profile-page-layout__stats-column">
-                <ProfileCurrencyStat amount={profile.totalEarned} LANGUAGE={LANGUAGE} />
-                <ProfileStatLine label={BADGES_COUNT_LABEL__TEXTLABEL[LANGUAGE]} value={formatProfileNumber(profile.badgesCount)} />
-                <ProfileStatLine label={SHOP_DISCOUNT_LABEL__TEXTLABEL[LANGUAGE]} value={`${shopDiscountPercent}%`} />
+                <ProfileStatLine
+                  label={STATS_LABELS.currency[LANGUAGE]}
+                  value={profile.currency ?? 0}
+                  isCurrency
+                />
+                <ProfileStatLine
+                  label={STATS_LABELS.totalEarned[LANGUAGE]}
+                  value={profile.totalEarned ?? 0}
+                  isCurrency
+                />
+                <ProfileStatLine
+                  label={STATS_LABELS.badgesCount[LANGUAGE]}
+                  value={formatProfileNumber(profile.badgesCount ?? profile.earnedBadges?.length ?? 0)}
+                />
+                <ProfileStatLine
+                  label={STATS_LABELS.purchasedItems[LANGUAGE]}
+                  value={purchasedDisplay}
+                />
+                <ProfileStatLine
+                  label={STATS_LABELS.usedItems[LANGUAGE]}
+                  value={usedDisplay}
+                />
+                <ProfileStatLine
+                  label={STATS_LABELS.lives[LANGUAGE]}
+                  value={livesDisplay}
+                />
+                <ProfileStatLine
+                  label={STATS_LABELS.lostLives[LANGUAGE]}
+                  value={lostLivesDisplay}
+                />
               </div>
             </div>
 

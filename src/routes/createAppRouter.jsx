@@ -42,6 +42,7 @@ import ProfileLayout from '../pages/links/groups/layouts/ProfileLayout.jsx';
 import ProfileHomePage from '../pages/links/groups/profile/ProfileHomePage.jsx';
 import ProfileLogPage from '../pages/links/groups/profile/ProfileLogPage.jsx';
 import ProfileEqPage from '../pages/links/groups/profile/ProfileEqPage.jsx';
+import ProfilePurchasesPage from '../pages/links/groups/profile/ProfilePurchasesPage.jsx';
 import StudentProfileViewPage from '../pages/links/groups/student-profile/StudentProfileViewPage.jsx';
 
 // Members (Użytkownicy) - lecturer only
@@ -274,6 +275,7 @@ const appRouteTree = [
                       { index: true, element: <ProfileHomePage /> },
                       { path: 'activity', element: <ProfileLogPage /> },
                       { path: 'eq', element: <ProfileEqPage /> },
+                      { path: 'purchases', element: <ProfilePurchasesPage /> },
                     ],
                   },
 

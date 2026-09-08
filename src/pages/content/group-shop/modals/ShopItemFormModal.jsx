@@ -10,11 +10,18 @@ const EDIT_ITEM_TITLE__TEXTLABEL = {
 };
 
 const ADD_ITEM_TITLE__TEXTLABEL = {
-  polish: 'Dodaj produkt',
-  english: 'Add Product'
+  polish: 'Dodaj przedmiot',
+  english: 'Add Item'
 };
 
+const STAGE_TITLES = {
+  1: { polish: 'Informacje', english: 'Information' },
+  2: { polish: 'Wartość przedmiotu', english: 'Item Value' },
+  3: { polish: 'Dostępność', english: 'Availability' },
+  4: { polish: 'Podsumowanie', english: 'Summary' },
+};
 
+const TOTAL_STEPS = 4;
 
 /**
  * @param {{
@@ -33,15 +40,28 @@ export default function ShopItemFormModal({
   onSaved,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const title = itemId
+  const [currentStep, setCurrentStep] = useState(1);
+
+  const baseTitle = itemId
     ? EDIT_ITEM_TITLE__TEXTLABEL[LANGUAGE]
     : ADD_ITEM_TITLE__TEXTLABEL[LANGUAGE];
+
+  const stageTitle = STAGE_TITLES[currentStep]?.[LANGUAGE] ?? '';
+
+  const modalTitle = (
+    <span className="shop-item-modal-title">
+      <span className="shop-item-modal-title__main">{baseTitle}</span>
+      <span className="shop-item-modal-title__stage">
+        {' '}&mdash; {stageTitle} {currentStep}/{TOTAL_STEPS}
+      </span>
+    </span>
+  );
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={title}
+      title={modalTitle}
       size="xl"
       showFooter={false}
       className="shop-item-form-modal"
@@ -51,6 +71,8 @@ export default function ShopItemFormModal({
         itemId={itemId}
         onClose={onClose}
         onSaved={onSaved}
+        onStepChange={setCurrentStep}
+        hideInternalHeader={true}
       />
     </Modal>
   );

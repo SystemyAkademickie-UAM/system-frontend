@@ -62,3 +62,17 @@ export async function updateGroupLivesConfig(groupId, payload) {
   const result = await patchJson(`/groups/${groupId}/lives-config`, payload);
   return { ok: result.ok };
 }
+
+/**
+ * Masowa aktualizacja żyć studentów (zbiorcza zmiana delt).
+ * PATCH /groups/:groupId/students/lives/bulk-update
+ *
+ * @param {string | number} groupId
+ * @param {Array<{ accountId: number, delta: number }>} students
+ * @returns {Promise<{ ok: boolean, data?: unknown, error?: string }>}
+ */
+export async function bulkUpdateStudentLives(groupId, students) {
+  const result = await patchJson(`/groups/${groupId}/students/lives/bulk-update`, { students }, { includeBrowserId: true });
+  return result;
+}
+

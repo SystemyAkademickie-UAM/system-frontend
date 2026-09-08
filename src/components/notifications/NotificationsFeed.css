@@ -22,9 +22,9 @@
 }
 
 .notifications-feed__row {
-  display: flex;
-  align-items: stretch;
-  gap: 0.35rem;
+  position: relative;
+  display: block;
+  width: 100%;
 }
 
 .notifications-feed__row--unread .notifications-feed__item {
@@ -63,10 +63,10 @@
 }
 
 .notifications-feed__item {
-  flex: 1 1 auto;
-  min-width: 0;
+  box-sizing: border-box;
+  width: 100%;
   display: block;
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 2.75rem 0.85rem 1rem;
   border-radius: 10px;
   background: rgba(13, 13, 24, 0.45);
   color: inherit;
@@ -76,7 +76,7 @@
 }
 
 .notifications-feed--compact .notifications-feed__item {
-  padding: 0.75rem;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
 }
 
 .notifications-feed__item--linkable {
@@ -128,13 +128,15 @@
 }
 
 .notifications-feed__mark-read {
-  flex: 0 0 auto;
-  align-self: center;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: 0;
   border-radius: 8px;

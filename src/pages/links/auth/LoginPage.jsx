@@ -13,12 +13,13 @@ import {
   resolveRegistrationWizardStep,
 } from '../../../services/registrationStatus.api.js';
 import {
-  LOGIN_FLOW_STEP_EULA,
+  LOGIN_FLOW_STEP_AVATAR,
   LOGIN_FLOW_STEP_EMAIL,
   LOGIN_FLOW_STEP_INSTITUTION,
   LOGIN_FLOW_STEP_ORDER,
   LOGIN_FLOW_STEP_PIONIER,
   LOGIN_FLOW_STEP_REGISTER,
+  LOGIN_FLOW_STEP_SETTINGS,
 } from '../../../constants/loginFlow.constants.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
@@ -28,6 +29,9 @@ import {
 } from '../../../auth/clientAuthState.js';
 import { prefetchAvatarList } from '../../../services/avatarListCache.js';
 import { isLogoutAvailable, logoutUser } from '../../../services/authService.js';
+import { updateProfile } from '../../../services/profile.api.js';
+import { setLeaderShowNickname } from '../../../hooks/useLeaderDisplayPreferences.js';
+import { applyTheme } from '../../../services/themeService.js';
 import { invalidateRegistrationStatusCache } from '../../../hooks/useRegistrationComplete.js';
 import { homePath, loginPath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
@@ -35,8 +39,9 @@ import {
   LoginInstitution,
   LoginEmail,
   LoginPionierId,
-  RegisterEula,
   RegisterProfile,
+  RegisterAvatar,
+  RegisterEula,
   AuthWizardResolvingPanel,
 } from '../../content/auth/index.js';
 
@@ -51,10 +56,10 @@ export default function LoginPage() {
   const session = useSessionOptional();
   const { refetchProfile } = useUserProfile();
   const [step, setStep] = useState(LOGIN_FLOW_STEP_PIONIER);
-  const [profileData, setProfileData] = useState({ nickname: '', avatarId: 1 });
-  const [eulaError, setEulaError] = useState(null);
+  const [profileData, setProfileData] = useState({ nickname: '', avatarId: 1, showNickname: true });
+  const [settingsError, setSettingsError] = useState(null);
   const [profileError, setProfileError] = useState(null);
-  const [isEulaSubmitting, setIsEulaSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationCheckDone, setRegistrationCheckDone] = useState(false);
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isLogoutBusy, setIsLogoutBusy] = useState(false);
@@ -146,10 +151,11 @@ export default function LoginPage() {
             navigate(postLoginPath, { replace: true });
             return;
           }
-          setProfileData({
+          setProfileData((prev) => ({
+            ...prev,
             nickname: typeof status?.nickname === 'string' ? status.nickname : '',
             avatarId: typeof status?.avatarId === 'number' ? status.avatarId : 1,
-          });
+          }));
           setStep(resolveRegistrationWizardStep(status));
           setRegistrationCheckDone(true);
           registrationResolvedRef.current = true;
@@ -204,8 +210,8 @@ export default function LoginPage() {
   }, [isLogoutBusy]);
 
   const resetLoginWizardAfterLogout = useCallback(() => {
-    setProfileData({ nickname: '', avatarId: 1 });
-    setEulaError(null);
+    setProfileData({ nickname: '', avatarId: 1, showNickname: true });
+    setSettingsError(null);
     setProfileError(null);
     setStep(LOGIN_FLOW_STEP_PIONIER);
     setRegistrationCheckDone(true);
@@ -231,64 +237,98 @@ export default function LoginPage() {
     }, { navigate });
   }, [handleLogoutFailed, navigate]);
 
-  const handleProfileContinue = useCallback(async ({ nickname, avatarId }) => {
+  // Ekran 1 -> Ekran 2
+  const handleNicknameContinue = useCallback(({ nickname, showNickname }) => {
     setProfileError(null);
-    const baseUrl = getApiBaseUrl();
-    if (baseUrl.length === 0) {
-      setProfileData({ nickname, avatarId });
-      setStep(LOGIN_FLOW_STEP_EULA);
-      return;
-    }
-    try {
-      const profileResponse = await fetch(`${baseUrl}${AUTH_LOGIN_PROFILE_PATH}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ nickname, avatarId }),
-      });
-      if (!profileResponse.ok) {
-        throw new Error('Nie udało się zapisać profilu.');
-      }
-      setProfileData({ nickname, avatarId });
-      setStep(LOGIN_FLOW_STEP_EULA);
-      setEulaError(null);
-      invalidateRegistrationStatusCache();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Nie udało się zapisać profilu.';
-      setProfileError(message);
-    }
+    setProfileData((prev) => ({
+      ...prev,
+      nickname,
+      showNickname: showNickname !== false,
+    }));
+    setStep(LOGIN_FLOW_STEP_AVATAR);
   }, []);
 
-  const handleEulaBack = useCallback(() => {
+  // Ekran 2 -> Ekran 1
+  const handleAvatarBack = useCallback(() => {
     setStep(LOGIN_FLOW_STEP_REGISTER);
-    setEulaError(null);
   }, []);
 
-  const handleEulaAccept = useCallback(async () => {
-    setIsEulaSubmitting(true);
-    setEulaError(null);
+  // Ekran 2 -> Ekran 3
+  const handleAvatarContinue = useCallback(({ avatarId }) => {
+    setProfileData((prev) => ({
+      ...prev,
+      avatarId,
+    }));
+    setStep(LOGIN_FLOW_STEP_SETTINGS);
+  }, []);
+
+  // Ekran 3 -> Ekran 2
+  const handleSettingsBack = useCallback(() => {
+    setStep(LOGIN_FLOW_STEP_AVATAR);
+    setSettingsError(null);
+  }, []);
+
+  // Ekran 3: Zakończenie rejestracji
+  const handleSettingsAccept = useCallback(async ({ theme }) => {
+    setIsSubmitting(true);
+    setSettingsError(null);
     const baseUrl = getApiBaseUrl();
+
     try {
-      const eulaResponse = await fetch(`${baseUrl}${AUTH_LOGIN_ACCEPT_EULA_PATH}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
-      if (!eulaResponse.ok) {
-        throw new Error('Nie udało się utworzyć konta.');
+      // 1. Zapis profilu w kreatorze (POST /login/profile)
+      if (baseUrl.length > 0) {
+        const profileResponse = await fetch(`${baseUrl}${AUTH_LOGIN_PROFILE_PATH}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            nickname: profileData.nickname,
+            avatarId: profileData.avatarId,
+          }),
+        });
+        if (!profileResponse.ok) {
+          throw new Error('Nie udało się zapisać profilu.');
+        }
+
+        // Zapis widoczności ksywki w preferencjach i backendzie
+        if (profileData.showNickname !== undefined) {
+          setLeaderShowNickname(profileData.showNickname);
+          await updateProfile({ showNickname: profileData.showNickname }).catch(() => {
+            // Ignoruj opcjonalny błąd PATCH w fazie rejestracji
+          });
+        }
+
+        // 2. Akceptacja EULA (POST /login/accept-eula)
+        const eulaResponse = await fetch(`${baseUrl}${AUTH_LOGIN_ACCEPT_EULA_PATH}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+        if (!eulaResponse.ok) {
+          throw new Error('Nie udało się utworzyć konta.');
+        }
+      } else {
+        if (profileData.showNickname !== undefined) {
+          setLeaderShowNickname(profileData.showNickname);
+        }
+      }
+
+      // 3. Zapis motywu
+      if (theme) {
+        applyTheme(theme);
       }
 
       await session?.refetchSession?.({ force: true });
       await refetchProfile?.();
       invalidateRegistrationStatusCache();
-      navigate(homePath());
+      navigate(postLoginPath);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Nie udało się utworzyć konta.';
-      setEulaError(message);
+      setSettingsError(message);
     } finally {
-      setIsEulaSubmitting(false);
+      setIsSubmitting(false);
     }
-  }, [navigate, refetchProfile, session]);
+  }, [navigate, postLoginPath, profileData, refetchProfile, session]);
 
   const stepContent = useMemo(() => {
     if (session?.isLoading) {
@@ -299,10 +339,10 @@ export default function LoginPage() {
       return (
         <RegisterProfile
           isBootstrapping
-          onContinue={handleProfileContinue}
+          onContinue={handleNicknameContinue}
           onBack={handleRegisterBack}
           initialNickname={profileData.nickname}
-          initialAvatarId={profileData.avatarId}
+          initialShowNickname={profileData.showNickname}
           errorMessage={profileError}
         />
       );
@@ -316,24 +356,37 @@ export default function LoginPage() {
       return <LoginEmail onBack={handleEmailBack} />;
     }
 
-    if (step === LOGIN_FLOW_STEP_EULA) {
+    // Ekran 3: Ustawienia konta (Wybór motywu + Dokumentacja + Polityka prywatności)
+    if (step === LOGIN_FLOW_STEP_SETTINGS) {
       return (
         <RegisterEula
-          onAccept={handleEulaAccept}
-          onBack={handleEulaBack}
-          isSubmitting={isEulaSubmitting}
-          errorMessage={eulaError}
+          onAccept={handleSettingsAccept}
+          onBack={handleSettingsBack}
+          isSubmitting={isSubmitting}
+          errorMessage={settingsError}
         />
       );
     }
 
+    // Ekran 2: Awatar
+    if (step === LOGIN_FLOW_STEP_AVATAR) {
+      return (
+        <RegisterAvatar
+          onContinue={handleAvatarContinue}
+          onBack={handleAvatarBack}
+          initialAvatarId={profileData.avatarId}
+        />
+      );
+    }
+
+    // Ekran 1: Pierwsze logowanie (Ksywka + widoczność)
     if (step === LOGIN_FLOW_STEP_REGISTER) {
       return (
         <RegisterProfile
-          onContinue={handleProfileContinue}
+          onContinue={handleNicknameContinue}
           onBack={handleRegisterBack}
           initialNickname={profileData.nickname}
-          initialAvatarId={profileData.avatarId}
+          initialShowNickname={profileData.showNickname}
           errorMessage={profileError}
         />
       );
@@ -349,12 +402,15 @@ export default function LoginPage() {
     handleEmailBack,
     handleInstitutionBack,
     handleRegisterBack,
-    handleProfileContinue,
-    handleEulaBack,
-    handleEulaAccept,
-    isEulaSubmitting,
-    eulaError,
+    handleNicknameContinue,
+    handleAvatarContinue,
+    handleAvatarBack,
+    handleSettingsBack,
+    handleSettingsAccept,
+    isSubmitting,
+    settingsError,
     profileData.nickname,
+    profileData.showNickname,
     profileData.avatarId,
     profileError,
   ]);

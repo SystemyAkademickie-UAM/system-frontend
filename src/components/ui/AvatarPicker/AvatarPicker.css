@@ -216,9 +216,49 @@
   text-align: center;
 }
 
-.maq-avatar-picker__current-frame--modal {
-  width: 5.5rem;
-  height: 5.5rem;
+.maq-avatar-picker__gallery-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.maq-avatar-picker__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.25rem;
+  background: rgba(13, 13, 24, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(189, 202, 190, 0.15);
+}
+
+.maq-avatar-picker__tab-button {
+  flex: 1;
+  min-width: 5rem;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-family-app);
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.maq-avatar-picker__tab-button:hover {
+  color: var(--color-text-primary);
+  background: rgba(189, 202, 190, 0.08);
+}
+
+.maq-avatar-picker__tab-button--active {
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border-color: rgba(30, 204, 56, 0.4);
+  font-weight: 600;
 }
 
 .maq-avatar-picker__modal-gallery {

@@ -1,1761 +1,842 @@
-import { useState, useEffect, useRef } from 'react';
-import {useParams} from 'react-router-dom';
-import {getApiBaseUrl} from '../../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
-import {Button, CharacterLimitedField, Divider, InfoTooltip, useToast} from '../../../components/ui/index.js';
-import { NAME_MAX_LENGTH, SHORT_DESCRIPTION_MAX_LENGTH } from '../../../constants/fieldLimits.js';
-import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
-import LivesIcon from '../../../components/ui/Lives/LivesIcon.jsx';
-import RewardsCurrencyLabel from '../group-rewards/shared/RewardsCurrencyLabel.jsx';
-import {createGroupShopItem, fetchGroupShopItems, updateGroupShopItem} from '../../../services/shop.api.js';
-import {syncShopItemRankUnlock, findRankUnlockingItem} from '../../../utils/ranks/rankShopItemUnlock.js';
-import { EXTRA_LIFE_ICON_EDIT_TOOLTIP } from '../../../utils/shop/extraLifeItem.js';
-import { sanitizeWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
+import { getApiBaseUrl } from '../../../constants/api.constants.js';
+import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
+import { Button, useToast } from '../../../components/ui/index.js';
+import { createGroupShopItem, fetchGroupShopItems, updateGroupShopItem } from '../../../services/shop.api.js';
+import { syncShopItemRankUnlock, findRankUnlockingItem } from '../../../utils/ranks/rankShopItemUnlock.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import ShopItemWizardHeader from './steps/ShopItemWizardHeader.jsx';
+import ShopItemStepInfo from './steps/ShopItemStepInfo.jsx';
+import ShopItemStepPricing from './steps/ShopItemStepPricing.jsx';
+import ShopItemStepAvailability from './steps/ShopItemStepAvailability.jsx';
+import ShopItemStepSummary from './steps/ShopItemStepSummary.jsx';
+import ShopItemUnsavedModal from './modals/ShopItemUnsavedModal.jsx';
+import ShopItemDraftPromptModal from './modals/ShopItemDraftPromptModal.jsx';
 import '../group-shop/modals/ShopItemFormModal.css';
 
-const ITEMNAMELABEL__TEXTLABEL = {
-  polish: 'Nazwa przedmiotu*',
-  english: 'Item Name*'
-};
+const DRAFT_STORAGE_KEY_PREFIX = 'maq_shop_item_draft_';
 
-const PRICELABEL__TEXTLABEL = {
-  polish: 'Cena*',
-  english: 'Price*'
-};
-
-const ITEMICONLABEL__TEXTLABEL = {
-  polish: 'Ikona przedmiotu',
-  english: 'Item Icon'
-};
-
-const ITEMICONSELECT__TEXTLABEL = {
-  polish: 'Wybierz ikonę przedmiotu',
-  english: 'Select item icon'
-};
-
-const ITEMICONLIVES__TEXTLABEL = {
-  polish: 'Ikona systemu żyć',
-  english: 'Lives system icon'
-};
-
-const CATEGORYLABEL__TEXTLABEL = {
-  polish: 'Kategoria',
-  english: 'Category'
-};
-
-const CATEGORYTOOLTIP__TEXTLABEL = {
-  polish: 'Przedmiot może należeć do wielu kategorii — kolory kategorii mieszają się na kafelku produktu.',
-  english: 'An item can belong to multiple categories — category colors mix on the product tile.'
-};
-
-const NOCATEGORIES__TEXTLABEL = {
-  polish: 'Brak kategorii — dodaj je w sklepie.',
-  english: 'No categories — add them in the shop.'
-};
-
-const STORYDESCLABEL__TEXTLABEL = {
-  polish: 'Opis fabularny',
-  english: 'Story Description'
-};
-
-const EDUCDESCLABEL__TEXTLABEL = {
-  polish: 'Opis dydaktyczny',
-  english: 'Didactic Description'
-};
-
-const AVAILABILITYLABEL__TEXTLABEL = {
-  polish: 'Dostępność',
-  english: 'Availability'
-};
-
-const AVAILABILITYTOOLTIP__TEXTLABEL = {
-  polish: 'Domyślnie przedmiot jest dostępny dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang.',
-  english: 'By default, the item is available to everyone. A higher rank also unlocks items from lower ranks.'
-};
-
-const ALLUSERS__TEXTLABEL = {
-  polish: 'Dostępny dla wszystkich',
-  english: 'Available to all'
-};
-
-const RANKACCESS__TEXTLABEL = {
-  polish: 'Dostępny po osiągnięciu rangi: {rank}',
-  english: 'Available after reaching rank: {rank}'
-};
-
-const GROUPLIMITLABEL__TEXTLABEL = {
-  polish: 'Limit sztuk na grupę',
-  english: 'Items per group limit'
-};
-
-const GROUPLIMITTOOLTIP__TEXTLABEL = {
-  polish: 'Ogranicza łączną liczbę sztuk dostępnych w sklepie.',
-  english: 'Limits the total number of items available in the shop.'
-};
-
-const STUDENTLIMITLABEL__TEXTLABEL = {
-  polish: 'Limit sztuk na studenta',
-  english: 'Items per student limit'
-};
-
-const STUDENTLIMITTOOLTIP__TEXTLABEL = {
-  polish: 'Ogranicza ile razy każdy z użytkowników może kupić ten przedmiot.',
-  english: 'Limits how many times each user can purchase this item.'
-};
-
-const BADGEDISCOUNTLABEL__TEXTLABEL = {
-  polish: 'Zniżki za odznaki',
-  english: 'Badge Discounts'
-};
-
-const BADGEDISCOUNTTOOLTIP__TEXTLABEL = {
-  polish: "Wpisanie znaku '%' w wartości sprawia, że zniżka staje się procentowa.",
-  english: "Entering '%' in the value makes the discount percentage-based."
-};
-
-const SELECTBADGE__TEXTLABEL = {
-  polish: 'Wybierz odznakę',
-  english: 'Select Badge'
-};
-
-const ADDDISCOUNT__TEXTLABEL = {
-  polish: 'Dodaj zniżkę',
-  english: 'Add Discount'
-};
-
-const REMOVE__TEXTLABEL = {
-  polish: 'Usuń',
-  english: 'Remove'
-};
-
-const RANKDISCOUNTLABEL__TEXTLABEL = {
-  polish: 'Zniżki za rangi',
-  english: 'Rank Discounts'
-};
-
-const RANKDISCOUNTTOOLTIP__TEXTLABEL = {
-  polish: 'Choć cena finalna w przypadku posiadania przez studenta danej rangi obliczana jest automatycznie, można ją nadpisać.',
-  english: 'Although the final price for a student with a given rank is calculated automatically, it can be overridden.'
-};
-
-const NORANKS__TEXTLABEL = {
-  polish: 'Brak rang w grupie.',
-  english: 'No ranks in the group.'
-};
-
-const BACKBUTTON__TEXTLABEL = {
-  polish: 'Cofnij',
-  english: 'Back'
-};
-
-const SAVEDISCHANGE__TEXTLABEL = {
-  polish: 'Zapisz zmiany',
-  english: 'Save Changes'
-};
-
-const CREATEITEM__TEXTLABEL = {
-  polish: 'Stwórz przedmiot',
-  english: 'Create Item'
-};
-
-const CATEGORYCREATED__TEXTLABEL = {
-  polish: 'Kategoria została utworzona.',
-  english: 'Category has been created.'
-};
-
-const CATEGORYDELETED__TEXTLABEL = {
-  polish: 'Kategoria została usunięta.',
-  english: 'Category has been deleted.'
-};
-
-const CATEGORYNAMEEMPTY__TEXTLABEL = {
-  polish: 'Prosze wpisac nazwe kategorii.',
-  english: 'Please enter a category name.'
-};
-
-const BADGESELECTEMPTY__TEXTLABEL = {
-  polish: 'Prosze wybrac odznake.',
-  english: 'Please select a badge.'
-};
-
-const BADGEALREADYUSED__TEXTLABEL = {
-  polish: 'Znizka zwiazana z ta odznaka juz istnieje.',
-  english: 'A discount for this badge already exists.'
-};
-
-const DISCOUNTVALUEEMPTY__TEXTLABEL = {
-  polish: 'Prosze wpisac wartosc znizki.',
-  english: 'Please enter a discount value.'
-};
-
-const BADGEDISCOUNTCREATED__TEXTLABEL = {
-  polish: 'Zniżka dla odznaki została utworzona.',
-  english: 'Badge discount has been created.'
-};
-
-const BADGEDISCOUNTDELETED__TEXTLABEL = {
-  polish: 'Zniżka za odznakę została usunięta.',
-  english: 'Badge discount has been deleted.'
-};
-
-const ITEMNAMEEMPTY__TEXTLABEL = {
-  polish: 'Proszę wpisać nazwę przedmiotu.',
-  english: 'Please enter the item name.'
-};
-
-const COSTINVALID__TEXTLABEL = {
-  polish: 'Proszę wpisać poprawny koszt przedmiotu.',
-  english: 'Please enter a valid item cost.'
-};
-
-const GROUPLIMITEMPTY__TEXTLABEL = {
-  polish: 'Proszę wpisać limit sztuk na grupę lub odznaczyć limit.',
-  english: 'Please enter the group item limit or uncheck the limit.'
-};
-
-const STUDENTLIMITEMPTY__TEXTLABEL = {
-  polish: 'Proszę wpisać limit sztuk na studenta lub odznaczyć limit.',
-  english: 'Please enter the student item limit or uncheck the limit.'
-};
-
-const SAVEFAILED__TEXTLABEL = {
-  polish: 'Nie udało się zapisać przedmiotu.',
-  english: 'Failed to save the item.'
-};
-
-const RANKUNLOCKFAILED__TEXTLABEL = {
-  polish: 'Przedmiot zapisany, ale nie udało się przypisać blokady rangi.',
-  english: 'Item saved, but failed to assign rank unlock.'
-};
-
-const ITEMUPDATED__TEXTLABEL = {
-  polish: 'Przedmiot został zaktualizowany!',
-  english: 'Item has been updated!'
-};
-
-const ITEMCREATED__TEXTLABEL = {
-  polish: 'Przedmiot został utworzony!',
-  english: 'Item has been created!'
-};
-
-const BADGEFALLBACK__TEXTLABEL = {
-  polish: 'Odznaka {id}',
-  english: 'Badge {id}'
-};
+const TOTAL_STEPS = 4;
 
 export default function ShopItemFormContent({
   groupId: groupIdProp,
   itemId = null,
   onClose,
   onSaved,
+  onStepChange,
+  hideInternalHeader = false,
 }) {
-
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const {showSuccess, showError} = useToast();
+  const { showSuccess, showError } = useToast();
 
   const routeParams = useParams();
   const groupId = groupIdProp ?? routeParams.groupId;
   const editingItemId = itemId != null && itemId !== '' ? String(itemId) : null;
+  const draftKey = `${DRAFT_STORAGE_KEY_PREFIX}${groupId}${editingItemId ? `_${editingItemId}` : ''}`;
+
+  // Krok kreatora (1 - Informacje, 2 - Wartość, 3 - Dostępność, 4 - Podsumowanie)
+  const [currentStep, setCurrentStepState] = useState(1);
+
+  const setCurrentStep = useCallback((stepOrFn) => {
+    setCurrentStepState((prev) => {
+      const next = typeof stepOrFn === 'function' ? stepOrFn(prev) : stepOrFn;
+      if (onStepChange) {
+        onStepChange(next);
+      }
+      return next;
+    });
+  }, [onStepChange]);
+
+  // Stany formularza - Krok 1 (Informacje)
+  const [itemName, setItemName] = useState('');
+  const [currentIcon, setCurrentIcon] = useState('🥕');
+  const [iconBackground, setIconBackground] = useState('rgb(40,40,52)');
   const [isEditingExtraLife, setIsEditingExtraLife] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const [currenticon, setCurrenticon] = useState('🥕');
-  const [iconbackground, setIconbackground] = useState('rgb(40,40,52)');
-
-  const [itemname, setItemname] = useState('');
-  const [description0, setDescription0] = useState('');
-  const [description1, setDescription1] = useState('');
-  const [cost, setCost] = useState('');
-  const [minprice, setMinprice] = useState('');
-  const [minpriceenabled, setMinpriceenabled] = useState(0);
-  const [grouplimit, setGrouplimit] = useState('');
-  const [grouplimitenabled, setGrouplimitenabled] = useState(0);
-  const [studentlimit, setStudentlimit] = useState('');
-  const [studentlimitenabled, setStudentlimitenabled] = useState(0);
-
+  const [storyDescription, setStoryDescription] = useState('');
+  const [didacticDescription, setDidacticDescription] = useState('');
   const [categories, setCategories] = useState([]);
+
+  // Stany formularza - Krok 2 (Wartość)
+  const [cost, setCost] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [minPriceEnabled, setMinPriceEnabled] = useState(false);
+  const [badges, setBadges] = useState([]);
+  const [badgeDiscounts, setBadgeDiscounts] = useState([]);
+  const [ranks, setRanks] = useState([]);
+  const [ranksFromBackend, setRanksFromBackend] = useState(0);
+
+  // Stany formularza - Krok 3 (Dostępność)
+  const [isVisible, setIsVisible] = useState(false); // Domyślnie ukryty
+  const [restrictRankEnabled, setRestrictRankEnabled] = useState(false);
+  const [unlockRankId, setUnlockRankId] = useState('');
+  const [groupLimitEnabled, setGroupLimitEnabled] = useState(false);
+  const [groupLimit, setGroupLimit] = useState('');
+  const [studentLimitEnabled, setStudentLimitEnabled] = useState(false);
+  const [studentLimit, setStudentLimit] = useState('');
+
+  // Błędy walidacji
+  const [nameError, setNameError] = useState('');
+  const [costError, setCostError] = useState('');
+  const [groupLimitError, setGroupLimitError] = useState('');
+  const [studentLimitError, setStudentLimitError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Modale potwierdzenia / wersji roboczej
+  const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
+  const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
   const editFormHydratedRef = useRef(null);
   const pendingEditCategoryIdsRef = useRef(null);
 
-  const [ranks, setRanks] = useState([]);
-  const [ranksfrombackend, setRanksfrombackend] = useState(0);
-  const [unlockRankId, setUnlockRankId] = useState('');
-
-  const [badges, setBadges] = useState([]);
-  const [badgediscounts, setBadgediscounts] = useState([]);
-  const [selectedbadge, setSelectedbadge] = useState('Wybierz odznakę');
-  const [pendingdiscountvalue, setPendingdiscountvalue] = useState('');
-  const [rankDiscountsExpanded, setRankDiscountsExpanded] = useState(false);
-
-
-
-  function onNumericinput(stringvalue, setterfunction) {
-    setterfunction(sanitizeWholeNumberInput(stringvalue));
-  }
-
-
-
-
-
-  function onDiscountinput(stringvalue, setterfunction) {
-
-    let filtered = '';
-
-    let i = 0;
-
-    while (i < stringvalue.length) {
-
-      let character = stringvalue[i];
-
-      if (character == '0' || character == '1' || character == '2' || character == '3' || character == '4' || character == '5' || character == '6' || character == '7' || character == '8' || character == '9' || character == '%') {
-        filtered = filtered + character;
-      }
-
-      i = i + 1;
-    }
-
-    setterfunction(filtered);
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-  async function onFetchcategories() {
-
-    setErrorMessage('');
-
+  // --- API: Pobieranie kategorii ---
+  const fetchCategories = useCallback(async () => {
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/item-categories';
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const response = await fetch(`${base}/groups/${groupId}/item-categories`, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
 
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/item-categories: ', response.status);
-      console.log('GET /groups/' + groupId + '/item-categories: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/item-categories not JSON: ' + responsetext);
-      }
-
-      console.log('GET /groups/' + groupId + '/item-categories JSON:', data);
-
-      let receiveddata = data;
-
-      if (!Array.isArray(receiveddata)) {
-        receiveddata = [];
-      }
+      if (!response.ok) return;
+      const data = await response.json();
+      const received = Array.isArray(data) ? data : [];
 
       setCategories((current) => {
-        const previousById = new Map(current.map((entry) => [String(entry.id), entry]));
-        const pendingCategoryIds = pendingEditCategoryIdsRef.current;
+        const prevMap = new Map(current.map((c) => [String(c.id), c]));
+        const pendingIds = pendingEditCategoryIdsRef.current;
 
-        return receiveddata.map((entry) => {
-          const previous = previousById.get(String(entry.id));
+        return received.map((c) => {
+          const prev = prevMap.get(String(c.id));
           let checked = 0;
-
-          if (previous?.checked === 1) {
+          if (prev?.checked === 1) {
             checked = 1;
-          } else if (pendingCategoryIds?.has(String(entry.id))) {
+          } else if (pendingIds?.has(String(c.id))) {
             checked = 1;
           }
-
           return {
-            id: entry.id,
-            name: entry.name,
-            color: entry.color ?? null,
+            id: c.id,
+            name: c.name,
+            color: c.color ?? null,
             checked,
-            editmode: previous?.editmode ?? 0,
-            tempname: previous?.tempname ?? entry.name,
           };
         });
       });
 
-      if (pendingEditCategoryIdsRef.current && receiveddata.length > 0) {
+      if (pendingEditCategoryIdsRef.current && received.length > 0) {
         pendingEditCategoryIdsRef.current = null;
       }
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
+    } catch {
+      // ignore
     }
-  }
+  }, [groupId]);
 
-
-
-
-
-
-  async function createcategory(name) {
-
-    setErrorMessage('');
-
+  // --- API: Tworzenie kategorii ---
+  const handleCreateCategory = async (name) => {
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/item-categories';
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const response = await fetch(`${base}/groups/${groupId}/item-categories`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
+          'X-Browser-ID': browserId,
         },
-        body: JSON.stringify({
-          name: name
-        })
+        body: JSON.stringify({ name }),
       });
 
-      const responsetext = await response.text();
-
-      console.log('POST /groups/' + groupId + '/item-categories: ', response.status);
-      console.log('POST /groups/' + groupId + '/item-categories: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/item-categories not JSON: ' + responsetext);
+      if (response.ok) {
+        showSuccess('Kategoria została utworzona.');
+        await fetchCategories();
+        return true;
       }
-
-      console.log('POST /groups/' + groupId + '/item-categories JSON:', data);
-
-      onFetchcategories();
-      setAddingcategory(0);
-      setNewcategoryname('');
-      showSuccess(CATEGORYCREATED__TEXTLABEL[LANGUAGE]);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
+      showError('Nie udało się utworzyć kategorii.');
+      return false;
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd tworzenia kategorii.');
+      return false;
     }
-  }
+  };
 
-
-  async function updatecategory(categoryId, name) {
-
-    setErrorMessage('');
-
+  // --- API: Aktualizacja kategorii ---
+  const handleUpdateCategory = async (categoryId, name) => {
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/item-categories/' + categoryId;
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const response = await fetch(`${base}/groups/${groupId}/item-categories/${categoryId}`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
+          'X-Browser-ID': browserId,
         },
-        body: JSON.stringify({
-          name: name
-        })
+        body: JSON.stringify({ name }),
       });
 
-      const responsetext = await response.text();
-
-      console.log('PATCH /groups/' + groupId + '/item-categories/' + categoryId + ': ', response.status);
-      console.log('PATCH /groups/' + groupId + '/item-categories/' + categoryId + ': ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/item-categories/' + categoryId + ' not JSON: ' + responsetext);
+      if (response.ok) {
+        showSuccess('Kategoria została zaktualizowana.');
+        await fetchCategories();
+        return true;
       }
-
-      console.log('PATCH /groups/' + groupId + '/item-categories/' + categoryId + ' JSON:', data);
-
-      onFetchcategories();
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
+      showError('Nie udało się zaktualizować kategorii.');
+      return false;
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd aktualizacji kategorii.');
+      return false;
     }
-  }
+  };
 
-
-
-
-
-  async function deletecategory(categoryId) {
-
-    setErrorMessage('');
-
+  // --- API: Usunięcie kategorii ---
+  const handleDeleteCategory = async (categoryId) => {
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/item-categories/' + categoryId;
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const response = await fetch(`${base}/groups/${groupId}/item-categories/${categoryId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
 
-      const responsetext = await response.text();
-
-      console.log('DELETE /groups/' + groupId + '/item-categories/' + categoryId + ': ', response.status);
-      console.log('DELETE /groups/' + groupId + '/item-categories/' + categoryId + ': ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/item-categories/' + categoryId + ' not JSON: ' + responsetext);
+      if (response.ok) {
+        showSuccess('Kategoria została usunięta.');
+        await fetchCategories();
+        return true;
       }
-
-      console.log('DELETE /groups/' + groupId + '/item-categories/' + categoryId + ' JSON:', data);
-
-      onFetchcategories();
-      showSuccess(CATEGORYDELETED__TEXTLABEL[LANGUAGE]);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
+      showError('Nie udało się usunąć kategorii.');
+      return false;
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd usuwania kategorii.');
+      return false;
     }
-  }
+  };
 
+  const handleCategoryCheckChange = (categoryId) => {
+    setCategories((current) => current.map((c) => (
+      String(c.id) === String(categoryId) ? { ...c, checked: c.checked === 1 ? 0 : 1 } : c
+    )));
+  };
 
-
-
-
-  async function onfetchranks() {
-
-    setErrorMessage('');
-
+  // --- API: Pobieranie rang ---
+  const fetchRanks = useCallback(async () => {
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/ranks';
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const response = await fetch(`${base}/groups/${groupId}/ranks`, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
 
-      const responsetext = await response.text();
+      if (!response.ok) return;
+      const data = await response.json();
+      const received = Array.isArray(data) ? data : [];
 
-      console.log('GET /groups/' + groupId + '/ranks: ', response.status);
-      console.log('GET /groups/' + groupId + '/ranks: ', responsetext);
+      const mapped = received.map((r) => {
+        let discountValue = r.globalDiscountType === 'percent'
+          ? Number(r.globalDiscountValue ?? 0)
+          : Number(r.discount ?? 0);
+        if (!Number.isFinite(discountValue)) discountValue = 0;
 
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/ranks not JSON: ' + responsetext);
-      }
-
-      console.log('GET /groups/' + groupId + '/ranks JSON:', data);
-
-      let receiveddata = data;
-
-      if (!Array.isArray(receiveddata)) {
-        receiveddata = [];
-      }
-
-      const receivedranks = [];
-
-      let i = 0;
-
-      while (i < receiveddata.length) {
-
-        let discountvalue = receiveddata[i].globalDiscountType === 'percent'
-          ? Number(receiveddata[i].globalDiscountValue ?? 0)
-          : Number(receiveddata[i].discount ?? 0);
-
-        if (!Number.isFinite(discountvalue)) {
-          discountvalue = 0;
-        }
-
-        let iconvalue = receiveddata[i].icon;
-
-        if (iconvalue == null) {
-          iconvalue = '';
-        }
-
-        receivedranks.push({
-          id: receiveddata[i].id,
-          icon: iconvalue || '',
-          name: receiveddata[i].name,
-          discount: discountvalue,
+        return {
+          id: r.id,
+          icon: r.icon || '',
+          name: r.name,
+          discount: discountValue,
           costafter: '',
           isCustom: 0,
-          uniqueStoreItems: receiveddata[i].uniqueStoreItems ?? [],
-        });
+          uniqueStoreItems: r.uniqueStoreItems ?? [],
+        };
+      });
 
-        i = i + 1;
-      }
-
-      setRanks(receivedranks);
-      setRanksfrombackend(1);
-
-      if (cost != '') {
-        recalculatediscounts(cost);
-      }
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
+      setRanks(mapped);
+      setRanksFromBackend(1);
+    } catch {
+      // ignore
     }
-  }
+  }, [groupId]);
 
-
-
-
-
-  async function onfetchbadges() {
-
-    setErrorMessage('');
-
+  // --- API: Pobieranie odznak ---
+  const fetchBadges = useCallback(async () => {
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/groups/' + groupId + '/badges';
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const response = await fetch(`${base}/groups/${groupId}/badges`, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
 
-      const responsetext = await response.text();
-
-      console.log('GET /groups/' + groupId + '/badges: ', response.status);
-      console.log('GET /groups/' + groupId + '/badges: ', responsetext);
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-        console.log('/groups/' + groupId + '/badges not JSON: ' + responsetext);
-      }
-
-      console.log('GET /groups/' + groupId + '/badges JSON:', data);
-
-      let receiveddata = data;
-
-      if (!Array.isArray(receiveddata)) {
-        receiveddata = [];
-      }
-
-      const receivedbadges = [];
-
-      let i = 0;
-
-      while (i < receiveddata.length) {
-
-        receivedbadges.push({id: receiveddata[i].id, name: receiveddata[i].name});
-
-        i = i + 1;
-      }
-
-      setBadges(receivedbadges);
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
+      if (!response.ok) return;
+      const data = await response.json();
+      const received = Array.isArray(data) ? data : [];
+      setBadges(received.map((b) => ({ id: b.id, name: b.name })));
+    } catch {
+      // ignore
     }
-  }
-
-
-
-
-
-  function starteditcategory(categoryId) {
-
-    const newcategories = [];
-
-    let i = 0;
-
-    while (i < categories.length) {
-
-      if (categories[i].id == categoryId) {
-
-        newcategories.push({id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: 1, tempname: categories[i].name});
-
-      } else {
-        newcategories.push(categories[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setCategories(newcategories);
-  }
-
-
-
-
-
-  function saveeditcategory(categoryId) {
-
-    let categorynamevalue = null;
-
-    const newcategories = [];
-
-    let i = 0;
-
-    while (i < categories.length) {
-
-      if (categories[i].id == categoryId) {
-
-        newcategories.push({id: categories[i].id, name: categories[i].tempname, checked: categories[i].checked, editmode: 0, tempname: categories[i].tempname});
-        categorynamevalue = categories[i].tempname;
-
-      } else {
-        newcategories.push(categories[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setCategories(newcategories);
-
-    if (categorynamevalue != null) {
-      updatecategory(categoryId, categorynamevalue);
-    }
-  }
-
-
-
-
-
-  function canceleditcategory(categoryId) {
-
-    const newcategories = [];
-
-    let i = 0;
-
-    while (i < categories.length) {
-
-      if (categories[i].id == categoryId) {
-
-        newcategories.push({id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: 0, tempname: categories[i].name});
-
-      } else {
-        newcategories.push(categories[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setCategories(newcategories);
-  }
-
-
-
-
-
-  function oncategorynamechange(categoryId, value) {
-
-    const newcategories = [];
-
-    let i = 0;
-
-    while (i < categories.length) {
-
-      if (categories[i].id == categoryId) {
-
-        let updatedcategory = {id: categories[i].id, name: categories[i].name, checked: categories[i].checked, editmode: categories[i].editmode, tempname: value};
-
-        newcategories.push(updatedcategory);
-
-      } else {
-        newcategories.push(categories[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setCategories(newcategories);
-  }
-
-
-
-
-
-  function oncategorycheckchange(categoryId) {
-    setCategories((current) => current.map((category) => {
-      if (String(category.id) !== String(categoryId)) {
-        return category;
-      }
-
-      return {
-        ...category,
-        checked: category.checked === 1 ? 0 : 1,
-      };
-    }));
-  }
-
-
-
-
-
-  function togglecategoriesopen() {
-
-    if (categoriesopen == 0) {
-      setCategoriesopen(1);
-    } else {
-      setCategoriesopen(0);
-    }
-  }
-
-
-
-
-
-  function confirmaddcategory() {
-
-    if (newcategoryname.trim().length == 0) {
-      showError(CATEGORYNAMEEMPTY__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    createcategory(newcategoryname.trim());
-  }
-
-
-
-
-
-  function canceladdcategory() {
-    setAddingcategory(0);
-    setNewcategoryname('');
-  }
-
-
-
-
-
-  function recalculatediscounts(basecostvalue) {
-
-    const basecost = Number(basecostvalue);
-
-    const newranks = [];
-
-    let i = 0;
-
-    while (i < ranks.length) {
-
-      let newcostafter = '';
-
-      if (basecostvalue != '' && basecost > 0) {
-
-        let discounted = basecost - Math.round(basecost * ranks[i].discount / 100);
-
-        if (discounted < 0) {
-          discounted = 0;
-        }
-
-        newcostafter = discounted;
-      }
-
-      newranks.push({
-        id: ranks[i].id,
-        icon: ranks[i].icon,
-        name: ranks[i].name,
-        discount: ranks[i].discount,
-        costafter: newcostafter,
-        isCustom: 0,
-        uniqueStoreItems: ranks[i].uniqueStoreItems ?? [],
-      });
-
-      i = i + 1;
-    }
-
-    setRanks(newranks);
-  }
-
-
-
-
-
-  function onrankcostchange(rankId, value) {
-
-    const newranks = [];
-
-    let i = 0;
-
-    while (i < ranks.length) {
-
-      if (ranks[i].id == rankId) {
-        newranks.push({
-          id: ranks[i].id,
-          icon: ranks[i].icon,
-          name: ranks[i].name,
-          discount: ranks[i].discount,
-          costafter: value,
-          isCustom: 1,
-          uniqueStoreItems: ranks[i].uniqueStoreItems ?? [],
-        });
-      } else {
-        newranks.push(ranks[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setRanks(newranks);
-  }
-
-
-
-
-
-  function onbadgediscountchange(discountId, value) {
-
-    const newdiscounts = [];
-
-    let i = 0;
-
-    while (i < badgediscounts.length) {
-
-      if (badgediscounts[i].id == discountId) {
-        newdiscounts.push({id: badgediscounts[i].id, badgeid: badgediscounts[i].badgeid, badgename: badgediscounts[i].badgename, value: value});
-      } else {
-        newdiscounts.push(badgediscounts[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setBadgediscounts(newdiscounts);
-  }
-
-
-
-
-
-  function addbadgediscount() {
-
-    if (selectedbadge == SELECTBADGE__TEXTLABEL[LANGUAGE]) {
-      showError(BADGESELECTEMPTY__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    let alreadyused = 0;
-
-    let i = 0;
-
-    while (i < badgediscounts.length) {
-
-      if (badgediscounts[i].badgename == selectedbadge) {
-        alreadyused = 1;
-      }
-
-      i = i + 1;
-    }
-
-    if (alreadyused == 1) {
-      showError(BADGEALREADYUSED__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    if (pendingdiscountvalue.length == 0) {
-      showError(DISCOUNTVALUEEMPTY__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    let badgeid = 0;
-
-    i = 0;
-
-    while (i < badges.length) {
-
-      if (badges[i].name == selectedbadge) {
-        badgeid = badges[i].id;
-      }
-
-      i = i + 1;
-    }
-
-    const newdiscounts = [];
-
-    i = 0;
-
-    while (i < badgediscounts.length) {
-      newdiscounts.push(badgediscounts[i]);
-      i = i + 1;
-    }
-
-    newdiscounts.push({id: badgediscounts.length, badgeid: badgeid, badgename: selectedbadge, value: pendingdiscountvalue});
-
-    setBadgediscounts(newdiscounts);
-    setSelectedbadge(SELECTBADGE__TEXTLABEL[LANGUAGE]);
-    setPendingdiscountvalue('');
-    showSuccess(BADGEDISCOUNTCREATED__TEXTLABEL[LANGUAGE]);
-  }
-
-
-
-
-
-  function deletebadgediscount(discountId) {
-
-    const newdiscounts = [];
-
-    let i = 0;
-
-    while (i < badgediscounts.length) {
-
-      if (badgediscounts[i].id != discountId) {
-        newdiscounts.push(badgediscounts[i]);
-      }
-
-      i = i + 1;
-    }
-
-    setBadgediscounts(newdiscounts);
-    showSuccess(BADGEDISCOUNTDELETED__TEXTLABEL[LANGUAGE]);
-  }
-
-
-
-  function goback() {
-    if (onClose) {
-      onClose();
-      return;
-    }
-    window.location.href = '/groups/' + groupId + '/shop';
-  }
-
-
-
-  function buildItemPayload() {
-    const items = {
-      name: itemname.trim(),
-      basePrice: Number(cost),
-    };
-
-    if (!isEditingExtraLife) {
-      items.imageRef = currenticon + '*' + iconbackground;
-    }
-
-    if (description0.trim().length > 0) {
-      items.storyDescription = description0.trim();
-    }
-
-    if (description1.trim().length > 0) {
-      items.educationalDescription = description1.trim();
-    }
-
-    let categoryIds = [];
-    let i = 0;
-    while (i < categories.length) {
-      if (categories[i].checked == 1) {
-        categoryIds.push(categories[i].id);
-      }
-      i = i + 1;
-    }
-
-    if (categoryIds.length > 0) {
-      items.categoryIds = categoryIds;
-    } else if (editingItemId) {
-      items.categoryId = null;
-    }
-
-    if (grouplimitenabled == 1) {
-      items.stockQuantity = Number(grouplimit);
-    } else if (editingItemId) {
-      items.stockQuantity = null;
-    }
-
-    if (studentlimitenabled == 1) {
-      items.perStudentLimit = Number(studentlimit);
-    } else if (editingItemId) {
-      items.perStudentLimit = null;
-    }
-
-    const badgePromotions = [];
-    i = 0;
-    while (i < badgediscounts.length) {
-      let promotionType = 'fixed';
-      let promotionValue = Number(badgediscounts[i].value);
-
-      if (badgediscounts[i].value.endsWith('%')) {
-        promotionType = 'percent';
-        promotionValue = Number(badgediscounts[i].value.replace('%', ''));
-      }
-
-      badgePromotions.push({id: badgediscounts[i].badgeid, promotionType: promotionType, value: promotionValue});
-      i = i + 1;
-    }
-
-    const rankPromotions = [];
-    i = 0;
-    while (i < ranks.length) {
-      if (ranks[i].isCustom == 1 && ranks[i].costafter != '') {
-        let discountValue = Number(cost) - Number(ranks[i].costafter);
-        if (discountValue < 0) {
-          discountValue = 0;
-        }
-        rankPromotions.push({id: ranks[i].id, promotionType: 'fixed', value: discountValue});
-      }
-      i = i + 1;
-    }
-
-    items.badgePromotions = badgePromotions;
-    items.rankPromotions = rankPromotions;
-
-    return items;
-  }
-
-
-
-  async function createitem() {
-
-    if (itemname.trim().length == 0) {
-      showError(ITEMNAMEEMPTY__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    if (cost == '' || Number(cost) < 0) {
-      showError(COSTINVALID__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    if (grouplimitenabled == 1 && grouplimit == '') {
-      showError(GROUPLIMITEMPTY__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    if (studentlimitenabled == 1 && studentlimit == '') {
-      showError(STUDENTLIMITEMPTY__TEXTLABEL[LANGUAGE]);
-      return;
-    }
-
-    setErrorMessage('');
-
-    try {
-      const items = buildItemPayload();
-      const saveResult = editingItemId
-        ? await updateGroupShopItem(groupId, editingItemId, items)
-        : await createGroupShopItem(groupId, items);
-
-      if (!saveResult.ok) {
-        showError(saveResult.error ?? SAVEFAILED__TEXTLABEL[LANGUAGE]);
-        return;
-      }
-
-      const savedItemId = editingItemId ?? saveResult.item?.id ?? null;
-      if (savedItemId) {
-        const rankRefs = ranks.map((rankEntry) => ({
-          dbId: rankEntry.id,
-          name: rankEntry.name,
-          shopItems: rankEntry.uniqueStoreItems || [],
-        }));
-        const rankResult = await syncShopItemRankUnlock(
-          groupId,
-          String(savedItemId),
-          unlockRankId === '' ? null : Number(unlockRankId),
-          rankRefs,
-        );
-        if (!rankResult.ok) {
-          showError(rankResult.error ?? RANKUNLOCKFAILED__TEXTLABEL[LANGUAGE]);
-          return;
-        }
-      }
-
-      showSuccess(editingItemId ? ITEMUPDATED__TEXTLABEL[LANGUAGE] : ITEMCREATED__TEXTLABEL[LANGUAGE]);
-      if (onSaved) {
-        onSaved();
-      } else {
-        window.location.href = '/groups/' + groupId + '/shop';
-      }
-
-    } catch (error) {
-
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
-      showError(message);
-    }
-  }
-
-
-
-
-
-  useEffect(() => {
-
-    onFetchcategories();
-    onfetchranks();
-    onfetchbadges();
-
   }, [groupId]);
 
+  // Ładowanie danych początkowych
+  useEffect(() => {
+    fetchCategories();
+    fetchRanks();
+    fetchBadges();
+  }, [fetchCategories, fetchRanks, fetchBadges]);
 
-
+  // Sprawdzanie wersji roboczej w localStorage przy tworzeniu nowego przedmiotu
   useEffect(() => {
     if (!editingItemId) {
-      setIsEditingExtraLife(false);
-      editFormHydratedRef.current = null;
-      pendingEditCategoryIdsRef.current = null;
+      try {
+        const savedDraft = localStorage.getItem(draftKey);
+        if (savedDraft) {
+          const parsed = JSON.parse(savedDraft);
+          if (parsed && (parsed.itemName || parsed.cost || parsed.currentStep > 1)) {
+            setIsDraftPromptOpen(true);
+          }
+        }
+      } catch {
+        // ignore
+      }
     }
-  }, [editingItemId]);
+  }, [draftKey, editingItemId]);
 
+  // Wczytanie istniejącego przedmiotu do edycji
   useEffect(() => {
-    if (!editingItemId || ranksfrombackend !== 1) {
-      return undefined;
-    }
+    if (!editingItemId || ranksFromBackend !== 1) return;
 
     let cancelled = false;
-
     (async () => {
       const result = await fetchGroupShopItems(groupId);
-      if (!result.ok || cancelled) {
-        return;
-      }
+      if (!result.ok || cancelled) return;
 
       const item = result.items.find((entry) => entry.id === editingItemId);
-      if (!item || cancelled) {
-        return;
-      }
-
-      if (editFormHydratedRef.current === editingItemId) {
-        return;
-      }
-
+      if (!item || cancelled) return;
+      if (editFormHydratedRef.current === editingItemId) return;
       editFormHydratedRef.current = editingItemId;
 
       setIsEditingExtraLife(item.isExtraLife === true);
-
       const imageParts = String(item.imageRef ?? '').split('*');
-      if (imageParts[0]) {
-        setCurrenticon(imageParts[0]);
-      }
-      if (imageParts[1]) {
-        setIconbackground(imageParts[1]);
-      }
+      if (imageParts[0]) setCurrentIcon(imageParts[0]);
+      if (imageParts[1]) setIconBackground(imageParts[1]);
 
       const priceAmount = String(item.priceAmount ?? '');
-      const baseCost = Number(priceAmount);
-
-      setItemname(item.name ?? '');
-      setDescription0(item.storyDescription ?? '');
-      setDescription1(item.didacticDescription ?? '');
+      setItemName(item.name ?? '');
       setCost(priceAmount);
+      setStoryDescription(item.storyDescription ?? '');
+      setDidacticDescription(item.didacticDescription ?? '');
+
+      if (item.minPrice != null) {
+        setMinPriceEnabled(true);
+        setMinPrice(String(item.minPrice));
+      }
 
       if (item.stockQuantity != null) {
-        setGrouplimitenabled(1);
-        setGrouplimit(String(item.stockQuantity));
-      } else {
-        setGrouplimitenabled(0);
-        setGrouplimit('');
+        setGroupLimitEnabled(true);
+        setGroupLimit(String(item.stockQuantity));
       }
 
       if (item.perStudentLimit != null) {
-        setStudentlimitenabled(1);
-        setStudentlimit(String(item.perStudentLimit));
-      } else {
-        setStudentlimitenabled(0);
-        setStudentlimit('');
+        setStudentLimitEnabled(true);
+        setStudentLimit(String(item.perStudentLimit));
       }
 
-      const selectedCategoryIds = new Set((item.categories ?? []).map((categoryId) => String(categoryId)));
+      setIsVisible(item.isPublished !== false);
+
+      const selectedCategoryIds = new Set((item.categories ?? []).map(String));
       pendingEditCategoryIdsRef.current = selectedCategoryIds;
 
       setCategories((current) => {
-        if (current.length === 0) {
-          return current;
-        }
-
-        return current.map((category) => ({
-          ...category,
-          checked: selectedCategoryIds.has(String(category.id)) ? 1 : 0,
+        if (current.length === 0) return current;
+        return current.map((c) => ({
+          ...c,
+          checked: selectedCategoryIds.has(String(c.id)) ? 1 : 0,
         }));
       });
 
-      let unlockRankValue = '';
-
       setRanks((current) => {
-        const rankRefs = current.map((rankEntry) => ({
-          dbId: rankEntry.id,
-          name: rankEntry.name,
-          shopItems: rankEntry.uniqueStoreItems || [],
+        const rankRefs = current.map((r) => ({
+          dbId: r.id,
+          name: r.name,
+          shopItems: r.uniqueStoreItems || [],
         }));
         const owningRank = findRankUnlockingItem(editingItemId, rankRefs);
-        unlockRankValue = owningRank ? String(owningRank.dbId) : '';
+        if (owningRank) {
+          setRestrictRankEnabled(true);
+          setUnlockRankId(String(owningRank.dbId));
+        }
 
         return current.map((rankEntry) => {
           const promo = (item.rankPromotions ?? []).find((entry) => (entry.rankId ?? entry.id) === rankEntry.id);
           if (promo) {
-            const costafter = Math.max(0, baseCost - Number(promo.value ?? 0));
+            const costafter = Math.max(0, Number(priceAmount) - Number(promo.value ?? 0));
             return {
               ...rankEntry,
               costafter: String(costafter),
               isCustom: 1,
             };
           }
-
-          let costafter = '';
-          if (priceAmount !== '' && baseCost > 0) {
-            let discounted = baseCost - Math.round(baseCost * rankEntry.discount / 100);
-            if (discounted < 0) {
-              discounted = 0;
-            }
-            costafter = String(discounted);
-          }
-
-          return {
-            ...rankEntry,
-            costafter,
-            isCustom: 0,
-          };
+          return rankEntry;
         });
       });
-      setUnlockRankId(unlockRankValue);
 
       const loadedBadgeDiscounts = (item.badgePromotions ?? []).map((promo, index) => {
         const badgeId = promo.badgeId ?? promo.id;
-        const badge = badges.find((entry) => entry.id === badgeId);
-        const value = promo.promotionType === 'percent'
-          ? `${promo.value}%`
-          : String(promo.value);
+        const badge = badges.find((b) => b.id === badgeId);
+        const value = promo.promotionType === 'percent' ? `${promo.value}%` : String(promo.value);
         return {
           id: index,
           badgeid: badgeId,
-          badgename: badge?.name ?? BADGEFALLBACK__TEXTLABEL[LANGUAGE].replace('{id}', String(badgeId)),
+          badgename: badge?.name ?? `Odznaka ${badgeId}`,
           value,
         };
       });
-      setBadgediscounts(loadedBadgeDiscounts);
+      setBadgeDiscounts(loadedBadgeDiscounts);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [badges, editingItemId, groupId, ranksfrombackend]);
+  }, [badges, editingItemId, groupId, ranksFromBackend]);
 
+  // --- Obsługa wersji roboczej (Draft) ---
+  const handleLoadDraft = () => {
+    try {
+      const savedDraft = localStorage.getItem(draftKey);
+      if (savedDraft) {
+        const data = JSON.parse(savedDraft);
+        if (data.itemName != null) setItemName(data.itemName);
+        if (data.currentIcon != null) setCurrentIcon(data.currentIcon);
+        if (data.storyDescription != null) setStoryDescription(data.storyDescription);
+        if (data.didacticDescription != null) setDidacticDescription(data.didacticDescription);
+        if (data.cost != null) setCost(data.cost);
+        if (data.minPrice != null) setMinPrice(data.minPrice);
+        if (data.minPriceEnabled != null) setMinPriceEnabled(data.minPriceEnabled);
+        if (data.badgeDiscounts != null) setBadgeDiscounts(data.badgeDiscounts);
+        if (data.isVisible != null) setIsVisible(data.isVisible);
+        if (data.restrictRankEnabled != null) setRestrictRankEnabled(data.restrictRankEnabled);
+        if (data.unlockRankId != null) setUnlockRankId(data.unlockRankId);
+        if (data.groupLimitEnabled != null) setGroupLimitEnabled(data.groupLimitEnabled);
+        if (data.groupLimit != null) setGroupLimit(data.groupLimit);
+        if (data.studentLimitEnabled != null) setStudentLimitEnabled(data.studentLimitEnabled);
+        if (data.studentLimit != null) setStudentLimit(data.studentLimit);
+        if (data.currentStep != null) setCurrentStep(Math.min(TOTAL_STEPS, Math.max(1, data.currentStep)));
 
+        if (Array.isArray(data.checkedCategoryIds)) {
+          const checkedSet = new Set(data.checkedCategoryIds.map(String));
+          setCategories((current) => current.map((c) => ({
+            ...c,
+            checked: checkedSet.has(String(c.id)) ? 1 : 0,
+          })));
+        }
+        showSuccess('Wczytano wersję roboczą.');
+      }
+    } catch {
+      showError('Nie udało się wczytać wersji roboczej.');
+    } finally {
+      setIsDraftPromptOpen(false);
+    }
+  };
+
+  const handleDiscardDraftAndNew = () => {
+    try {
+      localStorage.removeItem(draftKey);
+    } catch {
+      // ignore
+    }
+    setIsDraftPromptOpen(false);
+  };
+
+  const handleSaveDraftAndExit = () => {
+    try {
+      const checkedCategoryIds = categories.filter((c) => c.checked === 1).map((c) => c.id);
+      const draftData = {
+        currentStep,
+        itemName,
+        currentIcon,
+        storyDescription,
+        didacticDescription,
+        checkedCategoryIds,
+        cost,
+        minPrice,
+        minPriceEnabled,
+        badgeDiscounts,
+        isVisible,
+        restrictRankEnabled,
+        unlockRankId,
+        groupLimitEnabled,
+        groupLimit,
+        studentLimitEnabled,
+        studentLimit,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(draftKey, JSON.stringify(draftData));
+      showSuccess('Wersja robocza została zapisana.');
+    } catch {
+      showError('Nie udało się zapisać wersji roboczej.');
+    }
+    setIsUnsavedModalOpen(false);
+    if (onClose) {
+      onClose();
+    } else {
+      window.location.href = `/groups/${groupId}/shop`;
+    }
+  };
+
+  const handleDiscardAndExit = () => {
+    try {
+      localStorage.removeItem(draftKey);
+    } catch {
+      // ignore
+    }
+    setIsUnsavedModalOpen(false);
+    if (onClose) {
+      onClose();
+    } else {
+      window.location.href = `/groups/${groupId}/shop`;
+    }
+  };
+
+  // Sprawdzanie czy formularz ma wprowadzone dane
+  const hasUserChanges = Boolean(
+    itemName.trim() ||
+    cost.trim() ||
+    storyDescription.trim() ||
+    didacticDescription.trim() ||
+    badgeDiscounts.length > 0 ||
+    currentStep > 1
+  );
+
+  const handleAttemptClose = () => {
+    if (hasUserChanges) {
+      setIsUnsavedModalOpen(true);
+    } else if (onClose) {
+      onClose();
+    } else {
+      window.location.href = `/groups/${groupId}/shop`;
+    }
+  };
+
+  // --- Walidacja i nawigacja kroków ---
+  const validateStep = (step) => {
+    let isValid = true;
+    setNameError('');
+    setCostError('');
+    setGroupLimitError('');
+    setStudentLimitError('');
+
+    if (step === 1) {
+      if (!itemName.trim()) {
+        setNameError('Podaj nazwę przedmiotu.');
+        showError('Podaj nazwę przedmiotu.');
+        isValid = false;
+      }
+    } else if (step === 2) {
+      if (!cost || Number(cost) < 0) {
+        setCostError('Wpisz poprawną cenę bazową.');
+        showError('Wpisz poprawną cenę bazową.');
+        isValid = false;
+      }
+    } else if (step === 3) {
+      if (groupLimitEnabled && (!groupLimit || Number(groupLimit) <= 0)) {
+        setGroupLimitError('Wpisz limit sztuk na grupę.');
+        showError('Wpisz limit sztuk na grupę.');
+        isValid = false;
+      }
+      if (studentLimitEnabled && (!studentLimit || Number(studentLimit) <= 0)) {
+        setStudentLimitError('Wpisz limit sztuk na studenta.');
+        showError('Wpisz limit sztuk na studenta.');
+        isValid = false;
+      }
+    }
+
+    return isValid;
+  };
+
+  const handleNextStep = () => {
+    if (!validateStep(currentStep)) return;
+    if (currentStep < TOTAL_STEPS) {
+      setCurrentStep((s) => s + 1);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep((s) => s - 1);
+    }
+  };
+
+  // --- Zapis finalny (Krok 4) ---
+  const handleFinalSave = async () => {
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) return;
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        name: itemName.trim(),
+        basePrice: Number(cost),
+      };
+
+      if (editingItemId) {
+        payload.isPublished = isVisible;
+      }
+
+      if (!isEditingExtraLife) {
+        payload.imageRef = `${currentIcon}*${iconBackground}`;
+      }
+
+      if (storyDescription.trim()) {
+        payload.storyDescription = storyDescription.trim();
+      }
+
+      if (didacticDescription.trim()) {
+        payload.educationalDescription = didacticDescription.trim();
+      }
+
+      const categoryIds = categories.filter((c) => c.checked === 1).map((c) => c.id);
+      if (categoryIds.length > 0) {
+        payload.categoryIds = categoryIds;
+      } else if (editingItemId) {
+        payload.categoryId = null;
+      }
+
+      if (groupLimitEnabled) {
+        payload.stockQuantity = Number(groupLimit);
+      } else if (editingItemId) {
+        payload.stockQuantity = null;
+      }
+
+      if (studentLimitEnabled) {
+        payload.perStudentLimit = Number(studentLimit);
+      } else if (editingItemId) {
+        payload.perStudentLimit = null;
+      }
+
+      const badgePromotions = badgeDiscounts.map((d) => {
+        const isPercent = String(d.value).endsWith('%');
+        return {
+          id: d.badgeid,
+          promotionType: isPercent ? 'percent' : 'fixed',
+          value: Number(String(d.value).replace('%', '')),
+        };
+      });
+
+      const rankPromotions = [];
+      ranks.forEach((r) => {
+        if (r.isCustom === 1 && r.costafter !== '') {
+          const discountVal = Math.max(0, Number(cost) - Number(r.costafter));
+          rankPromotions.push({ id: r.id, promotionType: 'fixed', value: discountVal });
+        }
+      });
+
+      payload.badgePromotions = badgePromotions;
+      payload.rankPromotions = rankPromotions;
+
+      const saveResult = editingItemId
+        ? await updateGroupShopItem(groupId, editingItemId, payload)
+        : await createGroupShopItem(groupId, payload);
+
+      if (!saveResult.ok) {
+        showError(saveResult.error ?? 'Nie udało się zapisać przedmiotu.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const savedItemId = editingItemId ?? saveResult.item?.id ?? null;
+      if (savedItemId) {
+        // Jeśli nowo utworzony przedmiot ma być opublikowany (isVisible: true), aktualizujemy isPublished
+        if (!editingItemId && isVisible === true) {
+          await updateGroupShopItem(groupId, savedItemId, { isPublished: true });
+        }
+
+        const rankRefs = ranks.map((r) => ({
+          dbId: r.id,
+          name: r.name,
+          shopItems: r.uniqueStoreItems || [],
+        }));
+        await syncShopItemRankUnlock(
+          groupId,
+          String(savedItemId),
+          restrictRankEnabled && unlockRankId !== '' ? Number(unlockRankId) : null,
+          rankRefs,
+        );
+      }
+
+      // Czyszczenie wersji roboczej
+      try {
+        localStorage.removeItem(draftKey);
+      } catch {
+        // ignore
+      }
+
+      showSuccess(editingItemId ? 'Przedmiot został zaktualizowany!' : 'Przedmiot został dodany do sklepu!');
+      if (onSaved) {
+        onSaved();
+      } else if (onClose) {
+        onClose();
+      } else {
+        window.location.href = `/groups/${groupId}/shop`;
+      }
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd zapisu przedmiotu.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="shop-item-form">
-      {errorMessage ? (
-        <p className="shop-item-form__error" role="alert">{errorMessage}</p>
-      ) : null}
+    <div className="shop-item-form shop-item-wizard">
+      {/* Nagłówek wizarda (ukrywany w modalu, gdyż jest renderowany w tytule modala) */}
+      {!hideInternalHeader && (
+        <ShopItemWizardHeader
+          currentStep={currentStep}
+          totalSteps={TOTAL_STEPS}
+          isEditing={Boolean(editingItemId)}
+        />
+      )}
 
-      <div className="shop-item-form__layout">
-        <div className="shop-item-form__main">
-          <section className="shop-item-form__panel">
-            <div className="shop-item-form__row shop-item-form__row--name-price">
-              <div className="shop-item-form__field">
-                <label className="shop-item-form__label" htmlFor="shop-item-name">{ITEMNAMELABEL__TEXTLABEL[LANGUAGE]}</label>
-                <CharacterLimitedField value={itemname} maxLength={NAME_MAX_LENGTH}>
-                  <input
-                    id="shop-item-name"
-                    className="shop-item-form__input"
-                    value={itemname}
-                    maxLength={NAME_MAX_LENGTH}
-                    onChange={(event) => setItemname(event.target.value)}
-                  />
-                </CharacterLimitedField>
-              </div>
-              <div className="shop-item-form__field shop-item-form__field--price">
-                <RewardsCurrencyLabel htmlFor="shop-item-price" className="shop-item-form__label">
-                  {PRICELABEL__TEXTLABEL[LANGUAGE]}
-                </RewardsCurrencyLabel>
-                <input
-                  id="shop-item-price"
-                  className="shop-item-form__input"
-                  value={cost}
-                  onInput={(event) => {
-                    onNumericinput(event.target.value, setCost);
-                    recalculatediscounts(event.target.value);
-                  }}
-                />
-              </div>
-            </div>
+      {/* Ciało aktualnego kroku */}
+      <div className="shop-item-wizard__content">
+        {currentStep === 1 && (
+          <ShopItemStepInfo
+            itemName={itemName}
+            setItemName={setItemName}
+            storyDescription={storyDescription}
+            setStoryDescription={setStoryDescription}
+            didacticDescription={didacticDescription}
+            setDidacticDescription={setDidacticDescription}
+            currentIcon={currentIcon}
+            setCurrentIcon={setCurrentIcon}
+            isEditingExtraLife={isEditingExtraLife}
+            categories={categories}
+            onCategoryCheckChange={handleCategoryCheckChange}
+            onCreateCategory={handleCreateCategory}
+            onUpdateCategory={handleUpdateCategory}
+            onDeleteCategory={handleDeleteCategory}
+            nameError={nameError}
+          />
+        )}
 
-            {isEditingExtraLife ? (
-              <div className="shop-item-form__icon-picker shop-item-form__icon-picker--locked">
-                <span className="shop-item-form__label">
-                  {ITEMICONLABEL__TEXTLABEL[LANGUAGE]}
-                  <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP} />
-                </span>
-                <div
-                  className="shop-item-form__icon-locked"
-                  aria-disabled="true"
-                  title={EXTRA_LIFE_ICON_EDIT_TOOLTIP}
-                >
-                  <LivesIcon size="lg" ariaLabel={ITEMICONLIVES__TEXTLABEL[LANGUAGE]} />
-                </div>
-              </div>
-            ) : (
-              <EmojiPickerField
-                className="shop-item-form__icon-picker"
-                label={ITEMICONLABEL__TEXTLABEL[LANGUAGE]}
-                value={currenticon}
-                defaultEmoji="🥕"
-                onChange={setCurrenticon}
-                ariaLabel={ITEMICONSELECT__TEXTLABEL[LANGUAGE]}
-              />
-            )}
+        {currentStep === 2 && (
+          <ShopItemStepPricing
+            cost={cost}
+            setCost={setCost}
+            minPrice={minPrice}
+            setMinPrice={setMinPrice}
+            minPriceEnabled={minPriceEnabled}
+            setMinPriceEnabled={setMinPriceEnabled}
+            badges={badges}
+            badgeDiscounts={badgeDiscounts}
+            setBadgeDiscounts={setBadgeDiscounts}
+            ranks={ranks}
+            setRanks={setRanks}
+            costError={costError}
+          />
+        )}
 
-            <div className="shop-item-form__field">
-              <span className="shop-item-form__label shop-item-form__label--heading">
-                {CATEGORYLABEL__TEXTLABEL[LANGUAGE]}
-                <InfoTooltip text={CATEGORYTOOLTIP__TEXTLABEL[LANGUAGE]} />
-              </span>
-              {categories.length === 0 ? (
-                <p className="shop-item-form__empty">{NOCATEGORIES__TEXTLABEL[LANGUAGE]}</p>
-              ) : (
-                <ul className="shop-item-form__category-list">
-                  {categories.map((category) => (
-                    <li key={`category-${category.id}`}>
-                      <label className="shop-item-form__category-option">
-                        <input
-                          type="checkbox"
-                          checked={category.checked === 1}
-                          onChange={() => oncategorycheckchange(category.id)}
-                        />
-                        <span
-                          className="shop-item-form__category-swatch"
-                          style={{ backgroundColor: category.color ?? '#42f37d' }}
-                          aria-hidden="true"
-                        />
-                        <span>{category.name}</span>
-                      </label>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </section>
+        {currentStep === 3 && (
+          <ShopItemStepAvailability
+            isVisible={isVisible}
+            setIsVisible={setIsVisible}
+            restrictRankEnabled={restrictRankEnabled}
+            setRestrictRankEnabled={setRestrictRankEnabled}
+            unlockRankId={unlockRankId}
+            setUnlockRankId={setUnlockRankId}
+            ranks={ranks}
+            groupLimitEnabled={groupLimitEnabled}
+            setGroupLimitEnabled={setGroupLimitEnabled}
+            groupLimit={groupLimit}
+            setGroupLimit={setGroupLimit}
+            studentLimitEnabled={studentLimitEnabled}
+            setStudentLimitEnabled={setStudentLimitEnabled}
+            studentLimit={studentLimit}
+            setStudentLimit={setStudentLimit}
+            groupLimitError={groupLimitError}
+            studentLimitError={studentLimitError}
+          />
+        )}
 
-          <Divider />
+        {currentStep === 4 && (
+          <ShopItemStepSummary
+            itemName={itemName}
+            currentIcon={currentIcon}
+            storyDescription={storyDescription}
+            didacticDescription={didacticDescription}
+            categories={categories}
+            cost={cost}
+            minPriceEnabled={minPriceEnabled}
+            minPrice={minPrice}
+            badgeDiscounts={badgeDiscounts}
+            ranks={ranks}
+            isVisible={isVisible}
+            restrictRankEnabled={restrictRankEnabled}
+            unlockRankId={unlockRankId}
+            groupLimitEnabled={groupLimitEnabled}
+            groupLimit={groupLimit}
+            studentLimitEnabled={studentLimitEnabled}
+            studentLimit={studentLimit}
+          />
+        )}
+      </div>
 
-          <section className="shop-item-form__panel">
-            <div className="shop-item-form__field">
-              <label className="shop-item-form__label" htmlFor="shop-item-story">{STORYDESCLABEL__TEXTLABEL[LANGUAGE]}</label>
-              <CharacterLimitedField value={description0} maxLength={SHORT_DESCRIPTION_MAX_LENGTH}>
-                <textarea
-                  id="shop-item-story"
-                  className="shop-item-form__textarea"
-                  value={description0}
-                  maxLength={SHORT_DESCRIPTION_MAX_LENGTH}
-                  onChange={(event) => setDescription0(event.target.value)}
-                />
-              </CharacterLimitedField>
-            </div>
-            <div className="shop-item-form__field">
-              <label className="shop-item-form__label" htmlFor="shop-item-edu">{EDUCDESCLABEL__TEXTLABEL[LANGUAGE]}</label>
-              <CharacterLimitedField value={description1} maxLength={SHORT_DESCRIPTION_MAX_LENGTH}>
-                <textarea
-                  id="shop-item-edu"
-                  className="shop-item-form__textarea"
-                  value={description1}
-                  maxLength={SHORT_DESCRIPTION_MAX_LENGTH}
-                  onChange={(event) => setDescription1(event.target.value)}
-                />
-              </CharacterLimitedField>
-            </div>
-          </section>
+      {/* Pasek nawigacji / stopka wizarda — przyciski po prawej stronie */}
+      <div className="shop-item-wizard__footer">
+        <div className="shop-item-wizard__footer-actions">
+          <Button type="button" variant="ghost" size="md" onClick={handleAttemptClose}>
+            Anuluj
+          </Button>
 
-          <Divider />
+          {currentStep > 1 && (
+            <Button type="button" variant="secondary" size="md" onClick={handlePrevStep}>
+              Cofnij
+            </Button>
+          )}
 
-          <section className="shop-item-form__panel">
-            <div className="shop-item-form__field">
-              <label className="shop-item-form__label" htmlFor="shop-item-unlock-rank">
-                {AVAILABILITYLABEL__TEXTLABEL[LANGUAGE]}
-                <InfoTooltip text={AVAILABILITYTOOLTIP__TEXTLABEL[LANGUAGE]} />
-              </label>
-              <select
-                id="shop-item-unlock-rank"
-                className="shop-item-form__select"
-                value={unlockRankId}
-                onChange={(event) => setUnlockRankId(event.target.value)}
-              >
-                <option value="">{ALLUSERS__TEXTLABEL[LANGUAGE]}</option>
-                {ranks.map((rank) => (
-                  <option key={`unlock-rank-${rank.id}`} value={String(rank.id)}>
-                    {RANKACCESS__TEXTLABEL[LANGUAGE].replace('{rank}', rank.name)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="shop-item-form__row shop-item-form__row--limits">
-              <div className="shop-item-form__field">
-                <label className="shop-item-form__limit-toggle" htmlFor="shop-item-group-limit-enabled">
-                  <input
-                    id="shop-item-group-limit-enabled"
-                    type="checkbox"
-                    checked={grouplimitenabled === 1}
-                    onChange={() => {
-                      if (grouplimitenabled === 0) {
-                        setGrouplimitenabled(1);
-                      } else {
-                        setGrouplimitenabled(0);
-                        setGrouplimit('');
-                      }
-                    }}
-                  />
-                  <span>
-                    {GROUPLIMITLABEL__TEXTLABEL[LANGUAGE]}
-                    <InfoTooltip text={GROUPLIMITTOOLTIP__TEXTLABEL[LANGUAGE]} />
-                  </span>
-                </label>
-                <input
-                  className="shop-item-form__input"
-                  value={grouplimit}
-                  disabled={grouplimitenabled === 0}
-                  onInput={(event) => onNumericinput(event.target.value, setGrouplimit)}
-                />
-              </div>
-              <div className="shop-item-form__field">
-                <label className="shop-item-form__limit-toggle" htmlFor="shop-item-student-limit-enabled">
-                  <input
-                    id="shop-item-student-limit-enabled"
-                    type="checkbox"
-                    checked={studentlimitenabled === 1}
-                    onChange={() => {
-                      if (studentlimitenabled === 0) {
-                        setStudentlimitenabled(1);
-                      } else {
-                        setStudentlimitenabled(0);
-                        setStudentlimit('');
-                      }
-                    }}
-                  />
-                  <span>
-                    {STUDENTLIMITLABEL__TEXTLABEL[LANGUAGE]}
-                    <InfoTooltip text={STUDENTLIMITTOOLTIP__TEXTLABEL[LANGUAGE]} />
-                  </span>
-                </label>
-                <input
-                  className="shop-item-form__input"
-                  value={studentlimit}
-                  disabled={studentlimitenabled === 0}
-                  onInput={(event) => onNumericinput(event.target.value, setStudentlimit)}
-                />
-              </div>
-            </div>
-          </section>
-
-          <Divider />
-
-          <section className="shop-item-form__panel">
-            <span className="shop-item-form__label shop-item-form__label--heading">
-              {BADGEDISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
-              <InfoTooltip text={BADGEDISCOUNTTOOLTIP__TEXTLABEL[LANGUAGE]} />
-            </span>
-
-            <div className="shop-item-form__badge-toolbar">
-              <select
-                className="shop-item-form__select"
-                value={selectedbadge}
-                onChange={(event) => setSelectedbadge(event.target.value)}
-              >
-                <option value={SELECTBADGE__TEXTLABEL[LANGUAGE]}>{SELECTBADGE__TEXTLABEL[LANGUAGE]}</option>
-                {badges.map((badge) => (
-                  <option key={`badgeoption-${badge.id}`} value={badge.name}>{badge.name}</option>
-                ))}
-              </select>
-              <input
-                className="shop-item-form__input"
-                value={pendingdiscountvalue}
-                onInput={(event) => onDiscountinput(event.target.value, setPendingdiscountvalue)}
-              />
-              <Button type="button" variant="primary" size="md" onClick={addbadgediscount}>
-                {ADDDISCOUNT__TEXTLABEL[LANGUAGE]}
-              </Button>
-            </div>
-
-            {badgediscounts.map((discount) => (
-              <div key={`badgediscount-${discount.id}`} className="shop-item-form__badge-row">
-                <span className="shop-item-form__badge-name">{discount.badgename}</span>
-                <input
-                  className="shop-item-form__input"
-                  value={discount.value}
-                  onInput={(event) => onDiscountinput(
-                    event.target.value,
-                    (value) => onbadgediscountchange(discount.id, value),
-                  )}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deletebadgediscount(discount.id)}
-                >
-                  {REMOVE__TEXTLABEL[LANGUAGE]}
-                </Button>
-              </div>
-            ))}
-          </section>
+          {currentStep < TOTAL_STEPS ? (
+            <Button type="button" variant="primary" size="md" onClick={handleNextStep}>
+              Dalej
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={handleFinalSave}
+              disabled={isSubmitting}
+            >
+              {editingItemId ? 'Zapisz zmiany' : 'Dodaj do sklepu'}
+            </Button>
+          )}
         </div>
-
-        <aside className="shop-item-form__sidebar">
-          <section
-            className={[
-              'shop-item-form__panel',
-              'shop-item-form__panel--rank-discounts',
-              rankDiscountsExpanded ? 'shop-item-form__panel--rank-discounts-expanded' : '',
-            ].filter(Boolean).join(' ')}
-          >
-            <div className="shop-item-form__rank-discounts-header">
-              <button
-                type="button"
-                className="shop-item-form__rank-discounts-toggle"
-                onClick={() => setRankDiscountsExpanded((expanded) => !expanded)}
-                aria-expanded={rankDiscountsExpanded}
-                aria-controls="shop-item-rank-discounts-list"
-              >
-                <span className="shop-item-form__rank-discounts-chevron" aria-hidden="true" />
-                <span className="shop-item-form__label shop-item-form__label--heading shop-item-form__label--toggle">
-                  {RANKDISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
-                  {ranksfrombackend === 0 ? '*' : ''}
-                </span>
-              </button>
-              <InfoTooltip text={RANKDISCOUNTTOOLTIP__TEXTLABEL[LANGUAGE]} />
-            </div>
-
-            {rankDiscountsExpanded ? (
-              ranks.length === 0 ? (
-                <p className="shop-item-form__empty">{NORANKS__TEXTLABEL[LANGUAGE]}</p>
-              ) : (
-                <div id="shop-item-rank-discounts-list" className="shop-item-form__rank-list">
-                  {ranks.map((rank) => (
-                    <div key={`rank-${rank.id}`} className="shop-item-form__rank-card">
-                      <span className="shop-item-form__rank-icon" aria-hidden="true">
-                        {rank.icon || '⭐'}
-                      </span>
-                      <span className="shop-item-form__rank-name">{rank.name}</span>
-                      <input
-                        className="shop-item-form__input shop-item-form__rank-price-input"
-                        value={rank.costafter}
-                        onInput={(event) => onNumericinput(
-                          event.target.value,
-                          (value) => onrankcostchange(rank.id, value),
-                        )}
-                      />
-                      <span className="shop-item-form__rank-discount">{rank.discount}%</span>
-                    </div>
-                  ))}
-                </div>
-              )
-            ) : null}
-          </section>
-        </aside>
       </div>
 
-      <div className="shop-item-form__footer">
-        <Button type="button" variant="secondary" size="md" onClick={goback}>
-          {BACKBUTTON__TEXTLABEL[LANGUAGE]}
-        </Button>
-        <Button type="button" variant="primary" size="md" onClick={createitem}>
-          {editingItemId ? SAVEDISCHANGE__TEXTLABEL[LANGUAGE] : CREATEITEM__TEXTLABEL[LANGUAGE]}
-        </Button>
-      </div>
+      {/* Modal zapytania przy wyjściu (Anuluj / Odrzuć / Zapisz roboczo) */}
+      <ShopItemUnsavedModal
+        isOpen={isUnsavedModalOpen}
+        onClose={() => setIsUnsavedModalOpen(false)}
+        onDiscard={handleDiscardAndExit}
+        onSaveDraft={handleSaveDraftAndExit}
+      />
+
+      {/* Modal zapytania przy starcie (Wczytaj wersję roboczą vs Nowy) */}
+      <ShopItemDraftPromptModal
+        isOpen={isDraftPromptOpen}
+        onClose={handleDiscardDraftAndNew}
+        onLoadDraft={handleLoadDraft}
+        onDiscardDraftAndNew={handleDiscardDraftAndNew}
+      />
     </div>
   );
 }
-
-

@@ -119,14 +119,25 @@ export default function PaginatedNotificationsSection({
   const { showSuccess, showError } = useToast();
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-
   const [page, setPage] = useState(1);
-
   const [confirmClearMode, setConfirmClearMode] = useState(null);
-
   const [isClearing, setIsClearing] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const skip = (page - 1) * pageSize;
+
+  useEffect(() => {
+    if (!isMenuOpen) return undefined;
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.paginated-notifications__menu-container')) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
 
 
@@ -277,71 +288,63 @@ export default function PaginatedNotificationsSection({
           <div className="paginated-notifications__actions">
 
             <Button
-
               type="button"
-
               variant="secondary"
-
               size="sm"
-
               disabled={isLoading || unreadCount === 0}
-
               onClick={() => {
-
                 void handleMarkAllRead();
-
               }}
-
             >
-
               {MARKALLREAD__TEXTLABEL[LANGUAGE]}
-
             </Button>
 
-            {!isStudentView ? (
-
+            <div className="paginated-notifications__menu-container">
               <Button
-
                 type="button"
-
                 variant="secondary"
-
                 size="sm"
-
-                className="paginated-notifications__clear-partial-btn"
-
-                disabled={isLoading || isClearing || totalCount === 0}
-
-                onClick={() => setConfirmClearMode('exceptItemUses')}
-
+                className="paginated-notifications__more-btn"
+                aria-label="Więcej opcji"
+                title="Więcej opcji"
+                disabled={isLoading || totalCount === 0}
+                onClick={() => setIsMenuOpen((prev) => !prev)}
               >
-
-                {CLEARPARTIAL__TEXTLABEL[LANGUAGE]}
-
+                •••
               </Button>
 
-            ) : null}
-
-            <Button
-
-              type="button"
-
-              variant="danger"
-
-              size="sm"
-
-              disabled={isLoading || isClearing || totalCount === 0}
-
-              onClick={() => setConfirmClearMode('all')}
-
-            >
-
-              {CLEARALL__TEXTLABEL[LANGUAGE]}
-
-            </Button>
-
+              {isMenuOpen ? (
+                <div className="paginated-notifications__menu" role="menu">
+                  {!isStudentView ? (
+                    <button
+                      type="button"
+                      className="paginated-notifications__menu-item"
+                      role="menuitem"
+                      disabled={isLoading || isClearing || totalCount === 0}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setConfirmClearMode('exceptItemUses');
+                      }}
+                    >
+                      {CLEARPARTIAL__TEXTLABEL[LANGUAGE]}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="paginated-notifications__menu-item paginated-notifications__menu-item--danger"
+                    role="menuitem"
+                    disabled={isLoading || isClearing || totalCount === 0}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setConfirmClearMode('all');
+                    }}
+                  >
+                    {CLEARALL__TEXTLABEL[LANGUAGE]}
+                  </button>
+                </div>
+              ) : null}
+            </div>
           </div>
-
         </div>
 
 

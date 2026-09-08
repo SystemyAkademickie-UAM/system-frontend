@@ -11,6 +11,11 @@ import { Divider, CharacterLimitedField, Button, Modal, useToast } from '../../.
 import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
+import {
+  THEME_OPTIONS,
+  applyTheme,
+  getSavedTheme,
+} from '../../../services/themeService.js';
 import { SETTINGS_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 
@@ -41,6 +46,12 @@ const LANGUAGELABELTEXT = {
   english: 'LANGUAGE',
   japanese: '言語',
   kana: 'げんご'
+};
+const THEMELABELTEXT = {
+  polish: 'Motyw',
+  english: 'Theme',
+  japanese: 'テーマ',
+  kana: 'テーマ'
 };
 const NICKNAMELABELTEXT = {
   polish: 'Ksywka',
@@ -76,7 +87,7 @@ const SAVEBUTTONLABELTEXT = {
   polish: 'Zapisz zmiany',
   english: 'Save changes',
   japanese: '変更を保存',
-  kana: 'へんこうをほぞん'
+  kana: 'へんこうをほぞn'
 };
 const UNSAVEDCHANGESLABELTEXT = {
   polish: 'Niezapisane zmiany',
@@ -151,6 +162,7 @@ export default function SettingsContent() {
   const { showSuccess, showError } = useToast();
 
   const [draftShowNickname, setDraftShowNickname] = useState(true);
+  const [draftTheme, setDraftTheme] = useState(() => getSavedTheme());
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -188,10 +200,14 @@ export default function SettingsContent() {
       }
 
       const CURRENTLANGUAGE = READLANGUAGECOOKIE() || 'polish';
+      const CURRENTTHEME = getSavedTheme();
+      setDraftTheme(CURRENTTHEME);
+
       setSavedSnapshot({
         nickname: profile.nickname || '',
         avatarId: loadedAvatarId,
         LANGUAGE: CURRENTLANGUAGE,
+        theme: CURRENTTHEME,
         ...(role === APP_ROLE.LECTURER ? { showNickname: profile.showNickname !== false } : {}),
       });
     } catch (error) {
@@ -245,6 +261,9 @@ export default function SettingsContent() {
     const savedNickname = result.profile?.nickname ?? trimmedNickname;
     setNickname(savedNickname);
 
+    // Zastosuj i zapisz motyw
+    applyTheme(draftTheme);
+
     await refetchProfile();
 
     if (role === APP_ROLE.LECTURER) {
@@ -257,6 +276,7 @@ export default function SettingsContent() {
       nickname: savedNickname,
       avatarId: selectedAvatarId,
       LANGUAGE: SELECTEDLANGUAGE,
+      theme: draftTheme,
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
 
@@ -267,6 +287,7 @@ export default function SettingsContent() {
     DIVLANGUAGE,
     LANGUAGE,
     draftShowNickname,
+    draftTheme,
     nickname,
     refetchProfile,
     role,
@@ -293,6 +314,10 @@ export default function SettingsContent() {
       return true;
     }
 
+    if (draftTheme !== savedSnapshot.theme) {
+      return true;
+    }
+
     if (role === APP_ROLE.LECTURER && draftShowNickname !== savedSnapshot.showNickname) {
       return true;
     }
@@ -301,6 +326,7 @@ export default function SettingsContent() {
   }, [
     DIVLANGUAGE,
     draftShowNickname,
+    draftTheme,
     isLoading,
     nickname,
     role,
@@ -317,6 +343,14 @@ export default function SettingsContent() {
     when: isDirty && !isSaving,
     onSave: persistSettings,
   });
+
+  const handleDiscard = useCallback(() => {
+    if (savedSnapshot?.theme) {
+      setDraftTheme(savedSnapshot.theme);
+      applyTheme(savedSnapshot.theme);
+    }
+    discardChanges();
+  }, [discardChanges, savedSnapshot?.theme]);
 
   function onNicknamechange(stringvalue) {
     let nextValue = stringvalue;
@@ -406,6 +440,32 @@ export default function SettingsContent() {
 
               <Divider className="settings-page__divider" length="50%" />
 
+              <SettingsSectionHeader title={THEMELABELTEXT[LANGUAGE]} id="settings-theme-title" />
+              <div className="settings-page__field group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="settings-theme">
+                  {THEMELABELTEXT[LANGUAGE]}
+                </label>
+                <select
+                  id="settings-theme"
+                  className="group-settings-form__input"
+                  value={draftTheme}
+                  onChange={(event) => {
+                    const nextTheme = event.target.value;
+                    setDraftTheme(nextTheme);
+                    applyTheme(nextTheme);
+                  }}
+                  disabled={isSaving}
+                >
+                  {THEME_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Divider className="settings-page__divider" length="50%" />
+
               <SettingsSectionHeader title={LANGUAGELABELTEXT[LANGUAGE]} id="settings-LANGUAGE-title" />
               <div className="settings-page__field group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="settings-LANGUAGE">
@@ -419,8 +479,8 @@ export default function SettingsContent() {
                   disabled={isSaving}
                 >
                   {['polski', 'English'].map((LANGUAGEchosen) => (
-                                      <option key={LANGUAGEchosen} value={LANGUAGEchosen}>{LANGUAGEchosen}</option>
-                                    ))}
+                    <option key={LANGUAGEchosen} value={LANGUAGEchosen}>{LANGUAGEchosen}</option>
+                  ))}
                 </select>
               </div>
             </section>
@@ -464,7 +524,7 @@ export default function SettingsContent() {
             <Button type="button" variant="secondary" size="md" onClick={dismissPrompt}>
               {UNSAVEDCANCELLABELTEXT[LANGUAGE]}
             </Button>
-            <Button type="button" variant="secondary" size="md" onClick={discardChanges}>
+            <Button type="button" variant="secondary" size="md" onClick={handleDiscard}>
               {UNSAVEDDISCARDLABELTEXT[LANGUAGE]}
             </Button>
             <Button

@@ -220,6 +220,15 @@ export const ROUTE_TABLE = [
     roles: ['student'],
   },
   {
+    id: 'group.profile.purchases',
+    section: 'group',
+    pathPattern: '/groups/:groupId/profile/purchases',
+    pageTitle: 'Profil — historia zakupów',
+    pageModule: 'pages/links/groups/profile/ProfilePurchasesPage.jsx',
+    contentModule: 'pages/content/group-profile-purchases/ProfilePurchasesContent.jsx',
+    roles: ['student'],
+  },
+  {
     id: 'group.studentProfile',
     section: 'group',
     pathPattern: '/groups/:groupId/student-profile/:studentId',

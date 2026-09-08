@@ -51,7 +51,7 @@
 
 .settings-page__avatar-picker.maq-avatar-picker {
   width: 100%;
-  max-width: 50%;
+  max-width: min(44rem, 100%);
   align-self: flex-start;
 }
 

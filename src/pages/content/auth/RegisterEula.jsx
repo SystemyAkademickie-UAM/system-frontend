@@ -1,9 +1,14 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  AUTH_LEGAL_DOCUMENTS,
   authLegalDocumentUrl,
 } from '../../../constants/authLegalDocuments.constants.js';
+import {
+  THEME_MODE,
+  THEME_OPTIONS,
+  applyTheme,
+  getSavedTheme,
+} from '../../../services/themeService.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthCard.css';
 import './RegisterEula.css';
@@ -13,19 +18,24 @@ const BACK_ARIALABEL__TEXTLABEL = {
   english: 'Back'
 };
 
-const SUBTITLE__TEXTLABEL = {
-  polish: 'Tworząc nowe konto zgadzasz się z poniższą polityką MyAcademyQuest',
-  english: 'By creating a new account you agree to the MyAcademyQuest policy below'
+const PAGE_TITLE__TEXTLABEL = {
+  polish: 'Ustawienia konta',
+  english: 'Account settings'
 };
 
-const TERMS_CHECKBOX__TEXTLABEL = {
-  polish: 'Warunki użytkowania',
-  english: 'Terms of use'
+const THEME_SECTION__TEXTLABEL = {
+  polish: 'Wybór motywu',
+  english: 'Theme selection'
 };
 
 const PRIVACY_CHECKBOX__TEXTLABEL = {
   polish: 'Polityka prywatności',
   english: 'Privacy policy'
+};
+
+const DOCUMENTATION_CHECKBOX__TEXTLABEL = {
+  polish: 'Dokumentacja',
+  english: 'Documentation'
 };
 
 const SUBMIT_CREATING__TEXTLABEL = {
@@ -54,37 +64,22 @@ function CheckIcon({ className }) {
   );
 }
 
-function LegalDownloadLink({ documentKey, LANGUAGE }) {
-  const document = AUTH_LEGAL_DOCUMENTS[documentKey];
-
-  const DOWNLOAD_LINK__TEXTLABEL = {
-    polish: 'pobierz',
-    english: 'download'
-  };
-
-  const handleClick = (event) => {
-    event.stopPropagation();
-  };
-
-  return (
-    <a
-      href={authLegalDocumentUrl(documentKey)}
-      target="_blank"
-      rel="noopener noreferrer"
-
-      className="register-eula__download-link"
-      onClick={handleClick}
-    >
-      {DOWNLOAD_LINK__TEXTLABEL[LANGUAGE]}
-    </a>
-  );
-}
-
-export default function RegisterEula({ onAccept, onBack, errorMessage = null, isSubmitting = false }) {
+export default function RegisterEula({
+  onAccept,
+  onBack,
+  errorMessage = null,
+  isSubmitting = false,
+}) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const navigate = useNavigate();
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState(() => getSavedTheme());
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [documentationAccepted, setDocumentationAccepted] = useState(false);
+
+  const handleThemeChange = (theme) => {
+    setSelectedTheme(theme);
+    applyTheme(theme);
+  };
 
   const handleBack = useCallback(() => {
     if (onBack) {
@@ -95,28 +90,30 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
   }, [onBack, navigate]);
 
   const handleAccept = useCallback(() => {
-    if (termsAccepted && privacyAccepted && onAccept) {
-      onAccept();
+    if (privacyAccepted && documentationAccepted && onAccept) {
+      onAccept({ theme: selectedTheme });
     }
-  }, [termsAccepted, privacyAccepted, onAccept]);
+  }, [privacyAccepted, documentationAccepted, onAccept, selectedTheme]);
 
-  const isValid = termsAccepted && privacyAccepted && !isSubmitting;
+  const isValid = privacyAccepted && documentationAccepted && !isSubmitting;
 
   return (
     <div className="auth-card auth-card--wizard-panel auth-card--left-aligned register-eula">
-      <button
-        type="button"
-        className="auth-card__back-button"
-        onClick={handleBack}
-        aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
-        disabled={isSubmitting}
-      >
-        <BackIcon className="auth-card__back-icon" />
-      </button>
+      <div className="auth-card__header">
+        <button
+          type="button"
+          className="auth-card__back-button"
+          onClick={handleBack}
+          aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
+          disabled={isSubmitting}
+        >
+          <BackIcon className="auth-card__back-icon" />
+        </button>
 
-      <p className="auth-card__subtitle register-eula__subtitle">
-        {SUBTITLE__TEXTLABEL[LANGUAGE]}
-      </p>
+        <h1 className="auth-card__title register-eula__title">
+          {PAGE_TITLE__TEXTLABEL[LANGUAGE]}
+        </h1>
+      </div>
 
       {errorMessage && (
         <p className="register-eula__error" role="alert">
@@ -124,23 +121,67 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
         </p>
       )}
 
+      <div className="register-eula__theme-section">
+        <p className="register-eula__section-label">
+          {THEME_SECTION__TEXTLABEL[LANGUAGE]}
+        </p>
+        <div className="register-eula__theme-options" role="radiogroup" aria-label={THEME_SECTION__TEXTLABEL[LANGUAGE]}>
+          {THEME_OPTIONS.map((option) => {
+            const isSelected = selectedTheme === option.id;
+            return (
+              <label
+                key={option.id}
+                className={[
+                  'register-eula__theme-card',
+                  isSelected ? 'register-eula__theme-card--selected' : '',
+                ].join(' ')}
+              >
+                <input
+                  type="radio"
+                  name="app-theme-selection"
+                  value={option.id}
+                  checked={isSelected}
+                  onChange={() => handleThemeChange(option.id)}
+                  className="register-eula__theme-radio"
+                  disabled={isSubmitting}
+                />
+                <span className="register-eula__theme-radio-circle">
+                  {isSelected && <span className="register-eula__theme-radio-dot" />}
+                </span>
+                <span className="register-eula__theme-info">
+                  <span className="register-eula__theme-name">{option.label}</span>
+                  <span className="register-eula__theme-desc">{option.description}</span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="register-eula__checkboxes">
         <label className="register-eula__checkbox-item">
           <span className="register-eula__checkbox-wrapper">
             <input
               type="checkbox"
               className="register-eula__checkbox-input"
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
+              checked={privacyAccepted}
+              onChange={(e) => setPrivacyAccepted(e.target.checked)}
+              disabled={isSubmitting}
             />
             <span className="register-eula__checkbox-custom">
-              {termsAccepted && <CheckIcon className="register-eula__check-icon" />}
+              {privacyAccepted && <CheckIcon className="register-eula__check-icon" />}
             </span>
           </span>
           <span className="register-eula__checkbox-label">
-            {TERMS_CHECKBOX__TEXTLABEL[LANGUAGE]}
-            {' '}
-            <LegalDownloadLink documentKey="termsOfUse" LANGUAGE={LANGUAGE} />
+            <a
+              href={authLegalDocumentUrl('privacyPolicy')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="register-eula__document-link"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {PRIVACY_CHECKBOX__TEXTLABEL[LANGUAGE]}
+            </a>
           </span>
         </label>
 
@@ -149,17 +190,24 @@ export default function RegisterEula({ onAccept, onBack, errorMessage = null, is
             <input
               type="checkbox"
               className="register-eula__checkbox-input"
-              checked={privacyAccepted}
-              onChange={(e) => setPrivacyAccepted(e.target.checked)}
+              checked={documentationAccepted}
+              onChange={(e) => setDocumentationAccepted(e.target.checked)}
+              disabled={isSubmitting}
             />
             <span className="register-eula__checkbox-custom">
-              {privacyAccepted && <CheckIcon className="register-eula__check-icon" />}
+              {documentationAccepted && <CheckIcon className="register-eula__check-icon" />}
             </span>
           </span>
           <span className="register-eula__checkbox-label">
-            {PRIVACY_CHECKBOX__TEXTLABEL[LANGUAGE]}
-            {' '}
-            <LegalDownloadLink documentKey="privacyPolicy" LANGUAGE={LANGUAGE} />
+            <a
+              href={authLegalDocumentUrl('documentation')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="register-eula__document-link"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {DOCUMENTATION_CHECKBOX__TEXTLABEL[LANGUAGE]}
+            </a>
           </span>
         </label>
       </div>

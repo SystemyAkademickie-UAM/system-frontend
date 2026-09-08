@@ -463,6 +463,11 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     }
   }
 
+  const rawItemId = payload.itemId ?? payload.shopItemId ?? (payload.id != null && (item.type === 'SHOP_PURCHASE' || item.type === 'ITEM_USED' || item.type === 'SHOP_ITEM_ADDED') ? payload.id : null);
+  const itemId = rawItemId != null ? String(rawItemId) : null;
+  const itemName = readString(payload.itemName);
+  const isExtraLife = payload.isExtraLife === true;
+
   return {
     id: item.id,
     type: item.type,
@@ -477,6 +482,10 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     highlightVariant: !isStudentView && LECTURER_PRIORITY_NOTIFICATION_TYPES.has(item.type)
       ? 'gold'
       : null,
+    itemId,
+    itemName,
+    isExtraLife,
+    rawPayload: payload,
   };
 }
 

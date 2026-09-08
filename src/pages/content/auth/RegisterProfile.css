@@ -11,157 +11,133 @@
   margin-bottom: 0.5rem;
 }
 
-.register-profile__avatar-section {
+.register-profile__field-group {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  gap: 0.5rem;
   width: 100%;
-  margin: 24px 0 32px;
-  min-height: 13.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.register-profile__avatar-picker {
-  width: 100%;
-}
-
-.register-profile__avatar-label {
-  font-family: 'Caveat', 'Segoe Script', cursive;
-  font-weight: 700;
-  font-size: 36px;
-  line-height: 1.2;
-  color: #FDFBFF;
-  margin: 0 0 16px 0;
-  text-align: center;
-}
-
-.register-profile__avatar-selector {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 16px;
-}
-
-.register-profile__avatar-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.register-profile__avatar-arrow:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.register-profile__avatar-arrow:focus-visible {
-  outline: 2px solid #44E286;
-  outline-offset: 2px;
-}
-
-.register-profile__arrow-icon {
-  width: 32px;
-  height: 32px;
-  color: #FDFBFF;
-}
-
-.register-profile__avatar-preview {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.register-profile__avatar-image {
-  width: 120px;
-  height: 120px;
-  border-radius: 8px;
-  object-fit: cover;
-  background: #0d0d18;
-}
-
-.register-profile__avatar-number {
-  font-family: 'Manrope', sans-serif;
-  font-size: 14px;
-  color: rgba(189, 202, 190, 0.6);
+.register-profile__label {
+  font-family: var(--font-family-app);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .register-profile__input-container {
   padding-left: 16px;
 }
 
+.register-profile__checkbox-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.register-profile__checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.register-profile__checkbox-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+
+.register-profile__checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.register-profile__checkbox-custom {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid rgba(189, 202, 190, 0.4);
+  border-radius: 4px;
+  background: rgba(13, 13, 24, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.register-profile__checkbox-input:checked + .register-profile__checkbox-custom {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.register-profile__checkbox-input:focus-visible + .register-profile__checkbox-custom {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.register-profile__check-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--color-accent-on);
+}
+
+.register-profile__checkbox-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.register-profile__checkbox-title {
+  font-family: var(--font-family-app);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+.register-profile__checkbox-hint {
+  font-family: var(--font-family-app);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.register-profile__submit {
+  width: 100%;
+}
+
 @media (max-width: 768px) {
-  .auth-shell:has(.register-profile) {
-    --auth-card-max-width: min(569px, calc(100% - 1rem));
-    --auth-content-max-width: 100%;
-  }
-
-  .auth-shell__panel-inner:has(.register-profile) {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-  }
-
   .register-profile.auth-card--left-aligned {
-    align-items: center;
+    align-items: stretch;
     width: 100%;
     max-width: 100%;
     padding: 1rem 1.25rem 1.5rem;
   }
 
-  .register-profile .auth-card__back-button {
-    align-self: flex-start;
-    margin-bottom: 0.75rem;
-  }
-
-  .register-profile .auth-card__title {
-    text-align: center;
-    width: 100%;
-    max-width: 100%;
+  .register-profile .auth-card__header {
     margin-bottom: 1.25rem;
   }
 
   .register-profile .auth-card__input-wrapper {
     width: 100%;
     max-width: 100%;
-    margin-bottom: 1.25rem;
-  }
-
-  .register-profile .maq-char-limited-field {
-    width: 100%;
   }
 
   .register-profile .auth-card__input-container {
     width: 100%;
     padding: 0.875rem 1rem;
     min-height: 48px;
-  }
-
-  .register-profile .auth-card__primary-btn {
-    width: 100%;
-    max-width: 100%;
-    min-height: 44px;
-    padding: 0.625rem 0;
-    line-height: 1.25;
-  }
-
-  .register-profile__avatar-section {
-    align-items: center;
-    width: 100%;
-    margin: 1rem 0 1.25rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .register-profile__avatar-label {
-    font-size: 28px;
-  }
-
-  .register-profile__avatar-image {
-    width: 100px;
-    height: 100px;
   }
 }

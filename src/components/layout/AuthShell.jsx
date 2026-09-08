@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, useOutlet } from 'react-router-dom';
 import { welcomePath } from '../../routes/pathRegistry.js';
 import AuthAnimatedOutlet from './AuthAnimatedOutlet.jsx';
 import './AuthShell.css';
@@ -12,6 +12,7 @@ function normalizeAuthPath(pathname) {
 export default function AuthShell() {
   const { pathname } = useLocation();
   const isWelcome = normalizeAuthPath(pathname) === welcomePath();
+  const outlet = useOutlet();
 
   return (
     <div className={['auth-shell', isWelcome ? 'auth-shell--welcome' : ''].filter(Boolean).join(' ')}>
@@ -24,9 +25,7 @@ export default function AuthShell() {
 
       <main id="auth-main-content" className="auth-shell__main" tabIndex={-1}>
         {isWelcome ? (
-          <div className="auth-shell__welcome-outlet">
-            <AuthAnimatedOutlet />
-          </div>
+          outlet
         ) : (
           <section className="auth-shell__panel" aria-label="Logowanie">
             <div className="auth-shell__panel-inner">

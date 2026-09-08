@@ -3,14 +3,13 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { TexturedSurface, Divider } from '../../../components/ui/index.js';
 import ContentWithMeasuredDivider from '../../../components/ui/ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
 import NotificationsFeed from '../../../components/notifications/NotificationsFeed.jsx';
-import PaginatedNotificationsSection from '../../../components/notifications/PaginatedNotificationsSection.jsx';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useGroupDetails } from '../../../hooks/groups/useGroupDetails.js';
 import { useGroupBacklogNotifications } from '../../../hooks/notifications/useGroupBacklogNotifications.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { BACKLOG_LIST_POLL_MS } from '../../../constants/backlogNotifications.constants.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
-import { groupMembersLogPath } from '../../../routes/pathRegistry.js';
+import { groupMembersLogPath, groupProfileActivityPath } from '../../../routes/pathRegistry.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import GroupMainHomeContentWindow from './GroupMainHomeContentWindow.jsx';
 import './GroupMainHomeContent.css';
@@ -99,7 +98,7 @@ function InfoRow({ label, value }) {
   );
 }
 
-const LECTURER_PREVIEW_LIMIT = 5;
+const NOTIFICATIONS_PREVIEW_LIMIT = 5;
 
 export default function GroupMainHomeContent() {
   const { groupId } = useParams();
@@ -113,13 +112,13 @@ export default function GroupMainHomeContent() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const {
-    notifications: lecturerPreviewNotifications,
-    isLoading: lecturerPreviewLoading,
-    error: lecturerPreviewError,
-    markRead: lecturerMarkRead,
+    notifications: previewNotifications,
+    isLoading: previewLoading,
+    error: previewError,
+    markRead,
   } = useGroupBacklogNotifications(groupId, {
-    isStudentView: false,
-    take: LECTURER_PREVIEW_LIMIT,
+    isStudentView,
+    take: NOTIFICATIONS_PREVIEW_LIMIT,
     pollMs: BACKLOG_LIST_POLL_MS,
   });
 
@@ -178,40 +177,42 @@ export default function GroupMainHomeContent() {
     );
   }
 
+  const notificationsSeeMorePath = isStudentView
+    ? groupProfileActivityPath(groupId)
+    : groupMembersLogPath(groupId);
+
+  const sectionTitle = isStudentView
+    ? NOTIFICATIONSTITLE__TEXTLABEL[LANGUAGE]
+    : LATESTNOTIFICATIONS__TEXTLABEL[LANGUAGE];
+
   return (
     <div className="group-main-home">
       <GroupMainSubpageHeader eyebrow={WELCOMETITLE__TEXTLABEL[LANGUAGE]} title={HOMEPAGETITLE__TEXTLABEL[LANGUAGE]} />
 
-      {!isStudentView ? (
-        <TexturedSurface className="group-main-home__surface group-main-home__surface--notifications">
-          <section className="group-main-home__section" aria-label="Najnowsze powiadomienia">
-            <h2 className="group-main-home__section-title">{LATESTNOTIFICATIONS__TEXTLABEL[LANGUAGE]}</h2>
-            <NotificationsFeed
-              groupId={groupId}
-              role={role}
-              notifications={lecturerPreviewNotifications}
-              isLoading={lecturerPreviewLoading}
-              error={lecturerPreviewError}
-              limit={LECTURER_PREVIEW_LIMIT}
-              showDivider
-              onMarkRead={(id) => lecturerMarkRead(id)}
-              footerLink={{
-                label: SEE_MORE_BUTTON__TEXTLABEL[LANGUAGE],
-                to: groupMembersLogPath(groupId),
-              }}
-            />
-          </section>
-        </TexturedSurface>
-      ) : (
-        <PaginatedNotificationsSection
-          groupId={groupId}
-          isStudentView
-          title={NOTIFICATIONSTITLE__TEXTLABEL[LANGUAGE]}
-          sectionId="group-notifications"
-          linkable
-          surfaceClassName="group-main-home__surface--notifications"
-        />
-      )}
+      <TexturedSurface className="group-main-home__surface group-main-home__surface--notifications">
+        <section
+          id="group-notifications"
+          className="group-main-home__section"
+          aria-label={sectionTitle}
+        >
+          <h2 className="group-main-home__section-title">{sectionTitle}</h2>
+          <NotificationsFeed
+            groupId={groupId}
+            role={role}
+            notifications={previewNotifications}
+            isLoading={previewLoading}
+            error={previewError}
+            limit={NOTIFICATIONS_PREVIEW_LIMIT}
+            showDivider
+            linkable={isStudentView}
+            onMarkRead={(id) => markRead(id)}
+            footerLink={{
+              label: SEE_MORE_BUTTON__TEXTLABEL[LANGUAGE],
+              to: notificationsSeeMorePath,
+            }}
+          />
+        </section>
+      </TexturedSurface>
 
       <TexturedSurface className="group-main-home__surface group-main-home__surface--overview">
         <section className="group-main-home__section group-main-home__section--description" aria-label={GROUPDESCRIPTION__TEXTLABEL[LANGUAGE]}>

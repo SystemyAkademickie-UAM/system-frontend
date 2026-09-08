@@ -1,19 +1,9 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './WelcomeContent.css';
-
-const TAGLINE_WORDS__TEXTLABEL = {
-  polish: ['zabawa', 'przygoda', 'wyprawa', 'ekspedycja', 'podróż', 'eksploracja'],
-  english: ['fun', 'adventure', 'expedition', 'campaign', 'journey', 'exploration']
-};
-
-const PORTAL_WORDS__TEXTLABEL = {
-  polish: ['portalu', 'magii', 'przygodzie'],
-  english: ['portal', 'magic', 'adventure']
-};
 
 const INTRO_LINE0_WORDS__TEXTLABEL = {
   polish: ['sztuk', 'dziedzin', 'dyscyplin', 'rzemiosł', 'profesji'],
@@ -40,39 +30,19 @@ const INTRO_LINE4_WORDS__TEXTLABEL = {
   english: ['unity', 'oneness', 'wholeness', 'harmony', 'indivisible whole']
 };
 
-const TAGLINE_PREFIX__TEXTLABEL = {
-  polish: 'Nauka to',
-  english: 'Learning is'
+const JOIN_BUTTON__TEXTLABEL = {
+  polish: 'Dołącz',
+  english: 'Join'
 };
 
-const PORTAL_PREFIX__TEXTLABEL = {
-  polish: 'Zanurz się w',
-  english: 'Immerse yourself in'
+const SUBTITLE__TEXTLABEL = {
+  polish: 'MyAcademyQuest - system do grywalizacji',
+  english: 'MyAcademyQuest - gamification system'
 };
 
-const INTRO_LINE1_PREFIX__TEXTLABEL = {
-  polish: 'Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich',
-  english: 'Welcome, Traveler. You stand at the gates of a portal connecting universities gathering adepts of all'
-};
-
-const INTRO_LINE2_PREFIX__TEXTLABEL = {
-  polish: 'oraz nauk gotowych zdobywać wiedzę i poszerzać swoje',
-  english: 'and sciences ready to gain knowledge and expand their'
-};
-
-const INTRO_LINE3_PREFIX__TEXTLABEL = {
-  polish: 'w najodleglejszych krainach i czasach. Po drugiej stronie próżno szukać',
-  english: 'in the most distant realms and times. On the other side, you will not find'
-};
-
-const INTRO_LINE4_PREFIX__TEXTLABEL = {
-  polish: 'Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące',
-  english: 'Instead, there are epic campaigns, secret missions, and exciting'
-};
-
-const INTRO_LINE5_PREFIX__TEXTLABEL = {
-  polish: 'Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią',
-  english: 'Do you not lack wit and courage to enter a world where learning and adventure form'
+const SCROLL_HINT__TEXTLABEL = {
+  polish: 'Przewiń w dół',
+  english: 'Scroll down'
 };
 
 const LOGGEDOUT_SUCCESS__TEXTLABEL = {
@@ -104,44 +74,31 @@ function useCoarsePointer() {
   return isCoarsePointer;
 }
 
-function useWordSwapHandler(onSwap) {
-  const isCoarsePointer = useCoarsePointer();
-
-  return useCallback((event) => {
-    if (isCoarsePointer) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    onSwap();
-  }, [isCoarsePointer, onSwap]);
-}
-
-function SwapBlock({
-  className,
-  grayText,
-  greenText,
+function SwapWord({
+  word,
+  slotClass,
   onSwap,
+  suffix = '',
 }) {
   const isCoarsePointer = useCoarsePointer();
-  const handleSwap = useWordSwapHandler(onSwap);
 
   return (
-    <div
-      className={className}
+    <span
+      className={`welcome-swap-word ${slotClass}`}
       onMouseEnter={isCoarsePointer ? undefined : onSwap}
-      onClick={isCoarsePointer ? handleSwap : undefined}
-      onKeyDown={isCoarsePointer ? (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          handleSwap(event);
+      onClick={onSwap}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSwap();
         }
-      } : undefined}
-      role={isCoarsePointer ? 'button' : undefined}
-      tabIndex={isCoarsePointer ? 0 : undefined}
+      }}
     >
-      <span className="welcome-hero__text-gray">{grayText}</span>
-      {'\u00A0'}
-      <span className="welcome-hero__text-green">{greenText}</span>
-    </div>
+      <span className="welcome-swap-word__inner">{word}</span>
+      {suffix}
+    </span>
   );
 }
 
@@ -149,12 +106,8 @@ export default function WelcomeContent() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchParams, setSearchParams] = useSearchParams();
   const { showSuccess } = useToast();
-  const isCoarsePointer = useCoarsePointer();
+  const storySectionRef = useRef(null);
 
-  const [taglineWord, setTaglineWord] = useState(() =>
-    pickRandom(TAGLINE_WORDS__TEXTLABEL[LANGUAGE]));
-  const [portalWord, setPortalWord] = useState(() =>
-    pickRandom(PORTAL_WORDS__TEXTLABEL[LANGUAGE]));
   const [introWords, setIntroWords] = useState(() => ({
     line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]),
     line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]),
@@ -162,18 +115,8 @@ export default function WelcomeContent() {
     line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]),
     line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]),
   }));
-  const [ticks, setTicks] = useState(0);
-  const [tickDirection, setTickDirection] = useState(1);
 
-  const refreshPortalWord = useCallback(() => {
-    setPortalWord(pickRandom(PORTAL_WORDS__TEXTLABEL[LANGUAGE]));
-  }, [LANGUAGE]);
-
-  const refreshTaglineWord = useCallback(() => {
-    setTaglineWord(pickRandom(TAGLINE_WORDS__TEXTLABEL[LANGUAGE]));
-  }, [LANGUAGE]);
-
-  const refreshIntroWords = useCallback(() => {
+  useEffect(() => {
     setIntroWords({
       line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]),
       line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]),
@@ -182,40 +125,6 @@ export default function WelcomeContent() {
       line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]),
     });
   }, [LANGUAGE]);
-
-  useEffect(() => {
-    setTaglineWord(pickRandom(TAGLINE_WORDS__TEXTLABEL[LANGUAGE]));
-    setPortalWord(pickRandom(PORTAL_WORDS__TEXTLABEL[LANGUAGE]));
-    setIntroWords({
-      line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]),
-      line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]),
-      line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]),
-      line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]),
-      line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]),
-    });
-  }, [LANGUAGE]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTicks((previous) => {
-        let next = previous + tickDirection;
-
-        if (next >= 50) {
-          next = 50;
-          setTickDirection(-1);
-        }
-
-        if (next <= 0) {
-          next = 0;
-          setTickDirection(1);
-        }
-
-        return next;
-      });
-    }, 25);
-
-    return () => clearInterval(interval);
-  }, [tickDirection]);
 
   useEffect(() => {
     if (searchParams.get('loggedOut') !== '1') {
@@ -225,11 +134,12 @@ export default function WelcomeContent() {
     setSearchParams({}, { replace: true });
   }, [searchParams, setSearchParams, showSuccess, LANGUAGE]);
 
+  const scrollToStory = () => {
+    storySectionRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div
-      className="welcome-hero"
-      style={{ '--welcome-tagline-scale': 1 - ticks * 0.01 }}
-    >
+    <div className="welcome-hero">
       <div className="welcome-hero__bg" aria-hidden="true">
         <div className="welcome-hero__bg-image" />
         <div className="welcome-hero__bg-glow" />
@@ -237,86 +147,144 @@ export default function WelcomeContent() {
         <div className="welcome-hero__vignette" />
       </div>
 
-      <div className="welcome-hero__content">
+      {/* Górny pasek nawigacyjny z przyciskiem Dołącz */}
+      <header className="welcome-nav">
         <Link
           to={loginPath()}
-          className="welcome-hero__portal-link"
-          aria-label={PORTAL_PREFIX__TEXTLABEL[LANGUAGE]}
+          className="welcome-nav__join-btn"
+          aria-label={JOIN_BUTTON__TEXTLABEL[LANGUAGE]}
         >
-          <div className="welcome-hero__portal-btn">
-            <span className="welcome-hero__text-gray">{PORTAL_PREFIX__TEXTLABEL[LANGUAGE]}</span>
-            {' '}
-            <span
-              className="welcome-hero__text-green welcome-hero__portal-word"
-              onMouseEnter={isCoarsePointer ? undefined : refreshPortalWord}
-            >
-              {portalWord}
-            </span>
-          </div>
+          {JOIN_BUTTON__TEXTLABEL[LANGUAGE]}
         </Link>
+      </header>
 
-        <div className="welcome-hero__brand">
-          <img
-            src="/images/maq-logo.png"
-            alt=""
-            className="welcome-hero__brand-logo"
-            aria-hidden="true"
-          />
-          <span className="welcome-hero__brand-a" aria-hidden="true">A</span>
-          <span className="welcome-hero__brand-q" aria-hidden="true">Q</span>
-        </div>
+      <div className="welcome-scroll-container">
+        {/* SEKCJA 1: Główna z wycentrowanym logo i podpisem */}
+        <section className="welcome-section welcome-section--hero">
+          <div className="welcome-hero__main-brand">
+            <div className="welcome-hero__logo-wrapper">
+              <img
+                src="/images/maq-logo.png"
+                alt="MyAcademyQuest Logo"
+                className="welcome-hero__brand-logo"
+              />
+            </div>
+            <p className="welcome-hero__subtitle">
+              {SUBTITLE__TEXTLABEL[LANGUAGE]}
+            </p>
+          </div>
 
-        <SwapBlock
-          className="welcome-hero__tagline"
-          grayText={TAGLINE_PREFIX__TEXTLABEL[LANGUAGE]}
-          greenText={taglineWord}
-          onSwap={refreshTaglineWord}
-        />
+          <button
+            type="button"
+            className="welcome-hero__scroll-indicator"
+            onClick={scrollToStory}
+            aria-label={SCROLL_HINT__TEXTLABEL[LANGUAGE]}
+          >
+            <span className="welcome-hero__scroll-text">{SCROLL_HINT__TEXTLABEL[LANGUAGE]}</span>
+            <span className="welcome-hero__scroll-chevron" aria-hidden="true">↓</span>
+          </button>
+        </section>
 
-        <div className="welcome-hero__title">
-          <span className="welcome-hero__text-gray">MyAcademy</span>
-          <span className="welcome-hero__text-green">Quest</span>
-        </div>
+        {/* SEKCJA 2: Fabuła — tekst wycentrowany na ekranie z mechaniką słów */}
+        <section
+          ref={storySectionRef}
+          className="welcome-section welcome-section--story"
+        >
+          <div className="welcome-story-card">
+            <div className="welcome-story-card__narrative">
+              <p className="welcome-story-paragraph">
+                Witaj, Wędrowcze. Stoisz u bram portalu łączącego uczelnie zrzeszające adeptów wszelkich{' '}
+                <SwapWord
+                  word={introWords.line0}
+                  slotClass="welcome-swap-word--disciplines"
+                  onSwap={() => setIntroWords((prev) => ({ ...prev, line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                />
+                {' '}oraz nauk gotowych zdobywać wiedzę i poszerzać swoje{' '}
+                <SwapWord
+                  word={introWords.line1}
+                  slotClass="welcome-swap-word--skills"
+                  onSwap={() => setIntroWords((prev) => ({ ...prev, line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                />
+                {' '}w najodleglejszych krainach i czasach.
+              </p>
 
-        <SwapBlock
-          className="welcome-hero__intro-line welcome-hero__intro-line--1"
-          grayText={INTRO_LINE1_PREFIX__TEXTLABEL[LANGUAGE]}
-          greenText={introWords.line0}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line0: pickRandom(INTRO_LINE0_WORDS__TEXTLABEL[LANGUAGE]) }))}
-        />
+              <p className="welcome-story-paragraph">
+                Po drugiej stronie próżno szukać{' '}
+                <SwapWord
+                  word={introWords.line2}
+                  slotClass="welcome-swap-word--lectures"
+                  suffix="."
+                  onSwap={() => setIntroWords((prev) => ({ ...prev, line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                />
+                {' '}Ich miejsce zajmują epickie kampanie, sekretne misje oraz ekscytujące{' '}
+                <SwapWord
+                  word={introWords.line3}
+                  slotClass="welcome-swap-word--missions"
+                  suffix="."
+                  onSwap={() => setIntroWords((prev) => ({ ...prev, line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                />
+              </p>
 
-        <SwapBlock
-          className="welcome-hero__intro-line welcome-hero__intro-line--2"
-          grayText={INTRO_LINE2_PREFIX__TEXTLABEL[LANGUAGE]}
-          greenText={introWords.line1}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line1: pickRandom(INTRO_LINE1_WORDS__TEXTLABEL[LANGUAGE]) }))}
-        />
+              <p className="welcome-story-paragraph">
+                Czy nie brak Ci sprytu i odwagi by przejść do świata, gdzie nauka i przygoda stanowią{' '}
+                <SwapWord
+                  word={introWords.line4}
+                  slotClass="welcome-swap-word--unity"
+                  suffix="?"
+                  onSwap={() => setIntroWords((prev) => ({ ...prev, line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]) }))}
+                />
+              </p>
+            </div>
 
-        <SwapBlock
-          className="welcome-hero__intro-line welcome-hero__intro-line--3"
-          grayText={INTRO_LINE3_PREFIX__TEXTLABEL[LANGUAGE]}
-          greenText={`${introWords.line2}.`}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line2: pickRandom(INTRO_LINE2_WORDS__TEXTLABEL[LANGUAGE]) }))}
-        />
+            <div className="welcome-story-card__cta">
+              <Link to={loginPath()} className="welcome-story-card__btn">
+                {JOIN_BUTTON__TEXTLABEL[LANGUAGE]}
+              </Link>
+            </div>
+          </div>
+        </section>
 
-        <SwapBlock
-          className="welcome-hero__intro-line welcome-hero__intro-line--4"
-          grayText={INTRO_LINE4_PREFIX__TEXTLABEL[LANGUAGE]}
-          greenText={`${introWords.line3}.`}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line3: pickRandom(INTRO_LINE3_WORDS__TEXTLABEL[LANGUAGE]) }))}
-        />
+        {/* SEKCJA 3: Stopka i Kontakt */}
+        <footer className="welcome-section welcome-section--footer">
+          <div className="welcome-footer__content">
+            <div className="welcome-footer__grid">
+              <div className="welcome-footer__column welcome-footer__column--brand">
+                <div className="welcome-footer__logo-title">
+                  <span className="welcome-hero__text-gray">MyAcademy</span>
+                  <span className="welcome-hero__text-green">Quest</span>
+                </div>
+                <p className="welcome-footer__description">
+                  Nowoczesny system grywalizacji akademickiej. Łączymy edukację z interaktywną przygodą i mechanikami gier.
+                </p>
+              </div>
 
-        <SwapBlock
-          className="welcome-hero__intro-line welcome-hero__intro-line--5"
-          grayText={INTRO_LINE5_PREFIX__TEXTLABEL[LANGUAGE]}
-          greenText={`${introWords.line4}?`}
-          onSwap={() => setIntroWords((prev) => ({ ...prev, line4: pickRandom(INTRO_LINE4_WORDS__TEXTLABEL[LANGUAGE]) }))}
-        />
+              <div className="welcome-footer__column">
+                <h3 className="welcome-footer__heading">Kontakt</h3>
+                <ul className="welcome-footer__list">
+                  <li>Email: kontakt@myacademyquest.pl</li>
+                  <li>Wsparcie: support@myacademyquest.pl</li>
+                  <li>Dział wdrożeń dla uczelni</li>
+                </ul>
+              </div>
+
+              <div className="welcome-footer__column">
+                <h3 className="welcome-footer__heading">Informacje</h3>
+                <ul className="welcome-footer__list">
+                  <li><Link to="/help" className="welcome-footer__link">Centrum Pomocy</Link></li>
+                  <li><span className="welcome-footer__link-disabled">Dokumentacja</span></li>
+                  <li><span className="welcome-footer__link-disabled">Polityka Prywatności</span></li>
+                  <li><span className="welcome-footer__link-disabled">Regulamin Serwisu</span></li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="welcome-footer__bottom">
+              <span className="welcome-footer__copyright">{FOOTER_TEXT__TEXTLABEL[LANGUAGE]}</span>
+            </div>
+          </div>
+        </footer>
       </div>
-
-      <footer className="welcome-hero__footer welcome-hero__reveal welcome-hero__reveal--4">
-        {FOOTER_TEXT__TEXTLABEL[LANGUAGE]}
-      </footer>
     </div>
   );
 }
+
