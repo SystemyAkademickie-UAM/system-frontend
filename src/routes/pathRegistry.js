@@ -265,6 +265,10 @@ export function organizationsPath() {
   return '/organizations';
 }
 
+export function superadminLogsPath() {
+  return '/system-logs';
+}
+
 /** Galeria szablonów — `/templates`. */
 export function templatesPath() {
   return '/templates';
