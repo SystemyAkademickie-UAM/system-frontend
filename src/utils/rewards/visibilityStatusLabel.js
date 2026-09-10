@@ -52,16 +52,16 @@ export function getVisibilityStatusLabel(isPublished, entity = 'item', language)
 /**
  * @param {boolean | undefined} isPublished
  * @param {'badge' | 'item'} [entity='item']
- * @returns {'Odkryta' | 'Ukryta' | 'Odkryty' | 'Ukryty'}
+ * @returns {'Publiczna' | 'Ukryta' | 'Odkryty' | 'Ukryty'}
  */
 const TILEVISIBLEBADGE__TEXTLABEL = {
-  polish: 'Odkryta',
-  english: 'Unlocked'
+  polish: 'Publiczna',
+  english: 'Public'
 };
 
 const TILEHIDDENBADGE__TEXTLABEL = {
   polish: 'Ukryta',
-  english: 'Locked'
+  english: 'Hidden'
 };
 
 const TILEVISIBLEITEM__TEXTLABEL = {

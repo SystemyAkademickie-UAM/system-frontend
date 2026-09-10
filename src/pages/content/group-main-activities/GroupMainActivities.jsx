@@ -612,7 +612,7 @@ export default function GroupMainActivities() {
 
 
 
-        {isstudent === 1 && totalactivities > 5 ? (
+        {isstudent === 1 && totalactivities > 10 ? (
           <Button
             type="button"
             variant="primary"
