@@ -54,6 +54,12 @@ const THEMELABELTEXT = {
   japanese: 'テーマ',
   kana: 'テーマ'
 };
+const LOGINLABELTEXT = {
+  polish: 'Logowanie',
+  english: 'Login',
+  japanese: 'ログイン',
+  kana: 'ログイン',
+};
 const NICKNAMELABELTEXT = {
   polish: 'Ksywka',
   english: 'Nickname',
@@ -466,6 +472,9 @@ export default function SettingsContent() {
                 </div>
               ) : null}
 
+              <Divider className="settings-page__divider" length="50%" />
+
+              <SettingsSectionHeader title={LOGINLABELTEXT[LANGUAGE]} id="settings-login-title" />
               <div className="settings-page__field settings-page__field--toggle">
                 <label className="settings-page__toggle">
                   <input

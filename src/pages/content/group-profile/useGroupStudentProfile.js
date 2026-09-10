@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.js';
-import { fetchGroupStudents } from '../../../services/students.api.js';
+import { fetchGroupStudents, fetchStudentBadges } from '../../../services/students.api.js';
+import { fetchGroupRanks } from '../../../services/ranks.api.js';
 
 const PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL = {
-  polish: 'Nie znaleziono uczestnika w grupie.',
-  english: 'Participant not found in group.'
+  polish: 'Nie znaleziono uczestnika w tej grupie.',
+  english: 'Participant not found in this group.'
 };
 
 const MISSING_GROUP_ID_ERROR__TEXTLABEL = {
@@ -23,12 +24,44 @@ const PROFILE_LOAD_ERROR__TEXTLABEL = {
   english: 'Failed to load student profile'
 };
 
-async function loadStudentByAccountId(groupId, accountId) {
-  const students = await fetchGroupStudents(groupId);
-  const student = students.find((item) => String(item.accountId) === String(accountId));
+async function loadStudentByIdentifier(groupId, studentId) {
+  const [students, ranks] = await Promise.all([
+    fetchGroupStudents(groupId),
+    fetchGroupRanks(groupId).catch(() => []),
+  ]);
+
+  let student = null;
+  const num = parseInt(studentId, 10);
+  if (!Number.isNaN(num) && num >= 1 && num <= students.length) {
+    student = students[num - 1];
+  } else {
+    student = students.find((item) => String(item.accountId) === String(studentId) || String(item.enrollmentId) === String(studentId));
+  }
+
   if (!student) {
     return { ok: false, error: PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL.polish };
   }
+
+  let earnedBadges = [];
+  try {
+    const studentBadges = await fetchStudentBadges(groupId, student.accountId);
+    earnedBadges = (studentBadges || [])
+      .filter((b) => b.isEarned)
+      .map((b) => ({
+        id: b.id,
+        name: b.name,
+        icon: b.icon,
+        rarity: b.rarity,
+        storyDescription: b.storyDescription,
+        educationalDescription: b.educationalDescription,
+        rewardAmount: b.rewardAmount,
+      }));
+  } catch {
+    // fallback
+  }
+
+  const rankObj = ranks.find((r) => r.id === student.rankId);
+  const rankName = rankObj?.name || student.rankName || NO_RANK_TEXT__TEXTLABEL.polish;
 
   return {
     ok: true,
@@ -41,16 +74,16 @@ async function loadStudentByAccountId(groupId, accountId) {
       avatarId: student.avatarId,
       avatarUrl: student.avatarUrl,
       rankId: student.rankId,
-      rankName: student.rankName || NO_RANK_TEXT__TEXTLABEL.polish,
-      currency: student.currency,
-      totalEarned: student.totalEarned,
-      badgesCount: student.badgesCount ?? 0,
+      rankName,
+      currency: student.currency ?? 0,
+      totalEarned: student.totalEarned ?? 0,
+      badgesCount: student.badgesCount ?? earnedBadges.length,
       purchasedItemsCount: student.purchasedItemsCount ?? 0,
       usedItemsCount: student.usedItemsCount ?? 0,
       lostLivesCount: student.lostLivesCount ?? 0,
       groupCurrency: null,
-      lives: null,
-      earnedBadges: [],
+      lives: student.lives ?? null,
+      earnedBadges,
       completedActivities: [],
     },
   };
@@ -73,7 +106,7 @@ export function useGroupStudentProfile() {
     setError('');
 
     const result = studentId
-      ? await loadStudentByAccountId(groupId, studentId)
+      ? await loadStudentByIdentifier(groupId, studentId)
       : await fetchGroupStudentProfile(groupId);
 
     setIsLoading(false);

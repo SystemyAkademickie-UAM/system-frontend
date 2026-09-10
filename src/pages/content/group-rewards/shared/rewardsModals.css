@@ -179,21 +179,21 @@
   flex-shrink: 0;
   width: 1.75rem;
   height: 1.75rem;
-  border: 2px solid rgba(255, 255, 255, 0.22);
-  border-radius: 8px;
-  background: transparent;
-  color: rgb(0, 57, 21);
+  border: 1.5px solid var(--color-modal-border, rgba(255, 255, 255, 0.22));
+  border-radius: 6px;
+  background: var(--color-bg-elevated, transparent);
+  color: var(--color-button-primary-text, #ffffff);
   transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .rewards-modal__option-label:hover .rewards-modal__option-checkbox {
-  border-color: rgba(66, 243, 125, 0.45);
+  border-color: var(--color-accent);
 }
 
 .rewards-modal__option-checkbox--checked {
   border-color: var(--color-accent);
   background: var(--color-accent);
-  box-shadow: 0 0 0 1px rgba(66, 243, 125, 0.35);
+  box-shadow: 0 0 0 1px var(--color-accent);
 }
 
 .rewards-modal__option-checkbox .maq-asset-svg--mask {

@@ -15,6 +15,7 @@ import { useProfileInventoryHistory } from '../../../hooks/shop/useProfileInvent
 import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useProfileStudentProfileContext } from '../group-profile/ProfileStudentProfileContext.js';
 import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
@@ -201,7 +202,14 @@ export default function ProfileEqContentContent({
   studentAccountId = null,
   readOnly = false,
 }) {
-  const { groupId } = useParams();
+  const { groupId, studentId } = useParams();
+  const profileContext = useProfileStudentProfileContext();
+  const profile = profileContext?.profile;
+  const isProfileLoading = profileContext?.isLoading;
+  const effectiveAccountId = studentAccountId || (studentId ? profile?.studentAccountId : null);
+  const effectiveReadOnly = readOnly || Boolean(studentId);
+  const isEnabled = !studentId || Boolean(profile?.studentAccountId);
+
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
@@ -216,12 +224,19 @@ export default function ProfileEqContentContent({
     isLoading: isInventoryLoading,
     error: inventoryError,
     useItem,
-  } = useProfileInventory(groupId, { studentAccountId, readOnly });
+  } = useProfileInventory(groupId, {
+    studentAccountId: effectiveAccountId,
+    readOnly: effectiveReadOnly,
+    enabled: isEnabled,
+  });
 
   const {
     history,
     isLoading: isHistoryLoading,
-  } = useProfileInventoryHistory(groupId, { studentAccountId });
+  } = useProfileInventoryHistory(groupId, {
+    studentAccountId: effectiveAccountId,
+    enabled: isEnabled,
+  });
 
   const { categoriesById } = useGroupItemCategories(groupId);
 

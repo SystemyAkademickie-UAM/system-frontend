@@ -127,8 +127,8 @@ const SHOWMEMBERSBUTTON__TEXTLABEL = {
 };
 
 const MEMBERAVATARTOOLTIP__TEXTLABEL = {
-  polish: 'Steruje widocznością awatarów uczestników na ścieżce rang w widoku kafelkowym.',
-  english: 'Controls participant avatar visibility on the rank path in tile view.'
+  polish: 'Steruje widocznością innych uczestników dla studentów.',
+  english: 'Controls the visibility of other participants for students.'
 };
 
 const SEARCHPLACEHOLDER__TEXTLABEL = {

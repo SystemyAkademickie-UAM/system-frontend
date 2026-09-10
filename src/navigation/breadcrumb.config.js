@@ -67,8 +67,16 @@ export const GROUP_BREADCRUMB_RULES = [
     segments: [],
   },
   {
+    pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/eq\/?$/u,
+    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Ekwipunek' }],
+  },
+  {
+    pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/purchases\/?$/u,
+    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Historia zakupów' }],
+  },
+  {
     pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/?$/u,
-    segments: [{ label: 'Profil uczestnika' }],
+    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Profil uczestnika' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/eq\/?$/u,

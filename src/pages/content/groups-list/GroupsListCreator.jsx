@@ -341,12 +341,15 @@ export default function GroupsListCreator({
         // ignore
       }
 
-      showSuccess('Grupa została pomyślnie utworzona.');
-      onCreated?.({
-        groupId: result.groupId,
-        groupName: groupName.trim(),
-        subjectName: subjectName.trim(),
-      });
+      if (onCreated) {
+        onCreated({
+          groupId: result.groupId,
+          groupName: groupName.trim(),
+          subjectName: subjectName.trim(),
+        });
+      } else {
+        showSuccess('Grupa została pomyślnie utworzona.');
+      }
       resetForm();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

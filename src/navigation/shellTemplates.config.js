@@ -53,6 +53,12 @@ export const HREF_BUILDERS = {
   GROUP_PROFILE: (ctx) => (ctx.groupId ? paths.groupProfilePath(ctx.groupId) : null),
   GROUP_STUDENT_PROFILE: (ctx) =>
     ctx.groupId && ctx.studentId ? paths.groupStudentProfilePath(ctx.groupId, ctx.studentId) : null,
+  GROUP_STUDENT_PROFILE_BADGES: (ctx) =>
+    ctx.groupId && ctx.studentId ? paths.groupStudentProfileBadgesPath(ctx.groupId, ctx.studentId) : null,
+  GROUP_STUDENT_PROFILE_EQ: (ctx) =>
+    ctx.groupId && ctx.studentId ? paths.groupStudentProfileEqPath(ctx.groupId, ctx.studentId) : null,
+  GROUP_STUDENT_PROFILE_PURCHASES: (ctx) =>
+    ctx.groupId && ctx.studentId ? paths.groupStudentProfilePurchasesPath(ctx.groupId, ctx.studentId) : null,
   GROUP_PROFILE_LOG: (ctx) => (ctx.groupId ? paths.groupProfileActivityPath(ctx.groupId) : null),
   GROUP_PROFILE_EQ: (ctx) => (ctx.groupId ? paths.groupProfileEqPath(ctx.groupId) : null),
   GROUP_PROFILE_PURCHASES: (ctx) => (ctx.groupId ? paths.groupProfilePurchasesPath(ctx.groupId) : null),
@@ -621,6 +627,7 @@ export const SHELL_TEMPLATE_BLUEPRINTS = {
 export const SUB_NAV_META = {
   'group-main': { title: 'Strona główna', ariaLabel: 'Nawigacja strony głównej' },
   'group-profile': { title: 'Profil', ariaLabel: 'Nawigacja profilu' },
+  'group-student-profile': { title: 'Profil uczestnika', ariaLabel: 'Nawigacja profilu uczestnika' },
   'group-members': { title: 'Użytkownicy', ariaLabel: 'Nawigacja użytkowników' },
   'group-activities': { title: 'Aktywności', ariaLabel: 'Nawigacja aktywności' },
   'group-rewards': { title: 'Systemy nagród', ariaLabel: 'Nawigacja systemów nagród' },
@@ -645,6 +652,13 @@ export const SUB_NAV_CONFIG = {
     { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE_LOG', end: true },
     { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_PROFILE_EQ', end: true },
     { id: 'purchases', label: 'Historia zakupów', hrefKey: 'GROUP_PROFILE_PURCHASES', end: true },
+  ],
+
+  // Profil studenta (podgląd prowadzącego)
+  'group-student-profile': [
+    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_STUDENT_PROFILE_BADGES', end: true },
+    { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_STUDENT_PROFILE_EQ', end: true },
+    { id: 'purchases', label: 'Historia zakupów', hrefKey: 'GROUP_STUDENT_PROFILE_PURCHASES', end: true },
   ],
 
   // Użytkownicy (lecturer)

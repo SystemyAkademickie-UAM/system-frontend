@@ -15,6 +15,7 @@ import { useGroupCurrency } from '../../../context/GroupCurrencyContext.jsx';
 import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useProfileStudentProfileContext } from '../group-profile/ProfileStudentProfileContext.js';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfilePurchasesContent.css';
 
@@ -93,15 +94,23 @@ function formatDateTime(dateString) {
   });
 }
 
-export default function ProfilePurchasesContent() {
-  const { groupId } = useParams();
+function ProfilePurchasesContentInner() {
+  const { groupId, studentId } = useParams();
+  const profileContext = useProfileStudentProfileContext();
+  const profile = profileContext?.profile;
+  const targetAccountId = studentId ? profile?.studentAccountId : null;
+  const isEnabled = !studentId || Boolean(profile?.studentAccountId);
+
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [catalogItems, setCatalogItems] = useState([]);
 
   const { symbol: currencyEmoji } = useGroupCurrency();
-  const { history, isLoading, error } = useProfileInventoryHistory(groupId);
+  const { history, isLoading, error } = useProfileInventoryHistory(groupId, {
+    studentAccountId: targetAccountId,
+    enabled: isEnabled,
+  });
   const { categoriesById } = useGroupItemCategories(groupId);
 
   useEffect(() => {
@@ -202,102 +211,108 @@ export default function ProfilePurchasesContent() {
   }, [purchaseRecords, itemsMap, categoriesById, LANGUAGE]);
 
   return (
-    <ProfilePageLayout>
-      <div className="profile-purchases-page">
-        <header className="profile-purchases-page__header">
-          <h2 className="profile-purchases-page__title">{PURCHASESTITLE__TEXTLABEL[LANGUAGE]}</h2>
-        </header>
+    <div className="profile-purchases-page">
+      <header className="profile-purchases-page__header">
+        <h2 className="profile-purchases-page__title">{PURCHASESTITLE__TEXTLABEL[LANGUAGE]}</h2>
+      </header>
 
-        {error ? (
-          <p className="profile-purchases-page__error" role="alert">{error}</p>
-        ) : null}
+      {error ? (
+        <p className="profile-purchases-page__error" role="alert">{error}</p>
+      ) : null}
 
-        <div className="maq-section-page__toolbar profile-purchases-page__toolbar">
-          <div className="maq-section-page__toolbar-start profile-purchases-page__counts">
-            <span className="activities-page__count">
-              {TOTALPURCHASEDCOUNT__TEXTLABEL[LANGUAGE]}
-              {' '}
-              {purchaseRecords.length}
-            </span>
-          </div>
-
-          <div className="maq-section-page__toolbar-end">
-            <SearchBar
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-              name="profile-purchases-search"
-              className="profile-purchases-page__search"
-              aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
-            />
-          </div>
+      <div className="maq-section-page__toolbar profile-purchases-page__toolbar">
+        <div className="maq-section-page__toolbar-start profile-purchases-page__counts">
+          <span className="activities-page__count">
+            {TOTALPURCHASEDCOUNT__TEXTLABEL[LANGUAGE]}
+            {' '}
+            {purchaseRecords.length}
+          </span>
         </div>
 
-        {categoryFilters.length > 1 ? (
-          <>
-            <CatalogFiltersPanel className="profile-purchases-page__filters">
-              <div className="profile-purchases-page__filters-row">
-                <CatalogFilterGroup
-                  ariaLabel={FILTERGROUPALABEL__TEXTLABEL[LANGUAGE]}
-                  filters={categoryFilters}
-                  activeId={categoryFilter}
-                  onSelect={setCategoryFilter}
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  className="profile-purchases-page__toggle-categories"
-                  onClick={() => setCategoryFilter('all')}
-                >
-                  {SHOWALLBUTTON__TEXTLABEL[LANGUAGE]}
-                </Button>
-              </div>
-            </CatalogFiltersPanel>
-            <Divider className="profile-purchases-page__divider" />
-          </>
-        ) : null}
-
-        {isLoading ? (
-          <p className="profile-purchases-page__message">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
-        ) : filteredPurchases.length === 0 ? (
-          <p className="profile-purchases-page__message">
-            {purchaseRecords.length === 0
-              ? EMPTYPURCHASESMESSAGE__TEXTLABEL[LANGUAGE]
-              : NORESULTSMESSAGE__TEXTLABEL[LANGUAGE]}
-          </p>
-        ) : (
-          <div className="profile-purchases-page__grid">
-            {filteredPurchases.map((record) => {
-              const itemMeta = itemsMap.get(String(record.itemId));
-              const categoryIds = itemMeta?.categories?.length
-                ? itemMeta.categories
-                : (itemMeta?.categoryId != null ? [String(itemMeta.categoryId)] : []);
-              const categoryDetails = resolveShopCategoryDetails(categoryIds, categoriesById);
-
-              return (
-                <ProductCard
-                  key={`purchase-${record.id}`}
-                  itemId={record.itemId}
-                  name={record.itemName || itemMeta?.name || 'Produkt'}
-                  storyDescription={itemMeta?.storyDescription || ''}
-                  didacticDescription={itemMeta?.didacticDescription || ''}
-                  imageRef={itemMeta?.imageRef}
-                  imageUrl={itemMeta?.imageUrl}
-                  categoryDetails={categoryDetails}
-                  isExtraLife={record.isExtraLife || itemMeta?.isExtraLife}
-                  isPurchasedHistory
-                  priceAmount={record.price}
-                  priceEmoji={currencyEmoji}
-                  dateLabel={`Zakupiono: ${formatDateTime(record.date)}`}
-                  hideAddToCart
-                  hideActions
-                />
-              );
-            })}
-          </div>
-        )}
+        <div className="maq-section-page__toolbar-end">
+          <SearchBar
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+            name="profile-purchases-search"
+            className="profile-purchases-page__search"
+            aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
+          />
+        </div>
       </div>
+
+      {categoryFilters.length > 1 ? (
+        <>
+          <CatalogFiltersPanel className="profile-purchases-page__filters">
+            <div className="profile-purchases-page__filters-row">
+              <CatalogFilterGroup
+                ariaLabel={FILTERGROUPALABEL__TEXTLABEL[LANGUAGE]}
+                filters={categoryFilters}
+                activeId={categoryFilter}
+                onSelect={setCategoryFilter}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="profile-purchases-page__toggle-categories"
+                onClick={() => setCategoryFilter('all')}
+              >
+                {SHOWALLBUTTON__TEXTLABEL[LANGUAGE]}
+              </Button>
+            </div>
+          </CatalogFiltersPanel>
+          <Divider className="profile-purchases-page__divider" />
+        </>
+      ) : null}
+
+      {isLoading ? (
+        <p className="profile-purchases-page__message">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
+      ) : filteredPurchases.length === 0 ? (
+        <p className="profile-purchases-page__message">
+          {purchaseRecords.length === 0
+            ? EMPTYPURCHASESMESSAGE__TEXTLABEL[LANGUAGE]
+            : NORESULTSMESSAGE__TEXTLABEL[LANGUAGE]}
+        </p>
+      ) : (
+        <div className="profile-purchases-page__grid">
+          {filteredPurchases.map((record) => {
+            const itemMeta = itemsMap.get(String(record.itemId));
+            const categoryIds = itemMeta?.categories?.length
+              ? itemMeta.categories
+              : (itemMeta?.categoryId != null ? [String(itemMeta.categoryId)] : []);
+            const categoryDetails = resolveShopCategoryDetails(categoryIds, categoriesById);
+
+            return (
+              <ProductCard
+                key={`purchase-${record.id}`}
+                itemId={record.itemId}
+                name={record.itemName || itemMeta?.name || 'Produkt'}
+                storyDescription={itemMeta?.storyDescription || ''}
+                didacticDescription={itemMeta?.didacticDescription || ''}
+                imageRef={itemMeta?.imageRef}
+                imageUrl={itemMeta?.imageUrl}
+                categoryDetails={categoryDetails}
+                isExtraLife={record.isExtraLife || itemMeta?.isExtraLife}
+                isPurchasedHistory
+                priceAmount={record.price}
+                priceEmoji={currencyEmoji}
+                dateLabel={`Zakupiono: ${formatDateTime(record.date)}`}
+                hideAddToCart
+                hideActions
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ProfilePurchasesContent() {
+  return (
+    <ProfilePageLayout>
+      <ProfilePurchasesContentInner />
     </ProfilePageLayout>
   );
 }

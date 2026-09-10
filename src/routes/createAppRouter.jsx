@@ -40,6 +40,7 @@ import GroupMainBadgesPage from '../pages/links/groups/main/GroupMainBadgesPage.
 
 // Profile (Profil) - student only
 import ProfileLayout from '../pages/links/groups/layouts/ProfileLayout.jsx';
+import StudentProfileLayout from '../pages/links/groups/layouts/StudentProfileLayout.jsx';
 import ProfileHomePage from '../pages/links/groups/profile/ProfileHomePage.jsx';
 import ProfileLogPage from '../pages/links/groups/profile/ProfileLogPage.jsx';
 import ProfileEqPage from '../pages/links/groups/profile/ProfileEqPage.jsx';
@@ -211,10 +212,16 @@ const appRouteTree = [
                   {
                     element: withGuard(<GroupOwnerGuard />),
                     children: [
-                  // STUDENT PROFILE (lecturer view) — ekwipunek uczestnika
+                  // STUDENT PROFILE (lecturer view) — ekwipunek, odznaki, zakupy uczestnika
                   {
                     path: 'student-profile/:studentId',
-                    element: withGuard(<StudentProfileViewPage />, { allowedRoles: LECTURER_ONLY }),
+                    element: withGuard(<StudentProfileLayout />, { allowedRoles: LECTURER_ONLY }),
+                    children: [
+                      { index: true, element: <ProfileHomePage /> },
+                      { path: 'activity', element: <Navigate to="." replace /> },
+                      { path: 'eq', element: <ProfileEqPage /> },
+                      { path: 'purchases', element: <ProfilePurchasesPage /> },
+                    ],
                   },
 
                   // MEMBERS (Użytkownicy) - lecturer only

@@ -59,19 +59,22 @@ function ProfileStatLine({ label, value, isCurrency = false }) {
 }
 
 export default function ProfilePageLayout({ children }) {
-  const nav = useGroupSubNav('group-profile');
-  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const profileState = useGroupStudentProfile();
   const { groupId, profile, isLoading, error, refetch, studentId } = profileState;
+  const navKey = studentId ? 'group-student-profile' : 'group-profile';
+  const nav = useGroupSubNav(navKey);
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { profile: userProfile, avatarUrl: userAvatarUrl } = useUserProfile();
 
   const [historyStats, setHistoryStats] = useState({ purchasedCount: 0, usedCount: 0 });
 
   const loadHistoryStats = async () => {
     if (!groupId) return;
+    if (studentId && !profile?.studentAccountId) return;
     try {
-      const res = studentId
-        ? await fetchStudentInventoryHistory(groupId, studentId)
+      const targetAccountId = studentId ? profile?.studentAccountId : null;
+      const res = targetAccountId
+        ? await fetchStudentInventoryHistory(groupId, targetAccountId)
         : await fetchGroupInventoryHistory(groupId);
       if (res.ok && Array.isArray(res.history)) {
         const purchased = res.history.filter((h) => h.type === 'SHOP_PURCHASE').length;
@@ -91,7 +94,7 @@ export default function ProfilePageLayout({ children }) {
 
   useEffect(() => {
     loadHistoryStats();
-  }, [groupId, studentId]);
+  }, [groupId, studentId, profile?.studentAccountId]);
 
   useEffect(() => {
     if (!groupId) return undefined;
@@ -102,6 +105,7 @@ export default function ProfilePageLayout({ children }) {
     });
     const unsubProf = subscribeGroupScopedEvent(STUDENT_PROFILE_INVALIDATED, (evGroupId) => {
       if (evGroupId === String(groupId)) {
+        refetch();
         loadHistoryStats();
       }
     });
@@ -109,14 +113,20 @@ export default function ProfilePageLayout({ children }) {
       unsubInv();
       unsubProf();
     };
-  }, [groupId]);
+  }, [groupId, refetch]);
 
-  const subNavItems = nav.items;
+  const avatarUrl = profile?.avatarUrl ?? userAvatarUrl;
+  const displayName = profile?.nickname
+    ? `${profile.name || ''} ${profile.surname || ''} (${profile.nickname})`.trim()
+    : `${profile?.name || ''} ${profile?.surname || ''}`.trim() || DEFAULT_STUDENT_NAME__TEXTLABEL[LANGUAGE];
 
-  const nickname = (profile?.nickname || userProfile?.nickname || '').trim();
-  const legalName = [profile?.name, profile?.surname].filter(Boolean).join(' ').trim();
-  const displayName = nickname || legalName || DEFAULT_STUDENT_NAME__TEXTLABEL[LANGUAGE];
-  const avatarUrl = profile?.avatarUrl || userAvatarUrl;
+  const subNavItems = nav.items.map((item) => {
+    if (item.id === 'badges') {
+      const count = profile?.badgesCount ?? profile?.earnedBadges?.length ?? 0;
+      return { ...item, badge: count };
+    }
+    return item;
+  });
 
   const purchasedDisplay = profile?.purchasedItemsCount != null
     ? formatProfileNumber(profile.purchasedItemsCount)
@@ -128,6 +138,9 @@ export default function ProfilePageLayout({ children }) {
 
   const livesDisplay = profile?.lives != null ? formatProfileNumber(profile.lives) : '-';
   const lostLivesDisplay = profile?.lostLivesCount != null ? formatProfileNumber(profile.lostLivesCount) : '-';
+  const eyebrowLabel = studentId
+    ? (LANGUAGE === 'polish' ? 'Profil uczestnika' : 'Participant profile')
+    : EYEBROW_LABEL__TEXTLABEL[LANGUAGE];
 
   return (
     <ProfileStudentProfileContext.Provider value={profileState}>
@@ -138,7 +151,7 @@ export default function ProfilePageLayout({ children }) {
         {profile ? (
           <>
             <header className="profile-page-layout__header">
-              <p className="profile-page-layout__eyebrow">{EYEBROW_LABEL__TEXTLABEL[LANGUAGE]}</p>
+              <p className="profile-page-layout__eyebrow">{eyebrowLabel}</p>
               <h1 className="profile-page-layout__title">{displayName}</h1>
             </header>
 
@@ -199,10 +212,10 @@ export default function ProfilePageLayout({ children }) {
             <div className="profile-page-layout__sub-nav-wrap">
               <SubNav ariaLabel={nav.ariaLabel} items={subNavItems} className="profile-page-layout__sub-nav" />
             </div>
+
+            <div className="profile-page-layout__content">{children}</div>
           </>
         ) : null}
-
-        <div className="profile-page-layout__content">{children}</div>
       </section>
     </ProfileStudentProfileContext.Provider>
   );
