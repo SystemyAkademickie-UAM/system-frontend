@@ -45,7 +45,9 @@
 .paginated-notifications__more-btn {
   min-width: 2.25rem;
   padding: 0 0.5rem;
-  letter-spacing: 0.1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .paginated-notifications__menu {

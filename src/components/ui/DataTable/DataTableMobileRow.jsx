@@ -6,20 +6,29 @@ import { getMobileColumnSlots, renderDataTableCell } from './dataTableMobile.js'
  * @param {Object[]} props.columns
  * @param {import('react').ReactNode | ((row: Object) => import('react').ReactNode)} [props.renderActions]
  * @param {string} [props.className]
+ * @param {string | null} [props.rowColor]
  */
 export default function DataTableMobileRow({
   row,
   columns,
   renderActions = null,
   className = '',
+  rowColor = null,
 }) {
   const { primary, title, meta } = getMobileColumnSlots(columns);
   const actions = typeof renderActions === 'function' ? renderActions(row) : renderActions;
   const metaItems = meta.filter(Boolean);
+  const resolvedColor = rowColor ?? row.rowColor ?? row.color ?? null;
+  const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
 
   return (
     <li
-      className={['data-table-mobile__item', className].filter(Boolean).join(' ')}
+      className={[
+        'data-table-mobile__item',
+        resolvedColor ? 'data-table-mobile__item--colored' : '',
+        className,
+      ].filter(Boolean).join(' ')}
+      style={colorStyle}
     >
       <div
         className={[

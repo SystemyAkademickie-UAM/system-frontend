@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
 import ShopItemFormContent from '../../group-shop-add/GroupShopAddContentContent.jsx';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -40,7 +40,8 @@ export default function ShopItemFormModal({
   onSaved,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(itemId ? 4 : 1);
+  const formRef = useRef(null);
 
   const baseTitle = itemId
     ? EDIT_ITEM_TITLE__TEXTLABEL[LANGUAGE]
@@ -51,22 +52,33 @@ export default function ShopItemFormModal({
   const modalTitle = (
     <span className="shop-item-modal-title">
       <span className="shop-item-modal-title__main">{baseTitle}</span>
-      <span className="shop-item-modal-title__stage">
-        {' '}&mdash; {stageTitle} {currentStep}/{TOTAL_STEPS}
-      </span>
+      <span className="shop-item-modal-title__divider">•</span>
+      <span className="shop-item-modal-title__stage">{stageTitle}</span>
+      {!itemId && (
+        <span className="shop-item-modal-title__badge">{currentStep}/{TOTAL_STEPS}</span>
+      )}
     </span>
   );
+
+  const handleModalClose = () => {
+    if (formRef.current?.handleAttemptClose) {
+      formRef.current.handleAttemptClose();
+    } else {
+      onClose();
+    }
+  };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleModalClose}
       title={modalTitle}
       size="xl"
       showFooter={false}
       className="shop-item-form-modal"
     >
       <ShopItemFormContent
+        ref={formRef}
         groupId={groupId}
         itemId={itemId}
         onClose={onClose}
@@ -77,3 +89,4 @@ export default function ShopItemFormModal({
     </Modal>
   );
 }
+

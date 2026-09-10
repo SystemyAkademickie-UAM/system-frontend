@@ -8,6 +8,7 @@ import {
 } from '../../../components/ui/index.js';
 import TemplateListingCard from '../../../components/ui/TemplateListingCard/TemplateListingCard.jsx';
 import CreateGroupFromTemplateModal from './CreateGroupFromTemplateModal.jsx';
+import { updateGroupTemplate } from '../../../services/groupTemplates.api.js';
 import { resolveTemplateCreatorDisplay } from './templateCreatorDisplay.js';
 import { useTemplatesPage } from './useTemplatesPage.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
@@ -74,6 +75,21 @@ const GALLERY_PAGINATION_ARIA__TEXTLABEL = {
   english: 'Template gallery pagination'
 };
 
+const VISIBLE_CHANGE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się zmienić widoczności szablonu.',
+  english: 'Failed to change template visibility.'
+};
+
+const VISIBLE_SET_PRIVATE__TEXTLABEL = {
+  polish: 'Szablon ustawiony jako prywatny',
+  english: 'Template set as private'
+};
+
+const VISIBLE_SET_PUBLIC__TEXTLABEL = {
+  polish: 'Szablon udostępniony w galerii',
+  english: 'Template shared in gallery'
+};
+
 export default function TemplatesGalleryContent() {
   const [listFilter, setListFilter] = useState('all');
   const favoritesOnly = listFilter === 'favorites';
@@ -87,6 +103,7 @@ export default function TemplatesGalleryContent() {
     setSearchQuery,
     isLoading,
     errorMessage,
+    refetch,
     toggleFavorite,
     getTemplateCardProps,
   } = useTemplatesPage('public', { favoritesOnly });
@@ -115,7 +132,26 @@ export default function TemplatesGalleryContent() {
     if (!wasFavorite) {
       showSuccess(FAVORITE_ADDED_SUCCESS__TEXTLABEL[LANGUAGE]);
     }
-  }, [templates, showError, showSuccess, toggleFavorite]);
+  }, [templates, showError, showSuccess, toggleFavorite, LANGUAGE]);
+
+  const handleTogglePublic = useCallback(async (template) => {
+    const result = await updateGroupTemplate(template.id, {
+      isPublic: !template.isPublic,
+    });
+
+    if (!result.ok) {
+      showError(result.error || VISIBLE_CHANGE_ERROR__TEXTLABEL[LANGUAGE]);
+      return;
+    }
+
+    showSuccess(
+      template.isPublic
+        ? VISIBLE_SET_PRIVATE__TEXTLABEL[LANGUAGE]
+        : VISIBLE_SET_PUBLIC__TEXTLABEL[LANGUAGE],
+    );
+
+    await refetch();
+  }, [refetch, showError, showSuccess, LANGUAGE]);
 
   const emptyMessage = searchQuery.trim()
     ? NO_SEARCH_RESULTS__TEXTLABEL[LANGUAGE]
@@ -167,9 +203,11 @@ export default function TemplatesGalleryContent() {
                     stats={cardProps.stats}
                     isFavorite={Boolean(template.isFavorite)}
                     isOwnTemplate={Boolean(template.isOwn)}
+                    isPublic={template.isPublic}
                     creatorLabel={creatorLabelsById.get(template.id)}
                     showVisibilityBadge={false}
                     onToggleFavorite={() => handleToggleFavorite(template.id)}
+                    onTogglePublic={template.isOwn ? () => handleTogglePublic(template) : undefined}
                     onClick={() => setSelectedTemplate(template)}
                   />
                 </li>

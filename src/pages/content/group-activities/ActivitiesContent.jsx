@@ -56,6 +56,7 @@ export default function ActivitiesContent() {
     createActivity,
     updateActivity,
     deleteActivity,
+    toggleActivityVisibility,
   } = useGroupActivities();
   const { groupId } = useParams();
 
@@ -84,6 +85,18 @@ export default function ActivitiesContent() {
   const VISIBILITYDESCRIPTION__TEXTLABEL = {
     polish: 'Zmień widoczność etapu dla studentów.',
     english: 'Change stage visibility for students.',
+  };
+  const VISIBILITY_HIDE_ACT__TEXTLABEL = {
+    polish: 'Ukryj aktywność',
+    english: 'Hide activity',
+  };
+  const VISIBILITY_SHOW_ACT__TEXTLABEL = {
+    polish: 'Pokaż aktywność',
+    english: 'Show activity',
+  };
+  const VISIBILITY_ACT_DESC__TEXTLABEL = {
+    polish: 'Zmień widoczność aktywności dla studentów.',
+    english: 'Change activity visibility for students.',
   };
   const COPYSTAGE__TEXTLABEL = {
     polish: 'Kopiuj etap',
@@ -269,6 +282,25 @@ export default function ActivitiesContent() {
   const activityRowActions = useMemo(() => ({
     inlineActions: [
       {
+        id: 'visibility',
+        label: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
+        ),
+        iconFile: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? SVG_ICONS.actions.hide
+            : SVG_ICONS.actions.show
+        ),
+        ariaLabel: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
+        ),
+        onSelect: ({ stage, activity }) => toggleActivityVisibility(stage.id, activity.id),
+      },
+      {
         id: 'assign',
         label: ASSIGNACTIVITY__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.assign,
@@ -283,11 +315,21 @@ export default function ActivitiesContent() {
         description: EDITACTIVITYDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: ({ stage, activity }) => openModal('editActivity', { stage, activity }),
       },
+      {
+        id: 'visibility',
+        label: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
+        ),
+        description: VISIBILITY_ACT_DESC__TEXTLABEL[LANGUAGE],
+        onSelect: ({ stage, activity }) => toggleActivityVisibility(stage.id, activity.id),
+      },
     ],
     onDelete: ({ stage, activity }) => openModal('deleteActivity', { stage, activity }),
     deleteLabel: DELETEACTIVITY__TEXTLABEL[LANGUAGE],
     deleteAriaLabel: ({ activity }) => `${DELETEACTIVITY__TEXTLABEL[LANGUAGE]} ${activity.name}`,
-  }), [openModal, LANGUAGE]);
+  }), [openModal, toggleActivityVisibility, LANGUAGE]);
 
   const modalStage = activeModal?.stage ?? null;
   const modalActivity = activeModal?.activity ?? null;

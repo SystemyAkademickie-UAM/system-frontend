@@ -5,3 +5,10 @@
   line-height: 1.2;
   color: var(--color-text-primary);
 }
+
+.settings-section-header--inline {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+}
+

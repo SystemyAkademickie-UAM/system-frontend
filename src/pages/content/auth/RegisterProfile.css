@@ -11,12 +11,21 @@
   margin-bottom: 0.5rem;
 }
 
+.register-profile__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  margin: 1.5rem 0 2rem;
+}
+
 .register-profile__field-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   width: 100%;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
 }
 
 .register-profile__label {
@@ -34,7 +43,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-bottom: 2rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
 }
 
 .register-profile__checkbox-item {
@@ -116,6 +126,7 @@
 
 .register-profile__submit {
   width: 100%;
+  margin-top: auto;
 }
 
 @media (max-width: 768px) {

@@ -1,11 +1,7 @@
 import { useState } from 'react';
+import { Button, Modal } from '../../../components/ui/index.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthLogoutConfirmOverlay.css';
-
-const BACKDROP_ARIALABEL__TEXTLABEL = {
-  polish: 'Anuluj',
-  english: 'Cancel'
-};
 
 const DIALOGTITLE__TEXTLABEL = {
   polish: 'Wylogować się?',
@@ -49,32 +45,17 @@ export default function AuthLogoutConfirmOverlay({
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="auth-logout-confirm" role="presentation">
-      <button
-        type="button"
-        className="auth-logout-confirm__backdrop"
-        aria-label={BACKDROP_ARIALABEL__TEXTLABEL[LANGUAGE]}
-        onClick={onCancel}
-        disabled={isBusy}
-      />
-
-      <div
-        className="auth-logout-confirm__dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="auth-logout-confirm-title"
-        aria-describedby="auth-logout-confirm-message"
-      >
-        <h2 id="auth-logout-confirm-title" className="auth-logout-confirm__title">
-          {DIALOGTITLE__TEXTLABEL[LANGUAGE]}
-        </h2>
-
-        <p id="auth-logout-confirm-message" className="auth-logout-confirm__message">
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      title={DIALOGTITLE__TEXTLABEL[LANGUAGE]}
+      size="sm"
+      showFooter={false}
+      className="auth-logout-confirm-modal"
+    >
+      <div className="auth-logout-confirm">
+        <p className="auth-logout-confirm__message">
           {DIALOGMESSAGE__TEXTLABEL[LANGUAGE]}
         </p>
 
@@ -85,24 +66,26 @@ export default function AuthLogoutConfirmOverlay({
         )}
 
         <div className="auth-logout-confirm__actions">
-          <button
+          <Button
             type="button"
-            className="auth-logout-confirm__confirm"
-            onClick={onConfirm}
-            disabled={isBusy}
-          >
-            {isBusy ? CONFIRMBUSY__TEXTLABEL[LANGUAGE] : CONFIRMIDLE__TEXTLABEL[LANGUAGE]}
-          </button>
-          <button
-            type="button"
-            className="auth-logout-confirm__cancel"
+            variant="ghost"
+            size="md"
             onClick={onCancel}
             disabled={isBusy}
           >
             {CANCELBUTTON__TEXTLABEL[LANGUAGE]}
-          </button>
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            onClick={onConfirm}
+            disabled={isBusy}
+          >
+            {isBusy ? CONFIRMBUSY__TEXTLABEL[LANGUAGE] : CONFIRMIDLE__TEXTLABEL[LANGUAGE]}
+          </Button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

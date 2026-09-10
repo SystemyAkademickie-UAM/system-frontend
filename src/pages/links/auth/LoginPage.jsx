@@ -21,6 +21,7 @@ import {
   LOGIN_FLOW_STEP_REGISTER,
   LOGIN_FLOW_STEP_SETTINGS,
 } from '../../../constants/loginFlow.constants.js';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import {
@@ -343,6 +344,7 @@ export default function LoginPage() {
           onBack={handleRegisterBack}
           initialNickname={profileData.nickname}
           initialShowNickname={profileData.showNickname}
+          showNicknameToggle={session?.role === APP_ROLE.LECTURER}
           errorMessage={profileError}
         />
       );
@@ -387,6 +389,7 @@ export default function LoginPage() {
           onBack={handleRegisterBack}
           initialNickname={profileData.nickname}
           initialShowNickname={profileData.showNickname}
+          showNicknameToggle={session?.role === APP_ROLE.LECTURER}
           errorMessage={profileError}
         />
       );
@@ -396,6 +399,7 @@ export default function LoginPage() {
   }, [
     step,
     session?.isAuthenticated,
+    session?.role,
     registrationCheckDone,
     handlePionierContinue,
     handleEmailLogin,

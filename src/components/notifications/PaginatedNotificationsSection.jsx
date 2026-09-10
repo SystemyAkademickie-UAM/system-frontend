@@ -1,19 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-
-import { Button, Pagination, TexturedSurface, useToast } from '../ui/index.js';
-
+import { AssetSvg, Button, Pagination, TexturedSurface, useToast } from '../ui/index.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
-
 import { useGroupBacklogNotifications } from '../../hooks/notifications/useGroupBacklogNotifications.js';
-
 import NotificationsFeed from './NotificationsFeed.jsx';
-
 import ClearNotificationsConfirmModal from './ClearNotificationsConfirmModal.jsx';
-
+import { SVG_ICONS } from '../../constants/svgIcons.js';
 import { BACKLOG_LIST_POLL_MS } from '../../constants/backlogNotifications.constants.js';
-
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
-
 import './PaginatedNotificationsSection.css';
 
 
@@ -310,7 +303,12 @@ export default function PaginatedNotificationsSection({
                 disabled={isLoading || totalCount === 0}
                 onClick={() => setIsMenuOpen((prev) => !prev)}
               >
-                •••
+                <AssetSvg
+                  name={SVG_ICONS.controls.more}
+                  width={16}
+                  height={16}
+                  alt=""
+                />
               </Button>
 
               {isMenuOpen ? (

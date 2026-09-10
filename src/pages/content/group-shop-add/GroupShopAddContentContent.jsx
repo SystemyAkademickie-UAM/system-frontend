@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
@@ -19,14 +19,14 @@ const DRAFT_STORAGE_KEY_PREFIX = 'maq_shop_item_draft_';
 
 const TOTAL_STEPS = 4;
 
-export default function ShopItemFormContent({
+const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   groupId: groupIdProp,
   itemId = null,
   onClose,
   onSaved,
   onStepChange,
   hideInternalHeader = false,
-}) {
+}, ref) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
 
@@ -36,7 +36,7 @@ export default function ShopItemFormContent({
   const draftKey = `${DRAFT_STORAGE_KEY_PREFIX}${groupId}${editingItemId ? `_${editingItemId}` : ''}`;
 
   // Krok kreatora (1 - Informacje, 2 - Wartość, 3 - Dostępność, 4 - Podsumowanie)
-  const [currentStep, setCurrentStepState] = useState(1);
+  const [currentStep, setCurrentStepState] = useState(editingItemId ? 4 : 1);
 
   const setCurrentStep = useCallback((stepOrFn) => {
     setCurrentStepState((prev) => {
@@ -164,10 +164,11 @@ export default function ShopItemFormContent({
   };
 
   // --- API: Aktualizacja kategorii ---
-  const handleUpdateCategory = async (categoryId, name) => {
+  const handleUpdateCategory = async (categoryId, payload) => {
     try {
       const base = getApiBaseUrl();
       const browserId = getOrCreateBrowserId();
+      const body = typeof payload === 'string' ? { name: payload } : payload;
       const response = await fetch(`${base}/groups/${groupId}/item-categories/${categoryId}`, {
         method: 'PATCH',
         credentials: 'include',
@@ -175,7 +176,7 @@ export default function ShopItemFormContent({
           'Content-Type': 'application/json',
           'X-Browser-ID': browserId,
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify(body),
       });
 
       if (response.ok) {
@@ -253,8 +254,6 @@ export default function ShopItemFormContent({
           icon: r.icon || '',
           name: r.name,
           discount: discountValue,
-          costafter: '',
-          isCustom: 0,
           uniqueStoreItems: r.uniqueStoreItems ?? [],
         };
       });
@@ -378,18 +377,7 @@ export default function ShopItemFormContent({
           setUnlockRankId(String(owningRank.dbId));
         }
 
-        return current.map((rankEntry) => {
-          const promo = (item.rankPromotions ?? []).find((entry) => (entry.rankId ?? entry.id) === rankEntry.id);
-          if (promo) {
-            const costafter = Math.max(0, Number(priceAmount) - Number(promo.value ?? 0));
-            return {
-              ...rankEntry,
-              costafter: String(costafter),
-              isCustom: 1,
-            };
-          }
-          return rankEntry;
-        });
+        return current;
       });
 
       const loadedBadgeDiscounts = (item.badgePromotions ?? []).map((promo, index) => {
@@ -441,6 +429,7 @@ export default function ShopItemFormContent({
             checked: checkedSet.has(String(c.id)) ? 1 : 0,
           })));
         }
+        localStorage.removeItem(draftKey);
         showSuccess('Wczytano wersję roboczą.');
       }
     } catch {
@@ -519,7 +508,7 @@ export default function ShopItemFormContent({
     currentStep > 1
   );
 
-  const handleAttemptClose = () => {
+  const handleAttemptClose = useCallback(() => {
     if (hasUserChanges) {
       setIsUnsavedModalOpen(true);
     } else if (onClose) {
@@ -527,7 +516,11 @@ export default function ShopItemFormContent({
     } else {
       window.location.href = `/groups/${groupId}/shop`;
     }
-  };
+  }, [hasUserChanges, onClose, groupId]);
+
+  useImperativeHandle(ref, () => ({
+    handleAttemptClose,
+  }), [handleAttemptClose]);
 
   // --- Walidacja i nawigacja kroków ---
   const validateStep = (step) => {
@@ -633,16 +626,8 @@ export default function ShopItemFormContent({
         };
       });
 
-      const rankPromotions = [];
-      ranks.forEach((r) => {
-        if (r.isCustom === 1 && r.costafter !== '') {
-          const discountVal = Math.max(0, Number(cost) - Number(r.costafter));
-          rankPromotions.push({ id: r.id, promotionType: 'fixed', value: discountVal });
-        }
-      });
-
       payload.badgePromotions = badgePromotions;
-      payload.rankPromotions = rankPromotions;
+      payload.rankPromotions = [];
 
       const saveResult = editingItemId
         ? await updateGroupShopItem(groupId, editingItemId, payload)
@@ -787,6 +772,8 @@ export default function ShopItemFormContent({
             groupLimit={groupLimit}
             studentLimitEnabled={studentLimitEnabled}
             studentLimit={studentLimit}
+            isEditing={Boolean(editingItemId)}
+            onJumpToStep={setCurrentStep}
           />
         )}
       </div>
@@ -794,18 +781,34 @@ export default function ShopItemFormContent({
       {/* Pasek nawigacji / stopka wizarda — przyciski po prawej stronie */}
       <div className="shop-item-wizard__footer">
         <div className="shop-item-wizard__footer-actions">
-          <Button type="button" variant="ghost" size="md" onClick={handleAttemptClose}>
-            Anuluj
-          </Button>
-
           {currentStep > 1 && (
-            <Button type="button" variant="secondary" size="md" onClick={handlePrevStep}>
-              Cofnij
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              onClick={editingItemId && currentStep !== 4 ? () => setCurrentStep(4) : handlePrevStep}
+              disabled={isSubmitting}
+            >
+              {editingItemId && currentStep !== 4 ? 'Wróć do podsumowania' : 'Cofnij'}
             </Button>
           )}
 
-          {currentStep < TOTAL_STEPS ? (
+          {currentStep < TOTAL_STEPS && !editingItemId ? (
             <Button type="button" variant="primary" size="md" onClick={handleNextStep}>
+              Dalej
+            </Button>
+          ) : editingItemId && currentStep !== 4 ? (
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={() => {
+                if (validateStep(currentStep)) {
+                  setCurrentStep(4);
+                }
+              }}
+              disabled={isSubmitting}
+            >
               Dalej
             </Button>
           ) : (
@@ -839,4 +842,6 @@ export default function ShopItemFormContent({
       />
     </div>
   );
-}
+});
+
+export default ShopItemFormContent;

@@ -32,7 +32,7 @@ export const GROUP_NAME_MAX_LENGTH = NAME_MAX_LENGTH;
 export const GROUP_SUBJECT_NAME_MAX_LENGTH = NAME_MAX_LENGTH;
 
 /** Maks. długość ksywki użytkownika (rejestracja i ustawienia). */
-export const NICKNAME_MAX_LENGTH = 15;
+export const NICKNAME_MAX_LENGTH = 20;
 
 /** @deprecated Użyj NICKNAME_MAX_LENGTH */
 export const SETTINGS_NICKNAME_MAX_LENGTH = NICKNAME_MAX_LENGTH;

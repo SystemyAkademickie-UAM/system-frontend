@@ -16,6 +16,7 @@ import {
   applyTheme,
   getSavedTheme,
 } from '../../../services/themeService.js';
+import { getRememberMe, setRememberMe } from '../../../services/rememberMeService.js';
 import { SETTINGS_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 
@@ -82,6 +83,18 @@ const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
   english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
   japanese: 'ニックネームが他の利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
   kana: 'ニックネームがほかの利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
+};
+const REMEMBERMELABELTEXT = {
+  polish: 'Zapamiętaj mnie',
+  english: 'Remember me',
+  japanese: 'ログイン状態を保持',
+  kana: 'ログインじょうたいをほじ',
+};
+const REMEMBERMEDESCRIPTIONLABELTEXT = {
+  polish: 'Automatycznie loguj i utrzymuj aktywną sesję na tym urządzeniu.',
+  english: 'Automatically log in and maintain active session on this device.',
+  japanese: 'この端末で自動的にログインしセッションを維持します。',
+  kana: 'この端末でじどうてきにログインしセッションをいじします。',
 };
 const SAVEBUTTONLABELTEXT = {
   polish: 'Zapisz zmiany',
@@ -162,6 +175,7 @@ export default function SettingsContent() {
   const { showSuccess, showError } = useToast();
 
   const [draftShowNickname, setDraftShowNickname] = useState(true);
+  const [draftRememberMe, setDraftRememberMe] = useState(() => getRememberMe());
   const [draftTheme, setDraftTheme] = useState(() => getSavedTheme());
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -201,13 +215,16 @@ export default function SettingsContent() {
 
       const CURRENTLANGUAGE = READLANGUAGECOOKIE() || 'polish';
       const CURRENTTHEME = getSavedTheme();
+      const CURRENTREMEMBERME = getRememberMe();
       setDraftTheme(CURRENTTHEME);
+      setDraftRememberMe(CURRENTREMEMBERME);
 
       setSavedSnapshot({
         nickname: profile.nickname || '',
         avatarId: loadedAvatarId,
         LANGUAGE: CURRENTLANGUAGE,
         theme: CURRENTTHEME,
+        rememberMe: CURRENTREMEMBERME,
         ...(role === APP_ROLE.LECTURER ? { showNickname: profile.showNickname !== false } : {}),
       });
     } catch (error) {
@@ -261,8 +278,9 @@ export default function SettingsContent() {
     const savedNickname = result.profile?.nickname ?? trimmedNickname;
     setNickname(savedNickname);
 
-    // Zastosuj i zapisz motyw
+    // Zastosuj i zapisz motyw oraz preferencję zapamiętania sesji
     applyTheme(draftTheme);
+    setRememberMe(draftRememberMe);
 
     await refetchProfile();
 
@@ -277,6 +295,7 @@ export default function SettingsContent() {
       avatarId: selectedAvatarId,
       LANGUAGE: SELECTEDLANGUAGE,
       theme: draftTheme,
+      rememberMe: draftRememberMe,
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
 
@@ -286,6 +305,7 @@ export default function SettingsContent() {
   }, [
     DIVLANGUAGE,
     LANGUAGE,
+    draftRememberMe,
     draftShowNickname,
     draftTheme,
     nickname,
@@ -318,6 +338,10 @@ export default function SettingsContent() {
       return true;
     }
 
+    if (draftRememberMe !== savedSnapshot.rememberMe) {
+      return true;
+    }
+
     if (role === APP_ROLE.LECTURER && draftShowNickname !== savedSnapshot.showNickname) {
       return true;
     }
@@ -325,6 +349,7 @@ export default function SettingsContent() {
     return false;
   }, [
     DIVLANGUAGE,
+    draftRememberMe,
     draftShowNickname,
     draftTheme,
     isLoading,
@@ -349,8 +374,11 @@ export default function SettingsContent() {
       setDraftTheme(savedSnapshot.theme);
       applyTheme(savedSnapshot.theme);
     }
+    if (savedSnapshot?.rememberMe !== undefined) {
+      setDraftRememberMe(savedSnapshot.rememberMe);
+    }
     discardChanges();
-  }, [discardChanges, savedSnapshot?.theme]);
+  }, [discardChanges, savedSnapshot?.rememberMe, savedSnapshot?.theme]);
 
   function onNicknamechange(stringvalue) {
     let nextValue = stringvalue;
@@ -438,30 +466,46 @@ export default function SettingsContent() {
                 </div>
               ) : null}
 
+              <div className="settings-page__field settings-page__field--toggle">
+                <label className="settings-page__toggle">
+                  <input
+                    type="checkbox"
+                    checked={draftRememberMe}
+                    onChange={(event) => setDraftRememberMe(event.target.checked)}
+                    disabled={isSaving}
+                  />
+                  <span className="group-settings-form__label">{REMEMBERMELABELTEXT[LANGUAGE]}</span>
+                </label>
+                <p className="group-settings-form__hint">{REMEMBERMEDESCRIPTIONLABELTEXT[LANGUAGE]}</p>
+              </div>
+
               <Divider className="settings-page__divider" length="50%" />
 
               <SettingsSectionHeader title={THEMELABELTEXT[LANGUAGE]} id="settings-theme-title" />
-              <div className="settings-page__field group-settings-form__field">
-                <label className="group-settings-form__label" htmlFor="settings-theme">
-                  {THEMELABELTEXT[LANGUAGE]}
-                </label>
-                <select
-                  id="settings-theme"
-                  className="group-settings-form__input"
-                  value={draftTheme}
-                  onChange={(event) => {
-                    const nextTheme = event.target.value;
-                    setDraftTheme(nextTheme);
-                    applyTheme(nextTheme);
-                  }}
-                  disabled={isSaving}
-                >
-                  {THEME_OPTIONS.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+              <div className="settings-page__theme-radio-group" role="radiogroup" aria-labelledby="settings-theme-title">
+                {THEME_OPTIONS.map((option) => {
+                  const isSelected = draftTheme === option.id;
+                  return (
+                    <label
+                      key={option.id}
+                      className={`settings-page__theme-radio-option ${isSelected ? 'settings-page__theme-radio-option--selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="theme"
+                        value={option.id}
+                        checked={isSelected}
+                        onChange={() => {
+                          setDraftTheme(option.id);
+                          applyTheme(option.id);
+                        }}
+                        disabled={isSaving}
+                        className="settings-page__theme-radio-input"
+                      />
+                      <span className="settings-page__theme-radio-label">{option.label}</span>
+                    </label>
+                  );
+                })}
               </div>
 
               <Divider className="settings-page__divider" length="50%" />

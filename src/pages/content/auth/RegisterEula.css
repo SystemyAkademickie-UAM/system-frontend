@@ -214,6 +214,7 @@
 
 .register-eula__submit {
   width: 100%;
+  margin-top: auto;
 }
 
 @media (max-width: 768px) {

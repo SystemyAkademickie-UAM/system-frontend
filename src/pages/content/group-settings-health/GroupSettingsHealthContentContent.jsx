@@ -53,14 +53,9 @@ const LOADINGHINT__TEXTLABEL = {
   english: 'Loading lives settings…'
 };
 
-const TOGGLELABEL__TEXTLABEL = {
-  polish: 'Włącz system żyć',
-  english: 'Enable lives system'
-};
-
 const TOGGLETOOLTIP__TEXTLABEL = {
-  polish: 'Pozwala włączyć i wyłączyć system szans.',
-  english: 'Allows enabling and disabling the lives system.'
+  polish: 'System szans określa liczbę żyć posiadanych przez studenta, pozwalając na ich utratę, limitowanie oraz dokupowanie w sklepie.',
+  english: 'The lives system defines the number of lives a student has, allowing them to be lost, limited, and purchased in the shop.'
 };
 
 const EMOJIPICKERLABEL__TEXTLABEL = {
@@ -345,25 +340,27 @@ export default function GroupSettingsHealthContentContent() {
   return (
     <div className="group-settings-form group-settings-form--drive-layout group-settings-form--lives">
       <section className="group-settings-form__panel" aria-label={PANELAILABEL__TEXTLABEL[LANGUAGE]}>
-        <SettingsSectionHeader title={SECTIONHEADER__TEXTLABEL[LANGUAGE]} id="group-lives-title" />
+        <div className="group-settings-form__field group-settings-form__field--header-toggle">
+          <SettingsCheckboxField
+            id="group-lives-enabled"
+            checked={livesEnabled}
+            onChange={setLivesEnabled}
+            disabled={isSaving || isLoading}
+          >
+            <h2 className="settings-section-header settings-section-header--inline" id="group-lives-title">
+              {SECTIONHEADER__TEXTLABEL[LANGUAGE]}
+            </h2>
+            <span onClick={(event) => { event.preventDefault(); event.stopPropagation(); }}>
+              <InfoTooltip text={TOGGLETOOLTIP__TEXTLABEL[LANGUAGE]} />
+            </span>
+          </SettingsCheckboxField>
+        </div>
 
         {isLoading ? (
           <p className="group-settings-form__hint">{LOADINGHINT__TEXTLABEL[LANGUAGE]}</p>
         ) : (
           <>
-            <div className="group-settings-form__field">
-              <SettingsCheckboxField
-                id="group-lives-enabled"
-                checked={livesEnabled}
-                onChange={setLivesEnabled}
-                disabled={isSaving}
-              >
-                {TOGGLELABEL__TEXTLABEL[LANGUAGE]}
-                <InfoTooltip text={TOGGLETOOLTIP__TEXTLABEL[LANGUAGE]} />
-              </SettingsCheckboxField>
-            </div>
-
-            <div className="group-settings-form__field" style={{ marginTop: '0.5rem' }}>
+            <div className="group-settings-form__field" style={{ marginTop: '0.25rem', width: 'fit-content' }}>
               <Button
                 type="button"
                 variant="secondary"
@@ -495,6 +492,7 @@ export default function GroupSettingsHealthContentContent() {
           liveslabel={livesLabel}
           livesicon={livesIcon}
           livesstart={livesStart}
+          liveslimit={livesLimit}
         />
       ) : null}
 

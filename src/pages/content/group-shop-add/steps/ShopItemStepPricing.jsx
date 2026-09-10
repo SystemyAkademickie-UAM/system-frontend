@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Button, InfoTooltip, useToast } from '../../../../components/ui/index.js';
+import { Button, Divider, InfoTooltip, useToast } from '../../../../components/ui/index.js';
 import { CurrencyIcon } from '../../../../components/ui/Currency/CurrencyDisplay.jsx';
 import { sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -121,27 +121,6 @@ export default function ShopItemStepPricing({
   const handleCostChange = (val) => {
     const cleaned = sanitizeWholeNumberInput(val);
     setCost(cleaned);
-
-    // Przeliczenie cen rang automatycznych
-    const newBase = Number(cleaned) || 0;
-    setRanks((currentRanks) => currentRanks.map((rank) => {
-      if (rank.isCustom === 1) {
-        return rank;
-      }
-      let costafter = '';
-      if (cleaned !== '' && newBase > 0) {
-        let discounted = newBase - Math.round((newBase * (rank.discount || 0)) / 100);
-        if (discounted < 0) discounted = 0;
-        if (minPriceNum != null && discounted < minPriceNum) {
-          discounted = minPriceNum;
-        }
-        costafter = String(discounted);
-      }
-      return {
-        ...rank,
-        costafter,
-      };
-    }));
   };
 
   const handleMinPriceToggle = () => {
@@ -199,20 +178,6 @@ export default function ShopItemStepPricing({
   const handleDeleteBadgeDiscount = (discountId) => {
     setBadgeDiscounts(badgeDiscounts.filter((d) => d.id !== discountId));
     showSuccess('Zniżka za odznakę została usunięta.');
-  };
-
-  const handleRankCostCustomChange = (rankId, value) => {
-    const cleaned = sanitizeWholeNumberInput(value);
-    setRanks((current) => current.map((r) => {
-      if (r.id === rankId) {
-        return {
-          ...r,
-          costafter: cleaned,
-          isCustom: 1,
-        };
-      }
-      return r;
-    }));
   };
 
   // Obliczenia dla wybranej rangi do podglądu
@@ -293,7 +258,7 @@ export default function ShopItemStepPricing({
           ) : null}
         </div>
 
-        <div className="shop-item-form__field shop-item-pricing__field">
+        <div className={`shop-item-form__field shop-item-pricing__field ${!minPriceEnabled ? 'shop-item-pricing__field--dimmed' : ''}`}>
           <label className="shop-item-form__label shop-item-pricing__checkbox-label" htmlFor="shop-item-min-price-toggle">
             <input
               id="shop-item-min-price-toggle"
@@ -319,6 +284,8 @@ export default function ShopItemStepPricing({
           </div>
         </div>
       </div>
+
+      <Divider />
 
       {/* Sekcja: Zniżki za odznaki */}
       <div className="shop-item-pricing__discounts-section">
@@ -441,36 +408,57 @@ export default function ShopItemStepPricing({
                   <span className="shop-item-pricing__formula-badge-title">{item.badgename}:</span>
                   <div className="shop-item-pricing__formula-content">
                     {/* Cena bazowa */}
-                    <span className="shop-item-pricing__formula-token" title="Cena bazowa przedmiotu">
-                      {basePriceNum}<CurrencyIcon size="sm" />
-                    </span>
+                    <InfoTooltip text="Cena bazowa przedmiotu">
+                      <span className="shop-item-pricing__formula-token">
+                        {basePriceNum}<CurrencyIcon size="sm" />
+                      </span>
+                    </InfoTooltip>
 
                     {/* Zniżka odznaki */}
-                    <span className="shop-item-pricing__formula-token" title="Zniżka za odznakę">
-                      - {item.isPercent ? `${item.valNumber}% (${item.badgeDiscountAmount}` : `${item.valNumber}`}
-                      <CurrencyIcon size="sm" />
-                      {item.isPercent ? ')' : ''}
-                    </span>
+                    <InfoTooltip
+                      text={
+                        item.isPercent
+                          ? `Zniżka za odznakę „${item.badgename}”: -${item.valNumber}% (kwota zniżki: ${item.badgeDiscountAmount})`
+                          : `Zniżka za odznakę „${item.badgename}”: -${item.valNumber} w walucie grupy`
+                      }
+                    >
+                      <span className="shop-item-pricing__formula-token">
+                        - {item.isPercent ? `${item.valNumber}% (${item.badgeDiscountAmount}` : `${item.valNumber}`}
+                        <CurrencyIcon size="sm" />
+                        {item.isPercent ? ')' : ''}
+                      </span>
+                    </InfoTooltip>
 
                     {/* Zniżka rangi jeśli wybrana */}
                     {selectedPreviewRank && item.rankDiscountAmount > 0 ? (
-                      <span className="shop-item-pricing__formula-token shop-item-pricing__formula-token--rank" title={`Zniżka za rangę ${selectedPreviewRank.name}`}>
-                        - {item.rankPercent}% ({item.rankDiscountAmount}<CurrencyIcon size="sm" />)
-                      </span>
+                      <InfoTooltip
+                        text={`Zniżka za rangę „${selectedPreviewRank.name}”: -${item.rankPercent}% (kwota zniżki: ${item.rankDiscountAmount})`}
+                      >
+                        <span className="shop-item-pricing__formula-token shop-item-pricing__formula-token--rank">
+                          - {item.rankPercent}% ({item.rankDiscountAmount}<CurrencyIcon size="sm" />)
+                        </span>
+                      </InfoTooltip>
                     ) : null}
 
                     <span className="shop-item-pricing__formula-operator">=</span>
 
                     {/* Wynik */}
-                    <span
-                      className={`shop-item-pricing__formula-result ${item.isMinPriceCapped ? 'shop-item-pricing__formula-result--capped' : ''}`}
-                      title={item.isMinPriceCapped ? 'Zabezpieczono ceną minimalną' : 'Cena końcowa po zniżkach'}
+                    <InfoTooltip
+                      text={
+                        item.isMinPriceCapped
+                          ? `Cena końcowa po zniżkach: ${item.calculatedPrice} (ograniczona ustawioną ceną minimalną)`
+                          : `Cena końcowa po odliczeniu zniżek: ${item.calculatedPrice}`
+                      }
                     >
-                      {item.calculatedPrice} <CurrencyIcon size="sm" />
-                      {item.isMinPriceCapped ? (
-                        <span className="shop-item-pricing__capped-badge">Min.</span>
-                      ) : null}
-                    </span>
+                      <span
+                        className={`shop-item-pricing__formula-result ${item.isMinPriceCapped ? 'shop-item-pricing__formula-result--capped' : ''}`}
+                      >
+                        {item.calculatedPrice} <CurrencyIcon size="sm" />
+                        {item.isMinPriceCapped ? (
+                          <span className="shop-item-pricing__capped-badge">Min.</span>
+                        ) : null}
+                      </span>
+                    </InfoTooltip>
                   </div>
                 </div>
               ))}
@@ -505,6 +493,7 @@ export default function ShopItemStepPricing({
                   const discountAmount = Math.round((basePriceNum * rankDiscountVal) / 100);
                   let autoCost = basePriceNum - discountAmount;
                   if (autoCost < 0) autoCost = 0;
+                  const isCapped = minPriceNum != null && autoCost < minPriceNum && basePriceNum - discountAmount < minPriceNum;
                   if (minPriceNum != null && autoCost < minPriceNum) {
                     autoCost = minPriceNum;
                   }
@@ -516,20 +505,46 @@ export default function ShopItemStepPricing({
                           {rank.icon || '⭐'}
                         </span>
                         <span className="shop-item-pricing__rank-name">{rank.name}</span>
+                        <span className="shop-item-pricing__rank-badge-percent">(-{rankDiscountVal}%)</span>
                       </div>
+
                       <div className="shop-item-pricing__rank-calc">
                         {basePriceNum > 0 ? (
-                          <span className="shop-item-pricing__rank-calc-text">
-                            {basePriceNum}<CurrencyIcon size="sm" /> - {discountAmount}<CurrencyIcon size="sm" /> ({rankDiscountVal}%) =
-                          </span>
+                          <div className="shop-item-pricing__rank-calc-formula">
+                            <InfoTooltip text="Cena bazowa przedmiotu">
+                              <span className="shop-item-pricing__rank-calc-token">{basePriceNum}<CurrencyIcon size="sm" /></span>
+                            </InfoTooltip>
+                            <span className="shop-item-pricing__rank-calc-op">-</span>
+                            <InfoTooltip text={`Zniżka za rangę „${rank.name}”: -${rankDiscountVal}% (kwota zniżki: ${discountAmount})`}>
+                              <span className="shop-item-pricing__rank-calc-token">{rankDiscountVal}% ({discountAmount}<CurrencyIcon size="sm" />)</span>
+                            </InfoTooltip>
+                            <span className="shop-item-pricing__rank-calc-op">=</span>
+                          </div>
                         ) : null}
-                        <input
-                          className="shop-item-form__input shop-item-pricing__rank-price-input"
-                          value={rank.costafter !== '' ? rank.costafter : (basePriceNum > 0 ? String(autoCost) : '')}
-                          placeholder={String(autoCost)}
-                          onInput={(event) => handleRankCostCustomChange(rank.id, event.target.value)}
-                        />
-                        <CurrencyIcon size="sm" />
+
+                        {basePriceNum > 0 ? (
+                          <InfoTooltip
+                            text={
+                              isCapped
+                                ? `Cena dla rangi „${rank.name}”: ${autoCost} (ograniczona ustawioną ceną minimalną)`
+                                : `Cena dla rangi „${rank.name}” po zniżce ${rankDiscountVal}%: ${autoCost}`
+                            }
+                          >
+                            <div className="shop-item-pricing__rank-calc-result">
+                              <span className={`shop-item-pricing__rank-calc-final ${isCapped ? 'shop-item-pricing__rank-calc-final--capped' : ''}`}>
+                                {autoCost}
+                              </span>
+                              <CurrencyIcon size="sm" />
+                              {isCapped ? (
+                                <span className="shop-item-pricing__capped-badge">Min.</span>
+                              ) : null}
+                            </div>
+                          </InfoTooltip>
+                        ) : (
+                          <div className="shop-item-pricing__rank-calc-result">
+                            <span className="shop-item-pricing__rank-calc-placeholder">—</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

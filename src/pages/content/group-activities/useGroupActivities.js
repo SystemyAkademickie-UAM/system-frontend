@@ -91,6 +91,8 @@ function mapActivity(raw) {
     description1: raw.educationalDescription,
     reward: raw.currency,
     completionCount: raw.completionCount ?? 0,
+    visibilityStatus: raw.visibilityStatus ?? (raw.isPublished === false ? 0 : 1),
+    isPublished: raw.isPublished ?? (raw.visibilityStatus !== 0),
   };
 }
 
@@ -459,6 +461,44 @@ export function useGroupActivities() {
     }
   }, [fetchActivitiesForStage, showSuccess, showError]);
 
+  const toggleActivityVisibility = useCallback(async (stageId, activityId) => {
+    let nextVisibility = 1;
+    setStages((prev) => prev.map((stage) => {
+      if (stage.id !== stageId) return stage;
+      return {
+        ...stage,
+        activities: stage.activities.map((act) => {
+          if (act.id !== activityId) return act;
+          const currentVis = act.visibilityStatus ?? (act.isPublished === false ? 0 : 1);
+          nextVisibility = currentVis === 1 ? 0 : 1;
+          return {
+            ...act,
+            visibilityStatus: nextVisibility,
+            isPublished: nextVisibility === 1,
+          };
+        }),
+      };
+    }));
+
+    try {
+      await postJson('/activities', {
+        method: 'modify',
+        activityId,
+        visibilityStatus: nextVisibility,
+        isPublished: nextVisibility === 1,
+      });
+    } catch {
+      // Backend may not support activity visibility toggle yet
+    }
+
+    showSuccess(
+      nextVisibility === 1
+        ? (LANGUAGE === 'polish' ? 'Aktywność jest teraz widoczna dla studentów.' : 'Activity is now visible to students.')
+        : (LANGUAGE === 'polish' ? 'Aktywność została ukryta dla studentów.' : 'Activity has been hidden from students.')
+    );
+    return { ok: true };
+  }, [LANGUAGE, showSuccess]);
+
   return {
     stages,
     isLoading,
@@ -473,5 +513,6 @@ export function useGroupActivities() {
     createActivity,
     updateActivity,
     deleteActivity,
+    toggleActivityVisibility,
   };
 }

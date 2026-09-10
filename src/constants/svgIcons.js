@@ -17,6 +17,10 @@ export const SVG_ICONS = {
     delete: 'actions/delete.svg',
     manageBadges: 'actions/manage-badges.svg',
     manageProgress: 'actions/manage-progress.svg',
+    show: 'actions/show.svg',
+    hide: 'actions/hide.svg',
+    reveal: 'actions/show.svg',
+    conceal: 'actions/hide.svg',
   },
   controls: {
     close: 'controls/close.svg',

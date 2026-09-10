@@ -3,7 +3,7 @@ import { Button, useToast } from '../../../components/ui/index.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
-import { bulkUpdateStudentLives } from '../../../services/groupLives.api.js';
+import { bulkUpdateStudentLives, fetchGroupLivesConfig } from '../../../services/groupLives.api.js';
 import { sanitizeWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupSettingsHealthContentWindow.css';
@@ -98,6 +98,7 @@ export default function GroupSettingsHealthContentWindow({
   groupId,
   liveslabel,
   livesicon,
+  liveslimit,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
@@ -108,12 +109,29 @@ export default function GroupSettingsHealthContentWindow({
   const [sortReverse, setSortReverse] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [bulkInputValue, setBulkInputValue] = useState('');
+  const [maxLivesLimit, setMaxLivesLimit] = useState(
+    liveslimit !== undefined && liveslimit !== null && liveslimit !== ''
+      ? Number(liveslimit)
+      : null
+  );
 
   // Floating animations per accountId: { [accountId]: { id, text, type } }
   const [floatingEffects, setFloatingEffects] = useState({});
   const effectTimeoutRefs = useRef({});
 
   const titleText = liveslabel?.trim() || DEFAULTTITLE__TEXTLABEL[LANGUAGE];
+
+  useEffect(() => {
+    if (liveslimit !== undefined && liveslimit !== null && liveslimit !== '') {
+      setMaxLivesLimit(Number(liveslimit));
+    } else if (groupId) {
+      void fetchGroupLivesConfig(groupId).then((res) => {
+        if (res?.ok && res?.config?.livesMax != null) {
+          setMaxLivesLimit(res.config.livesMax);
+        }
+      });
+    }
+  }, [groupId, liveslimit]);
 
   const triggerFloatingEffect = (accountId, deltaText, type) => {
     const effectId = Date.now() + Math.random();
@@ -193,28 +211,50 @@ export default function GroupSettingsHealthContentWindow({
 
   // Pojedyncza zmiana: +1 / -1
   const handleStudentStep = (accountId, direction) => {
+    let changed = false;
+
     setStudents((prev) => prev.map((s) => {
       if (s.accountId !== accountId) return s;
-      const nextLives = direction === 'increment'
-        ? s.lives + 1
-        : Math.max(0, s.lives - 1);
+
+      if (direction === 'increment') {
+        if (maxLivesLimit != null && s.lives >= maxLivesLimit) {
+          return s;
+        }
+        changed = true;
+        const nextLives = maxLivesLimit != null ? Math.min(maxLivesLimit, s.lives + 1) : s.lives + 1;
+        return {
+          ...s,
+          lives: nextLives,
+        };
+      }
+
+      if (s.lives <= 0) {
+        return s;
+      }
+      changed = true;
       return {
         ...s,
-        lives: nextLives,
+        lives: Math.max(0, s.lives - 1),
       };
     }));
 
-    triggerFloatingEffect(
-      accountId,
-      direction === 'increment' ? '+1' : '-1',
-      direction === 'increment' ? 'heal' : 'damage'
-    );
+    if (changed) {
+      triggerFloatingEffect(
+        accountId,
+        direction === 'increment' ? '+1' : '-1',
+        direction === 'increment' ? 'heal' : 'damage'
+      );
+    }
   };
 
   // Bezpośrednie wpisanie wartości samemu
   const handleStudentLivesDirectChange = (accountId, rawValue) => {
     const sanitized = sanitizeWholeNumberInput(rawValue);
-    const parsed = sanitized === '' ? 0 : Math.max(0, Number(sanitized));
+    let parsed = sanitized === '' ? 0 : Math.max(0, Number(sanitized));
+
+    if (maxLivesLimit != null && parsed > maxLivesLimit) {
+      parsed = maxLivesLimit;
+    }
 
     setStudents((prev) => prev.map((s) => {
       if (s.accountId !== accountId) return s;
@@ -228,9 +268,19 @@ export default function GroupSettingsHealthContentWindow({
   // Masowa operacja +1 / -1 na KAŻDYM uczestniku
   const handleBulkStepAll = (direction) => {
     setStudents((prev) => prev.map((s) => {
-      const nextLives = direction === 'increment'
-        ? s.lives + 1
-        : Math.max(0, s.lives - 1);
+      let nextLives = s.lives;
+
+      if (direction === 'increment') {
+        if (maxLivesLimit != null && s.lives >= maxLivesLimit) {
+          return s;
+        }
+        nextLives = maxLivesLimit != null ? Math.min(maxLivesLimit, s.lives + 1) : s.lives + 1;
+      } else {
+        if (s.lives <= 0) {
+          return s;
+        }
+        nextLives = Math.max(0, s.lives - 1);
+      }
 
       triggerFloatingEffect(
         s.accountId,
@@ -245,10 +295,29 @@ export default function GroupSettingsHealthContentWindow({
     }));
   };
 
+  // Zmiana wartości w polu masowym
+  const handleBulkInputChange = (rawValue) => {
+    const sanitized = sanitizeWholeNumberInput(rawValue);
+    if (sanitized === '') {
+      setBulkInputValue('');
+      return;
+    }
+
+    let parsed = Number(sanitized);
+    if (maxLivesLimit != null && parsed > maxLivesLimit) {
+      parsed = maxLivesLimit;
+    }
+    setBulkInputValue(String(parsed));
+  };
+
   // Masowe ustawienie konkretnej wartości KAŻDEMU uczestnikowi
   const handleBulkSetAll = () => {
     if (bulkInputValue.trim() === '') return;
-    const targetVal = Math.max(0, Number(bulkInputValue) || 0);
+    let targetVal = Math.max(0, Number(bulkInputValue) || 0);
+
+    if (maxLivesLimit != null && targetVal > maxLivesLimit) {
+      targetVal = maxLivesLimit;
+    }
 
     setStudents((prev) => prev.map((s) => {
       const diff = targetVal - s.lives;
@@ -411,46 +480,50 @@ export default function GroupSettingsHealthContentWindow({
                     </div>
 
                     <div className="lives-manage-table__actions">
-                      {/* Przycisk Minus — powiększony czerwony SVG */}
-                      <button
-                        type="button"
-                        className="lives-manage-svg-btn lives-manage-svg-btn--decrease"
-                        aria-label={`Odejmij życie: ${student.name} ${student.surname}`}
-                        onClick={() => handleStudentStep(student.accountId, 'decrement')}
-                      >
-                        <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
-                        </svg>
-                      </button>
+                      <div className="lives-manage-table__controls">
+                        {/* Przycisk Minus — powiększony czerwony SVG */}
+                        <button
+                          type="button"
+                          className="lives-manage-svg-btn lives-manage-svg-btn--decrease"
+                          aria-label={`Odejmij życie: ${student.name} ${student.surname}`}
+                          onClick={() => handleStudentStep(student.accountId, 'decrement')}
+                          disabled={student.lives <= 0}
+                        >
+                          <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
+                          </svg>
+                        </button>
 
-                      {/* Zaokrąglony kwadrat z bezpośrednią edycją liczby żyć */}
-                      <div className="lives-manage-value-box-wrapper">
-                        {activeEffect && (
-                          <span className={`lives-manage-floating-text lives-manage-floating-text--${activeEffect.type}`}>
-                            {activeEffect.text}
-                          </span>
-                        )}
-                        <input
-                          className="lives-manage-value-box"
-                          value={student.lives}
-                          inputMode="numeric"
-                          onChange={(e) => handleStudentLivesDirectChange(student.accountId, e.target.value)}
-                          aria-label={`Liczba żyć dla ${student.name} ${student.surname}`}
-                        />
+                        {/* Zaokrąglony kwadrat z bezpośrednią edycją liczby żyć */}
+                        <div className="lives-manage-value-box-wrapper">
+                          {activeEffect && (
+                            <span className={`lives-manage-floating-text lives-manage-floating-text--${activeEffect.type}`}>
+                              {activeEffect.text}
+                            </span>
+                          )}
+                          <input
+                            className="lives-manage-value-box"
+                            value={student.lives}
+                            inputMode="numeric"
+                            onChange={(e) => handleStudentLivesDirectChange(student.accountId, e.target.value)}
+                            aria-label={`Liczba żyć dla ${student.name} ${student.surname}`}
+                          />
+                        </div>
+
+                        {/* Przycisk Plus — powiększony zielony SVG */}
+                        <button
+                          type="button"
+                          className="lives-manage-svg-btn lives-manage-svg-btn--increase"
+                          aria-label={`Dodaj życie: ${student.name} ${student.surname}`}
+                          onClick={() => handleStudentStep(student.accountId, 'increment')}
+                          disabled={maxLivesLimit != null && student.lives >= maxLivesLimit}
+                        >
+                          <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <line x1="12" y1="5" x2="12" y2="19" strokeWidth="3" strokeLinecap="round" />
+                            <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
+                          </svg>
+                        </button>
                       </div>
-
-                      {/* Przycisk Plus — powiększony zielony SVG */}
-                      <button
-                        type="button"
-                        className="lives-manage-svg-btn lives-manage-svg-btn--increase"
-                        aria-label={`Dodaj życie: ${student.name} ${student.surname}`}
-                        onClick={() => handleStudentStep(student.accountId, 'increment')}
-                      >
-                        <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                          <line x1="12" y1="5" x2="12" y2="19" strokeWidth="3" strokeLinecap="round" />
-                          <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
-                        </svg>
-                      </button>
 
                       {/* Liczba zmiany (delta) bez kółka */}
                       <span
@@ -471,54 +544,11 @@ export default function GroupSettingsHealthContentWindow({
           </div>
         </div>
 
-        {/* Stopka pop-upa: Zaktualizuj | Masowe akcje */}
+        {/* Stopka pop-upa */}
         <footer className="lives-manage-dialog__footer">
           <div className="lives-manage-footer-container">
-            {/* Przycisk Zaktualizuj po lewej */}
+            {/* Opcja "Ustaw wszystkim: [input] [Zmień]" po lewej */}
             <div className="lives-manage-footer-left">
-              <Button
-                type="button"
-                variant="primary"
-                size="md"
-                onClick={handleSaveAll}
-                disabled={isSaving}
-              >
-                {UPDATEBUTTON__TEXTLABEL[LANGUAGE]}
-              </Button>
-            </div>
-
-            {/* Separator pionowy */}
-            <div className="lives-manage-footer-divider" aria-hidden="true" />
-
-            {/* Masowe operacje po prawej */}
-            <div className="lives-manage-footer-right">
-              {/* Masowe przyciski - i + */}
-              <div className="lives-manage-bulk-step-group">
-                <button
-                  type="button"
-                  className="lives-manage-svg-btn lives-manage-svg-btn--decrease"
-                  title="Odejmij 1 życie wszystkim"
-                  onClick={() => handleBulkStepAll('decrement')}
-                >
-                  <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
-                  </svg>
-                </button>
-
-                <button
-                  type="button"
-                  className="lives-manage-svg-btn lives-manage-svg-btn--increase"
-                  title="Dodaj 1 życie wszystkim"
-                  onClick={() => handleBulkStepAll('increment')}
-                >
-                  <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <line x1="12" y1="5" x2="12" y2="19" strokeWidth="3" strokeLinecap="round" />
-                    <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Ustaw wszystkim wartość */}
               <div className="lives-manage-bulk-input-group">
                 <span className="lives-manage-bulk-label">{BULKSETPREFIX__TEXTLABEL[LANGUAGE]}</span>
                 <input
@@ -526,7 +556,7 @@ export default function GroupSettingsHealthContentWindow({
                   placeholder="0"
                   inputMode="numeric"
                   value={bulkInputValue}
-                  onChange={(e) => setBulkInputValue(sanitizeWholeNumberInput(e.target.value))}
+                  onChange={(e) => handleBulkInputChange(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBulkSetAll()}
                 />
                 <Button
@@ -539,6 +569,47 @@ export default function GroupSettingsHealthContentWindow({
                   {BULKSETBUTTON__TEXTLABEL[LANGUAGE]}
                 </Button>
               </div>
+            </div>
+
+            {/* Prawa strona: [- +] oddzielone tabem od [Zaktualizuj] */}
+            <div className="lives-manage-footer-right">
+              <div className="lives-manage-bulk-step-group">
+                <button
+                  type="button"
+                  className="lives-manage-svg-btn lives-manage-svg-btn--decrease"
+                  title="Odejmij 1 życie wszystkim"
+                  onClick={() => handleBulkStepAll('decrement')}
+                  disabled={displayStudents.length > 0 && displayStudents.every((s) => s.lives <= 0)}
+                >
+                  <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  className="lives-manage-svg-btn lives-manage-svg-btn--increase"
+                  title="Dodaj 1 życie wszystkim"
+                  onClick={() => handleBulkStepAll('increment')}
+                  disabled={maxLivesLimit != null && displayStudents.length > 0 && displayStudents.every((s) => s.lives >= maxLivesLimit)}
+                >
+                  <svg className="lives-manage-svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <line x1="12" y1="5" x2="12" y2="19" strokeWidth="3" strokeLinecap="round" />
+                    <line x1="5" y1="12" x2="19" y2="12" strokeWidth="3" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+
+              <Button
+                type="button"
+                variant="primary"
+                size="md"
+                className="lives-manage-update-btn"
+                onClick={handleSaveAll}
+                disabled={isSaving}
+              >
+                {UPDATEBUTTON__TEXTLABEL[LANGUAGE]}
+              </Button>
             </div>
           </div>
         </footer>

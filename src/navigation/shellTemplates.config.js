@@ -156,7 +156,7 @@ const studentView = {
           kind: 'tree-item',
           label: 'Dziennik aktywności',
           iconId: 'nav/activity',
-          hrefKey: 'GROUP_PROFILE_LOG',
+          hrefKey: 'GROUP_PROFILE',
           requiresGroup: true,
           matchEnd: true,
         },
@@ -166,7 +166,7 @@ const studentView = {
           kind: 'tree-item',
           label: 'Zdobyte odznaki',
           iconId: 'nav/profile-badges',
-          hrefKey: 'GROUP_PROFILE',
+          hrefKey: 'GROUP_PROFILE_LOG',
           requiresGroup: true,
           matchEnd: true,
         },
@@ -631,8 +631,8 @@ export const SUB_NAV_CONFIG = {
 
   // Profil studenta
   'group-profile': [
-    { id: 'log', label: 'Dziennik aktywności', hrefKey: 'GROUP_PROFILE_LOG', end: true },
-    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE', end: true },
+    { id: 'log', label: 'Dziennik aktywności', hrefKey: 'GROUP_PROFILE', end: true },
+    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE_LOG', end: true },
     { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_PROFILE_EQ', end: true },
     { id: 'purchases', label: 'Historia zakupów', hrefKey: 'GROUP_PROFILE_PURCHASES', end: true },
   ],

@@ -144,7 +144,8 @@ export async function fetchGroupSnapshotForTemplate(groupId) {
       categoryId: item.categoryId ?? null,
       imageRef: item.imageRef ?? null,
       name: item.name ?? '',
-      educationalDescription: item.didacticDescription ?? item.storyDescription ?? null,
+      storyDescription: item.storyDescription ?? null,
+      educationalDescription: item.didacticDescription ?? null,
       listing: {
         basePrice: item.priceAmount ?? 0,
         stockQuantity: item.stockQuantity ?? null,

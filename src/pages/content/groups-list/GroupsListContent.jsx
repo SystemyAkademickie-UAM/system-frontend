@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchBar, Button } from '../../../components/ui/index.js';
 import { RoleVisibility } from '../../../components/guards/index.js';
@@ -96,7 +95,6 @@ export default function GroupsListContent() {
   } = useGroupsList();
   const { role } = useAppRole();
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
-  const creatorOverlayRef = useRef(null);
 
   const showOtherGroups = role !== APP_ROLE.LECTURER;
   const hasAnyGroups = myGroups.length > 0 || (showOtherGroups && otherGroups.length > 0);
@@ -123,58 +121,6 @@ export default function GroupsListContent() {
       state: { joinSuccessMessage: successMessage },
     });
   };
-
-  // Portaluj overlay popupa do głównej sekcji treści (#main-content),
-  // żeby przykrywał tylko obszar strony, a nie sidebar/superbar.
-  const [portalTarget, setPortalTarget] = useState(null);
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    setPortalTarget(document.getElementById('main-content'));
-  }, []);
-
-  useEffect(() => {
-    if (!isCreatorOpen) {
-      return undefined;
-    }
-
-    const main = document.getElementById('main-content');
-    const overlay = creatorOverlayRef.current;
-    if (!main || !overlay) {
-      return undefined;
-    }
-
-    const syncOverlayBounds = () => {
-      const rect = main.getBoundingClientRect();
-      overlay.style.top = `${rect.top}px`;
-      overlay.style.left = `${rect.left}px`;
-      overlay.style.width = `${rect.width}px`;
-      overlay.style.height = `${rect.height}px`;
-    };
-
-    syncOverlayBounds();
-
-    const resizeObserver = new ResizeObserver(syncOverlayBounds);
-    resizeObserver.observe(main);
-
-    main.addEventListener('scroll', syncOverlayBounds, { passive: true });
-    window.addEventListener('resize', syncOverlayBounds);
-    window.addEventListener('scroll', syncOverlayBounds, { passive: true });
-
-    const previousOverflow = main.style.overflow;
-    main.style.overflow = 'hidden';
-
-    return () => {
-      resizeObserver.disconnect();
-      main.removeEventListener('scroll', syncOverlayBounds);
-      window.removeEventListener('resize', syncOverlayBounds);
-      window.removeEventListener('scroll', syncOverlayBounds);
-      main.style.overflow = previousOverflow;
-      overlay.style.top = '';
-      overlay.style.left = '';
-      overlay.style.width = '';
-      overlay.style.height = '';
-    };
-  }, [isCreatorOpen]);
 
   return (
     <section className="groups-list" aria-labelledby="groups-list-section-title">
@@ -213,23 +159,11 @@ export default function GroupsListContent() {
         </div>
       </div>
 
-      {isCreatorOpen && portalTarget
-        ? createPortal(
-            <div
-              ref={creatorOverlayRef}
-              className="groups-list__creator-overlay"
-              role="presentation"
-              onClick={(event) => {
-                if (event.target === event.currentTarget) {
-                  handleCreatorClose();
-                }
-              }}
-            >
-              <GroupsListCreator onClose={handleCreatorClose} onCreated={handleGroupCreated} />
-            </div>,
-            portalTarget,
-          )
-        : null}
+      <GroupsListCreator
+        isOpen={isCreatorOpen}
+        onClose={handleCreatorClose}
+        onCreated={handleGroupCreated}
+      />
 
       {errorMessage ? (
         <p className="groups-list__message groups-list__message--error" role="alert">

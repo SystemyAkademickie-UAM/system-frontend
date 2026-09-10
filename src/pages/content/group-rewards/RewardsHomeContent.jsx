@@ -17,6 +17,7 @@ import '../../../components/page/PageUnavailable.css';
 import { useGroupRanks } from './useGroupRanks.js';
 import { useGroupShopItems } from '../../../hooks/shop/useGroupShop.js';
 import { resolveShopItemLabels } from '../../../utils/ranks/rankShopItemUnlock.js';
+import { getRankGradientColor } from '../../../utils/rankGradient.js';
 import RewardsRankTableRow from './shared/RewardsRankTableRow.jsx';
 import './shared/rewardsShared.css';
 import './shared/rewardsTablePreview.css';
@@ -531,6 +532,11 @@ export default function RewardsHomeContent() {
 
   const modalRank = activeModal?.rank ?? null;
 
+  const getRankRowColor = useCallback((rank) => {
+    const index = ranks.findIndex((item) => item.id === rank.id);
+    return getRankGradientColor(index >= 0 ? index : (rank.position - 1), ranks.length);
+  }, [ranks]);
+
   if (error) {
     return (
       <SectionPageLayout
@@ -611,6 +617,7 @@ export default function RewardsHomeContent() {
           itemsPerPage={10}
           paginationAriaLabel={PAGINATIONARIA__TEXTLABEL[LANGUAGE]}
           className="rewards-table rewards-table--ranks"
+          getRowColor={getRankRowColor}
           search={{
             external: true,
             value: searchQuery,

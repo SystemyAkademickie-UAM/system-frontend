@@ -1,11 +1,11 @@
 import { useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Badge } from '../../../../components/ui/index.js';
+import { Badge, getBadgeRarityConfig } from '../../../../components/ui/index.js';
 import { DataTableRowActions } from '../../../../components/ui/DataTable/DataTable.jsx';
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
-export default function RewardsBadgeTableRow({ row, columns, rowActions }) {
+export default function RewardsBadgeTableRow({ row, columns, rowActions, rowColor }) {
   const rowRef = useRef(null);
   const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
@@ -13,11 +13,19 @@ export default function RewardsBadgeTableRow({ row, columns, rowActions }) {
     showPreview(rowRef.current);
   };
 
+  const resolvedColor = rowColor ?? row.rowColor ?? (row.rarity ? `var(${getBadgeRarityConfig(row.rarity).cssVar})` : null);
+  const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
+
   return (
     <>
       <tr
         ref={rowRef}
-        className="data-table__row rewards-table__row"
+        className={[
+          'data-table__row',
+          'rewards-table__row',
+          resolvedColor ? 'data-table__row--colored' : '',
+        ].filter(Boolean).join(' ')}
+        style={colorStyle}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={hidePreview}
       >

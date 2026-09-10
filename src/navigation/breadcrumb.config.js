@@ -74,11 +74,11 @@ export const GROUP_BREADCRUMB_RULES = [
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/activity\/?$/u,
-    segments: [{ label: 'Dziennik aktywności' }],
+    segments: [{ label: 'Zdobyte odznaki' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/?$/u,
-    segments: [{ label: 'Zdobyte odznaki' }],
+    segments: [{ label: 'Dziennik aktywności' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/members\/codes\/?$/u,
@@ -153,7 +153,8 @@ export const GROUP_BREADCRUMB_RULES = [
 /** Etykieta sidebar → breadcrumb (gdy brak dopasowania reguły). */
 export const SIDEBAR_LABEL_BY_HREF_KEY = {
   GROUP_MAIN: 'Strona główna',
-  GROUP_PROFILE: 'Zdobyte odznaki',
+  GROUP_PROFILE: 'Dziennik aktywności',
+  GROUP_PROFILE_LOG: 'Zdobyte odznaki',
   GROUP_SHOP: 'Sklep',
   GROUP_RANKING: 'Ranking',
   GROUP_MEMBERS: 'Użytkownicy',

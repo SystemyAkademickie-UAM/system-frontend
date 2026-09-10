@@ -11,7 +11,45 @@
 .rewards-modal__form {
   display: flex;
   flex-direction: column;
+  gap: 0.875rem;
+}
+
+.rewards-modal__grid-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 1rem;
+  align-items: flex-start;
+}
+
+.rewards-modal__icon-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--color-modal-border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  background: var(--color-bg-elevated, rgb(41, 40, 57));
+  flex-shrink: 0;
+}
+
+.rewards-modal__icon-box .rewards-modal__label {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.rewards-modal__fields-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.rewards-modal__divider {
+  margin: 0.25rem 0;
+  opacity: 0.5;
 }
 
 .rewards-modal__field {
@@ -80,7 +118,7 @@
 }
 
 .rewards-modal__row--name-reward {
-  grid-template-columns: minmax(0, 5fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1.4fr);
 }
 
 .rewards-modal__row--icon-rarity {
@@ -330,6 +368,10 @@
 }
 
 @media (max-width: 640px) {
+  .rewards-modal__grid-main {
+    grid-template-columns: 1fr;
+  }
+
   .rewards-modal__row,
   .rewards-modal__row--name-reward,
   .rewards-modal__row--icon-rarity {

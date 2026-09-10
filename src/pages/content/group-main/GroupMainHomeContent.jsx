@@ -9,7 +9,7 @@ import { useGroupBacklogNotifications } from '../../../hooks/notifications/useGr
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { BACKLOG_LIST_POLL_MS } from '../../../constants/backlogNotifications.constants.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
-import { groupMembersLogPath, groupProfileActivityPath } from '../../../routes/pathRegistry.js';
+import { groupMembersLogPath, groupProfilePath } from '../../../routes/pathRegistry.js';
 import GroupMainSubpageHeader from './shared/GroupMainSubpageHeader.jsx';
 import GroupMainHomeContentWindow from './GroupMainHomeContentWindow.jsx';
 import './GroupMainHomeContent.css';
@@ -178,7 +178,7 @@ export default function GroupMainHomeContent() {
   }
 
   const notificationsSeeMorePath = isStudentView
-    ? groupProfileActivityPath(groupId)
+    ? groupProfilePath(groupId)
     : groupMembersLogPath(groupId);
 
   const sectionTitle = isStudentView

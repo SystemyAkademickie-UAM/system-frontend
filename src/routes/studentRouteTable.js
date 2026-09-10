@@ -57,18 +57,18 @@ export const STUDENT_ROUTE_TABLE = [
   },
   {
     id: 'group.profile.activity',
-    navLabel: 'Dziennik aktywności',
+    navLabel: 'Zdobyte odznaki',
     hrefKey: 'GROUP_PROFILE_LOG',
     pathPattern: '/groups/:groupId/profile/activity',
-    breadcrumb: 'Dziennik aktywności',
+    breadcrumb: 'Zdobyte odznaki',
     notes: 'Podstrona profilu',
   },
   {
     id: 'group.profile.home',
-    navLabel: 'Zdobyte odznaki',
+    navLabel: 'Dziennik aktywności',
     hrefKey: 'GROUP_PROFILE',
     pathPattern: '/groups/:groupId/profile',
-    breadcrumb: 'Zdobyte odznaki',
+    breadcrumb: 'Dziennik aktywności',
     notes: 'Podstrona profilu',
   },
   {

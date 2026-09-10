@@ -68,13 +68,8 @@ const CREATE_GROUP_LABEL__TEXTLABEL = {
 };
 
 const EDIT_LABEL__TEXTLABEL = {
-  polish: 'Edytuj szablon',
-  english: 'Edit template'
-};
-
-const TOGGLE_PUBLIC_LABEL__TEXTLABEL = {
-  polish: 'Opublikuj bądź ukryj szablon w galerii',
-  english: 'Publish or hide template in gallery'
+  polish: 'Edytuj etykietę szablonu',
+  english: 'Edit template label'
 };
 
 const DELETE_ACTION_LABEL__TEXTLABEL = {
@@ -270,16 +265,11 @@ export default function TemplatesMyContent() {
         label: EDIT_LABEL__TEXTLABEL[LANGUAGE],
         onSelect: (template) => openModal('edit', template),
       },
-      {
-        id: 'togglePublic',
-        label: TOGGLE_PUBLIC_LABEL__TEXTLABEL[LANGUAGE],
-        onSelect: (template) => handleTogglePublic(template),
-      },
     ],
     onDelete: (template) => openModal('delete', template),
     deleteLabel: DELETE_ACTION_LABEL__TEXTLABEL[LANGUAGE],
     deleteAriaLabel: (template) => DELETE_ACTION_ARIA__TEXTLABEL[LANGUAGE](template.name),
-  }), [handleTogglePublic, openModal, setCreateGroupTemplate, LANGUAGE]);
+  }), [openModal, setCreateGroupTemplate, LANGUAGE]);
 
 
 
@@ -366,6 +356,8 @@ export default function TemplatesMyContent() {
                     description={template.description}
 
                     isPublic={template.isPublic}
+
+                    onTogglePublic={() => handleTogglePublic(template)}
 
                     createdAt={template.createdAt}
 

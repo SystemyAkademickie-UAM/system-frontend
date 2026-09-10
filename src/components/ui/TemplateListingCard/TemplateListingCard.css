@@ -110,7 +110,7 @@
 }
 
 .maq-template-listing-card__title--with-actions {
-  padding-right: 2.75rem;
+  padding-right: 5.5rem;
 }
 .maq-template-listing-card__head-actions {
   display: inline-flex;
@@ -133,18 +133,22 @@
   color: var(--color-text-primary);
 }
 
-/* Poza tabelą — pokaż ⋮ po najechaniu na kafelek (nie .data-table__row). */
-.maq-template-listing-card .data-table__actions {
+/* Pokaż ⋮ oraz ikonę widoczności po najechaniu na kafelek */
+.maq-template-listing-card .data-table__actions,
+.maq-template-listing-card .maq-template-listing-card__visibility {
   opacity: 0;
   transition: opacity 0.15s ease;
 }
 
 .maq-template-listing-card:hover .data-table__actions,
-.maq-template-listing-card:focus-within .data-table__actions {
+.maq-template-listing-card:focus-within .data-table__actions,
+.maq-template-listing-card:hover .maq-template-listing-card__visibility,
+.maq-template-listing-card:focus-within .maq-template-listing-card__visibility {
   opacity: 1;
 }
 
-.maq-template-listing-card__favorite {
+.maq-template-listing-card__favorite,
+.maq-template-listing-card__visibility {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -157,6 +161,7 @@
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.45);
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .maq-template-listing-card__favorite:hover {
@@ -172,6 +177,29 @@
 .maq-template-listing-card__favorite--active:hover {
   background: #ef4444;
   color: #ffffff;
+}
+
+.maq-template-listing-card__visibility:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-primary, #ffffff);
+}
+
+.maq-template-listing-card__visibility--public {
+  color: rgba(66, 243, 125, 0.85);
+}
+
+.maq-template-listing-card__visibility--public:hover {
+  background: rgba(66, 243, 125, 0.15);
+  color: #42f37d;
+}
+
+.maq-template-listing-card__visibility--private {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.maq-template-listing-card__visibility--private:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-primary, #ffffff);
 }
 
 .maq-template-listing-card__subject {

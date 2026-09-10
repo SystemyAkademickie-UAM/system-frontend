@@ -272,8 +272,8 @@ const appRouteTree = [
                     path: 'profile',
                     element: withGuard(<ProfileLayout />, { allowedRoles: STUDENT_ONLY }),
                     children: [
-                      { index: true, element: <ProfileHomePage /> },
-                      { path: 'activity', element: <ProfileLogPage /> },
+                      { index: true, element: <ProfileLogPage /> },
+                      { path: 'activity', element: <ProfileHomePage /> },
                       { path: 'eq', element: <ProfileEqPage /> },
                       { path: 'purchases', element: <ProfilePurchasesPage /> },
                     ],

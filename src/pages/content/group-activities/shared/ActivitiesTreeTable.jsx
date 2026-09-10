@@ -167,11 +167,26 @@ function StageIsland({
                   </tr>
                 </thead>
                 <tbody>
-                  {stage.activities.map((activity) => (
-                    <tr key={`activity-${stage.id}-${activity.id}`} className="activities-island__row">
-                      <td className="activities-island__cell activities-island__cell--name">
-                        <span className="activities-island__activity-name">{activity.name}</span>
-                      </td>
+                  {stage.activities.map((activity) => {
+                    const isActivityHidden = activity.visibilityStatus === 0 || activity.isPublished === false;
+                    return (
+                      <tr
+                        key={`activity-${stage.id}-${activity.id}`}
+                        className={[
+                          'activities-island__row',
+                          isActivityHidden ? 'activities-island__row--hidden' : '',
+                        ].filter(Boolean).join(' ')}
+                      >
+                        <td className="activities-island__cell activities-island__cell--name">
+                          <span className="activities-island__activity-name">
+                            {activity.name}
+                            {isActivityHidden ? (
+                              <span className="activities-island__activity-badge activities-island__activity-badge--hidden">
+                                {HIDDENBADGE__TEXTLABEL[LANGUAGE]}
+                              </span>
+                            ) : null}
+                          </span>
+                        </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--truncate">
                         <span className="activities-island__cell-text" title={activity.description0}>
                           <em>{activity.description0 || '—'}</em>
@@ -197,7 +212,8 @@ function StageIsland({
                         />
                       </td>
                     </tr>
-                  ))}
+                  );
+                })}
                 </tbody>
               </table>
             </div>

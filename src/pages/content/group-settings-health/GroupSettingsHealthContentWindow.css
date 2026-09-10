@@ -211,11 +211,18 @@
 
 /* --- Kolumna Operacje per rekord --- */
 .lives-manage-table__actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.lives-manage-table__controls {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  position: relative;
 }
 
 /* Przyciski SVG (+ i -) bez tła kółka */
@@ -240,13 +247,19 @@
   color: #22c55e;
 }
 
-.lives-manage-svg-btn:hover {
+.lives-manage-svg-btn:hover:not(:disabled) {
   transform: scale(1.2);
   opacity: 0.9;
 }
 
-.lives-manage-svg-btn:active {
+.lives-manage-svg-btn:active:not(:disabled) {
   transform: scale(1.05);
+}
+
+.lives-manage-svg-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .lives-manage-svg-icon {
@@ -327,8 +340,11 @@
 
 /* Tekst zmiany liczby żyć (delta) bez kółka */
 .lives-manage-delta-text {
-  display: inline-block;
-  min-width: 32px;
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 28px;
   text-align: right;
   font-family: var(--font-family-app);
   font-size: 14px;
@@ -377,16 +393,11 @@
   align-items: center;
 }
 
-.lives-manage-footer-divider {
-  width: 1px;
-  height: 28px;
-  background: var(--color-divider, rgba(255, 255, 255, 0.15));
-}
-
 .lives-manage-footer-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
+  margin-left: auto;
   flex-wrap: wrap;
 }
 
@@ -437,8 +448,5 @@
   .lives-manage-table__actions {
     grid-column: span 2;
     justify-content: flex-end;
-  }
-  .lives-manage-footer-divider {
-    display: none;
   }
 }

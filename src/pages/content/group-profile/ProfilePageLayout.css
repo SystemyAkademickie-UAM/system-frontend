@@ -81,9 +81,9 @@
 
 .profile-page-layout__stats-column {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.85rem 1.5rem;
-  align-content: start;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.15rem 1.75rem;
+  align-content: center;
 }
 
 .profile-page-layout__stat-line {
@@ -157,6 +157,13 @@
   }
 }
 
+@media (max-width: 1100px) {
+  .profile-page-layout__stats-column {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+  }
+}
+
 @media (max-width: 768px) {
   .profile-page-layout__summary {
     grid-template-columns: 1fr;
@@ -166,6 +173,13 @@
     display: none;
   }
 
+  .profile-page-layout__stats-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
   .profile-page-layout__stats-column {
     grid-template-columns: 1fr;
   }

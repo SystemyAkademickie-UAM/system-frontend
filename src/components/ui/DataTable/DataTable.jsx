@@ -99,6 +99,8 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange, collapseInline
     menuItems = [],
   } = rowActions ?? {};
 
+  const resolveValue = (field) => (typeof field === 'function' ? field(row) : field);
+
   const { visibleInlineActions, mergedMenuItems } = useMemo(() => {
     const deleteItem = onDelete && (canDelete == null || canDelete(row))
       ? {
@@ -170,32 +172,39 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange, collapseInline
 
   return (
     <div className="data-table__actions">
-      {visibleInlineActions.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          className={[
-            'data-table__action-btn',
-            'data-table__action-btn--inline',
-            item.className,
-          ].filter(Boolean).join(' ')}
-          aria-label={item.ariaLabel ?? item.label}
-          title={item.label}
-          onClick={() => item.onSelect?.(row)}
-        >
-          {item.iconFile ? (
-            <AssetSvg
-              name={item.iconFile}
-              className={item.iconClassName}
-              width={item.iconSize ?? INLINE_ACTION_ICON_SIZE}
-              height={item.iconSize ?? INLINE_ACTION_ICON_SIZE}
-              alt=""
-            />
-          ) : (
-            <span className="data-table__action-btn-text">{item.label}</span>
-          )}
-        </button>
-      ))}
+      {visibleInlineActions.map((item) => {
+        const itemLabel = resolveValue(item.label);
+        const itemAriaLabel = resolveValue(item.ariaLabel) ?? itemLabel;
+        const itemIcon = resolveValue(item.iconFile);
+        const itemClass = resolveValue(item.className);
+
+        return (
+          <button
+            key={item.id}
+            type="button"
+            className={[
+              'data-table__action-btn',
+              'data-table__action-btn--inline',
+              itemClass,
+            ].filter(Boolean).join(' ')}
+            aria-label={itemAriaLabel}
+            title={itemLabel}
+            onClick={() => item.onSelect?.(row)}
+          >
+            {itemIcon ? (
+              <AssetSvg
+                name={itemIcon}
+                className={item.iconClassName}
+                width={item.iconSize ?? INLINE_ACTION_ICON_SIZE}
+                height={item.iconSize ?? INLINE_ACTION_ICON_SIZE}
+                alt=""
+              />
+            ) : (
+              <span className="data-table__action-btn-text">{itemLabel}</span>
+            )}
+          </button>
+        );
+      })}
       {mergedMenuItems.length > 0 ? (
         <div className="data-table__menu-wrap">
           <button
@@ -231,28 +240,33 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange, collapseInline
                     top: menuLayout ? `${menuLayout.top}px` : 0,
                   }}
                 >
-                  {mergedMenuItems.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className={[
-                        'data-table__menu-item',
-                        item.destructive ? 'data-table__menu-item--destructive' : '',
-                      ].filter(Boolean).join(' ')}
-                      role="menuitem"
-                      aria-label={item.destructive ? deleteAriaLabel?.(row) ?? item.label : undefined}
-                      onClick={() => handleAction(item)}
-                    >
-                      <span className="data-table__menu-item-content">
-                        <span className="data-table__menu-item-label">{item.label}</span>
-                        {item.description ? (
-                          <span className="data-table__menu-item-description">
-                            {item.description}
-                          </span>
-                        ) : null}
-                      </span>
-                    </button>
-                  ))}
+                  {mergedMenuItems.map((item) => {
+                    const itemLabel = resolveValue(item.label);
+                    const itemDesc = resolveValue(item.description);
+
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className={[
+                          'data-table__menu-item',
+                          item.destructive ? 'data-table__menu-item--destructive' : '',
+                        ].filter(Boolean).join(' ')}
+                        role="menuitem"
+                        aria-label={item.destructive ? deleteAriaLabel?.(row) ?? itemLabel : undefined}
+                        onClick={() => handleAction(item)}
+                      >
+                        <span className="data-table__menu-item-content">
+                          <span className="data-table__menu-item-label">{itemLabel}</span>
+                          {itemDesc ? (
+                            <span className="data-table__menu-item-description">
+                              {itemDesc}
+                            </span>
+                          ) : null}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </>,
               document.body,
@@ -264,7 +278,9 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange, collapseInline
   );
 }
 
-function DefaultDataTableRow({ row, columns, rowActions, rowActionsPosition = 'end' }) {
+function DefaultDataTableRow({ row, columns, rowActions, rowActionsPosition = 'end', rowColor }) {
+  const resolvedColor = rowColor ?? row.rowColor ?? row.color ?? null;
+  const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
   const actionsCell = rowActions ? (
     <td className="data-table__cell data-table__cell--actions">
       <DataTableRowActions row={row} rowActions={rowActions} />
@@ -272,7 +288,13 @@ function DefaultDataTableRow({ row, columns, rowActions, rowActionsPosition = 'e
   ) : null;
 
   return (
-    <tr className="data-table__row">
+    <tr
+      className={[
+        'data-table__row',
+        resolvedColor ? 'data-table__row--colored' : '',
+      ].filter(Boolean).join(' ')}
+      style={colorStyle}
+    >
       {rowActionsPosition === 'start' ? actionsCell : null}
       {columns.map((column) => (
         <td
@@ -313,6 +335,7 @@ export default function DataTable({
   renderMobileRow,
   getMobileItemClassName,
   shouldRenderRowActions,
+  getRowColor,
 }) {
   const [page, setPage] = useState(1);
   const [internalSearch, setInternalSearch] = useState('');
@@ -595,6 +618,7 @@ export default function DataTable({
                     rowActions={rowActions}
                     rowActionsPosition={rowActionsPosition}
                     getRowKey={getRowKey}
+                    rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
                   />
                 ))}
               </tbody>
@@ -610,6 +634,7 @@ export default function DataTable({
                 columns={columns}
                 renderActions={renderMobileActions}
                 className={getMobileItemClassName?.(row) ?? ''}
+                rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
               />
             ))}
           </ul>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Modal, TextField } from '../../../../components/ui/index.js';
+import { Button, Divider, Modal, TextField } from '../../../../components/ui/index.js';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import { DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { validateWholeNumberInput, sanitizeWholeNumberInput, validateDiscountPercentInput } from '../../../../utils/validation/rewardsNumericValidation.js';
@@ -161,52 +161,60 @@ export default function RankFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        <div className="rewards-modal__row rewards-modal__row--name-reward">
-          <TextField
-            id="rank-name"
-            label={NAMELABEL__TEXTLABEL[LANGUAGE]}
-            fieldKind="name"
-            value={form.name}
-            onChange={handleChange('name')}
-            className="rewards-modal__field"
-            inputClassName="rewards-modal__input"
-          />
-
-          <div className="rewards-modal__field">
-            <RewardsCurrencyLabel htmlFor="rank-cost">{COSTLABEL__TEXTLABEL[LANGUAGE]}</RewardsCurrencyLabel>
-            <input
-              id="rank-cost"
-              type="text"
-              inputMode="numeric"
-              className={[
-                'rewards-modal__input',
-                showCostError ? 'rewards-modal__input--error' : '',
-              ].filter(Boolean).join(' ')}
-              value={form.costAmount}
-              onChange={handleChange('costAmount')}
-              placeholder={COSTPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-              aria-invalid={showCostError}
-              aria-describedby={showCostError ? 'rank-cost-error' : undefined}
+        {/* Sekcja 1: Podstawowe informacje */}
+        <div className="rewards-modal__grid-main">
+          <div className="rewards-modal__icon-box">
+            <EmojiPickerField
+              className="rewards-modal__field rewards-modal__field--icon"
+              label={ICONLABEL__TEXTLABEL[LANGUAGE]}
+              value={form.icon}
+              defaultEmoji={DEFAULT_RANK_EMOJI}
+              onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
+              ariaLabel={ICONARIA__TEXTLABEL[LANGUAGE]}
             />
-            {showCostError ? (
-              <p id="rank-cost-error" className="rewards-modal__field-error" role="alert">
-                {costValidation.error}
-              </p>
-            ) : null}
+          </div>
+
+          <div className="rewards-modal__fields-stack">
+            <div className="rewards-modal__row rewards-modal__row--name-reward">
+              <TextField
+                id="rank-name"
+                label={NAMELABEL__TEXTLABEL[LANGUAGE]}
+                fieldKind="name"
+                value={form.name}
+                onChange={handleChange('name')}
+                className="rewards-modal__field"
+                inputClassName="rewards-modal__input"
+              />
+
+              <div className="rewards-modal__field">
+                <RewardsCurrencyLabel htmlFor="rank-cost">{COSTLABEL__TEXTLABEL[LANGUAGE]}</RewardsCurrencyLabel>
+                <input
+                  id="rank-cost"
+                  type="text"
+                  inputMode="numeric"
+                  className={[
+                    'rewards-modal__input',
+                    showCostError ? 'rewards-modal__input--error' : '',
+                  ].filter(Boolean).join(' ')}
+                  value={form.costAmount}
+                  onChange={handleChange('costAmount')}
+                  placeholder={COSTPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                  aria-invalid={showCostError}
+                  aria-describedby={showCostError ? 'rank-cost-error' : undefined}
+                />
+                {showCostError ? (
+                  <p id="rank-cost-error" className="rewards-modal__field-error" role="alert">
+                    {costValidation.error}
+                  </p>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="rewards-modal__row rewards-modal__row--icon-only">
-          <EmojiPickerField
-            className="rewards-modal__field rewards-modal__field--icon"
-            label={ICONLABEL__TEXTLABEL[LANGUAGE]}
-            value={form.icon}
-            defaultEmoji={DEFAULT_RANK_EMOJI}
-            onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
-            ariaLabel={ICONARIA__TEXTLABEL[LANGUAGE]}
-          />
-        </div>
+        <Divider className="rewards-modal__divider" />
 
+        {/* Sekcja 2: Status fabularny */}
         <TextField
           id="rank-story"
           label={STORYLABEL__TEXTLABEL[LANGUAGE]}
@@ -217,62 +225,69 @@ export default function RankFormModal({
           inputClassName="rewards-modal__textarea"
         />
 
+        {/* Sekcja 3: Sklep / Zniżki */}
         {!isEdit && (
-          <div className="rewards-modal__field">
-            <label htmlFor="rank-discount" className="rewards-modal__label">
-              {DISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
-            </label>
-            <input
-              id="rank-discount"
-              type="text"
-              inputMode="decimal"
-              className={[
-                'rewards-modal__input',
-                showDiscountError ? 'rewards-modal__input--error' : '',
-              ].filter(Boolean).join(' ')}
-              value={form.discount}
-              onChange={handleChange('discount')}
-              placeholder='0'
-              aria-invalid={showDiscountError}
-              aria-describedby={showDiscountError ? 'rank-discount-error' : 'rank-discount-hint'}
-            />
-            <p id="rank-discount-hint" className="rewards-modal__field-hint">
-              {DISCOUNTHINT__TEXTLABEL[LANGUAGE]}
-            </p>
-            {showDiscountError ? (
-              <p id="rank-discount-error" className="rewards-modal__field-error" role="alert">
-                {discountValidation.error}
+          <>
+            <Divider className="rewards-modal__divider" />
+            <div className="rewards-modal__field">
+              <label htmlFor="rank-discount" className="rewards-modal__label">
+                {DISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
+              </label>
+              <input
+                id="rank-discount"
+                type="text"
+                inputMode="decimal"
+                className={[
+                  'rewards-modal__input',
+                  showDiscountError ? 'rewards-modal__input--error' : '',
+                ].filter(Boolean).join(' ')}
+                value={form.discount}
+                onChange={handleChange('discount')}
+                placeholder='0'
+                aria-invalid={showDiscountError}
+                aria-describedby={showDiscountError ? 'rank-discount-error' : 'rank-discount-hint'}
+              />
+              <p id="rank-discount-hint" className="rewards-modal__field-hint">
+                {DISCOUNTHINT__TEXTLABEL[LANGUAGE]}
               </p>
-            ) : null}
-          </div>
+              {showDiscountError ? (
+                <p id="rank-discount-error" className="rewards-modal__field-error" role="alert">
+                  {discountValidation.error}
+                </p>
+              ) : null}
+            </div>
+          </>
         )}
 
         {isEdit && (onOpenDiscountModal || onOpenUnlockItemsModal) ? (
-          <div className="rewards-modal__field rewards-modal__field--inline-actions">
-            <span className="rewards-modal__label">{EXTRASETTINGS__TEXTLABEL[LANGUAGE]}</span>
-            <div className="rewards-modal__inline-actions">
-              {onOpenDiscountModal ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => onOpenDiscountModal(rank)}
-                >
-                  {DISCOUNTBTN__TEXTLABEL[LANGUAGE]}
-                </Button>
-              ) : null}
-              {onOpenUnlockItemsModal ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => onOpenUnlockItemsModal(rank)}
-                >
-                  {UNLOCKBTN__TEXTLABEL[LANGUAGE]}
-                </Button>
-              ) : null}
+          <>
+            <Divider className="rewards-modal__divider" />
+            <div className="rewards-modal__field rewards-modal__field--inline-actions">
+              <span className="rewards-modal__label">{EXTRASETTINGS__TEXTLABEL[LANGUAGE]}</span>
+              <div className="rewards-modal__inline-actions">
+                {onOpenDiscountModal ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => onOpenDiscountModal(rank)}
+                  >
+                    {DISCOUNTBTN__TEXTLABEL[LANGUAGE]}
+                  </Button>
+                ) : null}
+                {onOpenUnlockItemsModal ? (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => onOpenUnlockItemsModal(rank)}
+                  >
+                    {UNLOCKBTN__TEXTLABEL[LANGUAGE]}
+                  </Button>
+                ) : null}
+              </div>
             </div>
-          </div>
+          </>
         ) : null}
       </div>
     </Modal>

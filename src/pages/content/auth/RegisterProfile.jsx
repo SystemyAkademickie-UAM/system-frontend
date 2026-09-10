@@ -63,6 +63,7 @@ export default function RegisterProfile({
   onBack,
   initialNickname = '',
   initialShowNickname = true,
+  showNicknameToggle = true,
   errorMessage = null,
   isBootstrapping = false,
 }) {
@@ -102,75 +103,78 @@ export default function RegisterProfile({
 
   return (
     <div className="auth-card auth-card--wizard-panel auth-card--left-aligned register-profile">
-      <div className="auth-card__header">
-        <button
-          type="button"
-          className="auth-card__back-button"
-          onClick={handleBack}
-          aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
-          disabled={isBootstrapping}
-        >
-          <BackIcon className="auth-card__back-icon" />
-        </button>
+      <button
+        type="button"
+        className="auth-card__back-link"
+        onClick={handleBack}
+        aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
+        disabled={isBootstrapping}
+      >
+        <BackIcon className="auth-card__back-icon" />
+        <span>{BACK_ARIALABEL__TEXTLABEL[LANGUAGE].toLowerCase()}</span>
+      </button>
 
-        <h1 className="auth-card__title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
-      </div>
+      <h1 className="auth-card__title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
 
       {errorMessage ? (
         <p className="login-institution__error" role="alert">{errorMessage}</p>
       ) : null}
 
-      <div className="register-profile__field-group">
-        <label className="register-profile__label">
-          {NICKNAME_SECTION_LABEL[LANGUAGE]}
-        </label>
-        <div className="auth-card__input-wrapper">
-          <CharacterLimitedField value={nickname} maxLength={PROFILE_NICKNAME_MAX_LENGTH}>
-            <div className="auth-card__input-container register-profile__input-container">
-              <input
-                type="text"
-                className="auth-card__input"
-                placeholder={NICKNAME_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && isValid) {
-                    event.preventDefault();
-                    handleContinue();
-                  }
-                }}
-                maxLength={PROFILE_NICKNAME_MAX_LENGTH}
-                autoComplete="nickname"
-                disabled={isBootstrapping}
-              />
-            </div>
-          </CharacterLimitedField>
+      <div className="register-profile__body">
+        <div className="register-profile__field-group">
+          <label className="register-profile__label">
+            {NICKNAME_SECTION_LABEL[LANGUAGE]}
+          </label>
+          <div className="auth-card__input-wrapper">
+            <CharacterLimitedField value={nickname} maxLength={PROFILE_NICKNAME_MAX_LENGTH}>
+              <div className="auth-card__input-container register-profile__input-container">
+                <input
+                  type="text"
+                  className="auth-card__input"
+                  placeholder={NICKNAME_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && isValid) {
+                      event.preventDefault();
+                      handleContinue();
+                    }
+                  }}
+                  maxLength={PROFILE_NICKNAME_MAX_LENGTH}
+                  autoComplete="nickname"
+                  disabled={isBootstrapping}
+                />
+              </div>
+            </CharacterLimitedField>
+          </div>
         </div>
-      </div>
 
-      <div className="register-profile__checkbox-section">
-        <label className="register-profile__checkbox-item">
-          <span className="register-profile__checkbox-wrapper">
-            <input
-              type="checkbox"
-              className="register-profile__checkbox-input"
-              checked={showNickname}
-              onChange={(e) => setShowNickname(e.target.checked)}
-              disabled={isBootstrapping}
-            />
-            <span className="register-profile__checkbox-custom">
-              {showNickname && <CheckIcon className="register-profile__check-icon" />}
-            </span>
-          </span>
-          <span className="register-profile__checkbox-text-wrap">
-            <span className="register-profile__checkbox-title">
-              {SHOW_NICKNAME_LABEL[LANGUAGE]}
-            </span>
-            <span className="register-profile__checkbox-hint">
-              {SHOW_NICKNAME_DESCRIPTION[LANGUAGE]}
-            </span>
-          </span>
-        </label>
+        {showNicknameToggle ? (
+          <div className="register-profile__checkbox-section">
+            <label className="register-profile__checkbox-item">
+              <span className="register-profile__checkbox-wrapper">
+                <input
+                  type="checkbox"
+                  className="register-profile__checkbox-input"
+                  checked={showNickname}
+                  onChange={(e) => setShowNickname(e.target.checked)}
+                  disabled={isBootstrapping}
+                />
+                <span className="register-profile__checkbox-custom">
+                  {showNickname && <CheckIcon className="register-profile__check-icon" />}
+                </span>
+              </span>
+              <span className="register-profile__checkbox-text-wrap">
+                <span className="register-profile__checkbox-title">
+                  {SHOW_NICKNAME_LABEL[LANGUAGE]}
+                </span>
+                <span className="register-profile__checkbox-hint">
+                  {SHOW_NICKNAME_DESCRIPTION[LANGUAGE]}
+                </span>
+              </span>
+            </label>
+          </div>
+        ) : null}
       </div>
 
       <button

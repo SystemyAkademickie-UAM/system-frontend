@@ -18,6 +18,19 @@ const SECTIONAVAILABILITY__TEXTLABEL = {
   english: 'Availability'
 };
 
+function PencilIcon({ className = '' }) {
+  return (
+    <svg className={className} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+    </svg>
+  );
+}
+
+const EDIT_SECTION_TOOLTIP__TEXTLABEL = {
+  polish: 'Edytuj tę sekcję',
+  english: 'Edit this section'
+};
+
 /**
  * Krok 4/4 kreatora przedmiotu: Podsumowanie wszystkich sekcji i parametrów.
  */
@@ -39,6 +52,8 @@ export default function ShopItemStepSummary({
   groupLimit,
   studentLimitEnabled,
   studentLimit,
+  isEditing = false,
+  onJumpToStep,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
@@ -55,7 +70,21 @@ export default function ShopItemStepSummary({
     <div className="shop-item-step shop-item-step--summary">
       {/* Sekcja 1: Informacje */}
       <div className="shop-item-summary__section">
-        <h4 className="shop-item-summary__section-title">{SECTIONINFO__TEXTLABEL[LANGUAGE]}</h4>
+        <div className="shop-item-summary__section-header">
+          <h4 className="shop-item-summary__section-title">{SECTIONINFO__TEXTLABEL[LANGUAGE]}</h4>
+          {isEditing && onJumpToStep ? (
+            <button
+              type="button"
+              className="shop-item-summary__edit-btn"
+              onClick={() => onJumpToStep(1)}
+              title={EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}
+              aria-label={`${EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}: ${SECTIONINFO__TEXTLABEL[LANGUAGE]}`}
+            >
+              <PencilIcon className="shop-item-summary__edit-icon" />
+              <span>Edytuj</span>
+            </button>
+          ) : null}
+        </div>
         
         <div className="shop-item-summary__info-grid">
           <div className="shop-item-summary__icon-badge" aria-hidden="true">
@@ -110,7 +139,21 @@ export default function ShopItemStepSummary({
 
       {/* Sekcja 2: Wartość przedmiotu */}
       <div className="shop-item-summary__section">
-        <h4 className="shop-item-summary__section-title">{SECTIONPRICING__TEXTLABEL[LANGUAGE]}</h4>
+        <div className="shop-item-summary__section-header">
+          <h4 className="shop-item-summary__section-title">{SECTIONPRICING__TEXTLABEL[LANGUAGE]}</h4>
+          {isEditing && onJumpToStep ? (
+            <button
+              type="button"
+              className="shop-item-summary__edit-btn"
+              onClick={() => onJumpToStep(2)}
+              title={EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}
+              aria-label={`${EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}: ${SECTIONPRICING__TEXTLABEL[LANGUAGE]}`}
+            >
+              <PencilIcon className="shop-item-summary__edit-icon" />
+              <span>Edytuj</span>
+            </button>
+          ) : null}
+        </div>
 
         <div className="shop-item-summary__key-value-list">
           <div className="shop-item-summary__row">
@@ -157,7 +200,21 @@ export default function ShopItemStepSummary({
 
       {/* Sekcja 3: Dostępność */}
       <div className="shop-item-summary__section">
-        <h4 className="shop-item-summary__section-title">{SECTIONAVAILABILITY__TEXTLABEL[LANGUAGE]}</h4>
+        <div className="shop-item-summary__section-header">
+          <h4 className="shop-item-summary__section-title">{SECTIONAVAILABILITY__TEXTLABEL[LANGUAGE]}</h4>
+          {isEditing && onJumpToStep ? (
+            <button
+              type="button"
+              className="shop-item-summary__edit-btn"
+              onClick={() => onJumpToStep(3)}
+              title={EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}
+              aria-label={`${EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}: ${SECTIONAVAILABILITY__TEXTLABEL[LANGUAGE]}`}
+            >
+              <PencilIcon className="shop-item-summary__edit-icon" />
+              <span>Edytuj</span>
+            </button>
+          ) : null}
+        </div>
 
         <div className="shop-item-summary__key-value-list">
           <div className="shop-item-summary__row">

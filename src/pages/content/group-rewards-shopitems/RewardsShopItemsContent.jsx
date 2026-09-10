@@ -14,7 +14,12 @@ import {
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
-import { buildShopCategoryFilters, resolveShopCategoryLabels } from '../../../utils/shop/shopCategories.js';
+import {
+  buildShopCategoryFilters,
+  getMixedShopCategoryColor,
+  resolveShopCategoryDetails,
+  resolveShopCategoryLabels,
+} from '../../../utils/shop/shopCategories.js';
 import ShopDeleteModal from '../group-shop/modals/ShopDeleteModal.jsx';
 import ShopItemFormModal from '../group-shop/modals/ShopItemFormModal.jsx';
 import ShopAccessModal from '../group-shop/modals/ShopAccessModal.jsx';
@@ -222,13 +227,17 @@ function formatLimitValue(value, language) {
  * @param {string} language
  */
 function mapShopItemToRow(item, index, categoriesById, language) {
+  const categoryDetails = resolveShopCategoryDetails(item.categories, categoriesById);
   const categoryLabels = resolveShopCategoryLabels(item.categories, categoriesById);
+  const categoryColor = getMixedShopCategoryColor(categoryDetails);
   return {
     ...item,
     position: index + 1,
     categoryLabel: categoryLabels.join(', ') || '—',
     stockLabel: formatLimitValue(item.stockQuantity, language),
     studentLimitLabel: formatLimitValue(item.perStudentLimit, language),
+    categoryColor,
+    rowColor: categoryColor,
   };
 }
 
@@ -682,6 +691,7 @@ export default function RewardsShopItemsContent() {
           itemsPerPage={10}
           paginationAriaLabel={PAGINATIONARIALABEL__TEXTLABEL[LANGUAGE]}
           className="rewards-table rewards-table--shop-items"
+          getRowColor={(item) => item.rowColor ?? item.categoryColor ?? null}
           search={{
             external: true,
             value: searchQuery,

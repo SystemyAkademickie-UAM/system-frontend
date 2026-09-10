@@ -169,6 +169,28 @@
   background: rgba(66, 243, 125, 0.04);
 }
 
+.data-table__row--colored {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--row-color) 14%, transparent) 0%,
+    color-mix(in srgb, var(--row-color) 5%, transparent) 45%,
+    color-mix(in srgb, var(--row-color) 1%, transparent) 100%
+  );
+}
+
+.data-table__row--colored:hover {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--row-color) 22%, transparent) 0%,
+    color-mix(in srgb, var(--row-color) 9%, transparent) 45%,
+    color-mix(in srgb, var(--row-color) 3%, transparent) 100%
+  );
+}
+
+.data-table__row--colored > .data-table__cell:first-child {
+  box-shadow: inset 3px 0 0 var(--row-color);
+}
+
 .data-table__row:not(:last-child) .data-table__cell {
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
@@ -411,6 +433,26 @@
 .data-table-mobile__item:active,
 .data-table-mobile__item:focus-within {
   background: rgba(66, 243, 125, 0.04);
+}
+
+.data-table-mobile__item--colored {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--row-color) 14%, transparent) 0%,
+    color-mix(in srgb, var(--row-color) 5%, transparent) 60%,
+    color-mix(in srgb, var(--row-color) 1%, transparent) 100%
+  );
+  border-left: 3px solid var(--row-color);
+}
+
+.data-table-mobile__item--colored:active,
+.data-table-mobile__item--colored:focus-within {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--row-color) 22%, transparent) 0%,
+    color-mix(in srgb, var(--row-color) 9%, transparent) 60%,
+    color-mix(in srgb, var(--row-color) 3%, transparent) 100%
+  );
 }
 
 .data-table-mobile__body {
