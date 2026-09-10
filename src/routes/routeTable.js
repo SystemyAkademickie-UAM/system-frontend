@@ -114,6 +114,15 @@ export const ROUTE_TABLE = [
     contentModule: 'pages/content/organization-management/OrganizationManagementContent.jsx',
     roles: ['superadmin'],
   },
+  {
+    id: 'app.system-logs',
+    section: 'app',
+    pathPattern: '/system-logs',
+    pageTitle: 'Logi produkcyjne',
+    pageModule: 'pages/links/app/SuperadminLogsPage.jsx',
+    contentModule: 'pages/content/superadmin-logs/SuperadminLogsContent.jsx',
+    roles: ['superadmin'],
+  },
 
   // ===========================================================================
   // GROUP — Korzeń (/groups/:groupId)

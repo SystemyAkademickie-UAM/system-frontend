@@ -336,6 +336,7 @@ export default function DataTable({
   getMobileItemClassName,
   shouldRenderRowActions,
   getRowColor,
+  onRowDoubleClick,
 }) {
   const [page, setPage] = useState(1);
   const [internalSearch, setInternalSearch] = useState('');
@@ -619,6 +620,7 @@ export default function DataTable({
                     rowActionsPosition={rowActionsPosition}
                     getRowKey={getRowKey}
                     rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
+                    onRowDoubleClick={onRowDoubleClick}
                   />
                 ))}
               </tbody>

@@ -15,6 +15,7 @@ import DevApiTestPage from '../pages/links/dev/DevApiTestPage.jsx';
 import CourseManagementPage from '../pages/links/app/CourseManagementPage.jsx';
 import HelpPage from '../pages/links/app/HelpPage.jsx';
 import OrganizationManagementPage from '../pages/links/app/OrganizationManagementPage.jsx';
+import SuperadminLogsPage from '../pages/links/app/SuperadminLogsPage.jsx';
 import SettingsPage from '../pages/links/app/SettingsPage.jsx';
 import StatisticsPage from '../pages/links/app/StatisticsPage.jsx';
 import UserManagementPage from '../pages/links/app/UserManagementPage.jsx';
@@ -150,6 +151,7 @@ const appRouteTree = [
           { path: 'courseManagement', element: withGuard(<CourseManagementPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
           { path: 'statistics', element: withGuard(<StatisticsPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
           { path: 'organizations', element: withGuard(<OrganizationManagementPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
+          { path: 'system-logs', element: withGuard(<SuperadminLogsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
 
           {
             path: 'templates',

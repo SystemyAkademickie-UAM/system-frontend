@@ -612,7 +612,7 @@ export default function GroupMainActivities() {
 
 
 
-        {isstudent === 1 ? (
+        {isstudent === 1 && totalactivities > 10 ? (
           <Button
             type="button"
             variant="primary"
@@ -623,47 +623,47 @@ export default function GroupMainActivities() {
             {whichfirst === 0 ? SORTCOMPLETED__TEXTLABEL[LANGUAGE] : SORTINCOMPLETE__TEXTLABEL[LANGUAGE]}
           </Button>
         ) : null}
-
-        <div className="group-main-activities__pagination">
-          <button
-            type="button"
-            className="group-main-activities__page-btn"
-            onClick={atfirststage === 0 ? firststage : undefined}
-            disabled={atfirststage !== 0}
-            aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
-          >
-            <img src={leftlefticon} alt="" />
-          </button>
-          <button
-            type="button"
-            className="group-main-activities__page-btn"
-            onClick={atfirststage === 0 ? previousstage : undefined}
-            disabled={atfirststage !== 0}
-            aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
-          >
-            <img src={lefticon} alt="" />
-          </button>
-          <span className="group-main-activities__page-number">{currentpagenumber}</span>
-          <button
-            type="button"
-            className="group-main-activities__page-btn"
-            onClick={atlaststage === 0 ? nextstage : undefined}
-            disabled={atlaststage !== 0}
-            aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
-          >
-            <img src={righticon} alt="" />
-          </button>
-          <button
-            type="button"
-            className="group-main-activities__page-btn"
-            onClick={atlaststage === 0 ? laststage : undefined}
-            disabled={atlaststage !== 0}
-            aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
-          >
-            <img src={rightrighticon} alt="" />
-          </button>
-        </div>
-
+        {isstudent === 1 && totalactivities > 5 ? (
+          <div className="group-main-activities__pagination">
+            <button
+              type="button"
+              className="group-main-activities__page-btn"
+              onClick={atfirststage === 0 ? firststage : undefined}
+              disabled={atfirststage !== 0}
+              aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+            >
+              <img src={leftlefticon} alt="" />
+            </button>
+            <button
+              type="button"
+              className="group-main-activities__page-btn"
+              onClick={atfirststage === 0 ? previousstage : undefined}
+              disabled={atfirststage !== 0}
+              aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+            >
+              <img src={lefticon} alt="" />
+            </button>
+            <span className="group-main-activities__page-number">{currentpagenumber}</span>
+            <button
+              type="button"
+              className="group-main-activities__page-btn"
+              onClick={atlaststage === 0 ? nextstage : undefined}
+              disabled={atlaststage !== 0}
+              aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+            >
+              <img src={righticon} alt="" />
+            </button>
+            <button
+              type="button"
+              className="group-main-activities__page-btn"
+              onClick={atlaststage === 0 ? laststage : undefined}
+              disabled={atlaststage !== 0}
+              aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+            >
+              <img src={rightrighticon} alt="" />
+            </button>
+          </div>
+        ) : null}
 
 
         <header className="group-main-activities__stage-header">

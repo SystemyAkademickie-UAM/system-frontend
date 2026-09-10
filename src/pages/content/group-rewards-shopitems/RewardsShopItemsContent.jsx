@@ -33,9 +33,11 @@ import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategori
 import {
   SHOP_SORT,
   getShopSortOptions,
+  sortShopItems,
 } from '../../../utils/shop/shopModel.js';
 import { getVisibilityStatusLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
-import { filterCatalogShopItems } from '../../../utils/shop/extraLifeItem.js';
+import { filterCatalogShopItems, resolveExtraLifeItemIcon, sortShopItemsWithExtraLifeFirst } from '../../../utils/shop/extraLifeItem.js';
+import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
 import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import RewardsShopItemTableRow from '../group-rewards/shared/RewardsShopItemTableRow.jsx';
 import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
@@ -225,8 +227,9 @@ function formatLimitValue(value, language) {
  * @param {number} index
  * @param {Map<string, any>} categoriesById
  * @param {string} language
+ * @param {string} [livesSymbol]
  */
-function mapShopItemToRow(item, index, categoriesById, language) {
+function mapShopItemToRow(item, index, categoriesById, language, livesSymbol) {
   const categoryDetails = resolveShopCategoryDetails(item.categories, categoriesById);
   const categoryLabels = resolveShopCategoryLabels(item.categories, categoriesById);
   const categoryColor = getMixedShopCategoryColor(categoryDetails);
@@ -235,6 +238,7 @@ function mapShopItemToRow(item, index, categoriesById, language) {
     position: index + 1,
     categoryLabel: categoryLabels.join(', ') || '—',
     stockLabel: formatLimitValue(item.stockQuantity, language),
+    livesSymbol: livesSymbol,
     studentLimitLabel: formatLimitValue(item.perStudentLimit, language),
     categoryColor,
     rowColor: categoryColor,
@@ -299,15 +303,26 @@ function getShopItemColumns(language) {
       label: COLUMNICON__TEXTLABEL[language],
       sort: 'text',
       width: '80px',
-      render: (item) => (
-        item.imageRef ? (
-          <span className="rewards-table__icon-emoji" aria-hidden="true">
-            {String(item.imageRef).split('*')[0]}
-          </span>
-        ) : (
+      render: (item) => {
+        if (item.isExtraLife) {
+          const { emoji } = resolveExtraLifeItemIcon(item.livesSymbol);
+          return (
+            <span className="rewards-table__icon-emoji" aria-hidden="true">
+              {emoji}
+            </span>
+          );
+        }
+        if (item.imageRef) {
+          return (
+            <span className="rewards-table__icon-emoji" aria-hidden="true">
+              {String(item.imageRef).split('*')[0]}
+            </span>
+          );
+        }
+        return (
           <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
-        )
-      ),
+        );
+      },
     },
     {
       key: 'priceAmount',
@@ -413,17 +428,21 @@ export default function RewardsShopItemsContent() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [sortBy, setSortBy] = useState(SHOP_SORT.nameAsc);
   const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
+  const [value, setValue] = useState(0);
 
   const categoryFilters = useMemo(
     () => buildShopCategoryFilters(categories, LANGUAGE),
     [categories, LANGUAGE],
   );
 
-  const catalogItems = useMemo(
-    () => filterCatalogShopItems(items, showExtraLifeProduct)
-      .map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE)),
-    [items, categoriesById, showExtraLifeProduct, LANGUAGE],
-  );
+  const { symbol: livesSymbol } = useGroupLives();
+
+  const catalogItems = useMemo(() => {
+    const filtered = filterCatalogShopItems(items, showExtraLifeProduct);
+    const sorted = sortShopItems(filtered, sortBy);
+    const withExtraLifeFirst = sortShopItemsWithExtraLifeFirst(sorted);
+    return withExtraLifeFirst.map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE, livesSymbol));
+  }, [items, categoriesById, showExtraLifeProduct, LANGUAGE, livesSymbol, sortBy]);
 
   const columns = useMemo(
     () => getShopItemColumns(LANGUAGE),
@@ -509,10 +528,13 @@ export default function RewardsShopItemsContent() {
       return;
     }
 
-    const result = await deleteItem(activeModal.item.id);
+    var result = await deleteItem(activeModal.item.id);
 
     if (result.ok) {
       showSuccess(DELETESUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
+      setValue(function(currentvalue) {
+        return currentvalue + 1;
+      });
       closeModal();
       return;
     }
@@ -542,11 +564,12 @@ export default function RewardsShopItemsContent() {
           ? TOGGLEALLVISIBLE__TEXTLABEL[LANGUAGE]
           : TOGGLEALLHIDDEN__TEXTLABEL[LANGUAGE],
       );
+      await refetch();
       return;
     }
 
     showError(result.error || TOGGLEALLERRORMESSAGE__TEXTLABEL[LANGUAGE]);
-  }, [bulkVisibilityItems, showError, showSuccess, toggleAllPublished, LANGUAGE]);
+  }, [bulkVisibilityItems, showError, showSuccess, toggleAllPublished, refetch, LANGUAGE]);
 
   const rowActions = useMemo(() => ({
     onDelete: openDeleteModal,
@@ -669,6 +692,7 @@ export default function RewardsShopItemsContent() {
             </CatalogFiltersPanel>
           ) : null}
           <ShopStudentCatalogPanel
+            key={value}
             groupId={groupId}
             showLecturerActions
             onlyPublished={false}
@@ -680,6 +704,7 @@ export default function RewardsShopItemsContent() {
             onSortByChange={setSortBy}
             onEdit={handleEdit}
             onDelete={openDeleteModal}
+            onDoubleClick={handleEdit}
           />
         </>
       ) : (
@@ -706,6 +731,7 @@ export default function RewardsShopItemsContent() {
           }}
           rowActions={rowActions}
           renderRow={RewardsShopItemTableRow}
+          onRowDoubleClick={(item) => openEditModal(item)}
         />
       )}
 

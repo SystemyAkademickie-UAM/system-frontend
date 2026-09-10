@@ -13,6 +13,7 @@ function StageIsland({
   onToggleExpand,
   stageRowActions,
   activityRowActions,
+  onActivityDoubleClick,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const activityCount = stage.activities?.length ?? 0;
@@ -34,6 +35,7 @@ function StageIsland({
     polish: 'Publiczny',
     english: 'Public',
   };
+
   const NOACTIVITIES__TEXTLABEL = {
     polish: 'Brak aktywności w tym etapie.',
     english: 'No activities in this stage.',
@@ -135,6 +137,7 @@ function StageIsland({
             className={[
               'activities-island__chevron',
               stage.expanded ? 'activities-island__chevron--open' : '',
+
             ].filter(Boolean).join(' ')}
             aria-hidden="true"
           >
@@ -176,6 +179,7 @@ function StageIsland({
                           'activities-island__row',
                           isActivityHidden ? 'activities-island__row--hidden' : '',
                         ].filter(Boolean).join(' ')}
+                        onDoubleClick={() => onActivityDoubleClick?.(stage, activity)}
                       >
                         <td className="activities-island__cell activities-island__cell--name">
                           <span className="activities-island__activity-name">
@@ -230,6 +234,7 @@ export default function ActivitiesTreeTable({
   stageRowActions,
   activityRowActions,
   onReorderStages,
+  onActivityDoubleClick,
 }) {
   const containerRef = useRef(null);
   const visibleStages = useMemo(() => stages, [stages]);
@@ -268,6 +273,7 @@ export default function ActivitiesTreeTable({
           onToggleExpand={onToggleExpand}
           stageRowActions={stageRowActions}
           activityRowActions={activityRowActions}
+          onActivityDoubleClick={onActivityDoubleClick}
         />
       ))}
     </div>

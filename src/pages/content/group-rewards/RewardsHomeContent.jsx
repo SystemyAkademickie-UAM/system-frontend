@@ -607,6 +607,7 @@ export default function RewardsHomeContent() {
           onEditRank={handleTileEditRank}
           onDeleteRank={handleTileDeleteRank}
           onAssignRank={handleTileAssignRank}
+          onRankDoubleClick={handleTileEditRank}
         />
       ) : (
         <DataTable
@@ -631,6 +632,7 @@ export default function RewardsHomeContent() {
           }}
           rowActions={rowActions}
           renderRow={RewardsRankTableRow}
+          onRowDoubleClick={(rank) => openModal('edit', rank)}
         />
       )}
 

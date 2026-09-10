@@ -826,6 +826,7 @@ export default function GroupShopContent() {
                         onEdit={() => setActiveModal({ type: 'itemForm', itemId: item.id })}
                         onDelete={item.isExtraLife ? undefined : () => setActiveModal({ type: 'delete', item })}
                         isExtraLife={item.isExtraLife}
+                        isPublished={item.isPublished}
                         className={[
                           'group-shop__card',
                           isCardHighlighted ? 'group-shop__card--highlighted' : '',
