@@ -27,6 +27,9 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {number} currency
  * @property {number} totalEarned
  * @property {number} badgesCount
+ * @property {number} [purchasedItemsCount]
+ * @property {number} [usedItemsCount]
+ * @property {number} [lostLivesCount]
  * @property {string | null} groupCurrency
  * @property {string | null} groupCurrencyEmoji
  * @property {number | null} lives

@@ -84,6 +84,7 @@ function assertActivityResponse(data, failureMessage, language) {
 }
 
 function mapActivity(raw) {
+  const isVisible = raw.isVisible !== false && raw.isPublished !== false && raw.visibilityStatus !== 0;
   return {
     id: raw.id,
     name: raw.name,
@@ -91,8 +92,9 @@ function mapActivity(raw) {
     description1: raw.educationalDescription,
     reward: raw.currency,
     completionCount: raw.completionCount ?? 0,
-    visibilityStatus: raw.visibilityStatus ?? (raw.isPublished === false ? 0 : 1),
-    isPublished: raw.isPublished ?? (raw.visibilityStatus !== 0),
+    isVisible,
+    visibilityStatus: isVisible ? 1 : 0,
+    isPublished: isVisible,
   };
 }
 
@@ -354,6 +356,7 @@ export function useGroupActivities() {
             currency: sourceStage.activities[i].reward,
             educationalDescription: sourceStage.activities[i].description1,
             storyDescription: sourceStage.activities[i].description0,
+            isVisible: sourceStage.activities[i].isVisible ?? (sourceStage.activities[i].visibilityStatus !== 0),
           });
           i = i + 1;
         }
@@ -406,6 +409,7 @@ export function useGroupActivities() {
         currency: values.reward,
         educationalDescription: values.description1,
         storyDescription: values.description0,
+        isVisible: values.isVisible !== undefined ? values.isVisible : (values.visibilityStatus !== 0),
       });
       showSuccess(ACTIVITYADDED__TEXTLABEL[LANGUAGE]);
       await fetchActivitiesForStage(stageId);
@@ -426,6 +430,7 @@ export function useGroupActivities() {
         currency: Number(values.reward),
         educationalDescription: values.description1,
         storyDescription: values.description0,
+        isVisible: values.isVisible !== undefined ? values.isVisible : (values.visibilityStatus !== 0),
       });
       showSuccess(ACTIVITYUPDATED__TEXTLABEL[LANGUAGE]);
       await fetchActivitiesForStage(stageId);
@@ -477,11 +482,12 @@ export function useGroupActivities() {
       await postJson('/activities', {
         method: 'modify',
         activityId,
+        isVisible: nextVisibility === 1,
         visibilityStatus: nextVisibility,
         isPublished: nextVisibility === 1,
       });
     } catch {
-      // Backend may not support activity visibility toggle yet
+      // Backend error fallback
     }
 
     showSuccess(

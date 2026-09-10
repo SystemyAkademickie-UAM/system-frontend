@@ -10,6 +10,7 @@ const EMPTY_FORM = {
   description0: '',
   description1: '',
   reward: '',
+  isVisible: true,
 };
 
 export default function ActivityFormModal({
@@ -76,6 +77,10 @@ export default function ActivityFormModal({
     polish: 'Etap:',
     english: 'Stage:',
   };
+  const ISVISIBLE__TEXTLABEL = {
+    polish: 'Aktywność widoczna dla studentów',
+    english: 'Activity visible to students',
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -86,6 +91,7 @@ export default function ActivityFormModal({
         description0: activity.description0 ?? '',
         description1: activity.description1 ?? '',
         reward: String(activity.reward ?? ''),
+        isVisible: activity.isVisible !== false && activity.visibilityStatus !== 0 && activity.isPublished !== false,
       });
       return;
     }
@@ -110,7 +116,7 @@ export default function ActivityFormModal({
   const handleChange = (field) => (event) => {
     const nextValue = field === 'reward'
       ? sanitizeWholeNumberInput(event.target.value)
-      : event.target.value;
+      : (field === 'isVisible' ? event.target.checked : event.target.value);
     setForm((prev) => ({ ...prev, [field]: nextValue }));
   };
 
@@ -122,6 +128,7 @@ export default function ActivityFormModal({
       description0: form.description0.trim(),
       description1: form.description1.trim(),
       reward: rewardValidation.value,
+      isVisible: form.isVisible,
     });
   };
 
@@ -197,6 +204,19 @@ export default function ActivityFormModal({
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
         />
+
+        <div className="rewards-modal__field" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+          <input
+            type="checkbox"
+            id="activity-is-visible"
+            checked={form.isVisible}
+            onChange={handleChange('isVisible')}
+            style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--color-primary, #6366f1)' }}
+          />
+          <label htmlFor="activity-is-visible" style={{ cursor: 'pointer', fontSize: '14px', userSelect: 'none' }}>
+            {ISVISIBLE__TEXTLABEL[LANGUAGE]}
+          </label>
+        </div>
       </div>
     </Modal>
   );

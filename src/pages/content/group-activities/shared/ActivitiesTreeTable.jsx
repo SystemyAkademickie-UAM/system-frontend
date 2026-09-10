@@ -171,7 +171,7 @@ function StageIsland({
                 </thead>
                 <tbody>
                   {stage.activities.map((activity) => {
-                    const isActivityHidden = activity.visibilityStatus === 0 || activity.isPublished === false;
+                    const isActivityHidden = activity.visibilityStatus === 0 || activity.isPublished === false || activity.isVisible === false;
                     return (
                       <tr
                         key={`activity-${stage.id}-${activity.id}`}
