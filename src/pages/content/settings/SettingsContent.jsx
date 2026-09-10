@@ -67,6 +67,36 @@ const SHOWNICKNAMELABELTEXT = {
   japanese: 'ニックネームを表示',
   kana: 'ニックネームをひょうじ',
 };
+const COLORSCHEMELABELTEXT = {
+  polish: 'Schemat kolorów',
+  english: 'Color scheme',
+  japanese: 'カラースキーム',
+  kana: 'カラースキーム',
+};
+const DARKTHEMELABELTEXT = {
+  polish: 'Ciemny motyw',
+  english: 'Dark theme',
+  japanese: 'ダークテーマ',
+  kana: 'ダークテーマ',
+};
+const LIGHTTHEMELABELTEXT = {
+  polish: 'Jasny motyw',
+  english: 'Light theme',
+  japanese: 'ライトテーマ',
+  kana: 'ライトテーマ',
+};
+const SYSTEMTHEMELABELTEXT = {
+  polish: 'Motyw systemu',
+  english: 'System theme',
+  japanese: 'システムテーマ',
+  kana: 'システムテーマ',
+};
+const COLORSCHEMEDESCRIPTIONTEXT = {
+  polish: 'Wybierz schemat kolorów interfejsu.',
+  english: 'Choose the interface color scheme.',
+  japanese: 'インターフェースのカラースキームを選択してください。',
+  kana: 'インターフェースのカラースキームをえらんでください。',
+};
 const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
   polish: 'Ksywka staje się widoczna dla innych użytkowników (wyświetlana jest dodatkowo obok imienia i nazwiska).',
   english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
@@ -162,6 +192,54 @@ export default function SettingsContent() {
   const [DIVLANGUAGE, SETDIVLANGUAGE] = useState(LANGUAGESDICTIONARY.polish);
   const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish');
 
+  const [selectedTheme, setSelectedTheme] = useState(() => {
+    var savedTheme = localStorage.getItem('maQ-theme');
+    if (savedTheme == 'light') {
+      return 'light';
+    }
+    return 'system';
+  });
+
+
+  const [savedTheme, setSavedTheme] = useState(() => {
+    var saved = localStorage.getItem('maQ-theme');
+    if (saved == 'light') {
+      return 'light';
+    }
+    return 'system';
+  });
+
+  function getSystemTheme() {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  }
+
+  useEffect(() => {
+    if (selectedTheme == 'system') {
+      var systemTheme = getSystemTheme();
+      document.documentElement.setAttribute('data-theme', systemTheme);
+    }
+  }, [selectedTheme]);
+
+  useEffect(() => {
+    var darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    function onSystemThemeChange() {
+      if (selectedTheme == 'system') {
+        var systemTheme = getSystemTheme();
+        document.documentElement.setAttribute('data-theme', systemTheme);
+      }
+    }
+
+    darkModeQuery.addEventListener('change', onSystemThemeChange);
+
+    return function cleanup() {
+      darkModeQuery.removeEventListener('change', onSystemThemeChange);
+    };
+  }, [selectedTheme]);
+
   const loadSettings = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage('');
@@ -189,10 +267,13 @@ export default function SettingsContent() {
       }
 
       const CURRENTLANGUAGE = READLANGUAGECOOKIE() || 'polish';
+      var CURRENTTHEME = localStorage.getItem('maQ-theme')
+
       setSavedSnapshot({
         nickname: profile.nickname || '',
         avatarId: loadedAvatarId,
         LANGUAGE: CURRENTLANGUAGE,
+        THEME: CURRENTTHEME,
         ...(role === APP_ROLE.LECTURER ? { showNickname: profile.showNickname !== false } : {}),
       });
     } catch (error) {
@@ -258,14 +339,29 @@ export default function SettingsContent() {
       nickname: savedNickname,
       avatarId: selectedAvatarId,
       LANGUAGE: SELECTEDLANGUAGE,
+      THEME: selectedTheme,
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
+
+    setSavedTheme(selectedTheme);
+
+    if (selectedTheme == 'light') {
+      localStorage.setItem('maQ-theme', 'light');
+      document.documentElement.setAttribute('data-theme', 'light');
+    } else if (selectedTheme == 'dark') {
+      localStorage.setItem('maQ-theme', 'dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      localStorage.setItem('maQ-theme', 'system');
+      document.documentElement.setAttribute('data-theme', 'system');
+    }
 
     setIsSaving(false);
     showSuccess('Zmiany zostały zapisane.');
     return true;
   }, [
     DIVLANGUAGE,
+    selectedTheme,
     LANGUAGE,
     draftShowNickname,
     nickname,
@@ -298,9 +394,14 @@ export default function SettingsContent() {
       return true;
     }
 
+    if (selectedTheme !== savedSnapshot.THEME) {
+      return true;
+    }
+
     return false;
   }, [
     DIVLANGUAGE,
+    selectedTheme,
     draftShowNickname,
     isLoading,
     nickname,
@@ -404,6 +505,47 @@ export default function SettingsContent() {
                   <p className="group-settings-form__hint">{SHOWNICKNAMEDESCRIPTIONLABELTEXT[LANGUAGE]}</p>
                 </div>
               ) : null}
+
+              <div className="settings-page__field settings-page__field--toggle">
+                <p className="group-settings-form__hint" style={{ marginBottom: '8px' }}>
+                  {COLORSCHEMEDESCRIPTIONTEXT[LANGUAGE]}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <label className="settings-page__toggle">
+                    <input
+                      type="radio"
+                      checked={selectedTheme == 'dark'}
+                      onChange={() => {
+                        setSelectedTheme('dark');
+                      }}
+                      disabled={isSaving}
+                    />
+                    <span className="group-settings-form__label">{DARKTHEMELABELTEXT[LANGUAGE]}</span>
+                  </label>
+                  <label className="settings-page__toggle">
+                    <input
+                      type="radio"
+                      checked={selectedTheme == 'system'}
+                      onChange={() => {
+                        setSelectedTheme('system');
+                      }}
+                      disabled={isSaving}
+                    />
+                    <span className="group-settings-form__label">{SYSTEMTHEMELABELTEXT[LANGUAGE]}</span>
+                  </label>
+                  <label className="settings-page__toggle">
+                    <input
+                      type="radio"
+                      checked={selectedTheme == 'light'}
+                      onChange={() => {
+                        setSelectedTheme('light');
+                      }}
+                      disabled={isSaving}
+                    />
+                    <span className="group-settings-form__label">{LIGHTTHEMELABELTEXT[LANGUAGE]}</span>
+                  </label>
+                </div>
+              </div>
 
               <Divider className="settings-page__divider" length="50%" />
 

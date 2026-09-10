@@ -5,7 +5,7 @@ import { DataTableRowActions } from '../../../../components/ui/DataTable/DataTab
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
-export default function RewardsRankTableRow({ row, columns, rowActions }) {
+export default function RewardsRankTableRow({ row, columns, rowActions, onRowDoubleClick }) {
   const rowRef = useRef(null);
   const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
@@ -20,6 +20,7 @@ export default function RewardsRankTableRow({ row, columns, rowActions }) {
         className="data-table__row rewards-table__row"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={hidePreview}
+        onDoubleClick={() => onRowDoubleClick(row)}
       >
         {columns.map((column) => (
           <td

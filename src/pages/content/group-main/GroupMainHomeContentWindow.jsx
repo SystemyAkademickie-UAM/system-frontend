@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import Button from '../../../components/ui/Button/Button.jsx';
 
 const closeicon = PUBLIC_UI_ICONS.close;
 
@@ -34,11 +35,13 @@ export default function GroupMainHomeContentWindow({popupclose, groupname, subje
 
   function closepopupwindow() {
     if (popupclose) {
+
       popupclose();
     }
   }
 
   var firstline = '';
+
 
   if (subjectname != null && subjectname.length > 0) {
     firstline = GROUPCREATEDTITLEWITHSUBJECT__TEXTLABEL[LANGUAGE].replace('{groupname}', groupname).replace('{subjectname}', subjectname);
@@ -57,12 +60,12 @@ export default function GroupMainHomeContentWindow({popupclose, groupname, subje
         </div>
 
         <div style = {{width: '90%', position: 'relative', left: '5%', display: 'flex', flexDirection: 'column', gap: '2vh', flex: 1, paddingTop: '10%', paddingBottom: '12%', justifyContent: 'center'}}>
-          <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginBottom: '2.5vh'}}><span>{firstline}</span></div>
-          <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'left'}}><span>{secondline}</span></div>
-          <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'left'}}><span>{thirdline}</span></div>
+          <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '18px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginBottom: '2.5vh'}}><span>{firstline}</span></div>
+          <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'left'}}><span>{secondline}</span></div>
+          <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'left'}}><span>{thirdline}</span></div>
         </div>
 
-        <div onClick = {closepopupwindow} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '20%', height: '12%', position: 'absolute', bottom: '5%', right: '5%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>{CONFIRMBUTTON__TEXTLABEL[LANGUAGE]}</div>
+          <Button onClick = {closepopupwindow} style = {{position: 'absolute', bottom: '5%', right: '5%'}}> {CONFIRMBUTTON__TEXTLABEL[LANGUAGE]}</Button>
 
       </div>
     </div>

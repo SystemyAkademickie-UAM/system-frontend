@@ -313,6 +313,7 @@ export default function DataTable({
   renderMobileRow,
   getMobileItemClassName,
   shouldRenderRowActions,
+  onRowDoubleClick,
 }) {
   const [page, setPage] = useState(1);
   const [internalSearch, setInternalSearch] = useState('');
@@ -595,6 +596,7 @@ export default function DataTable({
                     rowActions={rowActions}
                     rowActionsPosition={rowActionsPosition}
                     getRowKey={getRowKey}
+                    onRowDoubleClick={onRowDoubleClick}
                   />
                 ))}
               </tbody>

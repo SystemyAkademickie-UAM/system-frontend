@@ -5,8 +5,9 @@ import { DataTableRowActions } from '../../../../components/ui/DataTable/DataTab
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
-export default function RewardsBadgeTableRow({ row, columns, rowActions }) {
+export default function RewardsBadgeTableRow({ row, columns, rowActions, onRowDoubleClick }) {
   const rowRef = useRef(null);
+
   const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
   const handleMouseEnter = () => {
@@ -20,6 +21,7 @@ export default function RewardsBadgeTableRow({ row, columns, rowActions }) {
         className="data-table__row rewards-table__row"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={hidePreview}
+        onDoubleClick={() => onRowDoubleClick(row)}
       >
         {columns.map((column) => (
           <td
@@ -35,6 +37,7 @@ export default function RewardsBadgeTableRow({ row, columns, rowActions }) {
             {column.render ? column.render(row) : String(row[column.key] ?? '')}
           </td>
         ))}
+
         {rowActions ? (
           <td className="data-table__cell data-table__cell--actions">
             <DataTableRowActions

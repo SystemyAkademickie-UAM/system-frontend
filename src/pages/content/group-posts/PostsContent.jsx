@@ -149,6 +149,7 @@ export default function PostsContent() {
   );
 
   const postRowActions = useMemo(() => ({
+
     menuItems: [
       {
         id: 'edit',
@@ -245,6 +246,7 @@ export default function PostsContent() {
               titleClassName="posts-island__title"
               dividerClassName="posts-island__divider"
               textClassName="posts-island__text"
+              onDoubleClick={() => openModal('edit', { post })}
               trailing={(
                 <div className="posts-island__meta">
                   <div className="posts-island__status-row">

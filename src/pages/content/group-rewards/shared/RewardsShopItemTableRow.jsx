@@ -6,7 +6,7 @@ import { resolveShopCategoryLabels } from '../../../../utils/shop/shopCategories
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
-export default function RewardsShopItemTableRow({ row, columns, rowActions }) {
+export default function RewardsShopItemTableRow({ row, columns, rowActions, onRowDoubleClick }) {
   const rowRef = useRef(null);
   const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
@@ -21,6 +21,7 @@ export default function RewardsShopItemTableRow({ row, columns, rowActions }) {
         className="data-table__row rewards-table__row"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={hidePreview}
+        onDoubleClick={() => onRowDoubleClick(row)}
       >
         {columns.map((column) => (
           <td

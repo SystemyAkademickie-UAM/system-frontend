@@ -152,6 +152,7 @@ function readPanelContentTop(panelBody) {
  * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onEditRank]
  * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onDeleteRank]
  * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onAssignRank]
+ * @param {(rank: import('./rankPathModel.js').RankPathRank) => void} [props.onRankDoubleClick]
  */
 
 export default function RankPathBoard({
@@ -179,6 +180,7 @@ export default function RankPathBoard({
   onEditRank,
   onDeleteRank,
   onAssignRank,
+  onRankDoubleClick,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [isAxisPanelOpen, setIsAxisPanelOpen] = useState(false);
@@ -705,7 +707,7 @@ export default function RankPathBoard({
 
       {ranks.map((rank) => (
 
-        <div key={rank.id} className="rank-path-row">
+        <div key={rank.id} className="rank-path-row" onDoubleClick={() => onRankDoubleClick(rank)}>
 
           <div className={[
             'rank-path-row__rank',

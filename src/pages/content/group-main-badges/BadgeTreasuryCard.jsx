@@ -39,6 +39,7 @@ export default function BadgeTreasuryCard({
   onEdit,
   onDelete,
   onAssign,
+  onDoubleClick,
 }) {
   const earners = getBadgeEarners(earnersByBadgeId, badge.dbId, excludeAccountId);
   const isLocked = isStudentView && !badge.isUnlocked;
@@ -50,7 +51,8 @@ export default function BadgeTreasuryCard({
       'badge-treasury-card',
       hasEarners ? 'badge-treasury-card--has-earners' : '',
       showLecturerActions ? 'badge-treasury-card--lecturer' : '',
-    ].filter(Boolean).join(' ')}>
+    ].filter(Boolean).join(' ')}
+    onDoubleClick={() => onDoubleClick()}>
       {showLecturerActions ? (
         <>
           <span

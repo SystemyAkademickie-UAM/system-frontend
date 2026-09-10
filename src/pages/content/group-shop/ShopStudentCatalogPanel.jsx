@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+
 import {
   CatalogFilterGroup,
   CatalogFiltersPanel,
@@ -65,6 +66,8 @@ export default function ShopStudentCatalogPanel({
   onSortByChange,
   onEdit,
   onDelete,
+  onDoubleClick,
+  
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { items, isLoading, error } = useGroupShopItems(groupId);
@@ -156,7 +159,9 @@ export default function ShopStudentCatalogPanel({
                 hideActions={showLecturerActions}
                 onEdit={() => onEdit?.(item)}
                 onDelete={() => onDelete?.(item)}
+                onDoubleClick={() => onDoubleClick(item)}
                 isExtraLife={item.isExtraLife}
+                isPublished={item.isPublished}
                 disabled={cardsDisabled || item.isLocked}
                 isRankLocked={!showLecturerActions && item.isLocked}
                 className="group-shop__card"

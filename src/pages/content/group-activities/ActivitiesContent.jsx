@@ -35,6 +35,7 @@ function filterStages(stages, query) {
         ...stage,
         expanded: true,
         activities: matchingActivities,
+
       });
     }
 
@@ -203,6 +204,7 @@ export default function ActivitiesContent() {
   }, [activeModal, createActivity, closeModal]);
 
   const handleActivityEditConfirm = useCallback(async (values) => {
+
     if (!activeModal?.stage || !activeModal?.activity) return;
     setModalLoading(true);
     const result = await updateActivity(
@@ -359,6 +361,7 @@ export default function ActivitiesContent() {
           stageRowActions={stageRowActions}
           activityRowActions={activityRowActions}
           onReorderStages={reorderStages}
+          onActivityDoubleClick={(stage, activity) => openModal('editActivity', { stage, activity })}
         />
       )}
 

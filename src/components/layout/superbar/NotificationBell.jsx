@@ -42,6 +42,16 @@ export default function NotificationBell() {
       ? groupMembersLogPath(groupId)
       : null;
 
+  const originalTitle = useRef(document.title);
+
+  useEffect(() => {
+    if (unreadCount > 0) {
+      document.title = '(' + unreadCount + ') ' + originalTitle.current;
+    } else {
+      document.title = originalTitle.current;
+    }
+  }, [unreadCount]);
+
   useEffect(() => {
     if (!isOpen) {
       return undefined;

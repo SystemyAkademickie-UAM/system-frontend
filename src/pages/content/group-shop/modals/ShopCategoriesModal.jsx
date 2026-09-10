@@ -102,7 +102,7 @@ export default function ShopCategoriesModal({
   onClose,
   onChanged,
 }) {
-  const LANGUAGE = READLANGUAGECOOKIE;
+  const LANGUAGE = READLANGUAGECOOKIE();
   const { showSuccess, showError } = useToast();
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
