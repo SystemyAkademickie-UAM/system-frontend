@@ -5,6 +5,7 @@ import {
   Button,
   CatalogFilterGroup,
   CatalogFiltersPanel,
+  CatalogFiltersToggle,
   Divider,
   ProductCard,
   SearchBar,
@@ -104,6 +105,7 @@ function ProfilePurchasesContentInner() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [catalogItems, setCatalogItems] = useState([]);
 
   const { symbol: currencyEmoji } = useGroupCurrency();
@@ -238,10 +240,16 @@ function ProfilePurchasesContentInner() {
             className="profile-purchases-page__search"
             aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
           />
+          {categoryFilters.length > 1 ? (
+            <CatalogFiltersToggle
+              expanded={filtersExpanded}
+              onToggle={() => setFiltersExpanded((prev) => !prev)}
+            />
+          ) : null}
         </div>
       </div>
 
-      {categoryFilters.length > 1 ? (
+      {categoryFilters.length > 1 && filtersExpanded ? (
         <>
           <CatalogFiltersPanel className="profile-purchases-page__filters">
             <div className="profile-purchases-page__filters-row">

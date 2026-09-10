@@ -337,8 +337,18 @@ export default function DataTable({
   shouldRenderRowActions,
   getRowColor,
   onRowDoubleClick,
+  page: controlledPage,
+  onPageChange: onControlledPageChange,
+  highlightedRowId,
 }) {
-  const [page, setPage] = useState(1);
+  const [internalPage, setInternalPage] = useState(1);
+  const page = controlledPage ?? internalPage;
+  const setPage = useCallback((nextPage) => {
+    onControlledPageChange?.(nextPage);
+    if (controlledPage === undefined) {
+      setInternalPage(nextPage);
+    }
+  }, [controlledPage, onControlledPageChange]);
   const [internalSearch, setInternalSearch] = useState('');
   const [sortRules, setSortRules] = useState([]);
   const [isHeaderSticky, setIsHeaderSticky] = useState(false);
@@ -621,6 +631,7 @@ export default function DataTable({
                     getRowKey={getRowKey}
                     rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
                     onRowDoubleClick={onRowDoubleClick}
+                    isHighlighted={highlightedRowId != null && String(highlightedRowId) === String(getRowKey(row))}
                   />
                 ))}
               </tbody>
@@ -635,7 +646,10 @@ export default function DataTable({
                 row={row}
                 columns={columns}
                 renderActions={renderMobileActions}
-                className={getMobileItemClassName?.(row) ?? ''}
+                className={[
+                  getMobileItemClassName?.(row) ?? '',
+                  highlightedRowId != null && String(highlightedRowId) === String(getRowKey(row)) ? 'data-table-mobile__item--highlighted' : '',
+                ].filter(Boolean).join(' ')}
                 rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
               />
             ))}

@@ -31,6 +31,7 @@ const RANK_ASSIGNED__TEXTLABEL = { polish: 'Przyznano rangę: ${rankName}.', eng
 const PARTICIPANT_REMOVED__TEXTLABEL = { polish: 'Uczestnik został usunięty z grupy.', english: 'Participant has been removed from the group.' };
 const COLUMN_POSITION__TEXTLABEL = { polish: 'Numer', english: 'Number' };
 const COLUMN_MEMBER__TEXTLABEL = { polish: 'Członek grupy', english: 'Group member' };
+const COLUMN_EMAIL__TEXTLABEL = { polish: 'E-mail', english: 'E-mail' };
 const COLUMN_RANK__TEXTLABEL = { polish: 'Ranga', english: 'Rank' };
 const COLUMN_BADGES__TEXTLABEL = { polish: 'Odznaki', english: 'Badges' };
 const COLUMN_CURRENCY__TEXTLABEL = { polish: 'Waluta', english: 'Currency' };
@@ -239,6 +240,21 @@ export default function MembersHomeContent() {
       ),
     },
     {
+      key: 'email',
+      label: COLUMN_EMAIL__TEXTLABEL[LANGUAGE],
+      sort: 'text',
+      className: 'members-table__th--email',
+      colClassName: 'members-table__col--email',
+      cellClassName: 'members-table__cell--email',
+      hiddenBelow: 768,
+      mobileHidden: true,
+      render: (member) => (
+        <span className="members-table__cell-text members-table__cell-text--email">
+          {member.email || '—'}
+        </span>
+      ),
+    },
+    {
       key: 'rank',
       label: COLUMN_RANK__TEXTLABEL[LANGUAGE],
       sort: { type: 'custom', order: rankNames },
@@ -405,6 +421,7 @@ export default function MembersHomeContent() {
               member.name.toLowerCase().includes(query)
               || member.nickname?.toLowerCase().includes(query)
               || member.legalName?.toLowerCase().includes(query)
+              || member.email?.toLowerCase().includes(query)
             ),
           }}
           rowActions={rowActions}

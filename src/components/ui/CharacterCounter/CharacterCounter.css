@@ -22,6 +22,33 @@
   min-width: 0;
 }
 
+.maq-char-limited-field--inside {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.maq-char-limited-field--inside > input,
+.maq-char-limited-field--inside > textarea,
+.maq-char-limited-field--inside .maq-text-field__control {
+  padding-right: 3.5rem !important;
+}
+
 .maq-char-limited-field__counter {
   align-self: flex-end;
+}
+
+.maq-char-limited-field__counter--inside {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.65rem;
+  z-index: 2;
+  align-self: auto;
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0.8;
 }

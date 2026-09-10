@@ -4,6 +4,7 @@ import {
   Button,
   CatalogFilterGroup,
   CatalogFiltersPanel,
+  CatalogFiltersToggle,
   Divider,
   ProductCard,
   SearchBar,
@@ -214,6 +215,7 @@ export default function ProfileEqContentContent({
   const { showSuccess, showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [usingItemId, setUsingItemId] = useState(null);
   const [confirmUseItem, setConfirmUseItem] = useState(null);
   const [catalogItems, setCatalogItems] = useState([]);
@@ -374,10 +376,16 @@ export default function ProfileEqContentContent({
             className="profile-eq-page__search"
             aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
           />
+          {categoryFilters.length > 1 ? (
+            <CatalogFiltersToggle
+              expanded={filtersExpanded}
+              onToggle={() => setFiltersExpanded((prev) => !prev)}
+            />
+          ) : null}
         </div>
       </div>
 
-      {categoryFilters.length > 1 ? (
+      {categoryFilters.length > 1 && filtersExpanded ? (
         <>
           <CatalogFiltersPanel className="profile-eq-page__filters">
             <div className="profile-eq-page__filters-row">

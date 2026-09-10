@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Divider, Modal, TextField } from '../../../../components/ui/index.js';
+import { AssetSvg, Divider, Modal, TextField } from '../../../../components/ui/index.js';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import { DEFAULT_RANK_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { validateWholeNumberInput, sanitizeWholeNumberInput, validateDiscountPercentInput } from '../../../../utils/validation/rewardsNumericValidation.js';
+import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import RewardsCurrencyLabel from '../shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -47,21 +48,6 @@ const STORYLABEL__TEXTLABEL = {
   english: 'Story status*'
 };
 
-const EXTRASETTINGS__TEXTLABEL = {
-  polish: 'Dodatkowe ustawienia',
-  english: 'Additional settings'
-};
-
-const DISCOUNTBTN__TEXTLABEL = {
-  polish: 'Zniżka w sklepie',
-  english: 'Shop discount'
-};
-
-const UNLOCKBTN__TEXTLABEL = {
-  polish: 'Odblokowane przedmioty',
-  english: 'Unlocked items'
-};
-
 const DISCOUNTLABEL__TEXTLABEL = {
   polish: 'Zniżka w sklepie (%)',
   english: 'Shop discount (%)'
@@ -85,15 +71,16 @@ export default function RankFormModal({
   rank,
   onClose,
   onConfirm,
-  onOpenDiscountModal,
-  onOpenUnlockItemsModal,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [isDiscountExpanded, setIsDiscountExpanded] = useState(false);
   const isEdit = Boolean(rank);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    setIsDiscountExpanded(false);
 
     if (rank) {
       setForm({
@@ -225,70 +212,64 @@ export default function RankFormModal({
           inputClassName="rewards-modal__textarea"
         />
 
-        {/* Sekcja 3: Sklep / Zniżki */}
-        {!isEdit && (
-          <>
-            <Divider className="rewards-modal__divider" />
-            <div className="rewards-modal__field">
-              <label htmlFor="rank-discount" className="rewards-modal__label">
-                {DISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
-              </label>
-              <input
-                id="rank-discount"
-                type="text"
-                inputMode="decimal"
-                className={[
-                  'rewards-modal__input',
-                  showDiscountError ? 'rewards-modal__input--error' : '',
-                ].filter(Boolean).join(' ')}
-                value={form.discount}
-                onChange={handleChange('discount')}
-                placeholder='0'
-                aria-invalid={showDiscountError}
-                aria-describedby={showDiscountError ? 'rank-discount-error' : 'rank-discount-hint'}
-              />
-              <p id="rank-discount-hint" className="rewards-modal__field-hint">
-                {DISCOUNTHINT__TEXTLABEL[LANGUAGE]}
-              </p>
-              {showDiscountError ? (
-                <p id="rank-discount-error" className="rewards-modal__field-error" role="alert">
-                  {discountValidation.error}
-                </p>
-              ) : null}
-            </div>
-          </>
-        )}
+        <Divider className="rewards-modal__divider" />
 
-        {isEdit && (onOpenDiscountModal || onOpenUnlockItemsModal) ? (
-          <>
-            <Divider className="rewards-modal__divider" />
-            <div className="rewards-modal__field rewards-modal__field--inline-actions">
-              <span className="rewards-modal__label">{EXTRASETTINGS__TEXTLABEL[LANGUAGE]}</span>
-              <div className="rewards-modal__inline-actions">
-                {onOpenDiscountModal ? (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => onOpenDiscountModal(rank)}
-                  >
-                    {DISCOUNTBTN__TEXTLABEL[LANGUAGE]}
-                  </Button>
-                ) : null}
-                {onOpenUnlockItemsModal ? (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => onOpenUnlockItemsModal(rank)}
-                  >
-                    {UNLOCKBTN__TEXTLABEL[LANGUAGE]}
-                  </Button>
+        {/* Sekcja 3: Zniżka w sklepie (zwijalna, domyślnie zwinięta) */}
+        <div className="rewards-modal__collapse-section">
+          <button
+            type="button"
+            className={[
+              'rewards-modal__collapse-trigger',
+              isDiscountExpanded ? 'rewards-modal__collapse-trigger--expanded' : '',
+            ].filter(Boolean).join(' ')}
+            onClick={() => setIsDiscountExpanded((prev) => !prev)}
+            aria-expanded={isDiscountExpanded}
+            aria-controls="rank-discount-collapse-content"
+          >
+            <span className="rewards-modal__collapse-title">
+              {DISCOUNTLABEL__TEXTLABEL[LANGUAGE]}
+            </span>
+            <AssetSvg
+              name={SVG_ICONS.controls.chevronRight}
+              className={[
+                'rewards-modal__collapse-chevron',
+                isDiscountExpanded ? 'rewards-modal__collapse-chevron--expanded' : '',
+              ].filter(Boolean).join(' ')}
+              width={18}
+              height={18}
+              alt=""
+            />
+          </button>
+
+          {isDiscountExpanded && (
+            <div id="rank-discount-collapse-content" className="rewards-modal__collapse-content">
+              <div className="rewards-modal__field">
+                <input
+                  id="rank-discount"
+                  type="text"
+                  inputMode="decimal"
+                  className={[
+                    'rewards-modal__input',
+                    showDiscountError ? 'rewards-modal__input--error' : '',
+                  ].filter(Boolean).join(' ')}
+                  value={form.discount}
+                  onChange={handleChange('discount')}
+                  placeholder="0"
+                  aria-invalid={showDiscountError}
+                  aria-describedby={showDiscountError ? 'rank-discount-error' : 'rank-discount-hint'}
+                />
+                <p id="rank-discount-hint" className="rewards-modal__field-hint">
+                  {DISCOUNTHINT__TEXTLABEL[LANGUAGE]}
+                </p>
+                {showDiscountError ? (
+                  <p id="rank-discount-error" className="rewards-modal__field-error" role="alert">
+                    {discountValidation.error}
+                  </p>
                 ) : null}
               </div>
             </div>
-          </>
-        ) : null}
+          )}
+        </div>
       </div>
     </Modal>
   );

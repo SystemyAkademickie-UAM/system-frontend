@@ -79,13 +79,13 @@ export default function ActivitiesContent() {
     polish: 'Zmień nazwę etapu.',
     english: 'Change the stage name.',
   };
-  const VISIBILITYTEXTLABEL__TEXTLABEL = {
-    polish: 'Ukryj / upublicznij etap',
-    english: 'Hide / make public',
+  const VISIBILITY_HIDE_STAGE__TEXTLABEL = {
+    polish: 'Ukryj etap',
+    english: 'Hide stage',
   };
-  const VISIBILITYDESCRIPTION__TEXTLABEL = {
-    polish: 'Zmień widoczność etapu dla studentów.',
-    english: 'Change stage visibility for students.',
+  const VISIBILITY_SHOW_STAGE__TEXTLABEL = {
+    polish: 'Pokaż etap',
+    english: 'Show stage',
   };
   const VISIBILITY_HIDE_ACT__TEXTLABEL = {
     polish: 'Ukryj aktywność',
@@ -246,6 +246,28 @@ export default function ActivitiesContent() {
         ariaLabel: ADDACTIVITY__TEXTLABEL[LANGUAGE],
         onSelect: (stage) => openModal('createActivity', { stage }),
       },
+      {
+        id: 'visibility',
+        label: (stageItem) => (
+          stageItem?.visibilityStatus === 0
+            ? VISIBILITY_SHOW_STAGE__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_STAGE__TEXTLABEL[LANGUAGE]
+        ),
+        iconFile: (stageItem) => (
+          stageItem?.visibilityStatus === 0
+            ? SVG_ICONS.actions.hide
+            : SVG_ICONS.actions.show
+        ),
+        ariaLabel: (stageItem) => (
+          stageItem?.visibilityStatus === 0
+            ? VISIBILITY_SHOW_STAGE__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_STAGE__TEXTLABEL[LANGUAGE]
+        ),
+        onSelect: async (stageItem) => {
+          const nextStatus = stageItem.visibilityStatus === 1 ? 0 : 1;
+          await updateStage(stageItem.id, { visibilityStatus: nextStatus });
+        },
+      },
     ],
     menuItems: [
       {
@@ -253,15 +275,6 @@ export default function ActivitiesContent() {
         label: EDITSTAGE__TEXTLABEL[LANGUAGE],
         description: EDITSTAGEDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: (stage) => openModal('editStage', { stage }),
-      },
-      {
-        id: 'visibility',
-        label: VISIBILITYTEXTLABEL__TEXTLABEL[LANGUAGE],
-        description: VISIBILITYDESCRIPTION__TEXTLABEL[LANGUAGE],
-        onSelect: async (stageItem) => {
-          const nextStatus = stageItem.visibilityStatus === 1 ? 0 : 1;
-          await updateStage(stageItem.id, { visibilityStatus: nextStatus });
-        },
       },
       {
         id: 'copy',
@@ -346,7 +359,11 @@ export default function ActivitiesContent() {
         <div className="maq-section-page__toolbar-start">
           <div className="activities-page__add-island">
             <div className="activities-page__add-field">
-              <CharacterLimitedField value={newStageName} maxLength={STAGE_NAME_MAX_LENGTH}>
+              <CharacterLimitedField
+                value={newStageName}
+                maxLength={STAGE_NAME_MAX_LENGTH}
+                placement="inside"
+              >
                 <input
                   id="new-stage-name"
                   type="text"

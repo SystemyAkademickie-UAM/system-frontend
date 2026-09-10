@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, TextField } from '../../../../components/ui/index.js';
+import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -205,16 +207,27 @@ export default function ActivityFormModal({
           inputClassName="rewards-modal__textarea"
         />
 
-        <div className="rewards-modal__field" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-          <input
-            type="checkbox"
-            id="activity-is-visible"
-            checked={form.isVisible}
-            onChange={handleChange('isVisible')}
-            style={{ cursor: 'pointer', width: '16px', height: '16px', accentColor: 'var(--color-primary, #6366f1)' }}
-          />
-          <label htmlFor="activity-is-visible" style={{ cursor: 'pointer', fontSize: '14px', userSelect: 'none' }}>
-            {ISVISIBLE__TEXTLABEL[LANGUAGE]}
+        <div className="rewards-modal__field">
+          <label className="rewards-modal__option-label" htmlFor="activity-is-visible">
+            <input
+              id="activity-is-visible"
+              type="checkbox"
+              className="rewards-modal__option-input"
+              checked={form.isVisible}
+              onChange={handleChange('isVisible')}
+            />
+            <span
+              className={[
+                'rewards-modal__option-checkbox',
+                form.isVisible ? 'rewards-modal__option-checkbox--checked' : '',
+              ].filter(Boolean).join(' ')}
+              aria-hidden="true"
+            >
+              {form.isVisible ? (
+                <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+              ) : null}
+            </span>
+            <span className="rewards-modal__option-text">{ISVISIBLE__TEXTLABEL[LANGUAGE]}</span>
           </label>
         </div>
       </div>

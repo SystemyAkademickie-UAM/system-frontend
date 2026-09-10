@@ -197,10 +197,11 @@
   background: rgba(13, 13, 24, 0.5);
   border-radius: 8px;
   border: 1px solid rgba(189, 202, 190, 0.15);
-  justify-content: center;
 }
 
 .maq-avatar-picker__tab-button {
+  flex: 1 1 0;
+  min-width: fit-content;
   padding: 0.4rem 0.75rem;
   font-family: var(--font-family-app);
   font-size: 13px;

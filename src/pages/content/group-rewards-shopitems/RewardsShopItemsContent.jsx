@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation, useParams, useSearchParams } from 'react-router-dom';
 import {
   Button,
   CatalogFilterGroup,
@@ -403,6 +403,8 @@ export default function RewardsShopItemsContent() {
   const nav = useGroupSubNav('group-rewards');
   const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-shop-view');
   const { groupId } = useParams();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { showSuccess, showError } = useToast();
   const {
     items,
@@ -429,6 +431,14 @@ export default function RewardsShopItemsContent() {
   const [sortBy, setSortBy] = useState(SHOP_SORT.nameAsc);
   const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
   const [value, setValue] = useState(0);
+  const [highlightedItemId, setHighlightedItemId] = useState(null);
+  const [page, setPage] = useState(1);
+
+  const highlightParam = searchParams.get('highlight');
+  const highlightFromState = location.state?.highlightItemId;
+  const highlightNameFromState = location.state?.highlightItemName;
+  const isExtraLifeHighlight = location.state?.isExtraLife || highlightParam === 'extra-life';
+  const targetHighlightId = highlightFromState ?? highlightParam;
 
   const categoryFilters = useMemo(
     () => buildShopCategoryFilters(categories, LANGUAGE),
@@ -443,6 +453,63 @@ export default function RewardsShopItemsContent() {
     const withExtraLifeFirst = sortShopItemsWithExtraLifeFirst(sorted);
     return withExtraLifeFirst.map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE, livesSymbol));
   }, [items, categoriesById, showExtraLifeProduct, LANGUAGE, livesSymbol, sortBy]);
+
+  useEffect(() => {
+    if (!targetHighlightId && !highlightNameFromState && !isExtraLifeHighlight) {
+      return;
+    }
+    if (catalogItems.length === 0) {
+      return;
+    }
+
+    let targetItem = null;
+    if (isExtraLifeHighlight) {
+      targetItem = catalogItems.find((it) => it.isExtraLife === true) ?? null;
+    }
+    if (!targetItem && targetHighlightId) {
+      targetItem = catalogItems.find((it) => String(it.id) === String(targetHighlightId)) ?? null;
+    }
+    if (!targetItem && highlightNameFromState) {
+      const norm = String(highlightNameFromState).trim().toLowerCase();
+      targetItem = catalogItems.find((it) => it.name && it.name.trim().toLowerCase() === norm) ?? null;
+    }
+
+    if (!targetItem) {
+      return;
+    }
+
+    if (searchQuery) {
+      setSearchQuery('');
+    }
+    if (categoryFilter !== 'all') {
+      setCategoryFilter('all');
+    }
+
+    const itemIndex = catalogItems.findIndex((it) => String(it.id) === String(targetItem.id));
+    if (itemIndex !== -1) {
+      const targetPage = Math.floor(itemIndex / 10) + 1;
+      setPage(targetPage);
+    }
+
+    const targetId = targetItem.id;
+    setHighlightedItemId(targetId);
+
+    const scrollTimer = setTimeout(() => {
+      const el = document.getElementById(`shop-item-row-${targetId}`) || document.getElementById(`shop-item-${targetId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 150);
+
+    const clearTimer = setTimeout(() => {
+      setHighlightedItemId(null);
+    }, 3200);
+
+    return () => {
+      clearTimeout(scrollTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [catalogItems, targetHighlightId, highlightNameFromState, isExtraLifeHighlight]);
 
   const columns = useMemo(
     () => getShopItemColumns(LANGUAGE),
@@ -705,6 +772,7 @@ export default function RewardsShopItemsContent() {
             onEdit={handleEdit}
             onDelete={openDeleteModal}
             onDoubleClick={handleEdit}
+            highlightedItemId={highlightedItemId}
           />
         </>
       ) : (
@@ -714,6 +782,9 @@ export default function RewardsShopItemsContent() {
           rowKey="id"
           tiebreakerKey="position"
           itemsPerPage={10}
+          page={page}
+          onPageChange={setPage}
+          highlightedRowId={highlightedItemId}
           paginationAriaLabel={PAGINATIONARIALABEL__TEXTLABEL[LANGUAGE]}
           className="rewards-table rewards-table--shop-items"
           getRowColor={(item) => item.rowColor ?? item.categoryColor ?? null}

@@ -2,7 +2,9 @@ import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ProductCard } from '../ui/index.js';
-import { groupShopPath } from '../../routes/pathRegistry.js';
+import { useAppRole } from '../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
+import { groupShopItemsPath, groupShopPath } from '../../routes/pathRegistry.js';
 import { findCachedShopItem } from '../../utils/shop/shopItemsCache.js';
 import { positionCenteredTooltip } from '../../utils/ui/positionTooltipInViewport.js';
 import './NotificationItemPreview.css';
@@ -27,6 +29,7 @@ export default function NotificationItemPreview({
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const navigate = useNavigate();
+  const { role } = useAppRole();
 
   const [open, setOpen] = useState(false);
   const [layout, setLayout] = useState(null);
@@ -65,6 +68,7 @@ export default function NotificationItemPreview({
     setLayout(positionCenteredTooltip({
       triggerRect: trigger.getBoundingClientRect(),
       bubbleRect: bubble.getBoundingClientRect(),
+      margin: 12,
       gap: 10,
     }));
   }, []);
@@ -97,7 +101,8 @@ export default function NotificationItemPreview({
     }
 
     const targetItemId = resolvedItem?.id ?? notification.itemId ?? (effectiveIsExtraLife ? 'extra-life' : null);
-    const shopPath = groupShopPath(groupId);
+    const isStudent = role === APP_ROLE.STUDENT;
+    const shopPath = isStudent ? groupShopPath(groupId) : groupShopItemsPath(groupId);
 
     navigate(
       targetItemId ? `${shopPath}?highlight=${encodeURIComponent(targetItemId)}` : shopPath,

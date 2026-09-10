@@ -9,6 +9,7 @@
   gap: 0.25rem;
   padding: 0.375rem;
   background: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
   border-radius: 12px;
 }
 
@@ -26,7 +27,7 @@
   font-weight: 600;
   line-height: 1.25rem;
   white-space: nowrap;
-  color: #e3e0f7;
+  color: var(--color-text-secondary);
   text-decoration: none;
   cursor: pointer;
   transition:
@@ -35,6 +36,7 @@
 }
 
 .maq-sub-nav__item:hover:not(.maq-sub-nav__item--active) {
+  background: color-mix(in srgb, var(--color-text-secondary) 10%, transparent);
   color: var(--color-text-primary);
 }
 
@@ -44,13 +46,14 @@
 }
 
 .maq-sub-nav__item--active {
-  background: var(--color-nav-sub-active-bg);
+  background: var(--color-accent);
   font-weight: 700;
-  color: var(--color-accent);
+  color: var(--color-accent-on);
 }
 
 .maq-sub-nav__item--active:hover {
-  color: var(--color-accent);
+  background: var(--color-accent-pressed);
+  color: var(--color-accent-on);
 }
 
 @media (max-width: 639px) {

@@ -97,10 +97,23 @@ export function useGroupBacklogNotifications(groupId, {
     }
 
     const intervalId = window.setInterval(() => {
-      void refetch();
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        void refetch();
+      }
     }, pollMs);
 
-    return () => window.clearInterval(intervalId);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void refetch({ silent: true });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [groupId, pollMs, refetch]);
 
   const notifications = useMemo(

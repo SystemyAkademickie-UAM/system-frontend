@@ -57,12 +57,12 @@
   z-index: 10;
   display: flex;
   flex-direction: column;
-  min-width: 12rem;
+  min-width: 14rem;
   padding: 0.35rem;
   border-radius: 8px;
-  background: var(--color-bg-elevated, #1a1a2e);
-  border: 1px solid var(--color-border-subtle, rgba(255, 255, 255, 0.1));
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  background: var(--color-modal-surface, var(--color-bg-surface));
+  border: 1px solid var(--color-modal-border, var(--color-divider));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 .paginated-notifications__menu-item {
@@ -74,23 +74,23 @@
   font-weight: 500;
   text-align: left;
   border: 0;
-  border-radius: 4px;
+  border-radius: 6px;
   background: transparent;
-  color: var(--color-text-primary, #ffffff);
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition: background 0.12s ease;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
 .paginated-notifications__menu-item:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-elevated));
 }
 
 .paginated-notifications__menu-item--danger {
-  color: var(--color-input-error, #f87171);
+  color: var(--color-input-error, #dc2626);
 }
 
 .paginated-notifications__menu-item--danger:hover:not(:disabled) {
-  background: rgba(248, 113, 113, 0.15);
+  background: color-mix(in srgb, var(--color-input-error, #dc2626) 12%, transparent);
 }
 
 .paginated-notifications__menu-item:disabled {

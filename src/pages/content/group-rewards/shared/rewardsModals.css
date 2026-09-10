@@ -367,6 +367,55 @@
   color: var(--color-text-primary);
 }
 
+.rewards-modal__collapse-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rewards-modal__collapse-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font: inherit;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.rewards-modal__collapse-trigger:hover {
+  color: var(--color-text-primary);
+}
+
+.rewards-modal__collapse-title {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+}
+
+.rewards-modal__collapse-chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+  color: inherit;
+}
+
+.rewards-modal__collapse-chevron--expanded {
+  transform: rotate(90deg);
+}
+
+.rewards-modal__collapse-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding-top: 0.25rem;
+}
+
 @media (max-width: 640px) {
   .rewards-modal__grid-main {
     grid-template-columns: 1fr;

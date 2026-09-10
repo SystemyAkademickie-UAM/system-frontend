@@ -21,6 +21,7 @@ export const SVG_ICONS = {
     hide: 'actions/hide.svg',
     reveal: 'actions/show.svg',
     conceal: 'actions/hide.svg',
+    download: 'actions/download.svg',
   },
   controls: {
     close: 'controls/close.svg',

@@ -56,6 +56,54 @@ const FOOTER_TEXT__TEXTLABEL = {
   english: 'MyAcademyQuest 2026 ©'
 };
 
+const FOOTER_DESCRIPTION__TEXTLABEL = {
+  polish: 'Nowoczesny system grywalizacji akademickiej. Łączymy edukację z interaktywną przygodą i mechanikami gier.',
+  english: 'A modern academic gamification system connecting education with interactive adventures and game mechanics.',
+};
+
+const FOOTER_COORDINATOR_HEADING__TEXTLABEL = {
+  polish: 'Koordynacja',
+  english: 'Coordination',
+};
+
+const FOOTER_COORDINATOR_ROLE__TEXTLABEL = {
+  polish: 'Koordynator projektu:',
+  english: 'Project coordinator:',
+};
+
+const FOOTER_AUTHORS_HEADING__TEXTLABEL = {
+  polish: 'Twórcy',
+  english: 'Authors',
+};
+
+const FOOTER_DOCS_HEADING__TEXTLABEL = {
+  polish: 'Dokumenty',
+  english: 'Documents',
+};
+
+const FOOTER_TERMS__TEXTLABEL = {
+  polish: 'Warunki użytkowania',
+  english: 'Terms of Use',
+};
+
+const FOOTER_PRIVACY__TEXTLABEL = {
+  polish: 'Polityka prywatności',
+  english: 'Privacy Policy',
+};
+
+const FOOTER_DOCS__TEXTLABEL = {
+  polish: 'Dokumentacja',
+  english: 'Documentation',
+};
+
+const FOOTER_AUTHORS = [
+  'Mateusz Młyńczak',
+  'Nikita Breslavskyi',
+  'Paweł Plewczyński',
+  'Eryk Zerbin',
+  'Jacek Jakubowicz',
+];
+
 function pickRandom(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
@@ -246,7 +294,7 @@ export default function WelcomeContent() {
           </div>
         </section>
 
-        {/* SEKCJA 3: Stopka i Kontakt */}
+        {/* SEKCJA 3: Stopka i Informacje */}
         <footer className="welcome-section welcome-section--footer">
           <div className="welcome-footer__content">
             <div className="welcome-footer__grid">
@@ -256,29 +304,46 @@ export default function WelcomeContent() {
                   <span className="welcome-hero__text-green">Quest</span>
                 </div>
                 <p className="welcome-footer__description">
-                  Nowoczesny system grywalizacji akademickiej. Łączymy edukację z interaktywną przygodą i mechanikami gier.
+                  {FOOTER_DESCRIPTION__TEXTLABEL[LANGUAGE]}
                 </p>
               </div>
 
               <div className="welcome-footer__column">
-                <h3 className="welcome-footer__heading">Kontakt</h3>
-                <ul className="welcome-footer__list">
-                  <li>Email: kontakt@myacademyquest.pl</li>
-                  <li>Wsparcie: support@myacademyquest.pl</li>
+                <h3 className="welcome-footer__heading">{FOOTER_COORDINATOR_HEADING__TEXTLABEL[LANGUAGE]}</h3>
+                <div className="welcome-footer__coordinator">
+                  <span className="welcome-footer__coordinator-label">{FOOTER_COORDINATOR_ROLE__TEXTLABEL[LANGUAGE]}</span>
+                  <span className="welcome-footer__coordinator-name">Marcin Szczepański</span>
+                  <a
+                    href="mailto:marcin.szczepanski@amu.edu.pl"
+                    className="welcome-footer__link welcome-footer__coordinator-email"
+                  >
+                    marcin.szczepanski@amu.edu.pl
+                  </a>
+                </div>
+              </div>
+
+              <div className="welcome-footer__column">
+                <h3 className="welcome-footer__heading">{FOOTER_AUTHORS_HEADING__TEXTLABEL[LANGUAGE]}</h3>
+                <ul className="welcome-footer__list welcome-footer__authors-list">
+                  {FOOTER_AUTHORS.map((author) => (
+                    <li key={author} className="welcome-footer__author-item">
+                      {author}
+                    </li>
+                  ))}
                 </ul>
               </div>
 
               <div className="welcome-footer__column">
-                <h3 className="welcome-footer__heading">Informacje</h3>
+                <h3 className="welcome-footer__heading">{FOOTER_DOCS_HEADING__TEXTLABEL[LANGUAGE]}</h3>
                 <ul className="welcome-footer__list">
                   <li>
                     <a
-                      href={authLegalDocumentUrl('documentation')}
+                      href={authLegalDocumentUrl('termsOfUse')}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="welcome-footer__link"
                     >
-                      Dokumentacja
+                      {FOOTER_TERMS__TEXTLABEL[LANGUAGE]}
                     </a>
                   </li>
                   <li>
@@ -288,7 +353,17 @@ export default function WelcomeContent() {
                       rel="noopener noreferrer"
                       className="welcome-footer__link"
                     >
-                      Polityka Prywatności
+                      {FOOTER_PRIVACY__TEXTLABEL[LANGUAGE]}
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      href={authLegalDocumentUrl('documentation')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="welcome-footer__link"
+                    >
+                      {FOOTER_DOCS__TEXTLABEL[LANGUAGE]}
                     </a>
                   </li>
                 </ul>

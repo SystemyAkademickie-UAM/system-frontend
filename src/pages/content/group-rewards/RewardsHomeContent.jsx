@@ -27,7 +27,6 @@ import { useViewLayoutPreference } from '../../../hooks/useViewLayoutPreference.
 import ViewLayoutToggle from '../../../components/ui/ViewLayoutToggle/ViewLayoutToggle.jsx';
 import GroupMainRanksContent from '../group-main-ranks/GroupMainRanksContent.jsx';
 import RankFormModal from './modals/RankFormModal.jsx';
-import RankDiscountModal from './modals/RankDiscountModal.jsx';
 import RankUnlockItemsModal from './modals/RankUnlockItemsModal.jsx';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
@@ -49,11 +48,6 @@ const DELETEDSUCCESS__TEXTLABEL = {
 const ASSIGNEDSUCCESS__TEXTLABEL = {
   polish: 'Przypisanie rangi zostało zapisane.',
   english: 'Rank assignment has been saved.'
-};
-
-const DISCOUNTUPDATEDSUCCESS__TEXTLABEL = {
-  polish: 'Zniżka rangi została zaktualizowana.',
-  english: 'Rank discount has been updated.'
 };
 
 const ITEMSUPDATEDSUCCESS__TEXTLABEL = {
@@ -79,11 +73,6 @@ const DELETEERROR__TEXTLABEL = {
 const ASSIGNERROR__TEXTLABEL = {
   polish: 'Nie udało się przypisać rangi.',
   english: 'Failed to assign rank.'
-};
-
-const DISCOUNTUPDATEERROR__TEXTLABEL = {
-  polish: 'Nie udało się zaktualizować zniżki.',
-  english: 'Failed to update discount.'
 };
 
 const ITEMSUPDATEERROR__TEXTLABEL = {
@@ -199,16 +188,6 @@ const EDITLABEL__TEXTLABEL = {
 const EDITDESC__TEXTLABEL = {
   polish: 'Zmień dane rangi w kreatorze.',
   english: 'Change rank details in the editor.'
-};
-
-const DISCOUNTLABEL__TEXTLABEL = {
-  polish: 'Zniżka w sklepie',
-  english: 'Shop discount'
-};
-
-const DISCOUNTDESC__TEXTLABEL = {
-  polish: 'Ustaw procentową zniżkę dla posiadaczy rangi.',
-  english: 'Set a percentage discount for rank holders.'
 };
 
 const UNLOCKITEMSLABEL__TEXTLABEL = {
@@ -424,19 +403,6 @@ export default function RewardsHomeContent() {
     }
   }, [activeModal, handleAssign, closeModal, showSuccess, showError, LANGUAGE]);
 
-  const handleDiscountConfirm = useCallback(async (values) => {
-    if (!activeModal?.rank) return;
-    setModalLoading(true);
-    const result = await handleUpdate(activeModal.rank.id, values);
-    setModalLoading(false);
-    if (result.ok) {
-      showSuccess(DISCOUNTUPDATEDSUCCESS__TEXTLABEL[LANGUAGE]);
-      closeModal();
-    } else {
-      showError(result.error || DISCOUNTUPDATEERROR__TEXTLABEL[LANGUAGE]);
-    }
-  }, [activeModal, handleUpdate, closeModal, showSuccess, showError, LANGUAGE]);
-
   const handleUnlockItemsConfirm = useCallback(async (values) => {
     if (!activeModal?.rank) return;
     setModalLoading(true);
@@ -475,16 +441,6 @@ export default function RewardsHomeContent() {
     }
   }, [resolveRankByDbId, openModal]);
 
-  const handleOpenDiscountFromForm = useCallback((rank) => {
-    closeModal();
-    openModal('discount', rank);
-  }, [closeModal, openModal]);
-
-  const handleOpenUnlockItemsFromForm = useCallback((rank) => {
-    closeModal();
-    openModal('unlockItems', rank);
-  }, [closeModal, openModal]);
-
   const rowActions = useMemo(() => ({
     onDelete: (rank) => openModal('delete', rank),
     deleteLabel: DELETERANKLABEL__TEXTLABEL[LANGUAGE],
@@ -504,12 +460,6 @@ export default function RewardsHomeContent() {
         label: EDITLABEL__TEXTLABEL[LANGUAGE],
         description: EDITDESC__TEXTLABEL[LANGUAGE],
         onSelect: (rank) => openModal('edit', rank),
-      },
-      {
-        id: 'discount',
-        label: DISCOUNTLABEL__TEXTLABEL[LANGUAGE],
-        description: DISCOUNTDESC__TEXTLABEL[LANGUAGE],
-        onSelect: (rank) => openModal('discount', rank),
       },
       {
         id: 'unlock-items',
@@ -647,15 +597,6 @@ export default function RewardsHomeContent() {
         rank={modalRank}
         onClose={closeModal}
         onConfirm={handleEditConfirm}
-        onOpenDiscountModal={handleOpenDiscountFromForm}
-        onOpenUnlockItemsModal={handleOpenUnlockItemsFromForm}
-        isLoading={modalLoading}
-      />
-      <RankDiscountModal
-        isOpen={activeModal?.type === 'discount'}
-        rank={modalRank}
-        onClose={closeModal}
-        onConfirm={handleDiscountConfirm}
         isLoading={modalLoading}
       />
       <RankUnlockItemsModal

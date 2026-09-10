@@ -31,6 +31,10 @@ function StageIsland({
     polish: 'Ukryty',
     english: 'Hidden',
   };
+  const HIDDENBYSTAGEBADGE__TEXTLABEL = {
+    polish: 'Ukryty przez etap',
+    english: 'Hidden by stage',
+  };
   const PUBLICBADGE__TEXTLABEL = {
     polish: 'Publiczny',
     english: 'Public',
@@ -172,12 +176,14 @@ function StageIsland({
                 <tbody>
                   {stage.activities.map((activity) => {
                     const isActivityHidden = activity.visibilityStatus === 0 || activity.isPublished === false || activity.isVisible === false;
+                    const isHiddenByStage = !isActivityHidden && isHidden;
                     return (
                       <tr
                         key={`activity-${stage.id}-${activity.id}`}
                         className={[
                           'activities-island__row',
-                          isActivityHidden ? 'activities-island__row--hidden' : '',
+                          (isActivityHidden || isHiddenByStage) ? 'activities-island__row--hidden' : '',
+                          isHiddenByStage ? 'activities-island__row--hidden-by-stage' : '',
                         ].filter(Boolean).join(' ')}
                         onDoubleClick={() => onActivityDoubleClick?.(stage, activity)}
                       >
@@ -187,6 +193,10 @@ function StageIsland({
                             {isActivityHidden ? (
                               <span className="activities-island__activity-badge activities-island__activity-badge--hidden">
                                 {HIDDENBADGE__TEXTLABEL[LANGUAGE]}
+                              </span>
+                            ) : isHiddenByStage ? (
+                              <span className="activities-island__activity-badge activities-island__activity-badge--hidden-by-stage">
+                                {HIDDENBYSTAGEBADGE__TEXTLABEL[LANGUAGE]}
                               </span>
                             ) : null}
                           </span>

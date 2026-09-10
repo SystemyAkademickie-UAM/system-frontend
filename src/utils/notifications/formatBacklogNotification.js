@@ -4,6 +4,7 @@ import {
   groupMembersPath,
   groupPostsPath,
   groupRewardsPath,
+  groupShopItemsPath,
   groupShopPath,
   groupStudentActivityListPath,
   groupStudentBadgesPath,
@@ -513,18 +514,18 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         if (item.accountId) {
           href = groupStudentProfilePath(groupId, item.accountId);
         } else {
-          href = groupShopPath(groupId);
+          href = groupShopItemsPath(groupId);
         }
         break;
       case 'ITEM_USED':
         if (item.accountId) {
           href = groupStudentProfilePath(groupId, item.accountId);
         } else {
-          href = groupShopPath(groupId);
+          href = groupShopItemsPath(groupId);
         }
         break;
       case 'SHOP_STATUS_CHANGED':
-        href = groupShopPath(groupId);
+        href = groupShopItemsPath(groupId);
         break;
       case 'POST_ADDED':
         href = groupPostsPath(groupId);

@@ -79,7 +79,7 @@
   max-width: var(--auth-panel-max-width);
   flex: 1;
   min-height: 0;
-  background: #282834;
+  background: var(--color-bg-app);
   border-radius: 28px 28px 0 0;
 }
 

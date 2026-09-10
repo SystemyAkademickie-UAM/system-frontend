@@ -1,4 +1,4 @@
-import { getJson, patchJson, deleteJson } from './api-client.js';
+import { getJson, patchJson, deleteJson, postJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 import { invalidateStudentProfile } from './studentProfileEvents.js';
 
@@ -131,7 +131,6 @@ export async function fetchStudentBadges(groupId, accountId) {
  * @returns {Promise<{ ok: boolean, isEarned?: boolean, error?: string }>}
  */
 export async function toggleStudentBadge(groupId, accountId, badgeId) {
-  const { postJson } = await import('./api-client.js');
   const result = await postJson(`/groups/${groupId}/students/${accountId}/badges/${badgeId}/toggle`, {});
   if (!result.ok) {
     const errorData = /** @type {{ message?: string }} */ (result.data);
@@ -186,7 +185,6 @@ export async function fetchStudentProgress(groupId, accountId) {
  * @returns {Promise<{ ok: boolean, isCompleted?: boolean, error?: string }>}
  */
 export async function toggleStudentActivity(groupId, accountId, activityId) {
-  const { postJson } = await import('./api-client.js');
   const result = await postJson(
     `/groups/${groupId}/students/${accountId}/activities/${activityId}/toggle`,
     {},

@@ -19,6 +19,61 @@ const DRAFT_STORAGE_KEY_PREFIX = 'maq_shop_item_draft_';
 
 const TOTAL_STEPS = 4;
 
+function buildFormSnapshot({
+  itemName,
+  currentIcon,
+  iconBackground,
+  storyDescription,
+  didacticDescription,
+  cost,
+  minPriceEnabled,
+  minPrice,
+  checkedCategoryIds,
+  categories,
+  badgeDiscounts,
+  isVisible,
+  restrictRankEnabled,
+  unlockRankId,
+  groupLimitEnabled,
+  groupLimit,
+  studentLimitEnabled,
+  studentLimit,
+}) {
+  const resolvedCategoryIds = (
+    checkedCategoryIds
+    ?? (categories ?? []).filter((c) => c.checked === 1).map((c) => String(c.id))
+  )
+    .map(String)
+    .sort();
+
+  const normalizedBadgeDiscounts = (badgeDiscounts ?? [])
+    .map((b) => ({
+      badgeid: String(b.badgeid ?? b.id ?? ''),
+      value: String(b.value ?? '').trim(),
+    }))
+    .sort((a, b) => a.badgeid.localeCompare(b.badgeid));
+
+  return JSON.stringify({
+    itemName: (itemName ?? '').trim(),
+    currentIcon: currentIcon ?? '',
+    iconBackground: iconBackground ?? '',
+    storyDescription: (storyDescription ?? '').trim(),
+    didacticDescription: (didacticDescription ?? '').trim(),
+    cost: (cost ?? '').trim(),
+    minPriceEnabled: Boolean(minPriceEnabled),
+    minPrice: minPriceEnabled ? (minPrice ?? '').trim() : '',
+    checkedCategoryIds: resolvedCategoryIds,
+    badgeDiscounts: normalizedBadgeDiscounts,
+    isVisible: Boolean(isVisible),
+    restrictRankEnabled: Boolean(restrictRankEnabled),
+    unlockRankId: restrictRankEnabled ? String(unlockRankId ?? '') : '',
+    groupLimitEnabled: Boolean(groupLimitEnabled),
+    groupLimit: groupLimitEnabled ? (groupLimit ?? '').trim() : '',
+    studentLimitEnabled: Boolean(studentLimitEnabled),
+    studentLimit: studentLimitEnabled ? (studentLimit ?? '').trim() : '',
+  });
+}
+
 const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   groupId: groupIdProp,
   itemId = null,
@@ -86,6 +141,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
   const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
   const editFormHydratedRef = useRef(null);
+  const initialSnapshotRef = useRef(null);
   const pendingEditCategoryIdsRef = useRef(null);
 
   // --- API: Pobieranie kategorii ---
@@ -328,6 +384,8 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
 
       setIsEditingExtraLife(item.isExtraLife === true);
       const imageParts = String(item.imageRef ?? '').split('*');
+      const loadedIcon = imageParts[0] || '🥕';
+      const loadedIconBg = imageParts[1] || 'rgb(40,40,52)';
       if (imageParts[0]) setCurrentIcon(imageParts[0]);
       if (imageParts[1]) setIconBackground(imageParts[1]);
 
@@ -365,6 +423,8 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         }));
       });
 
+      let loadedRestrictRankEnabled = false;
+      let loadedUnlockRankId = '';
       setRanks((current) => {
         const rankRefs = current.map((r) => ({
           dbId: r.id,
@@ -373,6 +433,8 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         }));
         const owningRank = findRankUnlockingItem(editingItemId, rankRefs);
         if (owningRank) {
+          loadedRestrictRankEnabled = true;
+          loadedUnlockRankId = String(owningRank.dbId);
           setRestrictRankEnabled(true);
           setUnlockRankId(String(owningRank.dbId));
         }
@@ -392,6 +454,26 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         };
       });
       setBadgeDiscounts(loadedBadgeDiscounts);
+
+      initialSnapshotRef.current = buildFormSnapshot({
+        itemName: item.name ?? '',
+        currentIcon: loadedIcon,
+        iconBackground: loadedIconBg,
+        storyDescription: item.storyDescription ?? '',
+        didacticDescription: item.didacticDescription ?? '',
+        cost: priceAmount,
+        minPriceEnabled: item.minPrice != null,
+        minPrice: item.minPrice != null ? String(item.minPrice) : '',
+        checkedCategoryIds: Array.from(selectedCategoryIds),
+        badgeDiscounts: loadedBadgeDiscounts,
+        isVisible: item.isPublished !== false,
+        restrictRankEnabled: loadedRestrictRankEnabled,
+        unlockRankId: loadedUnlockRankId,
+        groupLimitEnabled: item.stockQuantity != null,
+        groupLimit: item.stockQuantity != null ? String(item.stockQuantity) : '',
+        studentLimitEnabled: item.perStudentLimit != null,
+        studentLimit: item.perStudentLimit != null ? String(item.perStudentLimit) : '',
+      });
     })();
 
     return () => {
@@ -498,15 +580,43 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
     }
   };
 
-  // Sprawdzanie czy formularz ma wprowadzone dane
-  const hasUserChanges = Boolean(
-    itemName.trim() ||
-    cost.trim() ||
-    storyDescription.trim() ||
-    didacticDescription.trim() ||
-    badgeDiscounts.length > 0 ||
-    currentStep > 1
-  );
+  // Sprawdzanie czy formularz ma wprowadzone dane / zmiany
+  const currentSnapshot = buildFormSnapshot({
+    itemName,
+    currentIcon,
+    iconBackground,
+    storyDescription,
+    didacticDescription,
+    cost,
+    minPriceEnabled,
+    minPrice,
+    categories,
+    badgeDiscounts,
+    isVisible,
+    restrictRankEnabled,
+    unlockRankId,
+    groupLimitEnabled,
+    groupLimit,
+    studentLimitEnabled,
+    studentLimit,
+  });
+
+  const hasUserChanges = editingItemId
+    ? Boolean(initialSnapshotRef.current && currentSnapshot !== initialSnapshotRef.current)
+    : Boolean(
+        itemName.trim() ||
+        cost.trim() ||
+        storyDescription.trim() ||
+        didacticDescription.trim() ||
+        badgeDiscounts.length > 0 ||
+        categories.some((c) => c.checked === 1) ||
+        minPriceEnabled ||
+        restrictRankEnabled ||
+        groupLimitEnabled ||
+        studentLimitEnabled ||
+        isVisible ||
+        currentStep > 1
+      );
 
   const handleAttemptClose = useCallback(() => {
     if (hasUserChanges) {

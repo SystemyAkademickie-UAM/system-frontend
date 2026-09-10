@@ -283,8 +283,8 @@
   --color-divider: #dad8cc;
 
   /* --- Nawigacja --- */
-  /** Główny pasek nawigacji (sidebar + superBar) */
-  --color-nav-primary: #1f3624;
+  /** Główny pasek nawigacji (sidebar + superBar) — jaśniejszy, przyjemny odcień zieleni w trybie jasnym */
+  --color-nav-primary: #2b5f39;
   /** Ciemniejsze odcienie paska bocznego (scrollbar). */
   --color-nav-scrollbar-track: color-mix(in srgb, var(--color-nav-primary) 80%, #000);
   --color-nav-scrollbar-thumb: color-mix(in srgb, var(--color-nav-primary) 58%, #000);
@@ -294,9 +294,9 @@
   /** Tekst i ikony pozycji w sidebarze */
   --color-nav-link: #d1fae5;
   /** Domyślny kolor ikon SVG (tryb mask) */
-  --color-asset-icon: #ffffff;
+  --color-asset-icon: var(--color-text-secondary);
   /** Ikony na zielonym pasku nawigacji (SuperBar, statystyki) */
-  --color-nav-icon-on-primary: var(--color-asset-icon);
+  --color-nav-icon-on-primary: #ffffff;
   /** Nazwa użytkownika w superBar */
   --color-nav-user-name: #ecfdf5;
   /** Rola użytkownika w superBar */
@@ -304,9 +304,9 @@
   /** Tło logo w sidebarze */
   --color-nav-logo-bg: #d1fae5;
   /** Kapsuła statystyk (życia, waluta) */
-  --color-nav-stat-bg: #29442f;
+  --color-nav-stat-bg: #1e4528;
   /** Podrzędny pasek nawigacji — tło aktywnego przycisku */
-  --color-nav-sub-active-bg: #1f3624;
+  --color-nav-sub-active-bg: #2b5f39;
 
   /* --- Tekst --- */
   /** Główny kolor tekstu */

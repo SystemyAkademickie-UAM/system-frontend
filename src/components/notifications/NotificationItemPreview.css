@@ -26,8 +26,9 @@
   position: fixed;
   z-index: 10000;
   width: min(340px, 92vw);
-  max-height: 80vh;
-  overflow: auto;
+  max-height: min(80vh, calc(100vh - 24px));
+  overflow-y: auto;
+  overflow-x: hidden;
   pointer-events: none;
   border-radius: 12px;
   background: var(--color-bg-surface, #1e1e24);
@@ -38,6 +39,7 @@
 .notification-item-preview__card {
   max-width: 100% !important;
   margin: 0 !important;
+  min-height: auto !important;
 }
 
 @keyframes notification-preview-fade {

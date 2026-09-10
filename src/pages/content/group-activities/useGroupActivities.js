@@ -196,14 +196,26 @@ export function useGroupActivities() {
       });
 
       const receivedStages = (data?.stages ?? []).map(mapStage);
-      setStages(receivedStages);
-      setIsLoading(false);
 
-      await Promise.all(
-        receivedStages.map((stage) => fetchActivitiesForStage(stage.id)),
+      const stagesWithActivities = await Promise.all(
+        receivedStages.map(async (stage) => {
+          try {
+            const actData = await postJson('/activities', {
+              method: 'retrieve',
+              stageId: stage.id,
+            });
+            const activities = sortByNewestFirst((actData?.activities ?? []).map(mapActivity));
+            return { ...stage, activities };
+          } catch {
+            return { ...stage, activities: [] };
+          }
+        }),
       );
 
-      return receivedStages;
+      setStages(stagesWithActivities);
+      setIsLoading(false);
+
+      return stagesWithActivities;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
@@ -211,7 +223,7 @@ export function useGroupActivities() {
       setIsLoading(false);
       return [];
     }
-  }, [groupId, fetchActivitiesForStage, showError]);
+  }, [groupId, showError]);
 
   useEffect(() => {
     fetchStages();
@@ -361,7 +373,19 @@ export function useGroupActivities() {
           i = i + 1;
         }
 
-        const orderedStageIds = [newStageId, ...stages.map((stage) => stage.id)];
+        const sourceIndex = stages.findIndex((stage) => stage.id === stageId);
+        const orderedStageIds = [];
+        if (sourceIndex >= 0) {
+          stages.forEach((stage, idx) => {
+            orderedStageIds.push(stage.id);
+            if (idx === sourceIndex) {
+              orderedStageIds.push(newStageId);
+            }
+          });
+        } else {
+          orderedStageIds.push(...stages.map((stage) => stage.id), newStageId);
+        }
+
         await postJson('/stages', {
           method: 'reorder',
           groupId: Number(groupId),
