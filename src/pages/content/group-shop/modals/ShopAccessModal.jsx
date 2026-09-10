@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Modal, ShopToggleButton } from '../../../../components/ui/index.js';
+import { Divider, Modal, ShopToggleButton } from '../../../../components/ui/index.js';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -37,8 +37,8 @@ const SCHEDULE_CHECKBOX_LABEL__TEXTLABEL = {
 };
 
 const OPEN_DATE_LABEL__TEXTLABEL = {
-  polish: 'Data otwarcia sklepu',
-  english: 'Shop opening date'
+  polish: 'Data i godzina otwarcia sklepu',
+  english: 'Shop opening date and time'
 };
 
 const OPEN_DATE_ARIA_LABEL__TEXTLABEL = {
@@ -259,17 +259,25 @@ export default function ShopAccessModal({
     >
       <div className="shop-access-modal__body">
         <section className="shop-access-modal__section" aria-label={SHOP_STATUS_SECTION_LABEL__TEXTLABEL[LANGUAGE]}>
-          <div className="shop-access-modal__row">
-            <p className="rewards-modal__label">{SHOP_STATUS_SECTION_LABEL__TEXTLABEL[LANGUAGE]}</p>
+          <div className="shop-access-modal__status-card">
+            <div className="shop-access-modal__status-info">
+              <span className="rewards-modal__label">{SHOP_STATUS_SECTION_LABEL__TEXTLABEL[LANGUAGE]}</span>
+              <p className="shop-access-modal__status-description">
+                {pendingShopOpen
+                  ? (LANGUAGE === 'polish' ? 'Sklep jest otwarty dla studentów' : 'Shop is open for students')
+                  : (LANGUAGE === 'polish' ? 'Sklep jest zamknięty' : 'Shop is closed')}
+              </p>
+            </div>
             <ShopToggleButton
               isShopOpen={pendingShopOpen}
               onToggle={handleToggle}
               disabled={busy}
+              className="shop-access-modal__toggle-btn"
             />
           </div>
         </section>
 
-        <div className="shop-access-modal__divider" role="separator" aria-hidden="true" />
+        <Divider className="shop-access-modal__divider" />
 
         <section
           className={[
@@ -292,32 +300,34 @@ export default function ShopAccessModal({
 
           <div className="rewards-modal__field">
             <span className="rewards-modal__label">{OPEN_DATE_LABEL__TEXTLABEL[LANGUAGE]}</span>
-            <div className={datetimeRowClassName}>
-              <input
-                ref={dateInputRef}
-                id="shop-open-date"
-                type="date"
-                className="rewards-modal__input rewards-modal__input--date"
-                value={openDate}
-                disabled={scheduleInputsDisabled}
-                onChange={(event) => setOpenDate(event.target.value)}
-                onClick={(event) => openDateTimePicker(event, dateInputRef, scheduleInputsDisabled)}
-                aria-label={OPEN_DATE_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
-              />
-            </div>
-            <div className={datetimeRowClassName}>
-              <input
-                ref={timeInputRef}
-                id="shop-open-time"
-                type="time"
-                className="rewards-modal__input rewards-modal__input--time"
-                value={openTime}
-                disabled={scheduleInputsDisabled}
-                onChange={(event) => setOpenTime(event.target.value)}
-                onClick={(event) => openDateTimePicker(event, timeInputRef, scheduleInputsDisabled)}
-                step={60}
-                aria-label={OPEN_TIME_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
-              />
+            <div className="shop-access-modal__datetime-grid">
+              <div className={datetimeRowClassName}>
+                <input
+                  ref={dateInputRef}
+                  id="shop-open-date"
+                  type="date"
+                  className="rewards-modal__input shop-access-modal__input"
+                  value={openDate}
+                  disabled={scheduleInputsDisabled}
+                  onChange={(event) => setOpenDate(event.target.value)}
+                  onClick={(event) => openDateTimePicker(event, dateInputRef, scheduleInputsDisabled)}
+                  aria-label={OPEN_DATE_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
+                />
+              </div>
+              <div className={datetimeRowClassName}>
+                <input
+                  ref={timeInputRef}
+                  id="shop-open-time"
+                  type="time"
+                  className="rewards-modal__input shop-access-modal__input"
+                  value={openTime}
+                  disabled={scheduleInputsDisabled}
+                  onChange={(event) => setOpenTime(event.target.value)}
+                  onClick={(event) => openDateTimePicker(event, timeInputRef, scheduleInputsDisabled)}
+                  step={60}
+                  aria-label={OPEN_TIME_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
+                />
+              </div>
             </div>
           </div>
         </section>

@@ -7,6 +7,11 @@ export const AUTH_LEGAL_DOCUMENTS = {
     publicPath: 'documents/warunki-uzytkowania.pdf',
     fileName: 'warunki-uzytkowania.pdf',
   },
+  documentation: {
+    label: 'Dokumentacja',
+    publicPath: 'documents/warunki-uzytkowania.pdf',
+    fileName: 'warunki-uzytkowania.pdf',
+  },
   privacyPolicy: {
     label: 'Polityka prywatności',
     publicPath: 'documents/polityka-prywatnosci.pdf',

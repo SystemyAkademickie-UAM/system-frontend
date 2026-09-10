@@ -31,6 +31,10 @@ function StageIsland({
     polish: 'Ukryty',
     english: 'Hidden',
   };
+  const HIDDENBYSTAGEBADGE__TEXTLABEL = {
+    polish: 'Ukryty przez etap',
+    english: 'Hidden by stage',
+  };
   const PUBLICBADGE__TEXTLABEL = {
     polish: 'Publiczny',
     english: 'Public',
@@ -170,11 +174,33 @@ function StageIsland({
                   </tr>
                 </thead>
                 <tbody>
-                  {stage.activities.map((activity) => (
-                    <tr key={`activity-${stage.id}-${activity.id}`} className="activities-island__row" onDoubleClick={() => onActivityDoubleClick(stage, activity)}>
-                      <td className="activities-island__cell activities-island__cell--name">
-                        <span className="activities-island__activity-name">{activity.name}</span>
-                      </td>
+                  {stage.activities.map((activity) => {
+                    const isActivityHidden = activity.visibilityStatus === 0 || activity.isPublished === false || activity.isVisible === false;
+                    const isHiddenByStage = !isActivityHidden && isHidden;
+                    return (
+                      <tr
+                        key={`activity-${stage.id}-${activity.id}`}
+                        className={[
+                          'activities-island__row',
+                          (isActivityHidden || isHiddenByStage) ? 'activities-island__row--hidden' : '',
+                          isHiddenByStage ? 'activities-island__row--hidden-by-stage' : '',
+                        ].filter(Boolean).join(' ')}
+                        onDoubleClick={() => onActivityDoubleClick?.(stage, activity)}
+                      >
+                        <td className="activities-island__cell activities-island__cell--name">
+                          <span className="activities-island__activity-name">
+                            {activity.name}
+                            {isActivityHidden ? (
+                              <span className="activities-island__activity-badge activities-island__activity-badge--hidden">
+                                {HIDDENBADGE__TEXTLABEL[LANGUAGE]}
+                              </span>
+                            ) : isHiddenByStage ? (
+                              <span className="activities-island__activity-badge activities-island__activity-badge--hidden-by-stage">
+                                {HIDDENBYSTAGEBADGE__TEXTLABEL[LANGUAGE]}
+                              </span>
+                            ) : null}
+                          </span>
+                        </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--truncate">
                         <span className="activities-island__cell-text" title={activity.description0}>
                           <em>{activity.description0 || '—'}</em>
@@ -200,7 +226,8 @@ function StageIsland({
                         />
                       </td>
                     </tr>
-                  ))}
+                  );
+                })}
                 </tbody>
               </table>
             </div>

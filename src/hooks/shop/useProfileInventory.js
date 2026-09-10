@@ -14,15 +14,19 @@ import {
  * @param {string | number | null | undefined} groupId
  * @param {{ studentAccountId?: string | number | null, readOnly?: boolean }} [options]
  */
-export function useProfileInventory(groupId, { studentAccountId = null, readOnly = false } = {}) {
+export function useProfileInventory(groupId, { studentAccountId = null, readOnly = false, enabled = true } = {}) {
   const [entries, setEntries] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState('');
 
   const refetch = useCallback(async () => {
-    if (!groupId) {
-      setEntries([]);
-      setIsLoading(false);
+    if (!groupId || !enabled) {
+      if (!enabled) {
+        setIsLoading(true);
+      } else {
+        setEntries([]);
+        setIsLoading(false);
+      }
       return;
     }
 
@@ -42,7 +46,7 @@ export function useProfileInventory(groupId, { studentAccountId = null, readOnly
 
     setEntries([]);
     setError(result.error ?? 'Nie udało się pobrać ekwipunku');
-  }, [groupId, studentAccountId]);
+  }, [groupId, studentAccountId, enabled]);
 
   useEffect(() => {
     refetch();

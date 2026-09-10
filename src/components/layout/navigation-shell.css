@@ -194,6 +194,12 @@
   box-shadow: none;
 }
 
+.sidebar-nav__link--active .maq-asset-svg--mask,
+.sidebar-nav__link--active .nav-glyph,
+.sidebar-nav__link--active .sidebar-nav__chevron {
+  color: var(--color-nav-cta);
+}
+
 .sidebar-nav__link--active::before {
   content: '';
   position: absolute;
@@ -207,6 +213,11 @@
 
 .sidebar-nav__link--active:hover {
   background: color-mix(in srgb, var(--color-bg-app) 86%, black 14%);
+  color: var(--color-accent);
+}
+
+.sidebar-nav__link--active:hover .maq-asset-svg--mask,
+.sidebar-nav__link--active:hover .nav-glyph {
   color: var(--color-accent);
 }
 

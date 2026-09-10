@@ -12,15 +12,19 @@ import {
  * @param {string | number | null | undefined} groupId
  * @param {{ studentAccountId?: string | number | null }} [options]
  */
-export function useProfileInventoryHistory(groupId, { studentAccountId = null } = {}) {
+export function useProfileInventoryHistory(groupId, { studentAccountId = null, enabled = true } = {}) {
   const [history, setHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(enabled);
   const [error, setError] = useState('');
 
   const refetch = useCallback(async () => {
-    if (!groupId) {
-      setHistory([]);
-      setIsLoading(false);
+    if (!groupId || !enabled) {
+      if (!enabled) {
+        setIsLoading(true);
+      } else {
+        setHistory([]);
+        setIsLoading(false);
+      }
       return;
     }
 
@@ -40,7 +44,7 @@ export function useProfileInventoryHistory(groupId, { studentAccountId = null } 
 
     setHistory([]);
     setError(result.error ?? 'Nie udało się pobrać historii ekwipunku');
-  }, [groupId, studentAccountId]);
+  }, [groupId, studentAccountId, enabled]);
 
   useEffect(() => {
     refetch();

@@ -6,6 +6,7 @@ import '../RouteContent.css';
 import { useState, useEffect } from 'react';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
+import { NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 //import './ProfileContent.css';
 
 export default function ProfileContent() {
@@ -73,7 +74,7 @@ export default function ProfileContent() {
 
 
   function onNicknamechange(stringvalue) {
-    while (stringvalue.length > 15) {
+    while (stringvalue.length > NICKNAME_MAX_LENGTH) {
       stringvalue = stringvalue.slice(0, -1);
     }
     setNickname(stringvalue);

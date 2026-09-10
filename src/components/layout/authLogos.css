@@ -8,7 +8,11 @@
   filter: grayscale(1) brightness(1.15);
 }
 
-/* Colors live in pionierid-logo.png — no CSS filter (avoids graying whites). */
+/* Colors live in pionierid-logo.png in dark mode, and pionierid-logo-dark.png in light mode. */
 .auth-logo--pionier {
   display: block;
+}
+
+[data-theme="light"] .auth-logo--pionier {
+  content: url('/images/pionierid-logo-dark.png');
 }

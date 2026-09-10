@@ -1,80 +1,95 @@
+import { Suspense, lazy } from 'react';
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
 import { HomeRedirect, RouteGuard, GroupAccessGuard, GroupOwnerGuard, RankingDisabledRedirect } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 
+// Helper for lazy page loading with Suspense
+function withLazy(factory) {
+  const Component = lazy(factory);
+  return function LazyPageWrapper(props) {
+    return (
+      <Suspense fallback={<div className="maq-route-loading" aria-busy="true" />}>
+        <Component {...props} />
+      </Suspense>
+    );
+  };
+}
+
 // Login/Auth pages
 import AuthShell from '../components/layout/AuthShell.jsx';
 import LoginShell from '../components/layout/LoginShell.jsx';
-import LoginPage from '../pages/links/auth/LoginPage.jsx';
-import LoginMagicPage from '../pages/links/auth/LoginMagicPage.jsx';
-import WelcomePage from '../pages/links/auth/WelcomePage.jsx';
-import DevApiTestPage from '../pages/links/dev/DevApiTestPage.jsx';
+const LoginPage = withLazy(() => import('../pages/links/auth/LoginPage.jsx'));
+const LoginMagicPage = withLazy(() => import('../pages/links/auth/LoginMagicPage.jsx'));
+const WelcomePage = withLazy(() => import('../pages/links/auth/WelcomePage.jsx'));
+const DevApiTestPage = withLazy(() => import('../pages/links/dev/DevApiTestPage.jsx'));
 
 // App-level pages
-import CourseManagementPage from '../pages/links/app/CourseManagementPage.jsx';
-import HelpPage from '../pages/links/app/HelpPage.jsx';
-import OrganizationManagementPage from '../pages/links/app/OrganizationManagementPage.jsx';
-import SuperadminLogsPage from '../pages/links/app/SuperadminLogsPage.jsx';
-import SettingsPage from '../pages/links/app/SettingsPage.jsx';
-import StatisticsPage from '../pages/links/app/StatisticsPage.jsx';
-import UserManagementPage from '../pages/links/app/UserManagementPage.jsx';
+const CourseManagementPage = withLazy(() => import('../pages/links/app/CourseManagementPage.jsx'));
+const HelpPage = withLazy(() => import('../pages/links/app/HelpPage.jsx'));
+const OrganizationManagementPage = withLazy(() => import('../pages/links/app/OrganizationManagementPage.jsx'));
+const SuperadminLogsPage = withLazy(() => import('../pages/links/app/SuperadminLogsPage.jsx'));
+const SettingsPage = withLazy(() => import('../pages/links/app/SettingsPage.jsx'));
+const StatisticsPage = withLazy(() => import('../pages/links/app/StatisticsPage.jsx'));
+const UserManagementPage = withLazy(() => import('../pages/links/app/UserManagementPage.jsx'));
 
 // Templates gallery - lecturer only
 import TemplatesLayout from '../pages/links/templates/TemplatesLayout.jsx';
-import TemplatesMyPage from '../pages/links/templates/TemplatesMyPage.jsx';
-import TemplatesGalleryPage from '../pages/links/templates/TemplatesGalleryPage.jsx';
+const TemplatesMyPage = withLazy(() => import('../pages/links/templates/TemplatesMyPage.jsx'));
+const TemplatesGalleryPage = withLazy(() => import('../pages/links/templates/TemplatesGalleryPage.jsx'));
 
 // Groups list
-import GroupsListPage from '../pages/links/groups/groups-list/GroupsListPage.jsx';
-import GroupJoinPage from '../pages/links/groups/GroupJoinPage.jsx';
+const GroupsListPage = withLazy(() => import('../pages/links/groups/groups-list/GroupsListPage.jsx'));
+const GroupJoinPage = withLazy(() => import('../pages/links/groups/GroupJoinPage.jsx'));
 
 // Group Main (Ekran główny) - student + lecturer
 import GroupMainLayout from '../pages/links/groups/layouts/GroupMainLayout.jsx';
-import GroupMainHomePage from '../pages/links/groups/main/GroupMainHomePage.jsx';
-import GroupMainPostsPage from '../pages/links/groups/main/GroupMainPostsPage.jsx';
-import GroupMainMembersPage from '../pages/links/groups/main/GroupMainMembersPage.jsx';
-import GroupMainActivitiesPage from '../pages/links/groups/main/GroupMainActivitiesPage.jsx';
-import GroupMainRanksPage from '../pages/links/groups/main/GroupMainRanksPage.jsx';
-import GroupMainBadgesPage from '../pages/links/groups/main/GroupMainBadgesPage.jsx';
+const GroupMainHomePage = withLazy(() => import('../pages/links/groups/main/GroupMainHomePage.jsx'));
+const GroupMainPostsPage = withLazy(() => import('../pages/links/groups/main/GroupMainPostsPage.jsx'));
+const GroupMainMembersPage = withLazy(() => import('../pages/links/groups/main/GroupMainMembersPage.jsx'));
+const GroupMainActivitiesPage = withLazy(() => import('../pages/links/groups/main/GroupMainActivitiesPage.jsx'));
+const GroupMainRanksPage = withLazy(() => import('../pages/links/groups/main/GroupMainRanksPage.jsx'));
+const GroupMainBadgesPage = withLazy(() => import('../pages/links/groups/main/GroupMainBadgesPage.jsx'));
 
 // Profile (Profil) - student only
 import ProfileLayout from '../pages/links/groups/layouts/ProfileLayout.jsx';
-import ProfileHomePage from '../pages/links/groups/profile/ProfileHomePage.jsx';
-import ProfileLogPage from '../pages/links/groups/profile/ProfileLogPage.jsx';
-import ProfileEqPage from '../pages/links/groups/profile/ProfileEqPage.jsx';
-import StudentProfileViewPage from '../pages/links/groups/student-profile/StudentProfileViewPage.jsx';
+import StudentProfileLayout from '../pages/links/groups/layouts/StudentProfileLayout.jsx';
+const ProfileHomePage = withLazy(() => import('../pages/links/groups/profile/ProfileHomePage.jsx'));
+const ProfileLogPage = withLazy(() => import('../pages/links/groups/profile/ProfileLogPage.jsx'));
+const ProfileEqPage = withLazy(() => import('../pages/links/groups/profile/ProfileEqPage.jsx'));
+const ProfilePurchasesPage = withLazy(() => import('../pages/links/groups/profile/ProfilePurchasesPage.jsx'));
+const StudentProfileViewPage = withLazy(() => import('../pages/links/groups/student-profile/StudentProfileViewPage.jsx'));
 
 // Members (Użytkownicy) - lecturer only
 import MembersLayout from '../pages/links/groups/layouts/MembersLayout.jsx';
-import MembersHomePage from '../pages/links/groups/members/MembersHomePage.jsx';
-import MembersLogPage from '../pages/links/groups/members/MembersLogPage.jsx';
-import MembersCodePage from '../pages/links/groups/members/MembersCodePage.jsx';
+const MembersHomePage = withLazy(() => import('../pages/links/groups/members/MembersHomePage.jsx'));
+const MembersLogPage = withLazy(() => import('../pages/links/groups/members/MembersLogPage.jsx'));
+const MembersCodePage = withLazy(() => import('../pages/links/groups/members/MembersCodePage.jsx'));
 
 // Activities (Aktywności) - lecturer only
 import ActivitiesLayout from '../pages/links/groups/layouts/ActivitiesLayout.jsx';
-import ActivitiesHomePage from '../pages/links/groups/activities/ActivitiesHomePage.jsx';
-import ActivitiesToolsPage from '../pages/links/groups/activities/ActivitiesToolsPage.jsx';
+const ActivitiesHomePage = withLazy(() => import('../pages/links/groups/activities/ActivitiesHomePage.jsx'));
+const ActivitiesToolsPage = withLazy(() => import('../pages/links/groups/activities/ActivitiesToolsPage.jsx'));
 
 // Posts (Wpisy) - lecturer only
-import PostsHomePage from '../pages/links/groups/posts/PostsHomePage.jsx';
+const PostsHomePage = withLazy(() => import('../pages/links/groups/posts/PostsHomePage.jsx'));
 
 // Rewards (Systemy nagród) - lecturer only
 import RewardsLayout from '../pages/links/groups/layouts/RewardsLayout.jsx';
-import RewardsHomePage from '../pages/links/groups/rewards/RewardsHomePage.jsx';
-import RewardsBadgesPage from '../pages/links/groups/rewards/RewardsBadgesPage.jsx';
-import ShopItemsPage from '../pages/links/groups/rewards/ShopItemsPage.jsx';
+const RewardsHomePage = withLazy(() => import('../pages/links/groups/rewards/RewardsHomePage.jsx'));
+const RewardsBadgesPage = withLazy(() => import('../pages/links/groups/rewards/RewardsBadgesPage.jsx'));
+const ShopItemsPage = withLazy(() => import('../pages/links/groups/rewards/ShopItemsPage.jsx'));
 
 // Group Settings (Ustawienia grupy) - lecturer only
 import GroupSettingsLayout from '../pages/links/groups/layouts/GroupSettingsLayout.jsx';
-import GroupSettingsHomePage from '../pages/links/groups/group-settings/GroupSettingsHomePage.jsx';
-import GroupSettingsCurrencyPage from '../pages/links/groups/group-settings/GroupSettingsCurrencyPage.jsx';
-import GroupSettingsHealthPage from '../pages/links/groups/group-settings/GroupSettingsHealthPage.jsx';
+const GroupSettingsHomePage = withLazy(() => import('../pages/links/groups/group-settings/GroupSettingsHomePage.jsx'));
+const GroupSettingsCurrencyPage = withLazy(() => import('../pages/links/groups/group-settings/GroupSettingsCurrencyPage.jsx'));
+const GroupSettingsHealthPage = withLazy(() => import('../pages/links/groups/group-settings/GroupSettingsHealthPage.jsx'));
 
 // Shop (Sklep) - student + lecturer
 import ShopLayout from '../pages/links/groups/shop/ShopLayout.jsx';
-import ShopHomePage from '../pages/links/groups/shop/ShopHomePage.jsx';
-import ShopAddRedirect from '../pages/links/groups/shop/ShopAddRedirect.jsx';
+const ShopHomePage = withLazy(() => import('../pages/links/groups/shop/ShopHomePage.jsx'));
+const ShopAddRedirect = withLazy(() => import('../pages/links/groups/shop/ShopAddRedirect.jsx'));
 
 // Ranking — tymczasowo wyłączony (redirect do /main)
 
@@ -210,10 +225,16 @@ const appRouteTree = [
                   {
                     element: withGuard(<GroupOwnerGuard />),
                     children: [
-                  // STUDENT PROFILE (lecturer view) — ekwipunek uczestnika
+                  // STUDENT PROFILE (lecturer view) — ekwipunek, odznaki, zakupy uczestnika
                   {
                     path: 'student-profile/:studentId',
-                    element: withGuard(<StudentProfileViewPage />, { allowedRoles: LECTURER_ONLY }),
+                    element: withGuard(<StudentProfileLayout />, { allowedRoles: LECTURER_ONLY }),
+                    children: [
+                      { index: true, element: <ProfileHomePage /> },
+                      { path: 'activity', element: <Navigate to="." replace /> },
+                      { path: 'eq', element: <ProfileEqPage /> },
+                      { path: 'purchases', element: <ProfilePurchasesPage /> },
+                    ],
                   },
 
                   // MEMBERS (Użytkownicy) - lecturer only
@@ -273,9 +294,10 @@ const appRouteTree = [
                     path: 'profile',
                     element: withGuard(<ProfileLayout />, { allowedRoles: STUDENT_ONLY }),
                     children: [
-                      { index: true, element: <ProfileHomePage /> },
-                      { path: 'activity', element: <ProfileLogPage /> },
+                      { index: true, element: <ProfileLogPage /> },
+                      { path: 'activity', element: <ProfileHomePage /> },
                       { path: 'eq', element: <ProfileEqPage /> },
+                      { path: 'purchases', element: <ProfilePurchasesPage /> },
                     ],
                   },
 

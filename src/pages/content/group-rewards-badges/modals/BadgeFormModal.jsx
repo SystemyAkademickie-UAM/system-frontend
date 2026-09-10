@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BADGE_RARITY, BADGE_RARITY_LABELS, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
+import { BADGE_RARITY, BADGE_RARITY_LABELS, Divider, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
@@ -180,57 +180,65 @@ export default function BadgeFormModal({
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        <div className="rewards-modal__row rewards-modal__row--name-reward">
-          <TextField
-            id="badge-name"
-            label={NAMELABEL__TEXTLABEL[LANGUAGE]}
-            fieldKind="name"
-            value={form.name}
-            onChange={handleChange('name')}
-            className="rewards-modal__field"
-            inputClassName="rewards-modal__input"
-          />
-          <div className="rewards-modal__field">
-            <RewardsCurrencyLabel htmlFor="badge-reward">{REWARDLABEL__TEXTLABEL[LANGUAGE]}</RewardsCurrencyLabel>
-            <input
-              id="badge-reward"
-              type="text"
-              inputMode="numeric"
-              className="rewards-modal__input"
-              value={form.rewardAmount}
-              onChange={handleChange('rewardAmount')}
+        {/* Sekcja 1: Podstawowe informacje */}
+        <div className="rewards-modal__grid-main">
+          <div className="rewards-modal__icon-box">
+            <EmojiPickerField
+              className="rewards-modal__field rewards-modal__field--icon"
+              label={ICONLABEL__TEXTLABEL[LANGUAGE]}
+              value={form.icon}
+              defaultEmoji={DEFAULT_BADGE_EMOJI}
+              onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
+              ariaLabel={ICONARIALABEL__TEXTLABEL[LANGUAGE]}
             />
           </div>
-        </div>
 
-        <div className="rewards-modal__row rewards-modal__row--icon-rarity">
-          <EmojiPickerField
-            className="rewards-modal__field rewards-modal__field--icon"
-            label={ICONLABEL__TEXTLABEL[LANGUAGE]}
-            value={form.icon}
-            defaultEmoji={DEFAULT_BADGE_EMOJI}
-            onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
-            ariaLabel={ICONARIALABEL__TEXTLABEL[LANGUAGE]}
-          />
+          <div className="rewards-modal__fields-stack">
+            <div className="rewards-modal__row rewards-modal__row--name-reward">
+              <TextField
+                id="badge-name"
+                label={NAMELABEL__TEXTLABEL[LANGUAGE]}
+                fieldKind="name"
+                value={form.name}
+                onChange={handleChange('name')}
+                className="rewards-modal__field"
+                inputClassName="rewards-modal__input"
+              />
+              <div className="rewards-modal__field">
+                <RewardsCurrencyLabel htmlFor="badge-reward">{REWARDLABEL__TEXTLABEL[LANGUAGE]}</RewardsCurrencyLabel>
+                <input
+                  id="badge-reward"
+                  type="text"
+                  inputMode="numeric"
+                  className="rewards-modal__input"
+                  value={form.rewardAmount}
+                  onChange={handleChange('rewardAmount')}
+                />
+              </div>
+            </div>
 
-          <div className="rewards-modal__field">
-            <label htmlFor="badge-rarity" className="rewards-modal__label">
-              {RARITYLABEL__TEXTLABEL[LANGUAGE]}
-              <InfoTooltip text={RARITYTOOLTIPTEXT__TEXTLABEL[LANGUAGE]} />
-            </label>
-            <select
-              id="badge-rarity"
-              className="rewards-modal__input"
-              value={form.rarity}
-              onChange={handleChange('rarity')}
-            >
-              {Object.entries(BADGE_RARITY_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
+            <div className="rewards-modal__field">
+              <label htmlFor="badge-rarity" className="rewards-modal__label">
+                {RARITYLABEL__TEXTLABEL[LANGUAGE]}
+                <InfoTooltip text={RARITYTOOLTIPTEXT__TEXTLABEL[LANGUAGE]} />
+              </label>
+              <select
+                id="badge-rarity"
+                className="rewards-modal__input"
+                value={form.rarity}
+                onChange={handleChange('rarity')}
+              >
+                {Object.entries(BADGE_RARITY_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
+        <Divider className="rewards-modal__divider" />
+
+        {/* Sekcja 2: Opisy */}
         <TextField
           id="badge-story"
           label={STORYDESCRIPTIONLABEL__TEXTLABEL[LANGUAGE]}
@@ -251,6 +259,9 @@ export default function BadgeFormModal({
           inputClassName="rewards-modal__textarea"
         />
 
+        <Divider className="rewards-modal__divider" />
+
+        {/* Sekcja 3: Dostępność */}
         <div className="rewards-modal__field">
           <BadgeOptionCheckbox
             id="badge-start-hidden"

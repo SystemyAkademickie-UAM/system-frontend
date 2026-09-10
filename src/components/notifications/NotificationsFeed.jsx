@@ -10,6 +10,7 @@ import {
   setNotificationsLastSeen,
 } from '../../utils/notifications/notificationsLastSeen.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+import NotificationItemPreview from './NotificationItemPreview.jsx';
 import './NotificationsFeed.css';
 
 const EMPTYMESSAGE__TEXTLABEL = {
@@ -26,6 +27,59 @@ const NEWFROMLASTVISIT__TEXTLABEL = {
   polish: 'Nowe od ostatniej wizyty',
   english: 'New since last visit',
 };
+
+function renderNotificationTextWithPreview(text, notification, groupId, onMarkRead) {
+  if (!text || !groupId) {
+    return text;
+  }
+
+  const itemName = notification.itemName?.trim();
+  const isExtraLife = notification.isExtraLife;
+
+  let targetTerm = null;
+  let isExtra = false;
+
+  if (itemName && text.toLowerCase().includes(itemName.toLowerCase())) {
+    targetTerm = itemName;
+  } else if (isExtraLife) {
+    const extraLifeRegex = /dodatkow(?:e|ego|ych|ym)\s+ży(?:cie|cia|ciom|ciach|ciem)/i;
+    const match = text.match(extraLifeRegex);
+    if (match) {
+      targetTerm = match[0];
+      isExtra = true;
+    }
+  }
+
+  if (!targetTerm) {
+    return text;
+  }
+
+  const lowerText = text.toLowerCase();
+  const lowerTerm = targetTerm.toLowerCase();
+  const index = lowerText.indexOf(lowerTerm);
+
+  if (index === -1) {
+    return text;
+  }
+
+  const before = text.slice(0, index);
+  const matched = text.slice(index, index + targetTerm.length);
+  const after = text.slice(index + targetTerm.length);
+
+  return (
+    <>
+      {before}
+      <NotificationItemPreview
+        groupId={groupId}
+        notification={notification}
+        name={matched}
+        isExtraLife={isExtra || isExtraLife}
+        onMarkRead={onMarkRead}
+      />
+      {after}
+    </>
+  );
+}
 
 function isSameNavigationTarget(location, href) {
   const hashIndex = href.indexOf('#');
@@ -188,13 +242,17 @@ export default function NotificationsFeed({
           const content = (
             <>
               <p className="notifications-feed__item-type">{notification.typeLabel}</p>
-              <p className="notifications-feed__item-title">{notification.title}</p>
+              <p className="notifications-feed__item-title">
+                {renderNotificationTextWithPreview(notification.title, notification, groupId, onMarkRead)}
+              </p>
               {notification.currencyReward != null ? (
                 <p className="notifications-feed__item-message notifications-feed__item-message--currency">
                   <CurrencyDisplay amount={`+${notification.currencyReward}`} size="sm" />
                 </p>
               ) : notification.message && notification.message !== notification.title ? (
-                <p className="notifications-feed__item-message">{notification.message}</p>
+                <p className="notifications-feed__item-message">
+                  {renderNotificationTextWithPreview(notification.message, notification, groupId, onMarkRead)}
+                </p>
               ) : null}
               <time className="notifications-feed__item-time" dateTime={notification.date}>
                 {formatRelativeTimePl(notification.date)}
@@ -245,8 +303,8 @@ export default function NotificationsFeed({
                   <button
                     type="button"
                     className="notifications-feed__mark-read"
-                    aria-label="Oznacz jako przeczytane"
-                    title="Oznacz jako przeczytane"
+                    aria-label="Odczytaj"
+                    title="Odczytaj"
                     onClick={(event) => handleMarkReadClick(event, notification)}
                   >
                     <AssetSvg

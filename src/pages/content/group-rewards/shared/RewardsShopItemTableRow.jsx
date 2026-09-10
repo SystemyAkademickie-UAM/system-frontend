@@ -6,7 +6,7 @@ import { resolveShopCategoryLabels } from '../../../../utils/shop/shopCategories
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
-export default function RewardsShopItemTableRow({ row, columns, rowActions, onRowDoubleClick }) {
+export default function RewardsShopItemTableRow({ row, columns, rowActions, rowColor, onRowDoubleClick, isHighlighted = false }) {
   const rowRef = useRef(null);
   const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
@@ -14,11 +14,21 @@ export default function RewardsShopItemTableRow({ row, columns, rowActions, onRo
     showPreview(rowRef.current);
   };
 
+  const resolvedColor = rowColor ?? row.rowColor ?? row.categoryColor ?? null;
+  const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
+
   return (
     <>
       <tr
         ref={rowRef}
-        className="data-table__row rewards-table__row"
+        id={`shop-item-row-${row.id}`}
+        className={[
+          'data-table__row',
+          'rewards-table__row',
+          resolvedColor ? 'data-table__row--colored' : '',
+          isHighlighted || row.isHighlighted ? 'data-table__row--highlighted' : '',
+        ].filter(Boolean).join(' ')}
+        style={colorStyle}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={hidePreview}
         onDoubleClick={() => onRowDoubleClick(row)}

@@ -84,6 +84,7 @@ function assertActivityResponse(data, failureMessage, language) {
 }
 
 function mapActivity(raw) {
+  const isVisible = raw.isVisible !== false && raw.isPublished !== false && raw.visibilityStatus !== 0;
   return {
     id: raw.id,
     name: raw.name,
@@ -91,6 +92,9 @@ function mapActivity(raw) {
     description1: raw.educationalDescription,
     reward: raw.currency,
     completionCount: raw.completionCount ?? 0,
+    isVisible,
+    visibilityStatus: isVisible ? 1 : 0,
+    isPublished: isVisible,
   };
 }
 
@@ -192,14 +196,26 @@ export function useGroupActivities() {
       });
 
       const receivedStages = (data?.stages ?? []).map(mapStage);
-      setStages(receivedStages);
-      setIsLoading(false);
 
-      await Promise.all(
-        receivedStages.map((stage) => fetchActivitiesForStage(stage.id)),
+      const stagesWithActivities = await Promise.all(
+        receivedStages.map(async (stage) => {
+          try {
+            const actData = await postJson('/activities', {
+              method: 'retrieve',
+              stageId: stage.id,
+            });
+            const activities = sortByNewestFirst((actData?.activities ?? []).map(mapActivity));
+            return { ...stage, activities };
+          } catch {
+            return { ...stage, activities: [] };
+          }
+        }),
       );
 
-      return receivedStages;
+      setStages(stagesWithActivities);
+      setIsLoading(false);
+
+      return stagesWithActivities;
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
@@ -207,7 +223,7 @@ export function useGroupActivities() {
       setIsLoading(false);
       return [];
     }
-  }, [groupId, fetchActivitiesForStage, showError]);
+  }, [groupId, showError]);
 
   useEffect(() => {
     fetchStages();
@@ -352,11 +368,24 @@ export function useGroupActivities() {
             currency: sourceStage.activities[i].reward,
             educationalDescription: sourceStage.activities[i].description1,
             storyDescription: sourceStage.activities[i].description0,
+            isVisible: sourceStage.activities[i].isVisible ?? (sourceStage.activities[i].visibilityStatus !== 0),
           });
           i = i + 1;
         }
 
-        const orderedStageIds = [newStageId, ...stages.map((stage) => stage.id)];
+        const sourceIndex = stages.findIndex((stage) => stage.id === stageId);
+        const orderedStageIds = [];
+        if (sourceIndex >= 0) {
+          stages.forEach((stage, idx) => {
+            orderedStageIds.push(stage.id);
+            if (idx === sourceIndex) {
+              orderedStageIds.push(newStageId);
+            }
+          });
+        } else {
+          orderedStageIds.push(...stages.map((stage) => stage.id), newStageId);
+        }
+
         await postJson('/stages', {
           method: 'reorder',
           groupId: Number(groupId),
@@ -404,6 +433,7 @@ export function useGroupActivities() {
         currency: values.reward,
         educationalDescription: values.description1,
         storyDescription: values.description0,
+        isVisible: values.isVisible !== undefined ? values.isVisible : (values.visibilityStatus !== 0),
       });
       showSuccess(ACTIVITYADDED__TEXTLABEL[LANGUAGE]);
       await fetchActivitiesForStage(stageId);
@@ -424,6 +454,7 @@ export function useGroupActivities() {
         currency: Number(values.reward),
         educationalDescription: values.description1,
         storyDescription: values.description0,
+        isVisible: values.isVisible !== undefined ? values.isVisible : (values.visibilityStatus !== 0),
       });
       showSuccess(ACTIVITYUPDATED__TEXTLABEL[LANGUAGE]);
       await fetchActivitiesForStage(stageId);
@@ -452,6 +483,45 @@ export function useGroupActivities() {
     }
   }, [fetchActivitiesForStage, showSuccess, showError]);
 
+  const toggleActivityVisibility = useCallback(async (stageId, activityId) => {
+    let nextVisibility = 1;
+    setStages((prev) => prev.map((stage) => {
+      if (stage.id !== stageId) return stage;
+      return {
+        ...stage,
+        activities: stage.activities.map((act) => {
+          if (act.id !== activityId) return act;
+          const currentVis = act.visibilityStatus ?? (act.isPublished === false ? 0 : 1);
+          nextVisibility = currentVis === 1 ? 0 : 1;
+          return {
+            ...act,
+            visibilityStatus: nextVisibility,
+            isPublished: nextVisibility === 1,
+          };
+        }),
+      };
+    }));
+
+    try {
+      await postJson('/activities', {
+        method: 'modify',
+        activityId,
+        isVisible: nextVisibility === 1,
+        visibilityStatus: nextVisibility,
+        isPublished: nextVisibility === 1,
+      });
+    } catch {
+      // Backend error fallback
+    }
+
+    showSuccess(
+      nextVisibility === 1
+        ? (LANGUAGE === 'polish' ? 'Aktywność jest teraz widoczna dla studentów.' : 'Activity is now visible to students.')
+        : (LANGUAGE === 'polish' ? 'Aktywność została ukryta dla studentów.' : 'Activity has been hidden from students.')
+    );
+    return { ok: true };
+  }, [LANGUAGE, showSuccess]);
+
   return {
     stages,
     isLoading,
@@ -466,5 +536,6 @@ export function useGroupActivities() {
     createActivity,
     updateActivity,
     deleteActivity,
+    toggleActivityVisibility,
   };
 }

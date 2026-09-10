@@ -5,6 +5,7 @@ import { AUTH_LOGIN_MAGIC_LINK_REQUEST_PATH } from '../../../constants/authPaths
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { postJson } from '../../../services/api-client.js';
 import { getMagicLinkErrorMessage } from '../../../services/magicLinkErrors.js';
+import { getRememberMe, setRememberMe } from '../../../services/rememberMeService.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthCard.css';
 import './LoginInstitution.css';
@@ -22,6 +23,11 @@ const PAGE_TITLE__TEXTLABEL = {
 const EMAILLABEL__TEXTLABEL = {
   polish: 'Adres e-mail',
   english: 'Email address'
+};
+
+const REMEMBER_ME__TEXTLABEL = {
+  polish: 'Zapamiętaj mnie',
+  english: 'Remember me'
 };
 
 const EMAILPLACEHOLDER__TEXTLABEL = {
@@ -67,6 +73,7 @@ export default function LoginEmail({ onBack }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [lastSentEmail, setLastSentEmail] = useState('');
+  const [rememberMe, setRememberMeState] = useState(() => getRememberMe());
   const [cooldownRemainingSeconds, setCooldownRemainingSeconds] = useState(0);
   const [isBusy, setIsBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -189,6 +196,23 @@ export default function LoginEmail({ onBack }) {
             autoComplete="email"
           />
         </div>
+      </div>
+
+      <div className="login-institution__remember-me">
+        <label className="login-institution__checkbox-label" htmlFor="email-remember-me">
+          <input
+            id="email-remember-me"
+            type="checkbox"
+            checked={rememberMe}
+            disabled={isBusy}
+            onChange={(e) => {
+              const next = e.target.checked;
+              setRememberMeState(next);
+              setRememberMe(next);
+            }}
+          />
+          <span>{REMEMBER_ME__TEXTLABEL[LANGUAGE]}</span>
+        </label>
       </div>
 
       {(errorMessage || successMessage) ? (

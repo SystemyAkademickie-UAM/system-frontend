@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
-import { CharacterLimitedField, useToast } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, Modal, useToast } from '../../../components/ui/index.js';
 import {
   GROUP_NAME_MAX_LENGTH,
   GROUP_SUBJECT_NAME_MAX_LENGTH,
@@ -15,188 +15,257 @@ import {
 import { validateGroupBannerFile } from '../../../utils/groupBannerUpload.js';
 import { createGroup } from '../../../services/groups.api.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import GroupCreatorUnsavedModal from './modals/GroupCreatorUnsavedModal.jsx';
+import GroupCreatorDraftPromptModal from './modals/GroupCreatorDraftPromptModal.jsx';
 import './GroupsListCreator.css';
 
-const MINCHARACTERS__TEXTLABEL = {
-  polish: 'musi zawierać minimum 1 znak.',
-  english: 'must contain minimum 1 character.',
-};
-const MAXCHARACTERS__TEXTLABEL = {
-  polish: 'maks. {{count}} znaków.',
-  english: 'max. {{count}} characters.',
-};
-const GROUPNAMEMIN__TEXTLABEL = {
-  polish: 'Nazwa grupy musi zawierać minimum 1 znak.',
-  english: 'Group name must contain minimum 1 character.',
-};
-const SUBJECTNAMEMIN__TEXTLABEL = {
-  polish: 'Nazwa przedmiotu musi zawierać minimum 1 znak.',
-  english: 'Subject name must contain minimum 1 character.',
-};
-const DESCRIPTIONREQUIRED__TEXTLABEL = {
-  polish: 'Opis grupy jest wymagany.',
-  english: 'Group description is required.',
-};
-const CREATIONFAILED__TEXTLABEL = {
-  polish: 'Nie udało się utworzyć grupy.',
-  english: 'Failed to create group.',
-};
+const DRAFT_STORAGE_KEY = 'maq_group_creator_draft';
+const TOTAL_STEPS = 2;
+
 const CREATORTITLE__TEXTLABEL = {
   polish: 'Kreator grupy',
   english: 'Group Creator',
 };
-const STEP1SUBTITLE__TEXTLABEL = {
-  polish: 'Nazwa, przedmiot i opis na jednej planszy.',
-  english: 'Name, subject, and description on one board.',
+
+const STAGE_TITLES = {
+  1: { polish: 'Informacje', english: 'Information' },
+  2: { polish: 'Baner grupy', english: 'Group Banner' },
 };
-const STEP2SUBTITLE__TEXTLABEL = {
-  polish: 'Wybierz baner: gotowy wzór, własny plik lub kolor tła.',
-  english: 'Choose banner: ready-made pattern, own file or background color.',
+
+const GROUPNAMEMIN__TEXTLABEL = {
+  polish: 'Nazwa grupy musi zawierać minimum 1 znak.',
+  english: 'Group name must contain minimum 1 character.',
 };
-const BACKBUTTON__TEXTLABEL = {
-  polish: '← Wróć',
-  english: '← Back',
+
+const SUBJECTNAMEMIN__TEXTLABEL = {
+  polish: 'Nazwa przedmiotu musi zawierać minimum 1 znak.',
+  english: 'Subject name must contain minimum 1 character.',
 };
-const GROUPDATALABEL__TEXTLABEL = {
-  polish: 'Dane grupy',
-  english: 'Group Data',
+
+const DESCRIPTIONREQUIRED__TEXTLABEL = {
+  polish: 'Opis grupy jest wymagany.',
+  english: 'Group description is required.',
 };
-const BANNERLABEL__TEXTLABEL = {
-  polish: 'Baner grupy',
-  english: 'Group Banner',
+
+const CREATIONFAILED__TEXTLABEL = {
+  polish: 'Nie udało się utworzyć grupy.',
+  english: 'Failed to create group.',
 };
+
 const GROUPNAME__TEXTLABEL = {
   polish: 'Nazwa grupy*',
   english: 'Group Name*',
 };
+
 const SUBJECTNAME__TEXTLABEL = {
   polish: 'Nazwa przedmiotu*',
   english: 'Subject Name*',
 };
+
 const GROUPDESCRIPTION__TEXTLABEL = {
   polish: 'Opis grupy*',
   english: 'Group Description*',
 };
+
 const DESCRIPTIONPLACEHOLDER__TEXTLABEL = {
   polish: 'Krótko opisz tło fabularne i cele grupy...',
   english: 'Briefly describe the background and goals of the group...',
 };
-const REJECTBUTTON__TEXTLABEL = {
-  polish: 'Odrzuć',
-  english: 'Reject',
+
+const CANCELBUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel',
 };
+
+const PREVBUTTON__TEXTLABEL = {
+  polish: 'Cofnij',
+  english: 'Back',
+};
+
 const NEXTBUTTON__TEXTLABEL = {
   polish: 'Dalej',
   english: 'Next',
 };
+
 const CREATEBUTTON__TEXTLABEL = {
-  polish: 'Stwórz',
-  english: 'Create',
+  polish: 'Stwórz grupę',
+  english: 'Create Group',
+};
+
+const CREATINGBUTTON__TEXTLABEL = {
+  polish: 'Tworzenie...',
+  english: 'Creating...',
 };
 
 const GROUP_NAME_MAX = GROUP_NAME_MAX_LENGTH;
 const SUBJECT_NAME_MAX = GROUP_SUBJECT_NAME_MAX_LENGTH;
 const GROUP_DESCRIPTION_MAX = GROUP_DESCRIPTION_MAX_LENGTH;
 
-export default function GroupsListCreator({ onClose, onCreated }) {
+export default function GroupsListCreator({
+  isOpen,
+  onClose,
+  onCreated,
+}) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const { showError } = useToast();
+  const { showSuccess, showError } = useToast();
+
   const [step, setStep] = useState(1);
-  const [slideDirection, setSlideDirection] = useState('forward');
-  const [groupnamevalue, setGroupnamevalue] = useState('');
-  const [subjectnamevalue, setSubjectnamevalue] = useState('');
-  const [groupnamevalueerror, setGroupnamevalueerror] = useState('');
-  const [subjectnamevalueerror, setSubjectnamevalueerror] = useState('');
-  const [groupdescriptionvalue, setGroupdescriptionvalue] = useState('');
+  const [groupName, setGroupName] = useState('');
+  const [subjectName, setSubjectName] = useState('');
+  const [groupDescription, setGroupDescription] = useState('');
   const [bannerSelection, setBannerSelection] = useState(createDefaultBannerPickerValue);
 
-  function onGroupnamechange(value) {
-    const trimmed = value.length > GROUP_NAME_MAX ? value.slice(0, GROUP_NAME_MAX) : value;
-    if (trimmed.length < 1) {
-      setGroupnamevalueerror(MINCHARACTERS__TEXTLABEL[LANGUAGE]);
-    } else if (value.length > GROUP_NAME_MAX) {
-      setGroupnamevalueerror(MAXCHARACTERS__TEXTLABEL[LANGUAGE].replace('{{count}}', GROUP_NAME_MAX));
-    } else {
-      setGroupnamevalueerror('');
+  const [groupNameError, setGroupNameError] = useState('');
+  const [subjectNameError, setSubjectNameError] = useState('');
+  const [groupDescriptionError, setGroupDescriptionError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Modale pomocnicze
+  const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
+  const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
+
+  // Sprawdzanie wersji roboczej przy otwarciu
+  useEffect(() => {
+    if (!isOpen) return;
+
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && (parsed.groupName || parsed.subjectName || parsed.groupDescription || parsed.step > 1)) {
+          setIsDraftPromptOpen(true);
+        }
+      }
+    } catch {
+      // ignore
     }
-    setGroupnamevalue(trimmed);
-  }
+  }, [isOpen]);
 
-  function onSubjectnamechange(value) {
-    const trimmed = value.length > SUBJECT_NAME_MAX ? value.slice(0, SUBJECT_NAME_MAX) : value;
-    if (value.length > SUBJECT_NAME_MAX) {
-      setSubjectnamevalueerror(MAXCHARACTERS__TEXTLABEL[LANGUAGE].replace('{{count}}', SUBJECT_NAME_MAX));
-    } else {
-      setSubjectnamevalueerror('');
-    }
-    setSubjectnamevalue(trimmed);
-  }
+  const hasUserChanges = Boolean(
+    groupName.trim()
+    || subjectName.trim()
+    || groupDescription.trim()
+    || step > 1
+  );
 
-  function onGroupdescriptionchange(value) {
-    const trimmed = value.length > GROUP_DESCRIPTION_MAX
-      ? value.slice(0, GROUP_DESCRIPTION_MAX)
-      : value;
-    setGroupdescriptionvalue(trimmed);
-  }
-
-  function resetForm() {
+  const resetForm = useCallback(() => {
     setStep(1);
-    setSlideDirection('forward');
-    setGroupnamevalue('');
-    setSubjectnamevalue('');
-    setGroupdescriptionvalue('');
+    setGroupName('');
+    setSubjectName('');
+    setGroupDescription('');
     setBannerSelection(createDefaultBannerPickerValue());
-    setGroupnamevalueerror('');
-    setSubjectnamevalueerror('');
-  }
+    setGroupNameError('');
+    setSubjectNameError('');
+    setGroupDescriptionError('');
+    setIsSubmitting(false);
+  }, []);
 
-  function onRejectclick() {
+  const handleAttemptClose = useCallback(() => {
+    if (hasUserChanges) {
+      setIsUnsavedModalOpen(true);
+    } else {
+      resetForm();
+      onClose?.();
+    }
+  }, [hasUserChanges, onClose, resetForm]);
+
+  // Obsługa wersji roboczej (Drafts)
+  const handleLoadDraft = () => {
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+      if (savedDraft) {
+        const data = JSON.parse(savedDraft);
+        if (data.groupName != null) setGroupName(data.groupName);
+        if (data.subjectName != null) setSubjectName(data.subjectName);
+        if (data.groupDescription != null) setGroupDescription(data.groupDescription);
+        if (data.bannerSelection != null) setBannerSelection(data.bannerSelection);
+        if (data.step != null) setStep(Math.min(TOTAL_STEPS, Math.max(1, data.step)));
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        showSuccess('Wczytano wersję roboczą.');
+      }
+    } catch {
+      showError('Nie udało się wczytać wersji roboczej.');
+    } finally {
+      setIsDraftPromptOpen(false);
+    }
+  };
+
+  const handleDiscardDraftAndNew = () => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setIsDraftPromptOpen(false);
+  };
+
+  const handleSaveDraftAndExit = () => {
+    try {
+      const draftData = {
+        step,
+        groupName,
+        subjectName,
+        groupDescription,
+        bannerSelection: bannerSelection.mode === 'file' ? createDefaultBannerPickerValue() : bannerSelection,
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData));
+      showSuccess('Wersja robocza została zapisana.');
+    } catch {
+      showError('Nie udało się zapisać wersji roboczej.');
+    }
+    setIsUnsavedModalOpen(false);
     resetForm();
     onClose?.();
-  }
+  };
 
-  function validateStep1() {
-    const validationErrors = [];
-    let hasError = false;
+  const handleDiscardAndExit = () => {
+    try {
+      localStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setIsUnsavedModalOpen(false);
+    resetForm();
+    onClose?.();
+  };
 
-    if (groupnamevalue.trim().length < 1) {
-      setGroupnamevalueerror(MINCHARACTERS__TEXTLABEL[LANGUAGE]);
-      validationErrors.push(GROUPNAMEMIN__TEXTLABEL[LANGUAGE]);
-      hasError = true;
+  // Walidacja
+  const validateStep1 = () => {
+    let isValid = true;
+    setGroupNameError('');
+    setSubjectNameError('');
+    setGroupDescriptionError('');
+
+    if (!groupName.trim()) {
+      setGroupNameError(GROUPNAMEMIN__TEXTLABEL[LANGUAGE]);
+      isValid = false;
     }
 
-    if (subjectnamevalue.trim().length < 1) {
-      setSubjectnamevalueerror(MINCHARACTERS__TEXTLABEL[LANGUAGE]);
-      validationErrors.push(SUBJECTNAMEMIN__TEXTLABEL[LANGUAGE]);
-      hasError = true;
+    if (!subjectName.trim()) {
+      setSubjectNameError(SUBJECTNAMEMIN__TEXTLABEL[LANGUAGE]);
+      isValid = false;
     }
 
-    if (groupdescriptionvalue.trim().length < 1) {
-      validationErrors.push(DESCRIPTIONREQUIRED__TEXTLABEL[LANGUAGE]);
-      hasError = true;
+    if (!groupDescription.trim()) {
+      setGroupDescriptionError(DESCRIPTIONREQUIRED__TEXTLABEL[LANGUAGE]);
+      isValid = false;
     }
 
-    if (hasError) {
-      showError(validationErrors.join(' '));
-    }
+    return isValid;
+  };
 
-    return !hasError;
-  }
-
-  function onNextStep() {
-    if (!validateStep1()) {
-      return;
-    }
-    setSlideDirection('forward');
+  const handleNextStep = () => {
+    if (!validateStep1()) return;
     setStep(2);
-  }
+  };
 
-  function onPreviousStep() {
-    setSlideDirection('back');
+  const handlePrevStep = () => {
     setStep(1);
-  }
+  };
 
-  async function uploadBannerToDrive(url, browserid, file) {
+  // Upload banera
+  const uploadBannerToDrive = async (url, browserid, file) => {
     const formdata = new FormData();
     const drivejson = {
       drive: { method: 'post', driveRef: '', size: file.size },
@@ -219,15 +288,15 @@ export default function GroupsListCreator({ onClose, onCreated }) {
       throw new Error('/drive not JSON: ' + drivetext);
     }
     if (!driveresponse.ok || drivedata.statusCode === 403) {
-      throw new Error('Błąd /drive.');
+      throw new Error('Błąd przesyłania banera.');
     }
     if (typeof drivedata.driveRef !== 'string' || drivedata.driveRef.trim() === '') {
-      throw new Error('Pusty driveRef.');
+      throw new Error('Pusty driveRef banera.');
     }
     return drivedata.driveRef.trim();
-  }
+  };
 
-  async function resolveImageRefForSave(base, browserid) {
+  const resolveImageRefForSave = async (base, browserid) => {
     if (bannerSelection.mode === 'file' && bannerSelection.file) {
       const validation = validateGroupBannerFile(bannerSelection.file);
       if (!validation.valid) {
@@ -236,24 +305,24 @@ export default function GroupsListCreator({ onClose, onCreated }) {
       return uploadBannerToDrive(base, browserid, bannerSelection.file);
     }
     return buildBannerImageRefPayload(bannerSelection);
-  }
+  };
 
-  async function onSavegroupclick() {
+  const handleSaveGroup = async () => {
     if (!validateStep1()) {
-      setSlideDirection('back');
       setStep(1);
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
       const imageref = await resolveImageRefForSave(base, browserid);
 
       const payload = {
-        name: groupnamevalue.trim(),
-        subjectName: subjectnamevalue.trim(),
-        description: groupdescriptionvalue.trim(),
+        name: groupName.trim(),
+        subjectName: subjectName.trim(),
+        description: groupDescription.trim(),
       };
       if (imageref !== undefined) {
         payload.imageRef = imageref;
@@ -262,188 +331,221 @@ export default function GroupsListCreator({ onClose, onCreated }) {
       const result = await createGroup(payload);
       if (!result.ok) {
         showError(result.error || CREATIONFAILED__TEXTLABEL[LANGUAGE]);
+        setIsSubmitting(false);
         return;
       }
 
-      onCreated?.({
-        groupId: result.groupId,
-        groupName: groupnamevalue.trim(),
-        subjectName: subjectnamevalue.trim(),
-      });
+      try {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {
+        // ignore
+      }
+
+      if (onCreated) {
+        onCreated({
+          groupId: result.groupId,
+          groupName: groupName.trim(),
+          subjectName: subjectName.trim(),
+        });
+      } else {
+        showSuccess('Grupa została pomyślnie utworzona.');
+      }
       resetForm();
-      onClose?.();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       showError(message);
+      setIsSubmitting(false);
     }
-  }
+  };
+
+  const stageTitle = STAGE_TITLES[step]?.[LANGUAGE] ?? '';
+
+  const modalTitle = (
+    <span className="group-creator-modal-title">
+      <span className="group-creator-modal-title__main">{CREATORTITLE__TEXTLABEL[LANGUAGE]}</span>
+      <span className="group-creator-modal-title__divider">•</span>
+      <span className="group-creator-modal-title__stage">{stageTitle}</span>
+      <span className="group-creator-modal-title__badge">{step}/{TOTAL_STEPS}</span>
+    </span>
+  );
 
   return (
-    <article
-      className={[
-        'groups-list-creator',
-        step === 2 ? 'groups-list-creator--banner-step' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="groups-list-creator-title"
-      onClick={(event) => event.stopPropagation()}
-    >
-      <div className="groups-list-creator__body">
-        <header className="groups-list-creator__header">
-          <div className="groups-list-creator__titles">
-            <div className="groups-list-creator__heading-row">
-              <h2 id="groups-list-creator-title" className="groups-list-creator__title">
-                {CREATORTITLE__TEXTLABEL[LANGUAGE]}
-              </h2>
-              <span className="groups-list-creator__step-badge" aria-live="polite">
-                {step}/2
-              </span>
-            </div>
-            <p className="groups-list-creator__subtitle">
-              {step === 1
-                ? STEP1SUBTITLE__TEXTLABEL[LANGUAGE]
-                : STEP2SUBTITLE__TEXTLABEL[LANGUAGE]}
-            </p>
-          </div>
-          {step === 2 ? (
-            <button
-              type="button"
-              className="groups-list-creator__btn groups-list-creator__btn--ghost groups-list-creator__back-btn"
-              onClick={onPreviousStep}
-              aria-label={BACKBUTTON__TEXTLABEL[LANGUAGE]}
-            >
-              {BACKBUTTON__TEXTLABEL[LANGUAGE]}
-            </button>
-          ) : null}
-        </header>
-
-        <div className="groups-list-creator__steps-viewport">
-          <div
-            className={[
-              'groups-list-creator__steps-track',
-              step === 2 ? 'groups-list-creator__steps-track--step-2' : '',
-              slideDirection === 'back' ? 'groups-list-creator__steps-track--back' : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-          >
-            <section
-              className="groups-list-creator__step"
-              aria-label={GROUPDATALABEL__TEXTLABEL[LANGUAGE]}
-              aria-hidden={step !== 1}
-              inert={step !== 1}
-            >
-              <div className="groups-list-creator__panel groups-list-creator__panel--compact">
-                <div className="groups-list-creator__fields">
-                  <div className="groups-list-creator__field">
-                    <label className="groups-list-creator__label" htmlFor="groups-list-creator-name">
+    <>
+      <Modal
+        isOpen={isOpen}
+        onClose={handleAttemptClose}
+        title={modalTitle}
+        size={step === 2 ? 'xl' : 'lg'}
+        showFooter={false}
+        className="group-creator-form-modal"
+      >
+        <div className="group-creator-wizard">
+          <div className="group-creator-wizard__content">
+            {step === 1 && (
+              <div className="group-creator-step group-creator-step--info">
+                <div className="group-creator__section">
+                  <div className="group-creator__field">
+                    <label className="group-creator__label" htmlFor="group-name-input">
                       {GROUPNAME__TEXTLABEL[LANGUAGE]}
-                      {groupnamevalueerror ? (
-                        <span className="groups-list-creator__label-error">{groupnamevalueerror}</span>
+                      {groupNameError ? (
+                        <span className="group-creator__label-error">{groupNameError}</span>
                       ) : null}
                     </label>
-                    <CharacterLimitedField value={groupnamevalue} maxLength={GROUP_NAME_MAX}>
+                    <CharacterLimitedField value={groupName} maxLength={GROUP_NAME_MAX}>
                       <input
-                        id="groups-list-creator-name"
-                        className="groups-list-creator__input groups-list-creator__input--compact"
+                        id="group-name-input"
+                        className={[
+                          'group-creator__input',
+                          groupNameError ? 'group-creator__input--error' : '',
+                        ].filter(Boolean).join(' ')}
                         type="text"
-                        value={groupnamevalue}
-                        onChange={(event) => onGroupnamechange(event.target.value)}
+                        value={groupName}
+                        onChange={(e) => {
+                          setGroupName(e.target.value.slice(0, GROUP_NAME_MAX));
+                          if (groupNameError) setGroupNameError('');
+                        }}
                         maxLength={GROUP_NAME_MAX}
                         autoComplete="off"
+                        disabled={isSubmitting}
                       />
                     </CharacterLimitedField>
                   </div>
-                  <div className="groups-list-creator__field">
-                    <label className="groups-list-creator__label" htmlFor="groups-list-creator-subject">
+
+                  <div className="group-creator__field">
+                    <label className="group-creator__label" htmlFor="group-subject-input">
                       {SUBJECTNAME__TEXTLABEL[LANGUAGE]}
-                      {subjectnamevalueerror ? (
-                        <span className="groups-list-creator__label-error">{subjectnamevalueerror}</span>
+                      {subjectNameError ? (
+                        <span className="group-creator__label-error">{subjectNameError}</span>
                       ) : null}
                     </label>
-                    <CharacterLimitedField value={subjectnamevalue} maxLength={SUBJECT_NAME_MAX}>
+                    <CharacterLimitedField value={subjectName} maxLength={SUBJECT_NAME_MAX}>
                       <input
-                        id="groups-list-creator-subject"
-                        className="groups-list-creator__input groups-list-creator__input--compact"
+                        id="group-subject-input"
+                        className={[
+                          'group-creator__input',
+                          subjectNameError ? 'group-creator__input--error' : '',
+                        ].filter(Boolean).join(' ')}
                         type="text"
-                        value={subjectnamevalue}
-                        onChange={(event) => onSubjectnamechange(event.target.value)}
+                        value={subjectName}
+                        onChange={(e) => {
+                          setSubjectName(e.target.value.slice(0, SUBJECT_NAME_MAX));
+                          if (subjectNameError) setSubjectNameError('');
+                        }}
                         maxLength={SUBJECT_NAME_MAX}
                         autoComplete="off"
+                        disabled={isSubmitting}
                       />
                     </CharacterLimitedField>
                   </div>
-                  <div className="groups-list-creator__field">
-                    <label className="groups-list-creator__label" htmlFor="groups-list-creator-description">
+
+                  <div className="group-creator__field">
+                    <label className="group-creator__label" htmlFor="group-desc-input">
                       {GROUPDESCRIPTION__TEXTLABEL[LANGUAGE]}
+                      {groupDescriptionError ? (
+                        <span className="group-creator__label-error">{groupDescriptionError}</span>
+                      ) : null}
                     </label>
-                    <CharacterLimitedField value={groupdescriptionvalue} maxLength={GROUP_DESCRIPTION_MAX}>
+                    <CharacterLimitedField value={groupDescription} maxLength={GROUP_DESCRIPTION_MAX}>
                       <textarea
-                        id="groups-list-creator-description"
-                        className="groups-list-creator__textarea groups-list-creator__textarea--compact"
-                        value={groupdescriptionvalue}
+                        id="group-desc-input"
+                        className={[
+                          'group-creator__textarea',
+                          groupDescriptionError ? 'group-creator__textarea--error' : '',
+                        ].filter(Boolean).join(' ')}
+                        value={groupDescription}
                         maxLength={GROUP_DESCRIPTION_MAX}
-                        onChange={(event) => onGroupdescriptionchange(event.target.value)}
+                        onChange={(e) => {
+                          setGroupDescription(e.target.value.slice(0, GROUP_DESCRIPTION_MAX));
+                          if (groupDescriptionError) setGroupDescriptionError('');
+                        }}
                         placeholder={DESCRIPTIONPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                         rows={4}
+                        disabled={isSubmitting}
                       />
                     </CharacterLimitedField>
                   </div>
                 </div>
               </div>
-            </section>
+            )}
 
-            <section
-              className="groups-list-creator__step groups-list-creator__step--banner"
-              aria-label={BANNERLABEL__TEXTLABEL[LANGUAGE]}
-              aria-hidden={step !== 2}
-              inert={step !== 2}
-            >
-              <div className="groups-list-creator__panel groups-list-creator__panel--banner">
-                <GroupBannerPicker
-                  value={bannerSelection}
-                  onChange={setBannerSelection}
-                  className="groups-list-creator__banner-picker"
-                />
+            {step === 2 && (
+              <div className="group-creator-step group-creator-step--banner">
+                <div className="group-creator__section group-creator__section--banner">
+                  <GroupBannerPicker
+                    value={bannerSelection}
+                    onChange={setBannerSelection}
+                    className="group-creator__banner-picker"
+                  />
+                </div>
               </div>
-            </section>
+            )}
+          </div>
+
+          <div className="group-creator-wizard__footer">
+            <div className="group-creator-wizard__footer-left">
+              <Button
+                type="button"
+                variant="ghost"
+                size="md"
+                onClick={handleAttemptClose}
+                disabled={isSubmitting}
+              >
+                {CANCELBUTTON__TEXTLABEL[LANGUAGE]}
+              </Button>
+            </div>
+
+            <div className="group-creator-wizard__footer-right">
+              {step === 2 && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  onClick={handlePrevStep}
+                  disabled={isSubmitting}
+                >
+                  {PREVBUTTON__TEXTLABEL[LANGUAGE]}
+                </Button>
+              )}
+
+              {step === 1 ? (
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="md"
+                  onClick={handleNextStep}
+                  disabled={isSubmitting}
+                >
+                  {NEXTBUTTON__TEXTLABEL[LANGUAGE]}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="md"
+                  onClick={handleSaveGroup}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? CREATINGBUTTON__TEXTLABEL[LANGUAGE] : CREATEBUTTON__TEXTLABEL[LANGUAGE]}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
+      </Modal>
 
-      </div>
+      <GroupCreatorUnsavedModal
+        isOpen={isUnsavedModalOpen}
+        onClose={() => setIsUnsavedModalOpen(false)}
+        onDiscard={handleDiscardAndExit}
+        onSaveDraft={handleSaveDraftAndExit}
+      />
 
-      <footer className="groups-list-creator__footer groups-list-creator__footer--sticky">
-        <div className="groups-list-creator__footer-spacer" />
-        <div className="groups-list-creator__footer-actions">
-          <button
-            type="button"
-            className="groups-list-creator__btn groups-list-creator__btn--ghost"
-            onClick={onRejectclick}
-          >
-            {REJECTBUTTON__TEXTLABEL[LANGUAGE]}
-          </button>
-          {step === 1 ? (
-            <button
-              type="button"
-              className="groups-list-creator__btn groups-list-creator__btn--primary"
-              onClick={onNextStep}
-            >
-              {NEXTBUTTON__TEXTLABEL[LANGUAGE]}
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="groups-list-creator__btn groups-list-creator__btn--primary"
-              onClick={onSavegroupclick}
-            >
-              {CREATEBUTTON__TEXTLABEL[LANGUAGE]}
-            </button>
-          )}
-        </div>
-      </footer>
-    </article>
+      <GroupCreatorDraftPromptModal
+        isOpen={isDraftPromptOpen}
+        onClose={() => setIsDraftPromptOpen(false)}
+        onLoadDraft={handleLoadDraft}
+        onDiscardDraftAndNew={handleDiscardDraftAndNew}
+      />
+    </>
   );
 }

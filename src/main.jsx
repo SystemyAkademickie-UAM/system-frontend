@@ -7,10 +7,13 @@ import { UserProfileProvider } from './context/UserProfileContext.jsx';
 import { ToastProvider } from './components/ui/Toast/Toast.jsx';
 import { NotificationsProvider } from './context/NotificationsContext.jsx';
 import { createAppRouter } from './routes/createAppRouter.jsx';
+import { initTheme } from './services/themeService.js';
 import { startProductionClientLogger } from './utils/startProductionClientLogger.js';
 import './styles/tokens.css';
 import './styles/messages.css';
 import './index.css';
+
+initTheme();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

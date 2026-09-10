@@ -6,8 +6,8 @@
   width: var(--auth-card-max-width);
   max-width: calc(100% - 2rem);
   background: var(--auth-card-bg, var(--color-bg-elevated));
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 64px 64px -12px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--color-modal-border, rgba(255, 255, 255, 0.05));
+  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.2);
   border-radius: 12px;
   overflow: visible;
 }
@@ -16,30 +16,53 @@
   align-items: flex-start;
 }
 
-/** Same outer card size as `/login` on large screens (Figma 569×558). */
-@media (min-width: 1920px) {
+.auth-card.auth-card--wizard-panel {
+  min-height: var(--auth-card-min-height, 558px);
+}
+
+@media (max-width: 640px) {
   .auth-card.auth-card--wizard-panel {
-    min-height: var(--auth-card-min-height);
+    min-height: auto;
   }
 }
 
-.auth-card__back-button {
+.auth-card__header {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.auth-card__header .auth-card__back-button {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.auth-card__header .auth-card__title {
+  margin-bottom: 0;
+}
+
+.auth-card__back-button {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   background: transparent;
-  border: none;
+  border: 1px solid rgba(189, 202, 190, 0.25);
   cursor: pointer;
-  border-radius: 50%;
-  transition: background-color 0.2s;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   align-self: flex-start;
   margin-bottom: 16px;
+  color: var(--auth-text-primary, var(--color-text-primary));
 }
 
 .auth-card__back-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(189, 202, 190, 0.45);
 }
 
 .auth-card__back-button:focus-visible {
@@ -47,10 +70,43 @@
   outline-offset: 2px;
 }
 
-.auth-card__back-icon {
-  width: 32px;
-  height: 32px;
+.auth-card__back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--auth-text-secondary, var(--color-text-secondary));
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 1.25rem;
+  transition: color 0.15s ease, opacity 0.15s ease;
+  align-self: flex-start;
+  text-decoration: none;
+}
+
+.auth-card__back-link:hover {
   color: var(--auth-text-primary, var(--color-text-primary));
+}
+
+.auth-card__back-link:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.auth-card__back-link .auth-card__back-icon {
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+}
+
+.auth-card__back-icon {
+  width: 18px;
+  height: 18px;
+  color: currentColor;
 }
 
 .auth-card__logo {

@@ -4,6 +4,7 @@ import { getSamlLoginUrl } from '../../../constants/api.constants.js';
 import { AUTH_SAML_ORGANIZATIONS_PATH, AUTH_SAML_STATUS_PATH } from '../../../constants/authPaths.constants.js';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { getJson } from '../../../services/api-client.js';
+import { getRememberMe, setRememberMe } from '../../../services/rememberMeService.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthCard.css';
 import './LoginInstitution.css';
@@ -18,6 +19,11 @@ const BACK_ARIALABEL__TEXTLABEL = {
 const SELECTIONLABEL__TEXTLABEL = {
   polish: 'Wybierz uczelnię',
   english: 'Select institution'
+};
+
+const REMEMBER_ME__TEXTLABEL = {
+  polish: 'Zapamiętaj mnie',
+  english: 'Remember me'
 };
 
 const LOADINGOPTION__TEXTLABEL = {
@@ -63,6 +69,7 @@ export default function LoginInstitution({ onBack }) {
   const navigate = useNavigate();
   const [organizations, setOrganizations] = useState(/** @type {SamlOrganizationOption[]} */ ([]));
   const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
+  const [rememberMe, setRememberMeState] = useState(() => getRememberMe());
   const [isOrganizationsLoading, setIsOrganizationsLoading] = useState(true);
   const [isBusy, setIsBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -168,6 +175,23 @@ export default function LoginInstitution({ onBack }) {
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="login-institution__remember-me">
+        <label className="login-institution__checkbox-label" htmlFor="institution-remember-me">
+          <input
+            id="institution-remember-me"
+            type="checkbox"
+            checked={rememberMe}
+            disabled={isBusy}
+            onChange={(e) => {
+              const next = e.target.checked;
+              setRememberMeState(next);
+              setRememberMe(next);
+            }}
+          />
+          <span>{REMEMBER_ME__TEXTLABEL[LANGUAGE]}</span>
+        </label>
       </div>
 
       {errorMessage && (

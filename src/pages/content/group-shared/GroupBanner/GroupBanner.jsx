@@ -8,8 +8,8 @@ import { splitGroupStoryTitle } from './splitGroupStoryTitle.js';
 import './GroupBanner.css';
 
 const NOIMAGE__TEXTLABEL = {
-  polish: 'Brak grafiki',
-  english: 'No image',
+  polish: 'Brak baneru',
+  english: 'No banner',
 };
 
 const LOADINGGROUPDATA__TEXTLABEL = {

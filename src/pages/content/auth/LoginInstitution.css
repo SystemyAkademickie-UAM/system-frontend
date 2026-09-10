@@ -132,6 +132,34 @@
   cursor: not-allowed;
 }
 
+.login-institution__remember-me {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  margin-top: 1.25rem;
+}
+
+.login-institution__checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--auth-text-secondary, var(--color-text-secondary));
+  cursor: pointer;
+  user-select: none;
+}
+
+.login-institution__checkbox-label input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--auth-accent, var(--color-accent));
+  cursor: pointer;
+}
+
 .login-institution__messages {
   width: 100%;
   max-width: var(--auth-content-max-width);

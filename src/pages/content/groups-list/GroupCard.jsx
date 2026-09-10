@@ -8,8 +8,8 @@ import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupCard.css';
 
 const NOIMAGE__TEXTLABEL = {
-  polish: 'Brak grafiki',
-  english: 'No image',
+  polish: 'Brak baneru',
+  english: 'No banner',
 };
 const SUBJECT__TEXTLABEL = {
   polish: 'Przedmiot',

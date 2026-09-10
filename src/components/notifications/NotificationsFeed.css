@@ -22,9 +22,9 @@
 }
 
 .notifications-feed__row {
-  display: flex;
-  align-items: stretch;
-  gap: 0.35rem;
+  position: relative;
+  display: block;
+  width: 100%;
 }
 
 .notifications-feed__row--unread .notifications-feed__item {
@@ -33,7 +33,8 @@
 
 .notifications-feed__row--gold .notifications-feed__item {
   border-left-color: var(--color-notification-item-used, #d4a017);
-  background: rgba(212, 160, 23, 0.1);
+  background: color-mix(in srgb, var(--color-notification-item-used, #d4a017) 12%, var(--color-bg-elevated));
+  border-color: color-mix(in srgb, var(--color-notification-item-used, #d4a017) 25%, var(--color-divider));
 }
 
 .notifications-feed__row--gold.notifications-feed__row--unread .notifications-feed__item {
@@ -41,34 +42,35 @@
 }
 
 .notifications-feed__row--gold .notifications-feed__item-type {
-  color: var(--color-notification-item-used-bright, #f0c940);
+  color: var(--color-notification-item-used, #d4a017);
 }
 
 .notifications-feed__row--gold .notifications-feed__item-title {
-  color: #f5e6b8;
+  color: var(--color-text-primary);
 }
 
 .notifications-feed__item--gold.notifications-feed__item--linkable:hover,
 .notifications-feed__item--gold.notifications-feed__item--linkable:focus-visible {
-  background: rgba(212, 160, 23, 0.18);
+  background: color-mix(in srgb, var(--color-notification-item-used, #d4a017) 18%, var(--color-bg-elevated));
 }
 
 .notifications-feed__row--gold .notifications-feed__mark-read {
-  background: rgba(212, 160, 23, 0.16);
-  color: var(--color-notification-item-used-bright, #f0c940);
+  background: color-mix(in srgb, var(--color-notification-item-used, #d4a017) 16%, transparent);
+  color: var(--color-notification-item-used, #d4a017);
 }
 
 .notifications-feed__row--gold .notifications-feed__mark-read:hover {
-  background: rgba(212, 160, 23, 0.28);
+  background: color-mix(in srgb, var(--color-notification-item-used, #d4a017) 28%, transparent);
 }
 
 .notifications-feed__item {
-  flex: 1 1 auto;
-  min-width: 0;
+  box-sizing: border-box;
+  width: 100%;
   display: block;
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 2.75rem 0.85rem 1rem;
   border-radius: 10px;
-  background: rgba(13, 13, 24, 0.45);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-divider);
   color: inherit;
   text-decoration: none;
   cursor: default;
@@ -76,7 +78,7 @@
 }
 
 .notifications-feed--compact .notifications-feed__item {
-  padding: 0.75rem;
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
 }
 
 .notifications-feed__item--linkable {
@@ -86,7 +88,7 @@
 
 .notifications-feed__item--linkable:hover,
 .notifications-feed__item--linkable:focus-visible {
-  background: rgba(30, 204, 56, 0.08);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-elevated));
   outline: none;
 }
 
@@ -96,7 +98,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(189, 202, 190, 0.75);
+  color: var(--color-text-secondary);
 }
 
 .notifications-feed__item-title {
@@ -124,28 +126,31 @@
   display: block;
   margin-top: 0.35rem;
   font-size: 0.8rem;
-  color: rgba(189, 202, 190, 0.75);
+  color: var(--color-text-secondary);
+  opacity: 0.85;
 }
 
 .notifications-feed__mark-read {
-  flex: 0 0 auto;
-  align-self: center;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: 0;
   border-radius: 8px;
-  background: rgba(30, 204, 56, 0.12);
+  background: var(--color-accent-muted);
   color: var(--color-accent);
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .notifications-feed__mark-read:hover {
-  background: rgba(30, 204, 56, 0.22);
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
 .notifications-feed__mark-read:focus-visible {
@@ -166,9 +171,9 @@
 
 .notifications-feed__divider-line {
   flex: 1 1 auto;
-  height: 3px;
+  height: 2px;
   border-radius: 999px;
-  background: rgba(189, 202, 190, 0.35);
+  background: var(--color-divider);
 }
 
 .notifications-feed__divider-label {
@@ -177,7 +182,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(189, 202, 190, 0.85);
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -192,12 +197,13 @@
   width: 100%;
   min-height: 2.25rem;
   border-radius: 8px;
-  background: rgba(30, 204, 56, 0.15);
+  background: var(--color-accent-muted);
   color: var(--color-accent);
   font-weight: 700;
   text-decoration: none;
+  transition: background 0.15s ease;
 }
 
 .notifications-feed__footer-link:hover {
-  background: rgba(30, 204, 56, 0.25);
+  background: color-mix(in srgb, var(--color-accent) 25%, transparent);
 }

@@ -4,6 +4,7 @@ import {
   groupMembersPath,
   groupPostsPath,
   groupRewardsPath,
+  groupShopItemsPath,
   groupShopPath,
   groupStudentActivityListPath,
   groupStudentBadgesPath,
@@ -142,6 +143,22 @@ function formatLivesChangeLabel(delta, lives) {
  * @param {Record<string, unknown>} payload
  * @returns {number | null}
  */
+function resolveCurrencyDelta(payload) {
+  return readNumber(payload.currencyDelta ?? payload.delta ?? payload.points ?? payload.currencyAmount ?? payload.amount);
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {number | null}
+ */
+function resolveCurrencyBalance(payload) {
+  return readNumber(payload.currency ?? payload.newCurrency ?? payload.totalCurrency);
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {number | null}
+ */
 function resolveActivityRewardAmount(payload) {
   return readNumber(payload.points ?? payload.currencyAmount ?? payload.rewardAmount);
 }
@@ -209,6 +226,12 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
     pushUnique(`Waluta: +${currencyAmount}`);
   }
 
+  const currencyDelta = resolveCurrencyDelta(payload);
+  const currencyBalance = resolveCurrencyBalance(payload);
+  if (currencyBalance != null) {
+    pushUnique(`Stan konta: ${currencyBalance}`);
+  }
+
   const livesDelta = resolveLivesDelta(payload);
   const newLives = readNumber(payload.newLives ?? payload.lives);
   const livesLabel = formatLivesChangeLabel(livesDelta, newLives);
@@ -235,6 +258,7 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
   const activityName = readString(payload.activityName);
   const price = resolvePrice(payload);
   const points = readNumber(payload.points ?? payload.currencyAmount ?? payload.amount);
+  const currencyDelta = resolveCurrencyDelta(payload);
   const livesDelta = resolveLivesDelta(payload);
   const lives = readNumber(payload.newLives ?? payload.lives);
   const livesLabel = formatLivesChangeLabel(livesDelta, lives);
@@ -276,6 +300,15 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
           ? `${studentLabel}: ${livesLabel}`
           : `${studentLabel}: zmiana liczby żyć`;
       case 'CURRENCY_ADDED':
+        if (currencyDelta != null) {
+          if (currencyDelta > 0) {
+            return `${studentLabel} otrzymał(a) walutę (+${currencyDelta})`;
+          }
+          if (currencyDelta < 0) {
+            return `${studentLabel}: pobrano walutę (${currencyDelta})`;
+          }
+          return `${studentLabel}: zaktualizowano stan konta`;
+        }
         return points != null
           ? `${studentLabel} otrzymał(a) walutę: +${points}`
           : `${studentLabel} otrzymał(a) walutę`;
@@ -321,7 +354,16 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
     case 'LIVES_CHANGED':
       return livesLabel ?? 'Zmiana liczby żyć';
     case 'CURRENCY_ADDED':
-      return points != null ? `Zdobyto walutę: +${points}` : null;
+      if (currencyDelta != null) {
+        if (currencyDelta > 0) {
+          return `Zdobyto walutę (+${currencyDelta})`;
+        }
+        if (currencyDelta < 0) {
+          return `Pobrano walutę (${currencyDelta})`;
+        }
+        return 'Zaktualizowano stan konta';
+      }
+      return points != null ? `Zdobyto walutę (+${points})` : null;
     case 'SHOP_STATUS_CHANGED':
       if (payload.shopOpen === true) {
         return 'Sklep grupy został otwarty';
@@ -378,7 +420,23 @@ function resolveNotificationSubtitle(title, details) {
 export function formatBacklogNotification(groupId, item, isStudentView = false) {
   const payload = parseBacklogPayload(item.value);
   const message = readString(payload.message) ?? '';
-  const typeLabel = TYPE_LABELS[item.type] ?? item.type;
+  let typeLabel = TYPE_LABELS[item.type] ?? item.type;
+
+  if (item.type === 'CURRENCY_ADDED') {
+    const delta = resolveCurrencyDelta(payload);
+    if (delta != null) {
+      if (delta > 0) {
+        typeLabel = 'Zdobyto walutę';
+      } else if (delta < 0) {
+        typeLabel = 'Pobrano walutę';
+      } else {
+        typeLabel = 'Stan konta';
+      }
+    } else {
+      typeLabel = 'Stan konta';
+    }
+  }
+
   const studentLabel = resolveStudentLabel(payload);
   const isStudentActivityReward = isStudentView && item.type === 'ACTIVITY_COMPLETED';
   const activityRewardAmount = isStudentActivityReward ? resolveActivityRewardAmount(payload) : null;
@@ -456,18 +514,18 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         if (item.accountId) {
           href = groupStudentProfilePath(groupId, item.accountId);
         } else {
-          href = groupShopPath(groupId);
+          href = groupShopItemsPath(groupId);
         }
         break;
       case 'ITEM_USED':
         if (item.accountId) {
           href = groupStudentProfilePath(groupId, item.accountId);
         } else {
-          href = groupShopPath(groupId);
+          href = groupShopItemsPath(groupId);
         }
         break;
       case 'SHOP_STATUS_CHANGED':
-        href = groupShopPath(groupId);
+        href = groupShopItemsPath(groupId);
         break;
       case 'POST_ADDED':
         href = groupPostsPath(groupId);
@@ -484,6 +542,11 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     }
   }
 
+  const rawItemId = payload.itemId ?? payload.shopItemId ?? (payload.id != null && (item.type === 'SHOP_PURCHASE' || item.type === 'ITEM_USED' || item.type === 'SHOP_ITEM_ADDED') ? payload.id : null);
+  const itemId = rawItemId != null ? String(rawItemId) : null;
+  const itemName = readString(payload.itemName);
+  const isExtraLife = payload.isExtraLife === true;
+
   return {
     id: item.id,
     type: item.type,
@@ -498,6 +561,10 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     highlightVariant: !isStudentView && LECTURER_PRIORITY_NOTIFICATION_TYPES.has(item.type)
       ? 'gold'
       : null,
+    itemId,
+    itemName,
+    isExtraLife,
+    rawPayload: payload,
   };
 }
 

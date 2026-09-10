@@ -18,6 +18,7 @@ import './TemplateListingCard.css';
  * @param {{ badges?: number, ranks?: number, items?: number, stages?: number, activities?: number, posts?: number }} [props.stats]
  * @param {boolean} [props.isFavorite=false]
  * @param {(event: import('react').MouseEvent) => void} [props.onToggleFavorite]
+ * @param {(event: import('react').MouseEvent) => void} [props.onTogglePublic]
  * @param {() => void} [props.onClick]
  * @param {string} [props.creatorLabel] — galeria: ksywka / imię i nazwisko autora
  * @param {boolean} [props.isOwnTemplate=false] — galeria: szablon bieżącego prowadzącego
@@ -36,6 +37,7 @@ export default function TemplateListingCard({
   stats,
   isFavorite = false,
   onToggleFavorite,
+  onTogglePublic,
   onClick,
   creatorLabel,
   isOwnTemplate = false,
@@ -48,7 +50,7 @@ export default function TemplateListingCard({
   const isColorBanner = isColorBannerRef(bannerUrl);
   const colorBannerValue = parseColorBannerRef(bannerUrl);
   const showFallback = !isColorBanner && (bannerFailed || !bannerUrl);
-  const hasHeadActions = Boolean(onToggleFavorite || (rowActions && row));
+  const hasHeadActions = Boolean(onToggleFavorite || onTogglePublic || (rowActions && row));
 
   useEffect(() => {
     setBannerFailed(!bannerUrl || isColorBannerRef(bannerUrl));
@@ -74,6 +76,7 @@ export default function TemplateListingCard({
             .filter(Boolean)
             .join(' ')}
           aria-label={isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
+          title={isFavorite ? 'Usuń z ulubionych' : 'Dodaj do ulubionych'}
           onClick={(event) => {
             event.stopPropagation();
             onToggleFavorite(event);
@@ -82,6 +85,31 @@ export default function TemplateListingCard({
           <AssetSvg
             name={SVG_ICONS.content.star}
             className="maq-template-listing-card__favorite-icon"
+            width={20}
+            height={20}
+            alt=""
+          />
+        </button>
+      ) : null}
+      {onTogglePublic ? (
+        <button
+          type="button"
+          className={[
+            'maq-template-listing-card__visibility',
+            isPublic ? 'maq-template-listing-card__visibility--public' : 'maq-template-listing-card__visibility--private',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          aria-label={isPublic ? 'Ukryj szablon w galerii' : 'Opublikuj szablon w galerii'}
+          title={isPublic ? 'Ukryj szablon w galerii' : 'Opublikuj szablon w galerii'}
+          onClick={(event) => {
+            event.stopPropagation();
+            onTogglePublic(event);
+          }}
+        >
+          <AssetSvg
+            name={isPublic ? SVG_ICONS.actions.show : SVG_ICONS.actions.hide}
+            className="maq-template-listing-card__visibility-icon"
             width={20}
             height={20}
             alt=""

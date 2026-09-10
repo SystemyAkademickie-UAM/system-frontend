@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Button,
   CatalogFilterGroup,
   CatalogFiltersPanel,
+  CatalogFiltersToggle,
   Divider,
   ProductCard,
   SearchBar,
@@ -11,10 +12,12 @@ import {
 } from '../../../components/ui/index.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import { useProfileInventory } from '../../../hooks/shop/useProfileInventory.js';
+import { useProfileInventoryHistory } from '../../../hooks/shop/useProfileInventoryHistory.js';
+import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useProfileStudentProfileContext } from '../group-profile/ProfileStudentProfileContext.js';
 import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
-import ProfileEqHistory from './ProfileEqHistory.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
 
@@ -46,28 +49,28 @@ const USEITEMERRORMESSAGE__TEXTLABEL = {
 };
 
 const INVENTORYTITLE__TEXTLABEL = {
-  polish: 'Ekwipunek',
+  polish: 'Posiadane przedmioty',
   english: 'Inventory'
 };
 
-const TABINVENTORY__TEXTLABEL = {
-  polish: 'Posiadane przedmioty',
-  english: 'Inventory items'
-};
-
-const TABHISTORY__TEXTLABEL = {
-  polish: 'Historia operacji',
-  english: 'Operation history'
+const USEDITEMSTITLE__TEXTLABEL = {
+  polish: 'Zużyte przedmioty',
+  english: 'Used items'
 };
 
 const PURCHASEDCOUNT__TEXTLABEL = {
-  polish: 'Zakupione',
-  english: 'Purchased'
+  polish: 'Posiadane',
+  english: 'Owned'
 };
 
 const UNIQUECOUNT__TEXTLABEL = {
   polish: 'Unikatowe',
   english: 'Unique'
+};
+
+const USEDCOUNT__TEXTLABEL = {
+  polish: 'Zużyte',
+  english: 'Used'
 };
 
 const SEARCHPLACEHOLDER__TEXTLABEL = {
@@ -96,8 +99,13 @@ const LOADINGMESSAGE__TEXTLABEL = {
 };
 
 const EMPTYINVENTORYMESSAGE__TEXTLABEL = {
-  polish: 'Brak zakupionych przedmiotów.',
-  english: 'No purchased items.'
+  polish: 'Brak zakupionych przedmiotów w ekwipunku.',
+  english: 'No active items in inventory.'
+};
+
+const EMPTYUSEDMESSAGE__TEXTLABEL = {
+  polish: 'Brak zużytych przedmiotów.',
+  english: 'No used items.'
 };
 
 const NORESULTSMESSAGE__TEXTLABEL = {
@@ -105,11 +113,19 @@ const NORESULTSMESSAGE__TEXTLABEL = {
   english: 'No search results.'
 };
 
-/**
- * @param {import('../../../utils/shop/shopItem.types.js').InventoryEntry[]} entries
- * @param {string} searchQuery
- * @param {string} categoryFilter
- */
+function formatDateTime(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString('pl-PL', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function filterInventoryEntries(entries, searchQuery, categoryFilter) {
   const normalized = searchQuery.trim().toLowerCase();
 
@@ -141,11 +157,6 @@ function filterInventoryEntries(entries, searchQuery, categoryFilter) {
   });
 }
 
-/**
- * @param {import('../../../utils/shop/shopItem.types.js').InventoryEntry[]} entries
- * @param {Map<string, import('../../../services/itemCategories.api.js').ItemCategory>} categoriesById
- * @param {string} language
- */
 function buildInventoryCategoryFilters(entries, categoriesById, language) {
   const usedCategoryIds = new Set();
 
@@ -188,32 +199,89 @@ function buildInventoryCategoryFilters(entries, categoriesById, language) {
   return filters;
 }
 
-/**
- * @param {Object} props
- * @param {string | number | null} [props.studentAccountId]
- * @param {boolean} [props.readOnly]
- */
 export default function ProfileEqContentContent({
   studentAccountId = null,
   readOnly = false,
 }) {
-  const { groupId } = useParams();
+  const { groupId, studentId } = useParams();
+  const profileContext = useProfileStudentProfileContext();
+  const profile = profileContext?.profile;
+  const isProfileLoading = profileContext?.isLoading;
+  const effectiveAccountId = studentAccountId || (studentId ? profile?.studentAccountId : null);
+  const effectiveReadOnly = readOnly || Boolean(studentId);
+  const isEnabled = !studentId || Boolean(profile?.studentAccountId);
+
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [usingItemId, setUsingItemId] = useState(null);
   const [confirmUseItem, setConfirmUseItem] = useState(null);
-  const [activeTab, setActiveTab] = useState('inventory');
+  const [catalogItems, setCatalogItems] = useState([]);
+  const [localUsedItems, setLocalUsedItems] = useState([]);
 
   const {
     entries,
-    isLoading,
-    error,
+    isLoading: isInventoryLoading,
+    error: inventoryError,
     useItem,
-  } = useProfileInventory(groupId, { studentAccountId, readOnly });
+  } = useProfileInventory(groupId, {
+    studentAccountId: effectiveAccountId,
+    readOnly: effectiveReadOnly,
+    enabled: isEnabled,
+  });
+
+  const {
+    history,
+    isLoading: isHistoryLoading,
+  } = useProfileInventoryHistory(groupId, {
+    studentAccountId: effectiveAccountId,
+    enabled: isEnabled,
+  });
 
   const { categoriesById } = useGroupItemCategories(groupId);
+
+  useEffect(() => {
+    if (!groupId) return;
+    let isCancelled = false;
+    fetchGroupShopItems(groupId).then((res) => {
+      if (!isCancelled && res.ok && Array.isArray(res.items)) {
+        setCatalogItems(res.items);
+      }
+    });
+    return () => {
+      isCancelled = true;
+    };
+  }, [groupId]);
+
+  const itemsMap = useMemo(() => {
+    const map = new Map();
+    catalogItems.forEach((it) => map.set(String(it.id), it));
+    entries.forEach((entry) => {
+      if (entry.item) {
+        map.set(String(entry.item.id), entry.item);
+      }
+    });
+    return map;
+  }, [catalogItems, entries]);
+
+  const backendUsedItems = useMemo(() => {
+    return history.filter((record) => record.type === 'ITEM_USED');
+  }, [history]);
+
+  const mergedUsedItems = useMemo(() => {
+    const combined = [...localUsedItems];
+    backendUsedItems.forEach((bItem) => {
+      const alreadyAdded = combined.some(
+        (cItem) => cItem.id === bItem.id || (cItem.isLocal && cItem.itemId === bItem.itemId && Math.abs(new Date(cItem.date).getTime() - new Date(bItem.date).getTime()) < 3000),
+      );
+      if (!alreadyAdded) {
+        combined.push(bItem);
+      }
+    });
+    return combined.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [localUsedItems, backendUsedItems]);
 
   const totalPurchased = useMemo(
     () => entries.reduce((sum, entry) => sum + entry.quantity, 0),
@@ -237,6 +305,9 @@ export default function ProfileEqContentContent({
       return;
     }
 
+    const itemObj = entries.find((e) => Number(e.itemId) === Number(confirmUseItem.itemId))?.item
+      || itemsMap.get(String(confirmUseItem.itemId));
+
     setUsingItemId(confirmUseItem.itemId);
     const result = await useItem(confirmUseItem.itemId);
     setUsingItemId(null);
@@ -244,6 +315,18 @@ export default function ProfileEqContentContent({
     if (result.ok) {
       showSuccess(USEITEMSUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
       setConfirmUseItem(null);
+
+      // Dynamically add to used items
+      const newUsedRecord = {
+        id: `local-${Date.now()}`,
+        isLocal: true,
+        type: 'ITEM_USED',
+        date: new Date().toISOString(),
+        itemId: Number(confirmUseItem.itemId),
+        itemName: itemObj?.name || confirmUseItem.itemName,
+        isExtraLife: itemObj?.isExtraLife || false,
+      };
+      setLocalUsedItems((prev) => [newUsedRecord, ...prev]);
       return;
     }
 
@@ -257,63 +340,52 @@ export default function ProfileEqContentContent({
     setConfirmUseItem({ itemId, itemName });
   };
 
+  const isLoading = isInventoryLoading || isHistoryLoading;
+  const error = inventoryError;
+
   return (
     <div className="profile-eq-page">
       <header className="profile-eq-page__header">
         <h2 className="profile-eq-page__title">{INVENTORYTITLE__TEXTLABEL[LANGUAGE]}</h2>
-        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-          <Button
-            type="button"
-            variant={activeTab === 'inventory' ? 'primary' : 'secondary'}
-            size="sm"
-            onClick={() => setActiveTab('inventory')}
-          >
-            {TABINVENTORY__TEXTLABEL[LANGUAGE]}
-          </Button>
-          <Button
-            type="button"
-            variant={activeTab === 'history' ? 'primary' : 'secondary'}
-            size="sm"
-            onClick={() => setActiveTab('history')}
-          >
-            {TABHISTORY__TEXTLABEL[LANGUAGE]}
-          </Button>
-        </div>
       </header>
 
       {error ? (
         <p className="profile-eq-page__error" role="alert">{error}</p>
       ) : null}
 
-      {activeTab === 'inventory' ? (
-        <>
-          <div className="maq-section-page__toolbar profile-eq-page__toolbar">
-            <div className="maq-section-page__toolbar-start profile-eq-page__counts">
-              <span className="activities-page__count">
-                {PURCHASEDCOUNT__TEXTLABEL[LANGUAGE]}
-                {' '}
-                {totalPurchased}
-              </span>
-              <span className="activities-page__count">
-                {UNIQUECOUNT__TEXTLABEL[LANGUAGE]}
-                {' '}
-                {uniqueCount}
-              </span>
-            </div>
+      <div className="maq-section-page__toolbar profile-eq-page__toolbar">
+        <div className="maq-section-page__toolbar-start profile-eq-page__counts">
+          <span className="activities-page__count">
+            {PURCHASEDCOUNT__TEXTLABEL[LANGUAGE]}
+            {' '}
+            {totalPurchased}
+          </span>
+          <span className="activities-page__count">
+            {UNIQUECOUNT__TEXTLABEL[LANGUAGE]}
+            {' '}
+            {uniqueCount}
+          </span>
+        </div>
 
-            <div className="maq-section-page__toolbar-end">
-              <SearchBar
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-                name="profile-eq-search"
-                className="profile-eq-page__search"
-                aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
-              />
-            </div>
-          </div>
+        <div className="maq-section-page__toolbar-end">
+          <SearchBar
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+            name="profile-eq-search"
+            className="profile-eq-page__search"
+            aria-label={SEARCHBARIALABEL__TEXTLABEL[LANGUAGE]}
+          />
+          {categoryFilters.length > 1 ? (
+            <CatalogFiltersToggle
+              expanded={filtersExpanded}
+              onToggle={() => setFiltersExpanded((prev) => !prev)}
+            />
+          ) : null}
+        </div>
+      </div>
 
-      {categoryFilters.length > 1 ? (
+      {categoryFilters.length > 1 && filtersExpanded ? (
         <>
           <CatalogFiltersPanel className="profile-eq-page__filters">
             <div className="profile-eq-page__filters-row">
@@ -338,7 +410,7 @@ export default function ProfileEqContentContent({
         </>
       ) : null}
 
-      {isLoading ? (
+      {isLoading && entries.length === 0 ? (
         <p className="profile-eq-page__message">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : filteredEntries.length === 0 ? (
         <p className="profile-eq-page__message">
@@ -377,9 +449,49 @@ export default function ProfileEqContentContent({
           })}
         </div>
       )}
-      </>
+
+      {/* SEKCJA: Zużyte przedmioty */}
+      <Divider className="profile-eq-page__divider" />
+
+      <header className="profile-eq-page__header">
+        <h2 className="profile-eq-page__title">{USEDITEMSTITLE__TEXTLABEL[LANGUAGE]}</h2>
+        <span className="activities-page__count">
+          {USEDCOUNT__TEXTLABEL[LANGUAGE]}
+          {' '}
+          {mergedUsedItems.length}
+        </span>
+      </header>
+
+      {mergedUsedItems.length === 0 ? (
+        <p className="profile-eq-page__message">{EMPTYUSEDMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : (
-        <ProfileEqHistory groupId={groupId} studentAccountId={studentAccountId} />
+        <div className="profile-eq-page__grid profile-eq-page__grid--used">
+          {mergedUsedItems.map((record) => {
+            const itemMeta = itemsMap.get(String(record.itemId));
+            const categoryIds = itemMeta?.categories?.length
+              ? itemMeta.categories
+              : (itemMeta?.categoryId != null ? [String(itemMeta.categoryId)] : []);
+            const categoryDetails = resolveShopCategoryDetails(categoryIds, categoriesById);
+
+            return (
+              <ProductCard
+                key={`used-${record.id}`}
+                itemId={record.itemId}
+                name={record.itemName || itemMeta?.name || 'Przedmiot'}
+                storyDescription={itemMeta?.storyDescription || ''}
+                didacticDescription={itemMeta?.didacticDescription || ''}
+                imageRef={itemMeta?.imageRef}
+                imageUrl={itemMeta?.imageUrl}
+                categoryDetails={categoryDetails}
+                isExtraLife={record.isExtraLife || itemMeta?.isExtraLife}
+                isUsed
+                dateLabel={`Użyto: ${formatDateTime(record.date)}`}
+                hideAddToCart
+                hideActions
+              />
+            );
+          })}
+        </div>
       )}
 
       <ProfileEqUseItemModal

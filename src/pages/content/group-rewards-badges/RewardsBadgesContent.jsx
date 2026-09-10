@@ -457,6 +457,11 @@ export default function RewardsBadgesContent() {
 
   const modalBadge = activeModal?.badge ?? null;
 
+  const getBadgeRowColor = useCallback((badge) => {
+    const config = getBadgeRarityConfig(badge.rarity);
+    return config ? `var(${config.cssVar})` : null;
+  }, []);
+
   if (error) {
     return (
       <SectionPageLayout
@@ -565,6 +570,7 @@ export default function RewardsBadgesContent() {
           itemsPerPage={10}
           paginationAriaLabel={TABLEPAGINATIONLABEL__TEXTLABEL[LANGUAGE]}
           className="rewards-table"
+          getRowColor={getBadgeRowColor}
           search={{
             external: true,
             value: searchQuery,

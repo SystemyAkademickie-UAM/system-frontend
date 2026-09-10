@@ -28,6 +28,22 @@
   filter: grayscale(0.85);
 }
 
+.maq-product-card--used {
+  opacity: 0.65;
+  filter: grayscale(0.65);
+}
+
+.maq-product-card--purchased {
+  opacity: 0.88;
+}
+
+.maq-product-card__date-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px 0 0;
+}
+
 .maq-product-card__main {
   display: flex;
 

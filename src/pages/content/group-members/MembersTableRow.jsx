@@ -5,7 +5,10 @@ export default function MembersTableRow({
   columns,
   rowActions,
   rowActionsPosition = 'end',
+  rowColor,
 }) {
+  const resolvedColor = rowColor ?? row.rowColor ?? row.color ?? null;
+  const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
   const showActionsCell = Boolean(rowActions);
   const actionsCell = showActionsCell ? (
     <td className="data-table__cell data-table__cell--actions">
@@ -17,8 +20,10 @@ export default function MembersTableRow({
     <tr
       className={[
         'data-table__row',
+        resolvedColor ? 'data-table__row--colored' : '',
         row.isLecturer ? 'members-table__row--lecturer' : '',
       ].filter(Boolean).join(' ')}
+      style={colorStyle}
     >
       {rowActionsPosition === 'start' ? actionsCell : null}
       {columns.map((column) => (

@@ -59,10 +59,6 @@
   align-self: stretch;
 }
 
-.group-settings-form--drive-layout.group-settings-form--currency {
-  padding-inline: clamp(0.75rem, 2vw, 1.25rem);
-}
-
 .group-settings-form--drive-layout .group-settings-form__panel {
   padding: 0;
   border: none;
@@ -166,6 +162,23 @@
 }
 
 .group-settings-form .rewards-modal__option-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.group-settings-form__field--header-toggle {
+  margin-bottom: 0.25rem;
+}
+
+.group-settings-form__field--header-toggle .rewards-modal__option-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.group-settings-form__field--header-toggle .rewards-modal__option-text {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;

@@ -67,7 +67,7 @@ export default function ShopStudentCatalogPanel({
   onEdit,
   onDelete,
   onDoubleClick,
-  
+  highlightedItemId = null,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { items, isLoading, error } = useGroupShopItems(groupId);
@@ -143,29 +143,39 @@ export default function ShopStudentCatalogPanel({
         ) : (
           <div className="group-shop__grid">
             {visibleItems.map((item, index) => (
-              <ProductCard
+              <div
                 key={`${item.id}-${index}`}
-                itemId={item.id}
-                name={item.name}
-                storyDescription={item.storyDescription}
-                didacticDescription={item.didacticDescription}
-                priceAmount={item.priceAmount}
-                salePriceAmount={item.salePriceAmount}
-                rankDiscountedPrice={item.rankDiscountedPrice}
-                imageRef={item.imageRef}
-                categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
-                showLecturerActions={showLecturerActions}
-                hideAddToCart
-                hideActions={showLecturerActions}
-                onEdit={() => onEdit?.(item)}
-                onDelete={() => onDelete?.(item)}
-                onDoubleClick={() => onDoubleClick(item)}
-                isExtraLife={item.isExtraLife}
-                isPublished={item.isPublished}
-                disabled={cardsDisabled || item.isLocked}
-                isRankLocked={!showLecturerActions && item.isLocked}
-                className="group-shop__card"
-              />
+                id={`shop-item-${item.id}`}
+                className="group-shop__card-wrapper"
+              >
+                <ProductCard
+                  itemId={item.id}
+                  name={item.name}
+                  storyDescription={item.storyDescription}
+                  didacticDescription={item.didacticDescription}
+                  priceAmount={item.priceAmount}
+                  salePriceAmount={item.salePriceAmount}
+                  rankDiscountedPrice={item.rankDiscountedPrice}
+                  imageRef={item.imageRef}
+                  categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
+                  showLecturerActions={showLecturerActions}
+                  hideAddToCart
+                  hideActions={showLecturerActions}
+                  onEdit={() => onEdit?.(item)}
+                  onDelete={() => onDelete?.(item)}
+                  onDoubleClick={() => onDoubleClick(item)}
+                  isExtraLife={item.isExtraLife}
+                  isPublished={item.isPublished}
+                  disabled={cardsDisabled || item.isLocked}
+                  isRankLocked={!showLecturerActions && item.isLocked}
+                  className={[
+                    'group-shop__card',
+                    highlightedItemId != null && String(highlightedItemId) === String(item.id)
+                      ? 'group-shop__card--highlighted'
+                      : '',
+                  ].filter(Boolean).join(' ')}
+                />
+              </div>
             ))}
           </div>
         )}

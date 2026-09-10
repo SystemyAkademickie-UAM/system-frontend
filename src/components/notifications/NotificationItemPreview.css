@@ -1,0 +1,54 @@
+.notification-item-preview__trigger {
+  display: inline;
+  color: var(--color-accent, #c9933b);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--color-accent, #c9933b) 60%, transparent);
+  cursor: pointer;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  outline: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+}
+
+.notification-item-preview__trigger:hover,
+.notification-item-preview__trigger:focus-visible {
+  color: var(--color-accent-hover, #e5a94b);
+  text-decoration-style: solid;
+  text-decoration-color: currentColor;
+}
+
+.notification-item-preview__popover {
+  position: fixed;
+  z-index: 10000;
+  width: min(340px, 92vw);
+  max-height: min(80vh, calc(100vh - 24px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  pointer-events: none;
+  border-radius: 12px;
+  background: var(--color-bg-surface, #1e1e24);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  animation: notification-preview-fade 0.16s ease-out;
+}
+
+.notification-item-preview__card {
+  max-width: 100% !important;
+  margin: 0 !important;
+  min-height: auto !important;
+}
+
+@keyframes notification-preview-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

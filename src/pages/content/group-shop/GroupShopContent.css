@@ -127,9 +127,50 @@
   gap: 1rem;
 }
 
+.group-shop__card-wrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  border-radius: var(--badge-border-radius, 12px);
+}
+
 .group-shop__card {
   max-width: none;
   height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.group-shop__card--highlighted {
+  animation: shop-item-highlight-pulse 2.8s ease-in-out forwards;
+  z-index: 3;
+}
+
+@keyframes shop-item-highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0px var(--color-accent, #c9933b);
+    outline: 2px solid var(--color-accent, #c9933b);
+    transform: scale(1);
+  }
+  20% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-accent, #c9933b) 55%, transparent);
+    outline: 3px solid var(--color-accent, #c9933b);
+    transform: scale(1.025);
+  }
+  45% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent, #c9933b) 30%, transparent);
+    outline: 2px solid var(--color-accent, #c9933b);
+    transform: scale(1.005);
+  }
+  70% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-accent, #c9933b) 55%, transparent);
+    outline: 3px solid var(--color-accent, #c9933b);
+    transform: scale(1.025);
+  }
+  100% {
+    box-shadow: 0 0 0 0px transparent;
+    outline: 2px solid transparent;
+    transform: scale(1);
+  }
 }
 
 .group-shop-page__toolbar-actions {

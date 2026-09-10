@@ -11,6 +11,12 @@ import { Divider, CharacterLimitedField, Button, Modal, useToast } from '../../.
 import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
+import {
+  THEME_OPTIONS,
+  applyTheme,
+  getSavedTheme,
+} from '../../../services/themeService.js';
+import { getRememberMe, setRememberMe } from '../../../services/rememberMeService.js';
 import { SETTINGS_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 
@@ -22,8 +28,7 @@ import '../group-members/MembersHomeContent.css';
 import '../group-settings/GroupSettingsForm.css';
 import './SettingsContent.css';
 
-const LANGUAGESDICTIONARY = { polish: 'Polish', english: 'English' };
-const LANGUAGE_SELECT_OPTIONS = [LANGUAGESDICTIONARY.polish, LANGUAGESDICTIONARY.english];
+const LANGUAGESDICTIONARY = { polish: 'polski', english: 'English' };
 
 const SETTINGSLABELTEXT = {
   polish: 'Ustawienia',
@@ -38,10 +43,22 @@ const AVATARLABELTEXT = {
   kana: 'アバタ'
 };
 const LANGUAGELABELTEXT = {
-  polish: 'Język',
-  english: 'Language',
+  polish: 'Jezyk',
+  english: 'LANGUAGE',
   japanese: '言語',
   kana: 'げんご'
+};
+const THEMELABELTEXT = {
+  polish: 'Motyw',
+  english: 'Theme',
+  japanese: 'テーマ',
+  kana: 'テーマ'
+};
+const LOGINLABELTEXT = {
+  polish: 'Logowanie',
+  english: 'Login',
+  japanese: 'ログイン',
+  kana: 'ログイン',
 };
 const NICKNAMELABELTEXT = {
   polish: 'Ksywka',
@@ -67,47 +84,29 @@ const SHOWNICKNAMELABELTEXT = {
   japanese: 'ニックネームを表示',
   kana: 'ニックネームをひょうじ',
 };
-const COLORSCHEMELABELTEXT = {
-  polish: 'Schemat kolorów',
-  english: 'Color scheme',
-  japanese: 'カラースキーム',
-  kana: 'カラースキーム',
-};
-const DARKTHEMELABELTEXT = {
-  polish: 'Ciemny motyw',
-  english: 'Dark theme',
-  japanese: 'ダークテーマ',
-  kana: 'ダークテーマ',
-};
-const LIGHTTHEMELABELTEXT = {
-  polish: 'Jasny motyw',
-  english: 'Light theme',
-  japanese: 'ライトテーマ',
-  kana: 'ライトテーマ',
-};
-const SYSTEMTHEMELABELTEXT = {
-  polish: 'Motyw systemu',
-  english: 'System theme',
-  japanese: 'システムテーマ',
-  kana: 'システムテーマ',
-};
-const COLORSCHEMEDESCRIPTIONTEXT = {
-  polish: 'Wybierz schemat kolorów interfejsu.',
-  english: 'Choose the interface color scheme.',
-  japanese: 'インターフェースのカラースキームを選択してください。',
-  kana: 'インターフェースのカラースキームをえらんでください。',
-};
 const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
   polish: 'Ksywka staje się widoczna dla innych użytkowników (wyświetlana jest dodatkowo obok imienia i nazwiska).',
   english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
   japanese: 'ニックネームが他の利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
   kana: 'ニックネームがほかの利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
 };
+const REMEMBERMELABELTEXT = {
+  polish: 'Zapamiętaj mnie',
+  english: 'Remember me',
+  japanese: 'ログイン状態を保持',
+  kana: 'ログインじょうたいをほじ',
+};
+const REMEMBERMEDESCRIPTIONLABELTEXT = {
+  polish: 'Automatycznie loguj i utrzymuj aktywną sesję na tym urządzeniu.',
+  english: 'Automatically log in and maintain active session on this device.',
+  japanese: 'この端末で自動的にログインしセッションを維持します。',
+  kana: 'この端末でじどうてきにログインしセッションをいじします。',
+};
 const SAVEBUTTONLABELTEXT = {
   polish: 'Zapisz zmiany',
   english: 'Save changes',
   japanese: '変更を保存',
-  kana: 'へんこうをほぞん'
+  kana: 'へんこうをほぞn'
 };
 const UNSAVEDCHANGESLABELTEXT = {
   polish: 'Niezapisane zmiany',
@@ -166,10 +165,10 @@ function resolveProfileSaveErrorMessage(error, language) {
 }
 
 function RESOLVELANGUAGECODE(displayLANGUAGE) {
-  if (displayLANGUAGE === LANGUAGESDICTIONARY.polish || displayLANGUAGE === 'polski') {
+  if (displayLANGUAGE === 'polski') {
     return 'polish';
   }
-  if (displayLANGUAGE === LANGUAGESDICTIONARY.english) {
+  if (displayLANGUAGE === 'English') {
     return 'english';
   }
   return 'english';
@@ -182,6 +181,8 @@ export default function SettingsContent() {
   const { showSuccess, showError } = useToast();
 
   const [draftShowNickname, setDraftShowNickname] = useState(true);
+  const [draftRememberMe, setDraftRememberMe] = useState(() => getRememberMe());
+  const [draftTheme, setDraftTheme] = useState(() => getSavedTheme());
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -189,56 +190,8 @@ export default function SettingsContent() {
   const [avatars, setAvatars] = useState([]);
   const [selectedAvatarId, setSelectedAvatarId] = useState(null);
   const [savedSnapshot, setSavedSnapshot] = useState(null);
-  const [DIVLANGUAGE, SETDIVLANGUAGE] = useState(LANGUAGESDICTIONARY.polish);
+  const [DIVLANGUAGE, SETDIVLANGUAGE] = useState('polski');
   const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish');
-
-  const [selectedTheme, setSelectedTheme] = useState(() => {
-    var savedTheme = localStorage.getItem('maQ-theme');
-    if (savedTheme == 'light') {
-      return 'light';
-    }
-    return 'system';
-  });
-
-
-  const [savedTheme, setSavedTheme] = useState(() => {
-    var saved = localStorage.getItem('maQ-theme');
-    if (saved == 'light') {
-      return 'light';
-    }
-    return 'system';
-  });
-
-  function getSystemTheme() {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    return 'light';
-  }
-
-  useEffect(() => {
-    if (selectedTheme == 'system') {
-      var systemTheme = getSystemTheme();
-      document.documentElement.setAttribute('data-theme', systemTheme);
-    }
-  }, [selectedTheme]);
-
-  useEffect(() => {
-    var darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    function onSystemThemeChange() {
-      if (selectedTheme == 'system') {
-        var systemTheme = getSystemTheme();
-        document.documentElement.setAttribute('data-theme', systemTheme);
-      }
-    }
-
-    darkModeQuery.addEventListener('change', onSystemThemeChange);
-
-    return function cleanup() {
-      darkModeQuery.removeEventListener('change', onSystemThemeChange);
-    };
-  }, [selectedTheme]);
 
   const loadSettings = useCallback(async () => {
     setIsLoading(true);
@@ -267,13 +220,17 @@ export default function SettingsContent() {
       }
 
       const CURRENTLANGUAGE = READLANGUAGECOOKIE() || 'polish';
-      var CURRENTTHEME = localStorage.getItem('maQ-theme')
+      const CURRENTTHEME = getSavedTheme();
+      const CURRENTREMEMBERME = getRememberMe();
+      setDraftTheme(CURRENTTHEME);
+      setDraftRememberMe(CURRENTREMEMBERME);
 
       setSavedSnapshot({
         nickname: profile.nickname || '',
         avatarId: loadedAvatarId,
         LANGUAGE: CURRENTLANGUAGE,
-        THEME: CURRENTTHEME,
+        theme: CURRENTTHEME,
+        rememberMe: CURRENTREMEMBERME,
         ...(role === APP_ROLE.LECTURER ? { showNickname: profile.showNickname !== false } : {}),
       });
     } catch (error) {
@@ -327,6 +284,10 @@ export default function SettingsContent() {
     const savedNickname = result.profile?.nickname ?? trimmedNickname;
     setNickname(savedNickname);
 
+    // Zastosuj i zapisz motyw oraz preferencję zapamiętania sesji
+    applyTheme(draftTheme);
+    setRememberMe(draftRememberMe);
+
     await refetchProfile();
 
     if (role === APP_ROLE.LECTURER) {
@@ -339,31 +300,20 @@ export default function SettingsContent() {
       nickname: savedNickname,
       avatarId: selectedAvatarId,
       LANGUAGE: SELECTEDLANGUAGE,
-      THEME: selectedTheme,
+      theme: draftTheme,
+      rememberMe: draftRememberMe,
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
-
-    setSavedTheme(selectedTheme);
-
-    if (selectedTheme == 'light') {
-      localStorage.setItem('maQ-theme', 'light');
-      document.documentElement.setAttribute('data-theme', 'light');
-    } else if (selectedTheme == 'dark') {
-      localStorage.setItem('maQ-theme', 'dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      localStorage.setItem('maQ-theme', 'system');
-      document.documentElement.setAttribute('data-theme', 'system');
-    }
 
     setIsSaving(false);
     showSuccess('Zmiany zostały zapisane.');
     return true;
   }, [
     DIVLANGUAGE,
-    selectedTheme,
     LANGUAGE,
+    draftRememberMe,
     draftShowNickname,
+    draftTheme,
     nickname,
     refetchProfile,
     role,
@@ -390,19 +340,24 @@ export default function SettingsContent() {
       return true;
     }
 
-    if (role === APP_ROLE.LECTURER && draftShowNickname !== savedSnapshot.showNickname) {
+    if (draftTheme !== savedSnapshot.theme) {
       return true;
     }
 
-    if (selectedTheme !== savedSnapshot.THEME) {
+    if (draftRememberMe !== savedSnapshot.rememberMe) {
+      return true;
+    }
+
+    if (role === APP_ROLE.LECTURER && draftShowNickname !== savedSnapshot.showNickname) {
       return true;
     }
 
     return false;
   }, [
     DIVLANGUAGE,
-    selectedTheme,
+    draftRememberMe,
     draftShowNickname,
+    draftTheme,
     isLoading,
     nickname,
     role,
@@ -420,6 +375,17 @@ export default function SettingsContent() {
     onSave: persistSettings,
   });
 
+  const handleDiscard = useCallback(() => {
+    if (savedSnapshot?.theme) {
+      setDraftTheme(savedSnapshot.theme);
+      applyTheme(savedSnapshot.theme);
+    }
+    if (savedSnapshot?.rememberMe !== undefined) {
+      setDraftRememberMe(savedSnapshot.rememberMe);
+    }
+    discardChanges();
+  }, [discardChanges, savedSnapshot?.rememberMe, savedSnapshot?.theme]);
+
   function onNicknamechange(stringvalue) {
     let nextValue = stringvalue;
 
@@ -434,11 +400,11 @@ export default function SettingsContent() {
     const COOKIELANGUAGE = READLANGUAGECOOKIE();
 
     if (COOKIELANGUAGE) {
-      SETDIVLANGUAGE(LANGUAGESDICTIONARY[COOKIELANGUAGE] || LANGUAGESDICTIONARY.polish);
+      SETDIVLANGUAGE(LANGUAGESDICTIONARY[COOKIELANGUAGE] || 'polski');
       SETLANGUAGE(COOKIELANGUAGE);
     } else {
       document.cookie = 'CURRENTLANGUAGE=polish;path=/';
-      SETDIVLANGUAGE(LANGUAGESDICTIONARY.polish);
+      SETDIVLANGUAGE('polski');
       SETLANGUAGE('polish');
     }
 
@@ -506,45 +472,49 @@ export default function SettingsContent() {
                 </div>
               ) : null}
 
+              <Divider className="settings-page__divider" length="50%" />
+
+              <SettingsSectionHeader title={LOGINLABELTEXT[LANGUAGE]} id="settings-login-title" />
               <div className="settings-page__field settings-page__field--toggle">
-                <p className="group-settings-form__hint" style={{ marginBottom: '8px' }}>
-                  {COLORSCHEMEDESCRIPTIONTEXT[LANGUAGE]}
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <label className="settings-page__toggle">
-                    <input
-                      type="radio"
-                      checked={selectedTheme == 'dark'}
-                      onChange={() => {
-                        setSelectedTheme('dark');
-                      }}
-                      disabled={isSaving}
-                    />
-                    <span className="group-settings-form__label">{DARKTHEMELABELTEXT[LANGUAGE]}</span>
-                  </label>
-                  <label className="settings-page__toggle">
-                    <input
-                      type="radio"
-                      checked={selectedTheme == 'system'}
-                      onChange={() => {
-                        setSelectedTheme('system');
-                      }}
-                      disabled={isSaving}
-                    />
-                    <span className="group-settings-form__label">{SYSTEMTHEMELABELTEXT[LANGUAGE]}</span>
-                  </label>
-                  <label className="settings-page__toggle">
-                    <input
-                      type="radio"
-                      checked={selectedTheme == 'light'}
-                      onChange={() => {
-                        setSelectedTheme('light');
-                      }}
-                      disabled={isSaving}
-                    />
-                    <span className="group-settings-form__label">{LIGHTTHEMELABELTEXT[LANGUAGE]}</span>
-                  </label>
-                </div>
+                <label className="settings-page__toggle">
+                  <input
+                    type="checkbox"
+                    checked={draftRememberMe}
+                    onChange={(event) => setDraftRememberMe(event.target.checked)}
+                    disabled={isSaving}
+                  />
+                  <span className="group-settings-form__label">{REMEMBERMELABELTEXT[LANGUAGE]}</span>
+                </label>
+                <p className="group-settings-form__hint">{REMEMBERMEDESCRIPTIONLABELTEXT[LANGUAGE]}</p>
+              </div>
+
+              <Divider className="settings-page__divider" length="50%" />
+
+              <SettingsSectionHeader title={THEMELABELTEXT[LANGUAGE]} id="settings-theme-title" />
+              <div className="settings-page__theme-radio-group" role="radiogroup" aria-labelledby="settings-theme-title">
+                {THEME_OPTIONS.map((option) => {
+                  const isSelected = draftTheme === option.id;
+                  return (
+                    <label
+                      key={option.id}
+                      className={`settings-page__theme-radio-option ${isSelected ? 'settings-page__theme-radio-option--selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="theme"
+                        value={option.id}
+                        checked={isSelected}
+                        onChange={() => {
+                          setDraftTheme(option.id);
+                          applyTheme(option.id);
+                        }}
+                        disabled={isSaving}
+                        className="settings-page__theme-radio-input"
+                      />
+                      <span className="settings-page__theme-radio-label">{option.label}</span>
+                    </label>
+                  );
+                })}
               </div>
 
               <Divider className="settings-page__divider" length="50%" />
@@ -561,8 +531,8 @@ export default function SettingsContent() {
                   onChange={(event) => SETDIVLANGUAGE(event.target.value)}
                   disabled={isSaving}
                 >
-                  {LANGUAGE_SELECT_OPTIONS.map((languageOption) => (
-                    <option key={languageOption} value={languageOption}>{languageOption}</option>
+                  {['polski', 'English'].map((LANGUAGEchosen) => (
+                    <option key={LANGUAGEchosen} value={LANGUAGEchosen}>{LANGUAGEchosen}</option>
                   ))}
                 </select>
               </div>
@@ -607,7 +577,7 @@ export default function SettingsContent() {
             <Button type="button" variant="secondary" size="md" onClick={dismissPrompt}>
               {UNSAVEDCANCELLABELTEXT[LANGUAGE]}
             </Button>
-            <Button type="button" variant="secondary" size="md" onClick={discardChanges}>
+            <Button type="button" variant="secondary" size="md" onClick={handleDiscard}>
               {UNSAVEDDISCARDLABELTEXT[LANGUAGE]}
             </Button>
             <Button
