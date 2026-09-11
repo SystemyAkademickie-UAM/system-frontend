@@ -105,6 +105,9 @@ export default function ShopItemStepPricing({
   ranks = [],
   setRanks,
   costError = '',
+  setCostError,
+  minPriceError = '',
+  setMinPriceError,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showError, showSuccess } = useToast();
@@ -121,12 +124,33 @@ export default function ShopItemStepPricing({
   const handleCostChange = (val) => {
     const cleaned = sanitizeWholeNumberInput(val);
     setCost(cleaned);
+    if (costError && Number(cleaned) >= 0) {
+      setCostError?.('');
+    }
+    if (minPriceEnabled && minPrice !== '') {
+      if (cleaned !== '' && Number(minPrice) > Number(cleaned)) {
+        setMinPriceError?.('Cena minimalna nie może być większa niż cena bazowa.');
+      } else {
+        setMinPriceError?.('');
+      }
+    }
+  };
+
+  const handleMinPriceChange = (val) => {
+    const cleaned = sanitizeWholeNumberInput(val);
+    setMinPrice(cleaned);
+    if (minPriceEnabled && cleaned !== '' && cost !== '' && Number(cleaned) > Number(cost)) {
+      setMinPriceError?.('Cena minimalna nie może być większa niż cena bazowa.');
+    } else {
+      setMinPriceError?.('');
+    }
   };
 
   const handleMinPriceToggle = () => {
     if (minPriceEnabled) {
       setMinPriceEnabled(false);
       setMinPrice('');
+      setMinPriceError?.('');
     } else {
       setMinPriceEnabled(true);
       if (!minPrice && cost) {
@@ -272,16 +296,19 @@ export default function ShopItemStepPricing({
           <div className="shop-item-pricing__input-wrapper">
             <input
               id="shop-item-min-price"
-              className="shop-item-form__input"
+              className={`shop-item-form__input ${minPriceError ? 'shop-item-form__input--error' : ''}`}
               value={minPrice}
               placeholder={minPriceEnabled ? '0' : '—'}
               disabled={!minPriceEnabled}
-              onInput={(event) => setMinPrice(sanitizeWholeNumberInput(event.target.value))}
+              onInput={(event) => handleMinPriceChange(event.target.value)}
             />
             <span className="shop-item-pricing__currency-adornment" aria-hidden="true">
               <CurrencyIcon size="sm" />
             </span>
           </div>
+          {minPriceError ? (
+            <span className="shop-item-form__field-error" role="alert">{minPriceError}</span>
+          ) : null}
         </div>
       </div>
 

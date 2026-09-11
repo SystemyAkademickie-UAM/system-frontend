@@ -154,6 +154,7 @@ export default function ShopStudentCatalogPanel({
                   storyDescription={item.storyDescription}
                   didacticDescription={item.didacticDescription}
                   priceAmount={item.priceAmount}
+                  minPrice={item.minPrice}
                   salePriceAmount={item.salePriceAmount}
                   rankDiscountedPrice={item.rankDiscountedPrice}
                   imageRef={item.imageRef}

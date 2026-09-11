@@ -5,6 +5,7 @@
  * @property {string} storyDescription
  * @property {string} didacticDescription
  * @property {number} priceAmount
+ * @property {number | null} [minPrice]
  * @property {number} [salePriceAmount] — cena końcowa po wszystkich zniżkach
  * @property {number} [rankDiscountedPrice] — cena po zniżce rangi (bez odznak)
  * @property {string} [imageUrl]

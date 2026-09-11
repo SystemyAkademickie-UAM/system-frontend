@@ -59,7 +59,8 @@ export default function StudentProfileViewContent() {
 
       try {
         const students = await fetchGroupStudents(groupId);
-        const found = students.find((item) => String(item.accountId) === String(studentId));
+        const found = students.find((item) => String(item.accountId) === String(studentId))
+          ?? students.find((item) => String(item.enrollmentId) === String(studentId));
 
         if (cancelled) {
           return;

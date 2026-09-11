@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CharacterLimitedField, InfoTooltip, useToast } from '../../../../components/ui/index.js';
+import { CharacterLimitedField, ColorPickerField, InfoTooltip, useToast } from '../../../../components/ui/index.js';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import LivesIcon from '../../../../components/ui/Lives/LivesIcon.jsx';
 import { NAME_MAX_LENGTH, SHORT_DESCRIPTION_MAX_LENGTH, ITEM_CATEGORY_NAME_MAX_LENGTH } from '../../../../constants/fieldLimits.js';
@@ -46,10 +46,7 @@ const NEWCATEGORYPLACEHOLDER__TEXTLABEL = {
   english: '+ Add new category (Enter)'
 };
 
-const PRESET_CATEGORY_COLORS = [
-  '#42f37d', '#00eeff', '#ffd000', '#ff9142', '#ff4d4f',
-  '#d843ff', '#4378ff', '#00c48c', '#e056fd', '#bdcabe',
-];
+
 
 function CloseIcon({ className = '' }) {
   return (
@@ -106,9 +103,7 @@ export default function ShopItemStepInfo({
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editingCategoryName, setEditingCategoryName] = useState('');
 
-  // Stan wyboru koloru kategorii (wyśrodkowany próbnik)
-  const [colorPickerCategory, setColorPickerCategory] = useState(null);
-  const [selectedCategoryColor, setSelectedCategoryColor] = useState('#42f37d');
+
 
   // Stan potwierdzenia usunięcia kategorii
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -152,20 +147,7 @@ export default function ShopItemStepInfo({
     }
   };
 
-  const handleOpenColorPicker = (category, event) => {
-    event.stopPropagation();
-    setColorPickerCategory(category);
-    setSelectedCategoryColor(category.color || '#42f37d');
-  };
 
-  const handleSaveCategoryColor = async () => {
-    if (!colorPickerCategory) return;
-    await onUpdateCategory(colorPickerCategory.id, {
-      name: colorPickerCategory.name,
-      color: selectedCategoryColor,
-    });
-    setColorPickerCategory(null);
-  };
 
   const handleConfirmDeleteCategory = async () => {
     if (!categoryToDelete) return;
@@ -244,19 +226,30 @@ export default function ShopItemStepInfo({
                         checked={category.checked === 1}
                         onChange={() => onCategoryCheckChange(category.id)}
                       />
-                      <button
-                        type="button"
-                        className="shop-item-form__category-swatch-btn"
-                        onClick={(event) => handleOpenColorPicker(category, event)}
-                        title="Zmień kolor kategorii"
-                        aria-label={`Zmień kolor kategorii ${category.name}`}
-                      >
-                        <span
-                          className="shop-item-form__category-swatch"
-                          style={{ backgroundColor: category.color ?? 'var(--color-accent)' }}
-                          aria-hidden="true"
-                        />
-                      </button>
+                      <ColorPickerField
+                        value={category.color || '#42f37d'}
+                        onChange={(newColor) => onUpdateCategory(category.id, { name: category.name, color: newColor })}
+                        title="Wybierz kolor kategorii"
+                        subtitle={category.name}
+                        triggerComponent={({ onClick }) => (
+                          <button
+                            type="button"
+                            className="shop-item-form__category-swatch-btn"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              onClick();
+                            }}
+                            title="Zmień kolor kategorii"
+                            aria-label={`Zmień kolor kategorii ${category.name}`}
+                          >
+                            <span
+                              className="shop-item-form__category-swatch"
+                              style={{ backgroundColor: category.color ?? 'var(--color-accent)' }}
+                              aria-hidden="true"
+                            />
+                          </button>
+                        )}
+                      />
                     </label>
 
                     {isEditing ? (
@@ -310,75 +303,7 @@ export default function ShopItemStepInfo({
         </div>
       </div>
 
-      {/* Wyśrodkowany próbnik koloru kategorii */}
-      {colorPickerCategory ? (
-        <div
-          className="shop-item-color-picker-overlay"
-          onClick={() => setColorPickerCategory(null)}
-          role="presentation"
-        >
-          <div
-            className="shop-item-color-picker-dialog"
-            onClick={(event) => event.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Wybierz kolor kategorii"
-          >
-            <div className="shop-item-color-picker-dialog__header">
-              <h3 className="shop-item-color-picker-dialog__title">Wybierz kolor kategorii</h3>
-              <p className="shop-item-color-picker-dialog__subtitle">{colorPickerCategory.name}</p>
-            </div>
 
-            <div className="shop-item-color-picker-dialog__body">
-              <div className="shop-item-color-picker-dialog__swatches">
-                {PRESET_CATEGORY_COLORS.map((hex) => (
-                  <button
-                    key={hex}
-                    type="button"
-                    className={`shop-item-color-picker-dialog__swatch ${selectedCategoryColor.toLowerCase() === hex.toLowerCase() ? 'shop-item-color-picker-dialog__swatch--active' : ''}`}
-                    style={{ backgroundColor: hex }}
-                    onClick={() => setSelectedCategoryColor(hex)}
-                    aria-label={`Kolor ${hex}`}
-                  />
-                ))}
-              </div>
-
-              <div className="shop-item-color-picker-dialog__custom-row">
-                <label htmlFor="custom-category-color" className="shop-item-color-picker-dialog__custom-label">
-                  Własny kolor:
-                </label>
-                <div className="shop-item-color-picker-dialog__custom-input-wrap">
-                  <input
-                    id="custom-category-color"
-                    type="color"
-                    className="shop-item-color-picker-dialog__color-input"
-                    value={selectedCategoryColor}
-                    onChange={(event) => setSelectedCategoryColor(event.target.value)}
-                  />
-                  <span className="shop-item-color-picker-dialog__hex-preview">{selectedCategoryColor}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="shop-item-color-picker-dialog__footer">
-              <button
-                type="button"
-                className="shop-item-modal-action-btn shop-item-modal-action-btn--ghost"
-                onClick={() => setColorPickerCategory(null)}
-              >
-                Anuluj
-              </button>
-              <button
-                type="button"
-                className="shop-item-modal-action-btn shop-item-modal-action-btn--primary"
-                onClick={handleSaveCategoryColor}
-              >
-                Zapisz kolor
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {/* Wyśrodkowany dialog potwierdzenia usunięcia kategorii */}
       {categoryToDelete ? (

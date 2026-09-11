@@ -7,10 +7,10 @@
   width: fit-content;
   max-width: 100%;
   gap: 0.25rem;
-  padding: 0.375rem;
+  padding: 0.25rem;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-divider);
-  border-radius: 12px;
+  border-radius: 10px;
 }
 
 .maq-sub-nav__item {
@@ -18,9 +18,9 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.75rem;
   border: 0;
-  border-radius: 8px;
+  border-radius: 6px;
   background: transparent;
   font-family: inherit;
   font-size: var(--font-size-body);
@@ -62,14 +62,18 @@
     flex-wrap: nowrap;
     align-items: stretch;
     width: 100%;
+    padding: 3px;
+    gap: 0.2rem;
+    border-radius: 8px;
     font-size: var(--font-size-body);
   }
 
   .maq-sub-nav__item {
     flex: 1 1 0;
     min-width: 0;
-    padding: 0.5em 0.375em;
+    padding: 0.35rem 0.25rem;
     font-size: 1em;
-    line-height: 1.25;
+    line-height: 1.15;
+    border-radius: 6px;
   }
 }

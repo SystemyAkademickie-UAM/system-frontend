@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import Button from '../Button/Button.jsx';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
@@ -28,12 +28,50 @@ export default function ShopCartPanel({
   className = '',
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [offsetShift, setOffsetShift] = useState(0);
   const panelId = useId();
   const rootRef = useRef(null);
+  const panelRef = useRef(null);
 
   const closePanel = useCallback(() => {
     setIsOpen(false);
   }, []);
+
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      setOffsetShift(0);
+      return undefined;
+    }
+
+    const adjustPosition = () => {
+      const panel = panelRef.current;
+      if (!panel) return;
+      const rect = panel.getBoundingClientRect();
+      const padding = 12;
+      const unshiftedLeft = rect.left - offsetShift;
+      const unshiftedRight = rect.right - offsetShift;
+
+      let shift = 0;
+      if (unshiftedLeft < padding) {
+        shift = padding - unshiftedLeft;
+      } else if (unshiftedRight > window.innerWidth - padding) {
+        shift = window.innerWidth - padding - unshiftedRight;
+      }
+
+      setOffsetShift(shift);
+    };
+
+    adjustPosition();
+    const rafId = window.requestAnimationFrame(adjustPosition);
+    window.addEventListener('resize', adjustPosition);
+    window.addEventListener('scroll', adjustPosition, true);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', adjustPosition);
+      window.removeEventListener('scroll', adjustPosition, true);
+    };
+  }, [isOpen, offsetShift, cartItems.length]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -101,7 +139,14 @@ export default function ShopCartPanel({
       </button>
 
       {isOpen ? (
-        <div id={panelId} className="maq-shop-cart__panel" role="region" aria-label="Zawartość koszyka">
+        <div
+          ref={panelRef}
+          id={panelId}
+          className="maq-shop-cart__panel"
+          style={offsetShift ? { transform: `translateX(${offsetShift}px)` } : undefined}
+          role="region"
+          aria-label="Zawartość koszyka"
+        >
           {cartItems.length === 0 ? (
             <p className="maq-shop-cart__empty">Koszyk jest pusty.</p>
           ) : (

@@ -38,13 +38,49 @@
 }
 
 @media (max-width: 768px) {
+  .rewards-shop-items__toolbar-start {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .rewards-shop-items__toolbar-start .rewards-shop-items__add-btn,
+  .rewards-shop-items__toolbar-start .rewards-page__bulk-visibility-btn,
+  .rewards-shop-items__toolbar-start .maq-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 13.5px;
+    white-space: nowrap;
+    justify-content: center;
+  }
+
   .rewards-shop-items__toolbar-end {
     width: 100%;
     align-items: stretch;
   }
 
   .rewards-shop-items__toolbar-row {
-    justify-content: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .rewards-shop-items__toolbar-row .rewards-shop-items__access-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    font-size: 13.5px;
+    white-space: nowrap;
+    justify-content: center;
   }
 
   .rewards-shop-items__toolbar-row--filters {
@@ -55,5 +91,6 @@
     width: 100%;
     max-width: none;
     flex: 1 1 100%;
+    margin-left: 0;
   }
 }

@@ -54,9 +54,7 @@ export default function ShopItemFormModal({
       <span className="shop-item-modal-title__main">{baseTitle}</span>
       <span className="shop-item-modal-title__divider">•</span>
       <span className="shop-item-modal-title__stage">{stageTitle}</span>
-      {!itemId && (
-        <span className="shop-item-modal-title__badge">{currentStep}/{TOTAL_STEPS}</span>
-      )}
+      <span className="shop-item-modal-title__badge">{currentStep}/{TOTAL_STEPS}</span>
     </span>
   );
 

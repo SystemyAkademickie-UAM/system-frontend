@@ -508,8 +508,8 @@ export default function RewardsHomeContent() {
       subNavAriaLabel={nav.ariaLabel}
       headerAction={<ViewLayoutToggle layout={layout} onToggle={toggleLayout} />}
       toolbar={(
-        <>
-          <div className="maq-section-page__toolbar-start">
+        <div className="rewards-page__toolbar-ranks-wrap">
+          <div className="rewards-page__toolbar-ranks-buttons">
             <Button
               variant="primary"
               size="md"
@@ -518,8 +518,6 @@ export default function RewardsHomeContent() {
             >
               {ADDRANKBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
-          </div>
-          <div className="maq-section-page__toolbar-end rewards-page__toolbar-end rewards-page__toolbar-end--ranks">
             <div className="rewards-ranks__members-toggle-wrap">
               <Button
                 type="button"
@@ -532,16 +530,16 @@ export default function RewardsHomeContent() {
               </Button>
               <InfoTooltip text={MEMBERAVATARTOOLTIP__TEXTLABEL[LANGUAGE]} />
             </div>
-            <SearchBar
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-              name="rank-catalog-search"
-              className="rewards-page__search"
-              aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
-            />
           </div>
-        </>
+          <SearchBar
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+            name="rank-catalog-search"
+            className="rewards-page__search"
+            aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
+          />
+        </div>
       )}
     >
 

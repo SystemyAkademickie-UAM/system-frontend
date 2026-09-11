@@ -663,6 +663,7 @@ export default function GroupShopContent() {
           aria-label={SEARCH_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
         />
       </div>
+
       <div className="maq-section-page__toolbar-end group-shop-page__toolbar-actions">
         {canManageShop ? (
           <div className="group-shop__lecturer-actions">
@@ -699,6 +700,11 @@ export default function GroupShopContent() {
           </div>
         ) : null}
 
+        <CatalogFiltersToggle
+          expanded={filtersExpanded}
+          onToggle={() => setFiltersExpanded((expanded) => !expanded)}
+        />
+
         <div className="group-shop__cart-actions">
           <ShopCartPanel
             cartCount={cartCount}
@@ -716,11 +722,6 @@ export default function GroupShopContent() {
             className="group-shop__cart"
           />
         </div>
-
-        <CatalogFiltersToggle
-          expanded={filtersExpanded}
-          onToggle={() => setFiltersExpanded((expanded) => !expanded)}
-        />
       </div>
     </>
   );
@@ -813,6 +814,7 @@ export default function GroupShopContent() {
                         storyDescription={item.storyDescription}
                         didacticDescription={item.didacticDescription}
                         priceAmount={item.priceAmount}
+                        minPrice={item.minPrice}
                         salePriceAmount={item.salePriceAmount}
                         rankDiscountedPrice={item.rankDiscountedPrice}
                         imageRef={item.imageRef}

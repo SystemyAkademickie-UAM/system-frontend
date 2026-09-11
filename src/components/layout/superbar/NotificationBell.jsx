@@ -42,14 +42,21 @@ export default function NotificationBell() {
       ? groupMembersLogPath(groupId)
       : null;
 
-  const originalTitle = useRef(document.title);
+  const originalTitle = useRef(
+    (document.title || '').replace(/^(\(\d+\)\s*)+/, '').trim() || 'MyAcademyQuest',
+  );
 
   useEffect(() => {
+    const baseTitle = originalTitle.current || 'MyAcademyQuest';
     if (unreadCount > 0) {
-      document.title = '(' + unreadCount + ') ' + originalTitle.current;
+      document.title = `(${unreadCount}) ${baseTitle}`;
     } else {
-      document.title = originalTitle.current;
+      document.title = baseTitle;
     }
+
+    return () => {
+      document.title = baseTitle;
+    };
   }, [unreadCount]);
 
   useEffect(() => {

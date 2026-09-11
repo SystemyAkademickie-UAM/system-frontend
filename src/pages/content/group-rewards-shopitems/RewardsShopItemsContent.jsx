@@ -75,6 +75,11 @@ const COLUMNPRICE__TEXTLABEL = {
   english: 'Price'
 };
 
+const COLUMNMINPRICE__TEXTLABEL = {
+  polish: 'Cena minimalna',
+  english: 'Minimum price'
+};
+
 const COLUMNSTORYDESCRIPTION__TEXTLABEL = {
   polish: 'Opis fabularny',
   english: 'Story Description'
@@ -255,7 +260,8 @@ function getShopItemColumns(language) {
       key: 'position',
       label: COLUMNNUMBER__TEXTLABEL[language],
       sort: 'number',
-      width: '90px',
+      width: '5%',
+      mobileRole: 'primary',
       className: 'rewards-table__th--position',
       render: (item) => (
         <span className="rewards-table__position">#{item.position}</span>
@@ -265,7 +271,8 @@ function getShopItemColumns(language) {
       key: 'name',
       label: COLUMNNAME__TEXTLABEL[language],
       sort: 'text',
-      width: '240px',
+      width: '14%',
+      mobileRole: 'title',
       render: (item) => (
         <span className="rewards-table__name">{item.name}</span>
       ),
@@ -274,7 +281,8 @@ function getShopItemColumns(language) {
       key: 'visibility',
       label: COLUMNVISIBILITY__TEXTLABEL[language],
       sort: 'text',
-      width: '110px',
+      width: '8%',
+      mobileRole: 'meta',
       accessor: (item) => getVisibilityStatusLabel(item.isPublished),
       render: (item) => (
         <span
@@ -290,19 +298,11 @@ function getShopItemColumns(language) {
       ),
     },
     {
-      key: '_spacer',
-      label: '',
-      sort: false,
-      className: 'rewards-table__th--spacer',
-      colClassName: 'rewards-table__col--spacer',
-      cellClassName: 'rewards-table__cell--spacer',
-      render: () => '\u00A0',
-    },
-    {
       key: 'icon',
       label: COLUMNICON__TEXTLABEL[language],
       sort: 'text',
-      width: '80px',
+      width: '4%',
+      mobileRole: 'meta',
       render: (item) => {
         if (item.isExtraLife) {
           const { emoji } = resolveExtraLifeItemIcon(item.livesSymbol);
@@ -328,7 +328,8 @@ function getShopItemColumns(language) {
       key: 'priceAmount',
       label: COLUMNPRICE__TEXTLABEL[language],
       sort: 'number',
-      width: '120px',
+      width: '6%',
+      mobileRole: 'meta',
       render: (item) => (
         <CurrencyDisplay
           amount={item.priceAmount}
@@ -337,10 +338,26 @@ function getShopItemColumns(language) {
       ),
     },
     {
+      key: 'minPrice',
+      label: COLUMNMINPRICE__TEXTLABEL[language],
+      sort: 'number',
+      width: '8%',
+      render: (item) => (
+        item.minPrice != null && Number(item.minPrice) > 0 ? (
+          <CurrencyDisplay
+            amount={Number(item.minPrice)}
+            size="sm"
+          />
+        ) : (
+          <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+        )
+      ),
+    },
+    {
       key: 'storyDescription',
       label: COLUMNSTORYDESCRIPTION__TEXTLABEL[language],
       sort: 'text',
-      width: '220px',
+      width: '13%',
       cellClassName: 'rewards-table__cell--truncate',
       hiddenBelow: 768,
       render: (item) => (
@@ -353,7 +370,7 @@ function getShopItemColumns(language) {
       key: 'didacticDescription',
       label: COLUMNDIDACTICDESCRIPTION__TEXTLABEL[language],
       sort: 'text',
-      width: '200px',
+      width: '13%',
       cellClassName: 'rewards-table__cell--truncate',
       hiddenBelow: 768,
       render: (item) => (
@@ -366,7 +383,7 @@ function getShopItemColumns(language) {
       key: 'categoryLabel',
       label: COLUMNCATEGORY__TEXTLABEL[language],
       sort: 'text',
-      width: '160px',
+      width: '11%',
       cellClassName: 'rewards-table__cell--truncate',
       hiddenBelow: 768,
       render: (item) => (
@@ -379,7 +396,7 @@ function getShopItemColumns(language) {
       key: 'stockLabel',
       label: COLUMNSTOCK__TEXTLABEL[language],
       sort: 'text',
-      width: '130px',
+      width: '9%',
       hiddenBelow: 768,
       render: (item) => (
         <span className="rewards-table__cell-text">{item.stockLabel}</span>
@@ -389,7 +406,7 @@ function getShopItemColumns(language) {
       key: 'studentLimitLabel',
       label: COLUMNSTUDENTLIMIT__TEXTLABEL[language],
       sort: 'text',
-      width: '130px',
+      width: '9%',
       hiddenBelow: 768,
       render: (item) => (
         <span className="rewards-table__cell-text">{item.studentLimitLabel}</span>

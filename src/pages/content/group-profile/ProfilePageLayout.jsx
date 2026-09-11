@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Divider, SubNav, CurrencyDisplay } from '../../../components/ui/index.js';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
+import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
 import { formatProfileNumber } from '../../../services/studentProfile.api.js';
 import { fetchGroupInventoryHistory, fetchStudentInventoryHistory } from '../../../services/shop.api.js';
@@ -61,6 +62,7 @@ function ProfileStatLine({ label, value, isCurrency = false }) {
 export default function ProfilePageLayout({ children }) {
   const profileState = useGroupStudentProfile();
   const { groupId, profile, isLoading, error, refetch, studentId } = profileState;
+  const { livesEnabled: groupLivesEnabled } = useGroupLives();
   const navKey = studentId ? 'group-student-profile' : 'group-profile';
   const nav = useGroupSubNav(navKey);
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
@@ -136,6 +138,9 @@ export default function ProfilePageLayout({ children }) {
     ? formatProfileNumber(profile.usedItemsCount)
     : formatProfileNumber(historyStats.usedCount);
 
+  const showLivesStats = profile?.livesEnabled != null
+    ? Boolean(profile.livesEnabled)
+    : Boolean(groupLivesEnabled);
   const livesDisplay = profile?.lives != null ? formatProfileNumber(profile.lives) : '-';
   const lostLivesDisplay = profile?.lostLivesCount != null ? formatProfileNumber(profile.lostLivesCount) : '-';
   const eyebrowLabel = studentId
@@ -196,14 +201,18 @@ export default function ProfilePageLayout({ children }) {
                   label={STATS_LABELS.usedItems[LANGUAGE]}
                   value={usedDisplay}
                 />
-                <ProfileStatLine
-                  label={STATS_LABELS.lives[LANGUAGE]}
-                  value={livesDisplay}
-                />
-                <ProfileStatLine
-                  label={STATS_LABELS.lostLives[LANGUAGE]}
-                  value={lostLivesDisplay}
-                />
+                {showLivesStats ? (
+                  <>
+                    <ProfileStatLine
+                      label={STATS_LABELS.lives[LANGUAGE]}
+                      value={livesDisplay}
+                    />
+                    <ProfileStatLine
+                      label={STATS_LABELS.lostLives[LANGUAGE]}
+                      value={lostLivesDisplay}
+                    />
+                  </>
+                ) : null}
               </div>
             </div>
 

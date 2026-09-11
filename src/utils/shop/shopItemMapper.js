@@ -8,6 +8,9 @@ export function mapBackendShopItem(raw) {
   const item = /** @type {Record<string, unknown>} */ (raw ?? {});
   const listing = /** @type {Record<string, unknown>} */ (item.listing ?? {});
   const basePrice = Number(listing.basePrice ?? 0);
+  const minPrice = listing.minPrice !== null && listing.minPrice !== undefined && Number(listing.minPrice) > 0
+    ? Number(listing.minPrice)
+    : null;
   const discountedPrice = listing.discountedPrice;
   const rankDiscountedPrice = listing.rankDiscountedPrice;
 
@@ -26,6 +29,7 @@ export function mapBackendShopItem(raw) {
     storyDescription: typeof item.storyDescription === 'string' ? item.storyDescription : '',
     didacticDescription: typeof item.educationalDescription === 'string' ? item.educationalDescription : '',
     priceAmount: basePrice,
+    minPrice,
     salePriceAmount: discountedPrice === null || discountedPrice === undefined
       ? undefined
       : Number(discountedPrice),

@@ -203,6 +203,8 @@ export default function ProductCard({
 
   rankDiscountedPrice,
 
+  minPrice,
+
   priceEmoji,
 
   imageRef,
@@ -466,47 +468,33 @@ export default function ProductCard({
 
 
 
-        <div className="maq-product-card__descriptions">
+        {(storyDescription || didacticDescription || !isPreview) ? (
+          <div className="maq-product-card__descriptions">
+            {(storyDescription || !isPreview) ? (
+              <div className="maq-product-card__section">
+                <span className="maq-product-card__section-label">Opis fabularny</span>
+                <p
+                  className="maq-product-card__story-text"
+                  title={isPreview ? undefined : storyDescription || undefined}
+                >
+                  {storyDescription || '\u00A0'}
+                </p>
+              </div>
+            ) : null}
 
-          <div className="maq-product-card__section">
-
-            <span className="maq-product-card__section-label">Opis fabularny</span>
-
-            <p
-
-              className="maq-product-card__story-text"
-
-              title={isPreview ? undefined : storyDescription || undefined}
-
-            >
-
-              {storyDescription || '\u00A0'}
-
-            </p>
-
+            {(didacticDescription || !isPreview) ? (
+              <div className="maq-product-card__section">
+                <span className="maq-product-card__section-label">Opis dydaktyczny</span>
+                <p
+                  className="maq-product-card__didactic-text"
+                  title={isPreview ? undefined : didacticDescription || undefined}
+                >
+                  {didacticDescription || '\u00A0'}
+                </p>
+              </div>
+            ) : null}
           </div>
-
-
-
-          <div className="maq-product-card__section">
-
-            <span className="maq-product-card__section-label">Opis dydaktyczny</span>
-
-            <p
-
-              className="maq-product-card__didactic-text"
-
-              title={isPreview ? undefined : didacticDescription || undefined}
-
-            >
-
-              {didacticDescription || '\u00A0'}
-
-            </p>
-
-          </div>
-
-        </div>
+        ) : null}
 
       </div>
 
@@ -542,7 +530,7 @@ export default function ProductCard({
                 <span className="maq-product-card__owned-count">{ownedQuantity}</span>
               </div>
 
-              {!readOnly ? (
+              {!readOnly && !hideActions ? (
                 <div className="maq-product-card__actions">
                   <Button
                     type="button"
@@ -576,6 +564,18 @@ export default function ProductCard({
             />
 
           </div>
+
+          {showLecturerActions && minPrice != null && Number(minPrice) > 0 ? (
+            <div className="maq-product-card__min-price-bar">
+              <span className="maq-product-card__section-label">Cena min.</span>
+              <CurrencyDisplay
+                amount={Number(minPrice)}
+                symbol={priceEmoji}
+                size="sm"
+                className="maq-product-card__min-price-value"
+              />
+            </div>
+          ) : null}
 
 
 

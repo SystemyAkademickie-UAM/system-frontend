@@ -68,12 +68,12 @@ export function getMobileColumnSlots(columns) {
     slots.title = ordered.find((column) => column.mobileRole === 'title')
       ?? ordered.find((column) => column !== slots.primary)
       ?? null;
-    slots.meta = ordered.filter((column) => column.mobileRole === 'meta').slice(0, 2);
+    slots.meta = ordered.filter((column) => column.mobileRole === 'meta');
 
     if (slots.meta.length === 0) {
       slots.meta = ordered
         .filter((column) => column !== slots.primary && column !== slots.title)
-        .slice(0, 2);
+        .slice(0, 3);
     }
 
     return slots;
@@ -81,7 +81,7 @@ export function getMobileColumnSlots(columns) {
 
   slots.primary = ordered[0] ?? null;
   slots.title = ordered[1] ?? null;
-  slots.meta = ordered.slice(2, 4);
+  slots.meta = ordered.slice(2, 5);
 
   if (ordered.length === 1) {
     slots.primary = null;

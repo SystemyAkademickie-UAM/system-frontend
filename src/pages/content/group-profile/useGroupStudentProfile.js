@@ -30,12 +30,14 @@ async function loadStudentByIdentifier(groupId, studentId) {
     fetchGroupRanks(groupId).catch(() => []),
   ]);
 
-  let student = null;
-  const num = parseInt(studentId, 10);
-  if (!Number.isNaN(num) && num >= 1 && num <= students.length) {
-    student = students[num - 1];
-  } else {
-    student = students.find((item) => String(item.accountId) === String(studentId) || String(item.enrollmentId) === String(studentId));
+  let student = students.find((item) => String(item.accountId) === String(studentId))
+    ?? students.find((item) => String(item.enrollmentId) === String(studentId));
+
+  if (!student && typeof studentId === 'string' && studentId.startsWith('student-')) {
+    const idx = parseInt(studentId.replace('student-', ''), 10) - 1;
+    if (!Number.isNaN(idx) && idx >= 0 && idx < students.length) {
+      student = students[idx];
+    }
   }
 
   if (!student) {
@@ -83,6 +85,7 @@ async function loadStudentByIdentifier(groupId, studentId) {
       lostLivesCount: student.lostLivesCount ?? 0,
       groupCurrency: null,
       lives: student.lives ?? null,
+      livesEnabled: student.livesEnabled ?? null,
       earnedBadges,
       completedActivities: [],
     },
@@ -103,11 +106,13 @@ export function useGroupStudentProfile() {
     }
 
     setIsLoading(true);
-    setError('');
-
-    const result = studentId
-      ? await loadStudentByIdentifier(groupId, studentId)
+    let result = studentId
+      ? await fetchGroupStudentProfile(groupId, studentId)
       : await fetchGroupStudentProfile(groupId);
+
+    if (!result.ok && studentId) {
+      result = await loadStudentByIdentifier(groupId, studentId);
+    }
 
     setIsLoading(false);
 

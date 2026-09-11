@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, SubNav } from '../../../../components/ui/index.js';
+import { Button, ColorPickerField, SubNav } from '../../../../components/ui/index.js';
 import { fetchPredefinedBanners } from '../../../../services/banners.api.js';
 import {
   getPredefinedBannerPath,
@@ -303,26 +303,23 @@ export default function GroupBannerPicker({ value, onChange, className = '' }) {
 
         {activeMode === 'color' ? (
           <div className="group-banner-picker__color">
-            <label className="group-banner-picker__color-label" htmlFor="group-banner-color-input">
+            <label className="group-banner-picker__color-label">
               {SELECTBACKGROUND__TEXTLABEL[LANGUAGE]}
             </label>
             <div className="group-banner-picker__color-row">
-              <input
-                id="group-banner-color-input"
-                type="color"
-                className="group-banner-picker__color-input"
+              <ColorPickerField
                 value={value.color}
-                onChange={(event) => {
+                onChange={(newColor) => {
                   onChange({
                     ...value,
                     mode: 'color',
-                    color: event.target.value,
+                    color: newColor,
                     cleared: false,
                   });
                   setActiveMode('color');
                 }}
+                title="Wybierz kolor tła"
               />
-              <span className="group-banner-picker__color-value">{value.color}</span>
             </div>
           </div>
         ) : null}

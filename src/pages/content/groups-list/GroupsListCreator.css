@@ -25,43 +25,101 @@
   width: 100%;
 }
 
-/* --- Tytuł modala ze zwykłym kolorem podnazwy etapu --- */
+/* --- Nagłówek modala kreatora grupy --- */
+.group-creator-form-modal .maq-modal__header {
+  padding: 1rem 1.25rem 0.875rem;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.group-creator-form-modal .maq-modal__title {
+  min-width: 0;
+  overflow: hidden;
+}
+
 .group-creator-modal-title {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.35rem;
   font-family: var(--font-family-app);
+  white-space: nowrap;
+  flex-wrap: nowrap;
+  max-width: 100%;
 }
 
 .group-creator-modal-title__main {
+  font-size: 16px;
   font-weight: 700;
   color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
 .group-creator-modal-title__divider {
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 13px;
+  opacity: 0.7;
 }
 
 .group-creator-modal-title__stage {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--color-accent);
+  white-space: nowrap;
 }
 
 .group-creator-modal-title__badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2rem 0.55rem;
+  padding: 0.15rem 0.45rem;
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-divider);
   border-radius: 9999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--color-text-primary);
   letter-spacing: 0.5px;
-  margin-left: 0.25rem;
+  margin-left: 0.15rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .group-creator-form-modal .maq-modal__header {
+    padding: 0.875rem 1rem 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .group-creator-modal-title {
+    gap: 0.25rem;
+  }
+
+  .group-creator-modal-title__main {
+    font-size: 14px;
+  }
+
+  .group-creator-modal-title__stage {
+    font-size: 13px;
+  }
+
+  .group-creator-modal-title__badge {
+    font-size: 10px;
+    padding: 0.1rem 0.35rem;
+  }
+
+  .group-creator-wizard__content {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .group-creator__section {
+    padding: 0.875rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .group-creator-wizard__footer {
+    padding: 0.75rem 1rem;
+  }
 }
 
 /* --- Zawartość kroków --- */

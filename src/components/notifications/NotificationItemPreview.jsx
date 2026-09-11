@@ -65,12 +65,31 @@ export default function NotificationItemPreview({
       return;
     }
 
-    setLayout(positionCenteredTooltip({
-      triggerRect: trigger.getBoundingClientRect(),
-      bubbleRect: bubble.getBoundingClientRect(),
-      margin: 12,
-      gap: 10,
-    }));
+    const triggerRect = trigger.getBoundingClientRect();
+    const bubbleRect = bubble.getBoundingClientRect();
+    const superbarHeight = 72; // safe offset under fixed superbar header
+
+    const spaceAbove = triggerRect.top - 10 - superbarHeight;
+    const spaceBelow = window.innerHeight - triggerRect.bottom - 10 - 12;
+
+    let placement = 'bottom';
+    if (spaceBelow >= bubbleRect.height) {
+      placement = 'bottom';
+    } else if (spaceAbove >= bubbleRect.height) {
+      placement = 'top';
+    } else {
+      placement = spaceBelow >= spaceAbove ? 'bottom' : 'top';
+    }
+
+    let top = placement === 'top'
+      ? Math.max(superbarHeight, triggerRect.top - 10 - bubbleRect.height)
+      : Math.min(window.innerHeight - bubbleRect.height - 12, triggerRect.bottom + 10);
+
+    let left = triggerRect.left + triggerRect.width / 2 - bubbleRect.width / 2;
+    const maxLeft = Math.max(12, window.innerWidth - bubbleRect.width - 12);
+    left = Math.min(Math.max(left, 12), maxLeft);
+
+    setLayout({ left, top, placement });
   }, []);
 
   useLayoutEffect(() => {
@@ -120,7 +139,7 @@ export default function NotificationItemPreview({
     id: notification.itemId ?? (effectiveIsExtraLife ? 'extra-life' : 'preview-item'),
     name: notification.itemName || name || (effectiveIsExtraLife ? 'Dodatkowe życie' : 'Przedmiot'),
     storyDescription: raw.storyDescription ?? '',
-    didacticDescription: raw.didacticDescription ?? '',
+    didacticDescription: raw.didacticDescription ?? raw.educationalDescription ?? '',
     priceAmount: raw.price ?? raw.amount ?? null,
     salePriceAmount: raw.salePriceAmount ?? null,
     imageRef: raw.imageRef ?? raw.imageUrl ?? null,

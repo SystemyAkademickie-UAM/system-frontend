@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { CharacterLimitedField, Modal, useToast } from '../../../../components/ui/index.js';
+import { CharacterLimitedField, ColorPickerField, Modal, useToast } from '../../../../components/ui/index.js';
 import { ITEM_CATEGORY_NAME_MAX_LENGTH } from '../../../../constants/fieldLimits.js';
 import {
   createGroupItemCategory,
@@ -265,14 +265,14 @@ export default function ShopCategoriesModal({
                 />
               </CharacterLimitedField>
             </label>
-            <label className="shop-categories-modal__field shop-categories-modal__field--color">
+            <div className="shop-categories-modal__field shop-categories-modal__field--color">
               <span>{COLOR_FIELD_LABEL__TEXTLABEL[LANGUAGE]}</span>
-              <input
-                type="color"
+              <ColorPickerField
                 value={form.color}
-                onChange={(event) => setForm((current) => ({ ...current, color: event.target.value }))}
+                onChange={(newColor) => setForm((current) => ({ ...current, color: newColor }))}
+                title="Wybierz kolor kategorii"
               />
-            </label>
+            </div>
             <div className="shop-categories-modal__editor-actions">
               <button type="button" className="shop-categories-modal__btn" onClick={() => setEditingId(null)}>
                 {CANCEL_BUTTON__TEXTLABEL[LANGUAGE]}

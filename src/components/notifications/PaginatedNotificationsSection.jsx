@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { AssetSvg, Button, Pagination, TexturedSurface, useToast } from '../ui/index.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { useGroupBacklogNotifications } from '../../hooks/notifications/useGroupBacklogNotifications.js';
@@ -112,10 +113,38 @@ export default function PaginatedNotificationsSection({
   const { showSuccess, showError } = useToast();
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const rawPageParam = searchParams.get('page');
+  const parsedPage = rawPageParam ? parseInt(rawPageParam, 10) : 1;
+  const initialPage = !Number.isNaN(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+  const [page, setPage] = useState(initialPage);
   const [confirmClearMode, setConfirmClearMode] = useState(null);
   const [isClearing, setIsClearing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const raw = searchParams.get('page');
+    const p = raw ? parseInt(raw, 10) : 1;
+    const valid = !Number.isNaN(p) && p >= 1 ? p : 1;
+    setPage(valid);
+  }, [searchParams]);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (newPage > 1) {
+          next.set('page', String(newPage));
+        } else {
+          next.delete('page');
+        }
+        return next;
+      },
+      { replace: false },
+    );
+  };
 
   const skip = (page - 1) * pageSize;
 
@@ -132,126 +161,65 @@ export default function PaginatedNotificationsSection({
     };
   }, [isMenuOpen]);
 
-
-
   const {
-
     notifications,
-
     totalCount,
-
     unreadCount,
-
     isLoading,
-
     error,
-
     markRead,
-
     markAllRead,
-
     clearNotifications,
-
   } = useGroupBacklogNotifications(groupId, {
-
     isStudentView,
-
     take: pageSize,
-
     skip,
-
     pollMs,
-
   });
 
-
-
   const totalPages = useMemo(
-
     () => Math.max(1, Math.ceil(totalCount / pageSize)),
-
     [pageSize, totalCount],
-
   );
-
-
 
   const safePage = Math.min(page, totalPages);
 
-
-
   useEffect(() => {
-
-    if (page > totalPages) {
-
-      setPage(totalPages);
-
+    if (totalCount > 0 && page > totalPages) {
+      handlePageChange(totalPages);
     }
-
-  }, [page, totalPages]);
-
-
+  }, [page, totalPages, totalCount]);
 
   const handleMarkAllRead = async () => {
-
     await markAllRead();
-
   };
 
-
-
   const handleConfirmClear = async () => {
-
     if (!confirmClearMode) {
-
       return;
-
     }
-
-
 
     setIsClearing(true);
-
     const result = await clearNotifications({
-
       excludeItemUses: confirmClearMode === 'exceptItemUses',
-
     });
-
     setIsClearing(false);
 
-
-
     if (!result.ok) {
-
       showError(result.error ?? 'Nie udało się wyczyścić powiadomień.');
-
       return;
-
     }
-
-
 
     if (result.deleted === 0) {
-
       showSuccess('Brak powiadomień do wyczyszczenia.');
-
     } else if (confirmClearMode === 'exceptItemUses') {
-
       showSuccess('Usunięto powiadomienia oprócz użyć przedmiotów.');
-
     } else {
-
       showSuccess('Powiadomienia zostały wyczyszczone.');
-
     }
 
-
-
     setConfirmClearMode(null);
-
-    setPage(1);
-
+    handlePageChange(1);
   };
 
 
@@ -381,7 +349,7 @@ export default function PaginatedNotificationsSection({
 
               page={safePage}
 
-              onPageChange={setPage}
+              onPageChange={handlePageChange}
 
               ariaLabel={PAG__TEXTLABEL[LANGUAGE]}
 

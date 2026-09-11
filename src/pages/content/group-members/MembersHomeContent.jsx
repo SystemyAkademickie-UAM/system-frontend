@@ -219,10 +219,10 @@ export default function MembersHomeContent() {
           </span>
           <div className="members-table__user-main">
             <div className="members-table__user-info">
-              {!member.isLecturer && groupId && (member.position || member.accountId) ? (
+              {!member.isLecturer && groupId && (member.accountId || member.position) ? (
                 <Link
                   className="members-table__profile-link"
-                  to={groupStudentProfilePath(groupId, member.position ?? member.accountId)}
+                  to={groupStudentProfilePath(groupId, member.accountId ?? member.position)}
                 >
                   {renderMemberNameLines(member)}
                 </Link>
