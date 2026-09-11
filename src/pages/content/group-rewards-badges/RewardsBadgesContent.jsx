@@ -184,6 +184,7 @@ const BADGE_COLUMNS = [
     label: 'Numer',
     sort: 'number',
     width: '90px',
+    mobileRole: 'primary',
     className: 'rewards-table__th--position',
     render: (badge) => (
       <span className="rewards-table__position">#{badge.position}</span>
@@ -194,6 +195,7 @@ const BADGE_COLUMNS = [
     label: 'Nazwa',
     sort: 'text',
     width: '260px',
+    mobileRole: 'title',
     render: (badge) => (
       <span className="rewards-table__name">{badge.name}</span>
     ),
@@ -203,6 +205,7 @@ const BADGE_COLUMNS = [
     label: 'Widoczność',
     sort: 'text',
     width: '110px',
+    mobileRole: 'meta',
     accessor: (badge) => getVisibilityStatusLabel(badge.isPublished, 'badge'),
     render: (badge) => (
       <span
@@ -231,6 +234,7 @@ const BADGE_COLUMNS = [
     label: 'Ikona',
     sort: 'text',
     width: '140px',
+    mobileRole: 'meta',
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
     render: (badge) => (
@@ -289,6 +293,7 @@ const BADGE_COLUMNS = [
     label: 'Nagroda',
     sort: 'number',
     width: '100px',
+    mobileRole: 'meta',
     render: (badge) => (
       <CurrencyDisplay amount={badge.rewardAmount} size="sm" />
     ),

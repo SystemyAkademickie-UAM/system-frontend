@@ -43,11 +43,9 @@ export default function ShopItemWizardHeader({
         <span className="shop-item-wizard-header__divider" aria-hidden="true">•</span>
         <span className="shop-item-wizard-header__stage-title">{stageTitle}</span>
       </div>
-      {!isEditing && (
-        <div className="shop-item-wizard-header__indicator" aria-label={`Krok ${currentStep} z ${totalSteps}`}>
-          <span className="shop-item-wizard-header__badge">{currentStep}/{totalSteps}</span>
-        </div>
-      )}
+      <div className="shop-item-wizard-header__indicator" aria-label={`Krok ${currentStep} z ${totalSteps}`}>
+        <span className="shop-item-wizard-header__badge">{currentStep}/{totalSteps}</span>
+      </div>
     </div>
   );
 }

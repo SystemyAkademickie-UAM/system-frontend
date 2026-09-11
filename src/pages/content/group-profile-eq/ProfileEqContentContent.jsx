@@ -17,6 +17,7 @@ import { fetchGroupShopItems } from '../../../services/shop.api.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { useProfileStudentProfileContext } from '../group-profile/ProfileStudentProfileContext.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
@@ -204,11 +205,13 @@ export default function ProfileEqContentContent({
   readOnly = false,
 }) {
   const { groupId, studentId } = useParams();
+  const { role } = useAppRole();
+  const isLecturer = role === 'lecturer';
   const profileContext = useProfileStudentProfileContext();
   const profile = profileContext?.profile;
   const isProfileLoading = profileContext?.isLoading;
   const effectiveAccountId = studentAccountId || (studentId ? profile?.studentAccountId : null);
-  const effectiveReadOnly = readOnly || Boolean(studentId);
+  const effectiveReadOnly = readOnly || Boolean(studentId) || isLecturer;
   const isEnabled = !studentId || Boolean(profile?.studentAccountId);
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
@@ -439,11 +442,11 @@ export default function ProfileEqContentContent({
                 categoryDetails={categoryDetails}
                 inventoryMode
                 ownedQuantity={entry.quantity}
-                readOnly={readOnly}
+                readOnly={effectiveReadOnly}
                 disabled={usingItemId === entry.itemId}
                 onUse={() => openUseItemConfirm(entry.itemId, item.name)}
                 hideAddToCart
-                hideActions={readOnly}
+                hideActions={effectiveReadOnly}
               />
             );
           })}

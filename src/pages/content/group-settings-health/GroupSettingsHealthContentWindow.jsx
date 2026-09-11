@@ -469,10 +469,15 @@ export default function GroupSettingsHealthContentWindow({
                     key={`student-${student.accountId}`}
                     className="lives-manage-table__grid lives-manage-table__row"
                   >
-                    <div className="lives-manage-table__cell">
-                      <span className="lives-manage-table__cell-text">
+                    <div className="lives-manage-table__cell lives-manage-table__cell--primary">
+                      <span className="lives-manage-table__cell-text lives-manage-table__cell-text--name">
                         {student.name} {student.surname}
                       </span>
+                      {student.nickname && (
+                        <span className="lives-manage-table__cell-text lives-manage-table__cell-text--mobile-nickname">
+                          {student.nickname}
+                        </span>
+                      )}
                     </div>
 
                     <div className="lives-manage-table__cell lives-manage-table__cell--nickname">
@@ -481,7 +486,7 @@ export default function GroupSettingsHealthContentWindow({
 
                     <div className="lives-manage-table__actions">
                       <div className="lives-manage-table__controls">
-                        {/* Przycisk Minus — powiększony czerwony SVG */}
+                        {/* Przycisk Minus */}
                         <button
                           type="button"
                           className="lives-manage-svg-btn lives-manage-svg-btn--decrease"
@@ -510,7 +515,7 @@ export default function GroupSettingsHealthContentWindow({
                           />
                         </div>
 
-                        {/* Przycisk Plus — powiększony zielony SVG */}
+                        {/* Przycisk Plus */}
                         <button
                           type="button"
                           className="lives-manage-svg-btn lives-manage-svg-btn--increase"
@@ -525,17 +530,20 @@ export default function GroupSettingsHealthContentWindow({
                         </button>
                       </div>
 
-                      {/* Liczba zmiany (delta) bez kółka */}
-                      <span
-                        className={[
-                          'lives-manage-delta-text',
-                          delta > 0 ? 'lives-manage-delta-text--positive' : '',
-                          delta < 0 ? 'lives-manage-delta-text--negative' : '',
-                          delta === 0 ? 'lives-manage-delta-text--neutral' : '',
-                        ].filter(Boolean).join(' ')}
-                      >
-                        {delta > 0 ? `+${delta}` : String(delta)}
-                      </span>
+                      {/* Dedykowane miejsce na deltę (wartość zmiany) */}
+                      <div className="lives-manage-delta-slot">
+                        <span
+                          className={[
+                            'lives-manage-delta-badge',
+                            delta > 0 ? 'lives-manage-delta-badge--positive' : '',
+                            delta < 0 ? 'lives-manage-delta-badge--negative' : '',
+                            delta === 0 ? 'lives-manage-delta-badge--neutral' : '',
+                          ].filter(Boolean).join(' ')}
+                          title={`Zmiana: ${delta > 0 ? `+${delta}` : delta}`}
+                        >
+                          {delta > 0 ? `+${delta}` : String(delta)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );

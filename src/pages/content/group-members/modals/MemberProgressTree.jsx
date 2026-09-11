@@ -104,9 +104,6 @@ function ProgressStageIsland({ stage, progress, isExpanded, onToggleExpand, onTo
         aria-expanded={isExpanded}
       >
         <div className="activities-island__header-start">
-          <span className="activities-island__icon" aria-hidden="true">
-            {stage.name.trim().charAt(0).toUpperCase() || '?'}
-          </span>
           <div className="activities-island__heading">
             <div className="activities-island__title-row">
               <h3 className="activities-island__title">{stage.name}</h3>

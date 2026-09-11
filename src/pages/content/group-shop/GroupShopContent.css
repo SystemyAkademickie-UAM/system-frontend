@@ -175,9 +175,21 @@
 
 .group-shop-page__toolbar-actions {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .group-shop-page__toolbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .group-shop__cart-actions {
+    margin-left: auto;
+  }
 }
 
 .group-shop__empty {

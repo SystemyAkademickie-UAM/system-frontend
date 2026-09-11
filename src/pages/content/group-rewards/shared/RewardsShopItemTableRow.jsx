@@ -73,11 +73,13 @@ export default function RewardsShopItemTableRow({ row, columns, rowActions, rowC
             <ProductCard
               variant="preview"
               hideActions
+              showLecturerActions
               itemId={row.id}
               name={row.name}
               storyDescription={row.storyDescription}
               didacticDescription={row.didacticDescription}
               priceAmount={row.priceAmount}
+              minPrice={row.minPrice}
               salePriceAmount={row.salePriceAmount}
               imageRef={row.imageRef}
               categories={resolveShopCategoryLabels(row.categories)}

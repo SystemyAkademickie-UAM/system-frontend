@@ -105,6 +105,31 @@ function resolveStudentLabel(payload) {
 }
 
 /**
+ * @param {import('../../services/backlog.api.js').BacklogItem} [item]
+ * @param {Record<string, unknown>} [payload]
+ * @returns {number | null}
+ */
+function resolveStudentAccountId(item, payload) {
+  const itemAccountId = readNumber(item?.accountId);
+  if (itemAccountId && itemAccountId > 0) {
+    return itemAccountId;
+  }
+  const payloadStudentAccountId = readNumber(payload?.studentAccountId);
+  if (payloadStudentAccountId && payloadStudentAccountId > 0) {
+    return payloadStudentAccountId;
+  }
+  const payloadAccountId = readNumber(payload?.accountId);
+  if (payloadAccountId && payloadAccountId > 0) {
+    return payloadAccountId;
+  }
+  const payloadStudentId = readNumber(payload?.studentId);
+  if (payloadStudentId && payloadStudentId > 0) {
+    return payloadStudentId;
+  }
+  return null;
+}
+
+/**
  * @param {Record<string, unknown>} payload
  * @returns {number | null}
  */
@@ -145,6 +170,30 @@ function formatLivesChangeLabel(delta, lives) {
  */
 function resolveCurrencyDelta(payload) {
   return readNumber(payload.currencyDelta ?? payload.delta ?? payload.points ?? payload.currencyAmount ?? payload.amount);
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {number | null}
+ */
+function resolveTotalEarnedDelta(payload) {
+  return readNumber(payload.totalEarnedDelta ?? payload.totalCurrencyDelta);
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {number | null}
+ */
+function resolveTotalEarnedBalance(payload) {
+  return readNumber(payload.totalEarned ?? payload.totalEarnedAmount ?? payload.totalCurrency);
+}
+
+/**
+ * @param {Record<string, unknown>} payload
+ * @returns {boolean}
+ */
+function isTotalEarnedPayload(payload) {
+  return payload.isTotalEarned === true || payload.totalEarnedDelta != null;
 }
 
 /**
@@ -232,6 +281,11 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
     pushUnique(`Stan konta: ${currencyBalance}`);
   }
 
+  const totalEarned = resolveTotalEarnedBalance(payload);
+  if (totalEarned != null && isTotalEarnedPayload(payload)) {
+    pushUnique(`Waluta zgromadzona: ${totalEarned}`);
+  }
+
   const livesDelta = resolveLivesDelta(payload);
   const newLives = readNumber(payload.newLives ?? payload.lives);
   const livesLabel = formatLivesChangeLabel(livesDelta, newLives);
@@ -259,6 +313,7 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
   const price = resolvePrice(payload);
   const points = readNumber(payload.points ?? payload.currencyAmount ?? payload.amount);
   const currencyDelta = resolveCurrencyDelta(payload);
+  const totalEarnedDelta = resolveTotalEarnedDelta(payload);
   const livesDelta = resolveLivesDelta(payload);
   const lives = readNumber(payload.newLives ?? payload.lives);
   const livesLabel = formatLivesChangeLabel(livesDelta, lives);
@@ -300,6 +355,18 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
           ? `${studentLabel}: ${livesLabel}`
           : `${studentLabel}: zmiana liczby żyć`;
       case 'CURRENCY_ADDED':
+        if (isTotalEarnedPayload(payload)) {
+          if (totalEarnedDelta != null) {
+            if (totalEarnedDelta > 0) {
+              return `${studentLabel}: zwiększono walutę zgromadzoną (+${totalEarnedDelta})`;
+            }
+            if (totalEarnedDelta < 0) {
+              return `${studentLabel}: zmniejszono walutę zgromadzoną (${totalEarnedDelta})`;
+            }
+            return `${studentLabel}: zaktualizowano walutę zgromadzoną`;
+          }
+          return `${studentLabel}: zaktualizowano walutę zgromadzoną`;
+        }
         if (currencyDelta != null) {
           if (currencyDelta > 0) {
             return `${studentLabel} otrzymał(a) walutę (+${currencyDelta})`;
@@ -354,6 +421,18 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
     case 'LIVES_CHANGED':
       return livesLabel ?? 'Zmiana liczby żyć';
     case 'CURRENCY_ADDED':
+      if (isTotalEarnedPayload(payload)) {
+        if (totalEarnedDelta != null) {
+          if (totalEarnedDelta > 0) {
+            return `Zwiększono walutę zgromadzoną (+${totalEarnedDelta})`;
+          }
+          if (totalEarnedDelta < 0) {
+            return `Zmniejszono walutę zgromadzoną (${totalEarnedDelta})`;
+          }
+          return 'Zaktualizowano walutę zgromadzoną';
+        }
+        return 'Zaktualizowano walutę zgromadzoną';
+      }
       if (currencyDelta != null) {
         if (currencyDelta > 0) {
           return `Zdobyto walutę (+${currencyDelta})`;
@@ -423,17 +502,21 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
   let typeLabel = TYPE_LABELS[item.type] ?? item.type;
 
   if (item.type === 'CURRENCY_ADDED') {
-    const delta = resolveCurrencyDelta(payload);
-    if (delta != null) {
-      if (delta > 0) {
-        typeLabel = 'Zdobyto walutę';
-      } else if (delta < 0) {
-        typeLabel = 'Pobrano walutę';
+    if (isTotalEarnedPayload(payload)) {
+      typeLabel = 'Waluta zgromadzona';
+    } else {
+      const delta = resolveCurrencyDelta(payload);
+      if (delta != null) {
+        if (delta > 0) {
+          typeLabel = 'Zdobyto walutę';
+        } else if (delta < 0) {
+          typeLabel = 'Pobrano walutę';
+        } else {
+          typeLabel = 'Stan konta';
+        }
       } else {
         typeLabel = 'Stan konta';
       }
-    } else {
-      typeLabel = 'Stan konta';
     }
   }
 
@@ -494,32 +577,45 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         href = `${groupMainPath(groupId)}#group-notifications`;
     }
   } else {
+    const targetAccountId = resolveStudentAccountId(item, payload);
     switch (item.type) {
       case 'STUDENT_JOINED':
-        href = groupMembersPath(groupId);
+        if (targetAccountId) {
+          href = groupStudentProfilePath(groupId, targetAccountId);
+        } else {
+          href = groupMembersPath(groupId);
+        }
         break;
       case 'STAGE_ADDED':
-      case 'ACTIVITY_COMPLETED':
       case 'STAGE_COMPLETED':
         href = groupActivitiesPath(groupId);
         break;
-      case 'BADGE_ADDED':
-      case 'BADGE_EARNED':
-      case 'RANK_ADDED':
-      case 'RANK_UP':
-        href = groupRewardsPath(groupId);
-        break;
-      case 'SHOP_ITEM_ADDED':
-      case 'SHOP_PURCHASE':
-        if (item.accountId) {
-          href = groupStudentProfilePath(groupId, item.accountId);
+      case 'ACTIVITY_COMPLETED':
+        if (targetAccountId) {
+          href = groupStudentProfilePath(groupId, targetAccountId);
         } else {
-          href = groupShopItemsPath(groupId);
+          href = groupActivitiesPath(groupId);
         }
         break;
+      case 'BADGE_ADDED':
+      case 'RANK_ADDED':
+        href = groupRewardsPath(groupId);
+        break;
+      case 'BADGE_EARNED':
+      case 'RANK_UP':
+        if (targetAccountId) {
+          href = groupStudentProfilePath(groupId, targetAccountId);
+        } else {
+          href = groupRewardsPath(groupId);
+        }
+        break;
+      case 'SHOP_ITEM_ADDED':
+        href = groupShopItemsPath(groupId);
+        break;
+      case 'SHOP_PURCHASE':
       case 'ITEM_USED':
-        if (item.accountId) {
-          href = groupStudentProfilePath(groupId, item.accountId);
+        if (targetAccountId) {
+          href = groupStudentProfilePath(groupId, targetAccountId);
         } else {
           href = groupShopItemsPath(groupId);
         }
@@ -532,7 +628,11 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
         break;
       case 'LIVES_CHANGED':
       case 'CURRENCY_ADDED':
-        href = groupMembersPath(groupId);
+        if (targetAccountId) {
+          href = groupStudentProfilePath(groupId, targetAccountId);
+        } else {
+          href = groupMembersPath(groupId);
+        }
         break;
       case 'LIVES_SYSTEM_CHANGED':
         href = groupMainPath(groupId);
@@ -546,6 +646,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
   const itemId = rawItemId != null ? String(rawItemId) : null;
   const itemName = readString(payload.itemName);
   const isExtraLife = payload.isExtraLife === true;
+  const resolvedAccountId = resolveStudentAccountId(item, payload);
 
   return {
     id: item.id,
@@ -557,7 +658,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
     date: item.date,
     isRead: item.isRead,
     href,
-    accountId: item.accountId,
+    accountId: resolvedAccountId ?? item.accountId,
     highlightVariant: !isStudentView && LECTURER_PRIORITY_NOTIFICATION_TYPES.has(item.type)
       ? 'gold'
       : null,

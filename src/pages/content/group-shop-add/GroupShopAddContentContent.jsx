@@ -133,6 +133,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   // Błędy walidacji
   const [nameError, setNameError] = useState('');
   const [costError, setCostError] = useState('');
+  const [minPriceError, setMinPriceError] = useState('');
   const [groupLimitError, setGroupLimitError] = useState('');
   const [studentLimitError, setStudentLimitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -395,9 +396,12 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       setStoryDescription(item.storyDescription ?? '');
       setDidacticDescription(item.didacticDescription ?? '');
 
-      if (item.minPrice != null) {
+      if (item.minPrice != null && Number(item.minPrice) > 0) {
         setMinPriceEnabled(true);
         setMinPrice(String(item.minPrice));
+      } else {
+        setMinPriceEnabled(false);
+        setMinPrice('');
       }
 
       if (item.stockQuantity != null) {
@@ -462,8 +466,8 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         storyDescription: item.storyDescription ?? '',
         didacticDescription: item.didacticDescription ?? '',
         cost: priceAmount,
-        minPriceEnabled: item.minPrice != null,
-        minPrice: item.minPrice != null ? String(item.minPrice) : '',
+        minPriceEnabled: item.minPrice != null && Number(item.minPrice) > 0,
+        minPrice: item.minPrice != null && Number(item.minPrice) > 0 ? String(item.minPrice) : '',
         checkedCategoryIds: Array.from(selectedCategoryIds),
         badgeDiscounts: loadedBadgeDiscounts,
         isVisible: item.isPublished !== false,
@@ -637,6 +641,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
     let isValid = true;
     setNameError('');
     setCostError('');
+    setMinPriceError('');
     setGroupLimitError('');
     setStudentLimitError('');
 
@@ -650,6 +655,11 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       if (!cost || Number(cost) < 0) {
         setCostError('Wpisz poprawną cenę bazową.');
         showError('Wpisz poprawną cenę bazową.');
+        isValid = false;
+      }
+      if (minPriceEnabled && minPrice !== '' && Number(minPrice) > Number(cost)) {
+        setMinPriceError('Cena minimalna nie może być większa niż cena bazowa.');
+        showError('Cena minimalna nie może być większa niż cena bazowa.');
         isValid = false;
       }
     } else if (step === 3) {
@@ -690,11 +700,9 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       const payload = {
         name: itemName.trim(),
         basePrice: Number(cost),
+        minPrice: minPriceEnabled && minPrice !== '' ? Number(minPrice) : 0,
+        isPublished: isVisible,
       };
-
-      if (editingItemId) {
-        payload.isPublished = isVisible;
-      }
 
       if (!isEditingExtraLife) {
         payload.imageRef = `${currentIcon}*${iconBackground}`;
@@ -751,11 +759,6 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
 
       const savedItemId = editingItemId ?? saveResult.item?.id ?? null;
       if (savedItemId) {
-        // Jeśli nowo utworzony przedmiot ma być opublikowany (isVisible: true), aktualizujemy isPublished
-        if (!editingItemId && isVisible === true) {
-          await updateGroupShopItem(groupId, savedItemId, { isPublished: true });
-        }
-
         const rankRefs = ranks.map((r) => ({
           dbId: r.id,
           name: r.name,
@@ -838,6 +841,9 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
             ranks={ranks}
             setRanks={setRanks}
             costError={costError}
+            setCostError={setCostError}
+            minPriceError={minPriceError}
+            setMinPriceError={setMinPriceError}
           />
         )}
 
@@ -891,15 +897,15 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       {/* Pasek nawigacji / stopka wizarda — przyciski po prawej stronie */}
       <div className="shop-item-wizard__footer">
         <div className="shop-item-wizard__footer-actions">
-          {currentStep > 1 && (
+          {!editingItemId && currentStep > 1 && (
             <Button
               type="button"
               variant="secondary"
               size="md"
-              onClick={editingItemId && currentStep !== 4 ? () => setCurrentStep(4) : handlePrevStep}
+              onClick={handlePrevStep}
               disabled={isSubmitting}
             >
-              {editingItemId && currentStep !== 4 ? 'Wróć do podsumowania' : 'Cofnij'}
+              Cofnij
             </Button>
           )}
 
