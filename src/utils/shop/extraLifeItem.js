@@ -4,7 +4,7 @@ import { DEFAULT_LIVES_SYMBOL } from '../../constants/lives.constants.js';
 
 export const EXTRA_LIFE_ITEM_NAME = 'Dodatkowe życie';
 
-export const EXTRA_LIFE_ICON_EDIT_TOOLTIP = 'Ikona jest taka sama jak ikona systemu żyć. Aby ją zmienić, przejdź do Ustawienia grupy → System żyć.';
+export const EXTRA_LIFE_ICON_EDIT_TOOLTIP = 'Ikona jest zależna od ikony systemu żyć w grupie. Aby ją zmienić, przejdź do: Ustawienia grupy -> System żyć.';
 
 const EXTRA_LIFE_ICON_BACKGROUND = 'rgb(40, 40, 52)';
 

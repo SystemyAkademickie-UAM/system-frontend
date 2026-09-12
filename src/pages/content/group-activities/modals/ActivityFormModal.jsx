@@ -12,7 +12,7 @@ const EMPTY_FORM = {
   description0: '',
   description1: '',
   reward: '',
-  isVisible: true,
+  isVisible: false,
 };
 
 export default function ActivityFormModal({

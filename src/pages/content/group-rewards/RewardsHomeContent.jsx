@@ -284,7 +284,7 @@ export default function RewardsHomeContent() {
       cellClassName: 'rewards-table__cell--truncate',
       hiddenBelow: 768,
       render: (rank) => (
-        <span className="rewards-table__cell-text">
+        <span className="rewards-table__cell-text" title={rank.storyDescription}>
           <em>{rank.storyDescription}</em>
         </span>
       ),

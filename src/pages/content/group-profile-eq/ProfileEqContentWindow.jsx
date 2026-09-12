@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ProductCard } from '../../../components/ui/index.js';
+import { CurrencyDisplay, ProductCard } from '../../../components/ui/index.js';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { DEFAULT_CURRENCY_SYMBOL } from '../../../constants/currency.constants.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
@@ -73,7 +73,7 @@ export function clearShopPurchaseSummary(groupId) {
   sessionStorage.removeItem(`${SHOP_PURCHASE_SUMMARY_PREFIX}${groupId}`);
 }
 
-export default function ProfileEqContentWindow({ popupclose, groupId, purchaseditems, currencyemoji }) {
+export default function ProfileEqContentWindow({ popupclose, groupId, purchaseditems = [], currencyemoji }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [errorMessage, setErrorMessage] = useState('');
   const [currencyEmojiValue, setCurrencyEmojiValue] = useState(currencyemoji || DEFAULT_CURRENCY_SYMBOL);
@@ -81,7 +81,7 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
   const { categoriesById } = useGroupItemCategories(groupId);
 
   async function onFetchCurrencyEmoji() {
-    if (currencyemoji != null && currencyemoji != '') {
+    if (currencyemoji != null && currencyemoji !== '') {
       setCurrencyEmojiValue(currencyemoji);
       return;
     }
@@ -92,7 +92,7 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
       const base = getApiBaseUrl();
       const browserid = getOrCreateBrowserId();
 
-      const url = base + '/groups/' + groupId + '/currency';
+      const url = `${base}/groups/${groupId}/currency`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -105,32 +105,18 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
 
       const responsetext = await response.text();
 
-      console.log('GET /groups/' + groupId + '/currency: ', response.status);
-      console.log('GET /groups/' + groupId + '/currency: ', responsetext);
-
       let data;
-
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/groups/' + groupId + '/currency not JSON: ' + responsetext);
+        // ignore non-json
       }
 
-      console.log('GET /groups/' + groupId + '/currency JSON:', data);
-
-      if (data && data.currencyEmoji != null && data.currencyEmoji != '') {
+      if (data && data.currencyEmoji != null && data.currencyEmoji !== '') {
         setCurrencyEmojiValue(data.currencyEmoji);
       }
     } catch (error) {
-      let message;
-
-      if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-
-      setErrorMessage(message);
+      setErrorMessage(error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -144,36 +130,15 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
     onFetchCurrencyEmoji();
   }, []);
 
-  let totalvalue = 0;
-  let totalcost = 0;
-
-  let i = 0;
-
-  while (i < purchaseditems.length) {
-    totalvalue = totalvalue + Number(purchaseditems[i].priceAmount);
-    totalcost = totalcost + Number(purchaseditems[i].effectivePrice);
-    i = i + 1;
-  }
-
+  const totalvalue = (purchaseditems || []).reduce(
+    (acc, item) => acc + Number(item.priceAmount || 0),
+    0,
+  );
+  const totalcost = (purchaseditems || []).reduce(
+    (acc, item) => acc + Number(item.effectivePrice ?? item.priceAmount ?? 0),
+    0,
+  );
   const totalsaved = totalvalue - totalcost;
-
-  const itemrows = [];
-
-  i = 0;
-
-  while (i < purchaseditems.length) {
-    const rowitems = [];
-
-    let j = 0;
-
-    while (j < 3 && i < purchaseditems.length) {
-      rowitems.push(purchaseditems[i]);
-      i = i + 1;
-      j = j + 1;
-    }
-
-    itemrows.push(rowitems);
-  }
 
   return (
     <div className="purchase-summary-modal">
@@ -192,56 +157,65 @@ export default function ProfileEqContentWindow({ popupclose, groupId, purchasedi
         </header>
 
         <div className="purchase-summary-modal__items">
-          {itemrows.map((rowitems, rowindex) => (
-            <div key={`purchaserow${rowindex}`} className="purchase-summary-modal__row">
-              {rowitems.map((item) => {
-                const categoryIds = item.categories?.length
-                  ? item.categories
-                  : (item.categoryId != null ? [String(item.categoryId)] : []);
-                const categoryDetails = resolveShopCategoryDetails(categoryIds, categoriesById);
+          {(purchaseditems || []).map((item, index) => {
+            const categoryIds = item.categories?.length
+              ? item.categories
+              : (item.categoryId != null ? [String(item.categoryId)] : []);
+            const categoryDetails = resolveShopCategoryDetails(categoryIds, categoriesById);
 
-                return (
-                  <div key={`purchaseitem${item.id}`} className="purchase-summary-modal__item">
-                    <ProductCard
-                      itemId={item.id}
-                      name={item.name}
-                      storyDescription={item.storyDescription}
-                      didacticDescription={item.didacticDescription}
-                      imageRef={item.imageRef}
-                      imageUrl={item.imageUrl}
-                      categoryDetails={categoryDetails}
-                      inventoryMode
-                      ownedQuantity={1}
-                      readOnly
-                      hideAddToCart
-                      hideActions
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+            return (
+              <div key={`purchaseitem-${item.id}-${index}`} className="purchase-summary-modal__item">
+                <ProductCard
+                  itemId={item.id}
+                  name={item.name}
+                  storyDescription={item.storyDescription}
+                  didacticDescription={item.didacticDescription}
+                  imageRef={item.imageRef}
+                  imageUrl={item.imageUrl}
+                  categoryDetails={categoryDetails}
+                  inventoryMode
+                  ownedQuantity={item.quantity ?? 1}
+                  readOnly
+                  hideAddToCart
+                  hideActions
+                  isExtraLife={item.isExtraLife === true}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <footer className="purchase-summary-modal__footer">
-          <div className="purchase-summary-modal__summary-row">
-            <span className="purchase-summary-modal__summary-label">{TOTALVALUELABEL__TEXTLABEL[LANGUAGE]}</span>
-            <span className="purchase-summary-modal__summary-value">{totalvalue}</span>
-            <span>{currencyEmojiValue}</span>
-          </div>
-          <div className="purchase-summary-modal__divider" />
-          <div className="purchase-summary-modal__summary-row">
-            <span className="purchase-summary-modal__summary-label">{TOTALCOSTLABEL__TEXTLABEL[LANGUAGE]}</span>
-            <span className="purchase-summary-modal__summary-value">{totalcost}</span>
-            <span>{currencyEmojiValue}</span>
-          </div>
-          <div className="purchase-summary-modal__divider purchase-summary-modal__divider--strong" />
-          <div className="purchase-summary-modal__summary-row">
-            <span className="purchase-summary-modal__summary-label">{SAVINGSLABEL__TEXTLABEL[LANGUAGE]}</span>
-            <span className="purchase-summary-modal__summary-value purchase-summary-modal__summary-value--saved">
-              {totalsaved}
-            </span>
-            <span>{currencyEmojiValue}</span>
+          <div className="purchase-summary-modal__summary-box">
+            <div className="purchase-summary-modal__summary-row">
+              <span className="purchase-summary-modal__summary-label">{TOTALVALUELABEL__TEXTLABEL[LANGUAGE]}</span>
+              <CurrencyDisplay
+                amount={totalvalue}
+                symbol={currencyEmojiValue}
+                size="md"
+                className="purchase-summary-modal__summary-value"
+              />
+            </div>
+            <div className="purchase-summary-modal__divider" />
+            <div className="purchase-summary-modal__summary-row">
+              <span className="purchase-summary-modal__summary-label">{TOTALCOSTLABEL__TEXTLABEL[LANGUAGE]}</span>
+              <CurrencyDisplay
+                amount={totalcost}
+                symbol={currencyEmojiValue}
+                size="md"
+                className="purchase-summary-modal__summary-value"
+              />
+            </div>
+            <div className="purchase-summary-modal__divider purchase-summary-modal__divider--strong" />
+            <div className="purchase-summary-modal__summary-row">
+              <span className="purchase-summary-modal__summary-label">{SAVINGSLABEL__TEXTLABEL[LANGUAGE]}</span>
+              <CurrencyDisplay
+                amount={totalsaved}
+                symbol={currencyEmojiValue}
+                size="md"
+                className="purchase-summary-modal__summary-value purchase-summary-modal__summary-value--saved"
+              />
+            </div>
           </div>
 
           {errorMessage ? (

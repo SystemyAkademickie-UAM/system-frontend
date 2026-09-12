@@ -187,13 +187,17 @@ export default function ShopItemStepInfo({
           </span>
           <div className="shop-item-step-info__icon-box">
             {isEditingExtraLife ? (
-              <div
-                className="shop-item-form__icon-locked"
-                aria-disabled="true"
-                title={EXTRA_LIFE_ICON_EDIT_TOOLTIP}
-              >
-                <LivesIcon size="lg" ariaLabel={ITEMICONLIVES__TEXTLABEL[LANGUAGE]} />
-              </div>
+              <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP}>
+                <div
+                  className="shop-item-form__icon-locked"
+                  aria-disabled="true"
+                  tabIndex={0}
+                  role="img"
+                  aria-label={ITEMICONLIVES__TEXTLABEL[LANGUAGE]}
+                >
+                  <LivesIcon size="xl" ariaLabel={ITEMICONLIVES__TEXTLABEL[LANGUAGE]} />
+                </div>
+              </InfoTooltip>
             ) : (
               <EmojiPickerField
                 className="shop-item-form__icon-picker"

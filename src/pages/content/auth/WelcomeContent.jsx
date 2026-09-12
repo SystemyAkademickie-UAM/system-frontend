@@ -173,6 +173,8 @@ export default function WelcomeContent() {
     setSearchParams({}, { replace: true });
   }, [searchParams, setSearchParams, showSuccess, LANGUAGE]);
 
+  const [isEasterEgg] = useState(() => Math.floor(Math.random() * 100) + 1 === 100);
+
   const scrollToStory = () => {
     storySectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -205,7 +207,10 @@ export default function WelcomeContent() {
               <img
                 src="/images/maq-logo.png"
                 alt="MyAcademyQuest Logo"
-                className="welcome-hero__brand-logo"
+                className={[
+                  'welcome-hero__brand-logo',
+                  isEasterEgg ? 'welcome-hero__brand-logo--easter-egg' : '',
+                ].filter(Boolean).join(' ')}
               />
               <span className="welcome-hero__brand-a" aria-hidden="true">A</span>
               <span className="welcome-hero__brand-q" aria-hidden="true">Q</span>

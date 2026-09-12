@@ -299,17 +299,17 @@ export default function ActivitiesContent() {
       {
         id: 'visibility',
         label: ({ activity }) => (
-          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)
             ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
             : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
         ),
         iconFile: ({ activity }) => (
-          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)
             ? SVG_ICONS.actions.hide
             : SVG_ICONS.actions.show
         ),
         ariaLabel: ({ activity }) => (
-          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)
             ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
             : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
         ),
@@ -333,7 +333,7 @@ export default function ActivitiesContent() {
       {
         id: 'visibility',
         label: ({ activity }) => (
-          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)
             ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
             : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
         ),

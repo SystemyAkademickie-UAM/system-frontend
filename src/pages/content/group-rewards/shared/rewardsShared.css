@@ -142,7 +142,6 @@
 
 .rewards-table__name,
 .rewards-table__cell-text {
-  display: block;
   min-width: 0;
   max-width: 100%;
   font-size: var(--rewards-font-table-secondary);
@@ -150,9 +149,20 @@
 }
 
 .rewards-table__name {
+  display: block;
   font-size: var(--rewards-font-table-primary);
   font-weight: 600;
   overflow-wrap: anywhere;
+}
+
+.rewards-table__cell-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 .rewards-table__visibility {

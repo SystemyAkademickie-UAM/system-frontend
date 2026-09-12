@@ -17,6 +17,7 @@
  * @property {boolean} [isPublished]
  * @property {boolean} [isLocked]
  * @property {boolean} [isExtraLife]
+ * @property {Array<{ source: 'rank' | 'badge', name: string, type: 'percent' | 'fixed', value: number, formattedText: string }>} [appliedDiscounts]
  */
 
 /**

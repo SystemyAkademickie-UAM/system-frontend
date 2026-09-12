@@ -27,16 +27,24 @@ function StageIsland({
     polish: `Zmień kolejność etapu ${stage.name}`,
     english: `Change stage order ${stage.name}`,
   };
-  const HIDDENBADGE__TEXTLABEL = {
+  const STAGE_HIDDEN_BADGE__TEXTLABEL = {
     polish: 'Ukryty',
     english: 'Hidden',
   };
-  const HIDDENBYSTAGEBADGE__TEXTLABEL = {
-    polish: 'Ukryty przez etap',
+  const STAGE_PUBLIC_BADGE__TEXTLABEL = {
+    polish: 'Publiczny',
+    english: 'Public',
+  };
+  const ACTIVITY_HIDDEN_BADGE__TEXTLABEL = {
+    polish: 'Ukryta',
+    english: 'Hidden',
+  };
+  const ACTIVITY_HIDDEN_BY_STAGE_BADGE__TEXTLABEL = {
+    polish: 'Ukryta przez etap',
     english: 'Hidden by stage',
   };
-  const PUBLICBADGE__TEXTLABEL = {
-    polish: 'Publiczny',
+  const ACTIVITY_PUBLIC_BADGE__TEXTLABEL = {
+    polish: 'Publiczna',
     english: 'Public',
   };
 
@@ -116,10 +124,10 @@ function StageIsland({
                 {ACTIVITYCOUNT__TEXTLABEL[LANGUAGE]}
               </span>
               {isHidden ? (
-                <span className="activities-island__visibility-badge">{HIDDENBADGE__TEXTLABEL[LANGUAGE]}</span>
+                <span className="activities-island__visibility-badge">{STAGE_HIDDEN_BADGE__TEXTLABEL[LANGUAGE]}</span>
               ) : (
                 <span className="activities-island__visibility-badge activities-island__visibility-badge--visible">
-                  {PUBLICBADGE__TEXTLABEL[LANGUAGE]}
+                  {STAGE_PUBLIC_BADGE__TEXTLABEL[LANGUAGE]}
                 </span>
               )}
             </div>
@@ -189,13 +197,17 @@ function StageIsland({
                             {activity.name}
                             {isActivityHidden ? (
                               <span className="activities-island__activity-badge activities-island__activity-badge--hidden">
-                                {HIDDENBADGE__TEXTLABEL[LANGUAGE]}
+                                {ACTIVITY_HIDDEN_BADGE__TEXTLABEL[LANGUAGE]}
                               </span>
                             ) : isHiddenByStage ? (
                               <span className="activities-island__activity-badge activities-island__activity-badge--hidden-by-stage">
-                                {HIDDENBYSTAGEBADGE__TEXTLABEL[LANGUAGE]}
+                                {ACTIVITY_HIDDEN_BY_STAGE_BADGE__TEXTLABEL[LANGUAGE]}
                               </span>
-                            ) : null}
+                            ) : (
+                              <span className="activities-island__activity-badge activities-island__activity-badge--public">
+                                {ACTIVITY_PUBLIC_BADGE__TEXTLABEL[LANGUAGE]}
+                              </span>
+                            )}
                           </span>
                         </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--truncate">

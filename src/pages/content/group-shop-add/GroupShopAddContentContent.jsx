@@ -6,6 +6,8 @@ import { Button, useToast } from '../../../components/ui/index.js';
 import { createGroupShopItem, fetchGroupShopItems, updateGroupShopItem } from '../../../services/shop.api.js';
 import { syncShopItemRankUnlock, findRankUnlockingItem } from '../../../utils/ranks/rankShopItemUnlock.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
+import { resolveExtraLifeItemIcon } from '../../../utils/shop/extraLifeItem.js';
 import ShopItemWizardHeader from './steps/ShopItemWizardHeader.jsx';
 import ShopItemStepInfo from './steps/ShopItemStepInfo.jsx';
 import ShopItemStepPricing from './steps/ShopItemStepPricing.jsx';
@@ -84,6 +86,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
 }, ref) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
+  const { symbol: livesSymbol } = useGroupLives();
 
   const routeParams = useParams();
   const groupId = groupIdProp ?? routeParams.groupId;
@@ -383,12 +386,19 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       if (editFormHydratedRef.current === editingItemId) return;
       editFormHydratedRef.current = editingItemId;
 
-      setIsEditingExtraLife(item.isExtraLife === true);
-      const imageParts = String(item.imageRef ?? '').split('*');
-      const loadedIcon = imageParts[0] || '🥕';
-      const loadedIconBg = imageParts[1] || 'rgb(40,40,52)';
-      if (imageParts[0]) setCurrentIcon(imageParts[0]);
-      if (imageParts[1]) setIconBackground(imageParts[1]);
+      if (item.isExtraLife === true) {
+        setIsEditingExtraLife(true);
+        const resolved = resolveExtraLifeItemIcon(livesSymbol);
+        setCurrentIcon(resolved.emoji);
+        setIconBackground(resolved.iconBackground);
+      } else {
+        setIsEditingExtraLife(false);
+        const imageParts = String(item.imageRef ?? '').split('*');
+        const loadedIcon = imageParts[0] || '🥕';
+        const loadedIconBg = imageParts[1] || 'rgb(40,40,52)';
+        if (imageParts[0]) setCurrentIcon(imageParts[0]);
+        if (imageParts[1]) setIconBackground(imageParts[1]);
+      }
 
       const priceAmount = String(item.priceAmount ?? '');
       setItemName(item.name ?? '');
@@ -873,6 +883,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
           <ShopItemStepSummary
             itemName={itemName}
             currentIcon={currentIcon}
+            isEditingExtraLife={isEditingExtraLife}
             storyDescription={storyDescription}
             didacticDescription={didacticDescription}
             categories={categories}
