@@ -26,6 +26,10 @@
   max-width: none;
 }
 
+.rewards-table-preview--shop-item .maq-product-card__footer {
+  padding-bottom: 20px;
+}
+
 .rewards-table__row {
   cursor: default;
 }

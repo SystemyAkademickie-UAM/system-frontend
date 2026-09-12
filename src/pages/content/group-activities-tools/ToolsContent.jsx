@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
-import { Button, Divider, useToast } from '../../../components/ui/index.js';
-import { publicIconPath } from '../../../utils/publicAssetUrl.js';
+import { AssetSvg, Button, Divider, useToast } from '../../../components/ui/index.js';
+import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { SHOW_ACTIVITIES_SUMMARY_CREATOR } from '../../../constants/featureFlags.js';
 import {
   downloadGroupReport,
@@ -16,8 +16,6 @@ import ReportSelectModal from './modals/ReportSelectModal.jsx';
 import { formatReportParticipantLabel } from './reportParticipantLabel.js';
 import '../group-settings/GroupSettingsForm.css';
 import './ToolsContent.css';
-
-const exportusersicon = publicIconPath('upload-02-svgrepo-com.svg');
 
 const REPORTTOOLSLABELS__TEXTLABEL = {
   polish: [
@@ -280,10 +278,12 @@ export default function ToolsContent() {
                 disabled={Boolean(downloading) || isLoadingData}
                 onClick={() => handleToolClick(tool.id)}
               >
-                <img
-                  src={exportusersicon}
+                <AssetSvg
+                  name={SVG_ICONS.actions.download}
+                  className="activities-tools-page__tool-icon"
+                  width={22}
+                  height={22}
                   alt=""
-                  className="activities-tools-page__tool-icon activities-tools-page__tool-icon--flipped"
                 />
                 <span>
                   {downloading === tool.id ? GENERATING__TEXTLABEL[LANGUAGE] : tool.label}

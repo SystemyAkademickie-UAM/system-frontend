@@ -45,7 +45,7 @@ export default function Rank({
       <div className="maq-rank__columns">
         <section className="maq-rank__section">
           <span className="maq-rank__label">Status fabularny</span>
-          <p className="maq-rank__text">{storyDescription}</p>
+          <p className="maq-rank__text"><em>{storyDescription}</em></p>
         </section>
 
         <section className="maq-rank__section">

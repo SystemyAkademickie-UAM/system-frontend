@@ -25,6 +25,7 @@
   border: 0;
   background: var(--color-activity-icon-unlocked-bg);
   box-shadow: 0 0 12px var(--color-activity-icon-unlocked-glow);
+  color: var(--color-accent-on);
 }
 
 .maq-activity-progress-icon .maq-asset-svg--mask {

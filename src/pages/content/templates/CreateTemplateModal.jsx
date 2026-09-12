@@ -6,7 +6,88 @@ import TemplateDetailPanel from '../../../components/ui/TemplateDetailPanel/Temp
 import { fetchGroupSnapshotForTemplate } from './groupSnapshotForTemplate.js';
 import SelectGroupMiniCard from './SelectGroupMiniCard.jsx';
 import { buildDefaultTemplateName } from '../../../utils/templates/templateName.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './CreateTemplateModal.css';
+
+const MODAL_TITLE__TEXTLABEL = {
+  polish: 'Nowy szablon',
+  english: 'New template'
+};
+
+const MODAL_SUBTITLE__TEXTLABEL = {
+  polish: 'Wybierz grupę źródłową i nadaj szablonowi nazwę*',
+  english: 'Select source group and name the template*'
+};
+
+const SEARCH_PLACEHOLDER__TEXTLABEL = {
+  polish: 'Szukaj grup…',
+  english: 'Search groups…'
+};
+
+const SEARCH_ARIA__TEXTLABEL = {
+  polish: 'Szukaj grup po nazwie',
+  english: 'Search groups by name'
+};
+
+const LOADING_GROUPS__TEXTLABEL = {
+  polish: 'Ładowanie grup…',
+  english: 'Loading groups…'
+};
+
+const NO_GROUPS_MESSAGE__TEXTLABEL = {
+  polish: 'Brak grup do wyboru.',
+  english: 'No groups available to select.'
+};
+
+const TEMPLATE_NAME_LABEL__TEXTLABEL = {
+  polish: 'Nazwa szablonu',
+  english: 'Template name'
+};
+
+const TEMPLATE_DESCRIPTION_LABEL__TEXTLABEL = {
+  polish: 'Opis szablonu (opcjonalny)',
+  english: 'Template description (optional)'
+};
+
+const PUBLIC_GALLERY_CHECKBOX__TEXTLABEL = {
+  polish: 'Udostępnij w publicznej galerii szablonów',
+  english: 'Share in public template gallery'
+};
+
+const PREVIEW_TITLE__TEXTLABEL = {
+  polish: 'Podgląd zawartości',
+  english: 'Content preview'
+};
+
+const SELECT_GROUP_ERROR__TEXTLABEL = {
+  polish: 'Wybierz grupę, z której chcesz utworzyć szablon.',
+  english: 'Select a group to create a template from.'
+};
+
+const TEMPLATE_NAME_ERROR__TEXTLABEL = {
+  polish: 'Podaj nazwę szablonu.',
+  english: 'Enter a template name.'
+};
+
+const SAVE_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się zapisać szablonu.',
+  english: 'Failed to save template.'
+};
+
+const CANCEL_BUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel'
+};
+
+const SAVING_BUTTON__TEXTLABEL = {
+  polish: 'Zapisywanie…',
+  english: 'Saving…'
+};
+
+const SAVE_BUTTON__TEXTLABEL = {
+  polish: 'Zapisz szablon',
+  english: 'Save template'
+};
 
 function CheckIcon({ className }) {
   return (
@@ -23,6 +104,8 @@ function CheckIcon({ className }) {
  * @param {() => void | Promise<void>} props.onCreated
  */
 export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
   const [groups, setGroups] = useState([]);
   const [isLoadingGroups, setIsLoadingGroups] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -96,11 +179,11 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
 
   const handleConfirm = async () => {
     if (!selectedGroupId) {
-      setErrorMessage('Wybierz grupę, z której chcesz utworzyć szablon.');
+      setErrorMessage(SELECT_GROUP_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
     if (!templateName.trim()) {
-      setErrorMessage('Podaj nazwę szablonu.');
+      setErrorMessage(TEMPLATE_NAME_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -114,7 +197,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
     setIsSaving(false);
 
     if (!result.ok) {
-      setErrorMessage(result.error || 'Nie udało się zapisać szablonu.');
+      setErrorMessage(result.error || SAVE_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -126,8 +209,8 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Nowy szablon"
-      subtitle="Wybierz grupę źródłową i nadaj szablonowi nazwę*"
+      title={MODAL_TITLE__TEXTLABEL[LANGUAGE]}
+      subtitle={MODAL_SUBTITLE__TEXTLABEL[LANGUAGE]}
       size="xl"
       showFooter={false}
       className="create-template-modal"
@@ -138,14 +221,14 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
             className="create-template-modal__search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Szukaj grup…"
-            aria-label="Szukaj grup po nazwie"
+            placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
+            aria-label={SEARCH_ARIA__TEXTLABEL[LANGUAGE]}
           />
 
           {isLoadingGroups ? (
-            <p className="create-template-modal__message">Ładowanie grup…</p>
+            <p className="create-template-modal__message">{LOADING_GROUPS__TEXTLABEL[LANGUAGE]}</p>
           ) : filteredGroups.length === 0 ? (
-            <p className="create-template-modal__message">Brak grup do wyboru.</p>
+            <p className="create-template-modal__message">{NO_GROUPS_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
           ) : (
             <ul className="create-template-modal__grid">
               {filteredGroups.map((group) => (
@@ -165,7 +248,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
           <div className="create-template-modal__form">
             <TextField
               id="template-name"
-              label="Nazwa szablonu"
+              label={TEMPLATE_NAME_LABEL__TEXTLABEL[LANGUAGE]}
               value={templateName}
               onChange={(event) => setTemplateName(event.target.value)}
               fieldKind="name"
@@ -173,7 +256,7 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
             />
             <TextField
               id="template-description"
-              label="Opis szablonu (opcjonalny)"
+              label={TEMPLATE_DESCRIPTION_LABEL__TEXTLABEL[LANGUAGE]}
               value={templateDescription}
               onChange={(event) => setTemplateDescription(event.target.value)}
               fieldKind="groupDescription"
@@ -195,14 +278,14 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
                 {isPublic ? <CheckIcon className="create-template-modal__checkbox-icon" /> : null}
               </span>
               <span className="create-template-modal__checkbox-text">
-                Udostępnij w publicznej galerii szablonów
+                {PUBLIC_GALLERY_CHECKBOX__TEXTLABEL[LANGUAGE]}
               </span>
             </label>
           </div>
         </div>
 
         <aside className="create-template-modal__preview" aria-live="polite">
-          <h3 className="create-template-modal__preview-title">Podgląd zawartości</h3>
+          <h3 className="create-template-modal__preview-title">{PREVIEW_TITLE__TEXTLABEL[LANGUAGE]}</h3>
           <TemplateDetailPanel
             data={previewData}
             isLoading={isLoadingPreview && Boolean(previewGroupId)}
@@ -217,10 +300,10 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreated }) {
 
       <div className="create-template-modal__footer-extra">
         <Button type="button" variant="secondary" onClick={onClose} disabled={isSaving}>
-          Anuluj
+          {CANCEL_BUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
         <Button type="button" variant="primary" onClick={handleConfirm} disabled={isSaving}>
-          {isSaving ? 'Zapisywanie…' : 'Zapisz szablon'}
+          {isSaving ? SAVING_BUTTON__TEXTLABEL[LANGUAGE] : SAVE_BUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       </div>
     </Modal>

@@ -57,6 +57,7 @@ export default function GroupMainRanksContent({
   onEditRank,
   onDeleteRank,
   onAssignRank,
+  onRankDoubleClick,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { groupId } = useParams();
@@ -88,6 +89,8 @@ export default function GroupMainRanksContent({
     return () => window.clearTimeout(timer);
   }, [isStudentView, isLoading, ranks.length, studentProfile?.totalEarned, studentProfile?.rankId, studentProfile?.autoRankEnabled]);
 
+  const emptyLink = useGroupMainEmptyLink('ranks', groupId);
+
   if (isLoading) {
     return <p className="group-main-ranks__message" role="status">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>;
   }
@@ -99,8 +102,6 @@ export default function GroupMainRanksContent({
       </p>
     );
   }
-
-  const emptyLink = useGroupMainEmptyLink('ranks', groupId);
 
   return (
     <section className="group-main-ranks" aria-label={SECTIONLABEL__TEXTLABEL[LANGUAGE]}>
@@ -138,6 +139,7 @@ export default function GroupMainRanksContent({
           onEditRank={onEditRank}
           onDeleteRank={onDeleteRank}
           onAssignRank={onAssignRank}
+          onRankDoubleClick={onRankDoubleClick}
         />
       )}
     </section>

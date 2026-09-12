@@ -1,0 +1,42 @@
+.register-avatar {
+  box-sizing: border-box;
+  width: var(--auth-card-max-width);
+  max-width: calc(100% - 2rem);
+  padding:
+    var(--auth-card-back-padding-top, 16px)
+    var(--auth-card-body-padding-x, clamp(1rem, 1.67vw, 32px))
+    var(--auth-card-body-padding-bottom, clamp(2rem, 3.3vw, 64px));
+  gap: 0;
+  overflow: visible;
+  margin-bottom: 0.5rem;
+}
+
+.register-avatar__picker-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  margin: 1rem 0 1.5rem;
+}
+
+.register-avatar__picker {
+  width: 100%;
+}
+
+.register-avatar__submit {
+  width: 100%;
+  margin-top: auto;
+}
+
+@media (max-width: 768px) {
+  .register-avatar.auth-card--left-aligned {
+    align-items: stretch;
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem 1.25rem 1.5rem;
+  }
+
+  .register-avatar .auth-card__header {
+    margin-bottom: 1.25rem;
+  }
+}

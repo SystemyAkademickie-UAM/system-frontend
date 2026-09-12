@@ -5,7 +5,7 @@ import { DataTableRowActions } from '../../../../components/ui/DataTable/DataTab
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
-export default function RewardsRankTableRow({ row, columns, rowActions }) {
+export default function RewardsRankTableRow({ row, columns, rowActions, rowColor, onRowDoubleClick }) {
   const rowRef = useRef(null);
   const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
@@ -13,13 +13,22 @@ export default function RewardsRankTableRow({ row, columns, rowActions }) {
     showPreview(rowRef.current);
   };
 
+  const resolvedColor = rowColor ?? row.rowColor ?? null;
+  const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
+
   return (
     <>
       <tr
         ref={rowRef}
-        className="data-table__row rewards-table__row"
+        className={[
+          'data-table__row',
+          'rewards-table__row',
+          resolvedColor ? 'data-table__row--colored' : '',
+        ].filter(Boolean).join(' ')}
+        style={colorStyle}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={hidePreview}
+        onDoubleClick={() => onRowDoubleClick(row)}
       >
         {columns.map((column) => (
           <td

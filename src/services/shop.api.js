@@ -59,12 +59,6 @@ export async function createGroupShopItem(groupId, payload) {
   }
 
   const item = mapBackendShopItem(result.data);
-  if (item.isPublished === false) {
-    const publishResult = await updateGroupShopItem(groupId, item.id, { isPublished: true });
-    if (publishResult.ok && publishResult.item) {
-      return { ok: true, item: publishResult.item };
-    }
-  }
 
   return { ok: true, item };
 }
@@ -161,6 +155,22 @@ export async function fetchStudentInventory(groupId, accountId) {
     return { ok: false, entries: [], error: extractApiError(result.data) };
   }
   return { ok: true, entries: mapBackendInventory(result.data) };
+}
+
+export async function fetchStudentInventoryHistory(groupId, accountId) {
+  const result = await getJson(`/groups/${groupId}/students/${accountId}/inventory-history`);
+  if (!result.ok) {
+    return { ok: false, history: [], error: extractApiError(result.data) };
+  }
+  return { ok: true, history: result.data };
+}
+
+export async function fetchGroupInventoryHistory(groupId) {
+  const result = await getJson(`/groups/${groupId}/inventory-history`, { includeBrowserId: true });
+  if (!result.ok) {
+    return { ok: false, history: [], error: extractApiError(result.data) };
+  }
+  return { ok: true, history: result.data };
 }
 
 /**

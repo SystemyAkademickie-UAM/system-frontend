@@ -6,7 +6,7 @@
 
 .maq-asset-svg--mask {
   flex-shrink: 0;
-  color: var(--color-asset-icon);
+  color: inherit;
   background-color: currentColor;
   mask-image: var(--maq-asset-mask-url);
   mask-repeat: no-repeat;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BADGE_RARITY, BADGE_RARITY_LABELS, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
+import { BADGE_RARITY, BADGE_RARITY_LABELS, Divider, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
@@ -7,6 +7,62 @@ import { DEFAULT_BADGE_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const MODALTITLEEDIT__TEXTLABEL = {
+  polish: 'Edytuj odznakę',
+  english: 'Edit Badge'
+};
+
+const MODALTITLECREATE__TEXTLABEL = {
+  polish: 'Dodaj odznakę',
+  english: 'Add Badge'
+};
+
+const NAMELABEL__TEXTLABEL = {
+  polish: 'Nazwa*',
+  english: 'Name*'
+};
+
+const REWARDLABEL__TEXTLABEL = {
+  polish: 'Nagroda*',
+  english: 'Reward*'
+};
+
+const ICONLABEL__TEXTLABEL = {
+  polish: 'Ikona',
+  english: 'Icon'
+};
+
+const ICONARIALABEL__TEXTLABEL = {
+  polish: 'Wybierz emoji odznaki',
+  english: 'Choose badge emoji'
+};
+
+const RARITYLABEL__TEXTLABEL = {
+  polish: 'Rzadkość',
+  english: 'Rarity'
+};
+
+const RARITYTOOLTIPTEXT__TEXTLABEL = {
+  polish: 'Wpływa na rzadkość odznaki w skarbcu.',
+  english: 'Affects badge rarity in the treasury.'
+};
+
+const STORYDESCRIPTIONLABEL__TEXTLABEL = {
+  polish: 'Opis fabularny*',
+  english: 'Story Description*'
+};
+
+const DIDACTICDESCRIPTIONLABEL__TEXTLABEL = {
+  polish: 'Opis dydaktyczny*',
+  english: 'Didactic Description*'
+};
+
+const HIDDENOPTIONTEXT__TEXTLABEL = {
+  polish: 'Ukryj odznakę (niewidoczna dla studentów)',
+  english: 'Hide badge (hidden from students)'
+};
 
 const EMPTY_FORM = {
   name: '',
@@ -55,6 +111,7 @@ export default function BadgeFormModal({
   onClose,
   onConfirm,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [form, setForm] = useState(EMPTY_FORM);
   const isEdit = Boolean(badge);
 
@@ -116,67 +173,75 @@ export default function BadgeFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edytuj odznakę' : 'Dodaj odznakę'}
+      title={isEdit ? MODALTITLEEDIT__TEXTLABEL[LANGUAGE] : MODALTITLECREATE__TEXTLABEL[LANGUAGE]}
       onConfirm={handleConfirm}
       confirmDisabled={!isValid}
       size="md"
       className="rewards-modal"
     >
       <div className="rewards-modal__form">
-        <div className="rewards-modal__row rewards-modal__row--name-reward">
-          <TextField
-            id="badge-name"
-            label="Nazwa*"
-            fieldKind="name"
-            value={form.name}
-            onChange={handleChange('name')}
-            className="rewards-modal__field"
-            inputClassName="rewards-modal__input"
-          />
-          <div className="rewards-modal__field">
-            <RewardsCurrencyLabel htmlFor="badge-reward">Nagroda*</RewardsCurrencyLabel>
-            <input
-              id="badge-reward"
-              type="text"
-              inputMode="numeric"
-              className="rewards-modal__input"
-              value={form.rewardAmount}
-              onChange={handleChange('rewardAmount')}
+        {/* Sekcja 1: Podstawowe informacje */}
+        <div className="rewards-modal__grid-main">
+          <div className="rewards-modal__icon-box">
+            <EmojiPickerField
+              className="rewards-modal__field rewards-modal__field--icon"
+              label={ICONLABEL__TEXTLABEL[LANGUAGE]}
+              value={form.icon}
+              defaultEmoji={DEFAULT_BADGE_EMOJI}
+              onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
+              ariaLabel={ICONARIALABEL__TEXTLABEL[LANGUAGE]}
             />
           </div>
-        </div>
 
-        <div className="rewards-modal__row rewards-modal__row--icon-rarity">
-          <EmojiPickerField
-            className="rewards-modal__field rewards-modal__field--icon"
-            label="Ikona"
-            value={form.icon}
-            defaultEmoji={DEFAULT_BADGE_EMOJI}
-            onChange={(emoji) => setForm((prev) => ({ ...prev, icon: emoji }))}
-            ariaLabel="Wybierz emoji odznaki"
-          />
+          <div className="rewards-modal__fields-stack">
+            <div className="rewards-modal__row rewards-modal__row--name-reward">
+              <TextField
+                id="badge-name"
+                label={NAMELABEL__TEXTLABEL[LANGUAGE]}
+                fieldKind="name"
+                value={form.name}
+                onChange={handleChange('name')}
+                className="rewards-modal__field"
+                inputClassName="rewards-modal__input"
+              />
+              <div className="rewards-modal__field">
+                <RewardsCurrencyLabel htmlFor="badge-reward">{REWARDLABEL__TEXTLABEL[LANGUAGE]}</RewardsCurrencyLabel>
+                <input
+                  id="badge-reward"
+                  type="text"
+                  inputMode="numeric"
+                  className="rewards-modal__input"
+                  value={form.rewardAmount}
+                  onChange={handleChange('rewardAmount')}
+                />
+              </div>
+            </div>
 
-          <div className="rewards-modal__field">
-            <label htmlFor="badge-rarity" className="rewards-modal__label">
-              Rzadkość
-              <InfoTooltip text="Wpływa na rzadkość odznaki w skarbcu." />
-            </label>
-            <select
-              id="badge-rarity"
-              className="rewards-modal__input"
-              value={form.rarity}
-              onChange={handleChange('rarity')}
-            >
-              {Object.entries(BADGE_RARITY_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
+            <div className="rewards-modal__field">
+              <label htmlFor="badge-rarity" className="rewards-modal__label">
+                {RARITYLABEL__TEXTLABEL[LANGUAGE]}
+                <InfoTooltip text={RARITYTOOLTIPTEXT__TEXTLABEL[LANGUAGE]} />
+              </label>
+              <select
+                id="badge-rarity"
+                className="rewards-modal__input"
+                value={form.rarity}
+                onChange={handleChange('rarity')}
+              >
+                {Object.entries(BADGE_RARITY_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
+        <Divider className="rewards-modal__divider" />
+
+        {/* Sekcja 2: Opisy */}
         <TextField
           id="badge-story"
-          label="Opis fabularny*"
+          label={STORYDESCRIPTIONLABEL__TEXTLABEL[LANGUAGE]}
           fieldKind="shortDescription"
           value={form.storyDescription}
           onChange={handleChange('storyDescription')}
@@ -186,7 +251,7 @@ export default function BadgeFormModal({
 
         <TextField
           id="badge-edu"
-          label="Opis dydaktyczny*"
+          label={DIDACTICDESCRIPTIONLABEL__TEXTLABEL[LANGUAGE]}
           fieldKind="shortDescription"
           value={form.didacticDescription}
           onChange={handleChange('didacticDescription')}
@@ -194,13 +259,16 @@ export default function BadgeFormModal({
           inputClassName="rewards-modal__textarea"
         />
 
+        <Divider className="rewards-modal__divider" />
+
+        {/* Sekcja 3: Dostępność */}
         <div className="rewards-modal__field">
           <BadgeOptionCheckbox
             id="badge-start-hidden"
             checked={form.startHidden}
             onChange={(checked) => setForm((prev) => ({ ...prev, startHidden: checked }))}
           >
-            Ukryj odznakę (niewidoczna dla studentów)
+            {HIDDENOPTIONTEXT__TEXTLABEL[LANGUAGE]}
           </BadgeOptionCheckbox>
         </div>
       </div>

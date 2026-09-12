@@ -46,18 +46,22 @@ export function positionCenteredTooltip({
   gap = TOOLTIP_GAP,
 }) {
   const centerX = triggerRect.left + triggerRect.width / 2;
+  const spaceAbove = triggerRect.top - gap - margin;
+  const spaceBelow = window.innerHeight - triggerRect.bottom - gap - margin;
+
   let placement = 'top';
-  let top = triggerRect.top - gap - bubbleRect.height;
 
-  if (top < margin) {
-    placement = 'bottom';
-    top = triggerRect.bottom + gap;
-  }
-
-  if (placement === 'bottom' && top + bubbleRect.height > window.innerHeight - margin) {
+  if (spaceAbove >= bubbleRect.height) {
     placement = 'top';
-    top = triggerRect.top - gap - bubbleRect.height;
+  } else if (spaceBelow >= bubbleRect.height) {
+    placement = 'bottom';
+  } else {
+    placement = spaceBelow >= spaceAbove ? 'bottom' : 'top';
   }
+
+  let top = placement === 'top'
+    ? triggerRect.top - gap - bubbleRect.height
+    : triggerRect.bottom + gap;
 
   let left = centerX - bubbleRect.width / 2;
   ({ left, top } = clampRectToViewport(left, top, bubbleRect.width, bubbleRect.height, margin));

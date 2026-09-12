@@ -155,7 +155,7 @@
 
 @media (max-width: 640px) {
   .maq-rank {
-    padding: 16px 16px 24px 20px;
+    padding: 16px 16px 20px 18px;
   }
 
   .maq-rank__columns {
@@ -169,24 +169,29 @@
     grid-template-columns: var(--size-rank-icon-circle) 1fr;
     grid-template-areas:
       'icon name'
-      'cost cost';
-    column-gap: 14px;
-    row-gap: 10px;
+      'icon cost';
+    column-gap: 12px;
+    row-gap: 6px;
     align-items: center;
     padding-right: 0;
   }
 
   .maq-rank__icon-circle {
     grid-area: icon;
+    align-self: center;
   }
 
   .maq-rank__name {
     grid-area: name;
+    font-size: 18px;
+    line-height: 1.3;
   }
 
   .maq-rank__cost {
     grid-area: cost;
-    justify-self: end;
+    justify-self: start;
     margin-left: 0;
+    padding: 4px 10px;
+    font-size: 13px;
   }
 }

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, TextField } from '../../../../components/ui/index.js';
+import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -10,6 +12,7 @@ const EMPTY_FORM = {
   description0: '',
   description1: '',
   reward: '',
+  isVisible: true,
 };
 
 export default function ActivityFormModal({
@@ -76,6 +79,10 @@ export default function ActivityFormModal({
     polish: 'Etap:',
     english: 'Stage:',
   };
+  const ISVISIBLE__TEXTLABEL = {
+    polish: 'Aktywność widoczna dla studentów',
+    english: 'Activity visible to students',
+  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -86,6 +93,7 @@ export default function ActivityFormModal({
         description0: activity.description0 ?? '',
         description1: activity.description1 ?? '',
         reward: String(activity.reward ?? ''),
+        isVisible: activity.isVisible !== false && activity.visibilityStatus !== 0 && activity.isPublished !== false,
       });
       return;
     }
@@ -110,7 +118,7 @@ export default function ActivityFormModal({
   const handleChange = (field) => (event) => {
     const nextValue = field === 'reward'
       ? sanitizeWholeNumberInput(event.target.value)
-      : event.target.value;
+      : (field === 'isVisible' ? event.target.checked : event.target.value);
     setForm((prev) => ({ ...prev, [field]: nextValue }));
   };
 
@@ -122,6 +130,7 @@ export default function ActivityFormModal({
       description0: form.description0.trim(),
       description1: form.description1.trim(),
       reward: rewardValidation.value,
+      isVisible: form.isVisible,
     });
   };
 
@@ -197,6 +206,30 @@ export default function ActivityFormModal({
           className="rewards-modal__field"
           inputClassName="rewards-modal__textarea"
         />
+
+        <div className="rewards-modal__field">
+          <label className="rewards-modal__option-label" htmlFor="activity-is-visible">
+            <input
+              id="activity-is-visible"
+              type="checkbox"
+              className="rewards-modal__option-input"
+              checked={form.isVisible}
+              onChange={handleChange('isVisible')}
+            />
+            <span
+              className={[
+                'rewards-modal__option-checkbox',
+                form.isVisible ? 'rewards-modal__option-checkbox--checked' : '',
+              ].filter(Boolean).join(' ')}
+              aria-hidden="true"
+            >
+              {form.isVisible ? (
+                <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
+              ) : null}
+            </span>
+            <span className="rewards-modal__option-text">{ISVISIBLE__TEXTLABEL[LANGUAGE]}</span>
+          </label>
+        </div>
       </div>
     </Modal>
   );

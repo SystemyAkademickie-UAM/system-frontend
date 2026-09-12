@@ -13,6 +13,7 @@ function StageIsland({
   onToggleExpand,
   stageRowActions,
   activityRowActions,
+  onActivityDoubleClick,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const activityCount = stage.activities?.length ?? 0;
@@ -30,10 +31,15 @@ function StageIsland({
     polish: 'Ukryty',
     english: 'Hidden',
   };
+  const HIDDENBYSTAGEBADGE__TEXTLABEL = {
+    polish: 'Ukryty przez etap',
+    english: 'Hidden by stage',
+  };
   const PUBLICBADGE__TEXTLABEL = {
     polish: 'Publiczny',
     english: 'Public',
   };
+
   const NOACTIVITIES__TEXTLABEL = {
     polish: 'Brak aktywności w tym etapie.',
     english: 'No activities in this stage.',
@@ -101,9 +107,6 @@ function StageIsland({
           <span aria-hidden="true">⋮⋮</span>
         </button>
         <div className="activities-island__header-start">
-          <span className="activities-island__icon" aria-hidden="true">
-            {stage.name.trim().charAt(0).toUpperCase() || '?'}
-          </span>
           <div className="activities-island__heading">
             <div className="activities-island__title-row">
               <h3 className="activities-island__title">{stage.name}</h3>
@@ -135,6 +138,7 @@ function StageIsland({
             className={[
               'activities-island__chevron',
               stage.expanded ? 'activities-island__chevron--open' : '',
+
             ].filter(Boolean).join(' ')}
             aria-hidden="true"
           >
@@ -167,14 +171,36 @@ function StageIsland({
                   </tr>
                 </thead>
                 <tbody>
-                  {stage.activities.map((activity) => (
-                    <tr key={`activity-${stage.id}-${activity.id}`} className="activities-island__row">
-                      <td className="activities-island__cell activities-island__cell--name">
-                        <span className="activities-island__activity-name">{activity.name}</span>
-                      </td>
+                  {stage.activities.map((activity) => {
+                    const isActivityHidden = activity.visibilityStatus === 0 || activity.isPublished === false || activity.isVisible === false;
+                    const isHiddenByStage = !isActivityHidden && isHidden;
+                    return (
+                      <tr
+                        key={`activity-${stage.id}-${activity.id}`}
+                        className={[
+                          'activities-island__row',
+                          (isActivityHidden || isHiddenByStage) ? 'activities-island__row--hidden' : '',
+                          isHiddenByStage ? 'activities-island__row--hidden-by-stage' : '',
+                        ].filter(Boolean).join(' ')}
+                        onDoubleClick={() => onActivityDoubleClick?.(stage, activity)}
+                      >
+                        <td className="activities-island__cell activities-island__cell--name">
+                          <span className="activities-island__activity-name">
+                            {activity.name}
+                            {isActivityHidden ? (
+                              <span className="activities-island__activity-badge activities-island__activity-badge--hidden">
+                                {HIDDENBADGE__TEXTLABEL[LANGUAGE]}
+                              </span>
+                            ) : isHiddenByStage ? (
+                              <span className="activities-island__activity-badge activities-island__activity-badge--hidden-by-stage">
+                                {HIDDENBYSTAGEBADGE__TEXTLABEL[LANGUAGE]}
+                              </span>
+                            ) : null}
+                          </span>
+                        </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--truncate">
                         <span className="activities-island__cell-text" title={activity.description0}>
-                          {activity.description0 || '—'}
+                          <em>{activity.description0 || '—'}</em>
                         </span>
                       </td>
                       <td className="activities-island__cell activities-island__cell--hide-mobile activities-island__cell--truncate">
@@ -197,7 +223,8 @@ function StageIsland({
                         />
                       </td>
                     </tr>
-                  ))}
+                  );
+                })}
                 </tbody>
               </table>
             </div>
@@ -214,6 +241,7 @@ export default function ActivitiesTreeTable({
   stageRowActions,
   activityRowActions,
   onReorderStages,
+  onActivityDoubleClick,
 }) {
   const containerRef = useRef(null);
   const visibleStages = useMemo(() => stages, [stages]);
@@ -252,6 +280,7 @@ export default function ActivitiesTreeTable({
           onToggleExpand={onToggleExpand}
           stageRowActions={stageRowActions}
           activityRowActions={activityRowActions}
+          onActivityDoubleClick={onActivityDoubleClick}
         />
       ))}
     </div>

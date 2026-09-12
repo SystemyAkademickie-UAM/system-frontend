@@ -33,6 +33,12 @@
   flex-shrink: 0;
 }
 
+.activities-tools-page__tool-icon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
 .activities-tools-page__tool-icon--flipped {
   transform: rotate(180deg);
 }
@@ -44,6 +50,10 @@
 
 .activities-tools-page__tool-btn:hover:not(:disabled) {
   color: var(--color-accent);
+}
+
+.activities-tools-page__tool-btn:hover:not(:disabled) .activities-tools-page__tool-icon {
+  color: var(--color-accent-pressed);
 }
 
 .activities-tools-page__tool-btn:disabled {

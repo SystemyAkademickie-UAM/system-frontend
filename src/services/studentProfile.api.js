@@ -27,13 +27,17 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @property {number} currency
  * @property {number} totalEarned
  * @property {number} badgesCount
+ * @property {number} [purchasedItemsCount]
+ * @property {number} [usedItemsCount]
+ * @property {number} [lostLivesCount]
  * @property {string | null} groupCurrency
  * @property {string | null} groupCurrencyEmoji
  * @property {number | null} lives
  * @property {string | null} livesIcon
+ * @property {boolean} [livesEnabled]
  * @property {boolean} [shopOpen]
  * @property {GroupStudentProfileBadge[]} earnedBadges
- * @property {Array<{ id: number, name: string, storyDescription: string | null, educationalDescription: string | null, currency: number, completedAt: string | null }>} completedActivities
+ * @property {Array<{ id: number, name: string, stageId: number | null, stageName: string | null, storyDescription: string | null, educationalDescription: string | null, currency: number, completedAt: string | null }>} completedActivities
  */
 
 /**
@@ -41,10 +45,14 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * GET /groups/:groupId/student-profile
  *
  * @param {string | number} groupId
+ * @param {string | number} [studentAccountId]
  * @returns {Promise<{ ok: boolean, profile?: GroupStudentProfile, error?: string }>}
  */
-export async function fetchGroupStudentProfile(groupId) {
-  const result = await getJson(`/groups/${groupId}/student-profile`, { includeBrowserId: true });
+export async function fetchGroupStudentProfile(groupId, studentAccountId) {
+  const url = studentAccountId
+    ? `/groups/${groupId}/student-profile?studentAccountId=${studentAccountId}`
+    : `/groups/${groupId}/student-profile`;
+  const result = await getJson(url, { includeBrowserId: true });
   if (!result.ok) {
     const errorData = /** @type {{ message?: string, error?: string }} */ (result.data);
     return {

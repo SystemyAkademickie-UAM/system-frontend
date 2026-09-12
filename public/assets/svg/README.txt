@@ -24,6 +24,8 @@ actions/
   delete.svg          — usuń
   manage-badges.svg   — zarządzaj odznakami uczestnika
   manage-progress.svg — zarządzaj postępem uczestnika
+  show.svg            — pokaż / odkryj element
+  hide.svg            — ukryj element
 
 controls/
   close.svg           — zamknij (modal, panel)

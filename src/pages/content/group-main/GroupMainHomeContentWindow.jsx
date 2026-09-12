@@ -1,8 +1,50 @@
+import { useEffect, useState } from 'react';
+import { Button } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import './GroupMainHomeContentWindow.css';
 
 const closeicon = PUBLIC_UI_ICONS.close;
 
-export default function GroupMainHomeContentWindow({popupclose, groupname, subjectname}) {
+const GROUPCREATEDTITLEWITHSUBJECT__TEXTLABEL = {
+  polish: 'Grupa {groupname} dla przedmiotu {subjectname} została utworzona z powodzeniem przy użyciu szablonu.',
+  english: 'Group {groupname} for the subject {subjectname} has been successfully created using the template.'
+};
+
+const GROUPCREATEDTITLE__TEXTLABEL = {
+  polish: 'Grupa {groupname} została utworzona z powodzeniem przy użyciu szablonu.',
+  english: 'Group {groupname} has been successfully created using the template.'
+};
+
+const GROUPCREATEDINFO1__TEXTLABEL = {
+  polish: '• Na początku wszystkie importowane elementy składowe grupy są ukryte przed pozostałymi członkami grupy.',
+  english: '• Initially, all imported group elements are hidden from other group members.'
+};
+
+const GROUPCREATEDINFO2__TEXTLABEL = {
+  polish: '• W celu udostępnienia ukrytej zawartości do wglądu dla studentów, należy poszczególne elementy uczynić widocznymi.',
+  english: '• To share hidden content with students, you need to make individual elements visible.'
+};
+
+const CONFIRMBUTTON__TEXTLABEL = {
+  polish: 'Rozumiem',
+  english: 'OK'
+};
+
+export default function GroupMainHomeContentWindow({ popupclose, groupname, subjectname }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' || e.key === 'Enter') {
+        if (popupclose) popupclose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [popupclose]);
 
   function closepopupwindow() {
     if (popupclose) {
@@ -10,33 +52,53 @@ export default function GroupMainHomeContentWindow({popupclose, groupname, subje
     }
   }
 
-  var firstline = '';
+  const firstline = (subjectname != null && subjectname.length > 0)
+    ? GROUPCREATEDTITLEWITHSUBJECT__TEXTLABEL[LANGUAGE].replace('{groupname}', groupname).replace('{subjectname}', subjectname)
+    : GROUPCREATEDTITLE__TEXTLABEL[LANGUAGE].replace('{groupname}', groupname);
 
-  if (subjectname != null && subjectname.length > 0) {
-    firstline = 'Grupa ' + groupname + ' dla przedmiotu ' + subjectname + ' została utworzona z powodzeniem przy użyciu szablonu.';
-  } else {
-    firstline = 'Grupa ' + groupname + ' została utworzona z powodzeniem przy użyciu szablonu.';
-  }
-
-  var secondline = '• Na początku wszystkie importowane elementy składowe grupy są ukryte przed pozostałymi członkami grupy.';
-  var thirdline = '• W celu udostępnienia ukrytej zawartości do wglądu dla studentów, należy poszczególne elementy uczynić widocznymi.';
+  const secondline = GROUPCREATEDINFO1__TEXTLABEL[LANGUAGE];
+  const thirdline = GROUPCREATEDINFO2__TEXTLABEL[LANGUAGE];
 
   return (
-    <div style = {{width: '100%', height: '100%', position: 'fixed', top: '0%', left: '0%', backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(4px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-      <div onClick = {(event) => event.stopPropagation()} style = {{backgroundColor: 'rgb(26, 26, 42)', width: '50%', height: '50%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
-        <div onClick = {closepopupwindow} style = {{width: '5%', aspectRatio: '1 / 1', position: 'absolute', top: '2%', left: '94%', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer', zIndex: 1}}>
-          <img src = {closeicon} style = {{width: '60%', height: '60%'}}/>
+    <div
+      className="group-main-template-modal"
+      onClick={closepopupwindow}
+      role="presentation"
+    >
+      <div
+        className="group-main-template-modal__dialog"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+      >
+        <button
+          type="button"
+          className="group-main-template-modal__close"
+          onClick={closepopupwindow}
+          aria-label="Zamknij"
+        >
+          <img src={closeicon} alt="" className="group-main-template-modal__close-icon" />
+        </button>
+
+        <div className="group-main-template-modal__body">
+          <p className="group-main-template-modal__title">{firstline}</p>
+          <div className="group-main-template-modal__info-list">
+            <p className="group-main-template-modal__info-item">{secondline}</p>
+            <p className="group-main-template-modal__info-item">{thirdline}</p>
+          </div>
         </div>
 
-        <div style = {{width: '90%', position: 'relative', left: '5%', display: 'flex', flexDirection: 'column', gap: '2vh', flex: 1, paddingTop: '10%', paddingBottom: '12%', justifyContent: 'center'}}>
-          <div style = {{width: '100%', position: 'relative', color: 'rgb(227, 224, 247)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginBottom: '2.5vh'}}><span>{firstline}</span></div>
-          <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'left'}}><span>{secondline}</span></div>
-          <div style = {{width: '100%', position: 'relative', color: 'rgb(187, 203, 185)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'left'}}><span>{thirdline}</span></div>
+        <div className="group-main-template-modal__footer">
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            onClick={closepopupwindow}
+          >
+            {CONFIRMBUTTON__TEXTLABEL[LANGUAGE]}
+          </Button>
         </div>
-
-        <div onClick = {closepopupwindow} style = {{backgroundColor: 'rgba(30, 204, 56)', width: '20%', height: '12%', position: 'absolute', bottom: '5%', right: '5%', borderRadius: '8px', color: 'rgb(0, 57, 21)', fontSize: '16px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center', cursor: 'pointer'}}>Potwierdź</div>
-
       </div>
     </div>
-  )
+  );
 }

@@ -91,59 +91,33 @@
 
 
 .activities-page__add-island {
-
   display: inline-flex;
-
-  align-items: flex-start;
-
+  align-items: center;
   gap: 0.75rem;
-
   padding: 0.625rem;
-
   border-radius: 12px;
-
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   background: var(--color-bg-surface);
-
 }
-
-
 
 .activities-page__add-field {
-
-  flex: 0 1 16rem;
-
-  width: 16rem;
-
-  max-width: min(16rem, 100%);
-
+  flex: 0 1 18rem;
+  width: 18rem;
+  max-width: min(18rem, 100%);
   min-width: 0;
-
+  position: relative;
 }
 
-
-
 .activities-page__add-input {
-
   width: 100%;
-
   box-sizing: border-box;
-
-  padding: 0.625rem 0.875rem;
-
+  padding: 0.625rem 3.5rem 0.625rem 0.875rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
-
   border-radius: 10px;
-
   background: var(--color-bg-elevated);
-
   font: inherit;
-
   font-size: var(--font-size-body);
-
   color: var(--color-text-primary);
-
 }
 
 
@@ -380,6 +354,14 @@
 }
 
 .activities-island__actions .data-table__actions {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.activities-island__header:hover .activities-island__actions .data-table__actions,
+.activities-island__header:focus-within .activities-island__actions .data-table__actions,
+.activities-island:hover .activities-island__actions .data-table__actions,
+.activities-island:focus-within .activities-island__actions .data-table__actions {
   opacity: 1;
 }
 
@@ -472,12 +454,53 @@
 }
 
 .activities-island__cell--actions .data-table__actions {
-  opacity: 1;
+  opacity: 0;
+  transition: opacity 0.15s ease;
   justify-content: flex-end;
 }
 
+.activities-island__row:hover .activities-island__cell--actions .data-table__actions,
+.activities-island__row:focus-within .activities-island__cell--actions .data-table__actions {
+  opacity: 1;
+}
+
+.activities-island__row--hidden .activities-island__cell {
+  opacity: 0.65;
+  transition: opacity 0.15s ease;
+}
+
+.activities-island__row--hidden:hover .activities-island__cell {
+  opacity: 0.95;
+}
+
+.activities-island__activity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.activities-island__activity-badge--hidden {
+  background: rgba(248, 113, 113, 0.14);
+  color: #f87171;
+}
+
+.activities-island__activity-badge--hidden-by-stage {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
 .activities-island__activity-name {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -559,6 +582,7 @@
 
   .activities-island__actions .data-table__actions {
     gap: 0.15rem;
+    opacity: 1;
   }
 
   .activities-island__actions .data-table__action-btn {
@@ -625,6 +649,10 @@
 
   .activities-island__cell--reward .maq-currency-display {
     justify-content: flex-end;
+  }
+
+  .activities-island__cell--actions .data-table__actions {
+    opacity: 1;
   }
 
   .activities-island__cell--actions .data-table__action-btn {

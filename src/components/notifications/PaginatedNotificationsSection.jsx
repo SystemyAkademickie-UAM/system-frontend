@@ -1,19 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-
-import { Button, Pagination, TexturedSurface, useToast } from '../ui/index.js';
-
+import { useSearchParams } from 'react-router-dom';
+import { AssetSvg, Button, Pagination, TexturedSurface, useToast } from '../ui/index.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
-
 import { useGroupBacklogNotifications } from '../../hooks/notifications/useGroupBacklogNotifications.js';
-
 import NotificationsFeed from './NotificationsFeed.jsx';
-
 import ClearNotificationsConfirmModal from './ClearNotificationsConfirmModal.jsx';
-
+import { SVG_ICONS } from '../../constants/svgIcons.js';
 import { BACKLOG_LIST_POLL_MS } from '../../constants/backlogNotifications.constants.js';
-
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
-
 import './PaginatedNotificationsSection.css';
 
 
@@ -119,135 +113,113 @@ export default function PaginatedNotificationsSection({
   const { showSuccess, showError } = useToast();
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [page, setPage] = useState(1);
-
+  const rawPageParam = searchParams.get('page');
+  const parsedPage = rawPageParam ? parseInt(rawPageParam, 10) : 1;
+  const initialPage = !Number.isNaN(parsedPage) && parsedPage >= 1 ? parsedPage : 1;
+  const [page, setPage] = useState(initialPage);
   const [confirmClearMode, setConfirmClearMode] = useState(null);
-
   const [isClearing, setIsClearing] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const raw = searchParams.get('page');
+    const p = raw ? parseInt(raw, 10) : 1;
+    const valid = !Number.isNaN(p) && p >= 1 ? p : 1;
+    setPage(valid);
+  }, [searchParams]);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (newPage > 1) {
+          next.set('page', String(newPage));
+        } else {
+          next.delete('page');
+        }
+        return next;
+      },
+      { replace: false },
+    );
+  };
 
   const skip = (page - 1) * pageSize;
 
-
+  useEffect(() => {
+    if (!isMenuOpen) return undefined;
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.paginated-notifications__menu-container')) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const {
-
     notifications,
-
     totalCount,
-
     unreadCount,
-
     isLoading,
-
     error,
-
     markRead,
-
     markAllRead,
-
     clearNotifications,
-
   } = useGroupBacklogNotifications(groupId, {
-
     isStudentView,
-
     take: pageSize,
-
     skip,
-
     pollMs,
-
   });
 
-
-
   const totalPages = useMemo(
-
     () => Math.max(1, Math.ceil(totalCount / pageSize)),
-
     [pageSize, totalCount],
-
   );
-
-
 
   const safePage = Math.min(page, totalPages);
 
-
-
   useEffect(() => {
-
-    if (page > totalPages) {
-
-      setPage(totalPages);
-
+    if (totalCount > 0 && page > totalPages) {
+      handlePageChange(totalPages);
     }
-
-  }, [page, totalPages]);
-
-
+  }, [page, totalPages, totalCount]);
 
   const handleMarkAllRead = async () => {
-
     await markAllRead();
-
   };
 
-
-
   const handleConfirmClear = async () => {
-
     if (!confirmClearMode) {
-
       return;
-
     }
-
-
 
     setIsClearing(true);
-
     const result = await clearNotifications({
-
       excludeItemUses: confirmClearMode === 'exceptItemUses',
-
     });
-
     setIsClearing(false);
 
-
-
     if (!result.ok) {
-
       showError(result.error ?? 'Nie udało się wyczyścić powiadomień.');
-
       return;
-
     }
-
-
 
     if (result.deleted === 0) {
-
       showSuccess('Brak powiadomień do wyczyszczenia.');
-
     } else if (confirmClearMode === 'exceptItemUses') {
-
       showSuccess('Usunięto powiadomienia oprócz użyć przedmiotów.');
-
     } else {
-
       showSuccess('Powiadomienia zostały wyczyszczone.');
-
     }
 
-
-
     setConfirmClearMode(null);
-
-    setPage(1);
-
+    handlePageChange(1);
   };
 
 
@@ -277,71 +249,68 @@ export default function PaginatedNotificationsSection({
           <div className="paginated-notifications__actions">
 
             <Button
-
               type="button"
-
               variant="secondary"
-
               size="sm"
-
               disabled={isLoading || unreadCount === 0}
-
               onClick={() => {
-
                 void handleMarkAllRead();
-
               }}
-
             >
-
               {MARKALLREAD__TEXTLABEL[LANGUAGE]}
-
             </Button>
 
-            {!isStudentView ? (
-
+            <div className="paginated-notifications__menu-container">
               <Button
-
                 type="button"
-
                 variant="secondary"
-
                 size="sm"
-
-                className="paginated-notifications__clear-partial-btn"
-
-                disabled={isLoading || isClearing || totalCount === 0}
-
-                onClick={() => setConfirmClearMode('exceptItemUses')}
-
+                className="paginated-notifications__more-btn"
+                aria-label="Więcej opcji"
+                title="Więcej opcji"
+                disabled={isLoading || totalCount === 0}
+                onClick={() => setIsMenuOpen((prev) => !prev)}
               >
-
-                {CLEARPARTIAL__TEXTLABEL[LANGUAGE]}
-
+                <AssetSvg
+                  name={SVG_ICONS.controls.more}
+                  width={16}
+                  height={16}
+                  alt=""
+                />
               </Button>
 
-            ) : null}
-
-            <Button
-
-              type="button"
-
-              variant="danger"
-
-              size="sm"
-
-              disabled={isLoading || isClearing || totalCount === 0}
-
-              onClick={() => setConfirmClearMode('all')}
-
-            >
-
-              {CLEARALL__TEXTLABEL[LANGUAGE]}
-
-            </Button>
-
+              {isMenuOpen ? (
+                <div className="paginated-notifications__menu" role="menu">
+                  {!isStudentView ? (
+                    <button
+                      type="button"
+                      className="paginated-notifications__menu-item"
+                      role="menuitem"
+                      disabled={isLoading || isClearing || totalCount === 0}
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setConfirmClearMode('exceptItemUses');
+                      }}
+                    >
+                      {CLEARPARTIAL__TEXTLABEL[LANGUAGE]}
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    className="paginated-notifications__menu-item paginated-notifications__menu-item--danger"
+                    role="menuitem"
+                    disabled={isLoading || isClearing || totalCount === 0}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setConfirmClearMode('all');
+                    }}
+                  >
+                    {CLEARALL__TEXTLABEL[LANGUAGE]}
+                  </button>
+                </div>
+              ) : null}
+            </div>
           </div>
-
         </div>
 
 
@@ -380,7 +349,7 @@ export default function PaginatedNotificationsSection({
 
               page={safePage}
 
-              onPageChange={setPage}
+              onPageChange={handlePageChange}
 
               ariaLabel={PAG__TEXTLABEL[LANGUAGE]}
 

@@ -120,8 +120,21 @@
 }
 
 .members-table__col--user {
-  width: 28%;
-  min-width: 12rem;
+  width: 24%;
+  min-width: 11rem;
+}
+
+.members-table__col--email {
+  width: 20%;
+  min-width: 9rem;
+}
+
+.members-table__cell-text--email {
+  color: var(--color-text-secondary);
+  font-size: var(--members-font-table-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .members-table__col--rank {

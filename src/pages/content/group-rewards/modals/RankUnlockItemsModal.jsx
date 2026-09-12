@@ -2,6 +2,22 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
 import RankUnlockItemChecklist from '../shared/RankUnlockItemChecklist.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const UNLOCKMODALTITLE__TEXTLABEL = {
+  polish: 'Odblokowane przedmioty',
+  english: 'Unlocked items'
+};
+
+const SHOPITEMSLABEL__TEXTLABEL = {
+  polish: 'Przedmioty sklepu',
+  english: 'Shop items'
+};
+
+const UNLOCKHINT__TEXTLABEL = {
+  polish: 'Przedmioty niezaznaczone są domyślnie dostępne dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang.',
+  english: 'Unticked items are available to everyone by default. A higher rank also unlocks items from lower ranks.'
+};
 
 function normalizeRankShopItemIds(items = []) {
   return items.map((item) => String(item).trim()).filter(Boolean);
@@ -16,6 +32,7 @@ export default function RankUnlockItemsModal({
   onConfirm,
   isLoading = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [selectedShopItems, setSelectedShopItems] = useState([]);
 
   const rankRefs = useMemo(
@@ -67,7 +84,7 @@ export default function RankUnlockItemsModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Odblokowane przedmioty"
+      title={UNLOCKMODALTITLE__TEXTLABEL[LANGUAGE]}
       subtitle={rank.name}
       onConfirm={handleConfirm}
       confirmDisabled={isLoading}
@@ -76,9 +93,9 @@ export default function RankUnlockItemsModal({
     >
       <div className="rewards-modal__form">
         <div className="rewards-modal__field">
-          <span className="rewards-modal__label">Przedmioty sklepu</span>
+          <span className="rewards-modal__label">{SHOPITEMSLABEL__TEXTLABEL[LANGUAGE]}</span>
           <p className="rewards-modal__field-hint">
-            Przedmioty niezaznaczone są domyślnie dostępne dla wszystkich. Wyższa ranga odblokowuje też przedmioty niższych rang.
+            {UNLOCKHINT__TEXTLABEL[LANGUAGE]}
           </p>
           <RankUnlockItemChecklist
             catalogItems={catalogItems}

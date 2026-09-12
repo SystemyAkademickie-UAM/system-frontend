@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+
 import {
   CatalogFilterGroup,
   CatalogFiltersPanel,
@@ -8,10 +9,11 @@ import {
 import {
   filterShopItems,
   SHOP_SORT,
-  SHOP_SORT_OPTIONS,
+  getShopSortOptions,
   sortShopItems,
 } from '../../../utils/shop/shopModel.js';
 import { buildShopCategoryFilters, resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import {
   filterCatalogShopItems,
   sortShopItemsWithExtraLifeFirst,
@@ -20,6 +22,21 @@ import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSy
 import { useGroupShopItems, useGroupShopOpen } from '../../../hooks/shop/useGroupShop.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import './GroupShopContent.css';
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie produktów sklepu…',
+  english: 'Loading shop products…'
+};
+
+const EMPTYMESSAGE__TEXTLABEL = {
+  polish: 'Brak produktów spełniających kryteria.',
+  english: 'No products match the criteria.'
+};
+
+const CATEOGYFILTERLABEL__TEXTLABEL = {
+  polish: 'Filtr kategorii produktu',
+  english: 'Product category filter'
+};
 
 /**
  * Kafelkowy katalog produktów sklepu — widok jak na /shop (bez koszyka).
@@ -49,7 +66,10 @@ export default function ShopStudentCatalogPanel({
   onSortByChange,
   onEdit,
   onDelete,
+  onDoubleClick,
+  highlightedItemId = null,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { items, isLoading, error } = useGroupShopItems(groupId);
   const { isShopOpen } = useGroupShopOpen(groupId);
   const { showExtraLifeProduct } = useGroupShopLivesSystem(groupId, {
@@ -58,8 +78,13 @@ export default function ShopStudentCatalogPanel({
   const { categories, categoriesById } = useGroupItemCategories(groupId);
 
   const categoryFilters = useMemo(
-    () => buildShopCategoryFilters(categories),
-    [categories],
+    () => buildShopCategoryFilters(categories, LANGUAGE),
+    [categories, LANGUAGE],
+  );
+
+  const sortOptions = useMemo(
+    () => getShopSortOptions(LANGUAGE),
+    [LANGUAGE],
   );
 
   const catalogItems = useMemo(() => {
@@ -83,7 +108,7 @@ export default function ShopStudentCatalogPanel({
   const cardsDisabled = !showLecturerActions && !isShopOpen;
 
   if (isLoading) {
-    return <p className="group-shop__empty page-unavailable__notice" role="status">Ładowanie produktów sklepu…</p>;
+    return <p className="group-shop__empty page-unavailable__notice" role="status">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>;
   }
 
   if (error) {
@@ -95,7 +120,7 @@ export default function ShopStudentCatalogPanel({
       {filtersExpanded ? (
         <CatalogFiltersPanel>
           <CatalogFilterGroup
-            ariaLabel="Filtr kategorii produktu"
+            ariaLabel={CATEOGYFILTERLABEL__TEXTLABEL[LANGUAGE]}
             filters={categoryFilters}
             activeId={categoryFilter}
             onSelect={onCategoryFilterChange}
@@ -104,7 +129,7 @@ export default function ShopStudentCatalogPanel({
           <CatalogSortSelect
             value={sortBy}
             onChange={onSortByChange}
-            options={SHOP_SORT_OPTIONS}
+            options={sortOptions}
           />
         </CatalogFiltersPanel>
       ) : null}
@@ -114,31 +139,44 @@ export default function ShopStudentCatalogPanel({
         blockCatalog ? 'group-shop__catalog--blocked' : '',
       ].filter(Boolean).join(' ')}>
         {visibleItems.length === 0 ? (
-          <p className="group-shop__empty page-unavailable__notice">Brak produktów spełniających kryteria.</p>
+          <p className="group-shop__empty page-unavailable__notice">{EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}</p>
         ) : (
           <div className="group-shop__grid">
             {visibleItems.map((item, index) => (
-              <ProductCard
+              <div
                 key={`${item.id}-${index}`}
-                itemId={item.id}
-                name={item.name}
-                storyDescription={item.storyDescription}
-                didacticDescription={item.didacticDescription}
-                priceAmount={item.priceAmount}
-                salePriceAmount={item.salePriceAmount}
-                rankDiscountedPrice={item.rankDiscountedPrice}
-                imageRef={item.imageRef}
-                categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
-                showLecturerActions={showLecturerActions}
-                hideAddToCart
-                hideActions={showLecturerActions}
-                onEdit={() => onEdit?.(item)}
-                onDelete={() => onDelete?.(item)}
-                isExtraLife={item.isExtraLife}
-                disabled={cardsDisabled || item.isLocked}
-                isRankLocked={!showLecturerActions && item.isLocked}
-                className="group-shop__card"
-              />
+                id={`shop-item-${item.id}`}
+                className="group-shop__card-wrapper"
+              >
+                <ProductCard
+                  itemId={item.id}
+                  name={item.name}
+                  storyDescription={item.storyDescription}
+                  didacticDescription={item.didacticDescription}
+                  priceAmount={item.priceAmount}
+                  minPrice={item.minPrice}
+                  salePriceAmount={item.salePriceAmount}
+                  rankDiscountedPrice={item.rankDiscountedPrice}
+                  imageRef={item.imageRef}
+                  categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
+                  showLecturerActions={showLecturerActions}
+                  hideAddToCart
+                  hideActions={showLecturerActions}
+                  onEdit={() => onEdit?.(item)}
+                  onDelete={() => onDelete?.(item)}
+                  onDoubleClick={() => onDoubleClick(item)}
+                  isExtraLife={item.isExtraLife}
+                  isPublished={item.isPublished}
+                  disabled={cardsDisabled || item.isLocked}
+                  isRankLocked={!showLecturerActions && item.isLocked}
+                  className={[
+                    'group-shop__card',
+                    highlightedItemId != null && String(highlightedItemId) === String(item.id)
+                      ? 'group-shop__card--highlighted'
+                      : '',
+                  ].filter(Boolean).join(' ')}
+                />
+              </div>
             ))}
           </div>
         )}

@@ -1,3 +1,10 @@
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const LANGUAGE = READLANGUAGECOOKIE();
+
+const INTEGER_ERROR__TEXTLABEL = { polish: 'Wpisz liczbę całkowitą (dodatnią lub ujemną).', english: 'Enter a whole number (positive or negative).' };
+const MAX_AMOUNT_ERROR_PATTERN__TEXTLABEL = { polish: '${fieldLabel} nie może przekraczać ${maxValue}.', english: '${fieldLabel} cannot exceed ${maxValue}.' };
+
 export function validateDeltaInput(value) {
   const trimmed = value.trim();
 
@@ -12,7 +19,7 @@ export function validateDeltaInput(value) {
   return {
     valid: false,
     delta: 0,
-    error: 'Wpisz liczbę całkowitą (dodatnią lub ujemną).',
+    error: INTEGER_ERROR__TEXTLABEL[LANGUAGE],
   };
 }
 
@@ -20,7 +27,9 @@ function validateResultingAmount(nextAmount, fieldLabel, max) {
   if (nextAmount > max) {
     return {
       valid: false,
-      error: `${fieldLabel} nie może przekraczać ${max.toLocaleString('pl-PL')}.`,
+      error: MAX_AMOUNT_ERROR_PATTERN__TEXTLABEL[LANGUAGE]
+        .replace('${fieldLabel}', fieldLabel)
+        .replace('${maxValue}', max.toLocaleString('pl-PL')),
     };
   }
 

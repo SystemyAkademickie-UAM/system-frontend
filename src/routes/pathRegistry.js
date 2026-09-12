@@ -76,6 +76,18 @@ export function groupStudentProfilePath(groupId, studentId) {
   return `/groups/${groupId}/student-profile/${studentId}`;
 }
 
+export function groupStudentProfileBadgesPath(groupId, studentId) {
+  return `/groups/${groupId}/student-profile/${studentId}`;
+}
+
+export function groupStudentProfileEqPath(groupId, studentId) {
+  return `/groups/${groupId}/student-profile/${studentId}/eq`;
+}
+
+export function groupStudentProfilePurchasesPath(groupId, studentId) {
+  return `/groups/${groupId}/student-profile/${studentId}/purchases`;
+}
+
 // ============================================================================
 // STUDENT FLAT ROUTES (poza /home — osobne pozycje w sidebarze)
 // ============================================================================
@@ -122,6 +134,11 @@ export function groupProfileActivityPath(groupId) {
 /** Ekwipunek — `/groups/:groupId/profile/eq`. */
 export function groupProfileEqPath(groupId) {
   return `/groups/${groupId}/profile/eq`;
+}
+
+/** Historia zakupów profilu — `/groups/:groupId/profile/purchases`. */
+export function groupProfilePurchasesPath(groupId) {
+  return `/groups/${groupId}/profile/purchases`;
 }
 
 // ============================================================================
@@ -263,6 +280,10 @@ export function statisticsPath() {
 
 export function organizationsPath() {
   return '/organizations';
+}
+
+export function superadminLogsPath() {
+  return '/system-logs';
 }
 
 /** Galeria szablonów — `/templates`. */

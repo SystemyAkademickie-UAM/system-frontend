@@ -66,13 +66,15 @@
 }
 
 .maq-btn--secondary {
-  background: var(--color-bg-elevated);
+  background: var(--color-bg-surface);
   color: var(--color-accent);
-  border: 1px solid var(--color-accent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 60%, var(--color-divider));
 }
 
 .maq-btn--secondary:hover:not(:disabled) {
-  background: var(--color-accent-muted);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-surface));
+  border-color: var(--color-accent);
+  color: var(--color-accent-pressed);
 }
 
 .maq-btn--ghost {
@@ -81,7 +83,7 @@
 }
 
 .maq-btn--ghost:hover:not(:disabled) {
-  background: var(--color-nav-sub-active-bg);
+  background: color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
   color: var(--color-accent);
 }
 

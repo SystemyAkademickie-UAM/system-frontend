@@ -2,6 +2,33 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Modal, SearchBar } from '../../../../components/ui/index.js';
 import { fetchStudentBadges, toggleStudentBadge } from '../../../../services/students.api.js';
 import '../../group-rewards/shared/rewardsModals.css';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
+
+const MODALTITLE__TEXTLABEL = {
+  polish: 'Przydziel odznakę',
+  english: 'Assign Badge'
+};
+
+const SEARCH__TEXTLABEL = {
+  polish: {
+    placeholder: 'Szukaj studenta…',
+    label: 'Szukaj studenta'
+  },
+  english: {
+    placeholder: 'Search student…',
+    label: 'Search student'
+  }
+};
+
+const LOADINGASSIGNMENTS__TEXTLABEL = {
+  polish: 'Ładowanie przypisań…',
+  english: 'Loading assignments…'
+};
+
+const GIVEFAILMESSAGE__TEXTLABEL = {
+  polish: 'Nie udało się zaktualizować odznak.',
+  english: 'Failed to update badges.'
+};
 
 export default function BadgeGiveModal({
   isOpen,
@@ -12,6 +39,7 @@ export default function BadgeGiveModal({
   onConfirm,
   isLoading = false,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -91,7 +119,7 @@ export default function BadgeGiveModal({
 
       const failed = results.filter((result) => !result.ok);
       if (failed.length > 0) {
-        onConfirm?.({ changed: 0, error: failed[0].error || 'Nie udało się zaktualizować odznak.' });
+        onConfirm?.({ changed: 0, error: failed[0].error || GIVEFAILMESSAGE__TEXTLABEL[LANGUAGE] });
         return;
       }
 
@@ -110,7 +138,7 @@ export default function BadgeGiveModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Przydziel odznakę"
+      title={MODALTITLE__TEXTLABEL[LANGUAGE]}
       subtitle={badge.name}
       onConfirm={handleConfirm}
       confirmDisabled={busy}
@@ -121,14 +149,14 @@ export default function BadgeGiveModal({
         <SearchBar
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Szukaj studenta…"
+          placeholder={SEARCH__TEXTLABEL[LANGUAGE].placeholder}
           name="badge-give-search"
-          aria-label="Szukaj studenta"
+          aria-label={SEARCH__TEXTLABEL[LANGUAGE].label}
         />
       </div>
 
       {isFetching ? (
-        <p className="rewards-modal__loading">Ładowanie przypisań…</p>
+        <p className="rewards-modal__loading">{LOADINGASSIGNMENTS__TEXTLABEL[LANGUAGE]}</p>
       ) : (
         <ul className="rewards-modal__student-list">
           {visibleStudents.map((student) => {

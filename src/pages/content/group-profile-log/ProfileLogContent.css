@@ -1,0 +1,25 @@
+.profile-log-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.profile-log-content__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-log-content__title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: rgb(227, 224, 247);
+}
+
+.profile-log-content__surface.maq-textured-surface {
+  width: 100%;
+  max-width: 100%;
+}

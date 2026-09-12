@@ -9,7 +9,7 @@
 .group-main-home__surface.maq-textured-surface {
   width: fit-content;
   max-width: 100%;
-  align-self: center;
+  align-self: flex-start;
 }
 
 .group-main-home__surface.maq-textured-surface.group-main-home__surface--notifications,

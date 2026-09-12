@@ -32,6 +32,7 @@ export { default as Divider } from './Divider/Divider.jsx';
 export { default as TitleWithDivider } from './TitleWithDivider/TitleWithDivider.jsx';
 export { default as ContentWithMeasuredDivider } from './ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
 export { default as AvatarPicker } from './AvatarPicker/AvatarPicker.jsx';
+export { default as ColorPickerField } from './ColorPickerField/ColorPickerField.jsx';
 export { default as ViewLayoutToggle, VIEW_LAYOUT } from './ViewLayoutToggle/ViewLayoutToggle.jsx';
 export {
   CatalogFiltersToggle,

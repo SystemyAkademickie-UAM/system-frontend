@@ -1,7 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Modal } from '../index.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
-import { useResponsivePopularCount } from './useResponsivePopularCount.js';
+import {
+  AVATAR_CATEGORY,
+  AVATAR_CATEGORY_TABS,
+  filterAvatarsByCategory,
+  pickRandomAvatars,
+} from '../../../utils/avatarCategories.js';
 import './AvatarPicker.css';
 
 const AVATARPICKERLABELTEXT = {
@@ -10,18 +15,8 @@ const AVATARPICKERLABELTEXT = {
 };
 
 const POPULARLABELTEXT = {
-  polish: 'Ostatnio najczęściej używane',
-  english: 'Recently most used',
-};
-
-const SHOWALLLABELTEXT = {
-  polish: 'Pokaż pozostałe awatary',
-  english: 'Show all avatars',
-};
-
-const HIDEALLLABELTEXT = {
-  polish: 'Ukryj pozostałe awatary',
-  english: 'Hide all avatars',
+  polish: 'Ostatnio najczęściej wybierane',
+  english: 'Recently most chosen',
 };
 
 const SHOWALLBUTTONLABELTEXT = {
@@ -30,8 +25,8 @@ const SHOWALLBUTTONLABELTEXT = {
 };
 
 const SELECTAVATARMODALLABELTEXT = {
-  polish: 'Wybierz awatar',
-  english: 'Select avatar',
+  polish: 'Wybór awataru',
+  english: 'Avatar selection',
 };
 
 const SELECTTITLELABEL = {
@@ -44,15 +39,11 @@ const SELECTEDAVATARLABELTEXT = {
   english: 'Selected avatar',
 };
 
-const REMAININGAVATARSLABELTEXT = {
-  polish: 'Pozostałe awatary',
-  english: 'Remaining avatars',
-};
-
 const ALLAVATARSLABELTEXT = {
   polish: 'Wszystkie awatary',
   english: 'All avatars',
 };
+
 function AvatarPlaceholder({ className }) {
   return (
     <svg className={className} viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -64,32 +55,8 @@ function AvatarPlaceholder({ className }) {
   );
 }
 
-function pickPopularAvatars(avatars, count = 5, selectedId = null) {
-  if (avatars.length <= count) {
-    return [...avatars];
-  }
-
-  const sorted = [...avatars].sort((left, right) => left.id - right.id);
-  const selected = selectedId === null
-    ? null
-    : sorted.find((avatar) => avatar.id === selectedId) ?? null;
-  const picked = selected ? [selected] : [];
-
-  for (const avatar of sorted) {
-    if (picked.length >= count) {
-      break;
-    }
-    if (avatar.id === selectedId) {
-      continue;
-    }
-    picked.push(avatar);
-  }
-
-  return picked;
-}
-
 /**
- * Kafelkowy wybór awatara — aktualny podgląd, 5 popularnych oraz pełna galeria.
+ * Kafelkowy wybór awatara — aktualny podgląd, 4 losowe awatary oraz pop-up ze wszystkimi awatarami i kategoriami.
  *
  * @param {Object} props
  * @param {{ id: number, name?: string, imageUrl?: string }[]} props.avatars
@@ -97,8 +64,10 @@ function pickPopularAvatars(avatars, count = 5, selectedId = null) {
  * @param {(avatarId: number) => void} props.onChange
  * @param {boolean} [props.disabled]
  * @param {boolean} [props.isLoading] — skeleton zamiast pustego przełączenia layoutu
- * @param {'default' | 'compact'} [props.variant='default'] — `compact` dla rejestracji (mniejszy podgląd, modal z pełną listą)
+ * @param {'default' | 'compact' | 'left' | 'center'} [props.variant='default']
+ * @param {'left' | 'center'} [props.align] — opcjonalne nadpisanie wyrównania
  * @param {string} [props.className]
+ * @param {string} [props.LANGUAGE='polish']
  */
 export default function AvatarPicker({
   avatars,
@@ -107,31 +76,38 @@ export default function AvatarPicker({
   disabled = false,
   isLoading = false,
   variant = 'default',
+  align,
   className = '',
   LANGUAGE = 'polish',
 }) {
-  const isCompact = variant === 'compact';
-  const responsivePopularCount = useResponsivePopularCount();
-  const popularLimit = isCompact ? responsivePopularCount : 5;
-  const [showGallery, setShowGallery] = useState(false);
   const [showAllModal, setShowAllModal] = useState(false);
+  const [activeCategory, setActiveCategory] = useState(AVATAR_CATEGORY.ALL);
   const [popularAvatars, setPopularAvatars] = useState([]);
+  const hasInitializedPopularRef = useRef(false);
+
+  const isCentered = align === 'center' || variant === 'compact' || variant === 'center';
+
   useEffect(() => {
     if (avatars.length === 0) {
       setPopularAvatars([]);
+      hasInitializedPopularRef.current = false;
       return;
     }
-    setPopularAvatars(pickPopularAvatars(avatars, popularLimit, value));
-  }, [avatars, popularLimit, value]);
+    if (!hasInitializedPopularRef.current) {
+      setPopularAvatars(pickRandomAvatars(avatars, 4));
+      hasInitializedPopularRef.current = true;
+    }
+  }, [avatars]);
+
   const selectedAvatar = useMemo(
     () => avatars.find((avatar) => avatar.id === value) ?? null,
     [avatars, value],
   );
 
-  const remainingAvatars = useMemo(() => {
-    const popularIds = new Set(popularAvatars.map((avatar) => avatar.id));
-    return avatars.filter((avatar) => !popularIds.has(avatar.id));
-  }, [avatars, popularAvatars]);
+  const filteredAvatars = useMemo(
+    () => filterAvatarsByCategory(avatars, activeCategory),
+    [avatars, activeCategory],
+  );
 
   const handleSelect = useCallback((avatarId) => {
     if (disabled) return;
@@ -185,18 +161,40 @@ export default function AvatarPicker({
     </div>
   );
 
-  const showAllButton = !isLoading && (isCompact
-    ? avatars.length > popularAvatars.length
-    : remainingAvatars.length > 0);
+  const renderCategoryTabs = () => (
+    <div className="maq-avatar-picker__tabs" role="tablist" aria-label="Kategorie awatarów">
+      {AVATAR_CATEGORY_TABS.map((tab) => {
+        const isSelected = activeCategory === tab.id;
+        const labelText = typeof tab.label === 'object'
+          ? (tab.label[LANGUAGE] || tab.label.polish)
+          : tab.label;
+        return (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={isSelected}
+            className={[
+              'maq-avatar-picker__tab-button',
+              isSelected ? 'maq-avatar-picker__tab-button--active' : '',
+            ].join(' ')}
+            onClick={() => setActiveCategory(tab.id)}
+          >
+            {labelText}
+          </button>
+        );
+      })}
+    </div>
+  );
 
-  const skeletonTileCount = isCompact ? popularLimit : 5;
+  const showAllButton = !isLoading && avatars.length > 0;
+  const skeletonTileCount = 4;
 
   return (
     <div
       className={[
         'maq-avatar-picker',
-        isCompact ? 'maq-avatar-picker--compact' : '',
-        showGallery ? 'maq-avatar-picker--gallery-open' : '',
+        isCentered ? 'maq-avatar-picker--center' : 'maq-avatar-picker--left',
         isLoading ? 'maq-avatar-picker--loading' : '',
         className,
       ].filter(Boolean).join(' ')}
@@ -212,6 +210,7 @@ export default function AvatarPicker({
           renderCurrentPreview()
         )}
       </div>
+
       {isLoading ? (
         <div className="maq-avatar-picker__popular">
           <p className="maq-avatar-picker__label">{POPULARLABELTEXT[LANGUAGE]}</p>
@@ -240,48 +239,33 @@ export default function AvatarPicker({
             variant="secondary"
             size="md"
             disabled={disabled}
-            onClick={() => {
-              if (isCompact) {
-                setShowAllModal(true);
-                return;
-              }
-              setShowGallery((expanded) => !expanded);
-            }}
-            aria-expanded={isCompact ? showAllModal : showGallery}
+            onClick={() => setShowAllModal(true)}
+            aria-expanded={showAllModal}
           >
-            {isCompact
-              ? SHOWALLBUTTONLABELTEXT[LANGUAGE]
-              : (showGallery ? HIDEALLLABELTEXT[LANGUAGE] : SHOWALLLABELTEXT[LANGUAGE])}
+            {SHOWALLBUTTONLABELTEXT[LANGUAGE]}
           </Button>
         </div>
       ) : null}
 
-      {!isCompact && showGallery && avatars.length > 0 ? (
-        <div className="maq-avatar-picker__gallery" role="list" aria-label={REMAININGAVATARSLABELTEXT[LANGUAGE]}>
-          {(remainingAvatars.length > 0 ? remainingAvatars : avatars).map((avatar) => renderTile(avatar, 'md'))}
-        </div>
-      ) : null}
-
-      {isCompact ? (
-        <Modal
-          isOpen={showAllModal}
-          onClose={() => setShowAllModal(false)}
-          title={SELECTAVATARMODALLABELTEXT[LANGUAGE]}
-          size="lg"
-          showFooter={false}
-          className="maq-avatar-picker__modal"
-        >
-          <div className="maq-avatar-picker__modal-content">
-            <div className="maq-avatar-picker__modal-preview">
-              <p className="maq-avatar-picker__label">{AVATARPICKERLABELTEXT[LANGUAGE]}</p>
-              {renderCurrentPreview('maq-avatar-picker__current-frame maq-avatar-picker__current-frame--modal')}
-            </div>
-            <div className="maq-avatar-picker__modal-gallery" role="list" aria-label={ALLAVATARSLABELTEXT[LANGUAGE]}>
-              {avatars.map((avatar) => renderTile(avatar, 'md'))}
-            </div>
+      <Modal
+        isOpen={showAllModal}
+        onClose={() => setShowAllModal(false)}
+        title={SELECTAVATARMODALLABELTEXT[LANGUAGE]}
+        size="lg"
+        showFooter={false}
+        className="maq-avatar-picker__modal"
+      >
+        <div className="maq-avatar-picker__modal-content">
+          <div className="maq-avatar-picker__modal-preview">
+            <p className="maq-avatar-picker__label">{AVATARPICKERLABELTEXT[LANGUAGE]}</p>
+            {renderCurrentPreview('maq-avatar-picker__current-frame maq-avatar-picker__current-frame--modal')}
           </div>
-        </Modal>
-      ) : null}
+          {renderCategoryTabs()}
+          <div className="maq-avatar-picker__modal-gallery" role="list" aria-label={ALLAVATARSLABELTEXT[LANGUAGE]}>
+            {filteredAvatars.map((avatar) => renderTile(avatar, 'md'))}
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

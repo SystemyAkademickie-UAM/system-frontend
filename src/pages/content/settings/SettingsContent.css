@@ -51,20 +51,13 @@
 
 .settings-page__avatar-picker.maq-avatar-picker {
   width: 100%;
-  max-width: 50%;
+  max-width: min(44rem, 100%);
   align-self: flex-start;
 }
 
 .settings-page .group-settings-form--drive-layout {
   flex: 1;
   min-height: 0;
-}
-
-.settings-page .group-settings-form--drive-layout > .group-settings-form__panel:first-of-type:has(.maq-avatar-picker--gallery-open) {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
 }
 
 .settings-page__avatar-controls {
@@ -169,6 +162,47 @@
   font-size: var(--font-size-body);
   font-weight: 400;
   color: var(--color-text-secondary);
+}
+
+.settings-page__theme-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: 100%;
+  max-width: min(28rem, 100%);
+}
+
+.settings-page__theme-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-divider, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  background: var(--color-bg-elevated, rgb(41, 40, 57));
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.settings-page__theme-radio-option:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.settings-page__theme-radio-option--selected {
+  border-color: var(--color-accent, #42f37d);
+  background: rgba(66, 243, 125, 0.04);
+}
+
+.settings-page__theme-radio-input {
+  margin: 0;
+  accent-color: var(--color-accent, #42f37d);
+  cursor: pointer;
+}
+
+.settings-page__theme-radio-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, rgb(227, 224, 247));
 }
 
 @media (max-width: 768px) {

@@ -1,14 +1,69 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.js';
-import { fetchGroupStudents } from '../../../services/students.api.js';
+import { fetchGroupStudents, fetchStudentBadges } from '../../../services/students.api.js';
+import { fetchGroupRanks } from '../../../services/ranks.api.js';
 
-async function loadStudentByAccountId(groupId, accountId) {
-  const students = await fetchGroupStudents(groupId);
-  const student = students.find((item) => String(item.accountId) === String(accountId));
-  if (!student) {
-    return { ok: false, error: 'Nie znaleziono uczestnika w grupie.' };
+const PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL = {
+  polish: 'Nie znaleziono uczestnika w tej grupie.',
+  english: 'Participant not found in this group.'
+};
+
+const MISSING_GROUP_ID_ERROR__TEXTLABEL = {
+  polish: 'Brak ID grupy',
+  english: 'Group ID missing'
+};
+
+const NO_RANK_TEXT__TEXTLABEL = {
+  polish: 'Brak rangi',
+  english: 'No rank'
+};
+
+const PROFILE_LOAD_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać profilu studenta',
+  english: 'Failed to load student profile'
+};
+
+async function loadStudentByIdentifier(groupId, studentId) {
+  const [students, ranks] = await Promise.all([
+    fetchGroupStudents(groupId),
+    fetchGroupRanks(groupId).catch(() => []),
+  ]);
+
+  let student = students.find((item) => String(item.accountId) === String(studentId))
+    ?? students.find((item) => String(item.enrollmentId) === String(studentId));
+
+  if (!student && typeof studentId === 'string' && studentId.startsWith('student-')) {
+    const idx = parseInt(studentId.replace('student-', ''), 10) - 1;
+    if (!Number.isNaN(idx) && idx >= 0 && idx < students.length) {
+      student = students[idx];
+    }
   }
+
+  if (!student) {
+    return { ok: false, error: PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL.polish };
+  }
+
+  let earnedBadges = [];
+  try {
+    const studentBadges = await fetchStudentBadges(groupId, student.accountId);
+    earnedBadges = (studentBadges || [])
+      .filter((b) => b.isEarned)
+      .map((b) => ({
+        id: b.id,
+        name: b.name,
+        icon: b.icon,
+        rarity: b.rarity,
+        storyDescription: b.storyDescription,
+        educationalDescription: b.educationalDescription,
+        rewardAmount: b.rewardAmount,
+      }));
+  } catch {
+    // fallback
+  }
+
+  const rankObj = ranks.find((r) => r.id === student.rankId);
+  const rankName = rankObj?.name || student.rankName || NO_RANK_TEXT__TEXTLABEL.polish;
 
   return {
     ok: true,
@@ -21,13 +76,17 @@ async function loadStudentByAccountId(groupId, accountId) {
       avatarId: student.avatarId,
       avatarUrl: student.avatarUrl,
       rankId: student.rankId,
-      rankName: student.rankName || 'Brak rangi',
-      currency: student.currency,
-      totalEarned: student.totalEarned,
-      badgesCount: student.badgesCount ?? 0,
+      rankName,
+      currency: student.currency ?? 0,
+      totalEarned: student.totalEarned ?? 0,
+      badgesCount: student.badgesCount ?? earnedBadges.length,
+      purchasedItemsCount: student.purchasedItemsCount ?? 0,
+      usedItemsCount: student.usedItemsCount ?? 0,
+      lostLivesCount: student.lostLivesCount ?? 0,
       groupCurrency: null,
-      lives: null,
-      earnedBadges: [],
+      lives: student.lives ?? null,
+      livesEnabled: student.livesEnabled ?? null,
+      earnedBadges,
       completedActivities: [],
     },
   };
@@ -41,17 +100,19 @@ export function useGroupStudentProfile() {
 
   const loadProfile = useCallback(async () => {
     if (!groupId) {
-      setError('Brak ID grupy');
+      setError(MISSING_GROUP_ID_ERROR__TEXTLABEL.polish);
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
-    setError('');
-
-    const result = studentId
-      ? await loadStudentByAccountId(groupId, studentId)
+    let result = studentId
+      ? await fetchGroupStudentProfile(groupId, studentId)
       : await fetchGroupStudentProfile(groupId);
+
+    if (!result.ok && studentId) {
+      result = await loadStudentByIdentifier(groupId, studentId);
+    }
 
     setIsLoading(false);
 
@@ -61,7 +122,7 @@ export function useGroupStudentProfile() {
     }
 
     setProfile(null);
-    setError(result.error || 'Nie udało się pobrać profilu studenta');
+    setError(result.error || PROFILE_LOAD_ERROR__TEXTLABEL.polish);
   }, [groupId, studentId]);
 
   useEffect(() => {

@@ -2,8 +2,20 @@ import { useEffect, useMemo, useState } from 'react';
 import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import { CurrencyDisplay } from '../../../../components/ui/index.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import '../../group-activities/shared/activitiesShared.css';
 import './memberModals.css';
+
+const ACTIVITY_COMPLETED__TEXTLABEL = { polish: 'ukończona', english: 'completed' };
+const ACTIVITY_INCOMPLETE__TEXTLABEL = { polish: 'nieukończona', english: 'incomplete' };
+const NO_ACTIVITIES_MESSAGE__TEXTLABEL = { polish: 'Brak aktywności w tym etapie.', english: 'No activities in this stage.' };
+const COLUMN_NAME__TEXTLABEL = { polish: 'Nazwa', english: 'Name' };
+const COLUMN_STORY__TEXTLABEL = { polish: 'Opis fabularny', english: 'Story description' };
+const COLUMN_EDUCATIONAL__TEXTLABEL = { polish: 'Opis dydaktyczny', english: 'Educational description' };
+const COLUMN_REWARD__TEXTLABEL = { polish: 'Nagroda', english: 'Reward' };
+const COMPLETED_COLUMN_ARIA__TEXTLABEL = { polish: 'Ukończona', english: 'Completed' };
+
+const LANGUAGE_INSTANCE = (() => { try { return READLANGUAGECOOKIE(); } catch { return 'polish'; } })();
 
 function ProgressActivityRow({ activity, completed, onToggle }) {
   const handleRowClick = () => {
@@ -29,7 +41,7 @@ function ProgressActivityRow({ activity, completed, onToggle }) {
       role="button"
       tabIndex={0}
       aria-pressed={completed}
-      aria-label={`${activity.name} — ${completed ? 'ukończona' : 'nieukończona'}`}
+      aria-label={`${activity.name} — ${completed ? ACTIVITY_COMPLETED__TEXTLABEL[LANGUAGE_INSTANCE] : ACTIVITY_INCOMPLETE__TEXTLABEL[LANGUAGE_INSTANCE]}`}
     >
       <td className="activities-island__cell activities-island__cell--name">
         <span className="activities-island__activity-name">{activity.name}</span>
@@ -92,9 +104,6 @@ function ProgressStageIsland({ stage, progress, isExpanded, onToggleExpand, onTo
         aria-expanded={isExpanded}
       >
         <div className="activities-island__header-start">
-          <span className="activities-island__icon" aria-hidden="true">
-            {stage.name.trim().charAt(0).toUpperCase() || '?'}
-          </span>
           <div className="activities-island__heading">
             <div className="activities-island__title-row">
               <h3 className="activities-island__title">{stage.name}</h3>
@@ -125,27 +134,27 @@ function ProgressStageIsland({ stage, progress, isExpanded, onToggleExpand, onTo
       {isExpanded ? (
         <div className="activities-island__body">
           {activityCount === 0 ? (
-            <p className="activities-island__empty">Brak aktywności w tym etapie.</p>
+            <p className="activities-island__empty">{NO_ACTIVITIES_MESSAGE__TEXTLABEL[LANGUAGE_INSTANCE]}</p>
           ) : (
             <div className="activities-island__table-wrap member-progress-tree__table-wrap">
               <table className="activities-island__table member-progress-tree__table">
                 <thead>
                   <tr>
-                    <th className="activities-island__th member-progress-tree__th--name" scope="col">Nazwa</th>
+                    <th className="activities-island__th member-progress-tree__th--name" scope="col">{COLUMN_NAME__TEXTLABEL[LANGUAGE_INSTANCE]}</th>
                     <th className="activities-island__th activities-island__th--hide-mobile member-progress-tree__th--story" scope="col">
-                      Opis fabularny
+                      {COLUMN_STORY__TEXTLABEL[LANGUAGE_INSTANCE]}
                     </th>
                     <th className="activities-island__th activities-island__th--hide-mobile member-progress-tree__th--edu" scope="col">
-                      Opis dydaktyczny
+                      {COLUMN_EDUCATIONAL__TEXTLABEL[LANGUAGE_INSTANCE]}
                     </th>
                     <th
                       className="activities-island__th activities-island__th--reward member-progress-tree__th--reward"
                       scope="col"
                     >
-                      Nagroda
+                      {COLUMN_REWARD__TEXTLABEL[LANGUAGE_INSTANCE]}
                     </th>
                     <th className="activities-island__th activities-island__th--actions member-progress-tree__th--status" scope="col">
-                      <span className="visually-hidden">Ukończona</span>
+                      <span className="visually-hidden">{COMPLETED_COLUMN_ARIA__TEXTLABEL[LANGUAGE_INSTANCE]}</span>
                     </th>
                   </tr>
                 </thead>

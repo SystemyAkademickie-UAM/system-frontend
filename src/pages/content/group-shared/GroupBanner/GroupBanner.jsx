@@ -3,8 +3,19 @@ import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import ContentWithMeasuredDivider from '../../../../components/ui/ContentWithMeasuredDivider/ContentWithMeasuredDivider.jsx';
 import { isColorBannerRef, parseColorBannerRef } from '../../../../constants/drive.constants.js';
 import { SVG_PLACEHOLDER } from '../../../../constants/svgIcons.js';
+import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import { splitGroupStoryTitle } from './splitGroupStoryTitle.js';
 import './GroupBanner.css';
+
+const NOIMAGE__TEXTLABEL = {
+  polish: 'Brak baneru',
+  english: 'No banner',
+};
+
+const LOADINGGROUPDATA__TEXTLABEL = {
+  polish: 'Ładowanie danych grupy…',
+  english: 'Loading group data…',
+};
 
 /**
  * Baner grupy — grafika z gradientem, nazwa fabularna i opis.
@@ -25,6 +36,7 @@ export default function GroupBanner({
   showDescription = true,
   className = '',
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [bannerFailed, setBannerFailed] = useState(!bannerUrl);
   const isColorBanner = isColorBannerRef(bannerUrl);
   const colorBannerValue = parseColorBannerRef(bannerUrl);
@@ -64,7 +76,7 @@ export default function GroupBanner({
               height={56}
               alt=""
             />
-            <span className="group-banner__fallback-text">Brak grafiki</span>
+            <span className="group-banner__fallback-text">{NOIMAGE__TEXTLABEL[LANGUAGE]}</span>
           </div>
         ) : (
           <img
@@ -81,7 +93,7 @@ export default function GroupBanner({
       <div className="group-banner__content">
         {isLoading ? (
           <p className="group-banner__loading" role="status">
-            Ładowanie danych grupy…
+            {LOADINGGROUPDATA__TEXTLABEL[LANGUAGE]}
           </p>
         ) : (
           <>

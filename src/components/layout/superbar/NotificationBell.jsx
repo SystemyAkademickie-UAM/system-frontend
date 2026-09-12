@@ -42,6 +42,23 @@ export default function NotificationBell() {
       ? groupMembersLogPath(groupId)
       : null;
 
+  const originalTitle = useRef(
+    (document.title || '').replace(/^(\(\d+\)\s*)+/, '').trim() || 'MyAcademyQuest',
+  );
+
+  useEffect(() => {
+    const baseTitle = originalTitle.current || 'MyAcademyQuest';
+    if (unreadCount > 0) {
+      document.title = `(${unreadCount}) ${baseTitle}`;
+    } else {
+      document.title = baseTitle;
+    }
+
+    return () => {
+      document.title = baseTitle;
+    };
+  }, [unreadCount]);
+
   useEffect(() => {
     if (!isOpen) {
       return undefined;

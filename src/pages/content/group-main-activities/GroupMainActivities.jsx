@@ -77,13 +77,13 @@ const LASTSTAGEBUTTON__TEXTLABEL = {
 };
 
 const SORTCOMPLETED__TEXTLABEL = {
-  polish: 'Ukończone na początku',
-  english: 'Completed first',
+  polish: 'Sortowanie: Ukończone na początku',
+  english: 'Sorting: Completed first',
 };
 
 const SORTINCOMPLETE__TEXTLABEL = {
-  polish: 'Ukończone na końcu',
-  english: 'Completed last',
+  polish: 'Sortowanie: Ukończone na końcu',
+  english: 'Sorting: Completed last',
 };
 
 const arrowrighticon = PUBLIC_UI_ICONS.arrowRight;
@@ -609,6 +609,50 @@ export default function GroupMainActivities() {
         />
       ) : (
       <div className="group-main-activities__stage">
+
+
+
+        <div className="group-main-activities__pagination">
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? firststage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={leftlefticon} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? previousstage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={lefticon} alt="" />
+          </button>
+          <span className="group-main-activities__page-number">{currentpagenumber}</span>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? nextstage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={righticon} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? laststage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={rightrighticon} alt="" />
+          </button>
+        </div>
+
+
         <header className="group-main-activities__stage-header">
           <h2 className="group-main-activities__stage-name">{currentstagename}</h2>
           <div className="group-main-activities__stage-stats">

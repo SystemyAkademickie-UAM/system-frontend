@@ -1,3 +1,5 @@
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+
 /**
  * @param {Array<{ isPublished?: boolean }>} items
  * @returns {boolean}
@@ -10,12 +12,24 @@ export function areAllRewardsItemsPublished(items) {
   return items.every((item) => item.isPublished !== false);
 }
 
+const HIDEALL__TEXTLABEL = {
+  polish: 'Ukryj wszystkie',
+  english: 'Hide all'
+};
+
+const SHOWALL__TEXTLABEL = {
+  polish: 'Odkryj wszystkie',
+  english: 'Show all'
+};
+
 /**
  * @param {Array<{ isPublished?: boolean }>} items
- * @returns {'Ukryj wszystkie' | 'Odkryj wszystkie'}
+ * @param {string} [language]
+ * @returns {string}
  */
-export function getBulkVisibilityToggleLabel(items) {
-  return areAllRewardsItemsPublished(items) ? 'Ukryj wszystkie' : 'Odkryj wszystkie';
+export function getBulkVisibilityToggleLabel(items, language) {
+  const lang = language ?? READLANGUAGECOOKIE();
+  return areAllRewardsItemsPublished(items) ? HIDEALL__TEXTLABEL[lang] || HIDEALL__TEXTLABEL.english : SHOWALL__TEXTLABEL[lang] || SHOWALL__TEXTLABEL.english;
 }
 
 /**

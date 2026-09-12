@@ -35,6 +35,7 @@ function filterStages(stages, query) {
         ...stage,
         expanded: true,
         activities: matchingActivities,
+
       });
     }
 
@@ -56,6 +57,7 @@ export default function ActivitiesContent() {
     createActivity,
     updateActivity,
     deleteActivity,
+    toggleActivityVisibility,
   } = useGroupActivities();
   const { groupId } = useParams();
 
@@ -77,13 +79,25 @@ export default function ActivitiesContent() {
     polish: 'Zmień nazwę etapu.',
     english: 'Change the stage name.',
   };
-  const VISIBILITYTEXTLABEL__TEXTLABEL = {
-    polish: 'Ukryj / upublicznij etap',
-    english: 'Hide / make public',
+  const VISIBILITY_HIDE_STAGE__TEXTLABEL = {
+    polish: 'Ukryj etap',
+    english: 'Hide stage',
   };
-  const VISIBILITYDESCRIPTION__TEXTLABEL = {
-    polish: 'Zmień widoczność etapu dla studentów.',
-    english: 'Change stage visibility for students.',
+  const VISIBILITY_SHOW_STAGE__TEXTLABEL = {
+    polish: 'Pokaż etap',
+    english: 'Show stage',
+  };
+  const VISIBILITY_HIDE_ACT__TEXTLABEL = {
+    polish: 'Ukryj aktywność',
+    english: 'Hide activity',
+  };
+  const VISIBILITY_SHOW_ACT__TEXTLABEL = {
+    polish: 'Pokaż aktywność',
+    english: 'Show activity',
+  };
+  const VISIBILITY_ACT_DESC__TEXTLABEL = {
+    polish: 'Zmień widoczność aktywności dla studentów.',
+    english: 'Change activity visibility for students.',
   };
   const COPYSTAGE__TEXTLABEL = {
     polish: 'Kopiuj etap',
@@ -203,6 +217,7 @@ export default function ActivitiesContent() {
   }, [activeModal, createActivity, closeModal]);
 
   const handleActivityEditConfirm = useCallback(async (values) => {
+
     if (!activeModal?.stage || !activeModal?.activity) return;
     setModalLoading(true);
     const result = await updateActivity(
@@ -231,6 +246,28 @@ export default function ActivitiesContent() {
         ariaLabel: ADDACTIVITY__TEXTLABEL[LANGUAGE],
         onSelect: (stage) => openModal('createActivity', { stage }),
       },
+      {
+        id: 'visibility',
+        label: (stageItem) => (
+          stageItem?.visibilityStatus === 0
+            ? VISIBILITY_SHOW_STAGE__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_STAGE__TEXTLABEL[LANGUAGE]
+        ),
+        iconFile: (stageItem) => (
+          stageItem?.visibilityStatus === 0
+            ? SVG_ICONS.actions.hide
+            : SVG_ICONS.actions.show
+        ),
+        ariaLabel: (stageItem) => (
+          stageItem?.visibilityStatus === 0
+            ? VISIBILITY_SHOW_STAGE__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_STAGE__TEXTLABEL[LANGUAGE]
+        ),
+        onSelect: async (stageItem) => {
+          const nextStatus = stageItem.visibilityStatus === 1 ? 0 : 1;
+          await updateStage(stageItem.id, { visibilityStatus: nextStatus });
+        },
+      },
     ],
     menuItems: [
       {
@@ -238,15 +275,6 @@ export default function ActivitiesContent() {
         label: EDITSTAGE__TEXTLABEL[LANGUAGE],
         description: EDITSTAGEDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: (stage) => openModal('editStage', { stage }),
-      },
-      {
-        id: 'visibility',
-        label: VISIBILITYTEXTLABEL__TEXTLABEL[LANGUAGE],
-        description: VISIBILITYDESCRIPTION__TEXTLABEL[LANGUAGE],
-        onSelect: async (stageItem) => {
-          const nextStatus = stageItem.visibilityStatus === 1 ? 0 : 1;
-          await updateStage(stageItem.id, { visibilityStatus: nextStatus });
-        },
       },
       {
         id: 'copy',
@@ -269,6 +297,25 @@ export default function ActivitiesContent() {
   const activityRowActions = useMemo(() => ({
     inlineActions: [
       {
+        id: 'visibility',
+        label: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
+        ),
+        iconFile: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? SVG_ICONS.actions.hide
+            : SVG_ICONS.actions.show
+        ),
+        ariaLabel: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
+        ),
+        onSelect: ({ stage, activity }) => toggleActivityVisibility(stage.id, activity.id),
+      },
+      {
         id: 'assign',
         label: ASSIGNACTIVITY__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.assign,
@@ -283,11 +330,21 @@ export default function ActivitiesContent() {
         description: EDITACTIVITYDESCRIPTION__TEXTLABEL[LANGUAGE],
         onSelect: ({ stage, activity }) => openModal('editActivity', { stage, activity }),
       },
+      {
+        id: 'visibility',
+        label: ({ activity }) => (
+          (activity?.visibilityStatus === 0 || activity?.isPublished === false)
+            ? VISIBILITY_SHOW_ACT__TEXTLABEL[LANGUAGE]
+            : VISIBILITY_HIDE_ACT__TEXTLABEL[LANGUAGE]
+        ),
+        description: VISIBILITY_ACT_DESC__TEXTLABEL[LANGUAGE],
+        onSelect: ({ stage, activity }) => toggleActivityVisibility(stage.id, activity.id),
+      },
     ],
     onDelete: ({ stage, activity }) => openModal('deleteActivity', { stage, activity }),
     deleteLabel: DELETEACTIVITY__TEXTLABEL[LANGUAGE],
     deleteAriaLabel: ({ activity }) => `${DELETEACTIVITY__TEXTLABEL[LANGUAGE]} ${activity.name}`,
-  }), [openModal, LANGUAGE]);
+  }), [openModal, toggleActivityVisibility, LANGUAGE]);
 
   const modalStage = activeModal?.stage ?? null;
   const modalActivity = activeModal?.activity ?? null;
@@ -302,7 +359,11 @@ export default function ActivitiesContent() {
         <div className="maq-section-page__toolbar-start">
           <div className="activities-page__add-island">
             <div className="activities-page__add-field">
-              <CharacterLimitedField value={newStageName} maxLength={STAGE_NAME_MAX_LENGTH}>
+              <CharacterLimitedField
+                value={newStageName}
+                maxLength={STAGE_NAME_MAX_LENGTH}
+                placement="inside"
+              >
                 <input
                   id="new-stage-name"
                   type="text"
@@ -359,6 +420,7 @@ export default function ActivitiesContent() {
           stageRowActions={stageRowActions}
           activityRowActions={activityRowActions}
           onReorderStages={reorderStages}
+          onActivityDoubleClick={(stage, activity) => openModal('editActivity', { stage, activity })}
         />
       )}
 

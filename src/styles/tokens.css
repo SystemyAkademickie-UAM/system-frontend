@@ -262,3 +262,261 @@
   --text-page-description: var(--font-size-page-description);
   --text-nav-stat: var(--font-size-nav-stat);
 }
+
+/* =============================================
+   Light Theme Overrides
+   When [data-theme="light"] is set on <html>,
+   these tokens replace the dark defaults.
+   Only grey-ish values change; green accents stay.
+   ============================================= */
+
+[data-theme="light"] {
+  /* --- Tła (Natural Warm-Stone & Clean Surfaces) --- */
+  /** Główne tło aplikacji (obszar treści) */
+  --color-bg-app: #f2f1eb;
+  /** Wyróżnienie na tle — karty, panele, sekcje */
+  --color-bg-surface: #ffffff;
+  /** Podniesiona powierzchnia (np. kafelki wewnątrz karty, toolbary) */
+  --color-bg-elevated: #e8e6dc;
+
+  /** Linie rozdzielające */
+  --color-divider: #dad8cc;
+
+  /* --- Nawigacja --- */
+  /** Główny pasek nawigacji (sidebar + superBar) — jaśniejszy, przyjemny odcień zieleni w trybie jasnym */
+  --color-nav-primary: #2b5f39;
+  /** Ciemniejsze odcienie paska bocznego (scrollbar). */
+  --color-nav-scrollbar-track: color-mix(in srgb, var(--color-nav-primary) 80%, #000);
+  --color-nav-scrollbar-thumb: color-mix(in srgb, var(--color-nav-primary) 58%, #000);
+  --color-nav-scrollbar-thumb-hover: color-mix(in srgb, var(--color-nav-primary) 48%, #000);
+  /** Przycisk „Twoje grupy” w sidebarze oraz akcent interaktywny */
+  --color-nav-cta: #15803d;
+  /** Tekst i ikony pozycji w sidebarze */
+  --color-nav-link: #d1fae5;
+  /** Domyślny kolor ikon SVG (tryb mask) */
+  --color-asset-icon: var(--color-text-secondary);
+  /** Ikony na zielonym pasku nawigacji (SuperBar, statystyki) */
+  --color-nav-icon-on-primary: #ffffff;
+  /** Nazwa użytkownika w superBar */
+  --color-nav-user-name: #ecfdf5;
+  /** Rola użytkownika w superBar */
+  --color-nav-user-role: rgba(209, 250, 229, 0.75);
+  /** Tło logo w sidebarze */
+  --color-nav-logo-bg: #d1fae5;
+  /** Kapsuła statystyk (życia, waluta) */
+  --color-nav-stat-bg: #1e4528;
+  /** Podrzędny pasek nawigacji — tło aktywnego przycisku */
+  --color-nav-sub-active-bg: #2b5f39;
+
+  /* --- Tekst --- */
+  /** Główny kolor tekstu */
+  --color-text-primary: #1a201c;
+  /** Dodatkowy / pomocniczy tekst */
+  --color-text-secondary: #566158;
+
+  /* --- Akcent / przyciski --- */
+  /** Kolor przycisku i akcentów interaktywnych */
+  --color-accent: #16a34a;
+  /** Tekst na przycisku akcentowym */
+  --color-accent-on: #ffffff;
+  /** Przycisk po naciśnięciu / hover — nieco ciemniejszy akcent */
+  --color-accent-pressed: #15803d;
+  /** Akcent z przezroczystością (tła badge, highlight) */
+  --color-accent-muted: rgba(22, 163, 74, 0.15);
+
+  --color-notification-item-used: #b45309;
+  --color-notification-item-used-bright: #d97706;
+
+  /* --- Odznaki — rzadkość (nasycone, szlachetne odcienie dopasowane do bieli) --- */
+  --color-badge-rarity-common: #0284c7;
+  --color-badge-rarity-uncommon: #4d7c0f;
+  --color-badge-rarity-rare: #c2410c;
+  --color-badge-rarity-epic: #a21caf;
+
+  /** Tło kółka ikony odznaki */
+  --color-badge-icon-bg-common: #e0f2fe;
+  --color-badge-icon-bg-uncommon: #ecfccb;
+  --color-badge-icon-bg-rare: #ffedd5;
+  --color-badge-icon-bg-epic: #fae8ff;
+
+  /** Kolor ikony SVG w odznace */
+  --color-badge-icon-common: #0284c7;
+  --color-badge-icon-uncommon: var(--color-badge-rarity-uncommon);
+  --color-badge-icon-rare: var(--color-badge-rarity-rare);
+  --color-badge-icon-epic: var(--color-badge-rarity-epic);
+
+  /** Tło mini odznaki — stan zaznaczony (zmieszane z rzadkością) */
+  --color-badge-mini-selected-common: #f0f9ff;
+  --color-badge-mini-selected-uncommon: #f7fee7;
+  --color-badge-mini-selected-rare: #fff7ed;
+  --color-badge-mini-selected-epic: #fdf4ff;
+
+  /** Tekst i linie w kafelkach odznak */
+  --color-badge-text: #1a201c;
+  --color-badge-divider: #e4e2d7;
+  --color-badge-date: #636f65;
+
+  /** Typografia odznak */
+  --font-size-badge-title: 18px;
+  --line-height-badge-title: 24px;
+  --line-height-badge-title-mini: 28px;
+  --font-size-badge-label: 14px;
+  --font-size-badge-label-mini: 14px;
+  --line-height-badge-label: 16px;
+  --font-size-badge-body: 12px;
+  --line-height-badge-body: 23px;
+  --line-height-badge-meta: 15px;
+  --font-size-badge-rarity: 12px;
+  --font-size-badge-rarity-mini: 14px;
+  --font-size-badge-reward: 14px;
+  --letter-spacing-badge-label: 1px;
+
+  /** Wymiary odznak */
+  --size-badge-icon-circle: 64px;
+  --size-badge-icon: 30px;
+  --badge-max-width: 453px;
+  --product-card-max-width: 453px;
+  --color-product-card-accent: #b45309;
+  --product-card-accent-width: 4px;
+  --badge-mini-max-width: 300px;
+  --badge-mini-min-height: 125px;
+  --badge-border-radius: 16px;
+  --badge-mini-border-radius: 12px;
+  --badge-accent-width: 8px;
+  --badge-mini-accent-width: 4px;
+
+  /* --- Rangi — kafelek --- */
+  --color-rank-accent: var(--color-accent);
+  --color-rank-icon-bg: #e8e6dc;
+  --color-rank-icon-color: #1f3624;
+  --color-rank-label: #566158;
+  --color-rank-text: #1a201c;
+  --color-rank-cost-bg: var(--color-bg-elevated);
+  --color-rank-check: var(--color-accent);
+
+  --font-size-rank-title: 18px;
+  --line-height-rank-title: 24px;
+  --font-size-rank-label: 14px;
+  --line-height-rank-label: 16px;
+  --font-size-rank-body: 14px;
+  --line-height-rank-body: 23px;
+  --font-size-rank-cost: 14px;
+  --letter-spacing-rank-label: 0.5px;
+
+  --size-rank-icon-circle: 64px;
+  --size-rank-icon: 30px;
+  --rank-max-width: 668px;
+  --rank-border-radius: 16px;
+  --rank-accent-width: 5px;
+
+  /** Placeholder w polu wyszukiwania */
+  --color-input-placeholder: #8c968e;
+  /** Błąd walidacji pola */
+  --color-input-error: #dc2626;
+  --color-input-error-border: #ef4444;
+
+  /** Pasek akcji (Odrzuć / Zapisz) */
+  --color-overlay-actions-bg: rgba(255, 255, 255, 0.94);
+  --color-overlay-actions-border: rgba(0, 0, 0, 0.08);
+
+  /** Modal — tło i panel */
+  --color-modal-backdrop: rgba(18, 24, 20, 0.45);
+  --color-modal-surface: #ffffff;
+  --color-modal-border: #dad8cc;
+  --modal-border-radius: 16px;
+  --modal-max-width-sm: 420px;
+  --modal-max-width-md: 640px;
+  --modal-max-width-lg: 800px;
+  --modal-max-width-xl: 960px;
+
+  /** Aktywność — kafelek podglądu i ikony postępu */
+  --color-activity-icon-locked-bg: #e4e2d7;
+  --color-activity-icon-locked-border: #bcb9ab;
+  --color-activity-icon-unlocked-bg: var(--color-accent);
+  --color-activity-icon-unlocked-glow: rgba(22, 163, 74, 0.3);
+  --color-activity-text: #1a201c;
+  --activity-card-max-width: 420px;
+  --activity-icon-size: 36px;
+  --font-size-activity-title: 14px;
+  --font-size-activity-body: 14px;
+
+  /** Sklep — kafelek produktu */
+  --product-card-max-width: 320px;
+
+  /** Odznaka — wariant kompaktowy (podgląd przy mini) */
+  --badge-compact-max-width: 533px;
+  --size-badge-icon-circle-compact: 48px;
+  --size-badge-icon-compact: 22px;
+
+  /** TexturedSurface */
+  --texture-radius: 20px;
+  --texture-displacement: 35;
+  --texture-frame-inset: 7px;
+  --texture-noise-frequency: 0.045;
+  --texture-frame-color: var(--color-bg-app);
+  --texture-surface-color: var(--color-bg-surface);
+
+  --shadow-nav-sidebar: 6px 0 24px rgba(0, 0, 0, 0.08);
+  --shadow-superbar: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-stat-badge: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  --shell-sidebar-scrollbar-width: 10px;
+  --shell-sidebar-width: calc(224px + var(--shell-sidebar-scrollbar-width));
+  /** Pionowy pasek przewijania strony (główna kolumna) — stabilizuje SuperBar. */
+  --shell-page-scrollbar-width: 15px;
+  --shell-superbar-height: 63px;
+  --z-index-shell-header: 10;
+  --z-index-modal: 1000;
+  --z-index-page-overlay: 1100;
+  --z-index-tooltip: 12100;
+  --z-index-toast: 12200;
+
+  /* --- Typografia --- */
+  /** Minimalny rozmiar czcionki w całej aplikacji */
+  --font-size-min: 12px;
+  /** Domyślna czcionka aplikacji */
+  --font-family-app: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /** Komunikaty: toasty, alerty, statusy, błędy inline */
+  --font-family-message: var(--font-family-app);
+  /** Standardowy tekst */
+  --font-size-body: 14px;
+  /** Nagłówek strony */
+  --font-size-page-title: 42px;
+  /** Nagłówek sekcji */
+  --font-size-section-title: 32px;
+  /** Tekst pod nagłówkiem */
+  --font-size-page-description: 14px;
+  /** Wartości statystyk na paskach nawigacji */
+  --font-size-nav-stat: 26px;
+
+  /** Baner grupy — tytuł i opis na grafice */
+  --group-banner-min-height: 220px;
+  --group-banner-border-radius: 16px;
+  --font-size-group-banner-title: clamp(28px, 4vw, 48px);
+  --font-size-group-banner-description: var(--font-size-page-description);
+  --color-group-banner-gradient: linear-gradient(
+    to top,
+    rgba(18, 24, 20, 0.88) 0%,
+    rgba(18, 24, 20, 0.45) 42%,
+    rgba(18, 24, 20, 0.15) 72%,
+    transparent 100%
+  );
+
+  /* --- Aliasy (skróty) --- */
+  --color-button: var(--color-accent);
+  --color-button-bg: var(--color-accent);
+  --color-button-text: var(--color-accent-on);
+
+  --bg-app: var(--color-bg-app);
+  --bg-surface: var(--color-bg-surface);
+  --bg-elevated: var(--color-bg-elevated);
+  --nav-primary: var(--color-nav-primary);
+  --nav-sub-active: var(--color-nav-sub-active-bg);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --accent: var(--color-accent);
+  --text-body: var(--font-size-body);
+  --text-page-title: var(--font-size-page-title);
+  --text-page-description: var(--font-size-page-description);
+  --text-nav-stat: var(--font-size-nav-stat);
+}

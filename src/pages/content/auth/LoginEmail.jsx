@@ -1,17 +1,64 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  MAGIC_LINK_CLIENT_COOLDOWN_SECONDS,
-  MAGIC_LINK_RESEND_BUTTON_LABEL,
-  MAGIC_LINK_SEND_BUTTON_LABEL,
-  MAGIC_LINK_SENT_SUCCESS_MESSAGE,
-} from '../../../constants/magicLink.constants.js';
+import { MAGIC_LINK_CLIENT_COOLDOWN_SECONDS } from '../../../constants/magicLink.constants.js';
 import { AUTH_LOGIN_MAGIC_LINK_REQUEST_PATH } from '../../../constants/authPaths.constants.js';
 import { loginPath } from '../../../routes/pathRegistry.js';
 import { postJson } from '../../../services/api-client.js';
 import { getMagicLinkErrorMessage } from '../../../services/magicLinkErrors.js';
+import { getRememberMe, setRememberMe } from '../../../services/rememberMeService.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './AuthCard.css';
 import './LoginInstitution.css';
+
+const BACK_ARIALABEL__TEXTLABEL = {
+  polish: 'Wróć',
+  english: 'Back'
+};
+
+const PAGE_TITLE__TEXTLABEL = {
+  polish: 'Zaloguj się przez e-mail',
+  english: 'Log in via email'
+};
+
+const EMAILLABEL__TEXTLABEL = {
+  polish: 'Adres e-mail',
+  english: 'Email address'
+};
+
+const REMEMBER_ME__TEXTLABEL = {
+  polish: 'Zapamiętaj mnie',
+  english: 'Remember me'
+};
+
+const EMAILPLACEHOLDER__TEXTLABEL = {
+  polish: 'twoj.email@uczelnia.pl',
+  english: 'your.email@university.pl'
+};
+
+const EMAILVALIDATION__TEXTLABEL = {
+  polish: 'Podaj prawidłowy adres e-mail.',
+  english: 'Enter a valid email address.'
+};
+
+const SEND_BUTTON__TEXTLABEL = {
+  polish: 'Wyślij link logowania',
+  english: 'Send login link'
+};
+
+const RESEND_BUTTON__TEXTLABEL = {
+  polish: 'Wyślij ponownie',
+  english: 'Send again'
+};
+
+const SEND_SUCCESS__TEXTLABEL = {
+  polish: 'Link logowania został wysłany na podany adres e-mail.',
+  english: 'Login link has been sent to the provided email address.'
+};
+
+const SEND_ERROR_GENERAL__TEXTLABEL = {
+  polish: 'Nie udało się wysłać linku logowania.',
+  english: 'Failed to send login link.'
+};
 
 function BackIcon({ className }) {
   return (
@@ -22,9 +69,11 @@ function BackIcon({ className }) {
 }
 
 export default function LoginEmail({ onBack }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [lastSentEmail, setLastSentEmail] = useState('');
+  const [rememberMe, setRememberMeState] = useState(() => getRememberMe());
   const [cooldownRemainingSeconds, setCooldownRemainingSeconds] = useState(0);
   const [isBusy, setIsBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -61,7 +110,7 @@ export default function LoginEmail({ onBack }) {
     const normalizedEmail = email.trim();
 
     if (!normalizedEmail.includes('@')) {
-      setErrorMessage('Podaj prawidłowy adres e-mail.');
+      setErrorMessage(EMAILVALIDATION__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -74,7 +123,7 @@ export default function LoginEmail({ onBack }) {
       if (!result.ok) {
         const cooldownMessage = getMagicLinkErrorMessage(
           result.data,
-          'Nie udało się wysłać linku logowania.',
+          SEND_ERROR_GENERAL__TEXTLABEL[LANGUAGE],
           result.status,
         );
         setErrorMessage(cooldownMessage);
@@ -92,13 +141,13 @@ export default function LoginEmail({ onBack }) {
 
       setLastSentEmail(normalizedEmail);
       setCooldownRemainingSeconds(MAGIC_LINK_CLIENT_COOLDOWN_SECONDS);
-      setSuccessMessage(MAGIC_LINK_SENT_SUCCESS_MESSAGE);
+      setSuccessMessage(SEND_SUCCESS__TEXTLABEL[LANGUAGE]);
     } catch {
-      setErrorMessage('Nie udało się wysłać linku logowania.');
+      setErrorMessage(SEND_ERROR_GENERAL__TEXTLABEL[LANGUAGE]);
     } finally {
       setIsBusy(false);
     }
-  }, [email]);
+  }, [email, LANGUAGE]);
 
   const normalizedEmail = email.trim();
   const isCooldownActive = cooldownRemainingSeconds > 0;
@@ -107,13 +156,13 @@ export default function LoginEmail({ onBack }) {
     lastSentEmail.length > 0 &&
     normalizedEmail === lastSentEmail;
   const submitButtonLabel = isResendLabel
-    ? MAGIC_LINK_RESEND_BUTTON_LABEL
-    : MAGIC_LINK_SEND_BUTTON_LABEL;
+    ? RESEND_BUTTON__TEXTLABEL[LANGUAGE]
+    : SEND_BUTTON__TEXTLABEL[LANGUAGE];
   const isSubmitDisabled = isBusy || isCooldownActive || normalizedEmail.length === 0;
 
   const submitButtonText = useMemo(() => {
     if (isCooldownActive) {
-      return `${MAGIC_LINK_SEND_BUTTON_LABEL} (${cooldownRemainingSeconds}s)`;
+      return `${SEND_BUTTON__TEXTLABEL[LANGUAGE]} (${cooldownRemainingSeconds}s)`;
     }
     return submitButtonLabel;
   }, [cooldownRemainingSeconds, isCooldownActive, submitButtonLabel]);
@@ -124,16 +173,16 @@ export default function LoginEmail({ onBack }) {
         type="button"
         className="auth-card__back-button"
         onClick={handleBack}
-        aria-label="Wróć"
+        aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
       >
         <BackIcon className="auth-card__back-icon" />
       </button>
 
-      <h1 className="login-institution__page-title">Zaloguj się przez e-mail</h1>
+      <h1 className="login-institution__page-title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
 
       <div className="login-institution__field">
         <label className="login-institution__field-label" htmlFor="email-login-input">
-          Adres e-mail
+          {EMAILLABEL__TEXTLABEL[LANGUAGE]}
         </label>
         <div className="login-institution__input-wrap">
           <input
@@ -143,10 +192,27 @@ export default function LoginEmail({ onBack }) {
             value={email}
             disabled={isBusy}
             onChange={handleEmailChange}
-            placeholder="twoj.email@uczelnia.pl"
+            placeholder={EMAILPLACEHOLDER__TEXTLABEL[LANGUAGE]}
             autoComplete="email"
           />
         </div>
+      </div>
+
+      <div className="login-institution__remember-me">
+        <label className="login-institution__checkbox-label" htmlFor="email-remember-me">
+          <input
+            id="email-remember-me"
+            type="checkbox"
+            checked={rememberMe}
+            disabled={isBusy}
+            onChange={(e) => {
+              const next = e.target.checked;
+              setRememberMeState(next);
+              setRememberMe(next);
+            }}
+          />
+          <span>{REMEMBER_ME__TEXTLABEL[LANGUAGE]}</span>
+        </label>
       </div>
 
       {(errorMessage || successMessage) ? (

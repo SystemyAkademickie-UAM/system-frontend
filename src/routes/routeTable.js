@@ -114,6 +114,15 @@ export const ROUTE_TABLE = [
     contentModule: 'pages/content/organization-management/OrganizationManagementContent.jsx',
     roles: ['superadmin'],
   },
+  {
+    id: 'app.system-logs',
+    section: 'app',
+    pathPattern: '/system-logs',
+    pageTitle: 'Logi produkcyjne',
+    pageModule: 'pages/links/app/SuperadminLogsPage.jsx',
+    contentModule: 'pages/content/superadmin-logs/SuperadminLogsContent.jsx',
+    roles: ['superadmin'],
+  },
 
   // ===========================================================================
   // GROUP — Korzeń (/groups/:groupId)
@@ -196,18 +205,18 @@ export const ROUTE_TABLE = [
     id: 'group.profile.home',
     section: 'group',
     pathPattern: '/groups/:groupId/profile',
-    pageTitle: 'Profil — odznaki',
-    pageModule: 'pages/links/groups/profile/ProfileHomePage.jsx',
-    contentModule: 'pages/content/group-profile/ProfileHomeContent.jsx',
+    pageTitle: 'Profil — dziennik aktywności',
+    pageModule: 'pages/links/groups/profile/ProfileLogPage.jsx',
+    contentModule: 'pages/content/group-profile-log/ProfileLogContent.jsx',
     roles: ['student'],
   },
   {
     id: 'group.profile.activity',
     section: 'group',
     pathPattern: '/groups/:groupId/profile/activity',
-    pageTitle: 'Profil — dziennik aktywności',
-    pageModule: 'pages/links/groups/profile/ProfileLogPage.jsx',
-    contentModule: 'pages/content/group-profile-log/ProfileLogContent.jsx',
+    pageTitle: 'Profil — odznaki',
+    pageModule: 'pages/links/groups/profile/ProfileHomePage.jsx',
+    contentModule: 'pages/content/group-profile/ProfileHomeContent.jsx',
     roles: ['student'],
   },
   {
@@ -217,6 +226,15 @@ export const ROUTE_TABLE = [
     pageTitle: 'Profil — ekwipunek',
     pageModule: 'pages/links/groups/profile/ProfileEqPage.jsx',
     contentModule: 'pages/content/group-profile-eq/ProfileEqContent.jsx',
+    roles: ['student'],
+  },
+  {
+    id: 'group.profile.purchases',
+    section: 'group',
+    pathPattern: '/groups/:groupId/profile/purchases',
+    pageTitle: 'Profil — historia zakupów',
+    pageModule: 'pages/links/groups/profile/ProfilePurchasesPage.jsx',
+    contentModule: 'pages/content/group-profile-purchases/ProfilePurchasesContent.jsx',
     roles: ['student'],
   },
   {

@@ -1,0 +1,95 @@
+.profile-purchases-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.profile-purchases-page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-purchases-page__title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: rgb(227, 224, 247);
+}
+
+.profile-purchases-page__toolbar {
+  align-items: center;
+}
+
+.profile-purchases-page__counts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-purchases-page__search {
+  width: 18rem;
+  max-width: 100%;
+}
+
+.profile-purchases-page__filters {
+  margin: 0;
+}
+
+.profile-purchases-page__filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.profile-purchases-page__toggle-categories {
+  flex-shrink: 0;
+}
+
+.profile-purchases-page__divider {
+  margin: 0;
+}
+
+.profile-purchases-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.profile-purchases-page__error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--color-input-error);
+  font-size: var(--font-size-body);
+}
+
+.profile-purchases-page__message {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
+@media (max-width: 720px) {
+  .profile-purchases-page__search {
+    width: 100%;
+  }
+
+  .profile-purchases-page__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-purchases-page__counts,
+  .maq-section-page__toolbar-end {
+    width: 100%;
+  }
+}

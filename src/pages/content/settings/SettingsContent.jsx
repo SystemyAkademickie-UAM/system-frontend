@@ -11,6 +11,12 @@ import { Divider, CharacterLimitedField, Button, Modal, useToast } from '../../.
 import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
+import {
+  THEME_OPTIONS,
+  applyTheme,
+  getSavedTheme,
+} from '../../../services/themeService.js';
+import { getRememberMe, setRememberMe } from '../../../services/rememberMeService.js';
 import { SETTINGS_NICKNAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 
@@ -42,6 +48,18 @@ const LANGUAGELABELTEXT = {
   japanese: '言語',
   kana: 'げんご'
 };
+const THEMELABELTEXT = {
+  polish: 'Motyw',
+  english: 'Theme',
+  japanese: 'テーマ',
+  kana: 'テーマ'
+};
+const LOGINLABELTEXT = {
+  polish: 'Logowanie',
+  english: 'Login',
+  japanese: 'ログイン',
+  kana: 'ログイン',
+};
 const NICKNAMELABELTEXT = {
   polish: 'Ksywka',
   english: 'Nickname',
@@ -67,16 +85,28 @@ const SHOWNICKNAMELABELTEXT = {
   kana: 'ニックネームをひょうじ',
 };
 const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
-  polish: 'Gdy wyłączone, uczniowie i inni prowadzący widzą imię i nazwisko zamiast ksywki (lista grup, strona główna, galeria szablonów itd.).',
-  english: 'When disabled, students and other lecturers see your legal name instead of nickname (group list, home page, template gallery, etc.).',
-  japanese: 'オフにすると、他の利用者にはニックネームではなく氏名が表示されます。',
-  kana: 'オフにすると、ほかの利用者にはニックネームではなく氏名が表示されます。',
+  polish: 'Ksywka staje się widoczna dla innych użytkowników (wyświetlana jest dodatkowo obok imienia i nazwiska).',
+  english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
+  japanese: 'ニックネームが他の利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
+  kana: 'ニックネームがほかの利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
+};
+const REMEMBERMELABELTEXT = {
+  polish: 'Zapamiętaj mnie',
+  english: 'Remember me',
+  japanese: 'ログイン状態を保持',
+  kana: 'ログインじょうたいをほじ',
+};
+const REMEMBERMEDESCRIPTIONLABELTEXT = {
+  polish: 'Automatycznie loguj i utrzymuj aktywną sesję na tym urządzeniu.',
+  english: 'Automatically log in and maintain active session on this device.',
+  japanese: 'この端末で自動的にログインしセッションを維持します。',
+  kana: 'この端末でじどうてきにログインしセッションをいじします。',
 };
 const SAVEBUTTONLABELTEXT = {
   polish: 'Zapisz zmiany',
   english: 'Save changes',
   japanese: '変更を保存',
-  kana: 'へんこうをほぞん'
+  kana: 'へんこうをほぞn'
 };
 const UNSAVEDCHANGESLABELTEXT = {
   polish: 'Niezapisane zmiany',
@@ -151,6 +181,8 @@ export default function SettingsContent() {
   const { showSuccess, showError } = useToast();
 
   const [draftShowNickname, setDraftShowNickname] = useState(true);
+  const [draftRememberMe, setDraftRememberMe] = useState(() => getRememberMe());
+  const [draftTheme, setDraftTheme] = useState(() => getSavedTheme());
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -188,10 +220,17 @@ export default function SettingsContent() {
       }
 
       const CURRENTLANGUAGE = READLANGUAGECOOKIE() || 'polish';
+      const CURRENTTHEME = getSavedTheme();
+      const CURRENTREMEMBERME = getRememberMe();
+      setDraftTheme(CURRENTTHEME);
+      setDraftRememberMe(CURRENTREMEMBERME);
+
       setSavedSnapshot({
         nickname: profile.nickname || '',
         avatarId: loadedAvatarId,
         LANGUAGE: CURRENTLANGUAGE,
+        theme: CURRENTTHEME,
+        rememberMe: CURRENTREMEMBERME,
         ...(role === APP_ROLE.LECTURER ? { showNickname: profile.showNickname !== false } : {}),
       });
     } catch (error) {
@@ -245,6 +284,10 @@ export default function SettingsContent() {
     const savedNickname = result.profile?.nickname ?? trimmedNickname;
     setNickname(savedNickname);
 
+    // Zastosuj i zapisz motyw oraz preferencję zapamiętania sesji
+    applyTheme(draftTheme);
+    setRememberMe(draftRememberMe);
+
     await refetchProfile();
 
     if (role === APP_ROLE.LECTURER) {
@@ -257,6 +300,8 @@ export default function SettingsContent() {
       nickname: savedNickname,
       avatarId: selectedAvatarId,
       LANGUAGE: SELECTEDLANGUAGE,
+      theme: draftTheme,
+      rememberMe: draftRememberMe,
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
 
@@ -266,7 +311,9 @@ export default function SettingsContent() {
   }, [
     DIVLANGUAGE,
     LANGUAGE,
+    draftRememberMe,
     draftShowNickname,
+    draftTheme,
     nickname,
     refetchProfile,
     role,
@@ -293,6 +340,14 @@ export default function SettingsContent() {
       return true;
     }
 
+    if (draftTheme !== savedSnapshot.theme) {
+      return true;
+    }
+
+    if (draftRememberMe !== savedSnapshot.rememberMe) {
+      return true;
+    }
+
     if (role === APP_ROLE.LECTURER && draftShowNickname !== savedSnapshot.showNickname) {
       return true;
     }
@@ -300,7 +355,9 @@ export default function SettingsContent() {
     return false;
   }, [
     DIVLANGUAGE,
+    draftRememberMe,
     draftShowNickname,
+    draftTheme,
     isLoading,
     nickname,
     role,
@@ -317,6 +374,17 @@ export default function SettingsContent() {
     when: isDirty && !isSaving,
     onSave: persistSettings,
   });
+
+  const handleDiscard = useCallback(() => {
+    if (savedSnapshot?.theme) {
+      setDraftTheme(savedSnapshot.theme);
+      applyTheme(savedSnapshot.theme);
+    }
+    if (savedSnapshot?.rememberMe !== undefined) {
+      setDraftRememberMe(savedSnapshot.rememberMe);
+    }
+    discardChanges();
+  }, [discardChanges, savedSnapshot?.rememberMe, savedSnapshot?.theme]);
 
   function onNicknamechange(stringvalue) {
     let nextValue = stringvalue;
@@ -406,6 +474,51 @@ export default function SettingsContent() {
 
               <Divider className="settings-page__divider" length="50%" />
 
+              <SettingsSectionHeader title={LOGINLABELTEXT[LANGUAGE]} id="settings-login-title" />
+              <div className="settings-page__field settings-page__field--toggle">
+                <label className="settings-page__toggle">
+                  <input
+                    type="checkbox"
+                    checked={draftRememberMe}
+                    onChange={(event) => setDraftRememberMe(event.target.checked)}
+                    disabled={isSaving}
+                  />
+                  <span className="group-settings-form__label">{REMEMBERMELABELTEXT[LANGUAGE]}</span>
+                </label>
+                <p className="group-settings-form__hint">{REMEMBERMEDESCRIPTIONLABELTEXT[LANGUAGE]}</p>
+              </div>
+
+              <Divider className="settings-page__divider" length="50%" />
+
+              <SettingsSectionHeader title={THEMELABELTEXT[LANGUAGE]} id="settings-theme-title" />
+              <div className="settings-page__theme-radio-group" role="radiogroup" aria-labelledby="settings-theme-title">
+                {THEME_OPTIONS.map((option) => {
+                  const isSelected = draftTheme === option.id;
+                  return (
+                    <label
+                      key={option.id}
+                      className={`settings-page__theme-radio-option ${isSelected ? 'settings-page__theme-radio-option--selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="theme"
+                        value={option.id}
+                        checked={isSelected}
+                        onChange={() => {
+                          setDraftTheme(option.id);
+                          applyTheme(option.id);
+                        }}
+                        disabled={isSaving}
+                        className="settings-page__theme-radio-input"
+                      />
+                      <span className="settings-page__theme-radio-label">{option.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+
+              <Divider className="settings-page__divider" length="50%" />
+
               <SettingsSectionHeader title={LANGUAGELABELTEXT[LANGUAGE]} id="settings-LANGUAGE-title" />
               <div className="settings-page__field group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="settings-LANGUAGE">
@@ -419,8 +532,8 @@ export default function SettingsContent() {
                   disabled={isSaving}
                 >
                   {['polski', 'English'].map((LANGUAGEchosen) => (
-                                      <option key={LANGUAGEchosen} value={LANGUAGEchosen}>{LANGUAGEchosen}</option>
-                                    ))}
+                    <option key={LANGUAGEchosen} value={LANGUAGEchosen}>{LANGUAGEchosen}</option>
+                  ))}
                 </select>
               </div>
             </section>
@@ -464,7 +577,7 @@ export default function SettingsContent() {
             <Button type="button" variant="secondary" size="md" onClick={dismissPrompt}>
               {UNSAVEDCANCELLABELTEXT[LANGUAGE]}
             </Button>
-            <Button type="button" variant="secondary" size="md" onClick={discardChanges}>
+            <Button type="button" variant="secondary" size="md" onClick={handleDiscard}>
               {UNSAVEDDISCARDLABELTEXT[LANGUAGE]}
             </Button>
             <Button

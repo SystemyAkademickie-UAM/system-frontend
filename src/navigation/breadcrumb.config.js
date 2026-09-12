@@ -9,6 +9,7 @@ import {
   groupsListPath,
   organizationsPath,
   statisticsPath,
+  superadminLogsPath,
   templatesMyPath,
   templatesPath,
   userManagementPath,
@@ -33,6 +34,7 @@ export const BREADCRUMB_BY_PATH = {
   [courseManagementPath()]: [{ label: 'Zarządzanie grupami' }],
   [statisticsPath()]: [{ label: 'Statystyki' }],
   [organizationsPath()]: [{ label: 'Zarządzanie organizacjami' }],
+  [superadminLogsPath()]: [{ label: 'Logi produkcyjne' }],
 
   [templatesPath()]: [{ label: 'Szablony' }, { label: 'Galeria szablonów' }],
   [templatesMyPath()]: [{ label: 'Szablony' }, { label: 'Moje szablony' }],
@@ -65,8 +67,16 @@ export const GROUP_BREADCRUMB_RULES = [
     segments: [],
   },
   {
+    pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/eq\/?$/u,
+    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Ekwipunek' }],
+  },
+  {
+    pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/purchases\/?$/u,
+    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Historia zakupów' }],
+  },
+  {
     pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/?$/u,
-    segments: [{ label: 'Profil uczestnika' }],
+    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Profil uczestnika' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/eq\/?$/u,
@@ -74,11 +84,11 @@ export const GROUP_BREADCRUMB_RULES = [
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/activity\/?$/u,
-    segments: [{ label: 'Dziennik aktywności' }],
+    segments: [{ label: 'Zdobyte odznaki' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/?$/u,
-    segments: [{ label: 'Zdobyte odznaki' }],
+    segments: [{ label: 'Dziennik aktywności' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/members\/codes\/?$/u,
@@ -153,7 +163,8 @@ export const GROUP_BREADCRUMB_RULES = [
 /** Etykieta sidebar → breadcrumb (gdy brak dopasowania reguły). */
 export const SIDEBAR_LABEL_BY_HREF_KEY = {
   GROUP_MAIN: 'Strona główna',
-  GROUP_PROFILE: 'Zdobyte odznaki',
+  GROUP_PROFILE: 'Dziennik aktywności',
+  GROUP_PROFILE_LOG: 'Zdobyte odznaki',
   GROUP_SHOP: 'Sklep',
   GROUP_RANKING: 'Ranking',
   GROUP_MEMBERS: 'Użytkownicy',

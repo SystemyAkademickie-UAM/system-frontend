@@ -45,9 +45,9 @@ const TEXTPLACEHOLDER__TEXTLABEL = {
   english: 'Post content',
 };
 
-const HIDEOPTION__TEXTLABEL = {
-  polish: 'Ukryj wpis (niepublikowany)',
-  english: 'Hide post (unpublished)',
+const PUBLISHOPTION__TEXTLABEL = {
+  polish: 'Opublikuj wpis',
+  english: 'Publish post',
 };
 
 const SCHEDULEOPTION__TEXTLABEL = {
@@ -63,7 +63,7 @@ const PUBLISH__TEXTLABEL = {
 const EMPTY_FORM = {
   title: '',
   text: '',
-  startHidden: false,
+  startHidden: true,
   schedulePublish: false,
   publishDate: '',
   publishTime: '',
@@ -260,13 +260,15 @@ export default function PostFormModal({
         <div className="rewards-modal__field">
           <PostOptionCheckbox
             id="post-start-hidden"
-            checked={form.startHidden}
+            checked={!form.startHidden}
+            disabled={false}
             onChange={(checked) => setForm((prev) => ({
               ...prev,
-              startHidden: checked,
+              startHidden: !checked,
+              schedulePublish: checked ? false : prev.schedulePublish,
             }))}
           >
-            {HIDEOPTION__TEXTLABEL[LANGUAGE]}
+            {PUBLISHOPTION__TEXTLABEL[LANGUAGE]}
           </PostOptionCheckbox>
         </div>
         <div className="rewards-modal__field">
