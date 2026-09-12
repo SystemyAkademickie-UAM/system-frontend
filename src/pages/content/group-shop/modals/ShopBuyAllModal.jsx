@@ -82,6 +82,7 @@ export default function ShopBuyAllModal({
               priceAmount={item.priceAmount}
               salePriceAmount={item.salePriceAmount}
               rankDiscountedPrice={item.rankDiscountedPrice}
+              appliedDiscounts={item.appliedDiscounts}
               size="sm"
             />
           </li>

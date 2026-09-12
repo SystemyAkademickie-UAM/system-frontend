@@ -89,6 +89,14 @@ const NOBADGEDISCOUNTSYET__TEXTLABEL = {
   english: 'No badge discounts defined yet. Add the first one above.'
 };
 
+function PencilIcon({ className = '' }) {
+  return (
+    <svg className={className} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+    </svg>
+  );
+}
+
 /**
  * Krok 2/4 kreatora przedmiotu: Wycena, zniżki i dynamiczny podgląd.
  */
@@ -115,11 +123,20 @@ export default function ShopItemStepPricing({
   const [selectedBadgeName, setSelectedBadgeName] = useState('');
   const [pendingDiscountValue, setPendingDiscountValue] = useState('');
   const [discountType, setDiscountType] = useState('fixed'); // 'fixed' | 'percent'
+  const [editingDiscountId, setEditingDiscountId] = useState(null);
+  const [editingValue, setEditingValue] = useState('');
+  const [editingType, setEditingType] = useState('fixed');
   const [previewRankId, setPreviewRankId] = useState('');
   const [rankDiscountsExpanded, setRankDiscountsExpanded] = useState(false);
 
   const basePriceNum = Number(cost) || 0;
   const minPriceNum = minPriceEnabled && minPrice !== '' ? Number(minPrice) : null;
+
+  const availableBadges = useMemo(() => {
+    const chosenNames = new Set(badgeDiscounts.map((d) => d.badgename));
+    const chosenIds = new Set(badgeDiscounts.map((d) => d.badgeid));
+    return badges.filter((b) => !chosenNames.has(b.name) && !chosenIds.has(b.id));
+  }, [badges, badgeDiscounts]);
 
   const handleCostChange = (val) => {
     const cleaned = sanitizeWholeNumberInput(val);
@@ -201,7 +218,43 @@ export default function ShopItemStepPricing({
 
   const handleDeleteBadgeDiscount = (discountId) => {
     setBadgeDiscounts(badgeDiscounts.filter((d) => d.id !== discountId));
+    if (editingDiscountId === discountId) {
+      setEditingDiscountId(null);
+      setEditingValue('');
+    }
     showSuccess('Zniżka za odznakę została usunięta.');
+  };
+
+  const handleStartEdit = (discount) => {
+    setEditingDiscountId(discount.id);
+    const isPercent = String(discount.value).endsWith('%');
+    const rawVal = String(discount.value).replace('%', '').trim();
+    setEditingValue(rawVal);
+    setEditingType(discount.type || (isPercent ? 'percent' : 'fixed'));
+  };
+
+  const handleCancelEdit = () => {
+    setEditingDiscountId(null);
+    setEditingValue('');
+  };
+
+  const handleSaveEdit = (discountId) => {
+    const cleaned = sanitizeWholeNumberInput(editingValue);
+    if (!cleaned || Number(cleaned) <= 0) {
+      showError('Proszę wpisać poprawną wartość zniżki.');
+      return;
+    }
+    const formattedValue = editingType === 'percent' ? `${cleaned}%` : cleaned;
+    setBadgeDiscounts(
+      badgeDiscounts.map((d) => (
+        d.id === discountId
+          ? { ...d, value: formattedValue, type: editingType }
+          : d
+      ))
+    );
+    setEditingDiscountId(null);
+    setEditingValue('');
+    showSuccess('Zniżka za odznakę została zaktualizowana.');
   };
 
   // Obliczenia dla wybranej rangi do podglądu
@@ -328,9 +381,14 @@ export default function ShopItemStepPricing({
             className="shop-item-form__select shop-item-pricing__badge-select"
             value={selectedBadgeName}
             onChange={(event) => setSelectedBadgeName(event.target.value)}
+            disabled={availableBadges.length === 0}
           >
-            <option value="">{SELECTBADGE__TEXTLABEL[LANGUAGE]}</option>
-            {badges.map((badge) => (
+            <option value="">
+              {availableBadges.length === 0
+                ? (LANGUAGE === 'polish' ? 'Brak kolejnych odznak do dodania' : 'No more badges to add')
+                : SELECTBADGE__TEXTLABEL[LANGUAGE]}
+            </option>
+            {availableBadges.map((badge) => (
               <option key={`badge-${badge.id}`} value={badge.name}>
                 {badge.name}
               </option>
@@ -342,6 +400,7 @@ export default function ShopItemStepPricing({
             placeholder="Wartość"
             value={pendingDiscountValue}
             onInput={(event) => setPendingDiscountValue(sanitizeWholeNumberInput(event.target.value))}
+            disabled={availableBadges.length === 0}
           />
 
           {/* Przełącznik typu zniżki: Waluta vs % */}
@@ -364,7 +423,13 @@ export default function ShopItemStepPricing({
             </button>
           </div>
 
-          <Button type="button" variant="primary" size="md" onClick={handleAddBadgeDiscount}>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            onClick={handleAddBadgeDiscount}
+            disabled={availableBadges.length === 0}
+          >
             {ADDDISCOUNT__TEXTLABEL[LANGUAGE]}
           </Button>
         </div>
@@ -372,23 +437,97 @@ export default function ShopItemStepPricing({
         {/* Lista dodanych odznak */}
         {badgeDiscounts.length > 0 ? (
           <ul className="shop-item-pricing__badge-list">
-            {badgeDiscounts.map((discount) => (
-              <li key={`badge-discount-${discount.id}`} className="shop-item-pricing__badge-item">
-                <span className="shop-item-pricing__badge-item-name">{discount.badgename}</span>
-                <span className="shop-item-pricing__badge-item-value">
-                  {discount.value.endsWith('%') ? discount.value : `${discount.value} `}
-                  {!discount.value.endsWith('%') && <CurrencyIcon size="sm" />}
-                </span>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteBadgeDiscount(discount.id)}
-                >
-                  {REMOVE__TEXTLABEL[LANGUAGE]}
-                </Button>
-              </li>
-            ))}
+            {badgeDiscounts.map((discount) => {
+              const isEditing = editingDiscountId === discount.id;
+              if (isEditing) {
+                return (
+                  <li key={`badge-discount-${discount.id}`} className="shop-item-pricing__badge-item shop-item-pricing__badge-item--editing">
+                    <span className="shop-item-pricing__badge-item-name">{discount.badgename}</span>
+                    <div className="shop-item-pricing__badge-item-edit-controls">
+                      <input
+                        className="shop-item-form__input shop-item-pricing__edit-input"
+                        value={editingValue}
+                        onInput={(e) => setEditingValue(sanitizeWholeNumberInput(e.target.value))}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleSaveEdit(discount.id);
+                          } else if (e.key === 'Escape') {
+                            e.preventDefault();
+                            handleCancelEdit();
+                          }
+                        }}
+                        autoFocus
+                        placeholder="Wartość"
+                      />
+                      <div className="shop-item-pricing__type-toggle shop-item-pricing__type-toggle--sm" role="radiogroup" aria-label="Typ zniżki">
+                        <button
+                          type="button"
+                          className={`shop-item-pricing__type-btn ${editingType === 'fixed' ? 'shop-item-pricing__type-btn--active' : ''}`}
+                          onClick={() => setEditingType('fixed')}
+                          title="Zniżka kwotowa w walucie"
+                        >
+                          <CurrencyIcon size="sm" />
+                        </button>
+                        <button
+                          type="button"
+                          className={`shop-item-pricing__type-btn ${editingType === 'percent' ? 'shop-item-pricing__type-btn--active' : ''}`}
+                          onClick={() => setEditingType('percent')}
+                          title="Zniżka procentowa (%)"
+                        >
+                          %
+                        </button>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="primary"
+                        size="sm"
+                        onClick={() => handleSaveEdit(discount.id)}
+                      >
+                        {LANGUAGE === 'polish' ? 'Zapisz' : 'Save'}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCancelEdit}
+                      >
+                        {LANGUAGE === 'polish' ? 'Anuluj' : 'Cancel'}
+                      </Button>
+                    </div>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={`badge-discount-${discount.id}`} className="shop-item-pricing__badge-item">
+                  <span className="shop-item-pricing__badge-item-name">{discount.badgename}</span>
+                  <div className="shop-item-pricing__badge-item-end">
+                    <span className="shop-item-pricing__badge-item-value">
+                      {discount.value.endsWith('%') ? discount.value : `${discount.value} `}
+                      {!discount.value.endsWith('%') && <CurrencyIcon size="sm" />}
+                    </span>
+                    <button
+                      type="button"
+                      className="shop-item-pricing__edit-btn"
+                      onClick={() => handleStartEdit(discount)}
+                      title={LANGUAGE === 'polish' ? 'Edytuj wartość zniżki' : 'Edit discount value'}
+                      aria-label={`${LANGUAGE === 'polish' ? 'Edytuj wartość zniżki' : 'Edit discount value'} ${discount.badgename}`}
+                    >
+                      <PencilIcon />
+                    </button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteBadgeDiscount(discount.id)}
+                    >
+                      {REMOVE__TEXTLABEL[LANGUAGE]}
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         ) : null}
       </div>

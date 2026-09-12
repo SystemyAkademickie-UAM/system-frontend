@@ -56,6 +56,7 @@ export default function ShopBuyModal({
         priceAmount={item.priceAmount}
         salePriceAmount={item.salePriceAmount}
         rankDiscountedPrice={item.rankDiscountedPrice}
+        appliedDiscounts={item.appliedDiscounts}
         imageRef={item.imageRef}
         categoryDetails={categoryDetails}
         hideActions

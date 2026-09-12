@@ -497,6 +497,12 @@
   border: 1px solid rgba(245, 158, 11, 0.28);
 }
 
+.activities-island__activity-badge--public {
+  background: rgba(66, 243, 125, 0.12);
+  color: var(--color-accent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+}
+
 .activities-island__activity-name {
   display: inline-flex;
   align-items: center;
@@ -506,12 +512,15 @@
 }
 
 .activities-island__cell-text {
-  display: block;
-  min-width: 0;
-  color: var(--color-text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  color: var(--color-text-secondary);
+  line-height: 1.35;
+  word-break: break-word;
 }
 
 @media (max-width: 768px) {
