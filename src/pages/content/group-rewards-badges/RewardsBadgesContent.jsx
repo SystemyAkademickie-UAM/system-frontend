@@ -270,7 +270,7 @@ const BADGE_COLUMNS = [
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
     render: (badge) => (
-      <span className="rewards-table__cell-text">
+      <span className="rewards-table__cell-text" title={badge.storyDescription}>
         <em>{badge.storyDescription}</em>
       </span>
     ),
@@ -283,7 +283,7 @@ const BADGE_COLUMNS = [
     cellClassName: 'rewards-table__cell--truncate',
     hiddenBelow: 768,
     render: (badge) => (
-      <span className="rewards-table__cell-text">
+      <span className="rewards-table__cell-text" title={badge.didacticDescription}>
         {badge.didacticDescription}
       </span>
     ),

@@ -182,6 +182,10 @@
   animation: welcome-logo-float 5s ease-in-out infinite;
 }
 
+.welcome-hero__brand-logo--easter-egg {
+  animation: welcome-logo-spin 0.25s linear infinite;
+}
+
 .welcome-hero__brand-a,
 .welcome-hero__brand-q {
   font-family: 'Manrope', var(--font-family-app);
@@ -475,6 +479,11 @@
   50% { transform: translateY(-8px); }
 }
 
+@keyframes welcome-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 @keyframes welcome-scroll-bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(6px); }
@@ -514,6 +523,7 @@
   .welcome-hero__bg-glow,
   .welcome-hero__stars,
   .welcome-hero__brand-logo,
+  .welcome-hero__brand-logo--easter-egg,
   .welcome-hero__scroll-chevron {
     animation: none;
     transform: none;

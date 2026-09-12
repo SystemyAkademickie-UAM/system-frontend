@@ -491,12 +491,14 @@ export function useGroupActivities() {
         ...stage,
         activities: stage.activities.map((act) => {
           if (act.id !== activityId) return act;
-          const currentVis = act.visibilityStatus ?? (act.isPublished === false ? 0 : 1);
-          nextVisibility = currentVis === 1 ? 0 : 1;
+          const isCurrentlyVisible = act.isVisible !== false && act.isPublished !== false && act.visibilityStatus !== 0;
+          nextVisibility = isCurrentlyVisible ? 0 : 1;
+          const isVisible = nextVisibility === 1;
           return {
             ...act,
+            isVisible,
             visibilityStatus: nextVisibility,
-            isPublished: nextVisibility === 1,
+            isPublished: isVisible,
           };
         }),
       };
@@ -510,8 +512,9 @@ export function useGroupActivities() {
         visibilityStatus: nextVisibility,
         isPublished: nextVisibility === 1,
       });
+      await fetchActivitiesForStage(stageId);
     } catch {
-      // Backend error fallback
+      await fetchActivitiesForStage(stageId);
     }
 
     showSuccess(
@@ -520,7 +523,7 @@ export function useGroupActivities() {
         : (LANGUAGE === 'polish' ? 'Aktywność została ukryta dla studentów.' : 'Activity has been hidden from students.')
     );
     return { ok: true };
-  }, [LANGUAGE, showSuccess]);
+  }, [LANGUAGE, fetchActivitiesForStage, showSuccess]);
 
   return {
     stages,

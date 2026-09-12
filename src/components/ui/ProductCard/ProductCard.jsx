@@ -14,7 +14,7 @@ import { parseShopItemImageRef } from '../../../utils/shop/shopItemIcon.js';
 import { resolveExtraLifeItemIcon } from '../../../utils/shop/extraLifeItem.js';
 import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
 import { getProductCardColorVars } from '../../../utils/shop/shopCategoryColors.js';
-import { getShopCatalogPriceHint, getShopItemPriceDisplay } from '../../../utils/shop/shopPricing.js';
+import { getShopCatalogPriceHint, getShopItemPriceDisplay, getShopStrikePriceHint } from '../../../utils/shop/shopPricing.js';
 import { getTileVisibilityLabel } from '../../../utils/rewards/visibilityStatusLabel.js';
 
 import './ProductCard.css';
@@ -26,6 +26,7 @@ function ProductCardPrice({
   priceAmount,
   salePriceAmount,
   rankDiscountedPrice,
+  appliedDiscounts,
   priceEmoji,
   size = 'md',
 }) {
@@ -33,21 +34,38 @@ function ProductCardPrice({
     priceAmount,
     salePriceAmount,
     rankDiscountedPrice,
+    appliedDiscounts,
   });
   const catalogPriceHint = getShopCatalogPriceHint(display);
 
   if (display.mode === 'badge') {
+    const strikeHint = getShopStrikePriceHint(display);
+
     return (
       <div
         className="maq-product-card__price-row"
         aria-label={`Cena ${display.displayPrice}, poprzednio ${display.strikePrice}`}
       >
-        <CurrencyDisplay
-          amount={display.strikePrice}
-          symbol={priceEmoji}
-          size={size}
-          className="maq-product-card__price-value maq-product-card__price-value--original"
-        />
+        {strikeHint ? (
+          <InfoTooltip
+            text={strikeHint}
+            className="maq-product-card__price-hover"
+          >
+            <CurrencyDisplay
+              amount={display.strikePrice}
+              symbol={priceEmoji}
+              size={size}
+              className="maq-product-card__price-value maq-product-card__price-value--original"
+            />
+          </InfoTooltip>
+        ) : (
+          <CurrencyDisplay
+            amount={display.strikePrice}
+            symbol={priceEmoji}
+            size={size}
+            className="maq-product-card__price-value maq-product-card__price-value--original"
+          />
+        )}
         <InfoTooltip
           text={catalogPriceHint}
           className="maq-product-card__price-hover"
@@ -67,19 +85,19 @@ function ProductCardPrice({
 
   if (display.mode === 'rank') {
     return (
-      <div className="maq-product-card__price-row maq-product-card__price-row--rank">
-        <InfoTooltip
-          text={catalogPriceHint}
-          className="maq-product-card__price-hover"
-        >
+      <InfoTooltip
+        text={catalogPriceHint}
+        className="maq-product-card__price-hover"
+      >
+        <div className="maq-product-card__price-row maq-product-card__price-row--rank">
           <CurrencyDisplay
             amount={display.displayPrice}
             symbol={priceEmoji}
             size={size}
             className="maq-product-card__price-value"
           />
-        </InfoTooltip>
-      </div>
+        </div>
+      </InfoTooltip>
     );
   }
 
@@ -202,6 +220,8 @@ export default function ProductCard({
   salePriceAmount,
 
   rankDiscountedPrice,
+
+  appliedDiscounts,
 
   minPrice,
 
@@ -558,6 +578,8 @@ export default function ProductCard({
               salePriceAmount={salePriceAmount}
 
               rankDiscountedPrice={rankDiscountedPrice}
+
+              appliedDiscounts={appliedDiscounts}
 
               priceEmoji={priceEmoji}
 

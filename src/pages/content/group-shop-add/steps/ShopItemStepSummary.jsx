@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Divider } from '../../../../components/ui/index.js';
 import { CurrencyIcon } from '../../../../components/ui/Currency/CurrencyDisplay.jsx';
+import { useGroupLives } from '../../../../context/GroupLivesContext.jsx';
+import { resolveExtraLifeItemIcon } from '../../../../utils/shop/extraLifeItem.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 
 const SECTIONINFO__TEXTLABEL = {
@@ -37,6 +39,7 @@ const EDIT_SECTION_TOOLTIP__TEXTLABEL = {
 export default function ShopItemStepSummary({
   itemName,
   currentIcon,
+  isEditingExtraLife = false,
   storyDescription,
   didacticDescription,
   categories = [],
@@ -56,6 +59,11 @@ export default function ShopItemStepSummary({
   onJumpToStep,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const { symbol: livesSymbol } = useGroupLives();
+
+  const resolvedIcon = isEditingExtraLife
+    ? resolveExtraLifeItemIcon(livesSymbol).emoji
+    : (currentIcon || '🥕');
 
   const selectedCategories = useMemo(() => {
     return categories.filter((c) => c.checked === 1);
@@ -88,7 +96,7 @@ export default function ShopItemStepSummary({
         
         <div className="shop-item-summary__info-grid">
           <div className="shop-item-summary__icon-badge" aria-hidden="true">
-            <span className="shop-item-summary__icon-emoji">{currentIcon || '🥕'}</span>
+            <span className="shop-item-summary__icon-emoji">{resolvedIcon}</span>
           </div>
 
           <div className="shop-item-summary__info-details">

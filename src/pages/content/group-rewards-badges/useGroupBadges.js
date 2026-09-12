@@ -94,7 +94,7 @@ export function useGroupBadges() {
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
     const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_BADGE_EMOJI);
-    const shouldPublish = values.isPublished !== false;
+    const shouldPublish = values.isPublished === true;
     const result = await createBadge(groupId, {
       name: values.name,
       icon,

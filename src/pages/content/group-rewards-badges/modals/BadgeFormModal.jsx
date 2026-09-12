@@ -59,9 +59,9 @@ const DIDACTICDESCRIPTIONLABEL__TEXTLABEL = {
   english: 'Didactic Description*'
 };
 
-const HIDDENOPTIONTEXT__TEXTLABEL = {
-  polish: 'Ukryj odznakę (niewidoczna dla studentów)',
-  english: 'Hide badge (hidden from students)'
+const PUBLISHEDOPTIONTEXT__TEXTLABEL = {
+  polish: 'Odznaka widoczna dla studentów',
+  english: 'Badge visible to students'
 };
 
 const EMPTY_FORM = {
@@ -71,7 +71,7 @@ const EMPTY_FORM = {
   storyDescription: '',
   didacticDescription: '',
   rewardAmount: '',
-  startHidden: false,
+  isPublished: false,
 };
 
 function BadgeOptionCheckbox({
@@ -126,7 +126,7 @@ export default function BadgeFormModal({
         storyDescription: badge.storyDescription,
         didacticDescription: badge.didacticDescription,
         rewardAmount: String(badge.rewardAmount),
-        startHidden: badge.isPublished === false,
+        isPublished: badge.isPublished !== false,
       });
       return;
     }
@@ -165,7 +165,7 @@ export default function BadgeFormModal({
       storyDescription: form.storyDescription.trim(),
       didacticDescription: form.didacticDescription.trim(),
       rewardAmount: rewardValidation.value,
-      isPublished: !form.startHidden,
+      isPublished: form.isPublished,
     });
   };
 
@@ -264,11 +264,11 @@ export default function BadgeFormModal({
         {/* Sekcja 3: Dostępność */}
         <div className="rewards-modal__field">
           <BadgeOptionCheckbox
-            id="badge-start-hidden"
-            checked={form.startHidden}
-            onChange={(checked) => setForm((prev) => ({ ...prev, startHidden: checked }))}
+            id="badge-is-published"
+            checked={form.isPublished}
+            onChange={(checked) => setForm((prev) => ({ ...prev, isPublished: checked }))}
           >
-            {HIDDENOPTIONTEXT__TEXTLABEL[LANGUAGE]}
+            {PUBLISHEDOPTIONTEXT__TEXTLABEL[LANGUAGE]}
           </BadgeOptionCheckbox>
         </div>
       </div>

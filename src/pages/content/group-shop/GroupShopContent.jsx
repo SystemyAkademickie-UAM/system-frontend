@@ -817,6 +817,7 @@ export default function GroupShopContent() {
                         minPrice={item.minPrice}
                         salePriceAmount={item.salePriceAmount}
                         rankDiscountedPrice={item.rankDiscountedPrice}
+                        appliedDiscounts={item.appliedDiscounts}
                         imageRef={item.imageRef}
                         categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
                         showLecturerActions={isLecturerView}

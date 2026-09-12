@@ -22,6 +22,7 @@ export function mapBackendShopItem(raw) {
   const icon = parseShopItemImageRef(imageRef);
   const badgePromotions = Array.isArray(listing.badgePromotions) ? listing.badgePromotions : [];
   const rankPromotions = Array.isArray(listing.rankPromotions) ? listing.rankPromotions : [];
+  const appliedDiscounts = Array.isArray(listing.appliedDiscounts) ? listing.appliedDiscounts : [];
 
   return {
     id: String(item.id ?? ''),
@@ -51,6 +52,7 @@ export function mapBackendShopItem(raw) {
     isExtraLife: item.isExtraLife === true,
     badgePromotions,
     rankPromotions,
+    appliedDiscounts,
   };
 }
 
