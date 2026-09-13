@@ -29,6 +29,7 @@ const CourseManagementPage = withLazy(() => import('../pages/links/app/CourseMan
 const HelpPage = withLazy(() => import('../pages/links/app/HelpPage.jsx'));
 const OrganizationManagementPage = withLazy(() => import('../pages/links/app/OrganizationManagementPage.jsx'));
 const SuperadminLogsPage = withLazy(() => import('../pages/links/app/SuperadminLogsPage.jsx'));
+const AdminBackupPage = withLazy(() => import('../pages/links/app/AdminBackupPage.jsx'));
 const SettingsPage = withLazy(() => import('../pages/links/app/SettingsPage.jsx'));
 const StatisticsPage = withLazy(() => import('../pages/links/app/StatisticsPage.jsx'));
 const UserManagementPage = withLazy(() => import('../pages/links/app/UserManagementPage.jsx'));
@@ -166,6 +167,7 @@ const appRouteTree = [
           { path: 'statistics', element: withGuard(<StatisticsPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
           { path: 'organizations', element: withGuard(<OrganizationManagementPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
           { path: 'system-logs', element: withGuard(<SuperadminLogsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
+          { path: 'admin/backup', element: withGuard(<AdminBackupPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
 
           {
             path: 'templates',

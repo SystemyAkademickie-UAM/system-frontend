@@ -1,0 +1,159 @@
+.admin-backup {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.admin-backup__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.admin-backup__subtitle {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary, #888);
+  margin: 0 0 2rem;
+}
+
+/* ── Section cards ────────────────────────────────────────────────── */
+
+.admin-backup__section {
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-backup__section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-backup__section-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #888);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+/* ── Restore section (danger zone) ────────────────────────────────── */
+
+.admin-backup__section--danger {
+  border-color: var(--color-danger-border, #5c2020);
+  background: var(--color-danger-surface, #1e1015);
+}
+
+.admin-backup__section--danger .admin-backup__section-title {
+  color: var(--color-danger, #e74c3c);
+}
+
+/* ── File input ───────────────────────────────────────────────────── */
+
+.admin-backup__file-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-backup__file-input {
+  font-size: 0.875rem;
+}
+
+.admin-backup__file-name {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary, #888);
+  font-style: italic;
+}
+
+/* ── Status messages ──────────────────────────────────────────────── */
+
+.admin-backup__status {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+.admin-backup__status--success {
+  background: var(--color-success-surface, #0d2818);
+  color: var(--color-success, #2ecc71);
+  border: 1px solid var(--color-success-border, #1e5631);
+}
+
+.admin-backup__status--error {
+  background: var(--color-danger-surface, #1e1015);
+  color: var(--color-danger, #e74c3c);
+  border: 1px solid var(--color-danger-border, #5c2020);
+}
+
+/* ── Confirm modal overlay ────────────────────────────────────────── */
+
+.admin-backup__modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-backup__modal {
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 480px;
+  width: 90%;
+}
+
+.admin-backup__modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-danger, #e74c3c);
+  margin: 0 0 1rem;
+}
+
+.admin-backup__modal-text {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #ccc);
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.admin-backup__modal-text code {
+  background: var(--color-code-bg, #2a2a3a);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-weight: 700;
+  color: var(--color-danger, #e74c3c);
+}
+
+.admin-backup__modal-input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-border, #444);
+  border-radius: 8px;
+  background: var(--color-input-bg, #12121a);
+  color: var(--color-text, #eee);
+  margin-bottom: 1.25rem;
+  outline: none;
+}
+
+.admin-backup__modal-input:focus {
+  border-color: var(--color-danger, #e74c3c);
+}
+
+.admin-backup__modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}

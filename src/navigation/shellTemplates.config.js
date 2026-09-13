@@ -105,6 +105,7 @@ export const HREF_BUILDERS = {
   STATISTICS: () => paths.statisticsPath(),
   ORG_MANAGEMENT: () => paths.organizationsPath(),
   SYSTEM_LOGS: () => paths.superadminLogsPath(),
+  ADMIN_BACKUP: () => paths.adminBackupPath(),
   TEMPLATES_MY: () => paths.templatesMyPath(),
   TEMPLATES_GALLERY: () => paths.templatesPath(),
 
@@ -595,6 +596,15 @@ const superadminView = {
       label: 'Logi produkcyjne',
       iconId: 'nav/stats',
       hrefKey: 'SYSTEM_LOGS',
+      requiresGroup: false,
+    },
+    {
+      id: 'backup-bazy',
+      enabled: true,
+      kind: 'navlink',
+      label: 'Kopia zapasowa',
+      iconId: 'nav/backup',
+      hrefKey: 'ADMIN_BACKUP',
       requiresGroup: false,
     },
   ],

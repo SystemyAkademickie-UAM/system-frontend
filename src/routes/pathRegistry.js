@@ -286,6 +286,11 @@ export function superadminLogsPath() {
   return '/system-logs';
 }
 
+/** Kopia zapasowa bazy danych — `/admin/backup`. */
+export function adminBackupPath() {
+  return '/admin/backup';
+}
+
 /** Galeria szablonów — `/templates`. */
 export function templatesPath() {
   return '/templates';
