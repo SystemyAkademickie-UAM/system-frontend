@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Button, useToast } from '../../../components/ui/index.js';
-import { exportBackup, importBackup } from '../../../services/backup.api.js';
+import { importBackup } from '../../../services/backup.api.js';
 import './AdminBackupContent.css';
 
 const CONFIRM_WORD = 'RESTORE';
@@ -24,20 +24,32 @@ export default function AdminBackupContent() {
 
   // ── Export ──────────────────────────────────────────────────────────
 
-  const handleExport = async () => {
+  const handleExport = () => {
     setIsExporting(true);
     setExportStatus(null);
 
-    const result = await exportBackup();
+    try {
+      // Zamiast fetch() pobieramy plik natywnie przez przeglądarkę,
+      // co oszczędza RAM klienta (szczególnie dla dużych plików).
+      // Serwer autoryzuje żądanie za pomocą ciasteczka sesji.
+      const exportUrl = '/api/admin/backup/export';
+      
+      const a = document.createElement('a');
+      a.href = exportUrl;
+      // Atrybut download sugeruje pobieranie.
+      // Dokładna nazwa i tak przyjdzie z nagłówka Content-Disposition z serwera.
+      a.download = 'backup.enc';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
 
-    setIsExporting(false);
-
-    if (result.ok) {
-      setExportStatus({ type: 'success', message: 'Kopia zapasowa została pobrana.' });
-      showSuccess('Kopia zapasowa pobrana pomyślnie.');
-    } else {
-      setExportStatus({ type: 'error', message: result.error || 'Nie udało się pobrać kopii zapasowej.' });
-      showError(result.error || 'Błąd eksportu.');
+      setExportStatus({ type: 'success', message: 'Rozpoczęto pobieranie kopii zapasowej.' });
+      showSuccess('Kopia zapasowa pobierana pomyślnie.');
+    } catch (err) {
+      setExportStatus({ type: 'error', message: err.message || 'Błąd inicjacji pobierania.' });
+      showError('Nie udało się rozpocząć pobierania.');
+    } finally {
+      setIsExporting(false);
     }
   };
 
