@@ -5,6 +5,9 @@ import { isColorBannerRef, parseColorBannerRef } from '../../../constants/drive.
 import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
 import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useUserProfile } from '../../../context/UserProfileContext.jsx';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import './GroupCard.css';
 
 const NOIMAGE__TEXTLABEL = {
@@ -30,6 +33,19 @@ export default function GroupCard({ group }) {
   const isColorBanner = isColorBannerRef(group.bannerUrl);
   const colorBannerValue = parseColorBannerRef(group.bannerUrl);
   const showFallback = !isColorBanner && (bannerFailed || !group.bannerUrl);
+
+  const { profile } = useUserProfile();
+  const { role } = useAppRole();
+
+  var userNickname = '';
+  if (profile && profile.nickname) {
+    userNickname = profile.nickname;
+  }
+
+  var displayLecturer = group.lecturer;
+  if (group.isMine && role == APP_ROLE.LECTURER && userNickname != '') {
+    displayLecturer = userNickname + ' (' + group.lecturer + ')';
+  }
 
   useEffect(() => {
     setBannerFailed(!group.bannerUrl || isColorBannerRef(group.bannerUrl));
@@ -80,7 +96,7 @@ export default function GroupCard({ group }) {
             </div>
             <div className="group-card__meta-col">
               <dt className="group-card__label">{LECTURER__TEXTLABEL[LANGUAGE]}</dt>
-              <dd className="group-card__value">{group.lecturer}</dd>
+              <dd className="group-card__value">{displayLecturer}</dd>
             </div>
           </dl>
         </div>

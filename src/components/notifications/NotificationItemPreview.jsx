@@ -7,7 +7,18 @@ import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
 import { groupShopItemsPath, groupShopPath } from '../../routes/pathRegistry.js';
 import { findCachedShopItem } from '../../utils/shop/shopItemsCache.js';
 import { positionCenteredTooltip } from '../../utils/ui/positionTooltipInViewport.js';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './NotificationItemPreview.css';
+
+const EXTRALIFE__TEXTLABEL = {
+  polish: 'Dodatkowe życie',
+  english: 'Extra life',
+};
+
+const ITEM__TEXTLABEL = {
+  polish: 'Przedmiot',
+  english: 'Item',
+};
 
 /**
  * @param {{
@@ -135,9 +146,11 @@ export default function NotificationItemPreview({
     );
   };
 
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
   const itemToRender = resolvedItem ?? {
     id: notification.itemId ?? (effectiveIsExtraLife ? 'extra-life' : 'preview-item'),
-    name: notification.itemName || name || (effectiveIsExtraLife ? 'Dodatkowe życie' : 'Przedmiot'),
+    name: notification.itemName || name || (effectiveIsExtraLife ? EXTRALIFE__TEXTLABEL[LANGUAGE] : ITEM__TEXTLABEL[LANGUAGE]),
     storyDescription: raw.storyDescription ?? '',
     didacticDescription: raw.didacticDescription ?? raw.educationalDescription ?? '',
     priceAmount: raw.price ?? raw.amount ?? null,

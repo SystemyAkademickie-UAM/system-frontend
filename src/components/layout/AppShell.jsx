@@ -78,6 +78,10 @@ function AppShellLayout() {
       return legalName || nickname || 'Użytkownik';
     }
 
+    if (nickname && legalName) {
+      return legalName + ' (' + nickname + ')';
+    }
+
     if (nickname) {
       return nickname;
     }

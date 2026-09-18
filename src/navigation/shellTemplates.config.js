@@ -1,4 +1,5 @@
 /**
+
  * Szablony nawigacji (widoki) — pojedyncze miejsce do definiowania przycisków paska bocznego per rola.
  *
  * Jak dodać nową pozycję we „widoku Studenta":
@@ -17,6 +18,391 @@
  * - visibleFor: tablica ról dla których element jest widoczny (puste = wszystkie)
  */
 import * as paths from '../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../utils/LANGUAGECOOKIE.js';
+
+const LANGUAGE = READLANGUAGECOOKIE();
+
+
+const STUDENT__TEXTLABEL = {
+  polish: 'Student',
+  english: 'Student',
+};
+
+const LECTURER__TEXTLABEL = {
+  polish: 'Prowadzący',
+  english: 'Lecturer',
+};
+
+const ADMINISTRATOR__TEXTLABEL = {
+  polish: 'Administrator',
+  english: 'Administrator',
+};
+
+const SUPERADMINISTRATOR__TEXTLABEL = {
+  polish: 'Superadministrator',
+  english: 'Superadmin',
+};
+
+const YOURGROUPS__TEXTLABEL = {
+  polish: 'Twoje grupy',
+  english: 'Your Groups',
+};
+
+const NAVIGATIONMAIN_PAGE__TEXTLABEL = {
+  polish: 'Strona Główna',
+  english: 'Main Page',
+};
+
+const NAVIGATIONPOSTS__TEXTLABEL = {
+  polish: 'Wpisy',
+  english: 'Posts',
+};
+
+const NAVIGATIONPROFILE__TEXTLABEL = {
+  polish: 'Profil',
+  english: 'Profile',
+};
+
+const NAVIGATIONPROFILEACTIVITYLOG__TEXTLABEL = {
+  polish: 'Dziennik aktywności',
+  english: 'Activity Log',
+};
+
+const NAVIGATIONPROFILEBADGES__TEXTLABEL = {
+  polish: 'Zdobyte odznaki',
+  english: 'Earned Badges',
+};
+
+const NAVIGATIONPROFILEINVENTORY__TEXTLABEL = {
+  polish: 'Ekwipunek',
+  english: 'Inventory',
+};
+
+const NAVIGATIONPROFILEPURCHASES__TEXTLABEL = {
+  polish: 'Historia zakupów',
+  english: 'Purchase History',
+};
+
+const NAVIGATIONACTIVITYLIST__TEXTLABEL = {
+  polish: 'Lista aktywności',
+  english: 'Activity List',
+};
+
+const NAVIGATIONBADGES__TEXTLABEL = {
+  polish: 'Odznaki',
+  english: 'Badges',
+};
+
+const NAVIGATIONRANKS__TEXTLABEL = {
+  polish: 'Rangi',
+  english: 'Ranks',
+};
+
+const NAVIGATIONSHOP__TEXTLABEL = {
+  polish: 'Sklep',
+  english: 'Shop',
+};
+
+const NAVIGATIONPARTICIPANTS__TEXTLABEL = {
+  polish: 'Uczestnicy',
+  english: 'Participants',
+};
+
+const RANKINGUNAVAILABLE__TEXTLABEL = {
+  polish: 'Ranking',
+  english: 'Ranking',
+};
+
+const RANKINGHINT__TEXTLABEL = {
+  polish: 'Ranking — funkcja w przygotowaniu.',
+  english: 'Ranking — coming soon.',
+};
+
+const NAVIGATIONSETTINGS__TEXTLABEL = {
+  polish: 'Ustawienia',
+  english: 'Settings',
+};
+
+const NAVIGATIONUSERS__TEXTLABEL = {
+  polish: 'Użytkownicy',
+  english: 'Users',
+};
+
+const NAVIGATIONMEMBERS__TEXTLABEL = {
+  polish: 'Uczestnicy',
+  english: 'Members',
+};
+
+const NAVIGATIONACCESSCODES__TEXTLABEL = {
+  polish: 'Kody dostępu',
+  english: 'Access Codes',
+};
+
+const NAVIGATIONACTIVITIES__TEXTLABEL = {
+  polish: 'Aktywności',
+  english: 'Activities',
+};
+
+const NAVIGATIONSTAGES__TEXTLABEL = {
+  polish: 'Etapy',
+  english: 'Stages',
+};
+
+const NAVIGATIONREPORTS__TEXTLABEL = {
+  polish: 'Raporty',
+  english: 'Reports',
+};
+
+const NAVIGATIONREWARDS__TEXTLABEL = {
+  polish: 'Systemy nagród',
+  english: 'Rewards',
+};
+
+const NAVIGATIONREWARDSBADGES__TEXTLABEL = {
+  polish: 'Odznaki',
+  english: 'Badges',
+};
+
+
+const NAVIGATIONREWARDSRANKS__TEXTLABEL = {
+  polish: 'Rangi',
+  english: 'Ranks',
+};
+
+const NAVIGATIONREWARDSITEMS__TEXTLABEL = {
+  polish: 'Sklep',
+  english: 'Shop',
+};
+
+const NAVIGATIONGROUPSETTINGS__TEXTLABEL = {
+  polish: 'Ustawienia grupy',
+  english: 'Group Settings',
+};
+
+const NAVIGATIONEDITOR__TEXTLABEL = {
+  polish: 'Edytor',
+  english: 'Editor',
+};
+
+const NAVIGATIONCURRENCY__TEXTLABEL = {
+  polish: 'Waluta',
+  english: 'Currency',
+};
+
+const NAVIGATIONLIVESSYSTEM__TEXTLABEL = {
+  polish: 'System żyć',
+  english: 'Lives System',
+};
+
+const NAVIGATIONRANKING__TEXTLABEL = {
+  polish: 'Ranking',
+  english: 'Ranking',
+};
+
+const NAVIGATIONACCESSMANAGEMENT__TEXTLABEL = {
+  polish: 'Zarządzanie dostępem',
+  english: 'Access Management',
+};
+
+const NAVIGATIONGROUPMANAGEMENT__TEXTLABEL = {
+  polish: 'Zarządzanie grupami',
+  english: 'Group Management',
+};
+
+const NAVIGATIONSTATISTICS__TEXTLABEL = {
+  polish: 'Statystyki',
+  english: 'Statistics',
+};
+
+const NAVIGATIONORGANIZATIONS__TEXTLABEL = {
+  polish: 'Zarządzanie organizacjami',
+  english: 'Organization Management',
+};
+
+const NAVIGATIONPRODUCTIONLOGS__TEXTLABEL = {
+  polish: 'Logi produkcyjne',
+  english: 'Production Logs',
+};
+
+const SUBNAVIGATIONMAINPAGE__TEXTLABEL = {
+  polish: 'Strona główna',
+  english: 'Main Page',
+};
+
+const SUBNAVIGATIONMAINPAGESUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja strony głównej',
+  english: 'Main Page Navigation',
+};
+
+const SUBNAVIGATIONPROFILE__TEXTLABEL = {
+  polish: 'Profil',
+  english: 'Profile',
+};
+
+const SUBNAVIGATIONPROFILESUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja profilu',
+  english: 'Profile Navigation',
+};
+
+const SUBNAVIGATIONSTUDENTPROFILE__TEXTLABEL = {
+  polish: 'Profil uczestnika',
+  english: 'Student Profile',
+};
+
+const SUBNAVIGATIONSTUDENTPROFILESUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja profilu uczestnika',
+  english: 'Student Profile Navigation',
+};
+
+const SUBNAVIGATIONMEMBERS__TEXTLABEL = {
+  polish: 'Użytkownicy',
+  english: 'Users',
+};
+
+const SUBNAVIGATIONMEMBERSSUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja użytkowników',
+  english: 'Users Navigation',
+};
+
+const SUBNAVIGATIONACTIVITIES__TEXTLABEL = {
+  polish: 'Aktywności',
+  english: 'Activities',
+};
+
+const SUBNAVIGATIONACTIVITIESSUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja aktywności',
+  english: 'Activities Navigation',
+};
+
+const SUBNAVIGATIONREWARDS__TEXTLABEL = {
+  polish: 'Systemy nagród',
+  english: 'Rewards',
+};
+
+const SUBNAVIGATIONREWARDSSUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja systemów nagród',
+  english: 'Rewards Navigation',
+};
+
+const SUBNAVIGATIONSETTINGS__TEXTLABEL = {
+  polish: 'Ustawienia grupy',
+  english: 'Group Settings',
+};
+
+const SUBNAVIGATIONSETTINGSSUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja ustawień grupy',
+  english: 'Group Settings Navigation',
+};
+
+const SUBNAVIGATIONRANKING__TEXTLABEL = {
+  polish: 'Ranking',
+  english: 'Ranking',
+};
+
+const SUBNAVIGATIONRANKINGSUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja rankingu',
+  english: 'Ranking Navigation',
+};
+
+const SUBNAVIGATIONTEMPLATES__TEXTLABEL = {
+  polish: 'Szablony',
+  english: 'Templates',
+};
+
+const SUBNAVIGATIONTEMPLATESSUBTITLE__TEXTLABEL = {
+  polish: 'Nawigacja szablonów',
+  english: 'Templates Navigation',
+};
+
+const SUBNAVIGATIONINFORMATION__TEXTLABEL = {
+  polish: 'Twoje informacje',
+  english: 'Your Information',
+};
+
+const SUBNAVIGATIONGROUPRANKING__TEXTLABEL = {
+  polish: 'Ranking grupy',
+  english: 'Group Ranking',
+};
+
+const SUBNAVIGATIONACTIVITYRANKING__TEXTLABEL = {
+  polish: 'Ranking aktywności',
+  english: 'Activity Ranking',
+};
+
+const SUBNAVIGATIONGALLERY__TEXTLABEL = {
+  polish: 'Galeria szablonów',
+  english: 'Template Gallery',
+};
+
+const SUBNAVIGATIONMYTEMPLATES__TEXTLABEL = {
+  polish: 'Moje szablony',
+  english: 'My Templates',
+};
+
+const SUBNAVIGATIONACTIVITYLOG__TEXTLABEL = {
+  polish: 'Dziennik aktywności',
+  english: 'Activity Log',
+};
+
+const SUBNAVIGATIONEARNEDBADGES__TEXTLABEL = {
+  polish: 'Zdobyte odznaki',
+  english: 'Earned Badges',
+};
+
+const SUBNAVIGATIONINVENTORY__TEXTLABEL = {
+  polish: 'Ekwipunek',
+  english: 'Inventory',
+};
+
+const SUBNAVIGATIONPURCHASEHISTORY__TEXTLABEL = {
+  polish: 'Historia zakupów',
+  english: 'Purchase History',
+};
+
+const SUBNAVIGATIONMEMBERSLIST__TEXTLABEL = {
+  polish: 'Uczestnicy',
+  english: 'Members',
+};
+
+const SUBNAVIGATIONACCESSCODES__TEXTLABEL = {
+  polish: 'Kody dostępu',
+  english: 'Access Codes',
+};
+
+const SUBNAVIGATIONSTAGES__TEXTLABEL = {
+  polish: 'Etapy',
+  english: 'Stages',
+};
+
+const SUBNAVIGATIONPOSTS__TEXTLABEL = {
+  polish: 'Wpisy',
+  english: 'Posts',
+};
+
+const SUBNAVIGATIONREPORTS__TEXTLABEL = {
+  polish: 'Raporty',
+  english: 'Reports',
+};
+
+const SUBNAVIGATIONSHOPITEMS__TEXTLABEL = {
+  polish: 'Sklep',
+  english: 'Shop',
+};
+
+const SUBNAVIGATIONCREATOR__TEXTLABEL = {
+  polish: 'Edytor',
+  english: 'Editor',
+};
+
+const SUBNAVIGATIONCURRENCY__TEXTLABEL = {
+  polish: 'Waluta',
+  english: 'Currency',
+};
+
+const SUBNAVIGATIONLIVES__TEXTLABEL = {
+  polish: 'System żyć',
+  english: 'Lives',
+};
 
 export const APP_ROLE = {
   STUDENT: 'student',
@@ -26,10 +412,10 @@ export const APP_ROLE = {
 };
 
 export const ROLE_UI_LABEL = {
-  [APP_ROLE.STUDENT]: 'Student',
-  [APP_ROLE.LECTURER]: 'Prowadzący',
-  [APP_ROLE.ADMIN]: 'Administrator',
-  [APP_ROLE.SUPERADMIN]: 'Superadministrator',
+  [APP_ROLE.STUDENT]: STUDENT__TEXTLABEL[LANGUAGE],
+  [APP_ROLE.LECTURER]: LECTURER__TEXTLABEL[LANGUAGE],
+  [APP_ROLE.ADMIN]: ADMINISTRATOR__TEXTLABEL[LANGUAGE],
+  [APP_ROLE.SUPERADMIN]: SUPERADMINISTRATOR__TEXTLABEL[LANGUAGE],
 };
 
 /** Buduje href na podstawie kontekstu (groupId z URL). */
@@ -105,6 +491,7 @@ export const HREF_BUILDERS = {
   STATISTICS: () => paths.statisticsPath(),
   ORG_MANAGEMENT: () => paths.organizationsPath(),
   SYSTEM_LOGS: () => paths.superadminLogsPath(),
+
   TEMPLATES_MY: () => paths.templatesMyPath(),
   TEMPLATES_GALLERY: () => paths.templatesPath(),
 
@@ -122,7 +509,7 @@ const studentView = {
       id: 'twoje-kursy',
       enabled: true,
       kind: 'cta',
-      label: 'Twoje grupy',
+      label: YOURGROUPS__TEXTLABEL[LANGUAGE],
       hrefKey: 'GROUPS_LIST',
       requiresGroup: false,
       matchEnd: true,
@@ -133,7 +520,7 @@ const studentView = {
       id: 'strona-glowna',
       enabled: true,
       kind: 'navlink',
-      label: 'Strona Główna',
+      label: NAVIGATIONMAIN_PAGE__TEXTLABEL[LANGUAGE],
       iconId: 'nav/group-main',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
@@ -143,7 +530,7 @@ const studentView = {
       id: 'wpisy',
       enabled: true,
       kind: 'navlink',
-      label: 'Wpisy',
+      label: NAVIGATIONPOSTS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/posts',
       hrefKey: 'GROUP_STUDENT_FEED',
       requiresGroup: true,
@@ -153,7 +540,7 @@ const studentView = {
       id: 'profil',
       enabled: true,
       kind: 'tree-group',
-      label: 'Profil',
+      label: NAVIGATIONPROFILE__TEXTLABEL[LANGUAGE],
       iconId: 'nav/profile',
       requiresGroup: true,
       children: [
@@ -161,7 +548,7 @@ const studentView = {
           id: 'profil-aktywnosci',
           enabled: true,
           kind: 'tree-item',
-          label: 'Dziennik aktywności',
+          label: NAVIGATIONPROFILEACTIVITYLOG__TEXTLABEL[LANGUAGE],
           iconId: 'nav/activity',
           hrefKey: 'GROUP_PROFILE',
           requiresGroup: true,
@@ -171,7 +558,7 @@ const studentView = {
           id: 'profil-odznaki',
           enabled: true,
           kind: 'tree-item',
-          label: 'Zdobyte odznaki',
+          label: NAVIGATIONPROFILEBADGES__TEXTLABEL[LANGUAGE],
           iconId: 'nav/profile-badges',
           hrefKey: 'GROUP_PROFILE_LOG',
           requiresGroup: true,
@@ -181,7 +568,7 @@ const studentView = {
           id: 'profil-ekwipunek',
           enabled: true,
           kind: 'tree-item',
-          label: 'Ekwipunek',
+          label: NAVIGATIONPROFILEINVENTORY__TEXTLABEL[LANGUAGE],
           iconId: 'nav/profile-inventory',
           hrefKey: 'GROUP_PROFILE_EQ',
           requiresGroup: true,
@@ -191,7 +578,7 @@ const studentView = {
           id: 'profil-zakupy',
           enabled: true,
           kind: 'tree-item',
-          label: 'Historia zakupów',
+          label: NAVIGATIONPROFILEPURCHASES__TEXTLABEL[LANGUAGE],
           iconId: 'nav/shop',
           hrefKey: 'GROUP_PROFILE_PURCHASES',
           requiresGroup: true,
@@ -203,7 +590,7 @@ const studentView = {
       id: 'lista-aktywnosci',
       enabled: true,
       kind: 'navlink',
-      label: 'Lista aktywności',
+      label: NAVIGATIONACTIVITYLIST__TEXTLABEL[LANGUAGE],
       iconId: 'nav/activity',
       hrefKey: 'GROUP_STUDENT_ACTIVITY_LIST',
       requiresGroup: true,
@@ -213,7 +600,7 @@ const studentView = {
       id: 'odznaki',
       enabled: true,
       kind: 'navlink',
-      label: 'Odznaki',
+      label: NAVIGATIONBADGES__TEXTLABEL[LANGUAGE],
       iconId: 'nav/badges',
       hrefKey: 'GROUP_STUDENT_BADGES',
       requiresGroup: true,
@@ -223,7 +610,7 @@ const studentView = {
       id: 'rangi',
       enabled: true,
       kind: 'navlink',
-      label: 'Rangi',
+      label: NAVIGATIONRANKS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/ranks',
       hrefKey: 'GROUP_STUDENT_RANKS',
       requiresGroup: true,
@@ -233,7 +620,7 @@ const studentView = {
       id: 'sklep',
       enabled: true,
       kind: 'navlink',
-      label: 'Sklep',
+      label: NAVIGATIONSHOP__TEXTLABEL[LANGUAGE],
       iconId: 'nav/shop',
       hrefKey: 'GROUP_SHOP',
       requiresGroup: true,
@@ -248,7 +635,7 @@ const studentView = {
       id: 'uczestnicy',
       enabled: true,
       kind: 'navlink',
-      label: 'Uczestnicy',
+      label: NAVIGATIONPARTICIPANTS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/users',
       hrefKey: 'GROUP_STUDENT_PARTICIPANTS',
       requiresGroup: true,
@@ -268,12 +655,12 @@ const studentView = {
       id: 'ranking',
       enabled: true,
       kind: 'unavailable',
-      label: 'Ranking',
+      label: RANKINGUNAVAILABLE__TEXTLABEL[LANGUAGE],
       iconId: 'nav/ranking',
       hrefKey: 'GROUP_RANKING',
       requiresGroup: true,
       clickable: false,
-      hint: 'Ranking — funkcja w przygotowaniu.',
+      hint: RANKINGHINT__TEXTLABEL[LANGUAGE],
     },
   ],
   footerItems: [
@@ -281,7 +668,7 @@ const studentView = {
       id: 'ustawienia',
       enabled: true,
       kind: 'navlink',
-      label: 'Ustawienia',
+      label: NAVIGATIONSETTINGS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/settings',
       hrefKey: 'APP_SETTINGS',
       requiresGroup: false,
@@ -300,7 +687,7 @@ const lecturerView = {
       id: 'twoje-kursy',
       enabled: true,
       kind: 'cta',
-      label: 'Twoje grupy',
+      label: YOURGROUPS__TEXTLABEL[LANGUAGE],
       hrefKey: 'GROUPS_LIST',
       requiresGroup: false,
       matchEnd: true,
@@ -311,7 +698,7 @@ const lecturerView = {
       id: 'strona-glowna',
       enabled: true,
       kind: 'navlink',
-      label: 'Strona Główna',
+      label: NAVIGATIONMAIN_PAGE__TEXTLABEL[LANGUAGE],
       iconId: 'nav/group-main',
       hrefKey: 'GROUP_MAIN',
       requiresGroup: true,
@@ -321,7 +708,7 @@ const lecturerView = {
       id: 'uzytkownicy',
       enabled: true,
       kind: 'tree-group',
-      label: 'Użytkownicy',
+      label: NAVIGATIONUSERS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/users',
       requiresGroup: true,
       children: [
@@ -329,7 +716,7 @@ const lecturerView = {
           id: 'uzytkownicy-uczestnicy',
           enabled: true,
           kind: 'tree-item',
-          label: 'Uczestnicy',
+          label: NAVIGATIONMEMBERS__TEXTLABEL[LANGUAGE],
           iconId: 'nav/members',
           hrefKey: 'GROUP_MEMBERS',
           requiresGroup: true,
@@ -340,7 +727,7 @@ const lecturerView = {
           id: 'uzytkownicy-log',
           enabled: true,
           kind: 'tree-item',
-          label: 'Dziennik aktywności',
+          label: NAVIGATIONPROFILEACTIVITYLOG__TEXTLABEL[LANGUAGE],
           iconId: 'nav/activity',
           hrefKey: 'GROUP_MEMBERS_LOG',
           requiresGroup: true,
@@ -351,7 +738,7 @@ const lecturerView = {
           id: 'uzytkownicy-kody',
           enabled: true,
           kind: 'tree-item',
-          label: 'Kody dostępu',
+          label: NAVIGATIONACCESSCODES__TEXTLABEL[LANGUAGE],
           iconId: 'nav/access-codes',
           hrefKey: 'GROUP_MEMBERS_CODE',
           requiresGroup: true,
@@ -364,7 +751,7 @@ const lecturerView = {
       id: 'aktywnosci',
       enabled: true,
       kind: 'tree-group',
-      label: 'Aktywności',
+      label: NAVIGATIONACTIVITIES__TEXTLABEL[LANGUAGE],
       iconId: 'nav/activity',
       requiresGroup: true,
       children: [
@@ -372,7 +759,7 @@ const lecturerView = {
           id: 'aktywnosci-etapy',
           enabled: true,
           kind: 'tree-item',
-          label: 'Etapy',
+          label: NAVIGATIONSTAGES__TEXTLABEL[LANGUAGE],
           iconId: 'nav/activity',
           hrefKey: 'GROUP_ACTIVITIES',
           requiresGroup: true,
@@ -383,7 +770,7 @@ const lecturerView = {
           id: 'aktywnosci-wpisy',
           enabled: true,
           kind: 'tree-item',
-          label: 'Wpisy',
+          label: NAVIGATIONPOSTS__TEXTLABEL[LANGUAGE],
           iconId: 'nav/posts',
           hrefKey: 'GROUP_POSTS',
           requiresGroup: true,
@@ -394,7 +781,7 @@ const lecturerView = {
           id: 'aktywnosci-raporty',
           enabled: true,
           kind: 'tree-item',
-          label: 'Raporty',
+          label: NAVIGATIONREPORTS__TEXTLABEL[LANGUAGE],
           iconId: 'nav/reports',
           hrefKey: 'GROUP_ACTIVITIES_TOOLS',
           requiresGroup: true,
@@ -407,7 +794,7 @@ const lecturerView = {
       id: 'systemy-nagrod',
       enabled: true,
       kind: 'tree-group',
-      label: 'Systemy nagród',
+      label: NAVIGATIONREWARDS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/rewards',
       requiresGroup: true,
       children: [
@@ -415,7 +802,7 @@ const lecturerView = {
           id: 'nagrody-odznaki',
           enabled: true,
           kind: 'tree-item',
-          label: 'Odznaki',
+          label: NAVIGATIONREWARDSBADGES__TEXTLABEL[LANGUAGE],
           iconId: 'nav/badges',
           hrefKey: 'GROUP_REWARDS',
           requiresGroup: true,
@@ -426,7 +813,7 @@ const lecturerView = {
           id: 'nagrody-rangi',
           enabled: true,
           kind: 'tree-item',
-          label: 'Rangi',
+          label: NAVIGATIONREWARDSRANKS__TEXTLABEL[LANGUAGE],
           iconId: 'nav/ranks',
           hrefKey: 'GROUP_REWARDS_RANKS',
           requiresGroup: true,
@@ -437,7 +824,7 @@ const lecturerView = {
           id: 'nagrody-przedmioty',
           enabled: true,
           kind: 'tree-item',
-          label: 'Sklep',
+          label: NAVIGATIONREWARDSITEMS__TEXTLABEL[LANGUAGE],
           iconId: 'nav/shop',
           hrefKey: 'GROUP_SHOP_ITEMS',
           requiresGroup: true,
@@ -450,7 +837,7 @@ const lecturerView = {
       id: 'ustawienia-grupy',
       enabled: true,
       kind: 'tree-group',
-      label: 'Ustawienia grupy',
+      label: NAVIGATIONGROUPSETTINGS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/group-settings',
       requiresGroup: true,
       children: [
@@ -458,7 +845,7 @@ const lecturerView = {
           id: 'ustawienia-edytor',
           enabled: true,
           kind: 'tree-item',
-          label: 'Edytor',
+          label: NAVIGATIONEDITOR__TEXTLABEL[LANGUAGE],
           iconId: 'nav/group-settings',
           hrefKey: 'GROUP_SETTINGS',
           requiresGroup: true,
@@ -469,7 +856,7 @@ const lecturerView = {
           id: 'ustawienia-waluta',
           enabled: true,
           kind: 'tree-item',
-          label: 'Waluta',
+          label: NAVIGATIONCURRENCY__TEXTLABEL[LANGUAGE],
           iconId: 'nav/currency',
           hrefKey: 'GROUP_SETTINGS_CURRENCY',
           requiresGroup: true,
@@ -480,7 +867,7 @@ const lecturerView = {
           id: 'ustawienia-zycia',
           enabled: true,
           kind: 'tree-item',
-          label: 'System żyć',
+          label: NAVIGATIONLIVESSYSTEM__TEXTLABEL[LANGUAGE],
           iconId: 'nav/lives',
           hrefKey: 'GROUP_SETTINGS_HEALTH',
           requiresGroup: true,
@@ -503,12 +890,13 @@ const lecturerView = {
       id: 'ranking',
       enabled: true,
       kind: 'unavailable',
-      label: 'Ranking',
+      label: NAVIGATIONRANKING__TEXTLABEL[LANGUAGE],
       iconId: 'nav/ranking',
       hrefKey: 'GROUP_RANKING',
       requiresGroup: true,
       clickable: false,
-      hint: 'Ranking — funkcja w przygotowaniu.',
+
+      hint: RANKINGHINT__TEXTLABEL[LANGUAGE],
     },
   ],
   footerItems: [
@@ -516,7 +904,7 @@ const lecturerView = {
       id: 'ustawienia',
       enabled: true,
       kind: 'navlink',
-      label: 'Ustawienia',
+      label: NAVIGATIONSETTINGS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/settings',
       hrefKey: 'APP_SETTINGS',
       requiresGroup: false,
@@ -536,7 +924,7 @@ const adminView = {
       id: 'zarzadzanie-dostepem',
       enabled: true,
       kind: 'navlink',
-      label: 'Zarządzanie dostępem',
+      label: NAVIGATIONACCESSMANAGEMENT__TEXTLABEL[LANGUAGE],
       iconId: 'nav/users',
       hrefKey: 'USER_MANAGEMENT',
       requiresGroup: false,
@@ -545,7 +933,7 @@ const adminView = {
       id: 'zarzadzanie-kursami',
       enabled: true,
       kind: 'navlink',
-      label: 'Zarządzanie grupami',
+      label: NAVIGATIONGROUPMANAGEMENT__TEXTLABEL[LANGUAGE],
       iconId: 'nav/groups',
       hrefKey: 'COURSE_MANAGEMENT',
       requiresGroup: false,
@@ -554,7 +942,7 @@ const adminView = {
       id: 'statystyki',
       enabled: true,
       kind: 'navlink',
-      label: 'Statystyki',
+      label: NAVIGATIONSTATISTICS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/stats',
       hrefKey: 'STATISTICS',
       requiresGroup: false,
@@ -574,7 +962,7 @@ const superadminView = {
       id: 'zarzadzanie-organizacjami',
       enabled: true,
       kind: 'navlink',
-      label: 'Zarządzanie organizacjami',
+      label: NAVIGATIONORGANIZATIONS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/organization',
       hrefKey: 'ORG_MANAGEMENT',
       requiresGroup: false,
@@ -583,7 +971,7 @@ const superadminView = {
       id: 'statystyki',
       enabled: true,
       kind: 'navlink',
-      label: 'Statystyki',
+      label: NAVIGATIONSTATISTICS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/stats',
       hrefKey: 'STATISTICS',
       requiresGroup: false,
@@ -592,7 +980,7 @@ const superadminView = {
       id: 'logi-produkcyjne',
       enabled: true,
       kind: 'navlink',
-      label: 'Logi produkcyjne',
+      label: NAVIGATIONPRODUCTIONLOGS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/stats',
       hrefKey: 'SYSTEM_LOGS',
       requiresGroup: false,
@@ -625,15 +1013,15 @@ export const SHELL_TEMPLATE_BLUEPRINTS = {
  * Klucz = klucz z SUB_NAV_CONFIG.
  */
 export const SUB_NAV_META = {
-  'group-main': { title: 'Strona główna', ariaLabel: 'Nawigacja strony głównej' },
-  'group-profile': { title: 'Profil', ariaLabel: 'Nawigacja profilu' },
-  'group-student-profile': { title: 'Profil uczestnika', ariaLabel: 'Nawigacja profilu uczestnika' },
-  'group-members': { title: 'Użytkownicy', ariaLabel: 'Nawigacja użytkowników' },
-  'group-activities': { title: 'Aktywności', ariaLabel: 'Nawigacja aktywności' },
-  'group-rewards': { title: 'Systemy nagród', ariaLabel: 'Nawigacja systemów nagród' },
-  'group-settings': { title: 'Ustawienia grupy', ariaLabel: 'Nawigacja ustawień grupy' },
-  'group-ranking': { title: 'Ranking', ariaLabel: 'Nawigacja rankingu' },
-  'app-templates': { title: 'Szablony', ariaLabel: 'Nawigacja szablonów' },
+  'group-main': { title: SUBNAVIGATIONMAINPAGE__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONMAINPAGESUBTITLE__TEXTLABEL[LANGUAGE] },
+  'group-profile': { title: SUBNAVIGATIONPROFILE__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONPROFILESUBTITLE__TEXTLABEL[LANGUAGE] },
+  'group-student-profile': { title: SUBNAVIGATIONSTUDENTPROFILE__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONSTUDENTPROFILESUBTITLE__TEXTLABEL[LANGUAGE] },
+  'group-members': { title: SUBNAVIGATIONMEMBERS__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONMEMBERSSUBTITLE__TEXTLABEL[LANGUAGE] },
+  'group-activities': { title: SUBNAVIGATIONACTIVITIES__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONACTIVITIESSUBTITLE__TEXTLABEL[LANGUAGE] },
+  'group-rewards': { title: SUBNAVIGATIONREWARDS__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONREWARDSSUBTITLE__TEXTLABEL[LANGUAGE] },
+  'group-settings': { title: SUBNAVIGATIONSETTINGS__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONSETTINGSSUBTITLE__TEXTLABEL[LANGUAGE] },
+  'group-ranking': { title: SUBNAVIGATIONRANKING__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONRANKINGSUBTITLE__TEXTLABEL[LANGUAGE] },
+  'app-templates': { title: SUBNAVIGATIONTEMPLATES__TEXTLABEL[LANGUAGE], ariaLabel: SUBNAVIGATIONTEMPLATESSUBTITLE__TEXTLABEL[LANGUAGE] },
 };
 
 /**
@@ -643,62 +1031,62 @@ export const SUB_NAV_META = {
 export const SUB_NAV_CONFIG = {
   // Ekran główny (student + lecturer)
   'group-main': [
-    { id: 'home', label: 'Strona główna', hrefKey: 'GROUP_MAIN', end: true },
+    { id: 'home', label: SUBNAVIGATIONMAINPAGE__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MAIN', end: true },
   ],
 
   // Profil studenta
   'group-profile': [
-    { id: 'log', label: 'Dziennik aktywności', hrefKey: 'GROUP_PROFILE', end: true },
-    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_PROFILE_LOG', end: true },
-    { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_PROFILE_EQ', end: true },
-    { id: 'purchases', label: 'Historia zakupów', hrefKey: 'GROUP_PROFILE_PURCHASES', end: true },
+    { id: 'log', label: SUBNAVIGATIONACTIVITYLOG__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_PROFILE', end: true },
+    { id: 'badges', label: SUBNAVIGATIONEARNEDBADGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_PROFILE_LOG', end: true },
+    { id: 'eq', label: SUBNAVIGATIONINVENTORY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_PROFILE_EQ', end: true },
+    { id: 'purchases', label: SUBNAVIGATIONPURCHASEHISTORY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_PROFILE_PURCHASES', end: true },
   ],
 
   // Profil studenta (podgląd prowadzącego)
   'group-student-profile': [
-    { id: 'badges', label: 'Zdobyte odznaki', hrefKey: 'GROUP_STUDENT_PROFILE_BADGES', end: true },
-    { id: 'eq', label: 'Ekwipunek', hrefKey: 'GROUP_STUDENT_PROFILE_EQ', end: true },
-    { id: 'purchases', label: 'Historia zakupów', hrefKey: 'GROUP_STUDENT_PROFILE_PURCHASES', end: true },
+    { id: 'badges', label: SUBNAVIGATIONEARNEDBADGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_STUDENT_PROFILE_BADGES', end: true },
+    { id: 'eq', label: SUBNAVIGATIONINVENTORY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_STUDENT_PROFILE_EQ', end: true },
+    { id: 'purchases', label: SUBNAVIGATIONPURCHASEHISTORY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_STUDENT_PROFILE_PURCHASES', end: true },
   ],
 
   // Użytkownicy (lecturer)
   'group-members': [
-    { id: 'list', label: 'Uczestnicy', hrefKey: 'GROUP_MEMBERS', end: true },
-    { id: 'log', label: 'Dziennik aktywności', hrefKey: 'GROUP_MEMBERS_LOG', end: true },
-    { id: 'code', label: 'Kody dostępu', hrefKey: 'GROUP_MEMBERS_CODE', end: true },
+    { id: 'list', label: SUBNAVIGATIONMEMBERSLIST__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MEMBERS', end: true },
+    { id: 'log', label: SUBNAVIGATIONACTIVITYLOG__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MEMBERS_LOG', end: true },
+    { id: 'code', label: SUBNAVIGATIONACCESSCODES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MEMBERS_CODE', end: true },
   ],
 
   // Aktywności (lecturer)
   'group-activities': [
-    { id: 'stages', label: 'Etapy', hrefKey: 'GROUP_ACTIVITIES', end: true },
-    { id: 'posts', label: 'Wpisy', hrefKey: 'GROUP_POSTS', end: true },
-    { id: 'reports', label: 'Raporty', hrefKey: 'GROUP_ACTIVITIES_TOOLS', end: true },
+    { id: 'stages', label: SUBNAVIGATIONSTAGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_ACTIVITIES', end: true },
+    { id: 'posts', label: SUBNAVIGATIONPOSTS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_POSTS', end: true },
+    { id: 'reports', label: SUBNAVIGATIONREPORTS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_ACTIVITIES_TOOLS', end: true },
   ],
 
   // Systemy nagród (lecturer)
   'group-rewards': [
-    { id: 'badges', label: 'Odznaki', hrefKey: 'GROUP_REWARDS', end: true },
-    { id: 'ranks', label: 'Rangi', hrefKey: 'GROUP_REWARDS_RANKS', end: true },
-    { id: 'shop-items', label: 'Sklep', hrefKey: 'GROUP_SHOP_ITEMS', end: true },
+    { id: 'badges', label: SUBNAVIGATIONSHOPITEMS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS', end: true },
+    { id: 'ranks', label: SUBNAVIGATIONRANKING__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS_RANKS', end: true },
+    { id: 'shop-items', label: SUBNAVIGATIONSHOPITEMS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SHOP_ITEMS', end: true },
   ],
 
   // Ustawienia grupy (lecturer)
   'group-settings': [
-    { id: 'creator', label: 'Edytor', hrefKey: 'GROUP_SETTINGS', end: true },
-    { id: 'currency', label: 'Waluta', hrefKey: 'GROUP_SETTINGS_CURRENCY' },
-    { id: 'health', label: 'System żyć', hrefKey: 'GROUP_SETTINGS_HEALTH' },
+    { id: 'creator', label: SUBNAVIGATIONCREATOR__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SETTINGS', end: true },
+    { id: 'currency', label: SUBNAVIGATIONCURRENCY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SETTINGS_CURRENCY' },
+    { id: 'health', label: SUBNAVIGATIONLIVES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SETTINGS_HEALTH' },
   ],
 
   // Ranking (student + lecturer)
   'group-ranking': [
-    { id: 'info', label: 'Twoje informacje', hrefKey: 'GROUP_RANKING', end: true },
-    { id: 'group', label: 'Ranking grupy', hrefKey: 'GROUP_RANKING_GROUP' },
-    { id: 'activities', label: 'Ranking aktywności', hrefKey: 'GROUP_RANKING_ACTIVITIES' },
+    { id: 'info', label: SUBNAVIGATIONINFORMATION__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_RANKING', end: true },
+    { id: 'group', label: SUBNAVIGATIONGROUPRANKING__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_RANKING_GROUP' },
+    { id: 'activities', label: SUBNAVIGATIONACTIVITYRANKING__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_RANKING_ACTIVITIES' },
   ],
 
   'app-templates': [
-    { id: 'gallery', label: 'Galeria szablonów', hrefKey: 'TEMPLATES_GALLERY', end: true },
-    { id: 'mine', label: 'Moje szablony', hrefKey: 'TEMPLATES_MY', end: true },
+    { id: 'gallery', label: SUBNAVIGATIONGALLERY__TEXTLABEL[LANGUAGE], hrefKey: 'TEMPLATES_GALLERY', end: true },
+    { id: 'mine', label: SUBNAVIGATIONMYTEMPLATES__TEXTLABEL[LANGUAGE], hrefKey: 'TEMPLATES_MY', end: true },
   ],
 };
 
@@ -728,6 +1116,7 @@ export function buildSubNavItems(configKey, context) {
  * @param {{ groupId: string | null }} context
  */
 function resolveNavItem(item, context) {
+
   if (!item.enabled) {
     return null;
   }

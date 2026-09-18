@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   BADGE_RARITY,
-  BADGE_RARITY_LABELS,
   CatalogFilterGroup,
   CatalogFiltersPanel,
   CatalogFiltersToggle,
@@ -72,24 +71,24 @@ const TITLE__TEXTLABEL = {
   english: 'Badges'
 };
 
-const RARITY_FILTERS__TEXTLABEL = {
+const RARITYFILTERS__TEXTLABEL = {
   polish: [
     { id: 'all', label: 'Wszystkie' },
-    { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
-    { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
-    { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
-    { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
+    { id: BADGE_RARITY.common, label: 'Zwykła' },
+    { id: BADGE_RARITY.uncommon, label: 'Niezwykła' },
+    { id: BADGE_RARITY.rare, label: 'Rzadka' },
+    { id: BADGE_RARITY.epic, label: 'Epicka' },
   ],
   english: [
     { id: 'all', label: 'All' },
-    { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
-    { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
-    { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
-    { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
+    { id: BADGE_RARITY.common, label: 'Common' },
+    { id: BADGE_RARITY.uncommon, label: 'Uncommon' },
+    { id: BADGE_RARITY.rare, label: 'Rare' },
+    { id: BADGE_RARITY.epic, label: 'Epic' },
   ],
 };
 
-const UNLOCK_FILTERS__TEXTLABEL = {
+const UNLOCKFILTERS__TEXTLABEL = {
   polish: [
     { id: 'all', label: 'Wszystkie' },
     { id: 'earned', label: 'Odblokowane' },
@@ -136,6 +135,7 @@ export default function GroupMainBadgesContent({
     isLoading,
     error,
     isStudentView,
+
   } = useGroupMainBadges();
   const emptyLink = useGroupMainEmptyLink('badges', groupId);
 
@@ -221,7 +221,7 @@ export default function GroupMainBadgesContent({
             <div className="badge-treasury__filter-group-wrap badge-treasury__filter-group-wrap--rarity">
               <CatalogFilterGroup
                 ariaLabel={RARITYFILTERARIA__TEXTLABEL[LANGUAGE]}
-                filters={RARITY_FILTERS__TEXTLABEL[LANGUAGE]}
+                filters={RARITYFILTERS__TEXTLABEL[LANGUAGE]}
                 activeId={rarityFilter}
                 onSelect={setRarityFilter}
               />
@@ -235,7 +235,7 @@ export default function GroupMainBadgesContent({
             <div className="badge-treasury__filter-group-wrap badge-treasury__filter-group-wrap--unlock">
               <CatalogFilterGroup
                 ariaLabel={UNLOCKFILTERARIA__TEXTLABEL[LANGUAGE]}
-                filters={UNLOCK_FILTERS__TEXTLABEL[LANGUAGE]}
+                filters={UNLOCKFILTERS__TEXTLABEL[LANGUAGE]}
                 activeId={unlockFilter}
                 onSelect={setUnlockFilter}
               />

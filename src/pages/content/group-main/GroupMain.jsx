@@ -134,7 +134,7 @@ export default function App() {
         id: post.id,
         title: post.title ?? '',
         text: post.content ?? '',
-        publishedAt: post.publishedAt ?? post.createdAt ?? null,
+        createdAt: post.createdAt ?? null,
         editmode: 0,
       }));
 
@@ -465,8 +465,13 @@ export default function App() {
           [...tempPosts, ...posts].map((post) => {
             const canSavePost = isPostFormValid(post);
 
-            const publishedLabel = post.publishedAt
-              ? new Date(post.publishedAt).toLocaleString('pl-PL', {
+            let createdLocale = 'en-US';
+            if (LANGUAGE === 'polish') {
+              createdLocale = 'pl-PL';
+            }
+
+            const createdLabel = post.createdAt
+              ? new Date(post.createdAt).toLocaleString(createdLocale, {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
@@ -487,9 +492,9 @@ export default function App() {
                 dividerClassName="group-main-posts__card-divider"
                 textClassName="group-main-posts__card-text"
                 titleTag="h2"
-                trailing={publishedLabel ? (
-                  <time className="group-main-posts__published-at" dateTime={post.publishedAt}>
-                    {publishedLabel}
+                trailing={createdLabel ? (
+                  <time className="group-main-posts__published-at" dateTime={post.createdAt}>
+                    {createdLabel}
                   </time>
                 ) : null}
               />

@@ -255,8 +255,8 @@ export default function ActivitiesContent() {
         ),
         iconFile: (stageItem) => (
           stageItem?.visibilityStatus === 0
-            ? SVG_ICONS.actions.hide
-            : SVG_ICONS.actions.show
+            ? SVG_ICONS.actions.show
+            : SVG_ICONS.actions.hide
         ),
         ariaLabel: (stageItem) => (
           stageItem?.visibilityStatus === 0
@@ -305,8 +305,8 @@ export default function ActivitiesContent() {
         ),
         iconFile: ({ activity }) => (
           (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)
-            ? SVG_ICONS.actions.hide
-            : SVG_ICONS.actions.show
+            ? SVG_ICONS.actions.show
+            : SVG_ICONS.actions.hide
         ),
         ariaLabel: ({ activity }) => (
           (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)

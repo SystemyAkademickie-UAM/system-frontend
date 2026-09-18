@@ -1,4 +1,16 @@
 import './CatalogFilters.css';
+import { useState } from 'react';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+const TOGGLEBUTTON__TEXTLABEL = {
+  polish: 'Filtry i sortowanie',
+  english: 'Filters and sorting'
+};
+
+const SORT__TEXTLABEL = {
+  polish: 'Sortuj:',
+  english: 'Sort:'
+};
 
 /**
  * @param {Object} props
@@ -7,6 +19,8 @@ import './CatalogFilters.css';
  * @param {string} [props.className]
  */
 export function CatalogFiltersToggle({ expanded, onToggle, className = '' }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
   return (
     <button
       type="button"
@@ -18,7 +32,7 @@ export function CatalogFiltersToggle({ expanded, onToggle, className = '' }) {
       aria-expanded={expanded}
       onClick={onToggle}
     >
-      Filtry i sortowanie
+      {TOGGLEBUTTON__TEXTLABEL[LANGUAGE]}
     </button>
   );
 }
@@ -77,11 +91,15 @@ export function CatalogSortSelect({
   value,
   onChange,
   options,
-  label = 'Sortuj:',
+  label = undefined,
   className = '',
   variant = 'panel',
   selectId,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+  const SORTLABEL = label ?? SORT__TEXTLABEL[LANGUAGE];
+
   return (
     <label
       className={[
@@ -90,7 +108,7 @@ export function CatalogSortSelect({
         className,
       ].filter(Boolean).join(' ')}
     >
-      <span className="catalog-filters__sort-label">{label}</span>
+      <span className="catalog-filters__sort-label">{SORTLABEL}</span>
       <select
         id={selectId}
         className="catalog-filters__sort-select"

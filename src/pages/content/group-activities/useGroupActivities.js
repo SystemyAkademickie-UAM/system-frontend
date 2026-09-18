@@ -484,20 +484,24 @@ export function useGroupActivities() {
   }, [fetchActivitiesForStage, showSuccess, showError]);
 
   const toggleActivityVisibility = useCallback(async (stageId, activityId) => {
-    let nextVisibility = 1;
+    let calculatedVisibility = 1;
     setStages((prev) => prev.map((stage) => {
       if (stage.id !== stageId) return stage;
       return {
         ...stage,
         activities: stage.activities.map((act) => {
           if (act.id !== activityId) return act;
-          const isCurrentlyVisible = act.isVisible !== false && act.isPublished !== false && act.visibilityStatus !== 0;
-          nextVisibility = isCurrentlyVisible ? 0 : 1;
-          const isVisible = nextVisibility === 1;
+          var isCurrentlyVisible = act.isVisible !== false && act.isPublished !== false && act.visibilityStatus !== 0;
+          if (isCurrentlyVisible) {
+            calculatedVisibility = 0;
+          } else {
+            calculatedVisibility = 1;
+          }
+          var isVisible = calculatedVisibility === 1;
           return {
             ...act,
             isVisible,
-            visibilityStatus: nextVisibility,
+            visibilityStatus: calculatedVisibility,
             isPublished: isVisible,
           };
         }),
@@ -508,22 +512,21 @@ export function useGroupActivities() {
       await postJson('/activities', {
         method: 'modify',
         activityId,
-        isVisible: nextVisibility === 1,
-        visibilityStatus: nextVisibility,
-        isPublished: nextVisibility === 1,
+        isVisible: calculatedVisibility === 1,
+        visibilityStatus: calculatedVisibility,
+        isPublished: calculatedVisibility === 1,
       });
-      await fetchActivitiesForStage(stageId);
     } catch {
       await fetchActivitiesForStage(stageId);
     }
 
     showSuccess(
-      nextVisibility === 1
+      calculatedVisibility === 1
         ? (LANGUAGE === 'polish' ? 'Aktywność jest teraz widoczna dla studentów.' : 'Activity is now visible to students.')
         : (LANGUAGE === 'polish' ? 'Aktywność została ukryta dla studentów.' : 'Activity has been hidden from students.')
     );
     return { ok: true };
-  }, [LANGUAGE, fetchActivitiesForStage, showSuccess]);
+  }, [LANGUAGE, showSuccess]);
 
   return {
     stages,

@@ -10,6 +10,7 @@ import ProductCategoryStrip from '../ProductCategoryStrip/ProductCategoryStrip.j
 
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { parseShopItemImageRef } from '../../../utils/shop/shopItemIcon.js';
 import { resolveExtraLifeItemIcon } from '../../../utils/shop/extraLifeItem.js';
 import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
@@ -20,6 +21,76 @@ import { getTileVisibilityLabel } from '../../../utils/rewards/visibilityStatusL
 import './ProductCard.css';
 import './lecturerTileActions.css';
 
+const PRICEPREVIOUSLY__TEXTLABEL = {
+  polish: 'Cena ${price}, poprzednio ${oldPrice}',
+  english: 'Price ${price}, previously ${oldPrice}'
+};
+
+const DEFAULTBUY__TEXTLABEL = {
+  polish: 'Kup teraz',
+  english: 'Buy now'
+};
+
+const DEFAULTADDTOCART__TEXTLABEL = {
+  polish: 'Do koszyka',
+  english: 'Add to cart'
+};
+
+const DEFAULTLOCKEDREASON__TEXTLABEL = {
+  polish: 'Wymaga wyższej rangi, aby odblokować ten przedmiot.',
+  english: 'Requires a higher rank to unlock this item.'
+};
+
+const EDITBUTTON__TEXTLABEL = {
+  polish: 'Edytuj produkt ${name}',
+  english: 'Edit product ${name}'
+};
+
+const DELETEBUTTON__TEXTLABEL = {
+  polish: 'Usuń produkt ${name}',
+  english: 'Delete product ${name}'
+};
+
+const STORYDESCRIPTION__TEXTLABEL = {
+  polish: 'Opis fabularny',
+  english: 'Story description'
+};
+
+const DIDACTICDESCRIPTION__TEXTLABEL = {
+  polish: 'Opis dydaktyczny',
+  english: 'Didactic description'
+};
+
+const USEDITEM__TEXTLABEL = {
+  polish: 'Przedmiot zużyty',
+  english: 'Item used'
+};
+
+const PRICE__TEXTLABEL = {
+  polish: 'Cena',
+  english: 'Price'
+};
+
+const OWNEDCOUNT__TEXTLABEL = {
+  polish: 'Posiadane sztuki',
+  english: 'Owned quantity'
+};
+
+const USEBUTTON__TEXTLABEL = {
+  polish: 'Użyj',
+  english: 'Use'
+};
+
+const MINPRICE__TEXTLABEL = {
+  polish: 'Cena min.',
+  english: 'Min. price'
+};
+
+const INCART__TEXTLABEL = {
+  polish: 'W koszyku',
+  english: 'In cart'
+};
+
 
 
 function ProductCardPrice({
@@ -29,6 +100,7 @@ function ProductCardPrice({
   appliedDiscounts,
   priceEmoji,
   size = 'md',
+  language,
 }) {
   const display = getShopItemPriceDisplay({
     priceAmount,
@@ -44,7 +116,7 @@ function ProductCardPrice({
     return (
       <div
         className="maq-product-card__price-row"
-        aria-label={`Cena ${display.displayPrice}, poprzednio ${display.strikePrice}`}
+        aria-label={PRICEPREVIOUSLY__TEXTLABEL[language].replace('${price}', display.displayPrice).replace('${oldPrice}', display.strikePrice)}
       >
         {strikeHint ? (
           <InfoTooltip
@@ -255,15 +327,15 @@ export default function ProductCard({
 
   hideActions = false,
 
-  buyLabel = 'Kup teraz',
+  buyLabel = null,
 
-  addToCartLabel = 'Do koszyka',
+  addToCartLabel = null,
 
   disabled = false,
 
   isRankLocked = false,
 
-  lockedReason = 'Wymaga wyższej rangi, aby odblokować ten przedmiot.',
+  lockedReason = null,
 
   isInCart = false,
 
@@ -291,6 +363,7 @@ export default function ProductCard({
 
 }) {
 
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { symbol: livesSymbol } = useGroupLives();
 
   const showLecturerTile = showLecturerActions && isPublished !== undefined;
@@ -361,7 +434,7 @@ export default function ProductCard({
         .join(' ')}
 
       style={cardStyle}
-      title={isRankLocked ? lockedReason : undefined}
+      title={isRankLocked ? (lockedReason ?? DEFAULTLOCKEDREASON__TEXTLABEL[LANGUAGE]) : undefined}
       onDoubleClick={() => onDoubleClick() }
 
 
@@ -426,7 +499,7 @@ export default function ProductCard({
 
                 className="maq-product-card__action-btn"
 
-                aria-label={`Edytuj produkt ${name}`}
+                aria-label={EDITBUTTON__TEXTLABEL[LANGUAGE].replace('${name}', name)}
 
                 onClick={(event) => {
 
@@ -450,7 +523,7 @@ export default function ProductCard({
 
                 className="maq-product-card__action-btn maq-product-card__action-btn--danger"
 
-                aria-label={`Usuń produkt ${name}`}
+                aria-label={DELETEBUTTON__TEXTLABEL[LANGUAGE].replace('${name}', name)}
 
                 onClick={(event) => {
 
@@ -492,7 +565,7 @@ export default function ProductCard({
           <div className="maq-product-card__descriptions">
             {(storyDescription || !isPreview) ? (
               <div className="maq-product-card__section">
-                <span className="maq-product-card__section-label">Opis fabularny</span>
+                <span className="maq-product-card__section-label">{STORYDESCRIPTION__TEXTLABEL[LANGUAGE]}</span>
                 <p
                   className="maq-product-card__story-text"
                   title={isPreview ? undefined : storyDescription || undefined}
@@ -504,7 +577,7 @@ export default function ProductCard({
 
             {(didacticDescription || !isPreview) ? (
               <div className="maq-product-card__section">
-                <span className="maq-product-card__section-label">Opis dydaktyczny</span>
+                <span className="maq-product-card__section-label">{DIDACTICDESCRIPTION__TEXTLABEL[LANGUAGE]}</span>
                 <p
                   className="maq-product-card__didactic-text"
                   title={isPreview ? undefined : didacticDescription || undefined}
@@ -526,15 +599,16 @@ export default function ProductCard({
 
           {isUsed ? (
             <div className="maq-product-card__price-bar">
-              <span className="maq-product-card__section-label">{dateLabel || 'Przedmiot zużyty'}</span>
+              <span className="maq-product-card__section-label">{dateLabel || USEDITEM__TEXTLABEL[LANGUAGE]}</span>
             </div>
           ) : isPurchasedHistory ? (
             <>
               <div className="maq-product-card__price-bar">
-                <span className="maq-product-card__section-label">Cena</span>
+                <span className="maq-product-card__section-label">{PRICE__TEXTLABEL[LANGUAGE]}</span>
                 <ProductCardPrice
                   priceAmount={priceAmount}
                   priceEmoji={priceEmoji}
+                  language={LANGUAGE}
                 />
               </div>
               {dateLabel ? (
@@ -546,7 +620,7 @@ export default function ProductCard({
           ) : isInventory ? (
             <>
               <div className="maq-product-card__price-bar">
-                <span className="maq-product-card__section-label">Posiadane sztuki</span>
+                <span className="maq-product-card__section-label">{OWNEDCOUNT__TEXTLABEL[LANGUAGE]}</span>
                 <span className="maq-product-card__owned-count">{ownedQuantity}</span>
               </div>
 
@@ -560,7 +634,7 @@ export default function ProductCard({
                     onClick={onUse}
                     className="maq-product-card__buy-btn"
                   >
-                    Użyj
+                    {USEBUTTON__TEXTLABEL[LANGUAGE]}
                   </Button>
                 </div>
               ) : null}
@@ -569,7 +643,7 @@ export default function ProductCard({
             <>
           <div className="maq-product-card__price-bar">
 
-            <span className="maq-product-card__section-label">Cena</span>
+            <span className="maq-product-card__section-label">{PRICE__TEXTLABEL[LANGUAGE]}</span>
 
             <ProductCardPrice
 
@@ -583,13 +657,15 @@ export default function ProductCard({
 
               priceEmoji={priceEmoji}
 
+              language={LANGUAGE}
+
             />
 
           </div>
 
           {showLecturerActions && minPrice != null && Number(minPrice) > 0 ? (
             <div className="maq-product-card__min-price-bar">
-              <span className="maq-product-card__section-label">Cena min.</span>
+              <span className="maq-product-card__section-label">{MINPRICE__TEXTLABEL[LANGUAGE]}</span>
               <CurrencyDisplay
                 amount={Number(minPrice)}
                 symbol={priceEmoji}
@@ -623,7 +699,7 @@ export default function ProductCard({
 
                 >
 
-                  {isInCart ? 'W koszyku' : addToCartLabel}
+                  {isInCart ? INCART__TEXTLABEL[LANGUAGE] : (addToCartLabel ?? DEFAULTADDTOCART__TEXTLABEL[LANGUAGE])}
 
                 </Button>
 
@@ -647,7 +723,7 @@ export default function ProductCard({
 
               >
 
-                {buyLabel}
+                {buyLabel ?? DEFAULTBUY__TEXTLABEL[LANGUAGE]}
 
               </Button>
 

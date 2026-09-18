@@ -5,7 +5,7 @@ import {
 } from '../../../constants/authLegalDocuments.constants.js';
 import {
   THEME_MODE,
-  THEME_OPTIONS,
+  getThemeOptions,
   applyTheme,
   getSavedTheme,
 } from '../../../services/themeService.js';
@@ -126,7 +126,7 @@ export default function RegisterEula({
           {THEME_SECTION__TEXTLABEL[LANGUAGE]}
         </p>
         <div className="register-eula__theme-options" role="radiogroup" aria-label={THEME_SECTION__TEXTLABEL[LANGUAGE]}>
-          {THEME_OPTIONS.map((option) => {
+          {getThemeOptions().map((option) => {
             const isSelected = selectedTheme === option.id;
             return (
               <label
