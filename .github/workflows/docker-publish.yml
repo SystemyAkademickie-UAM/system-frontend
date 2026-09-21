@@ -29,6 +29,7 @@ jobs:
         with:
           context: .
           push: true
+          no-cache: true
           # Empty ARG: SPA uses location.origin + /api so one image serves WMI and playground.
           # Leave vars.VITE_API_BASE_URL unset. A set value pins a single host and breaks the other.
           build-args: |
