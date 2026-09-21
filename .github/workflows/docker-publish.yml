@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - production
+  workflow_dispatch:
 
 jobs:
   build-and-push:
@@ -28,8 +29,10 @@ jobs:
         with:
           context: .
           push: true
+          # Empty ARG: SPA uses location.origin + /api so one image serves WMI and playground.
+          # Leave vars.VITE_API_BASE_URL unset. A set value pins a single host and breaks the other.
           build-args: |
-            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL || 'https://maq.projektstudencki.pl/api' }}
+            VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
           tags: |
             ghcr.io/systemyakademickie-uam/system-frontend:latest
             ghcr.io/systemyakademickie-uam/system-frontend:production
