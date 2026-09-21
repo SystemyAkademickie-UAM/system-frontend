@@ -12,6 +12,8 @@
  */
 
 :root {
+  --color-bg-svg: #1A1A2A;
+  --color-bg-icon: #282834;
   /* --- Tła --- */
   /** Główne tło aplikacji (obszar treści) */
   --color-bg-app: #282834;
@@ -55,7 +57,7 @@
   --color-text-primary: #d9d9d9;
   /** Dodatkowy / pomocniczy tekst */
   --color-text-secondary: #BBCBB9;
-
+  --colour-text-other: #e3e0f7;
   /* --- Akcent / przyciski --- */
   /** Kolor przycisku i akcentów interaktywnych */
   --color-accent: #1ecc38;
@@ -271,13 +273,15 @@
    ============================================= */
 
 [data-theme="light"] {
+  --color-bg-svg: #E5E5D5;
+  --color-bg-icon: #D7D7CB;
   /* --- Tła (Natural Warm-Stone & Clean Surfaces) --- */
   /** Główne tło aplikacji (obszar treści) */
-  --color-bg-app: #f2f1eb;
+  --color-bg-app: #ffffff;
   /** Wyróżnienie na tle — karty, panele, sekcje */
-  --color-bg-surface: #ffffff;
+  --color-bg-surface: #e8e6dc;
   /** Podniesiona powierzchnia (np. kafelki wewnątrz karty, toolbary) */
-  --color-bg-elevated: #e8e6dc;
+  --color-bg-elevated: #f2f1eb;
 
   /** Linie rozdzielające */
   --color-divider: #dad8cc;
@@ -313,7 +317,8 @@
   --color-text-primary: #1a201c;
   /** Dodatkowy / pomocniczy tekst */
   --color-text-secondary: #566158;
-
+  --color-text-muted: #566158;
+  --colour-text-other: #1C1F08;
   /* --- Akcent / przyciski --- */
   /** Kolor przycisku i akcentów interaktywnych */
   --color-accent: #16a34a;
@@ -458,7 +463,7 @@
 
   --shadow-nav-sidebar: 6px 0 24px rgba(0, 0, 0, 0.08);
   --shadow-superbar: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-stat-badge: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-stat-badge: 0 2px 4px rgba(0, 0, 0, 0.6);
 
   --shell-sidebar-scrollbar-width: 10px;
   --shell-sidebar-width: calc(224px + var(--shell-sidebar-scrollbar-width));
