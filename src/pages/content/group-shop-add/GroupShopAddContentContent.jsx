@@ -109,7 +109,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   // Stany formularza - Krok 1 (Informacje)
   const [itemName, setItemName] = useState('');
   const [currentIcon, setCurrentIcon] = useState('🥕');
-  const [iconBackground, setIconBackground] = useState('rgb(40,40,52)');
+  const [iconBackground, setIconBackground] = useState('var(--color-bg-icon');
   const [isEditingExtraLife, setIsEditingExtraLife] = useState(false);
   const [storyDescription, setStoryDescription] = useState('');
   const [didacticDescription, setDidacticDescription] = useState('');
@@ -386,6 +386,9 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       if (editFormHydratedRef.current === editingItemId) return;
       editFormHydratedRef.current = editingItemId;
 
+      let loadedIcon = '🥕';
+      let loadedIconBg = 'var(--color-bg-icon';
+
       if (item.isExtraLife === true) {
         setIsEditingExtraLife(true);
         const resolved = resolveExtraLifeItemIcon(livesSymbol);
@@ -394,8 +397,8 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       } else {
         setIsEditingExtraLife(false);
         const imageParts = String(item.imageRef ?? '').split('*');
-        const loadedIcon = imageParts[0] || '🥕';
-        const loadedIconBg = imageParts[1] || 'rgb(40,40,52)';
+        loadedIcon = imageParts[0] || '🥕';
+        loadedIconBg = imageParts[1] || 'rgb(40,40,52)';
         if (imageParts[0]) setCurrentIcon(imageParts[0]);
         if (imageParts[1]) setIconBackground(imageParts[1]);
       }

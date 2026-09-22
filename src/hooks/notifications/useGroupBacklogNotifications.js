@@ -117,8 +117,8 @@ export function useGroupBacklogNotifications(groupId, {
   }, [groupId, pollMs, refetch]);
 
   const notifications = useMemo(
-    () => items.map((item) => formatBacklogNotification(groupId, item, isStudentView)),
-    [groupId, isStudentView, items],
+    () => items.map((item) => formatBacklogNotification(groupId, item, isStudentView, LANGUAGE)),
+    [groupId, isStudentView, items, LANGUAGE],
   );
 
   const applySyncEvent = useCallback((event) => {
