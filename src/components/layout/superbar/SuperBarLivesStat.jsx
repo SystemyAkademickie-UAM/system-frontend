@@ -3,17 +3,33 @@ import { createPortal } from 'react-dom';
 import LivesIcon from '../../ui/Lives/LivesIcon.jsx';
 import SuperBarStatBadge from './SuperBarStatBadge.jsx';
 import { positionCenteredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBar.css';
 
 /**
  * @param {number | null} livesMax
  * @returns {string}
  */
-function formatLivesMaxLabel(livesMax) {
+const MAXLABELNOLIMIT__TEXTLABEL = {
+  polish: 'Bez limitu',
+  english: 'No limit',
+};
+
+const MAXLABELPREFIX__TEXTLABEL = {
+  polish: 'Maksymalnie:',
+  english: 'Maximum:',
+};
+
+const SHOPDETAIL__TEXTLABEL = {
+  polish: 'Można kupić w sklepie',
+  english: 'Can be bought in the shop',
+};
+
+function formatLivesMaxLabel(livesMax, language) {
   if (livesMax == null || Number.isNaN(Number(livesMax))) {
-    return 'Bez limitu';
+    return MAXLABELNOLIMIT__TEXTLABEL[language];
   }
-  return `Maksymalnie: ${Number(livesMax)}`;
+  return `${MAXLABELPREFIX__TEXTLABEL[language]} ${Number(livesMax)}`;
 }
 
 /**
@@ -26,6 +42,7 @@ export default function SuperBarLivesStat({
   livesShopEnabled = false,
   ariaLabel,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -103,9 +120,9 @@ export default function SuperBarLivesStat({
             aria-hidden="true"
           >
             <p className="super-bar-stat-preview__title">{livesLabel}</p>
-            <p className="super-bar-stat-preview__label">{formatLivesMaxLabel(livesMax)}</p>
+            <p className="super-bar-stat-preview__label">{formatLivesMaxLabel(livesMax, LANGUAGE)}</p>
             {livesShopEnabled ? (
-              <p className="super-bar-stat-preview__detail">Można kupić w sklepie</p>
+              <p className="super-bar-stat-preview__detail">{SHOPDETAIL__TEXTLABEL[LANGUAGE]}</p>
             ) : null}
           </div>,
           document.body,

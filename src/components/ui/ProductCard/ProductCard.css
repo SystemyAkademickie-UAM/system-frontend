@@ -542,7 +542,7 @@
 
   border-radius: 9999px;
 
-  background: rgba(26, 26, 42, 0.88);
+  background: var(--color-bg-svg);
 
   color: var(--color-text-primary);
 

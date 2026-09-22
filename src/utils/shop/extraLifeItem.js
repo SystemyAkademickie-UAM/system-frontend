@@ -2,11 +2,21 @@
 
 import { DEFAULT_LIVES_SYMBOL } from '../../constants/lives.constants.js';
 
+export const EXTRA_LIFE_ITEM_NAME__TEXTLABEL = {
+  polish: 'Dodatkowe życie',
+  english: 'Extra Life'
+};
+
+export const EXTRA_LIFE_ICON_EDIT_TOOLTIP__TEXTLABEL = {
+  polish: 'Ikona jest zależna od ikony systemu żyć w grupie. Aby ją zmienić, przejdź do: Ustawienia grupy -> System żyć.',
+  english: 'Icon depends on the group\'s lives system icon. To change it, go to: Group Settings -> Lives System.'
+};
+
 export const EXTRA_LIFE_ITEM_NAME = 'Dodatkowe życie';
 
 export const EXTRA_LIFE_ICON_EDIT_TOOLTIP = 'Ikona jest zależna od ikony systemu żyć w grupie. Aby ją zmienić, przejdź do: Ustawienia grupy -> System żyć.';
 
-const EXTRA_LIFE_ICON_BACKGROUND = 'rgb(40, 40, 52)';
+const EXTRA_LIFE_ICON_BACKGROUND = '--color-bg-icon';
 
 /**
  * Ikona kafelka „Dodatkowe życie” — zawsze emoji systemu żyć grupy.

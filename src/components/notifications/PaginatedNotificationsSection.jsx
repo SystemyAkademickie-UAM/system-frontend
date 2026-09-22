@@ -10,51 +10,52 @@ import { BACKLOG_LIST_POLL_MS } from '../../constants/backlogNotifications.const
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './PaginatedNotificationsSection.css';
 
-
-
 export const NOTIFICATIONS_PAGE_SIZE = 10;
 
-
-
 const MARKALLREAD__TEXTLABEL = {
-
   polish: 'Oznacz wszystkie jako przeczytane',
-
   english: 'Mark all as read',
-
 };
-
-
 
 const CLEARALL__TEXTLABEL = {
-
   polish: 'Wyczyść powiadomienia',
-
   english: 'Clear notifications',
-
 };
 
-
-
-const CLEARPARTIAL__TEXTLABEL = {
-
+const CLEARPART__TEXTLABEL = {
   polish: 'Wyczyść (oprócz użyć przedmiotów)',
-
   english: 'Clear (except item uses)',
-
 };
 
-
-
-const PAG__TEXTLABEL = {
-
+const PAGINATION__TEXTLABEL = {
   polish: 'Paginacja powiadomień',
-
   english: 'Notifications pagination',
-
 };
 
+const UNABLETOCLEAR__TEXTLABEL = {
+  polish: 'Nie udało się wyczyścić powiadomień.',
+  english: 'Failed to clear notifications.',
+};
 
+const NONOTIFICATIONSCLEAR__TEXTLABEL = {
+  polish: 'Brak powiadomień do wyczyszczenia.',
+  english: 'No notifications to clear.',
+};
+
+const CLEAREXCEPT__TEXTLABEL = {
+  polish: 'Usunięto powiadomienia oprócz użyć przedmiotów.',
+  english: 'Deleted notifications except item uses.',
+};
+
+const CLEARSUCCESS__TEXTLABEL = {
+  polish: 'Powiadomienia zostały wyczyszczone.',
+  english: 'Notifications have been cleared.',
+};
+
+const MOREOPTIONSLABEL__TEXTLABEL = {
+  polish: 'Więcej opcji',
+  english: 'More options',
+};
 
 /**
 
@@ -206,16 +207,16 @@ export default function PaginatedNotificationsSection({
     setIsClearing(false);
 
     if (!result.ok) {
-      showError(result.error ?? 'Nie udało się wyczyścić powiadomień.');
+      showError(result.error ?? UNABLETOCLEAR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
     if (result.deleted === 0) {
-      showSuccess('Brak powiadomień do wyczyszczenia.');
+      showSuccess(NONOTIFICATIONSCLEAR__TEXTLABEL[LANGUAGE]);
     } else if (confirmClearMode === 'exceptItemUses') {
-      showSuccess('Usunięto powiadomienia oprócz użyć przedmiotów.');
+      showSuccess(CLEAREXCEPT__TEXTLABEL[LANGUAGE]);
     } else {
-      showSuccess('Powiadomienia zostały wyczyszczone.');
+      showSuccess(CLEARSUCCESS__TEXTLABEL[LANGUAGE]);
     }
 
     setConfirmClearMode(null);
@@ -266,8 +267,8 @@ export default function PaginatedNotificationsSection({
                 variant="secondary"
                 size="sm"
                 className="paginated-notifications__more-btn"
-                aria-label="Więcej opcji"
-                title="Więcej opcji"
+                aria-label={MOREOPTIONSLABEL__TEXTLABEL[LANGUAGE]}
+                title={MOREOPTIONSLABEL__TEXTLABEL[LANGUAGE]}
                 disabled={isLoading || totalCount === 0}
                 onClick={() => setIsMenuOpen((prev) => !prev)}
               >
@@ -292,7 +293,7 @@ export default function PaginatedNotificationsSection({
                         setConfirmClearMode('exceptItemUses');
                       }}
                     >
-                      {CLEARPARTIAL__TEXTLABEL[LANGUAGE]}
+                      {CLEARPART__TEXTLABEL[LANGUAGE]}
                     </button>
                   ) : null}
                   <button
@@ -351,7 +352,7 @@ export default function PaginatedNotificationsSection({
 
               onPageChange={handlePageChange}
 
-              ariaLabel={PAG__TEXTLABEL[LANGUAGE]}
+              ariaLabel={PAGINATION__TEXTLABEL[LANGUAGE]}
 
             />
 

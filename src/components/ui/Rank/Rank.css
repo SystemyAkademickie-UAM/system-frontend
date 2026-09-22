@@ -100,7 +100,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 23px;
-  color: #bbcbb9;
+  color: var(--color-text-secondary);
 }
 
 .maq-rank__text--empty {
@@ -125,7 +125,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
-  color: #bbcbb9;
+  color: var(--color-text-secondary);
 }
 
 .maq-rank__shop-item--discount {

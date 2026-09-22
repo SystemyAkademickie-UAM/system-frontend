@@ -4,17 +4,24 @@ import CurrencyDisplay from '../../ui/Currency/CurrencyDisplay.jsx';
 import { CurrencyIcon } from '../../ui/Currency/CurrencyDisplay.jsx';
 import SuperBarStatBadge from './SuperBarStatBadge.jsx';
 import { positionCenteredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBar.css';
 
 /**
  * Statystyka waluty z podglądem zgromadzonej kwoty po najechaniu (jak mini odznaka).
  */
+const TOTALCURRENCYSHOW__TEXTLABEL = {
+  polish: 'Zgromadzono',
+  english: 'Total',
+};
+
 export default function SuperBarCurrencyStat({
   currentAmount,
   totalEarned,
   currencyLabel = 'Waluta',
   ariaLabel,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -92,7 +99,7 @@ export default function SuperBarCurrencyStat({
             aria-hidden="true"
           >
             <p className="super-bar-stat-preview__title">{currencyLabel}</p>
-            <p className="super-bar-stat-preview__label">Zgromadzona</p>
+            <p className="super-bar-stat-preview__label">{TOTALCURRENCYSHOW__TEXTLABEL[LANGUAGE]}</p>
             <CurrencyDisplay amount={totalEarned} size="md" className="super-bar-stat-preview__value" />
           </div>,
           document.body,

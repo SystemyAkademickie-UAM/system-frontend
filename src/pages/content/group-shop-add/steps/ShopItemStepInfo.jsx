@@ -3,7 +3,7 @@ import { CharacterLimitedField, ColorPickerField, InfoTooltip, useToast } from '
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
 import LivesIcon from '../../../../components/ui/Lives/LivesIcon.jsx';
 import { NAME_MAX_LENGTH, SHORT_DESCRIPTION_MAX_LENGTH, ITEM_CATEGORY_NAME_MAX_LENGTH } from '../../../../constants/fieldLimits.js';
-import { EXTRA_LIFE_ICON_EDIT_TOOLTIP } from '../../../../utils/shop/extraLifeItem.js';
+import { EXTRA_LIFE_ICON_EDIT_TOOLTIP__TEXTLABEL } from '../../../../utils/shop/extraLifeItem.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 
 const ITEMNAMELABEL__TEXTLABEL = {
@@ -183,11 +183,11 @@ export default function ShopItemStepInfo({
         <div className="shop-item-step-info__icon-col">
           <span className="shop-item-form__label">
             {ITEMICONLABEL__TEXTLABEL[LANGUAGE]}
-            {isEditingExtraLife ? <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP} /> : null}
+            {isEditingExtraLife ? <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP__TEXTLABEL[LANGUAGE]} /> : null}
           </span>
           <div className="shop-item-step-info__icon-box">
             {isEditingExtraLife ? (
-              <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP}>
+              <InfoTooltip text={EXTRA_LIFE_ICON_EDIT_TOOLTIP__TEXTLABEL[LANGUAGE]}>
                 <div
                   className="shop-item-form__icon-locked"
                   aria-disabled="true"

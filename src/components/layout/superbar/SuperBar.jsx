@@ -11,13 +11,34 @@ import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { groupsListPath } from '../../../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBar.css';
 
+import { useState } from 'react';
+
 /** Placeholdery — używane gdy brak danych z sesji. */
-const PLACEHOLDER_DISPLAY_NAME = 'Użytkownik';
-const PLACEHOLDER_ROLE_LABEL = 'Student';
+const PLACEHOLDERDISPLAYNAME__TEXTLABEL = {
+  polish: 'Użytkownik',
+  english: 'User',
+};
+
+const PLACEHOLDER_ROLE_LABEL__TEXTLABEL = {
+  polish: 'Student',
+  english: 'Student',
+};
+
 const DEFAULT_LIVES_DISPLAY = '0';
 const DEFAULT_CURRENCY_DISPLAY = '0';
+
+const MENUOPENTEXT__TEXTLABEL = {
+  polish: 'Otwórz menu nawigacji',
+  english: 'Open navigation menu',
+};
+
+const MENUCLOSETEXT__TEXTLABEL = {
+  polish: 'Zamknij menu nawigacji',
+  english: 'Close navigation menu',
+};
 
 /**
  * Górny pasek nawigacji (superBar) — statystyki, ustawienia, konto.
@@ -42,7 +63,7 @@ const DEFAULT_CURRENCY_DISPLAY = '0';
  */
 export default function SuperBar({
   displayName,
-  roleLabel = PLACEHOLDER_ROLE_LABEL,
+  roleLabel = PLACEHOLDER_ROLE_LABEL__TEXTLABEL.polish,
   avatarUrl = null,
   livesDisplay = DEFAULT_LIVES_DISPLAY,
   livesLabel = 'Życia',
@@ -62,8 +83,9 @@ export default function SuperBar({
 }) {
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const showStudentGroupStats = role === APP_ROLE.STUDENT && groupId !== null;
-  const resolvedDisplayName = displayName || PLACEHOLDER_DISPLAY_NAME;
+  const resolvedDisplayName = displayName || PLACEHOLDERDISPLAYNAME__TEXTLABEL[LANGUAGE];
 
   return (
     <>
@@ -75,7 +97,7 @@ export default function SuperBar({
             type="button"
             className="super-bar__menu-btn"
             aria-expanded={menuExpanded}
-            aria-label={menuExpanded ? 'Zamknij menu nawigacji' : 'Otwórz menu nawigacji'}
+            aria-label={menuExpanded ? MENUCLOSETEXT__TEXTLABEL[LANGUAGE] : MENUOPENTEXT__TEXTLABEL[LANGUAGE]}
             onClick={onMenuToggle}
           >
             <span className="super-bar__menu-icon" aria-hidden="true" />

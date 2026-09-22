@@ -17,15 +17,107 @@ import {
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
 import { createGroup, fetchGroupById, updateGroup } from '../../../services/groups.api.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './GroupSettingsForm.css';
 
 const GROUP_NAME_MAX = GROUP_NAME_MAX_LENGTH;
 const SUBJECT_NAME_MAX = GROUP_SUBJECT_NAME_MAX_LENGTH;
 const GROUP_DESCRIPTION_MAX = GROUP_DESCRIPTION_MAX_LENGTH;
 
+const GROUPNAMEMINERROR__TEXTLABEL = {
+  polish: 'musi zawierać minimum 1 znak.',
+  english: 'must contain at least 1 character.',
+};
+
+const GROUPNAMEMAXERROR__TEXTLABEL = {
+  polish: 'maks. {max} znaków.',
+  english: 'max. {max} characters.',
+};
+
+const SUBJECTNAMEMAXERROR__TEXTLABEL = {
+  polish: 'maks. {max} znaków.',
+  english: 'max. {max} characters.',
+};
+
+const BANNERUPLOADERROR__TEXTLABEL = {
+  polish: 'Nie udało się przesłać banera.',
+  english: 'Failed to upload banner.',
+};
+
+const DRIVEREFERERROR__TEXTLABEL = {
+  polish: 'Brak driveRef w odpowiedzi serwera.',
+  english: 'Missing driveRef in server response.',
+};
+
+const SAVEGROUPERROR__TEXTLABEL = {
+  polish: 'Nie udało się zapisać grupy.',
+  english: 'Failed to save group.',
+};
+
+const SAVEDSUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Zmiany zostały zapisane.',
+  english: 'Changes have been saved.',
+};
+
+const CREATEDSUCCESSMESSAGE__TEXTLABEL = {
+  polish: 'Grupa została utworzona.',
+  english: 'Group has been created.',
+};
+
+const GENERALSECTION__TEXTLABEL = {
+  polish: 'Ogólne',
+  english: 'General',
+};
+
+const BANNERSECTION__TEXTLABEL = {
+  polish: 'Baner',
+  english: 'Banner',
+};
+
+const LOADMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie danych grupy…',
+  english: 'Loading group data…',
+};
+
+const GROUPNAMETITLE__TEXTLABEL = {
+  polish: 'Nazwa grupy*',
+  english: 'Group name*',
+};
+
+const SUBJECTNAMETITLE__TEXTLABEL = {
+  polish: 'Nazwa przedmiotu',
+  english: 'Subject name',
+};
+
+const GROUPDESCRIPTIONTITLE__TEXTLABEL = {
+  polish: 'Opis grupy',
+  english: 'Group description',
+};
+
+const GROUPDESCRIPTIONPLACEHOLDER__TEXTLABEL = {
+  polish: 'Krótko opisz tło fabularne i cele grupy…',
+  english: 'Briefly describe the plot background and goals of the group…',
+};
+
+const SAVEDGROUPBUTTON__TEXTLABEL = {
+  polish: 'Zapisz zmiany',
+  english: 'Save changes',
+};
+
+const CANCELBUTTON__TEXTLABEL = {
+  polish: 'Anuluj',
+  english: 'Cancel',
+};
+
+const GROUPSETTINGS__TEXTLABEL = {
+  polish: 'Ustawienia grupy',
+  english: 'Group settings',
+};
+
 export default function TemporaryGroupsListCreator({ popupclose }) {
   const { groupId } = useParams();
   const { showSuccess, showError } = useToast();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const [errorMessage, setErrorMessage] = useState('');
   const [groupnamevalue, setGroupnamevalue] = useState('');
@@ -61,9 +153,9 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
   function onGroupnamechange(value) {
     const trimmed = value.length > GROUP_NAME_MAX ? value.slice(0, GROUP_NAME_MAX) : value;
     if (trimmed.length < 1) {
-      setGroupnamevalueerror('musi zawierać minimum 1 znak.');
+      setGroupnamevalueerror(GROUPNAMEMINERROR__TEXTLABEL[LANGUAGE]);
     } else if (value.length > GROUP_NAME_MAX) {
-      setGroupnamevalueerror(`maks. ${GROUP_NAME_MAX} znaków.`);
+      setGroupnamevalueerror(GROUPNAMEMAXERROR__TEXTLABEL[LANGUAGE].replace('{max}', GROUP_NAME_MAX));
     } else {
       setGroupnamevalueerror('');
     }
@@ -73,7 +165,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
   function onSubjectnamechange(value) {
     const trimmed = value.length > SUBJECT_NAME_MAX ? value.slice(0, SUBJECT_NAME_MAX) : value;
     if (value.length > SUBJECT_NAME_MAX) {
-      setSubjectnamevalueerror(`maks. ${SUBJECT_NAME_MAX} znaków.`);
+      setSubjectnamevalueerror(SUBJECTNAMEMAXERROR__TEXTLABEL[LANGUAGE].replace('{max}', SUBJECT_NAME_MAX));
     } else {
       setSubjectnamevalueerror('');
     }
@@ -115,10 +207,10 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
     }
 
     if (!driveresponse.ok || drivedata.statusCode === 403) {
-      throw new Error('Nie udało się przesłać banera.');
+      throw new Error(BANNERUPLOADERROR__TEXTLABEL[LANGUAGE]);
     }
     if (typeof drivedata.driveRef !== 'string' || drivedata.driveRef.trim() === '') {
-      throw new Error('Brak driveRef w odpowiedzi serwera.');
+      throw new Error(DRIVEREFERERROR__TEXTLABEL[LANGUAGE]);
     }
 
     return drivedata.driveRef.trim();
@@ -133,7 +225,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
 
   const persistGroupSettings = useCallback(async () => {
     if (groupnamevalue.length < 1) {
-      setGroupnamevalueerror('musi zawierać minimum 1 znak.');
+      setGroupnamevalueerror(GROUPNAMEMINERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -159,7 +251,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
         : await createGroup(payload);
 
       if (!result.ok) {
-        showError(result.error ?? 'Nie udało się zapisać grupy.');
+        showError(result.error ?? SAVEGROUPERROR__TEXTLABEL[LANGUAGE]);
         return;
       }
 
@@ -173,7 +265,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
         }
       }
 
-      showSuccess(groupId ? 'Zmiany zostały zapisane.' : 'Grupa została utworzona.');
+      showSuccess(groupId ? SAVEDSUCCESSMESSAGE__TEXTLABEL[LANGUAGE] : CREATEDSUCCESSMESSAGE__TEXTLABEL[LANGUAGE]);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       setErrorMessage(message);
@@ -210,16 +302,16 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
 
   return (
     <div className="group-settings-form group-settings-form--drive-layout">
-      <section className="group-settings-form__panel" aria-label="Ustawienia grupy">
-        <SettingsSectionHeader title="Ogólne" id="group-settings-general-title" />
+      <section className="group-settings-form__panel" aria-label={GROUPSETTINGS__TEXTLABEL[LANGUAGE]}>
+        <SettingsSectionHeader title={GENERALSECTION__TEXTLABEL[LANGUAGE]} id="group-settings-general-title" />
         {isLoadingGroup ? (
-          <p className="group-settings-form__hint">Ładowanie danych grupy…</p>
+          <p className="group-settings-form__hint">{LOADMESSAGE__TEXTLABEL[LANGUAGE]}</p>
         ) : null}
 
         <div className="group-settings-form__stack">
           <div className="group-settings-form__field">
             <label className="group-settings-form__label" htmlFor="group-settings-name">
-              Nazwa grupy*
+              {GROUPNAMETITLE__TEXTLABEL[LANGUAGE]}
               {groupnamevalueerror ? (
                 <span className="group-settings-form__label-error">{groupnamevalueerror}</span>
               ) : null}
@@ -238,7 +330,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
 
           <div className="group-settings-form__field">
             <label className="group-settings-form__label" htmlFor="group-settings-subject">
-              Nazwa przedmiotu
+              {SUBJECTNAMETITLE__TEXTLABEL[LANGUAGE]}
               {subjectnamevalueerror ? (
                 <span className="group-settings-form__label-error">{subjectnamevalueerror}</span>
               ) : null}
@@ -257,7 +349,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
 
           <div className="group-settings-form__field">
             <label className="group-settings-form__label" htmlFor="group-settings-description">
-              Opis grupy
+              {GROUPDESCRIPTIONTITLE__TEXTLABEL[LANGUAGE]}
             </label>
             <CharacterLimitedField value={groupdescriptionvalue} maxLength={GROUP_DESCRIPTION_MAX}>
               <textarea
@@ -266,7 +358,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
                 value={groupdescriptionvalue}
                 maxLength={GROUP_DESCRIPTION_MAX}
                 onChange={(event) => onGroupdescriptionchange(event.target.value)}
-                placeholder="Krótko opisz tło fabularne i cele grupy…"
+                placeholder={GROUPDESCRIPTIONPLACEHOLDER__TEXTLABEL[LANGUAGE]}
                 disabled={isSaving || isLoadingGroup}
               />
             </CharacterLimitedField>
@@ -275,7 +367,7 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
 
         <Divider className="group-settings-form__section-divider" />
 
-        <SettingsSectionHeader title="Baner" id="group-settings-banner-title" />
+        <SettingsSectionHeader title={BANNERSECTION__TEXTLABEL[LANGUAGE]} id="group-settings-banner-title" />
         <div className="group-settings-form__field group-settings-form__field--banner">
           <GroupBannerPicker
             value={bannerSelection}
@@ -298,14 +390,14 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
           onClick={persistGroupSettings}
           disabled={isSaving || isLoadingGroup}
         >
-          Zapisz zmiany
+          {SAVEDGROUPBUTTON__TEXTLABEL[LANGUAGE]}
         </Button>
       ) : null}
 
       {popupclose ? (
         <div className="group-settings-form__footer">
           <Button variant="ghost" size="md" onClick={onRejectclick}>
-            Anuluj
+            {CANCELBUTTON__TEXTLABEL[LANGUAGE]}
           </Button>
         </div>
       ) : null}

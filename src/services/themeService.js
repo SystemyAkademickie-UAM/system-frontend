@@ -1,7 +1,10 @@
+import { READLANGUAGECOOKIE } from '../utils/LANGUAGECOOKIE.js';
+
 /**
  * MyAcademyQuest — Theme Service
  * Obsługa motywów aplikacji: systemowy (domyślny), jasny, ciemny.
  */
+
 
 export const THEME_MODE = {
   SYSTEM: 'system',
@@ -9,11 +12,21 @@ export const THEME_MODE = {
   DARK: 'dark',
 };
 
-export const THEME_OPTIONS = [
-  { id: THEME_MODE.SYSTEM, label: 'Motyw systemowy', description: 'Dopasowany do ustawień Twojego urządzenia' },
-  { id: THEME_MODE.LIGHT, label: 'Motyw jasny', description: 'Jasne tło i wysoki kontrast' },
-  { id: THEME_MODE.DARK, label: 'Motyw ciemny', description: 'Ciemna oprawa graficzna' },
-];
+const THEMEOPTIONS__TEXTLABEL = {
+  polish: [
+    { id: THEME_MODE.SYSTEM, label: 'Motyw systemowy', description: 'Dopasowany do ustawień Twojego urządzenia' },
+    { id: THEME_MODE.LIGHT, label: 'Motyw jasny', description: 'Jasne tło i wysoki kontrast' },
+    { id: THEME_MODE.DARK, label: 'Motyw ciemny', description: 'Ciemna oprawa graficzna' },
+  ],
+  english: [
+    { id: THEME_MODE.SYSTEM, label: 'System theme', description: 'Adapted to your device settings' },
+
+    { id: THEME_MODE.LIGHT, label: 'Light theme', description: 'Light background and high contrast' },
+    { id: THEME_MODE.DARK, label: 'Dark theme', description: 'Dark graphical interface' },
+  ],
+};
+
+export const THEME_OPTIONS = THEMEOPTIONS__TEXTLABEL.polish;
 
 const STORAGE_KEY = 'maq.theme';
 
@@ -24,14 +37,17 @@ function handleSystemThemeChange(e) {
   if (currentTheme === THEME_MODE.SYSTEM) {
     const isDark = e.matches;
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+
   }
 }
 
 /**
+
  * Zwraca aktualnie wybrany motyw z localStorage lub domyślny 'system'.
  * @returns {'system' | 'light' | 'dark'}
  */
 export function getSavedTheme() {
+
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved === THEME_MODE.LIGHT || saved === THEME_MODE.DARK || saved === THEME_MODE.SYSTEM) {
@@ -58,8 +74,10 @@ export function applyTheme(theme) {
   if (theme === THEME_MODE.SYSTEM) {
     if (typeof window !== 'undefined' && window.matchMedia) {
       if (!systemThemeMediaQuery) {
+
         systemThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         systemThemeMediaQuery.addEventListener('change', handleSystemThemeChange);
+
       }
       const isDark = systemThemeMediaQuery.matches;
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -81,4 +99,13 @@ export function applyTheme(theme) {
 export function initTheme() {
   const saved = getSavedTheme();
   applyTheme(saved);
+}
+
+/**
+ * Zwraca opcje motywu w aktualnym języku.
+ * @returns {Array<{id: string, label: string, description: string}>}
+ */
+export function getThemeOptions() {
+  const language = READLANGUAGECOOKIE();
+  return THEMEOPTIONS__TEXTLABEL[language] || THEMEOPTIONS__TEXTLABEL.polish;
 }

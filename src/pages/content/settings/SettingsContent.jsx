@@ -12,7 +12,7 @@ import SettingsSectionHeader from '../../../components/layout/sectionPage/Settin
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
 import {
-  THEME_OPTIONS,
+  getThemeOptions,
   applyTheme,
   getSavedTheme,
 } from '../../../services/themeService.js';
@@ -307,6 +307,7 @@ export default function SettingsContent() {
 
     setIsSaving(false);
     showSuccess('Zmiany zostały zapisane.');
+    window.location.reload();
     return true;
   }, [
     DIVLANGUAGE,
@@ -492,7 +493,7 @@ export default function SettingsContent() {
 
               <SettingsSectionHeader title={THEMELABELTEXT[LANGUAGE]} id="settings-theme-title" />
               <div className="settings-page__theme-radio-group" role="radiogroup" aria-labelledby="settings-theme-title">
-                {THEME_OPTIONS.map((option) => {
+                {getThemeOptions().map((option) => {
                   const isSelected = draftTheme === option.id;
                   return (
                     <label

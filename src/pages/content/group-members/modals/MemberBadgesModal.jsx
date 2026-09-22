@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BadgeMini, BADGE_RARITY, BADGE_RARITY_LABELS, Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
+import { BadgeMini, BADGE_RARITY, Modal, SearchBar, useToast } from '../../../../components/ui/index.js';
 import { fetchStudentBadges, toggleStudentBadge } from '../../../../services/students.api.js';
 import { normalizeRankBadgeIcon } from '../../../../utils/ranks/rankBadgeIcon.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -28,28 +28,56 @@ const SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać odznak.', engl
 const SAVING_BUTTON__TEXTLABEL = { polish: 'Zapisywanie…', english: 'Saving…' };
 const SAVE_BUTTON__TEXTLABEL = { polish: 'Zapisz', english: 'Save' };
 
-const RARITY_FILTERS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
-  { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
-  { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
-  { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
-];
+const RARITY_FILTERS__TEXTLABEL = {
+  polish: [
+    { id: 'all', label: 'Wszystkie' },
+    { id: BADGE_RARITY.common, label: 'Zwykła' },
+    { id: BADGE_RARITY.uncommon, label: 'Niezwykła' },
+    { id: BADGE_RARITY.rare, label: 'Rzadka' },
+    { id: BADGE_RARITY.epic, label: 'Epicka' },
+  ],
 
-const EARNED_FILTERS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: 'earned', label: 'Zdobyte' },
-  { id: 'unearned', label: 'Niezdobyte' },
-];
+  english: [
+    { id: 'all', label: 'All' },
+    { id: BADGE_RARITY.common, label: 'Common' },
+    { id: BADGE_RARITY.uncommon, label: 'Uncommon' },
+    { id: BADGE_RARITY.rare, label: 'Rare' },
+    { id: BADGE_RARITY.epic, label: 'Epic' },
+  ],
+};
 
-const BADGE_SORT_OPTIONS = [
-  { id: 'earned-first', label: 'Zdobyte → niezdobyte' },
-  { id: 'unearned-first', label: 'Niezdobyte → zdobyte' },
-  { id: 'name-asc', label: 'Nazwa A–Z' },
-  { id: 'name-desc', label: 'Nazwa Z–A' },
-  { id: 'rarity-asc', label: 'Rzadkość rosnąco' },
-  { id: 'rarity-desc', label: 'Rzadkość malejąco' },
-];
+const EARNED_FILTERS__TEXTLABEL = {
+  polish: [
+    { id: 'all', label: 'Wszystkie' },
+
+    { id: 'earned', label: 'Zdobyte' },
+    { id: 'unearned', label: 'Niezdobyte' },
+  ],
+  english: [
+    { id: 'all', label: 'All' },
+    { id: 'earned', label: 'Earned' },
+    { id: 'unearned', label: 'Unearned' },
+  ],
+};
+
+const BADGE_SORT_OPTIONS__TEXTLABEL = {
+  polish: [
+    { id: 'earned-first', label: 'Zdobyte → niezdobyte' },
+    { id: 'unearned-first', label: 'Niezdobyte → zdobyte' },
+    { id: 'name-asc', label: 'Nazwa A–Z' },
+    { id: 'name-desc', label: 'Nazwa Z–A' },
+    { id: 'rarity-asc', label: 'Rzadkość rosnąco' },
+    { id: 'rarity-desc', label: 'Rzadkość malejąco' },
+  ],
+  english: [
+    { id: 'earned-first', label: 'Earned → unearned' },
+    { id: 'unearned-first', label: 'Unearned → earned' },
+    { id: 'name-asc', label: 'Name A–Z' },
+    { id: 'name-desc', label: 'Name Z–A' },
+    { id: 'rarity-asc', label: 'Rarity ascending' },
+    { id: 'rarity-desc', label: 'Rarity descending' },
+  ],
+};
 
 const BADGE_RARITY_ORDER = {
   [BADGE_RARITY.common]: 0,
@@ -160,6 +188,7 @@ export default function MemberBadgesModal({
         const earnedIds = data.filter((b) => b.isEarned).map((b) => b.id);
         initialSelectedIdsRef.current = earnedIds;
         setSelectedIds(earnedIds);
+
       } catch (err) {
         console.error('Failed to load student badges:', err);
         setStudentBadges([]);
@@ -301,7 +330,7 @@ export default function MemberBadgesModal({
           <div className="member-modal__control-row">
             <span className="member-modal__control-sublabel">{RARITY_SUBLABEL__TEXTLABEL[LANGUAGE]}</span>
             <div className="member-modal__filters" role="group" aria-label={RARITY_FILTER_ARIA__TEXTLABEL[LANGUAGE]}>
-              {RARITY_FILTERS.map((filter) => (
+              {RARITY_FILTERS__TEXTLABEL[LANGUAGE].map((filter) => (
                 <button
                   key={filter.id}
                   type="button"
@@ -320,7 +349,7 @@ export default function MemberBadgesModal({
           <div className="member-modal__control-row">
             <span className="member-modal__control-sublabel">{STATUS_SUBLABEL__TEXTLABEL[LANGUAGE]}</span>
             <div className="member-modal__filters" role="group" aria-label={STATUS_FILTER_ARIA__TEXTLABEL[LANGUAGE]}>
-              {EARNED_FILTERS.map((filter) => (
+              {EARNED_FILTERS__TEXTLABEL[LANGUAGE].map((filter) => (
                 <button
                   key={filter.id}
                   type="button"
@@ -350,7 +379,7 @@ export default function MemberBadgesModal({
               value={sortBy}
               onChange={(event) => setSortBy(event.target.value)}
             >
-              {BADGE_SORT_OPTIONS.map((option) => (
+              {BADGE_SORT_OPTIONS__TEXTLABEL[LANGUAGE].map((option) => (
                 <option key={option.id} value={option.id}>
                   {option.label}
                 </option>
@@ -372,6 +401,7 @@ export default function MemberBadgesModal({
               name={badge.name}
               storyDescription={badge.storyDescription}
               didacticDescription={badge.didacticDescription}
+
               rewardAmount={badge.rewardAmount}
               iconFile={badge.iconFile}
               selected={selectedIds.includes(badge.id)}

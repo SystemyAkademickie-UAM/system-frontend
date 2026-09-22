@@ -7,11 +7,33 @@ import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useFloatingPanelPosition } from '../../../hooks/useFloatingPanelPosition.js';
 import { positionDropdownMenu } from '../../../utils/ui/positionTooltipInViewport.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBar.css';
 
 /**
  * Awatar + rozwijane menu (Wyloguj → /login).
  */
+const LOGOUTERROR__TEXTLABEL = {
+  polish: 'Nie udało się wylogować.',
+  english: 'Logout failed.',
+};
+
+const LOGOUTBUTTONTEXT__TEXTLABEL = {
+  polish: {
+    logging: 'Wylogowywanie…',
+    logged: 'Wyloguj',
+  },
+  english: {
+    logging: 'Logging out…',
+    logged: 'Log out',
+  },
+};
+
+const ACCOUNTMENU__TEXTLABEL = {
+  polish: 'Menu konta użytkownika',
+  english: 'User account menu',
+};
+
 export default function SuperBarUserMenu({
   displayName,
   roleLabel,
@@ -24,6 +46,7 @@ export default function SuperBarUserMenu({
   const triggerRef = useRef(null);
   const panelRef = useRef(null);
   const navigate = useNavigate();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState(null);
@@ -72,7 +95,7 @@ export default function SuperBarUserMenu({
   const handleLogout = () => {
     setLogoutError(null);
     if (!isLogoutAvailable()) {
-      setLogoutError('Nie udało się wylogować.');
+      setLogoutError(LOGOUTERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
     setIsLoggingOut(true);
@@ -80,7 +103,7 @@ export default function SuperBarUserMenu({
     onNavigate?.();
     void logoutUser(() => {
       setIsLoggingOut(false);
-      setLogoutError('Nie udało się wylogować.');
+      setLogoutError(LOGOUTERROR__TEXTLABEL[LANGUAGE]);
       setOpen(true);
     }, { navigate });
   };
@@ -95,7 +118,7 @@ export default function SuperBarUserMenu({
         aria-expanded={open}
         aria-controls={menuId}
         aria-haspopup="menu"
-        aria-label="Menu konta użytkownika"
+        aria-label={ACCOUNTMENU__TEXTLABEL[LANGUAGE]}
         onClick={() => {
           setLogoutError(null);
           setOpen((value) => !value);
@@ -139,7 +162,7 @@ export default function SuperBarUserMenu({
                 onClick={handleLogout}
                 disabled={isLoggingOut}
               >
-                {isLoggingOut ? 'Wylogowywanie…' : 'Wyloguj'}
+                {isLoggingOut ? LOGOUTBUTTONTEXT__TEXTLABEL[LANGUAGE].logging : LOGOUTBUTTONTEXT__TEXTLABEL[LANGUAGE].logged}
               </button>
             </li>
           </ul>,

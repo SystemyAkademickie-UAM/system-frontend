@@ -82,9 +82,15 @@ const DELETEPOSTDEFAULTTITLE__TEXTLABEL = {
   english: 'untitled',
 };
 
-function formatPostDateTime(value) {
+function formatPostDateTime(value, language) {
   if (!value) return null;
-  return new Date(value).toLocaleString('pl-PL', {
+  let locale;
+  if (language === 'polish') {
+    locale = 'pl-PL';
+  } else {
+    locale = 'en-US';
+  }
+  return new Date(value).toLocaleString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -101,7 +107,7 @@ function resolvePostDateDisplay(post, language) {
     };
   }
 
-  const dateTime = post.publishedAt || post.createdAt;
+  const dateTime = post.createdAt;
   if (!dateTime) {
     return null;
   }

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import ProductCard from '../ProductCard/ProductCard.jsx';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ShopClosedOverlay.css';
 
 /**
@@ -13,6 +15,26 @@ import './ShopClosedOverlay.css';
  * @param {() => void} [props.onExtraLifeBuy]
  * @param {string} [props.className]
  */
+const CLOSEDSTORE__TEXTLABEL = {
+  polish: 'Zamknięte',
+  english: 'Closed',
+};
+
+const GAMEOVER__TEXTLABEL = {
+  polish: 'Koniec gry',
+  english: 'Game Over',
+};
+
+const GAMEOVERSUBTITLE__TEXTLABEL = {
+  polish: '... dla Twoich zakupów',
+  english: '... for your shopping',
+};
+
+const EXTRALIFEHINT__TEXTLABEL = {
+  polish: 'Aby odblokować ponownie sklep zakup dodatkowe życie',
+  english: 'To unlock the shop again, buy an extra life',
+};
+
 export default function ShopClosedOverlay({
   isClosed,
   isGameOver = false,
@@ -21,6 +43,8 @@ export default function ShopClosedOverlay({
   onExtraLifeBuy,
   className = '',
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
   const showClosed = isClosed;
   const showGameOver = !isClosed && isGameOver;
   const isVisible = showClosed || showGameOver;
@@ -39,17 +63,23 @@ export default function ShopClosedOverlay({
     >
       <div className="maq-shop-closed-overlay__panel">
         {showClosed ? (
-          <p className="maq-shop-closed-overlay__message">Zamknięte</p>
+          <p className="maq-shop-closed-overlay__message">
+            {CLOSEDSTORE__TEXTLABEL[LANGUAGE]}
+          </p>
         ) : null}
 
         {showGameOver ? (
           <>
             <div className="maq-shop-closed-overlay__game-over-copy">
-              <p className="maq-shop-closed-overlay__message">Koniec gry</p>
-              <p className="maq-shop-closed-overlay__subtitle">.. dla Twoich zakupów</p>
+              <p className="maq-shop-closed-overlay__message">
+                {GAMEOVER__TEXTLABEL[LANGUAGE]}
+              </p>
+              <p className="maq-shop-closed-overlay__subtitle">
+                {GAMEOVERSUBTITLE__TEXTLABEL[LANGUAGE]}
+              </p>
               {extraLifeProduct ? (
                 <p className="maq-shop-closed-overlay__hint">
-                  Aby odblokować ponownie sklep zakup dodatkowe życie
+                  {EXTRALIFEHINT__TEXTLABEL[LANGUAGE]}
                 </p>
               ) : null}
             </div>
