@@ -123,6 +123,15 @@ export const ROUTE_TABLE = [
     contentModule: 'pages/content/superadmin-logs/SuperadminLogsContent.jsx',
     roles: ['superadmin'],
   },
+  {
+    id: 'admin.backup',
+    section: 'app',
+    pathPattern: '/admin/backup',
+    pageTitle: 'Kopia zapasowa bazy',
+    pageModule: 'pages/links/app/AdminBackupPage.jsx',
+    contentModule: 'pages/content/admin-backup/AdminBackupContent.jsx',
+    roles: ['superadmin'],
+  },
 
   // ===========================================================================
   // GROUP — Korzeń (/groups/:groupId)
