@@ -7,6 +7,7 @@ import {
   groupRewardsPath,
   groupSettingsPath,
   groupsListPath,
+  adminBackupPath,
   organizationsPath,
   statisticsPath,
   superadminLogsPath,
@@ -35,6 +36,7 @@ export const BREADCRUMB_BY_PATH = {
   [statisticsPath()]: [{ label: 'Statystyki' }],
   [organizationsPath()]: [{ label: 'Zarządzanie organizacjami' }],
   [superadminLogsPath()]: [{ label: 'Logi produkcyjne' }],
+  [adminBackupPath()]: [{ label: 'Kopia zapasowa' }],
 
   [templatesPath()]: [{ label: 'Szablony' }, { label: 'Galeria szablonów' }],
   [templatesMyPath()]: [{ label: 'Szablony' }, { label: 'Moje szablony' }],

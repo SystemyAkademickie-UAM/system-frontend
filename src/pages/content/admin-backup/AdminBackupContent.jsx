@@ -1,9 +1,11 @@
 import { useState, useRef } from 'react';
 import { Button, useToast } from '../../../components/ui/index.js';
-import { importBackup } from '../../../services/backup.api.js';
+import {
+  ADMIN_BACKUP_CONFIRM_WORD,
+  BYTES_PER_MIB,
+} from '../../../constants/adminBackup.constants.js';
+import { getBackupExportUrl, importBackup } from '../../../services/backup.api.js';
 import './AdminBackupContent.css';
-
-const CONFIRM_WORD = 'RESTORE';
 
 export default function AdminBackupContent() {
   const { showSuccess, showError } = useToast();
@@ -32,10 +34,8 @@ export default function AdminBackupContent() {
       // Zamiast fetch() pobieramy plik natywnie przez przeglądarkę,
       // co oszczędza RAM klienta (szczególnie dla dużych plików).
       // Serwer autoryzuje żądanie za pomocą ciasteczka sesji.
-      const exportUrl = '/api/admin/backup/export';
-      
       const a = document.createElement('a');
-      a.href = exportUrl;
+      a.href = getBackupExportUrl();
       // Atrybut download sugeruje pobieranie.
       // Dokładna nazwa i tak przyjdzie z nagłówka Content-Disposition z serwera.
       a.download = 'backup.enc';
@@ -71,7 +71,7 @@ export default function AdminBackupContent() {
   };
 
   const handleConfirmRestore = async () => {
-    if (confirmInput !== CONFIRM_WORD) {
+    if (confirmInput !== ADMIN_BACKUP_CONFIRM_WORD) {
       return;
     }
 
@@ -151,12 +151,12 @@ export default function AdminBackupContent() {
           />
           {selectedFile ? (
             <span className="admin-backup__file-name">
-              {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
+              {selectedFile.name} ({(selectedFile.size / BYTES_PER_MIB).toFixed(2)} MB)
             </span>
           ) : null}
         </div>
 
-        <div style={{ marginTop: '1rem' }}>
+        <div className="admin-backup__restore-actions">
           <Button
             type="button"
             variant="danger"
@@ -196,14 +196,14 @@ export default function AdminBackupContent() {
               danych danymi z wybranego pliku kopii zapasowej.
             </p>
             <p className="admin-backup__modal-text">
-              Aby kontynuować, wpisz słowo <code>{CONFIRM_WORD}</code> poniżej:
+              Aby kontynuować, wpisz słowo <code>{ADMIN_BACKUP_CONFIRM_WORD}</code> poniżej:
             </p>
             <input
               type="text"
               className="admin-backup__modal-input"
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
-              placeholder={`Wpisz ${CONFIRM_WORD}`}
+              placeholder={`Wpisz ${ADMIN_BACKUP_CONFIRM_WORD}`}
               autoFocus
             />
             <div className="admin-backup__modal-actions">
@@ -219,7 +219,7 @@ export default function AdminBackupContent() {
                 type="button"
                 variant="danger"
                 size="sm"
-                disabled={confirmInput !== CONFIRM_WORD}
+                disabled={confirmInput !== ADMIN_BACKUP_CONFIRM_WORD}
                 onClick={handleConfirmRestore}
               >
                 Przywróć

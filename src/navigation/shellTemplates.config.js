@@ -990,7 +990,7 @@ const superadminView = {
       enabled: true,
       kind: 'navlink',
       label: 'Kopia zapasowa',
-      iconId: 'nav/backup',
+      iconId: 'nav/stats',
       hrefKey: 'ADMIN_BACKUP',
       requiresGroup: false,
     },
