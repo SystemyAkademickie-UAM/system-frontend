@@ -66,6 +66,10 @@
   font-size: 0.875rem;
 }
 
+.admin-backup__restore-actions {
+  margin-top: 1rem;
+}
+
 .admin-backup__file-name {
   font-size: 0.85rem;
   color: var(--color-text-secondary, #888);

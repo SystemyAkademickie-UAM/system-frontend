@@ -74,6 +74,7 @@ export const SVG_ICONS = {
     groups: 'nav/groups.svg',
     stats: 'nav/stats.svg',
     organization: 'nav/organization.svg',
+    backup: 'nav/stats.svg',
     courses: 'nav/courses.svg',
     logout: 'nav/logout.svg',
   },
