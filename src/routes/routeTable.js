@@ -174,7 +174,7 @@ export const ROUTE_TABLE = [
     id: 'group.student.users',
     section: 'group',
     pathPattern: '/groups/:groupId/users',
-    pageTitle: 'Uczestnicy',
+    pageTitle: 'Osoby uczestniczące',
     pageModule: 'pages/links/groups/main/GroupMainMembersPage.jsx',
     contentModule: 'pages/content/group-main-members/GroupMainMembersContent.jsx',
     roles: ['student'],

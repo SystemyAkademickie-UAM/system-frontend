@@ -19,7 +19,7 @@ const RESTRICTACCESSLABEL__TEXTLABEL = {
 };
 
 const RESTRICTACCESSTOOLTIP__TEXTLABEL = {
-  polish: 'Przedmiot w sklepie będzie widoczny/odblokowany wyłącznie dla studentów posiadających wskazaną rangę (lub wyższą).',
+  polish: 'Przedmiot w sklepie będzie widoczny/odblokowany wyłącznie dla osób posiadających wskazaną rangę (lub wyższą).',
   english: 'The item in the shop will be visible/unlocked only for students who have reached the specified rank (or higher).'
 };
 
@@ -34,7 +34,7 @@ const GROUPLIMITTOOLTIP__TEXTLABEL = {
 };
 
 const STUDENTLIMITLABEL__TEXTLABEL = {
-  polish: 'Limit sztuk na studenta',
+  polish: 'Limit sztuk na osobę',
   english: 'Items per student limit'
 };
 

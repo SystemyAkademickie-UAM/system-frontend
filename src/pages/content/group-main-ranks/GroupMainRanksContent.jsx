@@ -31,7 +31,7 @@ const PAGETITLE__TEXTLABEL = {
 };
 
 const STUDENTNAME__TEXTLABEL = {
-  polish: 'Student',
+  polish: 'Osoba studiująca',
   english: 'Student',
 };
 

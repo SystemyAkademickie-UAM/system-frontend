@@ -9,12 +9,12 @@ const ASSIGNMODALTITLE__TEXTLABEL = {
 };
 
 const SEARCHPLACEHOLDER__TEXTLABEL = {
-  polish: 'Szukaj studenta…',
+  polish: 'Szukaj osoby…',
   english: 'Search student…'
 };
 
 const SEARCHARIA__TEXTLABEL = {
-  polish: 'Szukaj studenta',
+  polish: 'Szukaj osoby',
   english: 'Search student'
 };
 

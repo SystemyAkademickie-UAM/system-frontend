@@ -522,8 +522,8 @@ export function useGroupActivities() {
 
     showSuccess(
       calculatedVisibility === 1
-        ? (LANGUAGE === 'polish' ? 'Aktywność jest teraz widoczna dla studentów.' : 'Activity is now visible to students.')
-        : (LANGUAGE === 'polish' ? 'Aktywność została ukryta dla studentów.' : 'Activity has been hidden from students.')
+        ? (LANGUAGE === 'polish' ? 'Aktywność jest teraz widoczna.' : 'Activity is now visible to students.')
+        : (LANGUAGE === 'polish' ? 'Aktywność została ukryta.' : 'Activity has been hidden from students.')
     );
     return { ok: true };
   }, [LANGUAGE, showSuccess]);

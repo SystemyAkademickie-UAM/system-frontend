@@ -29,7 +29,7 @@ const DEFAULTITEMNAME__TEXTLABEL = {
 };
 
 const HINTTEXT__TEXTLABEL = {
-  polish: 'Prowadzący otrzyma powiadomienie o użyciu przedmiotu.',
+  polish: 'Osoba prowadząca otrzyma powiadomienie o użyciu przedmiotu.',
   english: 'The instructor will receive a notification about the item use.'
 };
 

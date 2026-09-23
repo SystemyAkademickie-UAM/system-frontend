@@ -128,7 +128,7 @@ export function buildLecturerMemberRow({
 
     rankId: null,
 
-    rank: 'Prowadzący',
+    rank: 'Osoba prowadząca',
 
     currency: null,
 

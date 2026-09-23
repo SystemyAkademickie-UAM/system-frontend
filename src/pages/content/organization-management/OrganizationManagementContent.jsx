@@ -8,7 +8,7 @@ const PAGETITLE__TEXTLABEL = {
 };
 
 const PAGEDESCRIPTION__TEXTLABEL = {
-  polish: 'Twórz i konfiguruj organizacje oraz nadawaj uprawnienia administratorom.',
+  polish: 'Twórz i konfiguruj organizacje oraz nadawaj uprawnienia pozwalające na administrowanie nimi.',
   english: 'Create and configure organizations and assign administrator permissions.'
 };
 

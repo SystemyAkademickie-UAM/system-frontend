@@ -85,7 +85,7 @@ const SHOWNICKNAMELABELTEXT = {
   kana: 'ニックネームをひょうじ',
 };
 const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
-  polish: 'Ksywka staje się widoczna dla innych użytkowników (wyświetlana jest dodatkowo obok imienia i nazwiska).',
+  polish: 'Ksywka staje się widoczna dla innych (wyświetlana jest dodatkowo obok imienia i nazwiska).',
   english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
   japanese: 'ニックネームが他の利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
   kana: 'ニックネームがほかの利用者にも表示されるようになります（氏名の横に追加で表示されます）。',

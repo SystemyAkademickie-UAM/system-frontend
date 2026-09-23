@@ -19,7 +19,7 @@ const SUBJECT__TEXTLABEL = {
   english: 'Subject',
 };
 const LECTURER__TEXTLABEL = {
-  polish: 'Prowadzący',
+  polish: 'Osoba prowadząca',
   english: 'Lecturer',
 };
 

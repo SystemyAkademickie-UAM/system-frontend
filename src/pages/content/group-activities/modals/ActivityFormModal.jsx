@@ -80,7 +80,7 @@ export default function ActivityFormModal({
     english: 'Stage:',
   };
   const ISVISIBLE__TEXTLABEL = {
-    polish: 'Aktywność widoczna dla studentów',
+    polish: 'Aktywność widoczna',
     english: 'Activity visible to students',
   };
 

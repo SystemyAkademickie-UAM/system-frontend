@@ -8,32 +8,32 @@ import ProfileEqContentContent from '../group-profile-eq/ProfileEqContentContent
 import './StudentProfileViewContent.css';
 
 const ERRORMISSINGDATA__TEXTLABEL = {
-  polish: 'Brak danych uczestnika.',
+  polish: 'Brak danych osoby.',
   english: 'Participant data missing.'
 };
 
 const ERRORSTUDENTNOTFOUND__TEXTLABEL = {
-  polish: 'Nie znaleziono uczestnika w tej grupie.',
+  polish: 'Nie znaleziono osoby w grupie.',
   english: 'Participant not found in this group.'
 };
 
 const ERRORFETCHFAILED__TEXTLABEL = {
-  polish: 'Nie udało się pobrać danych uczestnika.',
+  polish: 'Nie udało się pobrać danych osoby.',
   english: 'Failed to load participant data.'
 };
 
 const DEFAULTPARTICIPANTNAME__TEXTLABEL = {
-  polish: 'Uczestnik',
+  polish: 'Osoba uczestnicząca',
   english: 'Participant'
 };
 
 const LOADINGMESSAGE__TEXTLABEL = {
-  polish: 'Ładowanie profilu uczestnika…',
+  polish: 'Ładowanie profilu…',
   english: 'Loading participant profile…'
 };
 
 const PROFILEEYEBROW__TEXTLABEL = {
-  polish: 'Profil uczestnika',
+  polish: 'Profil',
   english: 'Participant profile'
 };
 

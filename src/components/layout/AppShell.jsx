@@ -75,7 +75,7 @@ function AppShellLayout() {
     const legalName = buildDisplayName(user);
 
     if (role === APP_ROLE.LECTURER && !leaderShowsNickname) {
-      return legalName || nickname || 'Użytkownik';
+      return legalName || nickname || 'Osoba korzystająca z systemu';
     }
 
     if (nickname && legalName) {
