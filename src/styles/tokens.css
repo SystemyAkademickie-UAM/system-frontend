@@ -14,6 +14,9 @@
 :root {
   --color-bg-svg: #1A1A2A;
   --color-bg-icon: #282834;
+  --color-bg-avatar: rgba(13, 13, 24, 0.65);
+  --color-separator: rgba(255, 255, 255, 0.06);
+  --color-separator-one: rgba(255, 255, 255, 0.08);
   /* --- Tła --- */
   /** Główne tło aplikacji (obszar treści) */
   --color-bg-app: #282834;
@@ -275,6 +278,9 @@
 [data-theme="light"] {
   --color-bg-svg: #E5E5D5;
   --color-bg-icon: #D7D7CB;
+  --color-bg-avatar: rgba(242, 242, 231, 1);
+  --color-separator: rgba(0, 0, 0, 0.06);
+  --color-separator-one: rgba(0, 0, 0, 0.08);
   /* --- Tła (Natural Warm-Stone & Clean Surfaces) --- */
   /** Główne tło aplikacji (obszar treści) */
   --color-bg-app: #ffffff;
