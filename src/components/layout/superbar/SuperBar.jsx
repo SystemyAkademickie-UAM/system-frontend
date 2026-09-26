@@ -18,12 +18,12 @@ import { useState } from 'react';
 
 /** Placeholdery — używane gdy brak danych z sesji. */
 const PLACEHOLDERDISPLAYNAME__TEXTLABEL = {
-  polish: 'Użytkownik',
+  polish: 'Osoba korzystająca z systemu',
   english: 'User',
 };
 
 const PLACEHOLDER_ROLE_LABEL__TEXTLABEL = {
-  polish: 'Student',
+  polish: 'Osoba studiująca',
   english: 'Student',
 };
 

@@ -9,5 +9,5 @@ export function resolveTemplateCreatorDisplay(template) {
 
   const nickname = template.creatorNickname?.trim() || '';
   const legalName = template.creatorLegalName?.trim() || '';
-  return nickname || legalName || 'Prowadzący';
+  return nickname || legalName || 'Osoba prowadząca';
 }

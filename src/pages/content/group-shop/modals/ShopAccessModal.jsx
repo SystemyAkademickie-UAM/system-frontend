@@ -264,7 +264,7 @@ export default function ShopAccessModal({
               <span className="rewards-modal__label">{SHOP_STATUS_SECTION_LABEL__TEXTLABEL[LANGUAGE]}</span>
               <p className="shop-access-modal__status-description">
                 {pendingShopOpen
-                  ? (LANGUAGE === 'polish' ? 'Sklep jest otwarty dla studentów' : 'Shop is open for students')
+                  ? (LANGUAGE === 'polish' ? 'Sklep jest otwarty' : 'Shop is open for students')
                   : (LANGUAGE === 'polish' ? 'Sklep jest zamknięty' : 'Shop is closed')}
               </p>
             </div>

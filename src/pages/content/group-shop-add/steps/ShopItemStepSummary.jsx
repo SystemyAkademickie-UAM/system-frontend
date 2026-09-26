@@ -131,7 +131,7 @@ const GROUPLIMITDISABLED__TEXTLABEL = {
 };
 
 const STUDENTLIMIT__TEXTLABEL = {
-  polish: 'Limit sztuk na studenta:',
+  polish: 'Limit sztuk na osobę:',
   english: 'Items limit per student:'
 };
 

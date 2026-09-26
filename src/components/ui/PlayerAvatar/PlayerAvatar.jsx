@@ -131,7 +131,7 @@ export default function PlayerAvatar({
 
 
 
-  const displayName = nickname?.trim() || 'Użytkownik';
+  const displayName = nickname?.trim() || 'Osoba korzystająca z systemu';
   const label = ariaLabel ?? `Profil: ${displayName}`;
 
   const sharedClassName = [

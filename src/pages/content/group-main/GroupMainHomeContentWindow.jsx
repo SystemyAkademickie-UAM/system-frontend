@@ -17,12 +17,12 @@ const GROUPCREATEDTITLE__TEXTLABEL = {
 };
 
 const GROUPCREATEDINFO1__TEXTLABEL = {
-  polish: '• Na początku wszystkie importowane elementy składowe grupy są ukryte przed pozostałymi członkami grupy.',
+  polish: '• Na początku wszystkie importowane elementy składowe grupy są ukryte.',
   english: '• Initially, all imported group elements are hidden from other group members.'
 };
 
 const GROUPCREATEDINFO2__TEXTLABEL = {
-  polish: '• W celu udostępnienia ukrytej zawartości do wglądu dla studentów, należy poszczególne elementy uczynić widocznymi.',
+  polish: '• W celu udostępnienia ukrytej zawartości, należy poszczególne elementy uczynić widocznymi.',
   english: '• To share hidden content with students, you need to make individual elements visible.'
 };
 

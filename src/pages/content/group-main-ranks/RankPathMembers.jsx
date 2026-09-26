@@ -11,17 +11,17 @@ import './RankPathMembers.css';
 const DEFAULT_MAX_VISIBLE = 15;
 
 const OVERFLOW__TEXTLABEL = {
-  polish: 'Pozostali uczestnicy',
+  polish: 'Pozostałe osoby',
   english: 'Other Participants',
 };
 
 const MEMBERS__TEXTLABEL = {
-  polish: (count) => `${count} uczestników z tą rangą`,
+  polish: (count) => `${count} osoby z tą rangą`,
   english: (count) => `${count} participants with this rank`,
 };
 
 const OVERFLOWBUTTON__TEXTLABEL = {
-  polish: (count) => `${count} dodatkowych uczestników`,
+  polish: (count) => `${count} dodatkowych osób`,
   english: (count) => `${count} additional participants`,
 };
 

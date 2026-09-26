@@ -24,22 +24,22 @@ const LANGUAGE = READLANGUAGECOOKIE();
 
 
 const STUDENT__TEXTLABEL = {
-  polish: 'Student',
+  polish: 'Osoba studiująca',
   english: 'Student',
 };
 
 const LECTURER__TEXTLABEL = {
-  polish: 'Prowadzący',
+  polish: 'Osoba prowadząca',
   english: 'Lecturer',
 };
 
 const ADMINISTRATOR__TEXTLABEL = {
-  polish: 'Administrator',
+  polish: 'Osoba administrująca',
   english: 'Administrator',
 };
 
 const SUPERADMINISTRATOR__TEXTLABEL = {
-  polish: 'Superadministrator',
+  polish: 'Nadrzędna osoba administrująca',
   english: 'Superadmin',
 };
 
@@ -104,7 +104,7 @@ const NAVIGATIONSHOP__TEXTLABEL = {
 };
 
 const NAVIGATIONPARTICIPANTS__TEXTLABEL = {
-  polish: 'Uczestnicy',
+  polish: 'Osoby uczestniczące',
   english: 'Participants',
 };
 
@@ -124,12 +124,12 @@ const NAVIGATIONSETTINGS__TEXTLABEL = {
 };
 
 const NAVIGATIONUSERS__TEXTLABEL = {
-  polish: 'Użytkownicy',
+  polish: 'Osoby korzystające z systemu',
   english: 'Users',
 };
 
 const NAVIGATIONMEMBERS__TEXTLABEL = {
-  polish: 'Uczestnicy',
+  polish: 'Osoby uczestniczące',
   english: 'Members',
 };
 
@@ -245,22 +245,22 @@ const SUBNAVIGATIONPROFILESUBTITLE__TEXTLABEL = {
 };
 
 const SUBNAVIGATIONSTUDENTPROFILE__TEXTLABEL = {
-  polish: 'Profil uczestnika',
+  polish: 'Profil',
   english: 'Student Profile',
 };
 
 const SUBNAVIGATIONSTUDENTPROFILESUBTITLE__TEXTLABEL = {
-  polish: 'Nawigacja profilu uczestnika',
+  polish: 'Nawigacja profilu',
   english: 'Student Profile Navigation',
 };
 
 const SUBNAVIGATIONMEMBERS__TEXTLABEL = {
-  polish: 'Użytkownicy',
+  polish: 'Osoby korzystające z systemu',
   english: 'Users',
 };
 
 const SUBNAVIGATIONMEMBERSSUBTITLE__TEXTLABEL = {
-  polish: 'Nawigacja użytkowników',
+  polish: 'Nawigacja',
   english: 'Users Navigation',
 };
 
@@ -360,7 +360,7 @@ const SUBNAVIGATIONPURCHASEHISTORY__TEXTLABEL = {
 };
 
 const SUBNAVIGATIONMEMBERSLIST__TEXTLABEL = {
-  polish: 'Uczestnicy',
+  polish: 'Osoby uczestniczące',
   english: 'Members',
 };
 
@@ -632,7 +632,7 @@ const studentView = {
       kind: 'spacer',
     },
     {
-      id: 'uczestnicy',
+      id: 'osoby uczestniczące',
       enabled: true,
       kind: 'navlink',
       label: NAVIGATIONPARTICIPANTS__TEXTLABEL[LANGUAGE],

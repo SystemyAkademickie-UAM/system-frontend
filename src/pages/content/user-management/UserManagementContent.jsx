@@ -4,18 +4,18 @@ import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './UserManagementContent.css';
 
 const PAGETITLE__TEXTLABEL = {
-  polish: 'Zarządzanie użytkownikami',
+  polish: 'Zarządzanie osobami korzystającymi z systemu',
   english: 'User Management'
 };
 
 const PAGEDESCRIPTION__TEXTLABEL = {
-  polish: 'Zarządzaj dostępem, rolami i przypisaniami użytkowników w organizacji.',
+  polish: 'Zarządzaj dostępem, rolami i przypisaniami osób korzystających z systemu w wybranej organizacji.',
   english: 'Manage access, roles, and user assignments in your organization.'
 };
 
 const SUBNAVITEMS__TEXTLABEL = {
   polish: [
-    { id: 'users', label: 'Użytkownicy' },
+    { id: 'users', label: 'Osoby korzystające z systemu' },
     { id: 'activity', label: 'Etapy i aktywności' },
     { id: 'posts', label: 'Wpisy' }
   ],

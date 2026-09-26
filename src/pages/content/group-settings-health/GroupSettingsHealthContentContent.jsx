@@ -54,7 +54,7 @@ const LOADINGHINT__TEXTLABEL = {
 };
 
 const TOGGLETOOLTIP__TEXTLABEL = {
-  polish: 'System szans określa liczbę żyć posiadanych przez studenta, pozwalając na ich utratę, limitowanie oraz dokupowanie w sklepie.',
+  polish: 'System szans określa liczbę szans, pozwalając na ich utratę, limitowanie oraz dokupowanie w sklepie.',
   english: 'The lives system defines the number of lives a student has, allowing them to be lost, limited, and purchased in the shop.'
 };
 
@@ -89,7 +89,7 @@ const LIVESSTARTLABEL__TEXTLABEL = {
 };
 
 const LIVESSTARTTOOLTIP__TEXTLABEL = {
-  polish: 'Liczba szans, jaką student otrzymuje po dołączeniu do grupy.',
+  polish: 'Liczba szans, przydzielana po dołączeniu do grupy.',
   english: 'The number of lives a student receives after joining the group.'
 };
 
@@ -109,7 +109,7 @@ const EDITEXTRALIFEBUTTON__TEXTLABEL = {
 };
 
 const MANAGEBUTTON__TEXTLABEL = {
-  polish: 'Zarządzanie życiami studentów',
+  polish: 'Zarządzanie szansami',
   english: 'Manage student lives'
 };
 

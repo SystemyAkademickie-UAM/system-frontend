@@ -9,12 +9,12 @@ import './BadgeEarnersBar.css';
 const DEFAULT_MAX_VISIBLE = 15;
 
 const OVERFLOWARIA__TEXTLABEL = {
-  polish: 'dodatkowych uczestników',
+  polish: 'dodatkowych osób',
   english: 'additional participants'
 };
 
 const OVERFLOWTITLE__TEXTLABEL = {
-  polish: 'Pozostali uczestnicy',
+  polish: 'Pozostałe osoby',
   english: 'Other participants'
 };
 
@@ -105,7 +105,7 @@ function OverflowBadge({ hiddenStudents, LANGUAGE }) {
 }
 
 const BARIARIA__TEXTLABEL = {
-  polish: 'uczestników z tą odznaką',
+  polish: 'osób z tą odznaką',
   english: 'participants with this badge'
 };
 

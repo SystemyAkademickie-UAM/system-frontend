@@ -81,12 +81,12 @@ const ITEMSUPDATEERROR__TEXTLABEL = {
 };
 
 const MEMBERSHIDDEN__TEXTLABEL = {
-  polish: 'Uczestnicy zostali ukryci na ścieżce rang.',
+  polish: 'Ścieżka rang nie ujawnia postępu studentów.',
   english: 'Participants have been hidden from the rank path.'
 };
 
 const MEMBERSVISIBLE__TEXTLABEL = {
-  polish: 'Uczestnicy są widoczni na ścieżce rang.',
+  polish: 'Ścieżka rang ujawnia postęp studentów.',
   english: 'Participants are visible on the rank path.'
 };
 
@@ -106,17 +106,17 @@ const ADDRANKBUTTON__TEXTLABEL = {
 };
 
 const HIDEMEMBERSBUTTON__TEXTLABEL = {
-  polish: 'Ukryj uczestników',
+  polish: 'Ukryj osoby',
   english: 'Hide participants'
 };
 
 const SHOWMEMBERSBUTTON__TEXTLABEL = {
-  polish: 'Pokaż uczestników',
+  polish: 'Pokaż osoby',
   english: 'Show participants'
 };
 
 const MEMBERAVATARTOOLTIP__TEXTLABEL = {
-  polish: 'Steruje widocznością innych uczestników dla studentów.',
+  polish: 'Steruje widocznością osób.',
   english: 'Controls the visibility of other participants for students.'
 };
 
@@ -176,7 +176,7 @@ const ASSIGNLABEL__TEXTLABEL = {
 };
 
 const ASSIGNARIA__TEXTLABEL = {
-  polish: 'Przypisz rangę studentom',
+  polish: 'Przypisz rangę',
   english: 'Assign rank to students'
 };
 

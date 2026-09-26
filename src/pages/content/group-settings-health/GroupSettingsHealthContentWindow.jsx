@@ -46,7 +46,7 @@ const COLUMNOPERATIONS__TEXTLABEL = {
 };
 
 const EMPTYSTATE__TEXTLABEL = {
-  polish: 'Brak zapisanych uczestników w grupie.',
+  polish: 'Brak zapisanych osób w grupie.',
   english: 'No participants registered in the group.'
 };
 
@@ -61,7 +61,7 @@ const BULKSETBUTTON__TEXTLABEL = {
 };
 
 const BULKSETPREFIX__TEXTLABEL = {
-  polish: 'Ustaw wszystkim:',
+  polish: 'Ustaw globalnie:',
   english: 'Set to all:'
 };
 

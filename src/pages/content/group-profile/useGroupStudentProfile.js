@@ -5,7 +5,7 @@ import { fetchGroupStudents, fetchStudentBadges } from '../../../services/studen
 import { fetchGroupRanks } from '../../../services/ranks.api.js';
 
 const PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL = {
-  polish: 'Nie znaleziono uczestnika w tej grupie.',
+  polish: 'Nie znaleziono osoby w grupie.',
   english: 'Participant not found in this group.'
 };
 

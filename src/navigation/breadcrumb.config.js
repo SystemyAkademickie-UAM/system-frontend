@@ -50,7 +50,7 @@ export const GROUP_BREADCRUMB_RULES = [
   },
   {
     pattern: /^\/groups\/[^/]+\/users\/?$/u,
-    segments: [{ label: 'Uczestnicy' }],
+    segments: [{ label: 'Osoby uczestniczące' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/activity-list\/?$/u,
@@ -70,15 +70,15 @@ export const GROUP_BREADCRUMB_RULES = [
   },
   {
     pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/eq\/?$/u,
-    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Ekwipunek' }],
+    segments: [{ label: 'Osoby korzystające z systemu', path: groupMembersPath }, { label: 'Ekwipunek' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/purchases\/?$/u,
-    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Historia zakupów' }],
+    segments: [{ label: 'Osoby korzystające z systemu', path: groupMembersPath }, { label: 'Historia zakupów' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/student-profile\/[^/]+\/?$/u,
-    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Profil uczestnika' }],
+    segments: [{ label: 'Osoby korzystające z systemu', path: groupMembersPath }, { label: 'Profil' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/profile\/eq\/?$/u,
@@ -94,15 +94,15 @@ export const GROUP_BREADCRUMB_RULES = [
   },
   {
     pattern: /^\/groups\/[^/]+\/members\/codes\/?$/u,
-    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Kody dostępu' }],
+    segments: [{ label: 'Osoby korzystające z systemu', path: groupMembersPath }, { label: 'Kody dostępu' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/members\/log\/?$/u,
-    segments: [{ label: 'Użytkownicy', path: groupMembersPath }, { label: 'Dziennik aktywności' }],
+    segments: [{ label: 'Osoby korzystające z systemu', path: groupMembersPath }, { label: 'Dziennik aktywności' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/members\/?$/u,
-    segments: [{ label: 'Użytkownicy' }],
+    segments: [{ label: 'Osoby korzystające z systemu' }],
   },
   {
     pattern: /^\/groups\/[^/]+\/activities\/tools\/?$/u,
@@ -169,10 +169,10 @@ export const SIDEBAR_LABEL_BY_HREF_KEY = {
   GROUP_PROFILE_LOG: 'Zdobyte odznaki',
   GROUP_SHOP: 'Sklep',
   GROUP_RANKING: 'Ranking',
-  GROUP_MEMBERS: 'Użytkownicy',
+  GROUP_MEMBERS: 'Osoby korzystające z systemu',
   GROUP_ACTIVITIES: 'Aktywności',
   GROUP_STUDENT_FEED: 'Wpisy',
-  GROUP_STUDENT_PARTICIPANTS: 'Uczestnicy',
+  GROUP_STUDENT_PARTICIPANTS: 'Osoby uczestniczące',
   GROUP_STUDENT_ACTIVITY_LIST: 'Lista aktywności',
   GROUP_STUDENT_RANKS: 'Rangi',
   GROUP_STUDENT_BADGES: 'Odznaki',

@@ -96,12 +96,12 @@ const DELETEFAILMESSAGE__TEXTLABEL = {
 };
 
 const ALLOPUBLISHEDMESSAGE__TEXTLABEL = {
-  polish: 'Wszystkie odznaki są teraz widoczne dla studentów.',
+  polish: 'Wszystkie odznaki są teraz widoczne.',
   english: 'All badges are now visible to students.'
 };
 
 const ALLHIDDENMESSAGE__TEXTLABEL = {
-  polish: 'Wszystkie odznaki są teraz ukryte przed studentami.',
+  polish: 'Wszystkie odznaki są teraz ukryte.',
   english: 'All badges are now hidden from students.'
 };
 
@@ -111,12 +111,12 @@ const ALLTOGGLEFAILMESSAGE__TEXTLABEL = {
 };
 
 const PUBLISHMESSAGE__TEXTLABEL = {
-  polish: 'Odznaka jest teraz widoczna dla studentów.',
+  polish: 'Odznaka jest teraz widoczna.',
   english: 'Badge is now visible to students.'
 };
 
 const UNPUBLISHMESSAGE__TEXTLABEL = {
-  polish: 'Odznaka jest teraz ukryta przed studentami.',
+  polish: 'Odznaka jest teraz ukryta.',
   english: 'Badge is now hidden from students.'
 };
 
@@ -136,7 +136,7 @@ const ROWACTIONASSIGNTEXT__TEXTLABEL = {
 };
 
 const ROWACTIONASSIGNARIA__TEXTLABEL = {
-  polish: 'Przydziel odznakę studentom',
+  polish: 'Przydziel odznakę',
   english: 'Assign badge to students'
 };
 
@@ -156,7 +156,7 @@ const ROWACTIONVISIBILITYTEXT__TEXTLABEL = {
 };
 
 const ROWACTIONVISIBILITYDESC__TEXTLABEL = {
-  polish: 'Zmienia widoczność odznaki dla studenta.',
+  polish: 'Zmienia widoczność odznaki.',
   english: 'Changes badge visibility for students.'
 };
 

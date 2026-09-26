@@ -11,8 +11,8 @@ const MODALTITLE__TEXTLABEL = {
 
 const SEARCH__TEXTLABEL = {
   polish: {
-    placeholder: 'Szukaj studenta…',
-    label: 'Szukaj studenta'
+    placeholder: 'Szukaj osoby…',
+    label: 'Szukaj osoby'
   },
   english: {
     placeholder: 'Search student…',
