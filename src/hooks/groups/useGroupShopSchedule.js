@@ -39,6 +39,10 @@ export function useGroupRankPathSettings(groupId) {
     return { ok: true };
   }, [groupId]);
 
+  const toggleShowMemberAvatars = useCallback(async () => {
+    return setShowMemberAvatarsSetting(!showMemberAvatars);
+  }, [setShowMemberAvatarsSetting, showMemberAvatars]);
+
   return {
     showMemberAvatars,
     isLoading,

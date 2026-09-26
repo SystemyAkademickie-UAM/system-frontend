@@ -33,7 +33,7 @@ const SHOW_NICKNAME_LABEL = {
 };
 
 const SHOW_NICKNAME_DESCRIPTION = {
-  polish: 'Ksywka staje się widoczna dla innych użytkowników (wyświetlana jest dodatkowo obok imienia i nazwiska).',
+  polish: 'Ksywka staje się widoczna dla innych (wyświetlana jest dodatkowo obok imienia i nazwiska).',
   english: 'Your nickname becomes visible to other users (displayed alongside your full name).'
 };
 

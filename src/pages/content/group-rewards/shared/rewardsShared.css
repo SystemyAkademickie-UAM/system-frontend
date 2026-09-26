@@ -63,9 +63,9 @@
 }
 
 .rewards-page__search {
-  width: 100%;
-  max-width: 18rem;
-  flex: 0 0 auto;
+  width: 18rem;
+  max-width: 100%;
+  flex: 0 1 18rem;
 }
 
 .rewards-page__toolbar-end {
@@ -98,15 +98,15 @@
 
 .rewards-page__toolbar-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
   gap: 0.625rem;
-  width: 100%;
 }
 
 .rewards-page__settings-btn {
-  flex-shrink: 0;
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 

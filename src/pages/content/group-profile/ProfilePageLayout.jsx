@@ -27,7 +27,7 @@ const EYEBROW_LABEL__TEXTLABEL = {
 };
 
 const DEFAULT_STUDENT_NAME__TEXTLABEL = {
-  polish: 'Student',
+  polish: 'Osoba studiująca',
   english: 'Student'
 };
 
@@ -144,7 +144,7 @@ export default function ProfilePageLayout({ children }) {
   const livesDisplay = profile?.lives != null ? formatProfileNumber(profile.lives) : '-';
   const lostLivesDisplay = profile?.lostLivesCount != null ? formatProfileNumber(profile.lostLivesCount) : '-';
   const eyebrowLabel = studentId
-    ? (LANGUAGE === 'polish' ? 'Profil uczestnika' : 'Participant profile')
+    ? (LANGUAGE === 'polish' ? 'Profil' : 'Participant profile')
     : EYEBROW_LABEL__TEXTLABEL[LANGUAGE];
 
   return (

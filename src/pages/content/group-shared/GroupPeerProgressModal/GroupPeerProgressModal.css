@@ -1,5 +1,6 @@
-.group-peer-progress-modal {
+.group-peer-progress-modal .maq-modal__dialog {
   width: min(92vw, 480px);
+  max-width: 480px;
 }
 
 .group-peer-progress-modal__body {

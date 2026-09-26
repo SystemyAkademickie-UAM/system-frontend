@@ -354,7 +354,7 @@ export default function RewardsBadgesContent() {
     } else {
       showError(result.error || CREATEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
-  }, [handleCreate, closeModal, showSuccess, showError]);
+  }, [handleCreate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleEditConfirm = useCallback(async (values) => {
     if (!activeModal?.badge) return;
@@ -367,7 +367,7 @@ export default function RewardsBadgesContent() {
     } else {
       showError(result.error || EDITFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.badge) return;
@@ -380,7 +380,7 @@ export default function RewardsBadgesContent() {
     } else {
       showError(result.error || DELETEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleDelete, closeModal, showSuccess, showError]);
+  }, [activeModal, handleDelete, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleGiveConfirm = useCallback(({ changed, error: giveError } = {}) => {
     if (giveError) {
@@ -390,7 +390,7 @@ export default function RewardsBadgesContent() {
     if (changed > 0) {
       showSuccess(BADGEUPDATEDMESSAGE__TEXTLABEL[LANGUAGE].replace('{count}', changed));
     }
-  }, [showSuccess, showError]);
+  }, [showSuccess, showError, LANGUAGE]);
 
   const handleTileEditBadge = useCallback((treasuryBadge) => {
     const badge = badges.find((entry) => entry.dbId === treasuryBadge.dbId);

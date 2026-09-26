@@ -1,3 +1,4 @@
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import {
   groupActivitiesPath,
   groupMainPath,
@@ -35,23 +36,74 @@ export function parseBacklogPayload(value) {
 }
 
 const TYPE_LABELS = {
-  STUDENT_JOINED: 'Dołączenie do grupy',
-  SHOP_PURCHASE: 'Zakup w sklepie',
-  ITEM_USED: 'Użycie przedmiotu',
-  ACTIVITY_COMPLETED: 'Zaliczenie aktywności',
-  RANK_UP: 'Awans rangi',
-  BADGE_EARNED: 'Zdobyta odznaka',
-  STAGE_ADDED: 'Nowy etap',
-  BADGE_ADDED: 'Nowa odznaka',
-  RANK_ADDED: 'Nowa ranga',
-  SHOP_ITEM_ADDED: 'Nowy produkt w sklepie',
-  LIVES_SYSTEM_CHANGED: 'System żyć',
-  SHOP_STATUS_CHANGED: 'Status sklepu',
-  POST_ADDED: 'Nowy wpis',
-  STAGE_COMPLETED: 'Ukończono etap',
-  CURRENCY_ADDED: 'Zdobyto walutę',
-  LIVES_CHANGED: 'Zmiana żyć',
-  OTHER: 'Powiadomienie',
+  STUDENT_JOINED: {
+    polish: 'Dołączenie do grupy',
+    english: 'Group join',
+  },
+  SHOP_PURCHASE: {
+    polish: 'Zakup w sklepie',
+    english: 'Shop purchase',
+  },
+  ITEM_USED: {
+    polish: 'Użycie przedmiotu',
+    english: 'Item use',
+  },
+  ACTIVITY_COMPLETED: {
+    polish: 'Zaliczenie aktywności',
+    english: 'Activity completion',
+  },
+  RANK_UP: {
+    polish: 'Awans rangi',
+    english: 'Rank upgrade',
+  },
+  BADGE_EARNED: {
+    polish: 'Zdobyta odznaka',
+    english: 'Badge earned',
+  },
+  STAGE_ADDED: {
+    polish: 'Nowy etap',
+    english: 'New stage',
+  },
+  BADGE_ADDED: {
+    polish: 'Nowa odznaka',
+    english: 'New badge',
+  },
+  RANK_ADDED: {
+    polish: 'Nowa ranga',
+    english: 'New rank',
+  },
+  SHOP_ITEM_ADDED: {
+    polish: 'Nowy produkt w sklepie',
+    english: 'New shop item',
+  },
+  LIVES_SYSTEM_CHANGED: {
+    polish: 'System żyć',
+    english: 'Lives system',
+  },
+  SHOP_STATUS_CHANGED: {
+    polish: 'Status sklepu',
+    english: 'Shop status',
+  },
+  POST_ADDED: {
+    polish: 'Nowy wpis',
+    english: 'New post',
+  },
+  STAGE_COMPLETED: {
+    polish: 'Ukończono etap',
+    english: 'Stage completed',
+  },
+  CURRENCY_ADDED: {
+    polish: 'Zdobyto walutę',
+    english: 'Currency earned',
+  },
+  LIVES_CHANGED: {
+    polish: 'Zmiana żyć',
+    english: 'Life change',
+  },
+  OTHER: {
+    polish: 'Powiadomienie',
+    english: 'Notification',
+  },
 };
 
 const LECTURER_STUDENT_EVENT_TYPES = new Set([
@@ -145,6 +197,256 @@ function resolvePrice(payload) {
   return readNumber(payload.price ?? payload.amount);
 }
 
+const LIVESDELTA__TEXTLABEL = {
+  polish: 'Życia',
+  english: 'Lives',
+};
+
+const CURRENTLY__TEXTLABEL = {
+  polish: 'aktualnie',
+  english: 'currently',
+};
+
+const COST__TEXTLABEL = {
+  polish: 'Koszt',
+  english: 'Cost',
+};
+
+const POINTS__TEXTLABEL = {
+  polish: 'Punkty',
+  english: 'Points',
+};
+
+const REWARD__TEXTLABEL = {
+  polish: 'Nagroda',
+  english: 'Reward',
+};
+
+const CURRENCY__TEXTLABEL = {
+  polish: 'Waluta',
+  english: 'Currency',
+};
+
+const BALANCE__TEXTLABEL = {
+  polish: 'Stan konta',
+  english: 'Balance',
+};
+
+const TOTALEARNED__TEXTLABEL = {
+  polish: 'Waluta zgromadzona',
+  english: 'Total earned',
+};
+
+const STUDENTJOINEDSTUDENT__TEXTLABEL = {
+  polish: 'dołączył(a) do grupy',
+  english: 'joined the group',
+};
+
+const STUDENTJOINEDGROUP__TEXTLABEL = {
+  polish: 'dołączył(a) do grupy',
+  english: 'joined the group',
+};
+
+const SHOPEXTRALIFE__TEXTLABEL = {
+  polish: 'dodatkowe życie',
+  english: 'extra life',
+};
+
+const SHOPPURCHASE__TEXTLABEL = {
+  polish: 'kupił(a)',
+  english: 'purchased',
+};
+
+const SHOPPURCHASEPURCHASE__TEXTLABEL = {
+  polish: 'dokonał(a) zakupu w sklepie',
+  english: 'made a shop purchase',
+};
+
+const ITEMUSED__TEXTLABEL = {
+  polish: 'użył(a)',
+  english: 'used',
+};
+
+const ITEMUSEDUSED__TEXTLABEL = {
+  polish: 'użył(a) przedmiot',
+  english: 'used an item',
+};
+
+const ACTIVITYCOMPLETED__TEXTLABEL = {
+  polish: 'zaliczył(a)',
+  english: 'completed',
+};
+
+const ACTIVITYCOMPLETEDCOMPLETED__TEXTLABEL = {
+  polish: 'zaliczył(a) aktywność',
+  english: 'completed an activity',
+};
+
+const BADGEEARNED__TEXTLABEL = {
+  polish: 'zdobył(a) odznakę',
+  english: 'earned a badge',
+};
+
+const BADGEEARNEDEARNED__TEXTLABEL = {
+  polish: 'zdobył(a) odznakę',
+  english: 'earned a badge',
+};
+
+const RANKUP__TEXTLABEL = {
+  polish: 'awansował(a) na rangę',
+  english: 'ranked up to',
+};
+
+const RANKUPRANKUP__TEXTLABEL = {
+  polish: 'awansował(a) rangę',
+  english: 'ranked up',
+};
+
+const LIVESCHANGED__TEXTLABEL = {
+  polish: 'zmiana liczby żyć',
+  english: 'life change',
+};
+
+const CURRENCYADDED__TEXTLABEL = {
+  polish: 'otrzymał(a) walutę',
+  english: 'received currency',
+};
+
+const CURRENCYREMOVED__TEXTLABEL = {
+  polish: 'pobrano walutę',
+  english: 'currency removed',
+};
+
+const CURRENCYUPDATED__TEXTLABEL = {
+  polish: 'zaktualizowano stan konta',
+  english: 'balance updated',
+};
+
+const CURRENCYTOTALINCREASED__TEXTLABEL = {
+  polish: 'zwiększono walutę zgromadzoną',
+  english: 'total earned increased',
+};
+
+const CURRENCYTOTALDECREASED__TEXTLABEL = {
+  polish: 'zmniejszono walutę zgromadzoną',
+  english: 'total earned decreased',
+};
+
+const CURRENCYTOTALUPDATED__TEXTLABEL = {
+  polish: 'zaktualizowano walutę zgromadzoną',
+  english: 'total earned updated',
+};
+
+const JOINEDGROUP__TEXTLABEL = {
+  polish: 'Dołączyłeś(aś) do grupy',
+  english: 'You joined the group',
+};
+
+const NEWPRODUCT__TEXTLABEL = {
+  polish: 'Nowy produkt',
+  english: 'New product',
+};
+
+const NEWBADGE__TEXTLABEL = {
+  polish: 'Nowa odznaka',
+  english: 'New badge',
+};
+
+const NEWRANK__TEXTLABEL = {
+  polish: 'Nowa ranga',
+  english: 'New rank',
+};
+
+const NEWSTAGE__TEXTLABEL = {
+  polish: 'Nowy etap',
+  english: 'New stage',
+};
+
+const STAGECOMPLETED__TEXTLABEL = {
+  polish: 'Ukończono etap',
+  english: 'Stage completed',
+};
+
+const POSTADDED__TEXTLABEL = {
+  polish: 'Nowy wpis',
+  english: 'New post',
+};
+
+const BADGEEARNEDSTUDENT__TEXTLABEL = {
+  polish: 'Zdobyto odznakę',
+  english: 'Badge earned',
+};
+
+const RANKUPSTUDENT__TEXTLABEL = {
+  polish: 'Awans na rangę',
+  english: 'Rank upgrade',
+};
+
+const ACTIVITYCOMPLETEDSTUDENT__TEXTLABEL = {
+  polish: 'Zaliczono',
+  english: 'Completed',
+};
+
+const ACTIVITYCOMPLETEDSTUDENTSTUDENT__TEXTLABEL = {
+  polish: 'Zaliczono aktywność',
+  english: 'Activity completed',
+};
+
+const SHOPPURCHASESTUDENT__TEXTLABEL = {
+  polish: 'Zakup',
+  english: 'Purchase',
+};
+
+const ITEMUSEDSTUDENT__TEXTLABEL = {
+  polish: 'Użyto',
+  english: 'Used',
+};
+
+const LIVESCHANGEDSTUDENT__TEXTLABEL = {
+  polish: 'Zmiana liczby żyć',
+  english: 'Life change',
+};
+
+const CURRENCYADDEDSTUDENT__TEXTLABEL = {
+  polish: 'Zdobyto walutę',
+  english: 'Currency earned',
+};
+
+const CURRENCYREMOVEDSTUDENT__TEXTLABEL = {
+  polish: 'Pobrano walutę',
+  english: 'Currency removed',
+};
+
+const CURRENCYADDEDSTUDENTUPDATED__TEXTLABEL = {
+  polish: 'Zaktualizowano stan konta',
+  english: 'Balance updated',
+};
+
+const CURRENCYTOTALINCREASEDSTUDENT__TEXTLABEL = {
+  polish: 'Zwiększono walutę zgromadzoną',
+  english: 'Total earned increased',
+};
+
+const CURRENCYTOTALDECREASEDSTUDENT__TEXTLABEL = {
+  polish: 'Zmniejszono walutę zgromadzoną',
+  english: 'Total earned decreased',
+};
+
+const CURRENCYTOTALUPDATEDSTUDENT__TEXTLABEL = {
+  polish: 'Zaktualizowano walutę zgromadzoną',
+  english: 'Total earned updated',
+};
+
+const SHOPOPENED__TEXTLABEL = {
+  polish: 'Sklep grupy został otwarty',
+  english: 'Group shop has been opened',
+};
+
+const SHOPCLOSED__TEXTLABEL = {
+  polish: 'Sklep grupy został zamknięty',
+  english: 'Group shop has been closed',
+};
+
 /**
  * @param {number | null} delta
  * @param {number | null} lives
@@ -153,13 +455,14 @@ function resolvePrice(payload) {
 function formatLivesChangeLabel(delta, lives) {
   if (delta != null && lives != null) {
     const deltaLabel = delta >= 0 ? `+${delta}` : String(delta);
-    return `Życia: ${deltaLabel} (aktualnie: ${lives})`;
+    return `${LIVESDELTA__TEXTLABEL}: ${deltaLabel} (${CURRENTLY__TEXTLABEL}: ${lives})`;
   }
   if (lives != null) {
-    return `Aktualna liczba żyć: ${lives}`;
+    return `${CURRENTLY__TEXTLABEL} liczba żyć: ${lives}`;
   }
   if (delta != null) {
-    return delta >= 0 ? `Życia: +${delta}` : `Życia: ${delta}`;
+    return delta >= 0 ? `${LIVESDELTA__TEXTLABEL}: +${delta}` : `${LIVESDELTA__TEXTLABEL}: ${delta}`;
+
   }
   return null;
 }
@@ -257,33 +560,33 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
 
   const price = resolvePrice(payload);
   if (price != null) {
-    pushUnique(`Koszt: ${price}`);
+    pushUnique(`${COST__TEXTLABEL}: ${price}`);
   }
 
   const points = readNumber(payload.points);
   if (points != null && !skipPointsLabel) {
-    pushUnique(`Punkty: +${points}`);
+    pushUnique(`${POINTS__TEXTLABEL}: +${points}`);
   }
 
   const rewardAmount = readNumber(payload.rewardAmount);
   if (rewardAmount != null && rewardAmount !== points) {
-    pushUnique(`Nagroda: +${rewardAmount}`);
+    pushUnique(`${REWARD__TEXTLABEL}: +${rewardAmount}`);
   }
 
   const currencyAmount = readNumber(payload.currencyAmount);
   if (currencyAmount != null && currencyAmount !== points && currencyAmount !== price) {
-    pushUnique(`Waluta: +${currencyAmount}`);
+    pushUnique(`${CURRENCY__TEXTLABEL}: +${currencyAmount}`);
   }
 
   const currencyDelta = resolveCurrencyDelta(payload);
   const currencyBalance = resolveCurrencyBalance(payload);
   if (currencyBalance != null) {
-    pushUnique(`Stan konta: ${currencyBalance}`);
+    pushUnique(`${BALANCE__TEXTLABEL}: ${currencyBalance}`);
   }
 
   const totalEarned = resolveTotalEarnedBalance(payload);
   if (totalEarned != null && isTotalEarnedPayload(payload)) {
-    pushUnique(`Waluta zgromadzona: ${totalEarned}`);
+    pushUnique(`${TOTALEARNED__TEXTLABEL}: ${totalEarned}`);
   }
 
   const livesDelta = resolveLivesDelta(payload);
@@ -303,7 +606,7 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
  * @param {string | null} studentLabel
  * @returns {string | null}
  */
-function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
+function buildFallbackTitle(type, payload, isStudentView, studentLabel, language) {
   const itemName = readString(payload.itemName);
   const badgeName = readString(payload.badgeName);
   const rankName = readString(payload.rankName);
@@ -321,64 +624,65 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
 
   if (!isStudentView && studentLabel) {
     switch (type) {
+
       case 'STUDENT_JOINED':
-        return `${studentLabel} dołączył(a) do grupy`;
+        return `${studentLabel} ${STUDENTJOINEDSTUDENT__TEXTLABEL[language]}`;
       case 'SHOP_PURCHASE':
         if (isExtraLife) {
           return price != null
-            ? `${studentLabel} kupił(a) dodatkowe życie (${price})`
-            : `${studentLabel} kupił(a) dodatkowe życie`;
+            ? `${studentLabel} ${SHOPPURCHASE__TEXTLABEL[language]}: ${SHOPEXTRALIFE__TEXTLABEL[language]} (${price})`
+            : `${studentLabel} ${SHOPPURCHASE__TEXTLABEL[language]}: ${SHOPEXTRALIFE__TEXTLABEL[language]}`;
         }
         return price != null && itemName
-          ? `${studentLabel} kupił(a): ${itemName} (${price})`
+          ? `${studentLabel} ${SHOPPURCHASE__TEXTLABEL[language]}: ${itemName} (${price})`
           : itemName
-            ? `${studentLabel} kupił(a): ${itemName}`
-            : `${studentLabel} dokonał(a) zakupu w sklepie`;
+            ? `${studentLabel} ${SHOPPURCHASE__TEXTLABEL[language]}: ${itemName}`
+            : `${studentLabel} ${SHOPPURCHASEPURCHASE__TEXTLABEL[language]}`;
       case 'ITEM_USED':
         return itemName
-          ? `${studentLabel} użył(a): ${itemName}`
-          : `${studentLabel} użył(a) przedmiotu`;
+          ? `${studentLabel} ${ITEMUSED__TEXTLABEL[language]}: ${itemName}`
+          : `${studentLabel} ${ITEMUSEDUSED__TEXTLABEL[language]}`;
       case 'ACTIVITY_COMPLETED':
         return activityName
-          ? `${studentLabel} zaliczył(a): ${activityName}`
-          : `${studentLabel} zaliczył(a) aktywność`;
+          ? `${studentLabel} ${ACTIVITYCOMPLETED__TEXTLABEL[language]}: ${activityName}`
+          : `${studentLabel} ${ACTIVITYCOMPLETEDCOMPLETED__TEXTLABEL[language]}`;
       case 'BADGE_EARNED':
         return badgeName
-          ? `${studentLabel} zdobył(a) odznakę: ${badgeName}`
-          : `${studentLabel} zdobył(a) odznakę`;
+          ? `${studentLabel} ${BADGEEARNED__TEXTLABEL[language]}: ${badgeName}`
+          : `${studentLabel} ${BADGEEARNEDEARNED__TEXTLABEL[language]}`;
       case 'RANK_UP':
         return rankName
-          ? `${studentLabel} awansował(a) na rangę: ${rankName}`
-          : `${studentLabel} awansował(a) rangę`;
+          ? `${studentLabel} ${RANKUP__TEXTLABEL[language]}: ${rankName}`
+          : `${studentLabel} ${RANKUPRANKUP__TEXTLABEL[language]}`;
       case 'LIVES_CHANGED':
         return livesLabel
           ? `${studentLabel}: ${livesLabel}`
-          : `${studentLabel}: zmiana liczby żyć`;
+          : `${studentLabel}: ${LIVESCHANGED__TEXTLABEL[language]}`;
       case 'CURRENCY_ADDED':
         if (isTotalEarnedPayload(payload)) {
           if (totalEarnedDelta != null) {
             if (totalEarnedDelta > 0) {
-              return `${studentLabel}: zwiększono walutę zgromadzoną (+${totalEarnedDelta})`;
+              return `${studentLabel}: ${CURRENCYTOTALINCREASED__TEXTLABEL[language]} (+${totalEarnedDelta})`;
             }
             if (totalEarnedDelta < 0) {
-              return `${studentLabel}: zmniejszono walutę zgromadzoną (${totalEarnedDelta})`;
+              return `${studentLabel}: ${CURRENCYTOTALDECREASED__TEXTLABEL[language]} (${totalEarnedDelta})`;
             }
-            return `${studentLabel}: zaktualizowano walutę zgromadzoną`;
+            return `${studentLabel}: ${CURRENCYTOTALUPDATED__TEXTLABEL[language]}`;
           }
-          return `${studentLabel}: zaktualizowano walutę zgromadzoną`;
+          return `${studentLabel}: ${CURRENCYTOTALUPDATED__TEXTLABEL[language]}`;
         }
         if (currencyDelta != null) {
           if (currencyDelta > 0) {
-            return `${studentLabel} otrzymał(a) walutę (+${currencyDelta})`;
+            return `${studentLabel} ${CURRENCYADDED__TEXTLABEL[language]} (+${currencyDelta})`;
           }
           if (currencyDelta < 0) {
-            return `${studentLabel}: pobrano walutę (${currencyDelta})`;
+            return `${studentLabel}: ${CURRENCYREMOVED__TEXTLABEL[language]} (${currencyDelta})`;
           }
-          return `${studentLabel}: zaktualizowano stan konta`;
+          return `${studentLabel}: ${CURRENCYUPDATED__TEXTLABEL[language]}`;
         }
         return points != null
-          ? `${studentLabel} otrzymał(a) walutę: +${points}`
-          : `${studentLabel} otrzymał(a) walutę`;
+          ? `${studentLabel} ${CURRENCYADDED__TEXTLABEL[language]}: +${points}`
+          : `${studentLabel} ${CURRENCYADDED__TEXTLABEL[language]}`;
       default:
         break;
     }
@@ -386,69 +690,69 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel) {
 
   switch (type) {
     case 'STUDENT_JOINED':
-      return 'Dołączyłeś(aś) do grupy';
+      return JOINEDGROUP__TEXTLABEL[language];
     case 'SHOP_ITEM_ADDED':
-      return itemName ? `Nowy produkt: ${itemName}` : null;
+      return itemName ? `${NEWPRODUCT__TEXTLABEL[language]}: ${itemName}` : null;
     case 'BADGE_ADDED':
-      return badgeName ? `Nowa odznaka: ${badgeName}` : null;
+      return badgeName ? `${NEWBADGE__TEXTLABEL[language]}: ${badgeName}` : null;
     case 'RANK_ADDED':
-      return rankName ? `Nowa ranga: ${rankName}` : null;
+      return rankName ? `${NEWRANK__TEXTLABEL[language]}: ${rankName}` : null;
     case 'STAGE_ADDED':
-      return stageName ? `Nowy etap: ${stageName}` : null;
+      return stageName ? `${NEWSTAGE__TEXTLABEL[language]}: ${stageName}` : null;
     case 'STAGE_COMPLETED':
-      return stageName ? `Ukończono etap: ${stageName}` : null;
+      return stageName ? `${STAGECOMPLETED__TEXTLABEL[language]}: ${stageName}` : null;
     case 'POST_ADDED':
-      return postTitle ? `Nowy wpis: ${postTitle}` : null;
+      return postTitle ? `${POSTADDED__TEXTLABEL[language]}: ${postTitle}` : null;
     case 'BADGE_EARNED':
-      return badgeName ? `Zdobyto odznakę: ${badgeName}` : null;
+      return badgeName ? `${BADGEEARNEDSTUDENT__TEXTLABEL[language]}: ${badgeName}` : null;
     case 'RANK_UP':
-      return rankName ? `Awans na rangę: ${rankName}` : null;
+      return rankName ? `${RANKUPSTUDENT__TEXTLABEL[language]}: ${rankName}` : null;
     case 'ACTIVITY_COMPLETED':
       return activityName
-        ? `Zaliczono: ${activityName}`
-        : 'Zaliczono aktywność';
+        ? `${ACTIVITYCOMPLETEDSTUDENT__TEXTLABEL[language]}: ${activityName}`
+        : `${ACTIVITYCOMPLETEDSTUDENTSTUDENT__TEXTLABEL[language]}`;
     case 'SHOP_PURCHASE':
       if (isExtraLife) {
-        return price != null ? `Kupiono dodatkowe życie (${price})` : 'Kupiono dodatkowe życie';
+        return price != null ? `${SHOPEXTRALIFE__TEXTLABEL[language]} (${price})` : `${SHOPEXTRALIFE__TEXTLABEL[language]}`;
       }
       return itemName && price != null
-        ? `Zakup: ${itemName} (${price})`
+        ? `${SHOPPURCHASESTUDENT__TEXTLABEL[language]}: ${itemName} (${price})`
         : itemName
-          ? `Zakup: ${itemName}`
+          ? `${SHOPPURCHASESTUDENT__TEXTLABEL[language]}: ${itemName}`
           : null;
     case 'ITEM_USED':
-      return itemName ? `Użyto: ${itemName}` : null;
+      return itemName ? `${ITEMUSEDSTUDENT__TEXTLABEL[language]}: ${itemName}` : null;
     case 'LIVES_CHANGED':
-      return livesLabel ?? 'Zmiana liczby żyć';
+      return livesLabel ?? `${LIVESCHANGEDSTUDENT__TEXTLABEL[language]}`;
     case 'CURRENCY_ADDED':
       if (isTotalEarnedPayload(payload)) {
         if (totalEarnedDelta != null) {
           if (totalEarnedDelta > 0) {
-            return `Zwiększono walutę zgromadzoną (+${totalEarnedDelta})`;
+            return `${CURRENCYTOTALINCREASEDSTUDENT__TEXTLABEL[language]} (+${totalEarnedDelta})`;
           }
           if (totalEarnedDelta < 0) {
-            return `Zmniejszono walutę zgromadzoną (${totalEarnedDelta})`;
+            return `${CURRENCYTOTALDECREASEDSTUDENT__TEXTLABEL[language]} (${totalEarnedDelta})`;
           }
-          return 'Zaktualizowano walutę zgromadzoną';
+          return `${CURRENCYTOTALUPDATEDSTUDENT__TEXTLABEL[language]}`;
         }
-        return 'Zaktualizowano walutę zgromadzoną';
+        return `${CURRENCYTOTALUPDATEDSTUDENT__TEXTLABEL[language]}`;
       }
       if (currencyDelta != null) {
         if (currencyDelta > 0) {
-          return `Zdobyto walutę (+${currencyDelta})`;
+          return `${CURRENCYADDEDSTUDENT__TEXTLABEL[language]} (+${currencyDelta})`;
         }
         if (currencyDelta < 0) {
-          return `Pobrano walutę (${currencyDelta})`;
+          return `${CURRENCYREMOVEDSTUDENT__TEXTLABEL[language]} (${currencyDelta})`;
         }
-        return 'Zaktualizowano stan konta';
+        return `${CURRENCYADDEDSTUDENTUPDATED__TEXTLABEL[language]}`;
       }
-      return points != null ? `Zdobyto walutę (+${points})` : null;
+      return points != null ? `${CURRENCYADDEDSTUDENT__TEXTLABEL[language]} (+${points})` : null;
     case 'SHOP_STATUS_CHANGED':
       if (payload.shopOpen === true) {
-        return 'Sklep grupy został otwarty';
+        return SHOPOPENED__TEXTLABEL[language];
       }
       if (payload.shopOpen === false) {
-        return 'Sklep grupy został zamknięty';
+        return SHOPCLOSED__TEXTLABEL[language];
       }
       return readString(payload.message);
     case 'LIVES_SYSTEM_CHANGED':
@@ -491,31 +795,36 @@ function resolveNotificationSubtitle(title, details) {
   return subtitle && subtitle !== title ? subtitle : '';
 }
 
+function resolveTypeLabel(type, language) {
+  return TYPE_LABELS[type][language];
+}
+
 /**
  * @param {string | number} groupId
  * @param {import('../../services/backlog.api.js').BacklogItem} item
  * @param {boolean} [isStudentView=false]
  */
-export function formatBacklogNotification(groupId, item, isStudentView = false) {
+export function formatBacklogNotification(groupId, item, isStudentView = false, language) {
+  const resolvedLanguage = language ?? READLANGUAGECOOKIE();
   const payload = parseBacklogPayload(item.value);
   const message = readString(payload.message) ?? '';
-  let typeLabel = TYPE_LABELS[item.type] ?? item.type;
+  let typeLabel = TYPE_LABELS[item.type][resolvedLanguage];
 
   if (item.type === 'CURRENCY_ADDED') {
     if (isTotalEarnedPayload(payload)) {
-      typeLabel = 'Waluta zgromadzona';
+      typeLabel = TOTALEARNED__TEXTLABEL[resolvedLanguage];
     } else {
       const delta = resolveCurrencyDelta(payload);
       if (delta != null) {
         if (delta > 0) {
-          typeLabel = 'Zdobyto walutę';
+          typeLabel = CURRENCYADDEDSTUDENT__TEXTLABEL[resolvedLanguage];
         } else if (delta < 0) {
-          typeLabel = 'Pobrano walutę';
+          typeLabel = CURRENCYREMOVEDSTUDENT__TEXTLABEL[resolvedLanguage];
         } else {
-          typeLabel = 'Stan konta';
+          typeLabel = BALANCE__TEXTLABEL[resolvedLanguage];
         }
       } else {
-        typeLabel = 'Stan konta';
+        typeLabel = BALANCE__TEXTLABEL[resolvedLanguage];
       }
     }
   }
@@ -523,7 +832,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false) 
   const studentLabel = resolveStudentLabel(payload);
   const isStudentActivityReward = isStudentView && item.type === 'ACTIVITY_COMPLETED';
   const activityRewardAmount = isStudentActivityReward ? resolveActivityRewardAmount(payload) : null;
-  const fallbackTitle = buildFallbackTitle(item.type, payload, isStudentView, studentLabel);
+  const fallbackTitle = buildFallbackTitle(item.type, payload, isStudentView, studentLabel, resolvedLanguage);
   let title = resolveNotificationTitle(fallbackTitle, message, typeLabel);
 
   if (isStudentActivityReward) {

@@ -67,7 +67,7 @@ const FOOTER_COORDINATOR_HEADING__TEXTLABEL = {
 };
 
 const FOOTER_COORDINATOR_ROLE__TEXTLABEL = {
-  polish: 'Koordynator projektu:',
+  polish: 'Osoba koordynator projekt:',
   english: 'Project coordinator:',
 };
 

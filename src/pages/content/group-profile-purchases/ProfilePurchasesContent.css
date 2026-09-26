@@ -16,7 +16,7 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 500;
-  color: rgb(227, 224, 247);
+  color: rgb(--colour-text-other);
 }
 
 .profile-purchases-page__toolbar {
@@ -58,9 +58,14 @@
 
 .profile-purchases-page__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
   width: 100%;
+}
+
+.profile-purchases-page__grid .maq-product-card {
+  max-width: none;
+  height: 100%;
 }
 
 .profile-purchases-page__error {
@@ -78,6 +83,18 @@
   font-size: var(--font-size-body);
 }
 
+@media (max-width: 1200px) {
+  .profile-purchases-page__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .profile-purchases-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   .profile-purchases-page__search {
     width: 100%;
@@ -91,5 +108,11 @@
   .profile-purchases-page__counts,
   .maq-section-page__toolbar-end {
     width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-purchases-page__grid {
+    grid-template-columns: 1fr;
   }
 }

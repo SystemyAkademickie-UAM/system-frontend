@@ -28,6 +28,16 @@ const NEWFROMLASTVISIT__TEXTLABEL = {
   english: 'New since last visit',
 };
 
+const OLDERSINCELASTVISIT__TEXTLABEL = {
+  polish: 'Starsze powiadomienia',
+  english: 'Older notifications',
+};
+
+const READNOW__TEXTLABEL = {
+  polish: 'Odczytaj',
+  english: 'Read now',
+};
+
 function renderNotificationTextWithPreview(text, notification, groupId, onMarkRead) {
   if (!text || !groupId) {
     return text;
@@ -263,7 +273,7 @@ export default function NotificationsFeed({
           return (
             <div key={notification.id}>
               {index === dividerIndex ? (
-                <div className="notifications-feed__divider" role="separator" aria-label="Starsze powiadomienia">
+                <div className="notifications-feed__divider" role="separator" aria-label={OLDERSINCELASTVISIT__TEXTLABEL[LANGUAGE]}>
                   <span className="notifications-feed__divider-line" />
                   <span className="notifications-feed__divider-label">{NEWFROMLASTVISIT__TEXTLABEL[LANGUAGE]}</span>
                   <span className="notifications-feed__divider-line" />
@@ -303,8 +313,8 @@ export default function NotificationsFeed({
                   <button
                     type="button"
                     className="notifications-feed__mark-read"
-                    aria-label="Odczytaj"
-                    title="Odczytaj"
+                    aria-label={READNOW__TEXTLABEL[LANGUAGE]}
+                    title={READNOW__TEXTLABEL[LANGUAGE]}
                     onClick={(event) => handleMarkReadClick(event, notification)}
                   >
                     <AssetSvg

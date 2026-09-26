@@ -156,14 +156,14 @@
   gap: 0.5rem;
   font-size: 15px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--color-text-primary);
   font-family: var(--font-family-app);
 }
 
 .shop-item-form__label--heading {
   font-size: 16px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 /* Checkboxy w całym wizardzie: większe, zielone, białe teksty */
@@ -434,7 +434,7 @@
 .shop-item-step-info__category-name {
   font-size: 14px;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--color-text-primary);
   cursor: pointer;
   flex: 1 1 auto;
   overflow: hidden;
@@ -532,7 +532,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--color-text-primary);
   font-family: var(--font-family-app);
 }
 
@@ -571,7 +571,7 @@
 }
 
 .shop-item-color-picker-dialog__swatch--active {
-  border-color: #ffffff;
+  color: var(--color-text-primary);
   box-shadow: 0 0 0 2px var(--color-accent);
   transform: scale(1.1);
 }
@@ -657,7 +657,7 @@
 .shop-item-modal-action-btn--danger {
   background: #ff4d4f;
   border: 1px solid #ff4d4f;
-  color: #ffffff;
+  color: var(--color-text-primary);
 }
 
 .shop-item-modal-action-btn--danger:hover {

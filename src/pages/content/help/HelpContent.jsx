@@ -15,7 +15,7 @@ const COORDINATOR_SECTION__TEXTLABEL = {
 };
 
 const COORDINATOR_ROLE__TEXTLABEL = {
-  polish: 'Koordynator projektu:',
+  polish: 'Osoba koordynator projekt:',
   english: 'Project Coordinator:',
 };
 

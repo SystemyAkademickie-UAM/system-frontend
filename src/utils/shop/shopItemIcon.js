@@ -1,6 +1,6 @@
 import { buildDriveBannerUrl } from '../../constants/drive.constants.js';
 
-const DEFAULT_ICON_BG = 'rgb(40, 40, 52)';
+const DEFAULT_ICON_BG = 'var(--color-bg-icon';
 const DEFAULT_EMOJI = '📦';
 
 /**
@@ -20,7 +20,7 @@ export function parseShopItemImageRef(imageRef) {
   const starIndex = trimmed.indexOf('*');
   if (starIndex >= 0) {
     const emoji = trimmed.slice(0, starIndex).trim() || DEFAULT_EMOJI;
-    const iconBackground = trimmed.slice(starIndex + 1).trim() || DEFAULT_ICON_BG;
+    const iconBackground = DEFAULT_ICON_BG;
     return { emoji, iconBackground, imageUrl: null };
   }
 

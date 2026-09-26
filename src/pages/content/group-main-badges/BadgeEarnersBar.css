@@ -70,14 +70,13 @@
 .badge-earners-bar__overflow-list li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
   font-size: var(--font-size-min);
   color: var(--color-text-secondary);
 }
 
-.badge-earners-bar__overflow-earned {
+.badge-earners-bar__overflow-name {
+  color: var(--color-text-secondary);
   font-size: var(--font-size-min);
-  color: var(--color-text-primary);
-  white-space: nowrap;
+  line-height: 1.35;
+  user-select: text;
 }

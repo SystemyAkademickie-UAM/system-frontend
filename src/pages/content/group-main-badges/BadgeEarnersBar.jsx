@@ -1,7 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
-import CurrencyDisplay from '../../../components/ui/Currency/CurrencyDisplay.jsx';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
 import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import { positionAnchoredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
@@ -87,23 +85,7 @@ function OverflowBadge({ hiddenStudents, groupId, LANGUAGE }) {
             <ul className="badge-earners-bar__overflow-list">
               {hiddenStudents.map((student) => (
                 <li key={student.id}>
-                  {groupId && student.accountId ? (
-                    <Link
-                      className="badge-earners-bar__overflow-link"
-                      to={groupStudentProfilePath(groupId, student.accountId)}
-                    >
-                      {student.nickname}
-                    </Link>
-                  ) : (
-                    <span>{student.nickname}</span>
-                  )}
-                  {student.totalEarned !== undefined && student.totalEarned !== null ? (
-                    <CurrencyDisplay
-                      amount={student.totalEarned}
-                      size="sm"
-                      className="badge-earners-bar__overflow-earned"
-                    />
-                  ) : null}
+                  <span className="badge-earners-bar__overflow-name">{student.nickname}</span>
                 </li>
               ))}
             </ul>
@@ -124,7 +106,7 @@ const BARIARIA__TEXTLABEL = {
  * Awatary studentów na kafelku odznaki lub rangi.
  *
  * @param {Object} props
- * @param {Array<{ id: string | number, accountId?: number, nickname: string, avatarUrl?: string | null, totalEarned?: number }>} props.students
+ * @param {Array<{ id: string | number, accountId?: number, position?: number, nickname: string, avatarUrl?: string | null, totalEarned?: number }>} props.students
  * @param {number} [props.maxVisible]
  * @param {string | number} [props.groupId]
  * @param {string} [props.className]
@@ -198,8 +180,8 @@ export default function BadgeEarnersBar({
           totalEarned={student.totalEarned}
           size="md"
           tooltipPlacement="top"
-          href={groupId && student.accountId
-            ? groupStudentProfilePath(groupId, student.accountId)
+          href={groupId && (student.position || student.accountId)
+            ? groupStudentProfilePath(groupId, student.position ?? student.accountId)
             : undefined}
         />
       ))}

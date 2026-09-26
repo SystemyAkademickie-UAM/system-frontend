@@ -53,7 +53,11 @@ function mapPost(raw) {
   };
 }
 function sortPostsNewestFirst(posts) {
-  return [...posts].sort((a, b) => b.id - a.id);
+  return [...posts].sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return dateB - dateA;
+  });
 }
 
 export function useGroupPosts() {

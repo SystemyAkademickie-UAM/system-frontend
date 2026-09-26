@@ -36,6 +36,6 @@ select[data-sort-select],
 .badge-treasury__sort-select,
 .group-shop__sort-select,
 .member-modal__sort-select {
-  background-color: rgb(40, 40, 52);
-  color: rgb(187, 203, 185);
+  background-color: var(--color-bg-icon);
+  color: var(--color-text-secondary);
 }

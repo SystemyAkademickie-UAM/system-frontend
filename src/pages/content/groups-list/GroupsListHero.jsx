@@ -8,7 +8,7 @@ const SYSTEMLABEL__TEXTLABEL = {
   english: 'Gamification System',
 };
 const APPDESCRIPTION__TEXTLABEL = {
-  polish: 'Witaj, Wędrowcze! Przed Tobą most łączący akademię z epickimi kampaniami i misjami. Wybierz swoją drużynę, zdobywaj odznaki i wymieniaj zasoby na korzyści dydaktyczne.',
+  polish: 'Witaj! Przed Tobą most łączący akademię z epickimi kampaniami i misjami. Wybierz swoją drużynę, zdobywaj odznaki i wymieniaj zasoby na korzyści dydaktyczne.',
   english: 'Welcome, Wanderer! Ahead of you lies a bridge connecting academia with epic campaigns and missions. Choose your team, earn badges and exchange resources for educational benefits.',
 };
 

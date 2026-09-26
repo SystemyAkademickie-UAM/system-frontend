@@ -11,7 +11,7 @@ Import:
   <SubNav
     ariaLabel="Sekcje"
     items={[
-      { id: 'a', label: 'Użytkownicy', to: '.', end: true },
+      { id: 'a', label: 'Osoby korzystające z systemu', to: '.', end: true },
       { id: 'b', label: 'Wpisy', to: 'posts' },
     ]}
   />
@@ -19,7 +19,7 @@ Import:
   // bez routera (stan lokalny):
   <SubNav
     ariaLabel="Sekcje"
-    items={[{ id: 'a', label: 'Użytkownicy' }]}
+    items={[{ id: 'a', label: 'Osoby korzystające z systemu' }]}
     activeId={activeId}
     onSelect={setActiveId}
   />

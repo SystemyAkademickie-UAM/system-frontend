@@ -533,10 +533,7 @@ export default function GroupShopContent() {
       return false;
     }
 
-    const inventoryItems = purchasedItems.filter((item) => !item.isExtraLife);
-    if (inventoryItems.length === 0) {
-      return false;
-    }
+    const inventoryItems = purchasedItems;
 
     const toastMessage = buildStudentPurchaseToastMessage(purchasedItems, LANGUAGE);
     if (toastMessage) {

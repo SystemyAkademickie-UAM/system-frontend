@@ -61,7 +61,7 @@ const GALLERY_SEARCH_PLACEHOLDER__TEXTLABEL = {
 };
 
 const GALLERY_SEARCH_ARIA__TEXTLABEL = {
-  polish: 'Szukaj szablonów po nazwie, ksywce lub imieniu i nazwisku prowadzącego',
+  polish: 'Szukaj szablonów po nazwie, ksywce lub imieniu i nazwisku osoby prowadzącej',
   english: 'Search templates by name, nickname or instructor first and last name'
 };
 
