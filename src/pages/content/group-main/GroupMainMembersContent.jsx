@@ -20,7 +20,7 @@ const EXPLORERSEYEBROW__TEXTLABEL = {
 };
 
 const MEMBERSTITLE__TEXTLABEL = {
-  polish: 'Uczestnicy',
+  polish: 'Osoby uczestniczące',
   english: 'Members',
 };
 
@@ -30,12 +30,12 @@ const NOGROUPDATA__TEXTLABEL = {
 };
 
 const LOADINGMEMBERS__TEXTLABEL = {
-  polish: 'Ładowanie uczestników…',
+  polish: 'Ładowanie osób…',
   english: 'Loading members…',
 };
 
 const FETCHERROR__TEXTLABEL = {
-  polish: 'Nie udało się pobrać listy uczestników.',
+  polish: 'Nie udało się pobrać listy osób.',
   english: 'Failed to load member list.',
 };
 

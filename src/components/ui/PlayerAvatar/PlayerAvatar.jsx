@@ -131,7 +131,7 @@ export default function PlayerAvatar({
 
 
 
-  const displayName = nickname?.trim() || 'Użytkownik';
+  const displayName = nickname?.trim() || 'Osoba korzystająca z systemu';
   const label = ariaLabel ?? `Profil: ${displayName}`;
 
   const sharedClassName = [
@@ -209,7 +209,7 @@ export default function PlayerAvatar({
 
               <div className="maq-player-avatar__tooltip-meta">
 
-                <span className="maq-player-avatar__tooltip-label">Zgromadzona</span>
+                <span className="maq-player-avatar__tooltip-label">Zgromadzono</span>
 
                 <CurrencyDisplay amount={totalEarned} symbol={currencySymbol} size="md" />
 

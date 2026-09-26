@@ -61,7 +61,7 @@ const SUBJECT__TEXTLABEL = {
 };
 
 const INSTRUCTOR__TEXTLABEL = {
-  polish: 'Prowadzący',
+  polish: 'Osoba prowadząca',
   english: 'Instructor',
 };
 

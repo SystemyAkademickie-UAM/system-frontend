@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 import { DEFAULT_RANK_EMOJI, normalizeRankBadgeIcon } from '../../../utils/ranks/rankBadgeIcon.js';
@@ -5,7 +6,23 @@ import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { getRankCssVars } from './rankCssVars.js';
 import { RANK_THEME } from './rankTheme.js';
 import { formatRankDiscountLabel, hasRankShopDiscount } from '../../../utils/ranks/rankDiscount.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './Rank.css';
+
+const STORYSTATUS__TEXTLABEL = {
+  polish: 'Status fabularny',
+  english: 'Story status'
+};
+
+const SHOPITEMS__TEXTLABEL = {
+  polish: 'Odblokowane przedmioty w sklepie',
+  english: 'Unlocked shop items'
+};
+
+const NOSHOOPITEMS__TEXTLABEL = {
+  polish: 'Brak dodatkowych odblokowanych przedmiotów.',
+  english: 'No additional unlocked items.'
+};
 
 /**
  * Kafelek rangi (Figma: Background+VerticalBorder).
@@ -24,6 +41,7 @@ export default function Rank({
   isLocked = false,
   className = '',
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const emoji = normalizeRankBadgeIcon(icon ?? iconFile, DEFAULT_RANK_EMOJI);
 
   return (
@@ -44,12 +62,12 @@ export default function Rank({
 
       <div className="maq-rank__columns">
         <section className="maq-rank__section">
-          <span className="maq-rank__label">Status fabularny</span>
+          <span className="maq-rank__label">{STORYSTATUS__TEXTLABEL[LANGUAGE]}</span>
           <p className="maq-rank__text"><em>{storyDescription}</em></p>
         </section>
 
         <section className="maq-rank__section">
-          <span className="maq-rank__label">Odblokowane przedmioty w sklepie</span>
+          <span className="maq-rank__label">{SHOPITEMS__TEXTLABEL[LANGUAGE]}</span>
           <ul className="maq-rank__shop-list">
             {hasRankShopDiscount(discountPercent) ? (
               <li className="maq-rank__shop-item maq-rank__shop-item--discount">
@@ -60,7 +78,7 @@ export default function Rank({
                   height={11}
                   alt=""
                 />
-                <span>{formatRankDiscountLabel(discountPercent)}</span>
+                <span>{formatRankDiscountLabel(discountPercent, LANGUAGE)}</span>
               </li>
             ) : null}
             {shopItems.map((item, index) => (
@@ -78,7 +96,7 @@ export default function Rank({
           </ul>
           {shopItems.length === 0 ? (
             <p className="maq-rank__text maq-rank__text--empty maq-rank__text--shop-extra">
-              Brak dodatkowych odblokowanych przedmiotów.
+              {NOSHOOPITEMS__TEXTLABEL[LANGUAGE]}
             </p>
           ) : null}
         </section>

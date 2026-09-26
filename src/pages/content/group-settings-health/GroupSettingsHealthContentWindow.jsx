@@ -15,7 +15,7 @@ const DEFAULTTITLE__TEXTLABEL = {
   english: 'Lives'
 };
 
-const CLOSEARIALABEL__TEXTLABEL = {
+const CLOSE__TEXTLABEL = {
   polish: 'Zamknij panel zarządzania',
   english: 'Close management panel'
 };
@@ -46,7 +46,7 @@ const COLUMNOPERATIONS__TEXTLABEL = {
 };
 
 const EMPTYSTATE__TEXTLABEL = {
-  polish: 'Brak zapisanych uczestników w grupie.',
+  polish: 'Brak zapisanych osób w grupie.',
   english: 'No participants registered in the group.'
 };
 
@@ -61,8 +61,58 @@ const BULKSETBUTTON__TEXTLABEL = {
 };
 
 const BULKSETPREFIX__TEXTLABEL = {
-  polish: 'Ustaw wszystkim:',
+  polish: 'Ustaw globalnie:',
   english: 'Set to all:'
+};
+
+const SUBTRACTLIFE__TEXTLABEL = {
+  polish: 'Odejmij życie',
+  english: 'Subtract life'
+};
+
+const ADDLIFE__TEXTLABEL = {
+  polish: 'Dodaj życie',
+  english: 'Add life'
+};
+
+const LIVESNUMBER__TEXTLABEL = {
+  polish: 'Liczba żyć dla',
+  english: 'Lives count for'
+};
+
+const CHANGE__TEXTLABEL = {
+  polish: 'Zmiana',
+  english: 'Change'
+};
+
+const SUBTRACTALL__TEXTLABEL = {
+  polish: 'Odejmij 1 życie wszystkim',
+  english: 'Subtract 1 life from all'
+};
+
+const ADDALL__TEXTLABEL = {
+  polish: 'Dodaj 1 życie wszystkim',
+  english: 'Add 1 life to all'
+};
+
+const NOCHANGESTOSAVE__TEXTLABEL = {
+  polish: 'Brak zmian do zapisania.',
+  english: 'No changes to save.'
+};
+
+const LIVESUPDATEDSUCCESS__TEXTLABEL = {
+  polish: 'Życia studentów zostały zaktualizowane.',
+  english: 'Student lives have been updated.'
+};
+
+const LIVESUPDATEERROR__TEXTLABEL = {
+  polish: 'Nie udało się zaktualizować żyć studentów.',
+  english: 'Failed to update student lives.'
+};
+
+const UPDATEERROR__TEXTLABEL = {
+  polish: 'Błąd podczas aktualizacji żyć.',
+  english: 'Error while updating lives.'
 };
 
 function sortStudents(students, sortField, sortReverse) {
@@ -349,7 +399,7 @@ export default function GroupSettingsHealthContentWindow({
       .filter((s) => s.delta !== 0);
 
     if (changedStudents.length === 0) {
-      showSuccess('Brak zmian do zapisania.');
+      showSuccess(NOCHANGESTOSAVE__TEXTLABEL[LANGUAGE]);
       setIsSaving(false);
       return;
     }
@@ -357,17 +407,17 @@ export default function GroupSettingsHealthContentWindow({
     try {
       const result = await bulkUpdateStudentLives(groupId, changedStudents);
       if (!result.ok) {
-        throw new Error(result.error ?? 'Nie udało się zaktualizować żyć studentów.');
+        throw new Error(result.error ?? LIVESUPDATEERROR__TEXTLABEL[LANGUAGE]);
       }
 
-      showSuccess('Życia studentów zostały zaktualizowane.');
+      showSuccess(LIVESUPDATEDSUCCESS__TEXTLABEL[LANGUAGE]);
       // Uaktualniamy initialLives na obecne
       setStudents((prev) => prev.map((s) => ({
         ...s,
         initialLives: s.lives,
       })));
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Błąd podczas aktualizacji żyć.';
+      const msg = err instanceof Error ? err.message : UPDATEERROR__TEXTLABEL[LANGUAGE];
       setErrorMessage(msg);
       showError(msg);
     } finally {
@@ -402,7 +452,7 @@ export default function GroupSettingsHealthContentWindow({
           type="button"
           className="lives-manage-dialog__close"
           onClick={popupclose}
-          aria-label={CLOSEARIALABEL__TEXTLABEL[LANGUAGE]}
+          aria-label={CLOSE__TEXTLABEL[LANGUAGE]}
         >
           <img src={closeicon} alt="" className="lives-manage-dialog__close-icon" />
         </button>
@@ -490,7 +540,7 @@ export default function GroupSettingsHealthContentWindow({
                         <button
                           type="button"
                           className="lives-manage-svg-btn lives-manage-svg-btn--decrease"
-                          aria-label={`Odejmij życie: ${student.name} ${student.surname}`}
+                          aria-label={`${SUBTRACTLIFE__TEXTLABEL[LANGUAGE]}: ${student.name} ${student.surname}`}
                           onClick={() => handleStudentStep(student.accountId, 'decrement')}
                           disabled={student.lives <= 0}
                         >
@@ -511,7 +561,7 @@ export default function GroupSettingsHealthContentWindow({
                             value={student.lives}
                             inputMode="numeric"
                             onChange={(e) => handleStudentLivesDirectChange(student.accountId, e.target.value)}
-                            aria-label={`Liczba żyć dla ${student.name} ${student.surname}`}
+                            aria-label={`${LIVESNUMBER__TEXTLABEL[LANGUAGE]} ${student.name} ${student.surname}`}
                           />
                         </div>
 
@@ -519,7 +569,7 @@ export default function GroupSettingsHealthContentWindow({
                         <button
                           type="button"
                           className="lives-manage-svg-btn lives-manage-svg-btn--increase"
-                          aria-label={`Dodaj życie: ${student.name} ${student.surname}`}
+                          aria-label={`${ADDLIFE__TEXTLABEL[LANGUAGE]}: ${student.name} ${student.surname}`}
                           onClick={() => handleStudentStep(student.accountId, 'increment')}
                           disabled={maxLivesLimit != null && student.lives >= maxLivesLimit}
                         >
@@ -539,7 +589,7 @@ export default function GroupSettingsHealthContentWindow({
                             delta < 0 ? 'lives-manage-delta-badge--negative' : '',
                             delta === 0 ? 'lives-manage-delta-badge--neutral' : '',
                           ].filter(Boolean).join(' ')}
-                          title={`Zmiana: ${delta > 0 ? `+${delta}` : delta}`}
+                          title={`${CHANGE__TEXTLABEL[LANGUAGE]}: ${delta > 0 ? `+${delta}` : delta}`}
                         >
                           {delta > 0 ? `+${delta}` : String(delta)}
                         </span>
@@ -585,7 +635,7 @@ export default function GroupSettingsHealthContentWindow({
                 <button
                   type="button"
                   className="lives-manage-svg-btn lives-manage-svg-btn--decrease"
-                  title="Odejmij 1 życie wszystkim"
+                  title={SUBTRACTALL__TEXTLABEL[LANGUAGE]}
                   onClick={() => handleBulkStepAll('decrement')}
                   disabled={displayStudents.length > 0 && displayStudents.every((s) => s.lives <= 0)}
                 >
@@ -597,7 +647,7 @@ export default function GroupSettingsHealthContentWindow({
                 <button
                   type="button"
                   className="lives-manage-svg-btn lives-manage-svg-btn--increase"
-                  title="Dodaj 1 życie wszystkim"
+                  title={ADDALL__TEXTLABEL[LANGUAGE]}
                   onClick={() => handleBulkStepAll('increment')}
                   disabled={maxLivesLimit != null && displayStudents.length > 0 && displayStudents.every((s) => s.lives >= maxLivesLimit)}
                 >

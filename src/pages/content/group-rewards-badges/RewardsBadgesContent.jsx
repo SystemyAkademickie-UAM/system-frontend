@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
   BADGE_RARITY,
-  BADGE_RARITY_LABELS,
   Button,
   CurrencyDisplay,
   DataTable,
@@ -37,6 +36,7 @@ import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 const CREATENEWBADGE__TEXTLABEL = {
   polish: 'Dodaj odznakę',
   english: 'Add Badge'
+
 };
 
 const LOADINBADGES__TEXTLABEL = {
@@ -96,12 +96,12 @@ const DELETEFAILMESSAGE__TEXTLABEL = {
 };
 
 const ALLOPUBLISHEDMESSAGE__TEXTLABEL = {
-  polish: 'Wszystkie odznaki są teraz widoczne dla studentów.',
+  polish: 'Wszystkie odznaki są teraz widoczne.',
   english: 'All badges are now visible to students.'
 };
 
 const ALLHIDDENMESSAGE__TEXTLABEL = {
-  polish: 'Wszystkie odznaki są teraz ukryte przed studentami.',
+  polish: 'Wszystkie odznaki są teraz ukryte.',
   english: 'All badges are now hidden from students.'
 };
 
@@ -111,12 +111,12 @@ const ALLTOGGLEFAILMESSAGE__TEXTLABEL = {
 };
 
 const PUBLISHMESSAGE__TEXTLABEL = {
-  polish: 'Odznaka jest teraz widoczna dla studentów.',
+  polish: 'Odznaka jest teraz widoczna.',
   english: 'Badge is now visible to students.'
 };
 
 const UNPUBLISHMESSAGE__TEXTLABEL = {
-  polish: 'Odznaka jest teraz ukryta przed studentami.',
+  polish: 'Odznaka jest teraz ukryta.',
   english: 'Badge is now hidden from students.'
 };
 
@@ -136,7 +136,7 @@ const ROWACTIONASSIGNTEXT__TEXTLABEL = {
 };
 
 const ROWACTIONASSIGNARIA__TEXTLABEL = {
-  polish: 'Przydziel odznakę studentom',
+  polish: 'Przydziel odznakę',
   english: 'Assign badge to students'
 };
 
@@ -156,7 +156,7 @@ const ROWACTIONVISIBILITYTEXT__TEXTLABEL = {
 };
 
 const ROWACTIONVISIBILITYDESC__TEXTLABEL = {
-  polish: 'Zmienia widoczność odznaki dla studenta.',
+  polish: 'Zmienia widoczność odznaki.',
   english: 'Changes badge visibility for students.'
 };
 
@@ -170,13 +170,23 @@ const TABLEPAGINATIONLABEL__TEXTLABEL = {
   english: 'Badge list page navigation'
 };
 
-const RARITY_FILTERS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
-  { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
-  { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
-  { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
-];
+const RARITYFILTERS__TEXTLABEL = {
+  polish: [
+    { id: 'all', label: 'Wszystkie' },
+    { id: BADGE_RARITY.common, label: 'Zwykła' },
+    { id: BADGE_RARITY.uncommon, label: 'Niezwykła' },
+    { id: BADGE_RARITY.rare, label: 'Rzadka' },
+    { id: BADGE_RARITY.epic, label: 'Epicka' },
+  ],
+  english: [
+    { id: 'all', label: 'All' },
+
+    { id: BADGE_RARITY.common, label: 'Common' },
+    { id: BADGE_RARITY.uncommon, label: 'Uncommon' },
+    { id: BADGE_RARITY.rare, label: 'Rare' },
+    { id: BADGE_RARITY.epic, label: 'Epic' },
+  ],
+};
 
 const BADGE_COLUMNS = [
   {
@@ -408,6 +418,7 @@ export default function RewardsBadgesContent() {
     const result = await handleToggleAllPublished();
     setBulkVisibilityLoading(false);
 
+
     if (result.ok) {
       showSuccess(
         result.targetPublished
@@ -541,7 +552,7 @@ export default function RewardsBadgesContent() {
             <CatalogFiltersPanel className="rewards-page__filters">
               <CatalogFilterGroup
                 ariaLabel={RARITYFILTERLABEL__TEXTLABEL[LANGUAGE]}
-                filters={RARITY_FILTERS}
+                filters={RARITYFILTERS__TEXTLABEL[LANGUAGE]}
                 activeId={rarityFilter}
                 onSelect={setRarityFilter}
               />

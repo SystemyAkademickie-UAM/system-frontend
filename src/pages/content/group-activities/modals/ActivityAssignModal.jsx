@@ -116,11 +116,11 @@ export default function ActivityAssignModal({
     english: 'Saving...',
   };
   const SEARCHPLACEHOLDER__TEXTLABEL = {
-    polish: 'Szukaj uczestników…',
+    polish: 'Szukaj osób…',
     english: 'Search participants…',
   };
   const SEARCHARIALABEL__TEXTLABEL = {
-    polish: 'Szukaj uczestników',
+    polish: 'Szukaj osób',
     english: 'Search participants',
   };
   const LOADING__TEXTLABEL = {
@@ -128,15 +128,15 @@ export default function ActivityAssignModal({
     english: 'Loading participants...',
   };
   const NOMEMBERS__TEXTLABEL = {
-    polish: 'Brak uczestników w tej grupie.',
+    polish: 'Grupa jest pusta.',
     english: 'No participants in this group.',
   };
   const NOSEARCHRESULTS__TEXTLABEL = {
-    polish: 'Brak uczestników pasujących do wyszukiwania.',
+    polish: 'Brak wyników spełniających kryteria wyszukiwania.',
     english: 'No participants match the search.',
   };
   const LOADERROR__TEXTLABEL = {
-    polish: 'Nie udało się załadować uczestników',
+    polish: 'Nie udało się załadować rekordów',
     english: 'Failed to load participants',
   };
   const SAVEERROR__TEXTLABEL = {

@@ -166,12 +166,12 @@ const PAGINATIONARIALABEL__TEXTLABEL = {
 };
 
 const TOGGLEALLVISIBLE__TEXTLABEL = {
-  polish: 'Wszystkie produkty są teraz widoczne dla studentów.',
+  polish: 'Wszystkie produkty są teraz widoczne.',
   english: 'All products are now visible to students.'
 };
 
 const TOGGLEALLHIDDEN__TEXTLABEL = {
-  polish: 'Wszystkie produkty są teraz ukryte przed studentami.',
+  polish: 'Wszystkie produkty są teraz ukryte.',
   english: 'All products are now hidden from students.'
 };
 

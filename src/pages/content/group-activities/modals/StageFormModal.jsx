@@ -10,7 +10,7 @@ const EMPTY_FORM = { name: '', visibilityStatus: 1 };
 function StageVisibilityCheckbox({ checked, onChange }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const VISIBILITY__TEXTLABEL = {
-    polish: 'Etap widoczny dla studentów',
+    polish: 'Etap widoczny',
     english: 'Stage visible to students',
   };
   return (

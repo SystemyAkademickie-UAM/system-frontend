@@ -12,7 +12,7 @@ import SettingsSectionHeader from '../../../components/layout/sectionPage/Settin
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
 import {
-  THEME_OPTIONS,
+  getThemeOptions,
   applyTheme,
   getSavedTheme,
 } from '../../../services/themeService.js';
@@ -85,7 +85,7 @@ const SHOWNICKNAMELABELTEXT = {
   kana: 'ニックネームをひょうじ',
 };
 const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
-  polish: 'Ksywka staje się widoczna dla innych użytkowników (wyświetlana jest dodatkowo obok imienia i nazwiska).',
+  polish: 'Ksywka staje się widoczna dla innych (wyświetlana jest dodatkowo obok imienia i nazwiska).',
   english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
   japanese: 'ニックネームが他の利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
   kana: 'ニックネームがほかの利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
@@ -307,6 +307,7 @@ export default function SettingsContent() {
 
     setIsSaving(false);
     showSuccess('Zmiany zostały zapisane.');
+    window.location.reload();
     return true;
   }, [
     DIVLANGUAGE,
@@ -492,7 +493,7 @@ export default function SettingsContent() {
 
               <SettingsSectionHeader title={THEMELABELTEXT[LANGUAGE]} id="settings-theme-title" />
               <div className="settings-page__theme-radio-group" role="radiogroup" aria-labelledby="settings-theme-title">
-                {THEME_OPTIONS.map((option) => {
+                {getThemeOptions().map((option) => {
                   const isSelected = draftTheme === option.id;
                   return (
                     <label

@@ -16,7 +16,7 @@
   margin: 0;
   font-size: 1.75rem;
   font-weight: 500;
-  color: rgb(227, 224, 247);
+  color: rgb(--colour-text-other);
 }
 
 .profile-purchases-page__toolbar {

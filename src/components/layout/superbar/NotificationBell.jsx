@@ -9,9 +9,34 @@ import { groupMainPath, groupMembersLogPath } from '../../../routes/pathRegistry
 import { BACKLOG_LIST_POLL_MS } from '../../../constants/backlogNotifications.constants.js';
 import AssetSvg from '../../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './NotificationBell.css';
 
 const BELL_LIMIT = 10;
+
+const NOTIFICATIONBELLLABEL__TEXTLABEL = {
+  polish: [
+    { withCount: 'Powiadomienia ({count} nieprzeczytanych)', withoutCount: 'Powiadomienia' },
+  ],
+  english: [
+    { withCount: 'Notifications ({count} unread)', withoutCount: 'Notifications' },
+  ],
+};
+
+const NOTIFICATIONPANEL__TEXTLABEL = {
+  polish: 'Powiadomienia',
+  english: 'Notifications',
+};
+
+const EMPTYMESSAGE__TEXTLABEL = {
+  polish: 'Brak nowych powiadomień.',
+  english: 'No new notifications.',
+};
+
+const VIEWALL__TEXTLABEL = {
+  polish: 'Zobacz wszystkie',
+  english: 'View all',
+};
 
 /**
  * Dzwonek powiadomień w SuperBar — ostatnie 10 wpisów z API backlogu.
@@ -21,6 +46,7 @@ export default function NotificationBell() {
   const rootRef = useRef(null);
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [isOpen, setIsOpen] = useState(false);
   const isStudentView = role === APP_ROLE.STUDENT;
 
@@ -95,7 +121,9 @@ export default function NotificationBell() {
         className="notification-bell__trigger"
         aria-expanded={isOpen}
         aria-controls={panelId}
-        aria-label={unreadCount > 0 ? `Powiadomienia (${unreadCount} nieprzeczytanych)` : 'Powiadomienia'}
+        aria-label={unreadCount > 0
+          ? NOTIFICATIONBELLLABEL__TEXTLABEL[LANGUAGE][0].withCount.replace('{count}', unreadCount)
+          : NOTIFICATIONBELLLABEL__TEXTLABEL[LANGUAGE][0].withoutCount}
         onClick={() => setIsOpen((open) => !open)}
       >
         <AssetSvg
@@ -113,9 +141,9 @@ export default function NotificationBell() {
       </button>
 
       {isOpen ? (
-        <div id={panelId} className="notification-bell__panel" role="dialog" aria-label="Powiadomienia">
+        <div id={panelId} className="notification-bell__panel" role="dialog" aria-label={NOTIFICATIONPANEL__TEXTLABEL[LANGUAGE]}>
           <div className="notification-bell__panel-head">
-            <p className="notification-bell__panel-title">Powiadomienia</p>
+            <p className="notification-bell__panel-title">{NOTIFICATIONPANEL__TEXTLABEL[LANGUAGE]}</p>
           </div>
 
           <div className="notification-bell__list">
@@ -129,7 +157,7 @@ export default function NotificationBell() {
               showDivider
               linkable={isStudentView}
               compact
-              emptyMessage="Brak nowych powiadomień."
+              emptyMessage={EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}
               onMarkRead={(id) => markRead(id)}
               persistLastSeenOnLeave={false}
             />
@@ -142,7 +170,7 @@ export default function NotificationBell() {
                 className="notification-bell__view-all"
                 onClick={() => setIsOpen(false)}
               >
-                Zobacz wszystkie
+                {VIEWALL__TEXTLABEL[LANGUAGE]}
               </Link>
             </div>
           ) : null}

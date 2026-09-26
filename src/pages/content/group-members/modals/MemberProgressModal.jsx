@@ -13,7 +13,7 @@ const SEARCH_ARIA_LABEL__TEXTLABEL = { polish: 'Szukaj etapów lub aktywności',
 const LOADING_MESSAGE__TEXTLABEL = { polish: 'Ładowanie aktywności…', english: 'Loading activities…' };
 const NO_ACTIVITIES_EMPTY__TEXTLABEL = { polish: 'Brak aktywności w tej grupie.', english: 'No activities in this group.' };
 const NO_SEARCH_ACTIVITIES_EMPTY__TEXTLABEL = { polish: 'Brak etapów spełniających kryteria wyszukiwania.', english: 'No stages matching search criteria.' };
-const SAVED_SUCCESS__TEXTLABEL = { polish: 'Postęp uczestnika został zapisany.', english: 'Participant progress has been saved.' };
+const SAVED_SUCCESS__TEXTLABEL = { polish: 'Postęp został zapisany.', english: 'Participant progress has been saved.' };
 const SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać postępu', english: 'Failed to save progress' };
 const ACTIVITY_SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać postępu aktywności', english: 'Failed to save activity progress' };
 

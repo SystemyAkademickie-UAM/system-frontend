@@ -41,7 +41,7 @@ const NOSTAGES__TEXTLABEL = {
 };
 
 const NOPARTICIPANTS__TEXTLABEL = {
-  polish: 'Brak uczestników w tej grupie.',
+  polish: 'Grupa jest pusta.',
   english: 'No participants in this group.',
 };
 
@@ -56,7 +56,7 @@ const CSVTITLE__TEXTLABEL = {
 };
 
 const CSVHINT__TEXTLABEL = {
-  polish: 'Skróty do generowania raportów postępu uczestników.',
+  polish: 'Skróty do generowania raportów postępu.',
   english: 'Shortcuts to generate participant progress reports.',
 };
 
@@ -81,7 +81,7 @@ const STAGEMODALTITLE__TEXTLABEL = {
 };
 
 const STAGEMODALSUBTITLE__TEXTLABEL = {
-  polish: 'Raport obejmie wszystkich uczestników i aktywności z wybranego etapu.',
+  polish: 'Raport obejmie wszystkie osoby w grupie i aktywności z wybranego etapu.',
   english: 'Report will include all participants and activities from the selected stage.',
 };
 
@@ -91,17 +91,17 @@ const STAGEMODALSEARCH__TEXTLABEL = {
 };
 
 const PARTICIPANTTITLE__TEXTLABEL = {
-  polish: 'Wybierz uczestnika',
+  polish: 'Wybierz osobę',
   english: 'Select Participant',
 };
 
 const PARTICIPANTSUBTITLE__TEXTLABEL = {
-  polish: 'Raport obejmie postęp wybranego uczestnika we wszystkich etapach.',
+  polish: 'Raport obejmie postęp wybranej osoby we wszystkich etapach.',
   english: 'Report will include the progress of the selected participant in all stages.',
 };
 
 const PARTICIPANTMODALSEARCH__TEXTLABEL = {
-  polish: 'Szukaj uczestnika...',
+  polish: 'Szukaj osoby...',
   english: 'Search participant...',
 };
 

@@ -256,6 +256,26 @@ export function useGroupShopOpen(groupId) {
     refetch();
   }, [refetch]);
 
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    if (isShopOpen && !active) {
+      setActive(true);
+    }
+  }, [isShopOpen]);
+
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+    const intervalInterval = window.setInterval(() => {
+      refetch();
+    }, 3000);
+    return () => {
+      window.clearInterval(intervalInterval);
+    };
+  }, [active, refetch]);
+
   const setShopOpenStatus = useCallback(async (nextOpen) => {
     if (!groupId) {
       return { ok: false };

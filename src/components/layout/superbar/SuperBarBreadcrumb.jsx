@@ -2,7 +2,10 @@ import { Link } from 'react-router-dom';
 import AssetSvg from '../../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { groupsListPath } from '../../../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBarBreadcrumb.css';
+
+import { useState } from 'react';
 
 /**
  * @param {Object} props
@@ -11,18 +14,29 @@ import './SuperBarBreadcrumb.css';
  * @param {string | null} props.groupPath
  * @param {{ label: string, to?: string }[]} props.segments
  */
+const BREADCRUMB__TEXTLABEL = {
+  polish: 'Gdzie jesteś',
+  english: 'Where are you',
+};
+
+const HOMELABEL__TEXTLABEL = {
+  polish: 'Lista grup',
+  english: 'Group list',
+};
+
 export default function SuperBarBreadcrumb({
   homePath = groupsListPath(),
   groupName,
   groupPath,
   segments,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const items = [
     {
       key: 'home',
       type: 'home',
       to: homePath,
-      label: 'Lista grup',
+      label: HOMELABEL__TEXTLABEL[LANGUAGE],
     },
   ];
 
@@ -51,7 +65,7 @@ export default function SuperBarBreadcrumb({
   }
 
   return (
-    <nav className="super-bar-breadcrumb" aria-label="Gdzie jesteś">
+    <nav className="super-bar-breadcrumb" aria-label={BREADCRUMB__TEXTLABEL[LANGUAGE]}>
       <ol className="super-bar-breadcrumb__list">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

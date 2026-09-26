@@ -21,7 +21,7 @@ const SEARCHPLACEHOLDER__TEXTLABEL = {
   english: 'Search campaigns...',
 };
 const SEARCH__TEXTLABEL = {
-  polish: 'Szukaj kampanii po nazwie, przedmiocie lub prowadzącym',
+  polish: 'Szukaj kampanii po nazwie, przedmiocie lub osobie prowadzącej',
   english: 'Search campaigns by name, subject or lecturer',
 };
 const TEMPLATESGALLERYBUTTON__TEXTLABEL = {

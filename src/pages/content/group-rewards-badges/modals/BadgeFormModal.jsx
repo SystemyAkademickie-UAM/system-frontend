@@ -60,7 +60,7 @@ const DIDACTICDESCRIPTIONLABEL__TEXTLABEL = {
 };
 
 const PUBLISHEDOPTIONTEXT__TEXTLABEL = {
-  polish: 'Odznaka widoczna dla studentów',
+  polish: 'Odznaka widoczna',
   english: 'Badge visible to students'
 };
 

@@ -1,8 +1,25 @@
+import { useState } from 'react';
 import { getBadgeCssVars } from './badgeCssVars.js';
 import BadgeIcon from './BadgeIcon.jsx';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 import { BADGE_RARITY, getBadgeRarityConfig } from './badgeRarity.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './Badge.css';
+
+const STORYDESCRIPTION__TEXTLABEL = {
+  polish: 'Opis fabularny',
+  english: 'Story Description',
+};
+
+const DIDACTICDESCRIPTIONL__TEXTLABEL = {
+  polish: 'Opis dydaktyczny',
+  english: 'Didactic Description',
+};
+
+const REWARD__TEXTLABEL = {
+  polish: 'Nagroda',
+  english: 'Reward',
+};
 
 /**
  * Pełny kafelek odznaki (Figma: Achievement Card).
@@ -19,6 +36,7 @@ import './Badge.css';
  * @param {import('react').ReactNode} [props.icon]
  * @param {string} [props.iconFile]
  * @param {boolean} [props.isLocked=false]
+
  * @param {string} [props.className]
  */
 export default function Badge({
@@ -35,6 +53,7 @@ export default function Badge({
   isLocked = false,
   className = '',
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const config = getBadgeRarityConfig(rarity);
   const showDate = showEarnedAt && Boolean(earnedAt);
 
@@ -64,19 +83,19 @@ export default function Badge({
 
         <div className="maq-badge__descriptions">
           <div className="maq-badge__section">
-            <span className="maq-badge__section-label">Opis fabularny</span>
+            <span className="maq-badge__section-label">{STORYDESCRIPTION__TEXTLABEL[LANGUAGE]}</span>
             <p className="maq-badge__story-text">{storyDescription}</p>
           </div>
 
           <div className="maq-badge__section">
-            <span className="maq-badge__section-label">Opis dydaktyczny</span>
+            <span className="maq-badge__section-label">{DIDACTICDESCRIPTIONL__TEXTLABEL[LANGUAGE]}</span>
             <p className="maq-badge__didactic-text">{didacticDescription}</p>
           </div>
         </div>
       </div>
 
       <footer className="maq-badge__reward">
-        <span className="maq-badge__section-label">Nagroda</span>
+        <span className="maq-badge__section-label">{REWARD__TEXTLABEL[LANGUAGE]}</span>
         <CurrencyDisplay
           amount={rewardAmount}
           symbol={rewardEmoji}

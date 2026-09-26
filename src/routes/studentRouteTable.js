@@ -119,10 +119,10 @@ export const STUDENT_ROUTE_TABLE = [
   },
   {
     id: 'group.student.users',
-    navLabel: 'Uczestnicy',
+    navLabel: 'Osoby uczestniczące',
     hrefKey: 'GROUP_STUDENT_PARTICIPANTS',
     pathPattern: '/groups/:groupId/users',
-    breadcrumb: 'Uczestnicy',
+    breadcrumb: 'Osoby uczestniczące',
   },
   {
     id: 'group.ranking.home',
@@ -161,7 +161,7 @@ export const STUDENT_ROUTE_TABLE = [
     navLabel: '—',
     hrefKey: 'GROUP_STUDENT_PROFILE',
     pathPattern: '/groups/:groupId/student-profile/:studentId',
-    breadcrumb: 'Profil uczestnika',
+    breadcrumb: 'Profil',
     notes: 'Ekwipunek uczestnika — tylko prowadzący',
   },
   {

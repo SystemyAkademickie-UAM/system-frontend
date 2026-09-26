@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import AssetSvg from '../../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBarBackButton.css';
+
+import { useState } from 'react';
 
 /**
  * @param {{
@@ -10,11 +13,17 @@ import './SuperBarBackButton.css';
  *   onNavigate?: () => void,
  * }} props
  */
+const BACKBUTTON__TEXTLABEL = {
+  polish: 'Wróć do poprzedniej strony',
+  english: 'Go back to previous page',
+};
+
 export default function SuperBarBackButton({
-  ariaLabel = 'Wróć do poprzedniej strony',
+  ariaLabel,
   fallbackTo,
   onNavigate,
 }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -32,7 +41,7 @@ export default function SuperBarBackButton({
     <button
       type="button"
       className="super-bar-back"
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? BACKBUTTON__TEXTLABEL[LANGUAGE]}
       onClick={handleClick}
     >
       <AssetSvg

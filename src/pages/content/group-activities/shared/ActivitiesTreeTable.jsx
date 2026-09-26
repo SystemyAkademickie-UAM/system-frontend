@@ -69,7 +69,7 @@ function StageIsland({
     english: 'Reward',
   };
   const PARTICIPANTS__TEXTLABEL = {
-    polish: 'Uczestnicy',
+    polish: 'Osoby uczestniczące',
     english: 'Participants',
   };
   const ACTIONS__TEXTLABEL = {
@@ -77,7 +77,7 @@ function StageIsland({
     english: 'Actions',
   };
   const PARTICIPANTSTITLE__TEXTLABEL = {
-    polish: 'Uczestnicy z zaliczoną aktywnością',
+    polish: 'Osoby z zaliczoną aktywnością',
     english: 'Participants with completed activity',
   };
   const isHidden = stage.visibilityStatus === 0;
