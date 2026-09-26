@@ -32,7 +32,7 @@ export function getRememberMe() {
     // Ignoruj błędy dostępu do cookies/localStorage
   }
 
-  return true;
+  return false;
 }
 
 /**

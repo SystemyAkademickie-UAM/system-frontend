@@ -59,8 +59,14 @@ export default function StudentProfileViewContent() {
 
       try {
         const students = await fetchGroupStudents(groupId);
-        const found = students.find((item) => String(item.accountId) === String(studentId))
-          ?? students.find((item) => String(item.enrollmentId) === String(studentId));
+        let found = null;
+        const num = parseInt(String(studentId).replace(/^student-/, ''), 10);
+        if (!Number.isNaN(num) && num >= 1 && num <= students.length) {
+          found = students[num - 1];
+        } else {
+          found = students.find((item) => String(item.accountId) === String(studentId))
+            ?? students.find((item) => String(item.enrollmentId) === String(studentId));
+        }
 
         if (cancelled) {
           return;

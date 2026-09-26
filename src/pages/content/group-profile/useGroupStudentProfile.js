@@ -24,24 +24,14 @@ const PROFILE_LOAD_ERROR__TEXTLABEL = {
   english: 'Failed to load student profile'
 };
 
-async function loadStudentByIdentifier(groupId, studentId) {
-  const [students, ranks] = await Promise.all([
-    fetchGroupStudents(groupId),
-    fetchGroupRanks(groupId).catch(() => []),
-  ]);
-
-  let student = students.find((item) => String(item.accountId) === String(studentId))
-    ?? students.find((item) => String(item.enrollmentId) === String(studentId));
-
-  if (!student && typeof studentId === 'string' && studentId.startsWith('student-')) {
-    const idx = parseInt(studentId.replace('student-', ''), 10) - 1;
-    if (!Number.isNaN(idx) && idx >= 0 && idx < students.length) {
-      student = students[idx];
+async function loadStudentFallback(groupId, student, ranksData) {
+  let ranks = ranksData;
+  if (!ranks) {
+    try {
+      ranks = await fetchGroupRanks(groupId);
+    } catch {
+      ranks = [];
     }
-  }
-
-  if (!student) {
-    return { ok: false, error: PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL.polish };
   }
 
   let earnedBadges = [];
@@ -106,12 +96,32 @@ export function useGroupStudentProfile() {
     }
 
     setIsLoading(true);
-    let result = studentId
-      ? await fetchGroupStudentProfile(groupId, studentId)
-      : await fetchGroupStudentProfile(groupId);
+    let result;
 
-    if (!result.ok && studentId) {
-      result = await loadStudentByIdentifier(groupId, studentId);
+    if (studentId) {
+      const students = await fetchGroupStudents(groupId);
+      let targetStudent = null;
+
+      const num = parseInt(String(studentId).replace(/^student-/, ''), 10);
+      if (!Number.isNaN(num) && num >= 1 && num <= students.length) {
+        // Direct 1-based position in group (/student-profile/1 -> student #1)
+        targetStudent = students[num - 1];
+      } else {
+        // Fallback: match by accountId or enrollmentId
+        targetStudent = students.find((s) => String(s.accountId) === String(studentId))
+          ?? students.find((s) => String(s.enrollmentId) === String(studentId));
+      }
+
+      if (targetStudent) {
+        result = await fetchGroupStudentProfile(groupId, targetStudent.accountId);
+        if (!result.ok) {
+          result = await loadStudentFallback(groupId, targetStudent);
+        }
+      } else {
+        result = { ok: false, error: PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL.polish };
+      }
+    } else {
+      result = await fetchGroupStudentProfile(groupId);
     }
 
     setIsLoading(false);

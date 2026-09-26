@@ -25,25 +25,25 @@ export function useGroupRankPathSettings(groupId) {
     load();
   }, [load]);
 
-  const toggleShowMemberAvatars = useCallback(async () => {
+  const setShowMemberAvatarsSetting = useCallback(async (value) => {
     if (!groupId) {
       return { ok: false, error: 'Brak ID grupy' };
     }
 
-    const nextValue = !showMemberAvatars;
-    const result = await updateGroup(groupId, { rankShowMemberAvatars: nextValue });
+    const result = await updateGroup(groupId, { rankShowMemberAvatars: value });
     if (!result.ok) {
       return { ok: false, error: result.error ?? 'Nie udało się zapisać ustawienia.' };
     }
 
-    setShowMemberAvatars(nextValue);
+    setShowMemberAvatars(value);
     return { ok: true };
-  }, [groupId, showMemberAvatars]);
+  }, [groupId]);
 
   return {
     showMemberAvatars,
     isLoading,
     toggleShowMemberAvatars,
+    setShowMemberAvatarsSetting,
     refetch: load,
   };
 }

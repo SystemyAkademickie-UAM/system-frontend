@@ -96,6 +96,20 @@
   width: 100%;
 }
 
+.rewards-page__toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+.rewards-page__settings-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 .rewards-page__toolbar-ranks-wrap {
   display: flex;
   align-items: center;

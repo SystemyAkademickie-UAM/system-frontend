@@ -24,7 +24,9 @@ const ASSIGNLABEL__TEXTLABEL = {
  * @param {number | null} [props.excludeAccountId]
  * @param {string} [props.currencySymbol]
  * @param {boolean} [props.isStudentView]
+ * @param {boolean} [props.showMemberAvatars]
  * @param {boolean} [props.showLecturerActions]
+ * @param {string | number} [props.groupId]
  * @param {() => void} [props.onEdit]
  * @param {() => void} [props.onDelete]
  * @param {() => void} [props.onAssign]
@@ -34,16 +36,18 @@ export default function BadgeTreasuryCard({
   earnersByBadgeId,
   excludeAccountId = null,
   isStudentView = false,
+  showMemberAvatars = true,
   showLecturerActions = false,
+  groupId,
   LANGUAGE,
   onEdit,
   onDelete,
   onAssign,
   onDoubleClick,
 }) {
-  const earners = getBadgeEarners(earnersByBadgeId, badge.dbId, excludeAccountId);
+  const earners = showMemberAvatars ? getBadgeEarners(earnersByBadgeId, badge.dbId, excludeAccountId) : [];
   const isLocked = isStudentView && !badge.isUnlocked;
-  const hasEarners = earners.length > 0;
+  const hasEarners = showMemberAvatars && earners.length > 0;
   const isPublished = badge.isPublished !== false;
 
   return (
@@ -88,11 +92,14 @@ export default function BadgeTreasuryCard({
           isLocked={isLocked}
           className="badge-treasury-card__badge maq-badge--grid-fit"
         />
-        <BadgeEarnersBar
-          students={earners}
-          className="badge-treasury-card__earners"
-          LANGUAGE={LANGUAGE}
-        />
+        {showMemberAvatars ? (
+          <BadgeEarnersBar
+            students={earners}
+            groupId={groupId}
+            className="badge-treasury-card__earners"
+            LANGUAGE={LANGUAGE}
+          />
+        ) : null}
       </div>
     </article>
   );

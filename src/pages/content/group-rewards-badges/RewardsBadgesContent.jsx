@@ -32,11 +32,18 @@ import BadgeFormModal from './modals/BadgeFormModal.jsx';
 import BadgeGiveModal from './modals/BadgeGiveModal.jsx';
 import BadgeDeleteModal from './modals/BadgeDeleteModal.jsx';
 import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
+import GroupPeerProgressModal from '../group-shared/GroupPeerProgressModal/GroupPeerProgressModal.jsx';
+import { useGroupRankPathSettings } from '../../../hooks/groups/useGroupShopSchedule.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 const CREATENEWBADGE__TEXTLABEL = {
   polish: 'Dodaj odznakę',
   english: 'Add Badge'
+};
+
+const SETTINGSBUTTON__TEXTLABEL = {
+  polish: 'Ustawienia',
+  english: 'Settings'
 };
 
 const LOADINBADGES__TEXTLABEL = {
@@ -318,6 +325,8 @@ export default function RewardsBadgesContent() {
     handleToggleAllPublished,
   } = useGroupBadges();
 
+  const { showMemberAvatars, setShowMemberAvatarsSetting } = useGroupRankPathSettings(groupId);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState('all');
   const [sortBy, setSortBy] = useState(TREASURY_SORT.qualityDesc);
@@ -325,6 +334,7 @@ export default function RewardsBadgesContent() {
   const [activeModal, setActiveModal] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const openModal = useCallback((type, badge = null) => {
     setActiveModal({ type, badge });
@@ -420,6 +430,16 @@ export default function RewardsBadgesContent() {
     showError(result.error || ALLTOGGLEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
   }, [handleToggleAllPublished, showSuccess, showError, LANGUAGE]);
 
+  const handleSaveMemberAvatars = useCallback(async (value) => {
+    const result = await setShowMemberAvatarsSetting(value);
+    if (result.ok) {
+      showSuccess('Zapisano ustawienia widoczności uczestników.');
+      return { ok: true };
+    }
+    showError(result.error ?? 'Nie udało się zapisać ustawienia.');
+    return { ok: false, error: result.error };
+  }, [setShowMemberAvatarsSetting, showSuccess, showError]);
+
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
     deleteLabel: ROWACTIONDELETETEXT__TEXTLABEL[LANGUAGE],
@@ -510,14 +530,25 @@ export default function RewardsBadgesContent() {
             'rewards-page__toolbar-end',
             isTileView ? 'rewards-page__toolbar-end--stacked' : '',
           ].filter(Boolean).join(' ')}>
-            <SearchBar
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={BADGESEARCH__TEXTLABEL[LANGUAGE].placeholder}
-              name="badge-catalog-search"
-              className="rewards-page__search"
-              aria-label={BADGESEARCH__TEXTLABEL[LANGUAGE].label}
-            />
+            <div className="rewards-page__toolbar-row">
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                className="rewards-page__settings-btn"
+                onClick={() => setSettingsModalOpen(true)}
+              >
+                {SETTINGSBUTTON__TEXTLABEL[LANGUAGE]}
+              </Button>
+              <SearchBar
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={BADGESEARCH__TEXTLABEL[LANGUAGE].placeholder}
+                name="badge-catalog-search"
+                className="rewards-page__search"
+                aria-label={BADGESEARCH__TEXTLABEL[LANGUAGE].label}
+              />
+            </div>
             {isTileView ? (
               <div className="rewards-page__toolbar-filters-row">
                 <CatalogFiltersToggle
@@ -558,6 +589,7 @@ export default function RewardsBadgesContent() {
             searchQuery={searchQuery}
             rarityFilter={rarityFilter}
             sortBy={sortBy}
+            showMemberAvatars={showMemberAvatars}
             onRarityFilterChange={setRarityFilter}
             onSortByChange={setSortBy}
             showLecturerActions
@@ -619,6 +651,12 @@ export default function RewardsBadgesContent() {
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
+      />
+      <GroupPeerProgressModal
+        isOpen={isSettingsModalOpen}
+        currentValue={showMemberAvatars}
+        onSave={handleSaveMemberAvatars}
+        onClose={() => setSettingsModalOpen(false)}
       />
     </SectionPageLayout>
   );

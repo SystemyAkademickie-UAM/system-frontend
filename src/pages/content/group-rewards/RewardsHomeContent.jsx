@@ -28,6 +28,7 @@ import ViewLayoutToggle from '../../../components/ui/ViewLayoutToggle/ViewLayout
 import GroupMainRanksContent from '../group-main-ranks/GroupMainRanksContent.jsx';
 import RankFormModal from './modals/RankFormModal.jsx';
 import RankUnlockItemsModal from './modals/RankUnlockItemsModal.jsx';
+import GroupPeerProgressModal from '../group-shared/GroupPeerProgressModal/GroupPeerProgressModal.jsx';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 const CREATEDSUCCESS__TEXTLABEL = {
@@ -81,13 +82,13 @@ const ITEMSUPDATEERROR__TEXTLABEL = {
 };
 
 const MEMBERSHIDDEN__TEXTLABEL = {
-  polish: 'Uczestnicy zostali ukryci na ścieżce rang.',
-  english: 'Participants have been hidden from the rank path.'
+  polish: 'Zapisano ustawienia widoczności uczestników.',
+  english: 'Participant visibility settings saved.'
 };
 
 const MEMBERSVISIBLE__TEXTLABEL = {
-  polish: 'Uczestnicy są widoczni na ścieżce rang.',
-  english: 'Participants are visible on the rank path.'
+  polish: 'Zapisano ustawienia widoczności uczestników.',
+  english: 'Participant visibility settings saved.'
 };
 
 const LOADING__TEXTLABEL = {
@@ -105,19 +106,9 @@ const ADDRANKBUTTON__TEXTLABEL = {
   english: 'Add rank'
 };
 
-const HIDEMEMBERSBUTTON__TEXTLABEL = {
-  polish: 'Ukryj uczestników',
-  english: 'Hide participants'
-};
-
-const SHOWMEMBERSBUTTON__TEXTLABEL = {
-  polish: 'Pokaż uczestników',
-  english: 'Show participants'
-};
-
-const MEMBERAVATARTOOLTIP__TEXTLABEL = {
-  polish: 'Steruje widocznością innych uczestników dla studentów.',
-  english: 'Controls the visibility of other participants for students.'
+const SETTINGSBUTTON__TEXTLABEL = {
+  polish: 'Ustawienia',
+  english: 'Settings'
 };
 
 const SEARCHPLACEHOLDER__TEXTLABEL = {
@@ -317,7 +308,7 @@ export default function RewardsHomeContent() {
   const { groupId } = useParams();
   const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-ranks-view');
   const { showSuccess, showError } = useToast();
-  const { showMemberAvatars, toggleShowMemberAvatars } = useGroupRankPathSettings(groupId);
+  const { showMemberAvatars, setShowMemberAvatarsSetting } = useGroupRankPathSettings(groupId);
   const {
     ranks,
     students,
@@ -343,6 +334,7 @@ export default function RewardsHomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const openModal = useCallback((type, rank = null) => {
     setActiveModal({ type, rank });
@@ -470,15 +462,15 @@ export default function RewardsHomeContent() {
     ],
   }), [openModal, LANGUAGE]);
 
-  const handleToggleMemberAvatars = useCallback(async () => {
-    const wasVisible = showMemberAvatars;
-    const result = await toggleShowMemberAvatars();
+  const handleSaveMemberAvatars = useCallback(async (value) => {
+    const result = await setShowMemberAvatarsSetting(value);
     if (result.ok) {
-      showSuccess(wasVisible
-        ? MEMBERSHIDDEN__TEXTLABEL[LANGUAGE]
-        : MEMBERSVISIBLE__TEXTLABEL[LANGUAGE]);
+      showSuccess(MEMBERSVISIBLE__TEXTLABEL[LANGUAGE]);
+      return { ok: true };
     }
-  }, [toggleShowMemberAvatars, showMemberAvatars, showSuccess, LANGUAGE]);
+    showError(result.error ?? UPDATEERROR__TEXTLABEL[LANGUAGE]);
+    return { ok: false, error: result.error };
+  }, [setShowMemberAvatarsSetting, showSuccess, showError, LANGUAGE]);
 
   const modalRank = activeModal?.rank ?? null;
 
@@ -508,8 +500,8 @@ export default function RewardsHomeContent() {
       subNavAriaLabel={nav.ariaLabel}
       headerAction={<ViewLayoutToggle layout={layout} onToggle={toggleLayout} />}
       toolbar={(
-        <div className="rewards-page__toolbar-ranks-wrap">
-          <div className="rewards-page__toolbar-ranks-buttons">
+        <>
+          <div className="maq-section-page__toolbar-start rewards-page__toolbar-start">
             <Button
               variant="primary"
               size="md"
@@ -518,28 +510,29 @@ export default function RewardsHomeContent() {
             >
               {ADDRANKBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
-            <div className="rewards-ranks__members-toggle-wrap">
+          </div>
+          <div className="maq-section-page__toolbar-end rewards-page__toolbar-end">
+            <div className="rewards-page__toolbar-row">
               <Button
                 type="button"
-                variant={showMemberAvatars ? 'primary' : 'secondary'}
+                variant="secondary"
                 size="md"
-                className="rewards-ranks__members-toggle"
-                onClick={handleToggleMemberAvatars}
+                className="rewards-page__settings-btn"
+                onClick={() => setSettingsModalOpen(true)}
               >
-                {showMemberAvatars ? HIDEMEMBERSBUTTON__TEXTLABEL[LANGUAGE] : SHOWMEMBERSBUTTON__TEXTLABEL[LANGUAGE]}
+                {SETTINGSBUTTON__TEXTLABEL[LANGUAGE]}
               </Button>
-              <InfoTooltip text={MEMBERAVATARTOOLTIP__TEXTLABEL[LANGUAGE]} />
+              <SearchBar
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                name="rank-catalog-search"
+                className="rewards-page__search"
+                aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
+              />
             </div>
           </div>
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-            name="rank-catalog-search"
-            className="rewards-page__search"
-            aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
-          />
-        </div>
+        </>
       )}
     >
 
@@ -620,6 +613,12 @@ export default function RewardsHomeContent() {
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
+      />
+      <GroupPeerProgressModal
+        isOpen={isSettingsModalOpen}
+        currentValue={showMemberAvatars}
+        onSave={handleSaveMemberAvatars}
+        onClose={() => setSettingsModalOpen(false)}
       />
     </SectionPageLayout>
   );

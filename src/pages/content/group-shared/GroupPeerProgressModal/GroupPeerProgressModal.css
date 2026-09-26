@@ -1,0 +1,24 @@
+.group-peer-progress-modal {
+  width: min(92vw, 480px);
+}
+
+.group-peer-progress-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.group-peer-progress-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.group-peer-progress-modal__hint {
+  margin: 0;
+  padding-left: 2rem;
+  font-size: var(--font-size-min, 0.8125rem);
+  line-height: 1.45;
+  color: var(--color-text-secondary, #94a3b8);
+}

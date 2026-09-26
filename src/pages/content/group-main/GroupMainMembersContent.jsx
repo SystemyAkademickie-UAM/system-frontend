@@ -69,13 +69,13 @@ function buildRows(students, preview, { role, profileAvatarUrl }) {
     });
   }
 
-  students.forEach((student) => {
+  students.forEach((student, index) => {
     const nickname = student.nickname?.trim() || '—';
 
     rows.push({
       id: String(student.accountId),
       accountId: student.accountId,
-      position: rows.length + 1,
+      position: index + 1,
       nickname,
       avatarUrl: student.avatarUrl || generateMemberAvatarFallback(student.nickname || student.email),
       isLecturer: false,
@@ -88,13 +88,13 @@ function buildRows(students, preview, { role, profileAvatarUrl }) {
 function GroupMainMembersTableRow({ row, columns, canOpenProfiles }) {
   const { groupId } = useParams();
   const navigate = useNavigate();
-  const isClickable = canOpenProfiles && Boolean(groupId && row.accountId && !row.isLecturer);
+  const isClickable = canOpenProfiles && Boolean(groupId && (row.position || row.accountId) && !row.isLecturer);
 
   const openProfile = () => {
     if (!isClickable) {
       return;
     }
-    navigate(groupStudentProfilePath(groupId, row.accountId));
+    navigate(groupStudentProfilePath(groupId, row.position ?? row.accountId));
   };
 
   const handleKeyDown = (event) => {

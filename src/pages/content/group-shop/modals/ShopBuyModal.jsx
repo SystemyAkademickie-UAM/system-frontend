@@ -58,6 +58,7 @@ export default function ShopBuyModal({
         rankDiscountedPrice={item.rankDiscountedPrice}
         appliedDiscounts={item.appliedDiscounts}
         imageRef={item.imageRef}
+        imageUrl={item.imageUrl}
         categoryDetails={categoryDetails}
         hideActions
         isExtraLife={item.isExtraLife === true}

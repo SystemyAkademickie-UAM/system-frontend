@@ -127,6 +127,7 @@ export default function GroupMainRanksContent({
         <RankPathBoard
           ranks={ranks}
           students={students}
+          groupId={groupId}
           isStudentView={isStudentView}
           showMemberAvatars={showMemberAvatars}
           totalEarned={studentProfile?.totalEarned ?? 0}

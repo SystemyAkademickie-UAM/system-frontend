@@ -24,6 +24,16 @@
   padding-bottom: 20px;
 }
 
+.shop-modal__items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1rem;
+  max-height: 55vh;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  padding: 0.25rem;
+}
+
 .shop-modal__summary-list {
   list-style: none;
   margin: 0 0 1rem;
