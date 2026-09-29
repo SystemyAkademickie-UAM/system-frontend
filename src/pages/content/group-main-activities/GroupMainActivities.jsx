@@ -527,7 +527,7 @@ export default function GroupMainActivities() {
         if (iscompleted == 1) {
           completedcount = completedcount + 1;
           earnedrewards = earnedrewards + activities[i].reward;
-          completedactivities.push({id: activities[i].id, name: activities[i].name, description0: activities[i].description0, description1: activities[i].description1, reward: activities[i].reward, unlocked: 1, bordercolour: 'rgb(66, 243, 125)'});
+          completedactivities.push({id: activities[i].id, name: activities[i].name, description0: activities[i].description0, description1: activities[i].description1, reward: activities[i].reward, unlocked: 1, bordercolour: 'var(--color-accent)'});
         } else {
           incompleteactivities.push({id: activities[i].id, name: activities[i].name, description0: activities[i].description0, description1: activities[i].description1, reward: activities[i].reward, unlocked: 0, bordercolour: 'rgb(128, 128, 128)'});
         }

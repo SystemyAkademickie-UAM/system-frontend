@@ -64,7 +64,7 @@
   border-radius: 16px;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-separator-one);
-  border-left-width: 16px;
+  border-left-width: 6px;
 }
 
 .group-main-activities__item-icon {
