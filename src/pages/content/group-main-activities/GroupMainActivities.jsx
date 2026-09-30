@@ -8,6 +8,7 @@ import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 import { Button, CurrencyDisplay } from '../../../components/ui/index.js';
 import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
+import { publicIconPath } from '../../../utils/publicAssetUrl.js';
 import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
 import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
 import { useGroupMainEmptyLink } from '../../../hooks/group-main/useGroupMainEmptyLink.js';
@@ -90,13 +91,63 @@ const arrowrighticon = PUBLIC_UI_ICONS.arrowRight;
 const arrowlefticon = PUBLIC_UI_ICONS.arrowLeft;
 const arrowcirclerighticon = PUBLIC_UI_ICONS.arrowCircleRight;
 const editicon = PUBLIC_UI_ICONS.info;
-const lefticon = PUBLIC_UI_ICONS.chevronLeft;
-const leftlefticon = PUBLIC_UI_ICONS.chevronLeftDouble;
-const righticon = PUBLIC_UI_ICONS.chevronRight;
-const rightrighticon = PUBLIC_UI_ICONS.chevronRightDouble;
 const unlockedicon = PUBLIC_UI_ICONS.unlocked;
-const lockedicon = PUBLIC_UI_ICONS.locked;
 
+function themechosen() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  return theme;
+}
+
+const lefticondark = PUBLIC_UI_ICONS.chevronLeft;
+const lefticonlight = publicIconPath('chevron-left-svgrepo-com-light.svg');
+const leftlefticondark = PUBLIC_UI_ICONS.chevronLeftDouble;
+const leftlefticonlight = publicIconPath('chevron-left-double-svgrepo-com-light.svg');
+const righticondark = PUBLIC_UI_ICONS.chevronRight;
+const righticonlight = publicIconPath('chevron-right-svgrepo-com-light.svg');
+const rightrighticondark = PUBLIC_UI_ICONS.chevronRightDouble;
+const rightrighticonlight = publicIconPath('chevron-right-double-svgrepo-com-light.svg');
+const lockedicondark = PUBLIC_UI_ICONS.locked;
+const lockediconlight = publicIconPath('x-circle-svgrepo-com-light.svg');
+
+function getlefticon() {
+  if (themechosen() == 'dark') {
+    return lefticondark;
+  } else if (themechosen() == 'light') {
+    return lefticonlight;
+  }
+}
+
+function getleftlefticon() {
+  if (themechosen() == 'dark') {
+    return leftlefticondark;
+  } else if (themechosen() == 'light') {
+    return leftlefticonlight;
+  }
+}
+
+function getrighticon() {
+  if (themechosen() == 'dark') {
+    return righticondark;
+  } else if (themechosen() == 'light') {
+    return righticonlight;
+  }
+}
+
+function getrightrighticon() {
+  if (themechosen() == 'dark') {
+    return rightrighticondark;
+  } else if (themechosen() == 'light') {
+    return rightrighticonlight;
+  }
+}
+
+function getlockedicon() {
+  if (themechosen() == 'dark') {
+    return lockedicondark;
+  } else if (themechosen() == 'light') {
+    return lockediconlight;
+  }
+}
 
 export default function GroupMainActivities() {
 
@@ -620,7 +671,7 @@ export default function GroupMainActivities() {
             disabled={atfirststage !== 0}
             aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={leftlefticon} alt="" />
+            <img src={getleftlefticon()} alt="" />
           </button>
           <button
             type="button"
@@ -629,7 +680,7 @@ export default function GroupMainActivities() {
             disabled={atfirststage !== 0}
             aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={lefticon} alt="" />
+            <img src={getlefticon()} alt="" />
           </button>
           <span className="group-main-activities__page-number">{currentpagenumber}</span>
           <button
@@ -639,7 +690,7 @@ export default function GroupMainActivities() {
             disabled={atlaststage !== 0}
             aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={righticon} alt="" />
+            <img src={getrighticon()} alt="" />
           </button>
           <button
             type="button"
@@ -648,7 +699,7 @@ export default function GroupMainActivities() {
             disabled={atlaststage !== 0}
             aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={rightrighticon} alt="" />
+            <img src={getrightrighticon()} alt="" />
           </button>
         </div>
 
@@ -690,7 +741,7 @@ export default function GroupMainActivities() {
             >
               <img
                 className="group-main-activities__item-icon"
-                src={islecturer === 1 ? arrowcirclerighticon : (activity.unlocked === 1 ? unlockedicon : lockedicon)}
+                src={islecturer === 1 ? arrowcirclerighticon : (activity.unlocked === 1 ? unlockedicon : getlockedicon())}
                 alt=""
               />
               <div className="group-main-activities__item-body">
@@ -733,7 +784,7 @@ export default function GroupMainActivities() {
             disabled={atfirststage !== 0}
             aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={leftlefticon} alt="" />
+            <img src={getleftlefticon()} alt="" />
           </button>
           <button
             type="button"
@@ -742,7 +793,7 @@ export default function GroupMainActivities() {
             disabled={atfirststage !== 0}
             aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={lefticon} alt="" />
+            <img src={getlefticon()} alt="" />
           </button>
           <span className="group-main-activities__page-number">{currentpagenumber}</span>
           <button
@@ -752,7 +803,7 @@ export default function GroupMainActivities() {
             disabled={atlaststage !== 0}
             aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={righticon} alt="" />
+            <img src={getrighticon()} alt="" />
           </button>
           <button
             type="button"
@@ -761,7 +812,7 @@ export default function GroupMainActivities() {
             disabled={atlaststage !== 0}
             aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
           >
-            <img src={rightrighticon} alt="" />
+            <img src={getrightrighticon()} alt="" />
           </button>
         </div>
 
