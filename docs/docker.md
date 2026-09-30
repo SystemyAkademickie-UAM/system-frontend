@@ -39,6 +39,8 @@ docker run -d -p 127.0.0.1:3000:3000 --name ui system-frontend:prod
 
 The container listens on **3000** inside the image (`docker/nginx/default.conf`).
 
+`location /assets/` uses `try_files $uri =404` (never SPA `index.html`) and long-cache hashed files. `location /` sends `Cache-Control: no-cache` for `index.html` so a new deploy is picked up without a manual refresh. The SPA also reloads once on Vite `vite:preloadError` if a tab still holds an old bundle.
+
 ## Helper scripts (Docker CLI only)
 
 From this service directory (`system-frontend`, where this `docs/` folder lives next to `scripts/`):

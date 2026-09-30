@@ -3,10 +3,11 @@ import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
 import { HomeRedirect, RouteGuard, GroupAccessGuard, GroupOwnerGuard, RankingDisabledRedirect } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
+import { importOrReload } from '../utils/staleChunkReload.js';
 
 // Helper for lazy page loading with Suspense
 function withLazy(factory) {
-  const Component = lazy(factory);
+  const Component = lazy(() => importOrReload(factory));
   return function LazyPageWrapper(props) {
     return (
       <Suspense fallback={<div className="maq-route-loading" aria-busy="true" />}>
