@@ -124,7 +124,7 @@
 }
 
 .login-institution__input::placeholder {
-  color: rgba(189, 202, 190, 0.4);
+  color: var(--auth-text-muted);
 }
 
 .login-institution__input:disabled {
