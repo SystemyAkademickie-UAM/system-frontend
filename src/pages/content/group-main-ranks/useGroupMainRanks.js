@@ -82,7 +82,7 @@ export function useGroupMainRanks() {
       const studentsData = await fetchGroupStudents(groupId);
       const coloredRanks = applyRankPathColors(mappedRanks);
       setRanks(coloredRanks);
-      setStudents(studentsData.map((student) => mapStudentForRankPath(student, coloredRanks)));
+      setStudents(studentsData.map((student, idx) => mapStudentForRankPath({ ...student, position: idx + 1 }, coloredRanks)));
       setStudentProfile(null);
     } catch (loadError) {
       console.error('Failed to load rank path:', loadError);

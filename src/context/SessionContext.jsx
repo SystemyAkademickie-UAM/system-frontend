@@ -125,6 +125,25 @@ export function SessionProvider({ children }) {
     checkSession();
   }, [checkSession]);
 
+  useEffect(() => {
+    let lastCheckTime = Date.now();
+
+    const handleFocusOrVisibility = () => {
+      if (document.visibilityState === 'visible' && Date.now() - lastCheckTime > 30000) {
+        lastCheckTime = Date.now();
+        checkSession();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleFocusOrVisibility);
+    window.addEventListener('focus', handleFocusOrVisibility);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleFocusOrVisibility);
+      window.removeEventListener('focus', handleFocusOrVisibility);
+    };
+  }, [checkSession]);
+
   const role = useMemo(() => mapBackendRoleToAppRole(user?.role), [user]);
 
   const value = useMemo(

@@ -56,3 +56,27 @@ export function clearClientAuthState() {
     // ignore storage access errors
   }
 }
+
+let sessionExpiredHandling = false;
+
+/**
+ * Wywoływane, gdy sesja wygaśnie na backendzie (np. status 401 Unauthorized na chronionym zasobie).
+ * Czyści stan sesji w aplikacji, umożliwiając RouteGuard natychmiastowe przekierowanie na stronę logowania/powitalną.
+ */
+export function handleSessionExpired() {
+  if (isClientLogoutInProgress() || sessionExpiredHandling) {
+    return;
+  }
+  sessionExpiredHandling = true;
+  try {
+    clearClientAuthState();
+  } finally {
+    if (typeof window !== 'undefined') {
+      window.setTimeout(() => {
+        sessionExpiredHandling = false;
+      }, 500);
+    } else {
+      sessionExpiredHandling = false;
+    }
+  }
+}

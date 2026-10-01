@@ -122,6 +122,7 @@ export default function LoginInstitution({ onBack }) {
       setErrorMessage(ERROR_SAMLNOTCONFIGURED__TEXTLABEL[LANGUAGE]);
       return;
     }
+    setRememberMe(rememberMe);
     const samlLoginUrl = getSamlLoginUrl(organizationId);
     if (samlLoginUrl.length === 0) {
       setIsBusy(false);
@@ -129,7 +130,7 @@ export default function LoginInstitution({ onBack }) {
       return;
     }
     window.location.assign(samlLoginUrl);
-  }, [selectedOrganizationId, LANGUAGE]);
+  }, [selectedOrganizationId, rememberMe, LANGUAGE]);
 
   const isSelectDisabled = isOrganizationsLoading || organizations.length === 0 || isBusy;
 

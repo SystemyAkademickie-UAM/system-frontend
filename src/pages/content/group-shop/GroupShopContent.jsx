@@ -864,6 +864,7 @@ export default function GroupShopContent() {
         isOpen={activeModal?.type === 'buyAll'}
         cartItems={cartItems}
         cartTotal={cartTotal}
+        categoriesById={categoriesById}
         onClose={closeModal}
         onConfirm={handleBuyAllConfirm}
       />

@@ -10,7 +10,7 @@ import {
 } from '../../../utils/rankGradient.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { getStudentManualRankProgressPx, getStudentProgressPx, groupStudentsByRank } from './rankPathModel.js';
-import RankPathMembers from './RankPathMembers.jsx';
+import BadgeEarnersBar from '../group-main-badges/BadgeEarnersBar.jsx';
 import LecturerTileActions from '../group-rewards/shared/LecturerTileActions.jsx';
 import '../../../components/ui/ProductCard/ProductCard.css';
 import './RankPathBoard.css';
@@ -34,6 +34,7 @@ const EMPTYMESSAGE__TEXTLABEL = {
  * @param {Object} props
  * @param {import('./rankPathModel.js').RankPathRank[]} props.ranks
  * @param {import('./rankPathModel.js').RankPathStudent[]} [props.students]
+ * @param {string | number} [props.groupId]
  * @param {boolean} props.isStudentView
  * @param {number} [props.totalEarned]
  * @param {number | null | undefined} [props.studentRankId]
@@ -51,6 +52,7 @@ const EMPTYMESSAGE__TEXTLABEL = {
 export default function RankPathBoard({
   ranks,
   students = [],
+  groupId,
   isStudentView,
   totalEarned = 0,
   studentRankId = null,
@@ -206,43 +208,52 @@ export default function RankPathBoard({
 
   const rowsContent = (
     <div className="rank-path-board__rows" ref={rowsRef}>
-      {ranks.map((rank) => (
-        <div key={rank.id} className="rank-path-row" onDoubleClick={() => onRankDoubleClick?.(rank)}>
-          <div className={[
-            'rank-path-row__rank',
-            showLecturerActions ? 'rank-path-row__rank--lecturer' : '',
-          ].filter(Boolean).join(' ')}>
-            {showLecturerActions ? (
-              <LecturerTileActions
-                entityLabel="rangę"
+      {ranks.map((rank) => {
+        const rankStudents = studentsByRank.get(rank.id) ?? [];
+        const hasEarners = showMemberAvatars && rankStudents.length > 0;
+
+        return (
+          <div key={rank.id} className="rank-path-row" onDoubleClick={() => onRankDoubleClick?.(rank)}>
+            <div className={[
+              'rank-path-row__rank',
+              hasEarners ? 'rank-path-row__rank--has-earners' : '',
+              showLecturerActions ? 'rank-path-row__rank--lecturer' : '',
+            ].filter(Boolean).join(' ')}>
+              {showLecturerActions ? (
+                <LecturerTileActions
+                  entityLabel="rangę"
+                  name={rank.name}
+                  onEdit={onEditRank ? () => onEditRank(rank) : undefined}
+                  onDelete={onDeleteRank ? () => onDeleteRank(rank) : undefined}
+                  onAssign={onAssignRank ? () => onAssignRank(rank) : undefined}
+                  assignLabel="Przydziel rangę"
+                  className="rank-path-row__actions"
+                />
+              ) : null}
+
+              <Rank
                 name={rank.name}
-                onEdit={onEditRank ? () => onEditRank(rank) : undefined}
-                onDelete={onDeleteRank ? () => onDeleteRank(rank) : undefined}
-                onAssign={onAssignRank ? () => onAssignRank(rank) : undefined}
-                assignLabel="Przydziel rangę"
-                className="rank-path-row__actions"
+                costAmount={rank.costAmount}
+                storyDescription={rank.storyDescription}
+                shopItems={rank.shopItems}
+                discountPercent={rank.discount ?? 0}
+                iconFile={rank.iconFile}
+                accentColor={rank.accentColor}
+                isLocked={isStudentView && !rank.isUnlocked}
               />
-            ) : null}
 
-            <Rank
-              name={rank.name}
-              costAmount={rank.costAmount}
-              storyDescription={rank.storyDescription}
-              shopItems={rank.shopItems}
-              discountPercent={rank.discount ?? 0}
-              iconFile={rank.iconFile}
-              accentColor={rank.accentColor}
-              isLocked={isStudentView && !rank.isUnlocked}
-            />
+              {showMemberAvatars ? (
+                <BadgeEarnersBar
+                  students={rankStudents}
+                  groupId={groupId}
+                  className="rank-path-card__earners"
+                  LANGUAGE={LANGUAGE}
+                />
+              ) : null}
+            </div>
           </div>
-
-          {showMemberAvatars ? (
-            <RankPathMembers
-              students={studentsByRank.get(rank.id) ?? []}
-            />
-          ) : null}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 

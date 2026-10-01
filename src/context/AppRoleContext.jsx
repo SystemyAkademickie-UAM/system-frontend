@@ -40,11 +40,12 @@ export function AppRoleProvider({ children }) {
   const value = useMemo(
     () => ({
       role,
+      isLoading: session?.isLoading ?? false,
       setRole: setRoleOverride,
       isRoleOverridden: roleOverride !== null,
       clearRoleOverride: () => setRoleOverride(null),
     }),
-    [role, roleOverride],
+    [role, roleOverride, session?.isLoading],
   );
 
   return <AppRoleContext.Provider value={value}>{children}</AppRoleContext.Provider>;

@@ -1,6 +1,7 @@
 .notification-bell {
   position: relative;
   display: inline-flex;
+  flex-shrink: 0;
 }
 
 .notification-bell__trigger {
