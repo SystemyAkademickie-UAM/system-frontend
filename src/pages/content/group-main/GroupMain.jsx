@@ -117,18 +117,15 @@ export default function App() {
 
       const responsetext = await response.text();
 
-      console.log('GET /groups/' + groupId + '/post: ', response.status);
-      console.log('GET /groups/' + groupId + '/post: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/groups/' + groupId + '/post not JSON: ' + responsetext);
+
       }
 
-      console.log('GET /groups/' + groupId + '/post JSON:', data);
 
       const receivedposts = (data?.posts ?? []).map((post) => ({
         id: post.id,
@@ -182,18 +179,15 @@ export default function App() {
 
       const responsetext = await response.text();
 
-      console.log('POST /groups/' + groupId + '/post: ', response.status);
-      console.log('POST /groups/' + groupId + '/post: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/groups/' + groupId + '/post not JSON: ' + responsetext);
+
       }
 
-      console.log('POST /groups/' + groupId + '/post JSON:', data);
       if (post.title.length > 0 && post.text.length > 0) {
         showSuccess(CREATESUCCESS__TEXTLABEL[LANGUAGE]);
       } else {
@@ -239,18 +233,15 @@ export default function App() {
 
       const responsetext = await response.text();
 
-      console.log('DELETE /groups/' + groupId + '/post/' + id + ': ', response.status);
-      console.log('DELETE /groups/' + groupId + '/post/' + id + ': ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/groups/' + groupId + '/post/' + id + ' not JSON: ' + responsetext);
+
       }
 
-      console.log('DELETE /groups/' + groupId + '/post/' + id + ' JSON:', data);
 
       onFetchPosts();
 

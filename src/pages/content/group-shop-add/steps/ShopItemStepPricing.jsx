@@ -635,7 +635,7 @@ export default function ShopItemStepPricing({
 
       {/* Sekcja zwijana: Zniżki za rangi */}
       <div className={`shop-item-pricing__ranks-accordion ${rankDiscountsExpanded ? 'shop-item-pricing__ranks-accordion--expanded' : ''}`}>
-        <button
+        <div
           type="button"
           className="shop-item-pricing__ranks-accordion-toggle"
           onClick={() => setRankDiscountsExpanded(!rankDiscountsExpanded)}
@@ -646,7 +646,7 @@ export default function ShopItemStepPricing({
             {RANKDISCOUNTSLABEL__TEXTLABEL[LANGUAGE]}
           </span>
           <InfoTooltip text={RANKDISCOUNTSTOOLTIP__TEXTLABEL[LANGUAGE]} />
-        </button>
+        </div>
 
         {rankDiscountsExpanded ? (
           <div className="shop-item-pricing__ranks-content">

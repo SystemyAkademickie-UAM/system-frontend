@@ -194,18 +194,14 @@ export default function GroupMainActivities() {
 
       const responsetext = await response.text();
 
-      console.log('POST /stages retrieve: ', response.status);
-      console.log('POST /stages retrieve: ', responsetext);
-
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/stages retrieve not JSON: ' + responsetext);
+
       }
 
-      console.log('POST /stages retrieve JSON:', data);
 
       const receivedstages = (data?.stages ?? []).map((stage) => ({
           id: stage.id,
@@ -266,18 +262,15 @@ export default function GroupMainActivities() {
 
       const responsetext = await response.text();
 
-      console.log('POST /activities: ', response.status);
-      console.log('POST /activities: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/activities not JSON: ' + responsetext);
+
       }
 
-      console.log('POST /activities JSON:', data);
 
       let receiveddata = data;
 
@@ -357,18 +350,15 @@ export default function GroupMainActivities() {
 
       const responsetext = await response.text();
 
-      console.log('GET /groups/' + groupId + '/student-profile: ', response.status);
-      console.log('GET /groups/' + groupId + '/student-profile: ', responsetext);
 
       let data;
 
       try {
         data = JSON.parse(responsetext);
       } catch {
-        console.log('/groups/' + groupId + '/student-profile not JSON: ' + responsetext);
+
       }
 
-      console.log('GET /groups/' + groupId + '/student-profile JSON:', data);
 
       let receiveddata = data;
 
