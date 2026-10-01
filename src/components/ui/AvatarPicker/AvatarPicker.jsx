@@ -15,8 +15,8 @@ const AVATARPICKERLABELTEXT = {
 };
 
 const POPULARLABELTEXT = {
-  polish: 'Ostatnio najczęściej wybierane',
-  english: 'Recently most chosen',
+  polish: 'Przykładowe awatary',
+  english: 'Example avatars',
 };
 
 const SHOWALLBUTTONLABELTEXT = {

@@ -43,7 +43,7 @@ const AVATARLABELTEXT = {
   kana: 'アバタ'
 };
 const LANGUAGELABELTEXT = {
-  polish: 'Jezyk',
+  polish: 'Język',
   english: 'LANGUAGE',
   japanese: '言語',
   kana: 'げんご'
