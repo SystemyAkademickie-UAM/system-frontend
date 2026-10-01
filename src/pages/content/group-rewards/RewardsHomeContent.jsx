@@ -619,6 +619,7 @@ export default function RewardsHomeContent() {
         currentValue={showMemberAvatars}
         onSave={handleSaveMemberAvatars}
         onClose={() => setSettingsModalOpen(false)}
+        LANGUAGE={LANGUAGE}
       />
     </SectionPageLayout>
   );

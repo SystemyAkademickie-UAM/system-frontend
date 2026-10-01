@@ -46,6 +46,16 @@ const SETTINGSBUTTON__TEXTLABEL = {
   english: 'Settings'
 };
 
+const MEMBERSVISIBLE__TEXTLABEL = {
+  polish: 'Zapisano ustawienia widoczności uczestników.',
+  english: 'Participant visibility settings saved.'
+};
+
+const MEMBERSVISIBLEFAIL__TEXTLABEL = {
+  polish: 'Nie udało się zapisać ustawienia.',
+  english: 'Failed to save settings.'
+};
+
 const LOADINBADGES__TEXTLABEL = {
   polish: 'Ładowanie odznak…',
   english: 'Loading badges…'
@@ -433,12 +443,12 @@ export default function RewardsBadgesContent() {
   const handleSaveMemberAvatars = useCallback(async (value) => {
     const result = await setShowMemberAvatarsSetting(value);
     if (result.ok) {
-      showSuccess('Zapisano ustawienia widoczności uczestników.');
+      showSuccess(MEMBERSVISIBLE__TEXTLABEL[LANGUAGE]);
       return { ok: true };
     }
-    showError(result.error ?? 'Nie udało się zapisać ustawienia.');
+    showError(result.error ?? MEMBERSVISIBLEFAIL__TEXTLABEL[LANGUAGE]);
     return { ok: false, error: result.error };
-  }, [setShowMemberAvatarsSetting, showSuccess, showError]);
+  }, [setShowMemberAvatarsSetting, showSuccess, showError, LANGUAGE]);
 
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
@@ -657,6 +667,7 @@ export default function RewardsBadgesContent() {
         currentValue={showMemberAvatars}
         onSave={handleSaveMemberAvatars}
         onClose={() => setSettingsModalOpen(false)}
+        LANGUAGE={LANGUAGE}
       />
     </SectionPageLayout>
   );

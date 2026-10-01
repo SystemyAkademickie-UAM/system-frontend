@@ -43,14 +43,16 @@ const SAVINGBUTTON__TEXTLABEL = {
  * @param {boolean} props.currentValue
  * @param {(value: boolean) => Promise<{ ok: boolean, error?: string }>} props.onSave
  * @param {() => void} props.onClose
+ * @param {string} [props.LANGUAGE]
  */
 export default function GroupPeerProgressModal({
   isOpen,
   currentValue = true,
   onSave,
   onClose,
+  LANGUAGE: languageProp,
 }) {
-  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const LANGUAGE = languageProp ?? READLANGUAGECOOKIE();
   const [checked, setChecked] = useState(currentValue);
   const [isSaving, setIsSaving] = useState(false);
 

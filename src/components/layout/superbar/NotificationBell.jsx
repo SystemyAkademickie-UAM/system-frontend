@@ -44,7 +44,7 @@ const VIEWALL__TEXTLABEL = {
 export default function NotificationBell() {
   const panelId = useId();
   const rootRef = useRef(null);
-  const { role } = useAppRole();
+  const { role, isLoading: isRoleLoading } = useAppRole();
   const groupId = useOptionalGroupId();
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +57,7 @@ export default function NotificationBell() {
     error,
     markRead,
   } = useGroupBacklogNotifications(groupId, {
+    enabled: Boolean(groupId) && !isRoleLoading,
     isStudentView,
     take: BELL_LIMIT,
     pollMs: isOpen ? BACKLOG_LIST_POLL_MS / 2 : BACKLOG_LIST_POLL_MS,
