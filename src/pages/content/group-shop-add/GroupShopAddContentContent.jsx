@@ -97,14 +97,17 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   const [currentStep, setCurrentStepState] = useState(editingItemId ? 4 : 1);
 
   const setCurrentStep = useCallback((stepOrFn) => {
-    setCurrentStepState((prev) => {
-      const next = typeof stepOrFn === 'function' ? stepOrFn(prev) : stepOrFn;
-      if (onStepChange) {
-        onStepChange(next);
-      }
-      return next;
-    });
-  }, [onStepChange]);
+    let next;
+    if (typeof stepOrFn === 'function') {
+      next = stepOrFn(currentStep);
+    } else {
+      next = stepOrFn;
+    }
+    setCurrentStepState(next);
+    if (onStepChange) {
+      onStepChange(next);
+    }
+  }, [currentStep, onStepChange]);
 
   // Stany formularza - Krok 1 (Informacje)
   const [itemName, setItemName] = useState('');

@@ -64,13 +64,16 @@ function BackIcon({ className }) {
   );
 }
 
+/** @type {SamlOrganizationOption[] | null} */
+let cachedOrganizations = null;
+
 export default function LoginInstitution({ onBack }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const navigate = useNavigate();
-  const [organizations, setOrganizations] = useState(/** @type {SamlOrganizationOption[]} */ ([]));
-  const [selectedOrganizationId, setSelectedOrganizationId] = useState('');
+  const [organizations, setOrganizations] = useState(/** @type {SamlOrganizationOption[]} */ (() => cachedOrganizations ?? []));
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState(() => (cachedOrganizations && cachedOrganizations.length > 0 ? String(cachedOrganizations[0].id) : ''));
   const [rememberMe, setRememberMeState] = useState(() => getRememberMe());
-  const [isOrganizationsLoading, setIsOrganizationsLoading] = useState(true);
+  const [isOrganizationsLoading, setIsOrganizationsLoading] = useState(() => !cachedOrganizations);
   const [isBusy, setIsBusy] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -83,10 +86,9 @@ export default function LoginInstitution({ onBack }) {
       }
       if (result.ok && result.data && typeof result.data === 'object' && Array.isArray(result.data.organizations)) {
         const rows = result.data.organizations;
+        cachedOrganizations = rows;
         setOrganizations(rows);
-        if (rows.length > 0) {
-          setSelectedOrganizationId(String(rows[0].id));
-        }
+        setSelectedOrganizationId((prev) => (prev ? prev : (rows.length > 0 ? String(rows[0].id) : '')));
       }
       setIsOrganizationsLoading(false);
     })();
@@ -122,6 +124,7 @@ export default function LoginInstitution({ onBack }) {
       setErrorMessage(ERROR_SAMLNOTCONFIGURED__TEXTLABEL[LANGUAGE]);
       return;
     }
+    setRememberMe(rememberMe);
     const samlLoginUrl = getSamlLoginUrl(organizationId);
     if (samlLoginUrl.length === 0) {
       setIsBusy(false);
@@ -129,7 +132,7 @@ export default function LoginInstitution({ onBack }) {
       return;
     }
     window.location.assign(samlLoginUrl);
-  }, [selectedOrganizationId, LANGUAGE]);
+  }, [selectedOrganizationId, rememberMe, LANGUAGE]);
 
   const isSelectDisabled = isOrganizationsLoading || organizations.length === 0 || isBusy;
 
@@ -144,70 +147,72 @@ export default function LoginInstitution({ onBack }) {
         <BackIcon className="auth-card__back-icon" />
       </button>
 
-      <img
-        src="/images/pionierid-logo.png"
-        alt="PIONIER.id"
-        className="login-institution__logo auth-logo--pionier"
-      />
+      <div className="login-institution__body">
+        <img
+          src="/images/pionierid-logo.png"
+          alt="PIONIER.id"
+          className="login-institution__logo auth-logo--pionier"
+        />
 
-      <div className="login-institution__field">
-        <label className="login-institution__field-label" htmlFor="institution-select">
-          {SELECTIONLABEL__TEXTLABEL[LANGUAGE]}
-        </label>
-        <div className="login-institution__select-wrap">
-          <select
-            id="institution-select"
-            className="login-institution__select"
-            value={selectedOrganizationId}
-            disabled={isSelectDisabled}
-            onChange={(event) => setSelectedOrganizationId(event.target.value)}
-          >
-            {isOrganizationsLoading && (
-              <option value="">{LOADINGOPTION__TEXTLABEL[LANGUAGE]}</option>
-            )}
-            {!isOrganizationsLoading && organizations.length === 0 && (
-              <option value="">{NOINSTITUTIONS__TEXTLABEL[LANGUAGE]}</option>
-            )}
-            {organizations.map((organization) => (
-              <option key={organization.id} value={String(organization.id)}>
-                {organization.name}
-              </option>
-            ))}
-          </select>
+        <div className="login-institution__field">
+          <label className="login-institution__field-label" htmlFor="institution-select">
+            {SELECTIONLABEL__TEXTLABEL[LANGUAGE]}
+          </label>
+          <div className="login-institution__select-wrap">
+            <select
+              id="institution-select"
+              className="login-institution__select"
+              value={selectedOrganizationId}
+              disabled={isSelectDisabled}
+              onChange={(event) => setSelectedOrganizationId(event.target.value)}
+            >
+              {isOrganizationsLoading && (
+                <option value="">{LOADINGOPTION__TEXTLABEL[LANGUAGE]}</option>
+              )}
+              {!isOrganizationsLoading && organizations.length === 0 && (
+                <option value="">{NOINSTITUTIONS__TEXTLABEL[LANGUAGE]}</option>
+              )}
+              {organizations.map((organization) => (
+                <option key={organization.id} value={String(organization.id)}>
+                  {organization.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
+
+        <div className="login-institution__remember-me">
+          <label className="login-institution__checkbox-label" htmlFor="institution-remember-me">
+            <input
+              id="institution-remember-me"
+              type="checkbox"
+              checked={rememberMe}
+              disabled={isBusy}
+              onChange={(e) => {
+                const next = e.target.checked;
+                setRememberMeState(next);
+                setRememberMe(next);
+              }}
+            />
+            <span>{REMEMBER_ME__TEXTLABEL[LANGUAGE]}</span>
+          </label>
+        </div>
+
+        {errorMessage && (
+          <p className="login-institution__error" role="alert">
+            {errorMessage}
+          </p>
+        )}
+
+        <button
+          type="button"
+          className="auth-card__primary-btn login-institution__continue"
+          onClick={handleContinue}
+          disabled={isBusy || isOrganizationsLoading || organizations.length === 0}
+        >
+          {CONTINUE_BUTTON__TEXTLABEL[LANGUAGE]}
+        </button>
       </div>
-
-      <div className="login-institution__remember-me">
-        <label className="login-institution__checkbox-label" htmlFor="institution-remember-me">
-          <input
-            id="institution-remember-me"
-            type="checkbox"
-            checked={rememberMe}
-            disabled={isBusy}
-            onChange={(e) => {
-              const next = e.target.checked;
-              setRememberMeState(next);
-              setRememberMe(next);
-            }}
-          />
-          <span>{REMEMBER_ME__TEXTLABEL[LANGUAGE]}</span>
-        </label>
-      </div>
-
-      {errorMessage && (
-        <p className="login-institution__error" role="alert">
-          {errorMessage}
-        </p>
-      )}
-
-      <button
-        type="button"
-        className="auth-card__primary-btn login-institution__continue"
-        onClick={handleContinue}
-        disabled={isBusy || isOrganizationsLoading || organizations.length === 0}
-      >
-        {CONTINUE_BUTTON__TEXTLABEL[LANGUAGE]}
-      </button>
     </div>
   );
 }

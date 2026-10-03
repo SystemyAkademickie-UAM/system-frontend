@@ -178,67 +178,69 @@ export default function LoginEmail({ onBack }) {
         <BackIcon className="auth-card__back-icon" />
       </button>
 
-      <h1 className="login-institution__page-title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
+      <div className="login-institution__body">
+        <h1 className="login-institution__page-title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
 
-      <div className="login-institution__field">
-        <label className="login-institution__field-label" htmlFor="email-login-input">
-          {EMAILLABEL__TEXTLABEL[LANGUAGE]}
-        </label>
-        <div className="login-institution__input-wrap">
-          <input
-            id="email-login-input"
-            type="email"
-            className="login-institution__input"
-            value={email}
-            disabled={isBusy}
-            onChange={handleEmailChange}
-            placeholder={EMAILPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-            autoComplete="email"
-          />
+        <div className="login-institution__field">
+          <label className="login-institution__field-label" htmlFor="email-login-input">
+            {EMAILLABEL__TEXTLABEL[LANGUAGE]}
+          </label>
+          <div className="login-institution__input-wrap">
+            <input
+              id="email-login-input"
+              type="email"
+              className="login-institution__input"
+              value={email}
+              disabled={isBusy}
+              onChange={handleEmailChange}
+              placeholder={EMAILPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+              autoComplete="email"
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="login-institution__remember-me">
-        <label className="login-institution__checkbox-label" htmlFor="email-remember-me">
-          <input
-            id="email-remember-me"
-            type="checkbox"
-            checked={rememberMe}
-            disabled={isBusy}
-            onChange={(e) => {
-              const next = e.target.checked;
-              setRememberMeState(next);
-              setRememberMe(next);
-            }}
-          />
-          <span>{REMEMBER_ME__TEXTLABEL[LANGUAGE]}</span>
-        </label>
-      </div>
-
-      {(errorMessage || successMessage) ? (
-        <div className="login-institution__messages">
-          {errorMessage ? (
-            <p className="login-institution__error" role="alert">
-              {errorMessage}
-            </p>
-          ) : null}
-
-          {successMessage ? (
-            <p className="login-institution__success" role="status">
-              {successMessage}
-            </p>
-          ) : null}
+        <div className="login-institution__remember-me">
+          <label className="login-institution__checkbox-label" htmlFor="email-remember-me">
+            <input
+              id="email-remember-me"
+              type="checkbox"
+              checked={rememberMe}
+              disabled={isBusy}
+              onChange={(e) => {
+                const next = e.target.checked;
+                setRememberMeState(next);
+                setRememberMe(next);
+              }}
+            />
+            <span>{REMEMBER_ME__TEXTLABEL[LANGUAGE]}</span>
+          </label>
         </div>
-      ) : null}
 
-      <button
-        type="button"
-        className="auth-card__primary-btn login-institution__continue"
-        onClick={handleSubmit}
-        disabled={isSubmitDisabled}
-      >
-        {submitButtonText}
-      </button>
+        {(errorMessage || successMessage) ? (
+          <div className="login-institution__messages">
+            {errorMessage ? (
+              <p className="login-institution__error" role="alert">
+                {errorMessage}
+              </p>
+            ) : null}
+
+            {successMessage ? (
+              <p className="login-institution__success" role="status">
+                {successMessage}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        <button
+          type="button"
+          className="auth-card__primary-btn login-institution__continue"
+          onClick={handleSubmit}
+          disabled={isSubmitDisabled}
+        >
+          {submitButtonText}
+        </button>
+      </div>
     </div>
   );
 }

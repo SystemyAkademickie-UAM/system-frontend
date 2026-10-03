@@ -5,8 +5,8 @@ import {
   AVATAR_CATEGORY,
   AVATAR_CATEGORY_TABS,
   filterAvatarsByCategory,
-  pickRandomAvatars,
 } from '../../../utils/avatarCategories.js';
+import { getStablePopularAvatars } from '../../../services/avatarListCache.js';
 import './AvatarPicker.css';
 
 const AVATARPICKERLABELTEXT = {
@@ -15,8 +15,8 @@ const AVATARPICKERLABELTEXT = {
 };
 
 const POPULARLABELTEXT = {
-  polish: 'Ostatnio najczęściej wybierane',
-  english: 'Recently most chosen',
+  polish: 'Przykładowe awatary',
+  english: 'Example avatars',
 };
 
 const SHOWALLBUTTONLABELTEXT = {
@@ -82,21 +82,11 @@ export default function AvatarPicker({
 }) {
   const [showAllModal, setShowAllModal] = useState(false);
   const [activeCategory, setActiveCategory] = useState(AVATAR_CATEGORY.ALL);
-  const [popularAvatars, setPopularAvatars] = useState([]);
-  const hasInitializedPopularRef = useRef(false);
 
   const isCentered = align === 'center' || variant === 'compact' || variant === 'center';
 
-  useEffect(() => {
-    if (avatars.length === 0) {
-      setPopularAvatars([]);
-      hasInitializedPopularRef.current = false;
-      return;
-    }
-    if (!hasInitializedPopularRef.current) {
-      setPopularAvatars(pickRandomAvatars(avatars, 4));
-      hasInitializedPopularRef.current = true;
-    }
+  const popularAvatars = useMemo(() => {
+    return getStablePopularAvatars(avatars, 4);
   }, [avatars]);
 
   const selectedAvatar = useMemo(

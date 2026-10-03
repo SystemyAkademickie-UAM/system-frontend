@@ -31,7 +31,7 @@ const PAGETITLE__TEXTLABEL = {
 };
 
 const STUDENTNAME__TEXTLABEL = {
-  polish: 'Osoba studiująca',
+  polish: 'Student',
   english: 'Student',
 };
 
@@ -70,7 +70,9 @@ export default function GroupMainRanksContent({
     isStudentView,
     showMemberAvatars: showMemberAvatarsFromHook,
   } = useGroupMainRanks();
-  const showMemberAvatars = showMemberAvatarsOverride ?? showMemberAvatarsFromHook;
+  const showMemberAvatars = isStudentView
+    ? (showMemberAvatarsOverride ?? showMemberAvatarsFromHook)
+    : true;
   const hasScrolledRef = useRef(false);
 
   useEffect(() => {
@@ -127,6 +129,7 @@ export default function GroupMainRanksContent({
         <RankPathBoard
           ranks={ranks}
           students={students}
+          groupId={groupId}
           isStudentView={isStudentView}
           showMemberAvatars={showMemberAvatars}
           totalEarned={studentProfile?.totalEarned ?? 0}

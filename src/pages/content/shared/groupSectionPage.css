@@ -4,6 +4,8 @@
  * lub komponentem AppSectionPage (strony aplikacji: admin, superadmin, ustawienia).
  */
 
+.group-main-layout .page-unavailable,
+.app-page-layout .page-unavailable,
 .group-main-layout > .page-unavailable,
 .app-page-layout > .page-unavailable {
   padding: 0;

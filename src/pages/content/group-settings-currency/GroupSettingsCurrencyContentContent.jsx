@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
 import GroupSettingsUnsavedModal from '../group-settings/GroupSettingsUnsavedModal.jsx';
 import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
-import { Button, CharacterLimitedField, useToast } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, LoadingSpinner, useToast } from '../../../components/ui/index.js';
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
 import { DEFAULT_CURRENCY_SYMBOL } from '../../../constants/currency.constants.js';
 import { CURRENCY_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
@@ -175,7 +175,7 @@ export default function GroupSettingsCurrencyContentContent() {
         <SettingsSectionHeader title={SECTIONTITLE__TEXTLABEL[LANGUAGE]} id="group-currency-title" />
 
         {isLoading ? (
-          <p className="group-settings-form__hint">{LOADINGTEXT__TEXTLABEL[LANGUAGE]}</p>
+          <LoadingSpinner size="lg" />
         ) : (
           <div className="group-settings-form__stack">
             <EmojiPickerField

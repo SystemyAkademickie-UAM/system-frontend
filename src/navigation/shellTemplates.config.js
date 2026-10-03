@@ -1074,9 +1074,9 @@ export const SUB_NAV_CONFIG = {
 
   // Systemy nagród (lecturer)
   'group-rewards': [
-    { id: 'badges', label: SUBNAVIGATIONSHOPITEMS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS', end: true },
-    { id: 'ranks', label: SUBNAVIGATIONRANKING__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS_RANKS', end: true },
-    { id: 'shop-items', label: SUBNAVIGATIONSHOPITEMS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SHOP_ITEMS', end: true },
+    { id: 'badges', label: NAVIGATIONREWARDSBADGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS', end: true },
+    { id: 'ranks', label: NAVIGATIONREWARDSRANKS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS_RANKS', end: true },
+    { id: 'shop-items', label: NAVIGATIONREWARDSITEMS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SHOP_ITEMS', end: true },
   ],
 
   // Ustawienia grupy (lecturer)

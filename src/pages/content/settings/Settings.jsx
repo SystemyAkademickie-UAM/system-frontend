@@ -116,7 +116,7 @@ export default function ProfileContent() {
 
   var settingsLABEL = {polish: 'Ustawienia', english: 'Settings', japanese: '設定', kana: 'オプション'};
   var avatarLABEL = {polish: 'Awatar', english: 'Avatar', japanese: 'プロフィール画像', kana: 'アバタ'};
-  var languageLABEL = {polish: 'Jezyk', english: 'Language', japanese: '言語', kana: 'げんご'};
+  var languageLABEL = {polish: 'Język', english: 'Language', japanese: '言語', kana: 'げんご'};
   var nicknameLABEL = {polish: 'Ksywka', english: 'Nickname', japanese: '名前', kana: 'ニックネーム'};
   var paneldescriptionLABEL = {polish: 'Panel pozwalający na zmianę awatara, języka oraz nicku.', english: 'Panel allowing you to change your avatar, language, and nickname.', japanese: 'アバター、言語、ニックネームを変更できるパネル', kana: 'アバター、げんご、ニックネームをへんこうできるパネル'};
   var helpcenter0LABEL = {polish: 'Centrum Pomocy', english: 'Help Center', japanese: 'ヘルプセンター', kana: 'ヘルプセンター'};

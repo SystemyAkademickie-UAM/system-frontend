@@ -8,7 +8,6 @@
     var(--auth-card-body-padding-bottom, clamp(2rem, 3.3vw, 64px));
   gap: 0;
   align-items: stretch;
-  margin-bottom: 0.5rem;
 }
 
 .register-eula__title {

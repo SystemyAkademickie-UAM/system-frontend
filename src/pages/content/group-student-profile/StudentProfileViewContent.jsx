@@ -8,32 +8,32 @@ import ProfileEqContentContent from '../group-profile-eq/ProfileEqContentContent
 import './StudentProfileViewContent.css';
 
 const ERRORMISSINGDATA__TEXTLABEL = {
-  polish: 'Brak danych osoby.',
+  polish: 'Brak danych uczestnika.',
   english: 'Participant data missing.'
 };
 
 const ERRORSTUDENTNOTFOUND__TEXTLABEL = {
-  polish: 'Nie znaleziono osoby w grupie.',
+  polish: 'Nie znaleziono uczestnika w tej grupie.',
   english: 'Participant not found in this group.'
 };
 
 const ERRORFETCHFAILED__TEXTLABEL = {
-  polish: 'Nie udało się pobrać danych osoby.',
+  polish: 'Nie udało się pobrać danych uczestnika.',
   english: 'Failed to load participant data.'
 };
 
 const DEFAULTPARTICIPANTNAME__TEXTLABEL = {
-  polish: 'Osoba uczestnicząca',
+  polish: 'Uczestnik',
   english: 'Participant'
 };
 
 const LOADINGMESSAGE__TEXTLABEL = {
-  polish: 'Ładowanie profilu…',
+  polish: 'Ładowanie profilu uczestnika…',
   english: 'Loading participant profile…'
 };
 
 const PROFILEEYEBROW__TEXTLABEL = {
-  polish: 'Profil',
+  polish: 'Profil uczestnika',
   english: 'Participant profile'
 };
 
@@ -59,8 +59,14 @@ export default function StudentProfileViewContent() {
 
       try {
         const students = await fetchGroupStudents(groupId);
-        const found = students.find((item) => String(item.accountId) === String(studentId))
-          ?? students.find((item) => String(item.enrollmentId) === String(studentId));
+        let found = null;
+        const num = parseInt(String(studentId).replace(/^student-/, ''), 10);
+        if (!Number.isNaN(num) && num >= 1 && num <= students.length) {
+          found = students[num - 1];
+        } else {
+          found = students.find((item) => String(item.accountId) === String(studentId))
+            ?? students.find((item) => String(item.enrollmentId) === String(studentId));
+        }
 
         if (cancelled) {
           return;

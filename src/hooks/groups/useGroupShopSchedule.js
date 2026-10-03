@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchGroupPreview, updateGroup } from '../../services/groups.api.js';
+import { notifyGroupContentChanged } from '../../utils/groupContentInvalidation.js';
 
 /**
  * @param {string | number | null | undefined} groupId
@@ -25,25 +26,30 @@ export function useGroupRankPathSettings(groupId) {
     load();
   }, [load]);
 
-  const toggleShowMemberAvatars = useCallback(async () => {
+  const setShowMemberAvatarsSetting = useCallback(async (value) => {
     if (!groupId) {
       return { ok: false, error: 'Brak ID grupy' };
     }
 
-    const nextValue = !showMemberAvatars;
-    const result = await updateGroup(groupId, { rankShowMemberAvatars: nextValue });
+    const result = await updateGroup(groupId, { rankShowMemberAvatars: value });
     if (!result.ok) {
       return { ok: false, error: result.error ?? 'Nie udało się zapisać ustawienia.' };
     }
 
-    setShowMemberAvatars(nextValue);
+    setShowMemberAvatars(value);
+    notifyGroupContentChanged(groupId, ['ranks', 'badges']);
     return { ok: true };
-  }, [groupId, showMemberAvatars]);
+  }, [groupId]);
+
+  const toggleShowMemberAvatars = useCallback(async () => {
+    return setShowMemberAvatarsSetting(!showMemberAvatars);
+  }, [setShowMemberAvatarsSetting, showMemberAvatars]);
 
   return {
     showMemberAvatars,
     isLoading,
     toggleShowMemberAvatars,
+    setShowMemberAvatarsSetting,
     refetch: load,
   };
 }

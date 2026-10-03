@@ -226,7 +226,7 @@
   /** Komunikaty: toasty, alerty, statusy, błędy inline */
   --font-family-message: var(--font-family-app);
   /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
-  --font-size-body: 14px;
+  --font-size-body: 16px;
   /** Nagłówek strony (legacy PageHeader) */
   --font-size-page-title: 42px;
   /** Nagłówek sekcji (SectionPageLayout) */

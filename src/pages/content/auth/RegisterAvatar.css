@@ -8,13 +8,14 @@
     var(--auth-card-body-padding-bottom, clamp(2rem, 3.3vw, 64px));
   gap: 0;
   overflow: visible;
-  margin-bottom: 0.5rem;
 }
 
 .register-avatar__picker-section {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  justify-content: center;
+  flex: 1;
   width: 100%;
   margin: 1rem 0 1.5rem;
 }

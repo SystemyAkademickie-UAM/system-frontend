@@ -104,6 +104,7 @@ const UNLOCKFILTERS__TEXTLABEL = {
 /**
  * @param {Object} props
  * @param {boolean} [props.embedded]
+ * @param {boolean} [props.showMemberAvatars]
  * @param {string} [props.searchQuery]
  * @param {string} [props.rarityFilter]
  * @param {string} [props.sortBy]
@@ -116,6 +117,7 @@ const UNLOCKFILTERS__TEXTLABEL = {
  */
 export default function GroupMainBadgesContent({
   embedded = false,
+  showMemberAvatars: showMemberAvatarsOverride,
   searchQuery: externalSearchQuery,
   rarityFilter: externalRarityFilter,
   sortBy: externalSortBy,
@@ -135,8 +137,11 @@ export default function GroupMainBadgesContent({
     isLoading,
     error,
     isStudentView,
-
+    showMemberAvatars: showMemberAvatarsFromHook,
   } = useGroupMainBadges();
+  const showMemberAvatars = isStudentView
+    ? (showMemberAvatarsOverride ?? showMemberAvatarsFromHook)
+    : true;
   const emptyLink = useGroupMainEmptyLink('badges', groupId);
 
   const defaultSort = isStudentView ? TREASURY_SORT.unlockFirst : TREASURY_SORT.qualityDesc;
@@ -269,7 +274,9 @@ export default function GroupMainBadgesContent({
               earnersByBadgeId={earnersByBadgeId}
               excludeAccountId={isStudentView ? studentAccountId : null}
               isStudentView={isStudentView}
+              showMemberAvatars={showMemberAvatars}
               showLecturerActions={showLecturerActions}
+              groupId={groupId}
               LANGUAGE={LANGUAGE}
               onEdit={onEditBadge ? () => onEditBadge(badge) : undefined}
               onDelete={onDeleteBadge ? () => onDeleteBadge(badge) : undefined}

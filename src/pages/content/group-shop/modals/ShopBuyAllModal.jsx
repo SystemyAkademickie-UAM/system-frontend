@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Modal, CurrencyDisplay } from '../../../../components/ui/index.js';
-import ShopItemPriceRow from '../../../../components/ui/ShopItemPriceRow/ShopItemPriceRow.jsx';
+import { Modal, CurrencyDisplay, ProductCard } from '../../../../components/ui/index.js';
+import { resolveShopCategoryDetails } from '../../../../utils/shop/shopCategories.js';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import './shopModals.css';
 
@@ -44,6 +44,7 @@ export default function ShopBuyAllModal({
   isOpen,
   cartItems,
   cartTotal,
+  categoriesById,
   onClose,
   onConfirm,
 }) {
@@ -68,26 +69,37 @@ export default function ShopBuyAllModal({
       title={BUYALL_CONFIRM_TITLE__TEXTLABEL[LANGUAGE]}
       onConfirm={handleConfirm}
       confirmLabel={BUYALL_CONFIRM_BUTTON__TEXTLABEL[LANGUAGE]}
-      size="sm"
+      size={cartItems.length > 1 ? 'md' : 'sm'}
       className="shop-modal"
     >
       <p className="shop-modal__lead">
         {queryText}
       </p>
-      <ul className="shop-modal__summary-list">
-        {cartItems.map((item) => (
-          <li key={item.id} className="shop-modal__summary-item">
-            <span>{item.name}</span>
-            <ShopItemPriceRow
+      <div className="shop-modal__items-grid">
+        {cartItems.map((item) => {
+          const categoryDetails = resolveShopCategoryDetails(item.categories, categoriesById);
+          return (
+            <ProductCard
+              key={item.id}
+              variant="preview"
+              itemId={item.id}
+              name={item.name}
+              storyDescription={item.storyDescription}
+              didacticDescription={item.didacticDescription}
               priceAmount={item.priceAmount}
               salePriceAmount={item.salePriceAmount}
               rankDiscountedPrice={item.rankDiscountedPrice}
               appliedDiscounts={item.appliedDiscounts}
-              size="sm"
+              imageRef={item.imageRef}
+              imageUrl={item.imageUrl}
+              categoryDetails={categoryDetails}
+              hideActions
+              isExtraLife={item.isExtraLife === true}
+              className="shop-modal__preview"
             />
-          </li>
-        ))}
-      </ul>
+          );
+        })}
+      </div>
       <div className="shop-modal__summary-total">
         <span>{BUYALL_TOTAL_LABEL__TEXTLABEL[LANGUAGE]}</span>
         <CurrencyDisplay amount={cartTotal} size="md" />

@@ -189,52 +189,54 @@ export default function GroupMainHomeContent() {
     <div className="group-main-home">
       <GroupMainSubpageHeader eyebrow={WELCOMETITLE__TEXTLABEL[LANGUAGE]} title={HOMEPAGETITLE__TEXTLABEL[LANGUAGE]} />
 
-      <TexturedSurface className="group-main-home__surface group-main-home__surface--notifications">
-        <section
-          id="group-notifications"
-          className="group-main-home__section"
-          aria-label={sectionTitle}
-        >
-          <h2 className="group-main-home__section-title">{sectionTitle}</h2>
-          <NotificationsFeed
-            groupId={groupId}
-            role={role}
-            notifications={previewNotifications}
-            isLoading={previewLoading}
-            error={previewError}
-            limit={NOTIFICATIONS_PREVIEW_LIMIT}
-            showDivider
-            linkable={isStudentView}
-            onMarkRead={(id) => markRead(id)}
-            footerLink={{
-              label: SEE_MORE_BUTTON__TEXTLABEL[LANGUAGE],
-              to: notificationsSeeMorePath,
-            }}
-          />
-        </section>
-      </TexturedSurface>
+      <div className="group-main-home__grid">
+        <TexturedSurface className="group-main-home__surface group-main-home__surface--overview">
+          <section className="group-main-home__section group-main-home__section--description" aria-label={GROUPDESCRIPTION__TEXTLABEL[LANGUAGE]}>
+            <ContentWithMeasuredDivider
+              className="group-main-home__description"
+              dividerClassName="group-main-home__description-divider"
+            >
+              {group?.description?.trim() || NODESCRIPTION__TEXTLABEL[LANGUAGE]}
+            </ContentWithMeasuredDivider>
+          </section>
 
-      <TexturedSurface className="group-main-home__surface group-main-home__surface--overview">
-        <section className="group-main-home__section group-main-home__section--description" aria-label={GROUPDESCRIPTION__TEXTLABEL[LANGUAGE]}>
-          <ContentWithMeasuredDivider
-            className="group-main-home__description"
-            dividerClassName="group-main-home__description-divider"
+          <Divider className="group-main-home__overview-divider" />
+
+          <section className="group-main-home__section" aria-label={GROUPOVERVIEW__TEXTLABEL[LANGUAGE]}>
+            <h2 className="group-main-home__section-title">{GROUPOVERVIEW__TEXTLABEL[LANGUAGE]}</h2>
+            <InfoRow label={STORYNAME__TEXTLABEL[LANGUAGE]} value={group?.storyName} />
+            <InfoRow label={SUBJECT__TEXTLABEL[LANGUAGE]} value={group?.subject} />
+            <InfoRow label={INSTRUCTOR__TEXTLABEL[LANGUAGE]} value={group?.lecturer} />
+            <InfoRow label={CURRENCY__TEXTLABEL[LANGUAGE]} value={group?.currencyName || group?.currency} />
+            <InfoRow label={LIVESYSTEM__TEXTLABEL[LANGUAGE]} value={group?.lives != null ? String(group.lives) : null} />
+          </section>
+        </TexturedSurface>
+
+        <TexturedSurface className="group-main-home__surface group-main-home__surface--notifications">
+          <section
+            id="group-notifications"
+            className="group-main-home__section group-main-home__section--notifications"
+            aria-label={sectionTitle}
           >
-            {group?.description?.trim() || NODESCRIPTION__TEXTLABEL[LANGUAGE]}
-          </ContentWithMeasuredDivider>
-        </section>
-
-        <Divider className="group-main-home__overview-divider" />
-
-        <section className="group-main-home__section" aria-label={GROUPOVERVIEW__TEXTLABEL[LANGUAGE]}>
-          <h2 className="group-main-home__section-title">{GROUPOVERVIEW__TEXTLABEL[LANGUAGE]}</h2>
-          <InfoRow label={STORYNAME__TEXTLABEL[LANGUAGE]} value={group?.storyName} />
-          <InfoRow label={SUBJECT__TEXTLABEL[LANGUAGE]} value={group?.subject} />
-          <InfoRow label={INSTRUCTOR__TEXTLABEL[LANGUAGE]} value={group?.lecturer} />
-          <InfoRow label={CURRENCY__TEXTLABEL[LANGUAGE]} value={group?.currencyName || group?.currency} />
-          <InfoRow label={LIVESYSTEM__TEXTLABEL[LANGUAGE]} value={group?.lives != null ? String(group.lives) : null} />
-        </section>
-      </TexturedSurface>
+            <h2 className="group-main-home__section-title">{sectionTitle}</h2>
+            <NotificationsFeed
+              groupId={groupId}
+              role={role}
+              notifications={previewNotifications}
+              isLoading={previewLoading}
+              error={previewError}
+              limit={NOTIFICATIONS_PREVIEW_LIMIT}
+              showDivider
+              linkable={isStudentView}
+              onMarkRead={(id) => markRead(id)}
+              footerLink={{
+                label: SEE_MORE_BUTTON__TEXTLABEL[LANGUAGE],
+                to: notificationsSeeMorePath,
+              }}
+            />
+          </section>
+        </TexturedSurface>
+      </div>
 
       {showTemplatePopup && templatePopupData != null ? (
         <GroupMainHomeContentWindow

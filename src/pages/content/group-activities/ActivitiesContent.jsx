@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, CharacterLimitedField, SearchBar } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, LoadingSpinner, SearchBar } from '../../../components/ui/index.js';
 import { STAGE_NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
@@ -255,8 +255,8 @@ export default function ActivitiesContent() {
         ),
         iconFile: (stageItem) => (
           stageItem?.visibilityStatus === 0
-            ? SVG_ICONS.actions.show
-            : SVG_ICONS.actions.hide
+            ? SVG_ICONS.actions.hide
+            : SVG_ICONS.actions.show
         ),
         ariaLabel: (stageItem) => (
           stageItem?.visibilityStatus === 0
@@ -305,8 +305,8 @@ export default function ActivitiesContent() {
         ),
         iconFile: ({ activity }) => (
           (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)
-            ? SVG_ICONS.actions.show
-            : SVG_ICONS.actions.hide
+            ? SVG_ICONS.actions.hide
+            : SVG_ICONS.actions.show
         ),
         ariaLabel: ({ activity }) => (
           (activity?.visibilityStatus === 0 || activity?.isPublished === false || activity?.isVisible === false)
@@ -406,7 +406,7 @@ export default function ActivitiesContent() {
       </div>
 
       {isLoading ? (
-        <p className="activities-page__loading">{LOADING__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : filteredStages.length === 0 ? (
         <p className="activities-page__empty">
           {stages.length === 0

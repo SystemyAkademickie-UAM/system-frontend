@@ -18,6 +18,7 @@ import {
 } from '../../utils/notifications/backlogNotificationsSync.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import { BACKLOG_LIST_POLL_MS } from '../../constants/backlogNotifications.constants.js';
+import { useSessionOptional } from '../../context/SessionContext.jsx';
 
 const FETCHERROR__TEXTLABEL = {
   polish: 'Nie udało się pobrać powiadomień.',
@@ -26,26 +27,32 @@ const FETCHERROR__TEXTLABEL = {
 
 /**
  * @param {string | number | null | undefined} groupId
- * @param {{ isStudentView?: boolean, take?: number, skip?: number, pollMs?: number }} [options]
+ * @param {{ isStudentView?: boolean, enabled?: boolean, take?: number, skip?: number, pollMs?: number }} [options]
  */
 export function useGroupBacklogNotifications(groupId, {
   isStudentView = false,
+  enabled = true,
   take = 50,
   skip = 0,
   pollMs = BACKLOG_LIST_POLL_MS,
 } = {}) {
+  const session = useSessionOptional();
+  const isSessionLoading = session?.isLoading ?? false;
+  const isEnabled = enabled && Boolean(groupId) && !isSessionLoading;
   const [items, setItems] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(Boolean(groupId));
+  const [isLoading, setIsLoading] = useState(Boolean(groupId) && isEnabled);
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [error, setError] = useState('');
 
   const refetch = useCallback(async ({ silent = false } = {}) => {
-    if (!groupId) {
-      setItems([]);
-      setTotalCount(0);
-      setUnreadCount(0);
+    if (!groupId || !isEnabled) {
+      if (!groupId) {
+        setItems([]);
+        setTotalCount(0);
+        setUnreadCount(0);
+      }
       setIsLoading(false);
       return;
     }
@@ -85,14 +92,16 @@ export function useGroupBacklogNotifications(groupId, {
         setIsLoading(false);
       }
     }
-  }, [LANGUAGE, groupId, isStudentView, skip, take]);
+  }, [LANGUAGE, groupId, isEnabled, isStudentView, skip, take]);
 
   useEffect(() => {
-    void refetch();
-  }, [refetch]);
+    if (isEnabled) {
+      void refetch();
+    }
+  }, [isEnabled, refetch]);
 
   useEffect(() => {
-    if (!groupId || !pollMs) {
+    if (!groupId || !isEnabled || !pollMs) {
       return undefined;
     }
 

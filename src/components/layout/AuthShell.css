@@ -4,19 +4,19 @@
   --auth-content-max-width: min(501px, 26.09vw);
   --auth-maq-logo-opacity: 0.6;
   --auth-card-min-height: 558px;
-  --auth-card-body-padding-top: clamp(2.5rem, 4.3vw, 83px);
+  --auth-card-body-padding-top: clamp(2rem, 3.75vw, 72px);
   --auth-card-body-padding-x: clamp(1rem, 1.67vw, 32px);
-  --auth-card-body-padding-bottom: clamp(2rem, 3.3vw, 64px);
-  /** Institution step: back arrow sits flush to card top (not login’s logo inset). */
-  --auth-card-back-padding-top: clamp(1rem, 1.67vw, 16px);
-  --auth-card-logo-to-content-gap: clamp(3rem, 7vw, 136px);
-  --auth-card-logo-to-label-gap: clamp(2.5rem, 5vw, 80px);
-  --auth-card-label-to-field-gap: clamp(1.25rem, 2vw, 32px);
-  --auth-card-field-to-button-gap: clamp(1rem, 2vw, 32px);
-  --auth-card-field-gap: clamp(1.25rem, 2vw, 24px);
-  --auth-card-back-to-logo-gap: clamp(1.5rem, 2.5vw, 32px);
-  /** Institution: label → dropdown (inline labels ignore vertical margins). */
-  --auth-institution-label-to-field-gap: clamp(0.5rem, 1vw, 12px);
+  --auth-card-body-padding-bottom: clamp(1.75rem, 2.5vw, 48px);
+  /** Institution step: back arrow (36px) + gap (20px) + top (16px) matches 72px body-padding-top */
+  --auth-card-back-padding-top: clamp(0.75rem, 1vw, 16px);
+  --auth-card-logo-to-content-gap: clamp(2rem, 4vw, 64px);
+  --auth-card-logo-to-label-gap: clamp(1.5rem, 2.5vw, 36px);
+  --auth-card-label-to-field-gap: clamp(0.75rem, 1.2vw, 16px);
+  --auth-card-field-to-button-gap: clamp(1rem, 1.5vw, 24px);
+  --auth-card-field-gap: clamp(1rem, 1.5vw, 20px);
+  --auth-card-back-to-logo-gap: clamp(1rem, 1.25vw, 20px);
+  /** Institution: label → dropdown */
+  --auth-institution-label-to-field-gap: clamp(0.5rem, 0.8vw, 10px);
   --auth-card-transition-exit-ms: 240ms;
   --auth-card-transition-enter-ms: 240ms;
   --auth-card-transition-slide: 50%;

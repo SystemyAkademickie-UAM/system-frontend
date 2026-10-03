@@ -8,6 +8,7 @@ import {
   CatalogSortSelect,
   CurrencyDisplay,
   DataTable,
+  LoadingSpinner,
   SearchBar,
   useToast,
 } from '../../../components/ui/index.js';
@@ -753,7 +754,7 @@ export default function RewardsShopItemsContent() {
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : catalogItems.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">
           {EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}

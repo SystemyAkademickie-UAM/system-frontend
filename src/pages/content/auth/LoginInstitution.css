@@ -3,16 +3,30 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  position: relative;
   width: var(--auth-card-max-width);
   max-width: calc(100% - 2rem);
-  padding: var(--auth-card-back-padding-top) var(--auth-card-body-padding-x)
-    var(--auth-card-body-padding-bottom);
+  padding: 0;
   gap: 0;
 }
 
 .login-institution .auth-card__back-button {
-  margin-top: 0;
-  margin-bottom: var(--auth-card-back-to-logo-gap);
+  position: absolute;
+  top: clamp(1rem, 1.67vw, 24px);
+  left: clamp(1rem, 1.67vw, 32px);
+  z-index: 2;
+  margin: 0;
+}
+
+.login-institution__body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  padding: clamp(2rem, 4vw, 48px) var(--auth-card-body-padding-x);
 }
 
 .login-institution__logo {
@@ -124,7 +138,7 @@
 }
 
 .login-institution__input::placeholder {
-  color: rgba(189, 202, 190, 0.4);
+  color: var(--auth-text-muted);
 }
 
 .login-institution__input:disabled {

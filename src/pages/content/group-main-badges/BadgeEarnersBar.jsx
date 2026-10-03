@@ -1,24 +1,24 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import CurrencyDisplay from '../../../components/ui/Currency/CurrencyDisplay.jsx';
 import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
+import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import { positionAnchoredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import './BadgeEarnersBar.css';
 
-const DEFAULT_MAX_VISIBLE = 15;
-
 const OVERFLOWARIA__TEXTLABEL = {
-  polish: 'dodatkowych osób',
+  polish: 'dodatkowych uczestników',
   english: 'additional participants'
 };
 
 const OVERFLOWTITLE__TEXTLABEL = {
-  polish: 'Pozostałe osoby',
+  polish: 'Pozostali uczestnicy',
   english: 'Other participants'
 };
 
-function OverflowBadge({ hiddenStudents, LANGUAGE }) {
+function OverflowBadge({ hiddenStudents, groupId, LANGUAGE }) {
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -87,12 +87,7 @@ function OverflowBadge({ hiddenStudents, LANGUAGE }) {
             <ul className="badge-earners-bar__overflow-list">
               {hiddenStudents.map((student) => (
                 <li key={student.id}>
-                  <span>{student.nickname}</span>
-                  <CurrencyDisplay
-                    amount={student.totalEarned}
-                    size="sm"
-                    className="badge-earners-bar__overflow-earned"
-                  />
+                  <span className="badge-earners-bar__overflow-name">{student.nickname}</span>
                 </li>
               ))}
             </ul>
@@ -105,32 +100,77 @@ function OverflowBadge({ hiddenStudents, LANGUAGE }) {
 }
 
 const BARIARIA__TEXTLABEL = {
-  polish: 'osób z tą odznaką',
-  english: 'participants with this badge'
+  polish: 'uczestników',
+  english: 'participants'
 };
 
 /**
-  * Awatary studentów, którzy zdobyli odznakę.
-  *
-  * @param {Object} props
-  * @param {import('./badgeTreasuryModel.js').TreasuryStudent[]} props.students
-  * @param {number} [props.maxVisible]
-  */
-  export default function BadgeEarnersBar({
-  students,
-  maxVisible = DEFAULT_MAX_VISIBLE,
+ * Awatary studentów na kafelku odznaki lub rangi.
+ *
+ * @param {Object} props
+ * @param {Array<{ id: string | number, accountId?: number, position?: number, nickname: string, avatarUrl?: string | null, totalEarned?: number }>} props.students
+ * @param {number} [props.maxVisible]
+ * @param {string | number} [props.groupId]
+ * @param {string} [props.className]
+ * @param {string} [props.LANGUAGE]
+ */
+export default function BadgeEarnersBar({
+  students = [],
+  maxVisible: explicitMaxVisible,
+  groupId,
   className = '',
-  LANGUAGE,
+  LANGUAGE = 'polish',
+  isStudentView: isStudentViewProp,
 }) {
+  const { role } = useAppRole();
+  const isStudentView = isStudentViewProp ?? (role === APP_ROLE.STUDENT);
+  const barRef = useRef(null);
+  const [autoMaxVisible, setAutoMaxVisible] = useState(() => Math.min(students.length, 6));
+
+  useLayoutEffect(() => {
+    if (explicitMaxVisible !== undefined) {
+      return undefined;
+    }
+
+    const el = barRef.current;
+    if (!el) {
+      return undefined;
+    }
+
+    const calculateFit = () => {
+      const parentWidth = el.parentElement?.offsetWidth || el.offsetWidth;
+      if (!parentWidth) return;
+
+      const availableWidth = Math.max(80, parentWidth - 28);
+      const itemWidth = 40;
+      const gap = 6;
+      const maxSlots = Math.max(1, Math.floor((availableWidth + gap) / (itemWidth + gap)));
+      const nextVisible = students.length <= maxSlots ? students.length : Math.max(1, maxSlots - 1);
+
+      setAutoMaxVisible((prev) => (prev !== nextVisible ? nextVisible : prev));
+    };
+
+    calculateFit();
+    const ro = new ResizeObserver(calculateFit);
+    if (el.parentElement) {
+      ro.observe(el.parentElement);
+    }
+    ro.observe(el);
+
+    return () => ro.disconnect();
+  }, [students.length, explicitMaxVisible]);
+
   if (!students.length) {
-    return <div className={['badge-earners-bar', 'badge-earners-bar--empty', className].filter(Boolean).join(' ')} aria-hidden="true" />;
+    return <div ref={barRef} className={['badge-earners-bar', 'badge-earners-bar--empty', className].filter(Boolean).join(' ')} aria-hidden="true" />;
   }
 
-  const visibleStudents = students.slice(0, maxVisible);
-  const hiddenStudents = students.slice(maxVisible);
+  const effectiveMaxVisible = explicitMaxVisible !== undefined ? explicitMaxVisible : autoMaxVisible;
+  const visibleStudents = students.slice(0, effectiveMaxVisible);
+  const hiddenStudents = students.slice(effectiveMaxVisible);
 
   return (
     <div
+      ref={barRef}
       className={['badge-earners-bar', className].filter(Boolean).join(' ')}
       aria-label={`${students.length} ${BARIARIA__TEXTLABEL[LANGUAGE]}`}
     >
@@ -142,10 +182,13 @@ const BARIARIA__TEXTLABEL = {
           totalEarned={student.totalEarned}
           size="md"
           tooltipPlacement="top"
+          href={!isStudentView && groupId && (student.position || student.accountId)
+            ? groupStudentProfilePath(groupId, student.position ?? student.accountId)
+            : undefined}
         />
       ))}
       {hiddenStudents.length > 0 ? (
-        <OverflowBadge hiddenStudents={hiddenStudents} LANGUAGE={LANGUAGE} />
+        <OverflowBadge hiddenStudents={hiddenStudents} groupId={groupId} LANGUAGE={LANGUAGE} />
       ) : null}
     </div>
   );

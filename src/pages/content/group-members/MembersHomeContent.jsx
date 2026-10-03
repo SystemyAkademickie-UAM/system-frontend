@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
-import { DataTable, CurrencyDisplay, SearchBar, useToast } from '../../../components/ui/index.js';
+import { DataTable, CurrencyDisplay, LoadingSpinner, SearchBar, useToast } from '../../../components/ui/index.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
@@ -23,35 +23,35 @@ import MemberRankModal from './modals/MemberRankModal.jsx';
 
 import './MembersHomeContent.css';
 
-const PARTICIPANT_PROMOTED__TEXTLABEL = { polish: 'Awans do rangi: ${rankName}.', english: 'Participant promoted to rank: ${rankName}.' };
-const CURRENCY_UPDATED__TEXTLABEL = { polish: 'Waluta została zaktualizowana.', english: 'Participant currency has been updated.' };
-const TOTAL_CURRENCY_UPDATED__TEXTLABEL = { polish: 'Zgromadzona waluta została zaktualizowana.', english: 'Participant total earned currency has been updated.' };
+const PARTICIPANT_PROMOTED__TEXTLABEL = { polish: 'Uczestnik awansował na rangę: ${rankName}.', english: 'Participant promoted to rank: ${rankName}.' };
+const CURRENCY_UPDATED__TEXTLABEL = { polish: 'Waluta uczestnika została zaktualizowana.', english: 'Participant currency has been updated.' };
+const TOTAL_CURRENCY_UPDATED__TEXTLABEL = { polish: 'Zgromadzona waluta uczestnika została zaktualizowana.', english: 'Participant total earned currency has been updated.' };
 const AUTO_RANK_ENABLED__TEXTLABEL = { polish: 'Włączono rangę automatyczną. Aktualna ranga: ${rankName}.', english: 'Automatic rank enabled. Current rank: ${rankName}.' };
 const RANK_ASSIGNED__TEXTLABEL = { polish: 'Przyznano rangę: ${rankName}.', english: 'Rank assigned: ${rankName}.' };
-const PARTICIPANT_REMOVED__TEXTLABEL = { polish: 'Usunięto z grupy.', english: 'Participant has been removed from the group.' };
+const PARTICIPANT_REMOVED__TEXTLABEL = { polish: 'Uczestnik został usunięty z grupy.', english: 'Participant has been removed from the group.' };
 const COLUMN_POSITION__TEXTLABEL = { polish: 'Numer', english: 'Number' };
-const COLUMN_MEMBER__TEXTLABEL = { polish: 'Osoba należąca do grupy', english: 'Group member' };
+const COLUMN_MEMBER__TEXTLABEL = { polish: 'Członek grupy', english: 'Group member' };
 const COLUMN_EMAIL__TEXTLABEL = { polish: 'E-mail', english: 'E-mail' };
 const COLUMN_RANK__TEXTLABEL = { polish: 'Ranga', english: 'Rank' };
 const COLUMN_BADGES__TEXTLABEL = { polish: 'Odznaki', english: 'Badges' };
 const COLUMN_CURRENCY__TEXTLABEL = { polish: 'Waluta', english: 'Currency' };
 const COLUMN_TOTAL_CURRENCY__TEXTLABEL = { polish: 'Zgromadzona', english: 'Total earned' };
-const ROW_DELETE_LABEL__TEXTLABEL = { polish: 'Usuń z grupy', english: 'Remove participant' };
+const ROW_DELETE_LABEL__TEXTLABEL = { polish: 'Usuń uczestnika', english: 'Remove participant' };
 const ROW_BADGES_LABEL__TEXTLABEL = { polish: 'Przydziel odznakę', english: 'Assign badge' };
-const ROW_BADGES_ARIA__TEXTLABEL = { polish: 'Przydziel odznakę', english: 'Assign badge to participant' };
+const ROW_BADGES_ARIA__TEXTLABEL = { polish: 'Przydziel odznakę uczestnikowi', english: 'Assign badge to participant' };
 const ROW_PROGRESS_LABEL__TEXTLABEL = { polish: 'Edytuj postęp', english: 'Edit progress' };
-const ROW_PROGRESS_ARIA__TEXTLABEL = { polish: 'Edytuj postęp', english: 'Edit participant progress' };
+const ROW_PROGRESS_ARIA__TEXTLABEL = { polish: 'Edytuj postęp uczestnika', english: 'Edit participant progress' };
 const ROW_RANK_LABEL__TEXTLABEL = { polish: 'Zmień rangę', english: 'Change rank' };
-const ROW_RANK_DESC__TEXTLABEL = { polish: 'Ustaw ręcznie rangę.', english: 'Manually set participant rank.' };
+const ROW_RANK_DESC__TEXTLABEL = { polish: 'Ustaw ręcznie rangę uczestnikowi.', english: 'Manually set participant rank.' };
 const ROW_CURRENCY_LABEL__TEXTLABEL = { polish: 'Zarządzaj walutą', english: 'Manage currency' };
-const ROW_CURRENCY_DESC__TEXTLABEL = { polish: 'Dodaj lub odejmij walutę.', english: 'Add or subtract participant currency manually.' };
+const ROW_CURRENCY_DESC__TEXTLABEL = { polish: 'Dodaj lub odejmij ręcznie walutę uczestnikowi.', english: 'Add or subtract participant currency manually.' };
 const ROW_TOTAL_EARNED_LABEL__TEXTLABEL = { polish: 'Edytuj zgromadzoną walutę', english: 'Edit total earned currency' };
-const ROW_TOTAL_EARNED_DESC__TEXTLABEL = { polish: 'Zmień tylko zgromadzoną walutę.', english: 'Change only participant total earned currency.' };
-const SEARCH_PLACEHOLDER__TEXTLABEL = { polish: 'Szukaj osoby…', english: 'Search group member…' };
-const SEARCH_ARIA_LABEL__TEXTLABEL = { polish: 'Szukaj osoby', english: 'Search group member' };
-const LOADING_MESSAGE__TEXTLABEL = { polish: 'Ładowanie osób…', english: 'Loading group members…' };
-const EMPTY_MESSAGE__TEXTLABEL = { polish: 'Brak osób w tej grupie.', english: 'No members in this group.' };
-const PAGINATION_ARIA_LABEL__TEXTLABEL = { polish: 'Nawigacja stron listy osób', english: 'Participants list page navigation' };
+const ROW_TOTAL_EARNED_DESC__TEXTLABEL = { polish: 'Zmień tylko zgromadzoną walutę uczestnika.', english: 'Change only participant total earned currency.' };
+const SEARCH_PLACEHOLDER__TEXTLABEL = { polish: 'Szukaj członka grupy…', english: 'Search group member…' };
+const SEARCH_ARIA_LABEL__TEXTLABEL = { polish: 'Szukaj członka grupy', english: 'Search group member' };
+const LOADING_MESSAGE__TEXTLABEL = { polish: 'Ładowanie członków grupy…', english: 'Loading group members…' };
+const EMPTY_MESSAGE__TEXTLABEL = { polish: 'Brak członków w tej grupie.', english: 'No members in this group.' };
+const PAGINATION_ARIA_LABEL__TEXTLABEL = { polish: 'Nawigacja stron listy uczestników', english: 'Participants list page navigation' };
 
 function renderMemberNameLines(member) {
   const nickname = member.nickname?.trim() || '';
@@ -219,10 +219,10 @@ export default function MembersHomeContent() {
           </span>
           <div className="members-table__user-main">
             <div className="members-table__user-info">
-              {!member.isLecturer && groupId && (member.accountId || member.position) ? (
+              {!member.isLecturer && groupId && (member.position || member.accountId) ? (
                 <Link
                   className="members-table__profile-link"
-                  to={groupStudentProfilePath(groupId, member.accountId ?? member.position)}
+                  to={groupStudentProfilePath(groupId, member.position ?? member.accountId)}
                 >
                   {renderMemberNameLines(member)}
                 </Link>
@@ -403,7 +403,7 @@ export default function MembersHomeContent() {
     >
 
       {isLoading ? (
-        <p className="members-page__loading page-unavailable__notice">{LOADING_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : members.length === 0 ? (
         <p className="members-page__empty page-unavailable__notice">{EMPTY_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : (

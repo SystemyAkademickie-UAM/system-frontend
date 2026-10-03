@@ -55,7 +55,7 @@ const INVENTORYTITLE__TEXTLABEL = {
 };
 
 const USEDITEMSTITLE__TEXTLABEL = {
-  polish: 'Zużyte przedmioty',
+  polish: 'Użyte przedmioty',
   english: 'Used items'
 };
 
@@ -70,7 +70,7 @@ const UNIQUECOUNT__TEXTLABEL = {
 };
 
 const USEDCOUNT__TEXTLABEL = {
-  polish: 'Zużyte',
+  polish: 'Użyte',
   english: 'Used'
 };
 
@@ -105,7 +105,7 @@ const EMPTYINVENTORYMESSAGE__TEXTLABEL = {
 };
 
 const EMPTYUSEDMESSAGE__TEXTLABEL = {
-  polish: 'Brak zużytych przedmiotów.',
+  polish: 'Brak użytych przedmiotów.',
   english: 'No used items.'
 };
 
@@ -270,15 +270,36 @@ export default function ProfileEqContentContent({
   }, [catalogItems, entries]);
 
   const backendUsedItems = useMemo(() => {
-    return history.filter((record) => record.type === 'ITEM_USED');
+    return history.filter(
+      (record) => record.type === 'ITEM_USED' || (record.type === 'SHOP_PURCHASE' && record.isExtraLife),
+    );
   }, [history]);
+
+  useEffect(() => {
+    if (localUsedItems.length === 0 || backendUsedItems.length === 0) return;
+    setLocalUsedItems((prev) =>
+      prev.filter((localItem) => {
+        const hasBackendMatch = backendUsedItems.some(
+          (bItem) =>
+            bItem.itemId === localItem.itemId &&
+            Math.abs(new Date(bItem.date).getTime() - new Date(localItem.date).getTime()) < 120000,
+        );
+        return !hasBackendMatch;
+      }),
+    );
+  }, [backendUsedItems, localUsedItems.length]);
 
   const mergedUsedItems = useMemo(() => {
     const combined = [...localUsedItems];
     backendUsedItems.forEach((bItem) => {
-      const alreadyAdded = combined.some(
-        (cItem) => cItem.id === bItem.id || (cItem.isLocal && cItem.itemId === bItem.itemId && Math.abs(new Date(cItem.date).getTime() - new Date(bItem.date).getTime()) < 3000),
-      );
+      const alreadyAdded = combined.some((cItem) => {
+        if (cItem.id === bItem.id) return true;
+        if (cItem.isLocal && cItem.itemId === bItem.itemId) {
+          const timeDiff = Math.abs(new Date(cItem.date).getTime() - new Date(bItem.date).getTime());
+          return timeDiff < 120000;
+        }
+        return false;
+      });
       if (!alreadyAdded) {
         combined.push(bItem);
       }
@@ -447,13 +468,14 @@ export default function ProfileEqContentContent({
                 onUse={() => openUseItemConfirm(entry.itemId, item.name)}
                 hideAddToCart
                 hideActions={effectiveReadOnly}
+                isExtraLife={item.isExtraLife === true}
               />
             );
           })}
         </div>
       )}
 
-      {/* SEKCJA: Zużyte przedmioty */}
+      {/* SEKCJA: Użyte przedmioty */}
       <Divider className="profile-eq-page__divider" />
 
       <header className="profile-eq-page__header">

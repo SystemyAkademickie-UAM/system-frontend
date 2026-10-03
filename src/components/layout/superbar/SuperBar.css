@@ -33,11 +33,12 @@
 
 .super-bar__end {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
   gap: 1rem 1.25rem;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 .super-bar__menu-btn {
@@ -91,6 +92,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .super-bar-stat__icon {
@@ -116,6 +118,7 @@
   font-weight: 600;
   line-height: 1.2;
   color: #fff;
+  flex-shrink: 0;
 }
 
 .super-bar-settings {
@@ -126,6 +129,7 @@
   height: 30px;
   color: var(--color-nav-icon-on-primary);
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .super-bar-settings:focus-visible {
@@ -146,13 +150,14 @@
   flex-direction: row;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .super-bar-user-identity {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  max-width: 150px;
+  flex-shrink: 0;
 }
 
 .super-bar-user-identity__name {
@@ -162,11 +167,9 @@
   font-weight: 800;
   line-height: 1.25rem;
   letter-spacing: -0.35px;
-
   color: var(--color-nav-user-name);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: right;
 }
 
 .super-bar-user-identity__role {
@@ -177,6 +180,8 @@
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--color-nav-user-role);
+  text-align: right;
+  white-space: nowrap;
 }
 
 .super-bar-user-identity--loading {
