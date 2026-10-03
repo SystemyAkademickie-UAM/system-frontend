@@ -45,7 +45,7 @@ export function useGroupMainBadges() {
       ]);
 
       const memberAvatarsVisible = preview.group?.rankShowMemberAvatars !== false;
-      setShowMemberAvatars(memberAvatarsVisible);
+      setShowMemberAvatars(isStudentView ? memberAvatarsVisible : true);
 
       if (isStudentView) {
         const profileResult = await fetchGroupStudentProfile(groupId);

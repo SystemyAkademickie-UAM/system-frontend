@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, CharacterLimitedField, SearchBar } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, LoadingSpinner, SearchBar } from '../../../components/ui/index.js';
 import { STAGE_NAME_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
@@ -406,7 +406,7 @@ export default function ActivitiesContent() {
       </div>
 
       {isLoading ? (
-        <p className="activities-page__loading">{LOADING__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : filteredStages.length === 0 ? (
         <p className="activities-page__empty">
           {stages.length === 0

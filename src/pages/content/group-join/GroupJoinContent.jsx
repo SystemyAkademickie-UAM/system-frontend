@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, PageHeader, CharacterLimitedField } from '../../../components/ui/index.js';
+import { Button, PageHeader } from '../../../components/ui/index.js';
 import { ENROLLMENT_ENTRY_CODE_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
@@ -97,10 +97,21 @@ const MISSINGGROUPID__TEXTLABEL = {
   english: 'Missing group ID.',
 };
 
-const INVALIDCODE__TEXTLABEL = {
-  polish: 'Nieprawidłowy kod dostępu.',
-  english: 'Invalid access code.',
+const PASTEBUTTON__TEXTLABEL = {
+  polish: 'Wklej kod ze schowka',
+  english: 'Paste code from clipboard',
 };
+
+function PasteIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+    </svg>
+  );
+}
+
+const CODE_LENGTH = 6;
 
 export default function GroupJoinContent() {
   const { groupId } = useParams();
@@ -108,16 +119,19 @@ export default function GroupJoinContent() {
   const { role } = useAppRole();
   const { group, hasAccess, isLoading, errorMessage } = useGroupPreview(groupId);
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const [codeInput, setCodeInput] = useState('');
+  const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRefs = useMemo(() => Array.from({ length: CODE_LENGTH }, () => ({ current: null })), []);
 
   const isStudent = role === APP_ROLE.STUDENT;
+  const codeInput = digits.join('');
   const validation = useMemo(
     () => validateAlphanumericInput(codeInput, ENROLLMENT_ENTRY_CODE_MAX_LENGTH),
     [codeInput],
   );
-  const showValidationError = codeInput.trim() !== '' && !validation.valid;
+  const isCodeComplete = codeInput.length === CODE_LENGTH && validation.valid;
+  const showValidationError = codeInput.trim() !== '' && !validation.valid && codeInput.length === CODE_LENGTH;
 
   useEffect(() => {
     if (isLoading || !group || !hasAccess || !groupId) {
@@ -126,11 +140,109 @@ export default function GroupJoinContent() {
     navigate(groupMainPath(groupId), { replace: true });
   }, [isLoading, group, hasAccess, groupId, navigate]);
 
-  const handleSubmit = async (event) => {
+  const handleDigitChange = (index, value) => {
+    setSubmitError('');
+    const cleanChar = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    
+    if (cleanChar.length === 0) {
+      setDigits((prev) => {
+        const next = [...prev];
+        next[index] = '';
+        return next;
+      });
+      return;
+    }
+
+    // If more than 1 char was pasted/typed into this slot
+    if (cleanChar.length > 1) {
+      handlePastedString(cleanChar, index);
+      return;
+    }
+
+    const nextChar = cleanChar.slice(-1);
+    setDigits((prev) => {
+      const next = [...prev];
+      next[index] = nextChar;
+      return next;
+    });
+
+    // Auto-advance to next input
+    if (index < CODE_LENGTH - 1) {
+      inputRefs[index + 1].current?.focus();
+      inputRefs[index + 1].current?.select();
+    }
+  };
+
+  const handleKeyDown = (index, event) => {
+    if (event.key === 'Backspace') {
+      setSubmitError('');
+      if (digits[index] === '') {
+        if (index > 0) {
+          inputRefs[index - 1].current?.focus();
+          setDigits((prev) => {
+            const next = [...prev];
+            next[index - 1] = '';
+            return next;
+          });
+        }
+      } else {
+        setDigits((prev) => {
+          const next = [...prev];
+          next[index] = '';
+          return next;
+        });
+      }
+    } else if (event.key === 'ArrowLeft' && index > 0) {
+      event.preventDefault();
+      inputRefs[index - 1].current?.focus();
+      inputRefs[index - 1].current?.select();
+    } else if (event.key === 'ArrowRight' && index < CODE_LENGTH - 1) {
+      event.preventDefault();
+      inputRefs[index + 1].current?.focus();
+      inputRefs[index + 1].current?.select();
+    }
+  };
+
+  const handlePastedString = (rawText, startIndex = 0) => {
+    const clean = rawText.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    if (clean.length === 0) return;
+
+    setSubmitError('');
+    setDigits((prev) => {
+      const next = [...prev];
+      for (let i = 0; i < clean.length && startIndex + i < CODE_LENGTH; i += 1) {
+        next[startIndex + i] = clean[i];
+      }
+      return next;
+    });
+
+    const nextFocusIndex = Math.min(startIndex + clean.length, CODE_LENGTH - 1);
+    inputRefs[nextFocusIndex].current?.focus();
+    inputRefs[nextFocusIndex].current?.select();
+  };
+
+  const handlePasteEvent = (index, event) => {
     event.preventDefault();
+    const pasted = event.clipboardData.getData('text');
+    handlePastedString(pasted, index);
+  };
+
+  const handleClipboardPasteClick = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const text = await navigator.clipboard.readText();
+        handlePastedString(text, 0);
+      }
+    } catch {
+      // Clipboard access might be blocked by browser permissions
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    if (event) event.preventDefault();
     setSubmitError('');
 
-    if (!validation.valid || !validation.value) {
+    if (!isCodeComplete || !validation.value) {
       return;
     }
 
@@ -165,7 +277,7 @@ export default function GroupJoinContent() {
         title={PAGETITLE__TEXTLABEL[LANGUAGE]}
         description={
           isStudent
-            ? PAGEDESCRIPTIONSTUDENT__TEXTLABEL[LANGUAGE]
+            ? undefined
             : PAGEDESCRIPTIONNONSTUDENT__TEXTLABEL[LANGUAGE]
         }
       />
@@ -187,7 +299,7 @@ export default function GroupJoinContent() {
       ) : null}
 
       {!isLoading && group && !hasAccess && isStudent ? (
-        <>
+        <div className="group-join__content-card">
           <div className="group-join__info">
             <p className="group-join__lead">
               {GROUPINFOLEAD__TEXTLABEL[LANGUAGE]}
@@ -215,45 +327,44 @@ export default function GroupJoinContent() {
 
           <form className="group-join__form" onSubmit={handleSubmit}>
             <div className="group-join__field">
-              <label htmlFor="group-join-code" className="group-join__label">
+              <label className="group-join__label">
                 {ACCESSCODE__TEXTLABEL[LANGUAGE]}
               </label>
-              <div className="group-join__input-row">
-                <CharacterLimitedField
-                  value={codeInput}
-                  maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}
-                  className="group-join__input-field"
-                >
-                  <input
-                    id="group-join-code"
-                    type="text"
-                    inputMode="text"
-                    autoComplete="off"
-                    spellCheck={false}
-                    className={[
-                      'group-join__input',
-                      showValidationError ? 'group-join__input--error' : '',
-                    ].filter(Boolean).join(' ')}
-                    value={codeInput}
-                    onChange={(event) => {
-                      setCodeInput(event.target.value);
-                      setSubmitError('');
-                    }}
-                    placeholder={INPUTPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-                    maxLength={ENROLLMENT_ENTRY_CODE_MAX_LENGTH}
-                    aria-invalid={showValidationError}
-                    aria-describedby={
-                      showValidationError || submitError ? 'group-join-code-error' : undefined
-                    }
-                  />
-                </CharacterLimitedField>
-                <Button
-                  type="submit"
-                  variant="primary"
-                  disabled={!validation.valid || isSubmitting}
-                >
-                  {isSubmitting ? JOININGBUTTON__TEXTLABEL[LANGUAGE] : JOINBUTTON__TEXTLABEL[LANGUAGE]}
-                </Button>
+
+              <div className="group-join__tiles-row">
+                <div className="group-join__tiles" role="group" aria-label={ACCESSCODE__TEXTLABEL[LANGUAGE]}>
+                  {digits.map((digit, index) => (
+                    <input
+                      key={`code-tile-${index}`}
+                      ref={(el) => { inputRefs[index].current = el; }}
+                      type="text"
+                      inputMode="text"
+                      autoComplete="off"
+                      spellCheck={false}
+                      maxLength={1}
+                      className={[
+                        'group-join__tile',
+                        showValidationError || submitError ? 'group-join__tile--error' : '',
+                        digit ? 'group-join__tile--filled' : '',
+                      ].filter(Boolean).join(' ')}
+                      value={digit}
+                      onChange={(e) => handleDigitChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      onPaste={(e) => handlePasteEvent(index, e)}
+                      aria-label={`Znak ${index + 1} z ${CODE_LENGTH}`}
+                    />
+                  ))}
+
+                  <button
+                    type="button"
+                    className="group-join__paste-btn"
+                    onClick={handleClipboardPasteClick}
+                    title={PASTEBUTTON__TEXTLABEL[LANGUAGE]}
+                    aria-label={PASTEBUTTON__TEXTLABEL[LANGUAGE]}
+                  >
+                    <PasteIcon className="group-join__paste-icon" />
+                  </button>
+                </div>
               </div>
 
               {showValidationError || submitError ? (
@@ -261,9 +372,21 @@ export default function GroupJoinContent() {
                   {showValidationError ? validation.error : submitError}
                 </p>
               ) : null}
+
+              <div className="group-join__actions">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  disabled={!isCodeComplete || isSubmitting}
+                  className="group-join__submit-btn"
+                >
+                  {isSubmitting ? JOININGBUTTON__TEXTLABEL[LANGUAGE] : JOINBUTTON__TEXTLABEL[LANGUAGE]}
+                </Button>
+              </div>
             </div>
           </form>
-        </>
+        </div>
       ) : null}
     </section>
   );

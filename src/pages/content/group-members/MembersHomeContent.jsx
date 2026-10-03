@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
-import { DataTable, CurrencyDisplay, SearchBar, useToast } from '../../../components/ui/index.js';
+import { DataTable, CurrencyDisplay, LoadingSpinner, SearchBar, useToast } from '../../../components/ui/index.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
@@ -403,7 +403,7 @@ export default function MembersHomeContent() {
     >
 
       {isLoading ? (
-        <p className="members-page__loading page-unavailable__notice">{LOADING_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : members.length === 0 ? (
         <p className="members-page__empty page-unavailable__notice">{EMPTY_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : (

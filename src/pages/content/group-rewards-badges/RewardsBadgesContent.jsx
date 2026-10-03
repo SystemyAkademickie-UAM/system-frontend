@@ -11,6 +11,7 @@ import {
   CatalogFiltersToggle,
   CatalogSortSelect,
   getBadgeRarityConfig,
+  LoadingSpinner,
   SearchBar,
   useToast,
 } from '../../../components/ui/index.js';
@@ -44,16 +45,6 @@ const CREATENEWBADGE__TEXTLABEL = {
 const SETTINGSBUTTON__TEXTLABEL = {
   polish: 'Ustawienia',
   english: 'Settings'
-};
-
-const MEMBERSVISIBLE__TEXTLABEL = {
-  polish: 'Zapisano ustawienia widoczności uczestników.',
-  english: 'Participant visibility settings saved.'
-};
-
-const MEMBERSVISIBLEFAIL__TEXTLABEL = {
-  polish: 'Nie udało się zapisać ustawienia.',
-  english: 'Failed to save settings.'
 };
 
 const LOADINBADGES__TEXTLABEL = {
@@ -140,6 +131,21 @@ const UNPUBLISHMESSAGE__TEXTLABEL = {
 const VISIBILITYTOGGLEFAILMESSAGE__TEXTLABEL = {
   polish: 'Nie udało się zmienić widoczności odznaki.',
   english: 'Failed to change badge visibility.'
+};
+
+const MEMBERSHIDDEN__TEXTLABEL = {
+  polish: 'Wyłączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility disabled.'
+};
+
+const MEMBERSVISIBLE__TEXTLABEL = {
+  polish: 'Włączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility enabled.'
+};
+
+const MEMBERSVISIBLEFAIL__TEXTLABEL = {
+  polish: 'Nie udało się zapisać ustawienia widoczności uczestników.',
+  english: 'Failed to save participant visibility settings.'
 };
 
 const ROWACTIONDELETETEXT__TEXTLABEL = {
@@ -443,7 +449,7 @@ export default function RewardsBadgesContent() {
   const handleSaveMemberAvatars = useCallback(async (value) => {
     const result = await setShowMemberAvatarsSetting(value);
     if (result.ok) {
-      showSuccess(MEMBERSVISIBLE__TEXTLABEL[LANGUAGE]);
+      showSuccess(value ? MEMBERSVISIBLE__TEXTLABEL[LANGUAGE] : MEMBERSHIDDEN__TEXTLABEL[LANGUAGE]);
       return { ok: true };
     }
     showError(result.error ?? MEMBERSVISIBLEFAIL__TEXTLABEL[LANGUAGE]);
@@ -573,7 +579,7 @@ export default function RewardsBadgesContent() {
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">{LOADINBADGES__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : badges.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">{NOBADGESMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : isTileView ? (
@@ -599,7 +605,7 @@ export default function RewardsBadgesContent() {
             searchQuery={searchQuery}
             rarityFilter={rarityFilter}
             sortBy={sortBy}
-            showMemberAvatars={showMemberAvatars}
+            showMemberAvatars={true}
             onRarityFilterChange={setRarityFilter}
             onSortByChange={setSortBy}
             showLecturerActions

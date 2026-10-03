@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchGroupPreview, updateGroup } from '../../services/groups.api.js';
+import { notifyGroupContentChanged } from '../../utils/groupContentInvalidation.js';
 
 /**
  * @param {string | number | null | undefined} groupId
@@ -36,6 +37,7 @@ export function useGroupRankPathSettings(groupId) {
     }
 
     setShowMemberAvatars(value);
+    notifyGroupContentChanged(groupId, ['ranks', 'badges']);
     return { ok: true };
   }, [groupId]);
 

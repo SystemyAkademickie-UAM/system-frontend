@@ -39,19 +39,18 @@ export default function MemberRankModal({
   isLoading = false,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const [selectedRank, setSelectedRank] = useState('');
-  const [expandedRankName, setExpandedRankName] = useState(null);
+  const initialRank = member?.autoRankEnabled === false ? (member?.rank || '') : AUTO_RANK_OPTION;
+  const [selectedRank, setSelectedRank] = useState(initialRank);
+  const [expandedRankName, setExpandedRankName] = useState(member?.autoRankEnabled === false ? initialRank : null);
+  const [prevModalKey, setPrevModalKey] = useState(null);
   const isMobilePicker = useMobileRankPickerLayout();
 
-  useEffect(() => {
-    if (!isOpen || !member) {
-      return;
-    }
-
-    const initialRank = member.autoRankEnabled === false ? (member.rank || '') : AUTO_RANK_OPTION;
+  const modalKey = isOpen && member ? `${member.accountId}-${isOpen}` : null;
+  if (modalKey !== prevModalKey) {
+    setPrevModalKey(modalKey);
     setSelectedRank(initialRank);
-    setExpandedRankName(member.autoRankEnabled === false ? initialRank : null);
-  }, [isOpen, member]);
+    setExpandedRankName(member?.autoRankEnabled === false ? initialRank : null);
+  }
 
   const handleConfirm = () => {
     onConfirm?.(selectedRank);

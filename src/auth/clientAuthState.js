@@ -61,7 +61,7 @@ let sessionExpiredHandling = false;
 
 /**
  * Wywoływane, gdy sesja wygaśnie na backendzie (np. status 401 Unauthorized na chronionym zasobie).
- * Czyści stan sesji w aplikacji, umożliwiając RouteGuard natychmiastowe przekierowanie na stronę logowania/powitalną.
+ * Czyści stan sesji w aplikacji oraz przekierowuje na stronę główną/powitalną.
  */
 export function handleSessionExpired() {
   if (isClientLogoutInProgress() || sessionExpiredHandling) {
@@ -70,6 +70,20 @@ export function handleSessionExpired() {
   sessionExpiredHandling = true;
   try {
     clearClientAuthState();
+    if (typeof window !== 'undefined' && typeof window.location?.replace === 'function') {
+      const pathname = window.location.pathname || '';
+      const isAuthPage = pathname.startsWith('/welcome')
+        || pathname.startsWith('/login')
+        || pathname.startsWith('/auth')
+        || pathname.startsWith('/dev');
+      if (!isAuthPage) {
+        try {
+          window.location.replace('/welcome');
+        } catch {
+          // ignore navigation errors in test/unsupported environments
+        }
+      }
+    }
   } finally {
     if (typeof window !== 'undefined') {
       window.setTimeout(() => {

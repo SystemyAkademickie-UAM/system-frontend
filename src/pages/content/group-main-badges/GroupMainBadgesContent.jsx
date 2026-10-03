@@ -139,7 +139,9 @@ export default function GroupMainBadgesContent({
     isStudentView,
     showMemberAvatars: showMemberAvatarsFromHook,
   } = useGroupMainBadges();
-  const showMemberAvatars = showMemberAvatarsOverride ?? showMemberAvatarsFromHook;
+  const showMemberAvatars = isStudentView
+    ? (showMemberAvatarsOverride ?? showMemberAvatarsFromHook)
+    : true;
   const emptyLink = useGroupMainEmptyLink('badges', groupId);
 
   const defaultSort = isStudentView ? TREASURY_SORT.unlockFirst : TREASURY_SORT.qualityDesc;

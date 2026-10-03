@@ -4,7 +4,7 @@ import SettingsSectionHeader from '../../../components/layout/sectionPage/Settin
 import GroupSettingsUnsavedModal from '../group-settings/GroupSettingsUnsavedModal.jsx';
 import SettingsCheckboxField from '../group-settings/SettingsCheckboxField.jsx';
 import EmojiPickerField from '../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
-import { Button, CharacterLimitedField, Divider, InfoTooltip, useToast } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, Divider, InfoTooltip, LoadingSpinner, useToast } from '../../../components/ui/index.js';
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
 import { LIVES_LABEL_MAX_LENGTH } from '../../../constants/fieldLimits.js';
 import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../../../constants/lives.constants.js';
@@ -357,7 +357,7 @@ export default function GroupSettingsHealthContentContent() {
         </div>
 
         {isLoading ? (
-          <p className="group-settings-form__hint">{LOADINGHINT__TEXTLABEL[LANGUAGE]}</p>
+          <LoadingSpinner size="lg" />
         ) : (
           <>
             <div className="group-settings-form__field" style={{ marginTop: '0.25rem', width: 'fit-content' }}>

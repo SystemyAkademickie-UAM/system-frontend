@@ -79,6 +79,7 @@ export function SessionProvider({ children }) {
 
   const checkSession = useCallback(async (options = {}) => {
     const force = options.force === true;
+    const isInitial = options.initial === true;
     if (sessionCheckInFlightRef.current) {
       if (!force) {
         return;
@@ -89,7 +90,9 @@ export function SessionProvider({ children }) {
     }
 
     sessionCheckInFlightRef.current = true;
-    setIsLoading(true);
+    if (isInitial) {
+      setIsLoading(true);
+    }
     setSessionError(null);
 
     try {
@@ -122,26 +125,7 @@ export function SessionProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    checkSession();
-  }, [checkSession]);
-
-  useEffect(() => {
-    let lastCheckTime = Date.now();
-
-    const handleFocusOrVisibility = () => {
-      if (document.visibilityState === 'visible' && Date.now() - lastCheckTime > 30000) {
-        lastCheckTime = Date.now();
-        checkSession();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleFocusOrVisibility);
-    window.addEventListener('focus', handleFocusOrVisibility);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleFocusOrVisibility);
-      window.removeEventListener('focus', handleFocusOrVisibility);
-    };
+    checkSession({ initial: true });
   }, [checkSession]);
 
   const role = useMemo(() => mapBackendRoleToAppRole(user?.role), [user]);

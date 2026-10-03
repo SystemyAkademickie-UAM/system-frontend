@@ -170,9 +170,10 @@ export default function PlayerAvatar({
           {avatarContent}
         </Link>
       ) : (
-        <button
+        <div
           ref={triggerRef}
-          type="button"
+          tabIndex={0}
+          role="img"
           className={sharedClassName}
           aria-label={label}
           onMouseEnter={handleMouseEnter}
@@ -181,7 +182,7 @@ export default function PlayerAvatar({
           onBlur={handleMouseLeave}
         >
           {avatarContent}
-        </button>
+        </div>
       )}
 
 

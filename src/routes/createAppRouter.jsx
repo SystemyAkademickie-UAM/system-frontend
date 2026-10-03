@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
+import { LoadingSpinner } from '../components/ui/index.js';
 import { HomeRedirect, RouteGuard, GroupAccessGuard, GroupOwnerGuard, RankingDisabledRedirect } from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 
@@ -9,7 +10,7 @@ function withLazy(factory) {
   const Component = lazy(factory);
   return function LazyPageWrapper(props) {
     return (
-      <Suspense fallback={<div className="maq-route-loading" aria-busy="true" />}>
+      <Suspense fallback={<LoadingSpinner size="lg" />}>
         <Component {...props} />
       </Suspense>
     );
@@ -157,7 +158,7 @@ const appRouteTree = [
       // APP SHELL (requires auth)
       // ========================================
       {
-        element: <AppShell />,
+        element: withGuard(<AppShell />),
         children: [
           // App-level pages
           { path: 'settings', element: withGuard(<SettingsPage />) },

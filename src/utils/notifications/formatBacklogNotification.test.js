@@ -80,4 +80,23 @@ describe('formatBacklogNotification', () => {
     expect(lecturerFormatted.title).toBe('Marek: zwiększono walutę zgromadzoną (+100)');
     expect(lecturerFormatted.href).toBe(`/groups/${groupId}/student-profile/42`);
   });
+
+  it('formats SHOP_ITEM_ADDED without [object Object] and includes cost', () => {
+    const item = {
+      type: 'SHOP_ITEM_ADDED',
+      accountId: 0,
+      value: JSON.stringify({
+        itemName: 'dsad',
+        storyDescription: 'dasdsa',
+        educationalDescription: 'das',
+        price: 111,
+      }),
+    };
+
+    const studentFormatted = formatBacklogNotification(groupId, item, true);
+    expect(studentFormatted.typeLabel).toBe('Nowy produkt w sklepie');
+    expect(studentFormatted.title).toBe('Nowy produkt: dsad');
+    expect(studentFormatted.message).toBe('dasdsa · das · Koszt: 111');
+    expect(studentFormatted.message).not.toContain('[object Object]');
+  });
 });

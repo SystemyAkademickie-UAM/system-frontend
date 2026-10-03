@@ -92,12 +92,13 @@ export default function BadgeTreasuryCard({
           isLocked={isLocked}
           className="badge-treasury-card__badge maq-badge--grid-fit"
         />
-        {showMemberAvatars ? (
+        {(isStudentView ? showMemberAvatars : true) ? (
           <BadgeEarnersBar
             students={earners}
             groupId={groupId}
             className="badge-treasury-card__earners"
             LANGUAGE={LANGUAGE}
+            isStudentView={isStudentView}
           />
         ) : null}
       </div>
