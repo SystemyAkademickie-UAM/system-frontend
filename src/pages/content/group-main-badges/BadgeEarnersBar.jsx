@@ -4,6 +4,8 @@ import PlayerAvatar from '../../../components/ui/PlayerAvatar/PlayerAvatar.jsx';
 import { groupStudentProfilePath } from '../../../routes/pathRegistry.js';
 import { positionAnchoredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import './BadgeEarnersBar.css';
 
 const OVERFLOWARIA__TEXTLABEL = {
@@ -118,9 +120,12 @@ export default function BadgeEarnersBar({
   groupId,
   className = '',
   LANGUAGE = 'polish',
+  isStudentView: isStudentViewProp,
 }) {
+  const { role } = useAppRole();
+  const isStudentView = isStudentViewProp ?? (role === APP_ROLE.STUDENT);
   const barRef = useRef(null);
-  const [autoMaxVisible, setAutoMaxVisible] = useState(students.length);
+  const [autoMaxVisible, setAutoMaxVisible] = useState(() => Math.min(students.length, 6));
 
   useLayoutEffect(() => {
     if (explicitMaxVisible !== undefined) {
@@ -140,12 +145,9 @@ export default function BadgeEarnersBar({
       const itemWidth = 40;
       const gap = 6;
       const maxSlots = Math.max(1, Math.floor((availableWidth + gap) / (itemWidth + gap)));
+      const nextVisible = students.length <= maxSlots ? students.length : Math.max(1, maxSlots - 1);
 
-      if (students.length <= maxSlots) {
-        setAutoMaxVisible(students.length);
-      } else {
-        setAutoMaxVisible(Math.max(1, maxSlots - 1));
-      }
+      setAutoMaxVisible((prev) => (prev !== nextVisible ? nextVisible : prev));
     };
 
     calculateFit();
@@ -180,7 +182,7 @@ export default function BadgeEarnersBar({
           totalEarned={student.totalEarned}
           size="md"
           tooltipPlacement="top"
-          href={groupId && (student.position || student.accountId)
+          href={!isStudentView && groupId && (student.position || student.accountId)
             ? groupStudentProfilePath(groupId, student.position ?? student.accountId)
             : undefined}
         />

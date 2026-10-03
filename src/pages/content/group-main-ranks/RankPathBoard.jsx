@@ -72,6 +72,8 @@ export default function RankPathBoard({
   const [rowCenters, setRowCenters] = useState([]);
   const [boardHeight, setBoardHeight] = useState(0);
 
+  const effectiveShowMemberAvatars = isStudentView ? showMemberAvatars : true;
+
   const studentsByRank = useMemo(
     () => groupStudentsByRank(ranks, students),
     [ranks, students],
@@ -210,7 +212,7 @@ export default function RankPathBoard({
     <div className="rank-path-board__rows" ref={rowsRef}>
       {ranks.map((rank) => {
         const rankStudents = studentsByRank.get(rank.id) ?? [];
-        const hasEarners = showMemberAvatars && rankStudents.length > 0;
+        const hasEarners = effectiveShowMemberAvatars && rankStudents.length > 0;
 
         return (
           <div key={rank.id} className="rank-path-row" onDoubleClick={() => onRankDoubleClick?.(rank)}>
@@ -242,12 +244,13 @@ export default function RankPathBoard({
                 isLocked={isStudentView && !rank.isUnlocked}
               />
 
-              {showMemberAvatars ? (
+              {effectiveShowMemberAvatars ? (
                 <BadgeEarnersBar
                   students={rankStudents}
                   groupId={groupId}
                   className="rank-path-card__earners"
                   LANGUAGE={LANGUAGE}
+                  isStudentView={isStudentView}
                 />
               ) : null}
             </div>

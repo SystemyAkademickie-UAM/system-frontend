@@ -8,6 +8,12 @@
   min-height: 12rem;
 }
 
+.group-main-layout .page-unavailable,
+.app-page-layout .page-unavailable,
+.maq-section-page.page-unavailable {
+  padding: 0;
+}
+
 .page-unavailable__notice {
   margin: 0;
   width: 100%;

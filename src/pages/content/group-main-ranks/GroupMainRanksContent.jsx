@@ -70,7 +70,9 @@ export default function GroupMainRanksContent({
     isStudentView,
     showMemberAvatars: showMemberAvatarsFromHook,
   } = useGroupMainRanks();
-  const showMemberAvatars = showMemberAvatarsOverride ?? showMemberAvatarsFromHook;
+  const showMemberAvatars = isStudentView
+    ? (showMemberAvatarsOverride ?? showMemberAvatarsFromHook)
+    : true;
   const hasScrolledRef = useRef(false);
 
   useEffect(() => {

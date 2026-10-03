@@ -6,6 +6,7 @@ import {
   DataTable,
   AssetSvg,
   InfoTooltip,
+  LoadingSpinner,
   SearchBar,
   useToast,
 } from '../../../components/ui/index.js';
@@ -82,13 +83,13 @@ const ITEMSUPDATEERROR__TEXTLABEL = {
 };
 
 const MEMBERSHIDDEN__TEXTLABEL = {
-  polish: 'Zapisano ustawienia widoczności uczestników.',
-  english: 'Participant visibility settings saved.'
+  polish: 'Wyłączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility disabled.'
 };
 
 const MEMBERSVISIBLE__TEXTLABEL = {
-  polish: 'Zapisano ustawienia widoczności uczestników.',
-  english: 'Participant visibility settings saved.'
+  polish: 'Włączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility enabled.'
 };
 
 const LOADING__TEXTLABEL = {
@@ -465,7 +466,7 @@ export default function RewardsHomeContent() {
   const handleSaveMemberAvatars = useCallback(async (value) => {
     const result = await setShowMemberAvatarsSetting(value);
     if (result.ok) {
-      showSuccess(MEMBERSVISIBLE__TEXTLABEL[LANGUAGE]);
+      showSuccess(value ? MEMBERSVISIBLE__TEXTLABEL[LANGUAGE] : MEMBERSHIDDEN__TEXTLABEL[LANGUAGE]);
       return { ok: true };
     }
     showError(result.error ?? UPDATEERROR__TEXTLABEL[LANGUAGE]);
@@ -537,13 +538,13 @@ export default function RewardsHomeContent() {
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">{LOADING__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : ranks.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">{EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : isTileView ? (
         <GroupMainRanksContent
           embedded
-          showMemberAvatars={showMemberAvatars}
+          showMemberAvatars={true}
           showLecturerActions
           onEditRank={handleTileEditRank}
           onDeleteRank={handleTileDeleteRank}

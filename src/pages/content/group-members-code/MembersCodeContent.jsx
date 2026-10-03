@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import {
   Button,
   DataTable,
+  LoadingSpinner,
   SearchBar,
   useToast,
 } from '../../../components/ui/index.js';
@@ -470,7 +471,7 @@ export default function MembersCodeContent() {
       ) : null}
 
       {isLoading ? (
-        <p className="members-code-page__loading page-unavailable__notice" role="status">{LOADING__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : codes.length === 0 ? (
         <p className="members-code-page__empty page-unavailable__notice">
           {EMPTY__TEXTLABEL[LANGUAGE].replace('{button}', GENERATEBUTTON__TEXTLABEL[LANGUAGE])}

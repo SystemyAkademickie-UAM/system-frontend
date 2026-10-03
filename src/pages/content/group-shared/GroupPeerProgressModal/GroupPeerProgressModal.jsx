@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Modal } from '../../../../components/ui/index.js';
+import { Modal } from '../../../../components/ui/index.js';
 import SettingsCheckboxField from '../../group-settings/SettingsCheckboxField.jsx';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 import '../../group-rewards/shared/rewardsModals.css';
@@ -18,11 +18,6 @@ const CHECKBOXLABEL__TEXTLABEL = {
 const HINTLABEL__TEXTLABEL = {
   polish: 'Włączenie tej opcji pozwala studentom na podgląd postępu innych uczestników grupy. Ustawienie to wpływa jednocześnie na wyświetlanie awatarów uczestników na kafelkach rang oraz odznak.',
   english: 'Enabling this option allows students to see the progress of other group members. This setting applies to participant avatars displayed on both rank and badge cards.',
-};
-
-const CANCELBUTTON__TEXTLABEL = {
-  polish: 'Anuluj',
-  english: 'Cancel',
 };
 
 const SAVEBUTTON__TEXTLABEL = {
@@ -82,28 +77,9 @@ export default function GroupPeerProgressModal({
       onClose={onClose}
       title={MODALTITLE__TEXTLABEL[LANGUAGE]}
       className="rewards-modal group-peer-progress-modal"
-      footer={(
-        <div className="rewards-modal__footer">
-          <Button
-            type="button"
-            variant="secondary"
-            size="md"
-            onClick={onClose}
-            disabled={isSaving}
-          >
-            {CANCELBUTTON__TEXTLABEL[LANGUAGE]}
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? SAVINGBUTTON__TEXTLABEL[LANGUAGE] : SAVEBUTTON__TEXTLABEL[LANGUAGE]}
-          </Button>
-        </div>
-      )}
+      onConfirm={handleSave}
+      confirmLabel={isSaving ? SAVINGBUTTON__TEXTLABEL[LANGUAGE] : SAVEBUTTON__TEXTLABEL[LANGUAGE]}
+      confirmDisabled={isSaving}
     >
       <div className="rewards-modal__body group-peer-progress-modal__body">
         <div className="rewards-modal__field group-peer-progress-modal__field">

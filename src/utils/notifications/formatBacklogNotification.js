@@ -450,19 +450,22 @@ const SHOPCLOSED__TEXTLABEL = {
 /**
  * @param {number | null} delta
  * @param {number | null} lives
+ * @param {string} [language='polish']
  * @returns {string | null}
  */
-function formatLivesChangeLabel(delta, lives) {
+function formatLivesChangeLabel(delta, lives, language = 'polish') {
+  const currentLang = language ?? 'polish';
   if (delta != null && lives != null) {
     const deltaLabel = delta >= 0 ? `+${delta}` : String(delta);
-    return `${LIVESDELTA__TEXTLABEL}: ${deltaLabel} (${CURRENTLY__TEXTLABEL}: ${lives})`;
+    return `${LIVESDELTA__TEXTLABEL[currentLang]}: ${deltaLabel} (${CURRENTLY__TEXTLABEL[currentLang]}: ${lives})`;
   }
   if (lives != null) {
-    return `${CURRENTLY__TEXTLABEL} liczba żyć: ${lives}`;
+    return `${CURRENTLY__TEXTLABEL[currentLang]} liczba żyć: ${lives}`;
   }
   if (delta != null) {
-    return delta >= 0 ? `${LIVESDELTA__TEXTLABEL}: +${delta}` : `${LIVESDELTA__TEXTLABEL}: ${delta}`;
-
+    return delta >= 0
+      ? `${LIVESDELTA__TEXTLABEL[currentLang]}: +${delta}`
+      : `${LIVESDELTA__TEXTLABEL[currentLang]}: ${delta}`;
   }
   return null;
 }
@@ -525,10 +528,11 @@ function stripActivityPointsSuffix(title) {
 
 /**
  * @param {Record<string, unknown>} payload
- * @param {{ excludeInMessage?: string[], skipPointsLabel?: boolean }} [options]
+ * @param {{ excludeInMessage?: string[], skipPointsLabel?: boolean, language?: string }} [options]
  * @returns {string[]}
  */
-function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel = false } = {}) {
+function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel = false, language = 'polish' } = {}) {
+  const currentLang = language ?? 'polish';
   /** @type {string[]} */
   const details = [];
   const excluded = new Set(excludeInMessage.filter(Boolean));
@@ -560,38 +564,38 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
 
   const price = resolvePrice(payload);
   if (price != null) {
-    pushUnique(`${COST__TEXTLABEL}: ${price}`);
+    pushUnique(`${COST__TEXTLABEL[currentLang]}: ${price}`);
   }
 
   const points = readNumber(payload.points);
   if (points != null && !skipPointsLabel) {
-    pushUnique(`${POINTS__TEXTLABEL}: +${points}`);
+    pushUnique(`${POINTS__TEXTLABEL[currentLang]}: +${points}`);
   }
 
   const rewardAmount = readNumber(payload.rewardAmount);
   if (rewardAmount != null && rewardAmount !== points) {
-    pushUnique(`${REWARD__TEXTLABEL}: +${rewardAmount}`);
+    pushUnique(`${REWARD__TEXTLABEL[currentLang]}: +${rewardAmount}`);
   }
 
   const currencyAmount = readNumber(payload.currencyAmount);
   if (currencyAmount != null && currencyAmount !== points && currencyAmount !== price) {
-    pushUnique(`${CURRENCY__TEXTLABEL}: +${currencyAmount}`);
+    pushUnique(`${CURRENCY__TEXTLABEL[currentLang]}: +${currencyAmount}`);
   }
 
   const currencyDelta = resolveCurrencyDelta(payload);
   const currencyBalance = resolveCurrencyBalance(payload);
   if (currencyBalance != null) {
-    pushUnique(`${BALANCE__TEXTLABEL}: ${currencyBalance}`);
+    pushUnique(`${BALANCE__TEXTLABEL[currentLang]}: ${currencyBalance}`);
   }
 
   const totalEarned = resolveTotalEarnedBalance(payload);
   if (totalEarned != null && isTotalEarnedPayload(payload)) {
-    pushUnique(`${TOTALEARNED__TEXTLABEL}: ${totalEarned}`);
+    pushUnique(`${TOTALEARNED__TEXTLABEL[currentLang]}: ${totalEarned}`);
   }
 
   const livesDelta = resolveLivesDelta(payload);
   const newLives = readNumber(payload.newLives ?? payload.lives);
-  const livesLabel = formatLivesChangeLabel(livesDelta, newLives);
+  const livesLabel = formatLivesChangeLabel(livesDelta, newLives, currentLang);
   if (livesLabel) {
     pushUnique(livesLabel);
   }
@@ -604,6 +608,7 @@ function collectPayloadDetails(payload, { excludeInMessage = [], skipPointsLabel
  * @param {Record<string, unknown>} payload
  * @param {boolean} isStudentView
  * @param {string | null} studentLabel
+ * @param {string} language
  * @returns {string | null}
  */
 function buildFallbackTitle(type, payload, isStudentView, studentLabel, language) {
@@ -619,7 +624,7 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel, language
   const totalEarnedDelta = resolveTotalEarnedDelta(payload);
   const livesDelta = resolveLivesDelta(payload);
   const lives = readNumber(payload.newLives ?? payload.lives);
-  const livesLabel = formatLivesChangeLabel(livesDelta, lives);
+  const livesLabel = formatLivesChangeLabel(livesDelta, lives, language);
   const isExtraLife = payload.isExtraLife === true;
 
   if (!isStudentView && studentLabel) {
@@ -843,6 +848,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false, 
   const details = collectPayloadDetails(payload, {
     excludeInMessage,
     skipPointsLabel: isStudentActivityReward,
+    language: resolvedLanguage,
   });
 
   if (!isStudentView && LECTURER_STUDENT_EVENT_TYPES.has(item.type) && studentLabel && !title.includes(studentLabel)) {

@@ -21,9 +21,19 @@ export function isPublicAuthEndpoint(pathOrUrl) {
   return PUBLIC_AUTH_PATHS.some((path) => pathOrUrl.includes(path));
 }
 
-function handleResponseStatus(response, resourcePath) {
-  if (response?.status === 401 && !isPublicAuthEndpoint(resourcePath)) {
+function handleResponseStatus(response, resourcePath, data = null) {
+  if (isPublicAuthEndpoint(resourcePath)) {
+    return;
+  }
+  if (response?.status === 401) {
     handleSessionExpired();
+    return;
+  }
+  if (response?.status === 403) {
+    const msg = typeof data === 'object' && data?.message ? String(data.message) : '';
+    if (msg.includes('Not authorized') || msg.includes('Missing or invalid session')) {
+      handleSessionExpired();
+    }
   }
 }
 
@@ -90,8 +100,8 @@ export async function getJson(resourcePath, _options = {}) {
     credentials: 'include',
   });
 
-  handleResponseStatus(response, resourcePath);
   const data = await parseResponseBody(response);
+  handleResponseStatus(response, resourcePath, data);
   return { ok: response.ok, status: response.status, data };
 }
 
@@ -113,8 +123,8 @@ export async function postJson(resourcePath, body, _options = {}) {
     body: JSON.stringify(body),
   });
 
-  handleResponseStatus(response, resourcePath);
   const data = await parseResponseBody(response);
+  handleResponseStatus(response, resourcePath, data);
   return { ok: response.ok, status: response.status, data };
 }
 
@@ -136,8 +146,8 @@ export async function patchJson(resourcePath, body, _options = {}) {
     body: JSON.stringify(body),
   });
 
-  handleResponseStatus(response, resourcePath);
   const data = await parseResponseBody(response);
+  handleResponseStatus(response, resourcePath, data);
   return { ok: response.ok, status: response.status, data };
 }
 
@@ -159,8 +169,8 @@ export async function putJson(resourcePath, body, _options = {}) {
     body: JSON.stringify(body),
   });
 
-  handleResponseStatus(response, resourcePath);
   const data = await parseResponseBody(response);
+  handleResponseStatus(response, resourcePath, data);
   return { ok: response.ok, status: response.status, data };
 }
 
@@ -179,7 +189,7 @@ export async function deleteJson(resourcePath, _options = {}) {
     credentials: 'include',
   });
 
-  handleResponseStatus(response, resourcePath);
   const data = await parseResponseBody(response);
+  handleResponseStatus(response, resourcePath, data);
   return { ok: response.ok, status: response.status, data };
 }

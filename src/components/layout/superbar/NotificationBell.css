@@ -221,6 +221,6 @@
 
   .notification-bell__list .notifications-feed__mark-read {
     width: 2rem;
-    height: 2rem;
+    height: 100%;
   }
 }
