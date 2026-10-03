@@ -35,6 +35,7 @@
 }
 
 .maq-emoji-picker-field__emoji {
+  font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   font-size: 2rem;
   line-height: 1;
 }
@@ -70,6 +71,7 @@
   display: block;
   width: 100%;
   min-width: min(640px, calc(100vw - 2rem));
+  --emoji-font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   --fill-color: rgb(40, 40, 52);
   --text-color: rgb(227, 224, 247);
   --title-bar-fill-color: rgb(40, 40, 52);
