@@ -41,19 +41,22 @@ export async function fetchGroupStudents(groupId) {
 
 /**
  * Uczestnicy ścieżki rang (awatar + ranga) — dla studentów gdy włączone w grupie.
- * GET /groups/:groupId/rank-path-members
+ * GET /groups/:groupId/participants
  *
  * @param {string | number} groupId
- * @returns {Promise<Pick<StudentListItem, 'accountId' | 'nickname' | 'avatarUrl' | 'rankId' | 'totalEarned'>[]>}
+ * @returns {Promise<Pick<StudentListItem, 'accountId' | 'nickname' | 'avatarUrl' | 'rankId' | 'totalEarned' | 'autoRankEnabled'>[]>}
  */
 export async function fetchRankPathMembers(groupId) {
-  const result = await getJson(`/groups/${groupId}/rank-path-members`, { includeBrowserId: true });
+  const result = await getJson(`/groups/${groupId}/participants`, { includeBrowserId: true });
   if (!result.ok) {
     console.warn('Failed to fetch rank path members:', result.status, result.data);
     return [];
   }
 
-  const list = Array.isArray(result.data) ? result.data : [];
+  const list = Array.isArray(result.data)
+    ? result.data
+    : (Array.isArray(result.data?.participants) ? result.data.participants : []);
+
   return list.map((student) => ({
     ...student,
     avatarUrl: getAssetUrl(student.avatarUrl),

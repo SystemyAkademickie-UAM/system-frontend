@@ -65,7 +65,6 @@ export default function LoginPage() {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isLogoutBusy, setIsLogoutBusy] = useState(false);
   const [logoutError, setLogoutError] = useState(null);
-  const samlRecoveryAttemptedRef = useRef(false);
   const postLogoutLandingRef = useRef(false);
   const registrationResolvedRef = useRef(false);
 
@@ -97,16 +96,10 @@ export default function LoginPage() {
   }, [searchParams, setSearchParams, showSuccess, session?.refetchSession]);
 
   useEffect(() => {
-    if (session?.isLoading || session?.isAuthenticated) {
-      return;
-    }
-    if (samlRecoveryAttemptedRef.current || postLogoutLandingRef.current) {
-      return;
-    }
+    prefetchAvatarList();
+  }, []);
 
-    samlRecoveryAttemptedRef.current = true;
-    void session?.refetchSession?.();
-  }, [session?.isAuthenticated, session?.isLoading, session?.refetchSession]);
+
 
   useEffect(() => {
     if (session?.isLoading) {

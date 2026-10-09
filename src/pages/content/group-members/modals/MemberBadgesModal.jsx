@@ -170,37 +170,54 @@ export default function MemberBadgesModal({
   const [studentBadges, setStudentBadges] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [prevModalKey, setPrevModalKey] = useState(null);
   const initialSelectedIdsRef = useRef([]);
 
-  useEffect(() => {
-    if (!isOpen || !member || !groupId) return;
-
+  const modalKey = isOpen && member ? `${member.accountId}-${isOpen}` : null;
+  if (modalKey !== prevModalKey) {
+    setPrevModalKey(modalKey);
+    setIsLoading(Boolean(modalKey));
+    setStudentBadges([]);
+    setSelectedIds([]);
     setSearchQuery('');
     setRarityFilter('all');
     setEarnedFilter('all');
     setSortBy('rarity-asc');
+  }
+
+  useEffect(() => {
+    if (!isOpen || !member || !groupId) return;
+
+    let cancelled = false;
 
     async function loadStudentBadges() {
-      setIsLoading(true);
       try {
         const data = await fetchStudentBadges(groupId, member.accountId);
+        if (cancelled) return;
+
         setStudentBadges(data);
         const earnedIds = data.filter((b) => b.isEarned).map((b) => b.id);
         initialSelectedIdsRef.current = earnedIds;
         setSelectedIds(earnedIds);
-
       } catch (err) {
+        if (cancelled) return;
         console.error('Failed to load student badges:', err);
         setStudentBadges([]);
         initialSelectedIdsRef.current = [];
         setSelectedIds([]);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     }
 
     loadStudentBadges();
-  }, [isOpen, member, groupId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, member?.accountId, groupId]);
 
   const allBadges = useMemo(() => {
     if (studentBadges.length > 0) {

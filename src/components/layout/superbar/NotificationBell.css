@@ -1,6 +1,7 @@
 .notification-bell {
   position: relative;
   display: inline-flex;
+  flex-shrink: 0;
 }
 
 .notification-bell__trigger {
@@ -220,6 +221,6 @@
 
   .notification-bell__list .notifications-feed__mark-read {
     width: 2rem;
-    height: 2rem;
+    height: 100%;
   }
 }

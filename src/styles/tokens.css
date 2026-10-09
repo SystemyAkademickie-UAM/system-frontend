@@ -223,6 +223,8 @@
   --font-size-min: 12px;
   /** Domyślna czcionka aplikacji (bez Comic Sans / cursive w fallbacku) */
   --font-family-app: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /** Czcionka dla emoji z pełnym wsparciem flag */
+  --font-family-emoji: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   /** Komunikaty: toasty, alerty, statusy, błędy inline */
   --font-family-message: var(--font-family-app);
   /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
@@ -487,6 +489,8 @@
   --font-size-min: 12px;
   /** Domyślna czcionka aplikacji */
   --font-family-app: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /** Czcionka dla emoji z pełnym wsparciem flag */
+  --font-family-emoji: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   /** Komunikaty: toasty, alerty, statusy, błędy inline */
   --font-family-message: var(--font-family-app);
   /** Standardowy tekst */

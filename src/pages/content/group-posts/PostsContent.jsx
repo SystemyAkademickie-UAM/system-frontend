@@ -82,14 +82,9 @@ const DELETEPOSTDEFAULTTITLE__TEXTLABEL = {
   english: 'untitled',
 };
 
-function formatPostDateTime(value, language) {
+function formatPostDateTime(value, language = READLANGUAGECOOKIE()) {
   if (!value) return null;
-  let locale;
-  if (language === 'polish') {
-    locale = 'pl-PL';
-  } else {
-    locale = 'en-US';
-  }
+  const locale = language === 'polish' ? 'pl-PL' : 'en-US';
   return new Date(value).toLocaleString(locale, {
     day: 'numeric',
     month: 'long',
@@ -261,7 +256,7 @@ export default function PostsContent() {
                         {dateDisplay.label ? (
                           <span className="posts-island__date-label">{dateDisplay.label} </span>
                         ) : null}
-                        {formatPostDateTime(dateDisplay.dateTime)}
+                        {formatPostDateTime(dateDisplay.dateTime, LANGUAGE)}
                       </time>
                     ) : null}
                     <span

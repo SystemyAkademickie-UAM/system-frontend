@@ -51,7 +51,7 @@ export function useGroupMainRanks() {
       }));
       const preview = await fetchGroupPreview(groupId);
       const memberAvatarsVisible = preview.group?.rankShowMemberAvatars !== false;
-      setShowMemberAvatars(memberAvatarsVisible);
+      setShowMemberAvatars(isStudentView ? memberAvatarsVisible : true);
 
       if (isStudentView) {
         const profileResult = await fetchGroupStudentProfile(groupId);
@@ -72,7 +72,11 @@ export function useGroupMainRanks() {
 
         if (memberAvatarsVisible) {
           const studentsData = await fetchRankPathMembers(groupId);
-          setStudents(studentsData.map((student) => mapStudentForRankPath(student, finalRanks)));
+          const loggedInAccountId = profile.studentAccountId ?? profile.accountId;
+          const peerStudents = loggedInAccountId
+            ? studentsData.filter((student) => student.accountId !== loggedInAccountId)
+            : studentsData;
+          setStudents(peerStudents.map((student) => mapStudentForRankPath(student, finalRanks)));
         } else {
           setStudents([]);
         }
@@ -82,7 +86,7 @@ export function useGroupMainRanks() {
       const studentsData = await fetchGroupStudents(groupId);
       const coloredRanks = applyRankPathColors(mappedRanks);
       setRanks(coloredRanks);
-      setStudents(studentsData.map((student) => mapStudentForRankPath(student, coloredRanks)));
+      setStudents(studentsData.map((student, idx) => mapStudentForRankPath({ ...student, position: idx + 1 }, coloredRanks)));
       setStudentProfile(null);
     } catch (loadError) {
       console.error('Failed to load rank path:', loadError);

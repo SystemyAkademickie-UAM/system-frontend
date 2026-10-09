@@ -141,6 +141,7 @@ export default function BadgeGiveModal({
       title={MODALTITLE__TEXTLABEL[LANGUAGE]}
       subtitle={badge.name}
       onConfirm={handleConfirm}
+      confirmLabel={isSaving ? 'Zapisywanie…' : 'Zapisz'}
       confirmDisabled={busy}
       size="md"
       className="rewards-modal"
@@ -152,38 +153,36 @@ export default function BadgeGiveModal({
           placeholder={SEARCH__TEXTLABEL[LANGUAGE].placeholder}
           name="badge-give-search"
           aria-label={SEARCH__TEXTLABEL[LANGUAGE].label}
+          disabled={busy}
         />
       </div>
 
-      {isFetching ? (
-        <p className="rewards-modal__loading">{LOADINGASSIGNMENTS__TEXTLABEL[LANGUAGE]}</p>
-      ) : (
-        <ul className="rewards-modal__student-list">
-          {visibleStudents.map((student) => {
-            const isSelected = selectedIds.includes(student.id);
+      <ul className="rewards-modal__student-list">
+        {visibleStudents.map((student) => {
+          const isSelected = selectedIds.includes(student.id);
 
-            return (
-              <li key={student.id}>
-                <label
-                  className={[
-                    'rewards-modal__student-option',
-                    isSelected ? 'rewards-modal__student-option--selected' : '',
-                  ].join(' ')}
-                >
-                  <input
-                    type="checkbox"
-                    className="rewards-modal__student-checkbox"
-                    checked={isSelected}
-                    disabled={busy}
-                    onChange={() => toggleStudent(student.id)}
-                  />
-                  <span className="rewards-modal__student-name">{student.name}</span>
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+          return (
+            <li key={student.id}>
+              <label
+                className={[
+                  'rewards-modal__student-option',
+                  isSelected ? 'rewards-modal__student-option--selected' : '',
+                  isFetching ? 'rewards-modal__student-option--disabled' : '',
+                ].join(' ')}
+              >
+                <input
+                  type="checkbox"
+                  className="rewards-modal__student-checkbox"
+                  checked={isSelected}
+                  disabled={busy}
+                  onChange={() => toggleStudent(student.id)}
+                />
+                <span className="rewards-modal__student-name">{student.name}</span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
     </Modal>
   );
 }

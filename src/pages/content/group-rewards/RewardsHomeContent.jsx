@@ -6,6 +6,7 @@ import {
   DataTable,
   AssetSvg,
   InfoTooltip,
+  LoadingSpinner,
   SearchBar,
   useToast,
 } from '../../../components/ui/index.js';
@@ -28,6 +29,7 @@ import ViewLayoutToggle from '../../../components/ui/ViewLayoutToggle/ViewLayout
 import GroupMainRanksContent from '../group-main-ranks/GroupMainRanksContent.jsx';
 import RankFormModal from './modals/RankFormModal.jsx';
 import RankUnlockItemsModal from './modals/RankUnlockItemsModal.jsx';
+import GroupPeerProgressModal from '../group-shared/GroupPeerProgressModal/GroupPeerProgressModal.jsx';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 const CREATEDSUCCESS__TEXTLABEL = {
@@ -81,13 +83,13 @@ const ITEMSUPDATEERROR__TEXTLABEL = {
 };
 
 const MEMBERSHIDDEN__TEXTLABEL = {
-  polish: 'Ścieżka rang nie ujawnia postępu studentów.',
-  english: 'Participants have been hidden from the rank path.'
+  polish: 'Wyłączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility disabled.'
 };
 
 const MEMBERSVISIBLE__TEXTLABEL = {
-  polish: 'Ścieżka rang ujawnia postęp studentów.',
-  english: 'Participants are visible on the rank path.'
+  polish: 'Włączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility enabled.'
 };
 
 const LOADING__TEXTLABEL = {
@@ -105,19 +107,9 @@ const ADDRANKBUTTON__TEXTLABEL = {
   english: 'Add rank'
 };
 
-const HIDEMEMBERSBUTTON__TEXTLABEL = {
-  polish: 'Ukryj osoby',
-  english: 'Hide participants'
-};
-
-const SHOWMEMBERSBUTTON__TEXTLABEL = {
-  polish: 'Pokaż osoby',
-  english: 'Show participants'
-};
-
-const MEMBERAVATARTOOLTIP__TEXTLABEL = {
-  polish: 'Steruje widocznością osób.',
-  english: 'Controls the visibility of other participants for students.'
+const SETTINGSBUTTON__TEXTLABEL = {
+  polish: 'Ustawienia',
+  english: 'Settings'
 };
 
 const SEARCHPLACEHOLDER__TEXTLABEL = {
@@ -176,7 +168,7 @@ const ASSIGNLABEL__TEXTLABEL = {
 };
 
 const ASSIGNARIA__TEXTLABEL = {
-  polish: 'Przypisz rangę',
+  polish: 'Przypisz rangę studentom',
   english: 'Assign rank to students'
 };
 
@@ -317,7 +309,7 @@ export default function RewardsHomeContent() {
   const { groupId } = useParams();
   const { layout, toggleLayout, isTileView } = useViewLayoutPreference('maq-rewards-ranks-view');
   const { showSuccess, showError } = useToast();
-  const { showMemberAvatars, toggleShowMemberAvatars } = useGroupRankPathSettings(groupId);
+  const { showMemberAvatars, setShowMemberAvatarsSetting } = useGroupRankPathSettings(groupId);
   const {
     ranks,
     students,
@@ -343,6 +335,7 @@ export default function RewardsHomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const openModal = useCallback((type, rank = null) => {
     setActiveModal({ type, rank });
@@ -470,15 +463,15 @@ export default function RewardsHomeContent() {
     ],
   }), [openModal, LANGUAGE]);
 
-  const handleToggleMemberAvatars = useCallback(async () => {
-    const wasVisible = showMemberAvatars;
-    const result = await toggleShowMemberAvatars();
+  const handleSaveMemberAvatars = useCallback(async (value) => {
+    const result = await setShowMemberAvatarsSetting(value);
     if (result.ok) {
-      showSuccess(wasVisible
-        ? MEMBERSHIDDEN__TEXTLABEL[LANGUAGE]
-        : MEMBERSVISIBLE__TEXTLABEL[LANGUAGE]);
+      showSuccess(value ? MEMBERSVISIBLE__TEXTLABEL[LANGUAGE] : MEMBERSHIDDEN__TEXTLABEL[LANGUAGE]);
+      return { ok: true };
     }
-  }, [toggleShowMemberAvatars, showMemberAvatars, showSuccess, LANGUAGE]);
+    showError(result.error ?? UPDATEERROR__TEXTLABEL[LANGUAGE]);
+    return { ok: false, error: result.error };
+  }, [setShowMemberAvatarsSetting, showSuccess, showError, LANGUAGE]);
 
   const modalRank = activeModal?.rank ?? null;
 
@@ -508,8 +501,8 @@ export default function RewardsHomeContent() {
       subNavAriaLabel={nav.ariaLabel}
       headerAction={<ViewLayoutToggle layout={layout} onToggle={toggleLayout} />}
       toolbar={(
-        <div className="rewards-page__toolbar-ranks-wrap">
-          <div className="rewards-page__toolbar-ranks-buttons">
+        <>
+          <div className="maq-section-page__toolbar-start rewards-page__toolbar-start">
             <Button
               variant="primary"
               size="md"
@@ -518,39 +511,40 @@ export default function RewardsHomeContent() {
             >
               {ADDRANKBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
-            <div className="rewards-ranks__members-toggle-wrap">
+          </div>
+          <div className="maq-section-page__toolbar-end rewards-page__toolbar-end">
+            <div className="rewards-page__toolbar-row">
               <Button
                 type="button"
-                variant={showMemberAvatars ? 'primary' : 'secondary'}
+                variant="secondary"
                 size="md"
-                className="rewards-ranks__members-toggle"
-                onClick={handleToggleMemberAvatars}
+                className="rewards-page__settings-btn"
+                onClick={() => setSettingsModalOpen(true)}
               >
-                {showMemberAvatars ? HIDEMEMBERSBUTTON__TEXTLABEL[LANGUAGE] : SHOWMEMBERSBUTTON__TEXTLABEL[LANGUAGE]}
+                {SETTINGSBUTTON__TEXTLABEL[LANGUAGE]}
               </Button>
-              <InfoTooltip text={MEMBERAVATARTOOLTIP__TEXTLABEL[LANGUAGE]} />
+              <SearchBar
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                name="rank-catalog-search"
+                className="rewards-page__search"
+                aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
+              />
             </div>
           </div>
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-            name="rank-catalog-search"
-            className="rewards-page__search"
-            aria-label={SEARCHARIA__TEXTLABEL[LANGUAGE]}
-          />
-        </div>
+        </>
       )}
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">{LOADING__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : ranks.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">{EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : isTileView ? (
         <GroupMainRanksContent
           embedded
-          showMemberAvatars={showMemberAvatars}
+          showMemberAvatars={true}
           showLecturerActions
           onEditRank={handleTileEditRank}
           onDeleteRank={handleTileDeleteRank}
@@ -621,7 +615,13 @@ export default function RewardsHomeContent() {
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
       />
+      <GroupPeerProgressModal
+        isOpen={isSettingsModalOpen}
+        currentValue={showMemberAvatars}
+        onSave={handleSaveMemberAvatars}
+        onClose={() => setSettingsModalOpen(false)}
+        LANGUAGE={LANGUAGE}
+      />
     </SectionPageLayout>
   );
 }
-

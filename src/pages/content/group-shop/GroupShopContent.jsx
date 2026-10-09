@@ -7,6 +7,7 @@ import {
   CatalogFiltersToggle,
   CatalogSortSelect,
   Divider,
+  LoadingSpinner,
   Pagination,
   ProductCard,
   SearchBar,
@@ -768,7 +769,7 @@ export default function GroupShopContent() {
 
         <div className="group-shop__catalog-surface">
           {isLoading ? (
-            <p className="group-shop__empty page-unavailable__notice" role="status">{STATUS_LOADING__TEXTLABEL[LANGUAGE]}</p>
+            <LoadingSpinner size="lg" />
           ) : catalogItems.length === 0 ? (
             <p className="group-shop__empty page-unavailable__notice" role="status">
               {isStudentView
@@ -864,6 +865,7 @@ export default function GroupShopContent() {
         isOpen={activeModal?.type === 'buyAll'}
         cartItems={cartItems}
         cartTotal={cartTotal}
+        categoriesById={categoriesById}
         onClose={closeModal}
         onConfirm={handleBuyAllConfirm}
       />

@@ -8,7 +8,6 @@
     var(--auth-card-body-padding-bottom, clamp(2rem, 3.3vw, 64px));
   gap: 0;
   overflow: visible;
-  margin-bottom: 0.5rem;
 }
 
 .register-profile__body {
@@ -17,7 +16,7 @@
   justify-content: center;
   flex: 1;
   width: 100%;
-  margin: 1.5rem 0 2rem;
+  margin: 1rem 0 1.5rem;
 }
 
 .register-profile__field-group {

@@ -16,7 +16,7 @@ export default function WelcomePage() {
     );
   }
 
-  if (isAuthenticated && getRememberMe()) {
+  if (isAuthenticated) {
     return <Navigate to={groupsListPath()} replace />;
   }
 

@@ -40,7 +40,17 @@ export default function MemberProgressModal({
   const [stages, setStages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [prevModalKey, setPrevModalKey] = useState(null);
   const initialProgressRef = useRef({});
+
+  const modalKey = isOpen && member ? `${member.accountId}-${isOpen}` : null;
+  if (modalKey !== prevModalKey) {
+    setPrevModalKey(modalKey);
+    setIsLoading(Boolean(modalKey));
+    setStages([]);
+    setProgress({});
+    setSearchQuery('');
+  }
 
   useEffect(() => {
     if (!isOpen || !member || !groupId) {
@@ -50,24 +60,31 @@ export default function MemberProgressModal({
     let cancelled = false;
 
     async function loadProgress() {
-      setIsLoading(true);
-      setSearchQuery('');
+      try {
+        const progressStages = await fetchStudentProgress(groupId, member.accountId);
 
-      const progressStages = await fetchStudentProgress(groupId, member.accountId);
+        if (cancelled) return;
 
-      if (cancelled) return;
-
-      const nextProgress = {};
-      progressStages.forEach((stage) => {
-        stage.activities.forEach((activity) => {
-          nextProgress[activity.id] = activity.isCompleted;
+        const nextProgress = {};
+        progressStages.forEach((stage) => {
+          stage.activities.forEach((activity) => {
+            nextProgress[activity.id] = activity.isCompleted;
+          });
         });
-      });
 
-      initialProgressRef.current = { ...nextProgress };
-      setProgress(nextProgress);
-      setStages(sortProgressStagesNewestFirst(progressStages));
-      setIsLoading(false);
+        initialProgressRef.current = { ...nextProgress };
+        setProgress(nextProgress);
+        setStages(sortProgressStagesNewestFirst(progressStages));
+      } catch (err) {
+        if (cancelled) return;
+        console.error('Failed to load student progress:', err);
+        setProgress({});
+        setStages([]);
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
     }
 
     loadProgress();
@@ -75,7 +92,7 @@ export default function MemberProgressModal({
     return () => {
       cancelled = true;
     };
-  }, [isOpen, member, groupId]);
+  }, [isOpen, member?.accountId, groupId]);
 
   const visibleStages = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();

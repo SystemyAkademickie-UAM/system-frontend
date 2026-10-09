@@ -8,7 +8,7 @@ import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import { useLeaderDisplayPreferences } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { useUnsavedChangesGuard } from '../../../hooks/useUnsavedChangesGuard.js';
-import { Divider, CharacterLimitedField, Button, Modal, useToast } from '../../../components/ui/index.js';
+import { Divider, CharacterLimitedField, Button, LoadingSpinner, Modal, useToast } from '../../../components/ui/index.js';
 import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
 import AvatarPicker from '../../../components/ui/AvatarPicker/AvatarPicker.jsx';
 import { fetchAvatars, fetchProfile, updateProfile } from '../../../services/profile.api.js';
@@ -371,7 +371,9 @@ export default function SettingsContent() {
 
 
     setIsSaving(false);
+
     showSuccess(SUCMESSAGETEXT__TEXTLABEL[LANGUAGE]);
+
     return true;
   }, [
     DIVLANGUAGE,
@@ -488,7 +490,7 @@ export default function SettingsContent() {
       >
         <div className="settings-page__body">
         {isLoading ? (
-          <p className="settings-page__message page-unavailable__notice">Ładowanie ustawień…</p>
+          <LoadingSpinner size="lg" />
         ) : null}
 
         {!isLoading ? (

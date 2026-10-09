@@ -40,3 +40,4 @@ export {
   CatalogFilterGroup,
   CatalogSortSelect,
 } from './CatalogFilters/CatalogFilters.jsx';
+export { default as LoadingSpinner } from './LoadingSpinner/LoadingSpinner.jsx';

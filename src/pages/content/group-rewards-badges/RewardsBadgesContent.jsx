@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
   BADGE_RARITY,
+  BADGE_RARITY_LABELS,
   Button,
   CurrencyDisplay,
   DataTable,
@@ -10,6 +11,7 @@ import {
   CatalogFiltersToggle,
   CatalogSortSelect,
   getBadgeRarityConfig,
+  LoadingSpinner,
   SearchBar,
   useToast,
 } from '../../../components/ui/index.js';
@@ -31,12 +33,18 @@ import BadgeFormModal from './modals/BadgeFormModal.jsx';
 import BadgeGiveModal from './modals/BadgeGiveModal.jsx';
 import BadgeDeleteModal from './modals/BadgeDeleteModal.jsx';
 import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
+import GroupPeerProgressModal from '../group-shared/GroupPeerProgressModal/GroupPeerProgressModal.jsx';
+import { useGroupRankPathSettings } from '../../../hooks/groups/useGroupShopSchedule.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
 const CREATENEWBADGE__TEXTLABEL = {
   polish: 'Dodaj odznakę',
   english: 'Add Badge'
+};
 
+const SETTINGSBUTTON__TEXTLABEL = {
+  polish: 'Ustawienia',
+  english: 'Settings'
 };
 
 const LOADINBADGES__TEXTLABEL = {
@@ -96,12 +104,12 @@ const DELETEFAILMESSAGE__TEXTLABEL = {
 };
 
 const ALLOPUBLISHEDMESSAGE__TEXTLABEL = {
-  polish: 'Wszystkie odznaki są teraz widoczne.',
+  polish: 'Wszystkie odznaki są teraz widoczne dla studentów.',
   english: 'All badges are now visible to students.'
 };
 
 const ALLHIDDENMESSAGE__TEXTLABEL = {
-  polish: 'Wszystkie odznaki są teraz ukryte.',
+  polish: 'Wszystkie odznaki są teraz ukryte przed studentami.',
   english: 'All badges are now hidden from students.'
 };
 
@@ -111,18 +119,33 @@ const ALLTOGGLEFAILMESSAGE__TEXTLABEL = {
 };
 
 const PUBLISHMESSAGE__TEXTLABEL = {
-  polish: 'Odznaka jest teraz widoczna.',
+  polish: 'Odznaka jest teraz widoczna dla studentów.',
   english: 'Badge is now visible to students.'
 };
 
 const UNPUBLISHMESSAGE__TEXTLABEL = {
-  polish: 'Odznaka jest teraz ukryta.',
+  polish: 'Odznaka jest teraz ukryta przed studentami.',
   english: 'Badge is now hidden from students.'
 };
 
 const VISIBILITYTOGGLEFAILMESSAGE__TEXTLABEL = {
   polish: 'Nie udało się zmienić widoczności odznaki.',
   english: 'Failed to change badge visibility.'
+};
+
+const MEMBERSHIDDEN__TEXTLABEL = {
+  polish: 'Wyłączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility disabled.'
+};
+
+const MEMBERSVISIBLE__TEXTLABEL = {
+  polish: 'Włączono widoczność postępu uczestników.',
+  english: 'Participant progress visibility enabled.'
+};
+
+const MEMBERSVISIBLEFAIL__TEXTLABEL = {
+  polish: 'Nie udało się zapisać ustawienia widoczności uczestników.',
+  english: 'Failed to save participant visibility settings.'
 };
 
 const ROWACTIONDELETETEXT__TEXTLABEL = {
@@ -136,7 +159,7 @@ const ROWACTIONASSIGNTEXT__TEXTLABEL = {
 };
 
 const ROWACTIONASSIGNARIA__TEXTLABEL = {
-  polish: 'Przydziel odznakę',
+  polish: 'Przydziel odznakę studentom',
   english: 'Assign badge to students'
 };
 
@@ -156,7 +179,7 @@ const ROWACTIONVISIBILITYTEXT__TEXTLABEL = {
 };
 
 const ROWACTIONVISIBILITYDESC__TEXTLABEL = {
-  polish: 'Zmienia widoczność odznaki.',
+  polish: 'Zmienia widoczność odznaki dla studenta.',
   english: 'Changes badge visibility for students.'
 };
 
@@ -170,23 +193,13 @@ const TABLEPAGINATIONLABEL__TEXTLABEL = {
   english: 'Badge list page navigation'
 };
 
-const RARITYFILTERS__TEXTLABEL = {
-  polish: [
-    { id: 'all', label: 'Wszystkie' },
-    { id: BADGE_RARITY.common, label: 'Zwykła' },
-    { id: BADGE_RARITY.uncommon, label: 'Niezwykła' },
-    { id: BADGE_RARITY.rare, label: 'Rzadka' },
-    { id: BADGE_RARITY.epic, label: 'Epicka' },
-  ],
-  english: [
-    { id: 'all', label: 'All' },
-
-    { id: BADGE_RARITY.common, label: 'Common' },
-    { id: BADGE_RARITY.uncommon, label: 'Uncommon' },
-    { id: BADGE_RARITY.rare, label: 'Rare' },
-    { id: BADGE_RARITY.epic, label: 'Epic' },
-  ],
-};
+const RARITY_FILTERS = [
+  { id: 'all', label: 'Wszystkie' },
+  { id: BADGE_RARITY.common, label: BADGE_RARITY_LABELS.common },
+  { id: BADGE_RARITY.uncommon, label: BADGE_RARITY_LABELS.uncommon },
+  { id: BADGE_RARITY.rare, label: BADGE_RARITY_LABELS.rare },
+  { id: BADGE_RARITY.epic, label: BADGE_RARITY_LABELS.epic },
+];
 
 const BADGE_COLUMNS = [
   {
@@ -328,6 +341,8 @@ export default function RewardsBadgesContent() {
     handleToggleAllPublished,
   } = useGroupBadges();
 
+  const { showMemberAvatars, setShowMemberAvatarsSetting } = useGroupRankPathSettings(groupId);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [rarityFilter, setRarityFilter] = useState('all');
   const [sortBy, setSortBy] = useState(TREASURY_SORT.qualityDesc);
@@ -335,6 +350,7 @@ export default function RewardsBadgesContent() {
   const [activeModal, setActiveModal] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
 
   const openModal = useCallback((type, badge = null) => {
     setActiveModal({ type, badge });
@@ -354,7 +370,7 @@ export default function RewardsBadgesContent() {
     } else {
       showError(result.error || CREATEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
-  }, [handleCreate, closeModal, showSuccess, showError]);
+  }, [handleCreate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleEditConfirm = useCallback(async (values) => {
     if (!activeModal?.badge) return;
@@ -367,7 +383,7 @@ export default function RewardsBadgesContent() {
     } else {
       showError(result.error || EDITFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleUpdate, closeModal, showSuccess, showError]);
+  }, [activeModal, handleUpdate, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!activeModal?.badge) return;
@@ -380,7 +396,7 @@ export default function RewardsBadgesContent() {
     } else {
       showError(result.error || DELETEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
     }
-  }, [activeModal, handleDelete, closeModal, showSuccess, showError]);
+  }, [activeModal, handleDelete, closeModal, showSuccess, showError, LANGUAGE]);
 
   const handleGiveConfirm = useCallback(({ changed, error: giveError } = {}) => {
     if (giveError) {
@@ -390,7 +406,7 @@ export default function RewardsBadgesContent() {
     if (changed > 0) {
       showSuccess(BADGEUPDATEDMESSAGE__TEXTLABEL[LANGUAGE].replace('{count}', changed));
     }
-  }, [showSuccess, showError]);
+  }, [showSuccess, showError, LANGUAGE]);
 
   const handleTileEditBadge = useCallback((treasuryBadge) => {
     const badge = badges.find((entry) => entry.dbId === treasuryBadge.dbId);
@@ -418,7 +434,6 @@ export default function RewardsBadgesContent() {
     const result = await handleToggleAllPublished();
     setBulkVisibilityLoading(false);
 
-
     if (result.ok) {
       showSuccess(
         result.targetPublished
@@ -430,6 +445,16 @@ export default function RewardsBadgesContent() {
 
     showError(result.error || ALLTOGGLEFAILMESSAGE__TEXTLABEL[LANGUAGE]);
   }, [handleToggleAllPublished, showSuccess, showError, LANGUAGE]);
+
+  const handleSaveMemberAvatars = useCallback(async (value) => {
+    const result = await setShowMemberAvatarsSetting(value);
+    if (result.ok) {
+      showSuccess(value ? MEMBERSVISIBLE__TEXTLABEL[LANGUAGE] : MEMBERSHIDDEN__TEXTLABEL[LANGUAGE]);
+      return { ok: true };
+    }
+    showError(result.error ?? MEMBERSVISIBLEFAIL__TEXTLABEL[LANGUAGE]);
+    return { ok: false, error: result.error };
+  }, [setShowMemberAvatarsSetting, showSuccess, showError, LANGUAGE]);
 
   const rowActions = useMemo(() => ({
     onDelete: (badge) => openModal('delete', badge),
@@ -521,14 +546,25 @@ export default function RewardsBadgesContent() {
             'rewards-page__toolbar-end',
             isTileView ? 'rewards-page__toolbar-end--stacked' : '',
           ].filter(Boolean).join(' ')}>
-            <SearchBar
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder={BADGESEARCH__TEXTLABEL[LANGUAGE].placeholder}
-              name="badge-catalog-search"
-              className="rewards-page__search"
-              aria-label={BADGESEARCH__TEXTLABEL[LANGUAGE].label}
-            />
+            <div className="rewards-page__toolbar-row">
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                className="rewards-page__settings-btn"
+                onClick={() => setSettingsModalOpen(true)}
+              >
+                {SETTINGSBUTTON__TEXTLABEL[LANGUAGE]}
+              </Button>
+              <SearchBar
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={BADGESEARCH__TEXTLABEL[LANGUAGE].placeholder}
+                name="badge-catalog-search"
+                className="rewards-page__search"
+                aria-label={BADGESEARCH__TEXTLABEL[LANGUAGE].label}
+              />
+            </div>
             {isTileView ? (
               <div className="rewards-page__toolbar-filters-row">
                 <CatalogFiltersToggle
@@ -543,7 +579,7 @@ export default function RewardsBadgesContent() {
     >
 
       {isLoading ? (
-        <p className="rewards-page__loading page-unavailable__notice">{LOADINBADGES__TEXTLABEL[LANGUAGE]}</p>
+        <LoadingSpinner size="lg" />
       ) : badges.length === 0 ? (
         <p className="rewards-page__empty page-unavailable__notice">{NOBADGESMESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : isTileView ? (
@@ -552,7 +588,7 @@ export default function RewardsBadgesContent() {
             <CatalogFiltersPanel className="rewards-page__filters">
               <CatalogFilterGroup
                 ariaLabel={RARITYFILTERLABEL__TEXTLABEL[LANGUAGE]}
-                filters={RARITYFILTERS__TEXTLABEL[LANGUAGE]}
+                filters={RARITY_FILTERS}
                 activeId={rarityFilter}
                 onSelect={setRarityFilter}
               />
@@ -569,6 +605,7 @@ export default function RewardsBadgesContent() {
             searchQuery={searchQuery}
             rarityFilter={rarityFilter}
             sortBy={sortBy}
+            showMemberAvatars={true}
             onRarityFilterChange={setRarityFilter}
             onSortByChange={setSortBy}
             showLecturerActions
@@ -630,6 +667,13 @@ export default function RewardsBadgesContent() {
         onClose={closeModal}
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
+      />
+      <GroupPeerProgressModal
+        isOpen={isSettingsModalOpen}
+        currentValue={showMemberAvatars}
+        onSave={handleSaveMemberAvatars}
+        onClose={() => setSettingsModalOpen(false)}
+        LANGUAGE={LANGUAGE}
       />
     </SectionPageLayout>
   );

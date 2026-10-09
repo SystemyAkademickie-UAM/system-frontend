@@ -103,18 +103,19 @@ export default function RegisterProfile({
 
   return (
     <div className="auth-card auth-card--wizard-panel auth-card--left-aligned register-profile">
-      <button
-        type="button"
-        className="auth-card__back-link"
-        onClick={handleBack}
-        aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
-        disabled={isBootstrapping}
-      >
-        <BackIcon className="auth-card__back-icon" />
-        <span>{BACK_ARIALABEL__TEXTLABEL[LANGUAGE].toLowerCase()}</span>
-      </button>
+      <div className="auth-card__header">
+        <button
+          type="button"
+          className="auth-card__back-button"
+          onClick={handleBack}
+          aria-label={BACK_ARIALABEL__TEXTLABEL[LANGUAGE]}
+          disabled={isBootstrapping}
+        >
+          <BackIcon className="auth-card__back-icon" />
+        </button>
 
-      <h1 className="auth-card__title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
+        <h1 className="auth-card__title">{PAGE_TITLE__TEXTLABEL[LANGUAGE]}</h1>
+      </div>
 
       {errorMessage ? (
         <p className="login-institution__error" role="alert">{errorMessage}</p>

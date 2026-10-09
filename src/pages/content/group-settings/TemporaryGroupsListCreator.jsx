@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import SettingsSectionHeader from '../../../components/layout/sectionPage/SettingsSectionHeader.jsx';
-import { Button, Divider, CharacterLimitedField, useToast } from '../../../components/ui/index.js';
+import { Button, Divider, CharacterLimitedField, LoadingSpinner, useToast } from '../../../components/ui/index.js';
 import {
   GROUP_NAME_MAX_LENGTH,
   GROUP_SUBJECT_NAME_MAX_LENGTH,
@@ -305,83 +305,85 @@ export default function TemporaryGroupsListCreator({ popupclose }) {
       <section className="group-settings-form__panel" aria-label={GROUPSETTINGS__TEXTLABEL[LANGUAGE]}>
         <SettingsSectionHeader title={GENERALSECTION__TEXTLABEL[LANGUAGE]} id="group-settings-general-title" />
         {isLoadingGroup ? (
-          <p className="group-settings-form__hint">{LOADMESSAGE__TEXTLABEL[LANGUAGE]}</p>
-        ) : null}
+          <LoadingSpinner size="lg" />
+        ) : (
+          <>
+            <div className="group-settings-form__stack">
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-settings-name">
+                  {GROUPNAMETITLE__TEXTLABEL[LANGUAGE]}
+                  {groupnamevalueerror ? (
+                    <span className="group-settings-form__label-error">{groupnamevalueerror}</span>
+                  ) : null}
+                </label>
+                <CharacterLimitedField value={groupnamevalue} maxLength={GROUP_NAME_MAX}>
+                  <input
+                    id="group-settings-name"
+                    className="group-settings-form__input"
+                    value={groupnamevalue}
+                    maxLength={GROUP_NAME_MAX}
+                    onChange={(event) => onGroupnamechange(event.target.value)}
+                    disabled={isSaving || isLoadingGroup}
+                  />
+                </CharacterLimitedField>
+              </div>
 
-        <div className="group-settings-form__stack">
-          <div className="group-settings-form__field">
-            <label className="group-settings-form__label" htmlFor="group-settings-name">
-              {GROUPNAMETITLE__TEXTLABEL[LANGUAGE]}
-              {groupnamevalueerror ? (
-                <span className="group-settings-form__label-error">{groupnamevalueerror}</span>
-              ) : null}
-            </label>
-            <CharacterLimitedField value={groupnamevalue} maxLength={GROUP_NAME_MAX}>
-              <input
-                id="group-settings-name"
-                className="group-settings-form__input"
-                value={groupnamevalue}
-                maxLength={GROUP_NAME_MAX}
-                onChange={(event) => onGroupnamechange(event.target.value)}
-                disabled={isSaving || isLoadingGroup}
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-settings-subject">
+                  {SUBJECTNAMETITLE__TEXTLABEL[LANGUAGE]}
+                  {subjectnamevalueerror ? (
+                    <span className="group-settings-form__label-error">{subjectnamevalueerror}</span>
+                  ) : null}
+                </label>
+                <CharacterLimitedField value={subjectnamevalue} maxLength={SUBJECT_NAME_MAX}>
+                  <input
+                    id="group-settings-subject"
+                    className="group-settings-form__input"
+                    value={subjectnamevalue}
+                    maxLength={SUBJECT_NAME_MAX}
+                    onChange={(event) => onSubjectnamechange(event.target.value)}
+                    disabled={isSaving || isLoadingGroup}
+                  />
+                </CharacterLimitedField>
+              </div>
+
+              <div className="group-settings-form__field">
+                <label className="group-settings-form__label" htmlFor="group-settings-description">
+                  {GROUPDESCRIPTIONTITLE__TEXTLABEL[LANGUAGE]}
+                </label>
+                <CharacterLimitedField value={groupdescriptionvalue} maxLength={GROUP_DESCRIPTION_MAX}>
+                  <textarea
+                    id="group-settings-description"
+                    className="group-settings-form__textarea"
+                    value={groupdescriptionvalue}
+                    maxLength={GROUP_DESCRIPTION_MAX}
+                    onChange={(event) => onGroupdescriptionchange(event.target.value)}
+                    placeholder={GROUPDESCRIPTIONPLACEHOLDER__TEXTLABEL[LANGUAGE]}
+                    disabled={isSaving || isLoadingGroup}
+                  />
+                </CharacterLimitedField>
+              </div>
+            </div>
+
+            <Divider className="group-settings-form__section-divider" />
+
+            <SettingsSectionHeader title={BANNERSECTION__TEXTLABEL[LANGUAGE]} id="group-settings-banner-title" />
+            <div className="group-settings-form__field group-settings-form__field--banner">
+              <GroupBannerPicker
+                value={bannerSelection}
+                onChange={setBannerSelection}
+                className="group-settings-form__banner-picker"
               />
-            </CharacterLimitedField>
-          </div>
-
-          <div className="group-settings-form__field">
-            <label className="group-settings-form__label" htmlFor="group-settings-subject">
-              {SUBJECTNAMETITLE__TEXTLABEL[LANGUAGE]}
-              {subjectnamevalueerror ? (
-                <span className="group-settings-form__label-error">{subjectnamevalueerror}</span>
-              ) : null}
-            </label>
-            <CharacterLimitedField value={subjectnamevalue} maxLength={SUBJECT_NAME_MAX}>
-              <input
-                id="group-settings-subject"
-                className="group-settings-form__input"
-                value={subjectnamevalue}
-                maxLength={SUBJECT_NAME_MAX}
-                onChange={(event) => onSubjectnamechange(event.target.value)}
-                disabled={isSaving || isLoadingGroup}
-              />
-            </CharacterLimitedField>
-          </div>
-
-          <div className="group-settings-form__field">
-            <label className="group-settings-form__label" htmlFor="group-settings-description">
-              {GROUPDESCRIPTIONTITLE__TEXTLABEL[LANGUAGE]}
-            </label>
-            <CharacterLimitedField value={groupdescriptionvalue} maxLength={GROUP_DESCRIPTION_MAX}>
-              <textarea
-                id="group-settings-description"
-                className="group-settings-form__textarea"
-                value={groupdescriptionvalue}
-                maxLength={GROUP_DESCRIPTION_MAX}
-                onChange={(event) => onGroupdescriptionchange(event.target.value)}
-                placeholder={GROUPDESCRIPTIONPLACEHOLDER__TEXTLABEL[LANGUAGE]}
-                disabled={isSaving || isLoadingGroup}
-              />
-            </CharacterLimitedField>
-          </div>
-        </div>
-
-        <Divider className="group-settings-form__section-divider" />
-
-        <SettingsSectionHeader title={BANNERSECTION__TEXTLABEL[LANGUAGE]} id="group-settings-banner-title" />
-        <div className="group-settings-form__field group-settings-form__field--banner">
-          <GroupBannerPicker
-            value={bannerSelection}
-            onChange={setBannerSelection}
-            className="group-settings-form__banner-picker"
-          />
-        </div>
+            </div>
+          </>
+        )}
       </section>
 
       {errorMessage ? (
         <p className="group-settings-form__error" role="alert">{errorMessage}</p>
       ) : null}
 
-      {groupId ? (
+      {groupId && !isLoadingGroup ? (
         <Button
           type="button"
           variant="primary"
