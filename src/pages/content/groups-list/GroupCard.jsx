@@ -37,13 +37,10 @@ export default function GroupCard({ group }) {
   const { profile } = useUserProfile();
   const { role } = useAppRole();
 
-  var userNickname = '';
-  if (profile && profile.nickname) {
-    userNickname = profile.nickname;
-  }
+  var userNickname = profile.nickname;
 
   var displayLecturer = group.lecturer;
-  if (group.isMine && role == APP_ROLE.LECTURER && userNickname != '') {
+  if (group.isMine && role == APP_ROLE.LECTURER && !displayLecturer.startsWith(userNickname + ' (')) {
     displayLecturer = userNickname + ' (' + group.lecturer + ')';
   }
 

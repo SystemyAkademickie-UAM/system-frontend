@@ -10,8 +10,8 @@ const PRICELABEL__TEXTLABEL = {
 };
 
 const PRICETOOLTIP__TEXTLABEL = {
-  polish: 'Podstawowy koszt przedmiotu w sklepie przed naliczeniem zniżek.',
-  english: 'Base cost of the item in the shop before discounts.'
+  polish: 'Podstawowy koszt przedmiotu w sklepie (bez uwzględniania zniżek za rangę i odznaki).',
+  english: 'Base cost of the item in the shop (before the rank and badge discounts are applied).'
 };
 
 const MINPRICELABEL__TEXTLABEL = {

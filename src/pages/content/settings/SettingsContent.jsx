@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
@@ -30,135 +31,192 @@ import './SettingsContent.css';
 
 const LANGUAGESDICTIONARY = { polish: 'polski', english: 'English' };
 
-const SETTINGSLABELTEXT = {
+const PAGETITLE__TEXTLABEL = {
   polish: 'Ustawienia',
   english: 'Settings',
   japanese: '設定',
   kana: 'オプション',
 };
-const AVATARLABELTEXT = {
+
+const AVATARLABEL__TEXTLABEL = {
   polish: 'Awatar',
   english: 'Avatar',
   japanese: 'プロフィール画像',
   kana: 'アバタ'
 };
-const LANGUAGELABELTEXT = {
+
+const LANGUAGELABEL__TEXTLABEL = {
   polish: 'Język',
   english: 'LANGUAGE',
   japanese: '言語',
   kana: 'げんご'
 };
-const THEMELABELTEXT = {
+
+const THEMELABEL__TEXTLABEL = {
   polish: 'Motyw',
   english: 'Theme',
   japanese: 'テーマ',
   kana: 'テーマ'
 };
-const LOGINLABELTEXT = {
+
+const LOGINLABEL__TEXTLABEL = {
   polish: 'Logowanie',
   english: 'Login',
   japanese: 'ログイン',
   kana: 'ログイン',
 };
-const NICKNAMELABELTEXT = {
+
+const NICKNAMELABEL__TEXTLABEL = {
   polish: 'Ksywka',
   english: 'Nickname',
   japanese: '名前',
   kana: 'ニックネーム'
 };
-const HELPCENTER0LABELTEXT = {
+
+const HELPCENTER0__TEXTLABEL = {
   polish: 'Centrum Pomocy',
   english: 'Help Center',
   japanese: 'ヘルプセンター',
   kana: 'ヘルプセンター'
 };
-const HELPCENTER1LABELTEXT = {
+
+const HELPCENTER1__TEXTLABEL = {
   polish: '- informacje, dokumentacja i wsparcie',
   english: '- information, documentation, and support',
   japanese: '- 情報、ドキュメント、サポート',
   kana: '- じょうほう、ドキュメント、サポート',
 };
-const SHOWNICKNAMELABELTEXT = {
+
+const SHOWNICKNAMETOGGLE__TEXTLABEL = {
   polish: 'Wyświetlaj ksywkę',
   english: 'Show nickname',
   japanese: 'ニックネームを表示',
   kana: 'ニックネームをひょうじ',
 };
-const SHOWNICKNAMEDESCRIPTIONLABELTEXT = {
+
+const SHOWNICKNAMEDESC__TEXTLABEL = {
+
   polish: 'Ksywka staje się widoczna dla innych (wyświetlana jest dodatkowo obok imienia i nazwiska).',
   english: 'Your nickname becomes visible to other users (it is displayed alongside your first and last name).',
   japanese: 'ニックネームが他の利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
   kana: 'ニックネームがほかの利用者にも表示されるようになります（氏名の横に追加で表示されます）。',
+
 };
-const REMEMBERMELABELTEXT = {
+
+const REMEMBERMECHECK__TEXTLABEL = {
   polish: 'Zapamiętaj mnie',
   english: 'Remember me',
   japanese: 'ログイン状態を保持',
   kana: 'ログインじょうたいをほじ',
 };
-const REMEMBERMEDESCRIPTIONLABELTEXT = {
+
+const REMEMBERMECHECKDESC__TEXTLABEL = {
   polish: 'Automatycznie loguj i utrzymuj aktywną sesję na tym urządzeniu.',
   english: 'Automatically log in and maintain active session on this device.',
   japanese: 'この端末で自動的にログインしセッションを維持します。',
   kana: 'この端末でじどうてきにログインしセッションをいじします。',
 };
-const SAVEBUTTONLABELTEXT = {
+
+const SAVEBUTTON__TEXTLABEL = {
   polish: 'Zapisz zmiany',
   english: 'Save changes',
   japanese: '変更を保存',
-  kana: 'へんこうをほぞn'
+  kana: 'へんこうをほぞん'
 };
-const UNSAVEDCHANGESLABELTEXT = {
+
+const UNSAVEDCHANGESTITLE__TEXTLABEL = {
   polish: 'Niezapisane zmiany',
   english: 'Unsaved changes',
   japanese: '未保存の変更',
   kana: 'みほぞんのへんこう',
 };
-const UNSAVEDMESSAGESLABELTEXT = {
+
+const UNSAVEDMESSAGE__TEXTLABEL = {
   polish: 'Masz niezapisane zmiany na tej stronie. Czy chcesz je zapisać przed opuszczeniem?',
+
   english: 'You have unsaved changes on this page. Do you want to save them before leaving?',
   japanese: 'このページに未保存の変更があります。離れる前に保存しますか？',
   kana: 'このページにみほぞんのへんこうがあります。離れるまえにほぞんしますか？',
 };
-const UNSAVEDCANCELLABELTEXT = {
+
+const UNSAVEDCANCEL__TEXTLABEL = {
   polish: 'Anuluj',
   english: 'Cancel',
+
   japanese: 'キャンセル',
   kana: 'キャンセル'
 };
-const UNSAVEDDISCARDLABELTEXT = {
+
+const UNSAVEDDISCARD__TEXTLABEL = {
   polish: 'Odrzuć zmiany',
   english: 'Discard changes',
   japanese: '変更を破棄',
   kana: 'へんこうをはき',
 };
-const UNSAVEDSAVELABELTEXT = {
+
+const UNSAVEDSAVE__TEXTLABEL = {
   polish: 'Zapisz',
   english: 'Save',
+
   japanese: '保存',
   kana: 'ほぞん'
 };
 
-const EMPTYNICKNAMEERRORTEXT = {
+const PROFILEFETCHERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać profilu użytkownika',
+  english: 'Failed to fetch user profile',
+  japanese: 'ユーザープロファイルの取得に失敗しました',
+  kana: 'ユーザープロファイルのしとくにしっぱいしました'
+};
+
+const SAVESETTINGERROR__TEXTLABEL = {
+  polish: 'Nie udało się zapisać ustawień',
+  english: 'Failed to save settings',
+  japanese: '設定の保存に失敗しました',
+  kana: 'せちのほぞんにしっぱいしました'
+};
+
+const SUCMESSAGETEXT__TEXTLABEL = {
+  polish: 'Zmiany zostały zapisane.',
+  english: 'Changes have been saved.',
+  japanese: '変更が保存されました。',
+  kana: 'へんこうがほぞんされました。'
+};
+
+const ACCOUNTPREFARIA__TEXTLABEL = {
+  polish: 'Preferencje konta',
+  english: 'Account preferences',
+  japanese: 'アカウント設定',
+  kana: 'アカウントせっち'
+};
+
+const EMPTYNICKNAMEERROR__TEXTLABEL = {
   polish: 'Podaj ksywkę, aby zapisać zmiany.',
   english: 'Enter a nickname before saving your changes.',
+  japanese: '変更を保存する前にニックネームを入力してください。',
+  kana: 'へんこうをほぞるまえにニックネームをにいれてください。',
+
 };
 
 function resolveProfileSaveErrorMessage(error, language) {
   if (!error) {
     return null;
+
   }
 
   const normalized = Array.isArray(error) ? error.join(' ') : String(error);
   const lower = normalized.toLowerCase();
 
+
   if (
     lower.includes('pusty')
     || lower.includes('empty')
+
     || lower === 'forbidden'
     || lower.includes('nickname must not be empty')
   ) {
-    return EMPTYNICKNAMEERRORTEXT[language] ?? EMPTYNICKNAMEERRORTEXT.polish;
+    return EMPTYNICKNAMEERROR__TEXTLABEL[language] ?? EMPTYNICKNAMEERROR__TEXTLABEL.polish;
+
   }
 
   return normalized;
@@ -167,11 +225,14 @@ function resolveProfileSaveErrorMessage(error, language) {
 function RESOLVELANGUAGECODE(displayLANGUAGE) {
   if (displayLANGUAGE === 'polski') {
     return 'polish';
+
   }
   if (displayLANGUAGE === 'English') {
     return 'english';
+
   }
   return 'english';
+
 }
 
 export default function SettingsContent() {
@@ -204,7 +265,7 @@ export default function SettingsContent() {
       ]);
 
       if (!profile) {
-        throw new Error('Nie udało się pobrać profilu użytkownika');
+        throw new Error(PROFILEFETCHERROR__TEXTLABEL[LANGUAGE]);
       }
 
       setNickname(profile.nickname || '');
@@ -234,17 +295,18 @@ export default function SettingsContent() {
         ...(role === APP_ROLE.LECTURER ? { showNickname: profile.showNickname !== false } : {}),
       });
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Nie udało się pobrać ustawień');
+      setErrorMessage(error instanceof Error ? error.message : SAVESETTINGERROR__TEXTLABEL[LANGUAGE]);
     } finally {
       setIsLoading(false);
+
     }
-  }, [role]);
+  }, [role, LANGUAGE]);
 
   const persistSettings = useCallback(async () => {
     const trimmedNickname = nickname.trim();
 
     if (!trimmedNickname) {
-      const message = EMPTYNICKNAMEERRORTEXT[LANGUAGE] ?? EMPTYNICKNAMEERRORTEXT.polish;
+      const message = EMPTYNICKNAMEERROR__TEXTLABEL[LANGUAGE] ?? EMPTYNICKNAMEERROR__TEXTLABEL.polish;
       setErrorMessage(message);
       showError(message);
       return false;
@@ -275,11 +337,13 @@ export default function SettingsContent() {
     if (!result.ok) {
       setIsSaving(false);
       const message = resolveProfileSaveErrorMessage(result.error, LANGUAGE)
-        || 'Nie udało się zapisać ustawień';
+        || SAVESETTINGERROR__TEXTLABEL[LANGUAGE];
+
       setErrorMessage(message);
       showError(message);
       return false;
     }
+
 
     const savedNickname = result.profile?.nickname ?? trimmedNickname;
     setNickname(savedNickname);
@@ -305,8 +369,11 @@ export default function SettingsContent() {
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
 
+
     setIsSaving(false);
-    showSuccess('Zmiany zostały zapisane.');
+
+    showSuccess(SUCMESSAGETEXT__TEXTLABEL[LANGUAGE]);
+
     return true;
   }, [
     DIVLANGUAGE,
@@ -338,6 +405,7 @@ export default function SettingsContent() {
 
     if (RESOLVELANGUAGECODE(DIVLANGUAGE) !== savedSnapshot.LANGUAGE) {
       return true;
+
     }
 
     if (draftTheme !== savedSnapshot.theme) {
@@ -371,6 +439,7 @@ export default function SettingsContent() {
     discardChanges,
     saveAndContinue,
   } = useUnsavedChangesGuard({
+
     when: isDirty && !isSaving,
     onSave: persistSettings,
   });
@@ -411,11 +480,13 @@ export default function SettingsContent() {
     loadSettings();
   }, [loadSettings]);
 
+
   return (
     <div className="app-page-layout">
       <SectionPageLayout
         className="page-unavailable settings-page group-settings-page"
-        title={SETTINGSLABELTEXT[LANGUAGE]}
+
+        title={PAGETITLE__TEXTLABEL[LANGUAGE]}
       >
         <div className="settings-page__body">
         {isLoading ? (
@@ -425,7 +496,7 @@ export default function SettingsContent() {
         {!isLoading ? (
           <div className="group-settings-form group-settings-form--drive-layout">
             <section className="group-settings-form__panel" aria-labelledby="settings-avatar-title">
-              <SettingsSectionHeader id="settings-avatar-title" title={AVATARLABELTEXT[LANGUAGE]} />
+              <SettingsSectionHeader id="settings-avatar-title" title={AVATARLABEL__TEXTLABEL[LANGUAGE]} />
               <AvatarPicker
                 avatars={avatars}
                 value={selectedAvatarId}
@@ -438,11 +509,12 @@ export default function SettingsContent() {
 
             <Divider className="settings-page__divider" length="50%" />
 
-            <section className="settings-page__preferences" aria-label="Preferencje konta">
-              <SettingsSectionHeader title={NICKNAMELABELTEXT[LANGUAGE]} id="settings-nickname-title" />
+
+            <section className="settings-page__preferences" aria-label={ACCOUNTPREFARIA__TEXTLABEL[LANGUAGE]}>
+              <SettingsSectionHeader title={NICKNAMELABEL__TEXTLABEL[LANGUAGE]} id="settings-nickname-title" />
               <div className="settings-page__field group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="settings-nickname">
-                  {NICKNAMELABELTEXT[LANGUAGE]}
+                  {NICKNAMELABEL__TEXTLABEL[LANGUAGE]}
                 </label>
                 <CharacterLimitedField value={nickname} maxLength={SETTINGS_NICKNAME_MAX_LENGTH}>
                   <input
@@ -466,15 +538,16 @@ export default function SettingsContent() {
                       onChange={(event) => setDraftShowNickname(event.target.checked)}
                       disabled={isSaving}
                     />
-                    <span className="group-settings-form__label">{SHOWNICKNAMELABELTEXT[LANGUAGE]}</span>
+                    <span className="group-settings-form__label">{SHOWNICKNAMETOGGLE__TEXTLABEL[LANGUAGE]}</span>
                   </label>
-                  <p className="group-settings-form__hint">{SHOWNICKNAMEDESCRIPTIONLABELTEXT[LANGUAGE]}</p>
+                  <p className="group-settings-form__hint">{SHOWNICKNAMEDESC__TEXTLABEL[LANGUAGE]}</p>
                 </div>
               ) : null}
 
+
               <Divider className="settings-page__divider" length="50%" />
 
-              <SettingsSectionHeader title={LOGINLABELTEXT[LANGUAGE]} id="settings-login-title" />
+              <SettingsSectionHeader title={LOGINLABEL__TEXTLABEL[LANGUAGE]} id="settings-login-title" />
               <div className="settings-page__field settings-page__field--toggle">
                 <label className="settings-page__toggle">
                   <input
@@ -483,14 +556,14 @@ export default function SettingsContent() {
                     onChange={(event) => setDraftRememberMe(event.target.checked)}
                     disabled={isSaving}
                   />
-                  <span className="group-settings-form__label">{REMEMBERMELABELTEXT[LANGUAGE]}</span>
+                  <span className="group-settings-form__label">{REMEMBERMECHECK__TEXTLABEL[LANGUAGE]}</span>
                 </label>
-                <p className="group-settings-form__hint">{REMEMBERMEDESCRIPTIONLABELTEXT[LANGUAGE]}</p>
+                <p className="group-settings-form__hint">{REMEMBERMECHECKDESC__TEXTLABEL[LANGUAGE]}</p>
               </div>
 
               <Divider className="settings-page__divider" length="50%" />
 
-              <SettingsSectionHeader title={THEMELABELTEXT[LANGUAGE]} id="settings-theme-title" />
+              <SettingsSectionHeader title={THEMELABEL__TEXTLABEL[LANGUAGE]} id="settings-theme-title" />
               <div className="settings-page__theme-radio-group" role="radiogroup" aria-labelledby="settings-theme-title">
                 {getThemeOptions().map((option) => {
                   const isSelected = draftTheme === option.id;
@@ -505,6 +578,7 @@ export default function SettingsContent() {
                         value={option.id}
                         checked={isSelected}
                         onChange={() => {
+
                           setDraftTheme(option.id);
                           applyTheme(option.id);
                         }}
@@ -519,10 +593,10 @@ export default function SettingsContent() {
 
               <Divider className="settings-page__divider" length="50%" />
 
-              <SettingsSectionHeader title={LANGUAGELABELTEXT[LANGUAGE]} id="settings-LANGUAGE-title" />
+              <SettingsSectionHeader title={LANGUAGELABEL__TEXTLABEL[LANGUAGE]} id="settings-LANGUAGE-title" />
               <div className="settings-page__field group-settings-form__field">
                 <label className="group-settings-form__label" htmlFor="settings-LANGUAGE">
-                  {LANGUAGELABELTEXT[LANGUAGE]}
+                  {LANGUAGELABEL__TEXTLABEL[LANGUAGE]}
                 </label>
                 <select
                   id="settings-LANGUAGE"
@@ -540,13 +614,14 @@ export default function SettingsContent() {
 
             <Divider className="settings-page__divider" length="50%" />
 
+
             <div className="settings-page__footer">
               <p className="settings-page__help-text">
                 <Link className="settings-page__help-link" to={appHelpPath()}>
-                  {HELPCENTER0LABELTEXT[LANGUAGE]}
+                  {HELPCENTER0__TEXTLABEL[LANGUAGE]}
                 </Link>
                 {' '}
-                <span>{HELPCENTER1LABELTEXT[LANGUAGE]}</span>
+                <span>{HELPCENTER1__TEXTLABEL[LANGUAGE]}</span>
               </p>
             </div>
           </div>
@@ -561,35 +636,39 @@ export default function SettingsContent() {
             onClick={persistSettings}
             disabled={isSaving}
           >
-            {SAVEBUTTONLABELTEXT[LANGUAGE]}
+            {SAVEBUTTON__TEXTLABEL[LANGUAGE]}
           </Button>
         ) : null}
 
         <Modal
           isOpen={isPromptOpen}
           onClose={dismissPrompt}
-          title={UNSAVEDCHANGESLABELTEXT[LANGUAGE]}
-          subtitle={UNSAVEDMESSAGESLABELTEXT[LANGUAGE]}
+          title={UNSAVEDCHANGESTITLE__TEXTLABEL[LANGUAGE]}
+          subtitle={UNSAVEDMESSAGE__TEXTLABEL[LANGUAGE]}
           showFooter={false}
           className="settings-page__unsaved-modal"
         >
           <div className="settings-page__unsaved-actions">
             <Button type="button" variant="secondary" size="md" onClick={dismissPrompt}>
-              {UNSAVEDCANCELLABELTEXT[LANGUAGE]}
+              {UNSAVEDCANCEL__TEXTLABEL[LANGUAGE]}
             </Button>
             <Button type="button" variant="secondary" size="md" onClick={handleDiscard}>
-              {UNSAVEDDISCARDLABELTEXT[LANGUAGE]}
+
+              {UNSAVEDDISCARD__TEXTLABEL[LANGUAGE]}
             </Button>
             <Button
               type="button"
+
               variant="primary"
               size="md"
               onClick={saveAndContinue}
               disabled={isSaving}
+
             >
-              {UNSAVEDSAVELABELTEXT[LANGUAGE]}
+              {UNSAVEDSAVE__TEXTLABEL[LANGUAGE]}
             </Button>
           </div>
+
         </Modal>
 
         {errorMessage ? (
@@ -599,4 +678,5 @@ export default function SettingsContent() {
       </SectionPageLayout>
     </div>
   );
+
 }

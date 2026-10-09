@@ -27,4 +27,8 @@
   .super-bar-breadcrumb-mobile .super-bar-breadcrumb__sep {
     color: var(--color-text-secondary);
   }
+  
+  .super-bar-breadcrumb-mobile .super-bar-breadcrumb__home-icon {
+    color: var(--color-text-secondary);
+  }
 }
