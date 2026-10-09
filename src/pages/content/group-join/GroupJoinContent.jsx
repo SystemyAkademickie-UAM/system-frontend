@@ -117,7 +117,9 @@ export default function GroupJoinContent() {
     () => validateAlphanumericInput(codeInput, ENROLLMENT_ENTRY_CODE_MAX_LENGTH),
     [codeInput],
   );
-  const showValidationError = codeInput.trim() !== '' && !validation.valid;
+
+  const isCodeComplete = codeInput.length > 0 && validation.valid;
+  const showValidationError = codeInput.trim() !== '' && !validation.valid && codeInput.length > 0;
 
   useEffect(() => {
     if (isLoading || !group || !hasAccess || !groupId) {

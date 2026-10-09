@@ -254,7 +254,7 @@ export function useGroupActivities() {
 
       const newStageId = data?.stage;
       if (typeof newStageId === 'number' && newStageId > 0) {
-        const orderedStageIds = [newStageId, ...stages.map((stage) => stage.id)];
+        const orderedStageIds = [...stages.map((stage) => stage.id), newStageId];
         await postJson('/stages', {
           method: 'reorder',
           groupId: Number(groupId),

@@ -101,7 +101,7 @@ const RANKRESTRICTION__TEXTLABEL = {
 };
 
 const RANKRESTRICTIONYES__TEXTLABEL = {
-  polish: 'Tak (Wymagana ranga:)',
+  polish: 'Tak (Wymagana ranga:',
   english: 'Yes (Required rank:'
 };
 
