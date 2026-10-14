@@ -149,6 +149,7 @@ export default function GroupSettingsHealthContentWindow({
   liveslabel,
   livesicon,
   liveslimit,
+  updatelives
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
@@ -409,7 +410,7 @@ export default function GroupSettingsHealthContentWindow({
       if (!result.ok) {
         throw new Error(result.error ?? LIVESUPDATEERROR__TEXTLABEL[LANGUAGE]);
       }
-
+      updatelives();
       showSuccess(LIVESUPDATEDSUCCESS__TEXTLABEL[LANGUAGE]);
       // Uaktualniamy initialLives na obecne
       setStudents((prev) => prev.map((s) => ({
