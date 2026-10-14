@@ -36,6 +36,7 @@ import {
 
  * @property {string} nickname
 
+
  * @property {string} legalName - Imię i nazwisko
 
  * @property {string} email
@@ -51,6 +52,7 @@ import {
  * @property {number} totalCurrency
 
  * @property {number} badgesCount
+
  * @property {boolean} autoRankEnabled
  */
 
@@ -87,6 +89,7 @@ function mapStudentToMember(student, index, ranksMap, badgesCount) {
 
     id: `member-${student.enrollmentId}`,
 
+
     enrollmentId: student.enrollmentId,
 
     accountId: student.accountId,
@@ -112,6 +115,8 @@ function mapStudentToMember(student, index, ranksMap, badgesCount) {
     totalCurrency: student.totalEarned,
 
     badgesCount,
+
+    lives: student.lives,
 
     autoRankEnabled: student.autoRankEnabled !== false,
 
@@ -509,5 +514,6 @@ export function useGroupMembers() {
   };
 
 }
+
 
 

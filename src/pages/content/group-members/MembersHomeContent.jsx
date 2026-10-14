@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
+
 import { Link } from 'react-router-dom';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
-import { DataTable, CurrencyDisplay, LoadingSpinner, SearchBar, useToast } from '../../../components/ui/index.js';
+import { DataTable, CurrencyDisplay, LoadingSpinner, SearchBar, useToast, Button } from '../../../components/ui/index.js';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useGroupSubNav from '../../../navigation/useGroupSubNav.js';
@@ -13,6 +14,8 @@ import '../group-members/MembersHomeContent.css';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { useGroupMembers } from './useGroupMembers.js';
 import MembersTableRow from './MembersTableRow.jsx';
+import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
+import LivesIcon from '../../../components/ui/Lives/LivesIcon.jsx';
 
 import MemberBadgesModal from './modals/MemberBadgesModal.jsx';
 import MemberCurrencyModal from './modals/MemberCurrencyModal.jsx';
@@ -20,6 +23,7 @@ import MemberTotalEarnedModal from './modals/MemberTotalEarnedModal.jsx';
 import MemberDeleteModal from './modals/MemberDeleteModal.jsx';
 import MemberProgressModal from './modals/MemberProgressModal.jsx';
 import MemberRankModal from './modals/MemberRankModal.jsx';
+import GroupSettingsHealthContentWindow from '../group-settings-health/GroupSettingsHealthContentWindow.jsx';
 
 import './MembersHomeContent.css';
 
@@ -30,7 +34,8 @@ const AUTO_RANK_ENABLED__TEXTLABEL = { polish: 'Włączono rangę automatyczną.
 const RANK_ASSIGNED__TEXTLABEL = { polish: 'Przyznano rangę: ${rankName}.', english: 'Rank assigned: ${rankName}.' };
 const PARTICIPANT_REMOVED__TEXTLABEL = { polish: 'Uczestnik został usunięty z grupy.', english: 'Participant has been removed from the group.' };
 const COLUMN_POSITION__TEXTLABEL = { polish: 'Numer', english: 'Number' };
-const COLUMN_MEMBER__TEXTLABEL = { polish: 'Członek grupy', english: 'Group member' };
+const COLUMN_NICKNAME__TEXTLABEL = { polish: 'Ksywka', english: 'Nickname' };
+const COLUMN_NAME__TEXTLABEL = { polish: 'Imię', english: 'First name' };
 const COLUMN_EMAIL__TEXTLABEL = { polish: 'E-mail', english: 'E-mail' };
 const COLUMN_RANK__TEXTLABEL = { polish: 'Ranga', english: 'Rank' };
 const COLUMN_BADGES__TEXTLABEL = { polish: 'Odznaki', english: 'Badges' };
@@ -52,6 +57,8 @@ const SEARCH_ARIA_LABEL__TEXTLABEL = { polish: 'Szukaj członka grupy', english:
 const LOADING_MESSAGE__TEXTLABEL = { polish: 'Ładowanie członków grupy…', english: 'Loading group members…' };
 const EMPTY_MESSAGE__TEXTLABEL = { polish: 'Brak członków w tej grupie.', english: 'No members in this group.' };
 const PAGINATION_ARIA_LABEL__TEXTLABEL = { polish: 'Nawigacja stron listy uczestników', english: 'Participants list page navigation' };
+const MANAGEBUTTON__TEXTLABEL = { polish: 'Zarządzanie szansami', english: 'Manage student lives' };
+const COLUMN_CHANCES__TEXTLABEL = { polish: 'Szanse', english: 'Chances' };
 
 function renderMemberNameLines(member) {
   const nickname = member.nickname?.trim() || '';
@@ -64,7 +71,7 @@ function renderMemberNameLines(member) {
   return (
     <>
       <span className="members-table__name">{primary}</span>
-      {legalLine ? <span className="members-table__nickname">{legalLine}</span> : null}
+      {legalLine ? <span className="members-table__nickname">{}</span> : null}
     </>
   );
 }
@@ -72,7 +79,9 @@ function renderMemberNameLines(member) {
 export default function MembersHomeContent() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const nav = useGroupSubNav('group-members');
+
   const { showSuccess } = useToast();
+  const { livesEnabled } = useGroupLives();
   const {
     groupId,
     members,
@@ -82,6 +91,7 @@ export default function MembersHomeContent() {
     isLoading,
     error,
     refetchWithRankNotice,
+    refetch,
     deleteMember,
     updateMemberRank,
     updateMemberCurrency,
@@ -91,6 +101,7 @@ export default function MembersHomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [isManageOpen, setIsManageOpen] = useState(false);
 
   const openModal = useCallback((type, member) => {
     setActiveModal({ type, member });
@@ -201,13 +212,14 @@ export default function MembersHomeContent() {
       ),
     },
     {
-      key: 'name',
-      label: COLUMN_MEMBER__TEXTLABEL[LANGUAGE],
+      key: 'nickname',
+      label: COLUMN_NICKNAME__TEXTLABEL[LANGUAGE],
       sort: 'text',
       className: 'members-table__th--user',
       colClassName: 'members-table__col--user',
       cellClassName: 'members-table__cell--user',
       render: (member) => (
+
         <div className="members-table__user">
           <span className="members-table__avatar-wrap">
             <img
@@ -233,10 +245,21 @@ export default function MembersHomeContent() {
             {!member.isLecturer ? (
               <span className="members-table__mobile-total">
                 <CurrencyDisplay amount={member.totalCurrency} size="sm" />
+
               </span>
             ) : null}
           </div>
         </div>
+      ),
+    },
+    {
+      key: 'legalName',
+      label: COLUMN_NAME__TEXTLABEL[LANGUAGE],
+      width: '128px',
+      render: (member) => (
+        <span className="members-table__cell-text">
+          {member.legalName}
+        </span>
       ),
     },
     {
@@ -258,7 +281,7 @@ export default function MembersHomeContent() {
       key: 'rank',
       label: COLUMN_RANK__TEXTLABEL[LANGUAGE],
       sort: { type: 'custom', order: rankNames },
-      width: '140px',
+      width: '96px',
       className: 'members-table__th--rank',
       colClassName: 'members-table__col--rank',
       cellClassName: 'members-table__cell--rank',
@@ -269,10 +292,12 @@ export default function MembersHomeContent() {
           <span className="members-table__cell-text">{member.rank}</span>
           {member.autoRankEnabled === false ? (
             <span className="members-table__rank-manual-note">*przyznawana ręcznie</span>
+
           ) : null}
         </span>
       ),
     },
+
     {
       key: 'badgesCount',
       label: COLUMN_BADGES__TEXTLABEL[LANGUAGE],
@@ -286,10 +311,12 @@ export default function MembersHomeContent() {
       render: (member) => (
         <span className="members-table__stat">
           {member.isLecturer ? '—' : member.badgesCount}
+
         </span>
       ),
     },
     {
+
       key: 'currency',
       label: COLUMN_CURRENCY__TEXTLABEL[LANGUAGE],
       sort: 'number',
@@ -298,22 +325,27 @@ export default function MembersHomeContent() {
       colClassName: 'members-table__col--currency',
       cellClassName: 'members-table__cell--currency',
       hiddenBelow: 480,
+
       mobileHidden: true,
       render: (member) => (
         member.isLecturer
           ? <span className="members-table__stat">—</span>
+
           : <CurrencyDisplay amount={member.currency} size="sm" />
       ),
     },
     {
+
       key: 'totalCurrency',
       label: COLUMN_TOTAL_CURRENCY__TEXTLABEL[LANGUAGE],
       sort: 'number',
       width: '110px',
       className: 'members-table__th--total',
       colClassName: 'members-table__col--total',
+
       cellClassName: 'members-table__cell--total',
       hiddenBelow: 768,
+
       mobileHidden: true,
       render: (member) => (
         member.isLecturer
@@ -323,13 +355,40 @@ export default function MembersHomeContent() {
     },
   ], [groupId, rankNames]);
 
+  const chancesColumn = useMemo(() => {
+    if (!livesEnabled) {
+      return null;
+    }
+    return [
+      {
+        key: 'lives',
+        label: COLUMN_CHANCES__TEXTLABEL[LANGUAGE],
+        sort: 'number',
+        width: '100px',
+        className: 'members-table__th--lives',
+        colClassName: 'members-table__col--lives',
+        cellClassName: 'members-table__cell--lives',
+        hiddenBelow: 480,
+        mobileHidden: true,
+        render: (member) => (
+          member.isLecturer
+            ? <span className="members-table__stat">—</span>
+            : <CurrencyDisplay amount={member.lives} size="sm" />
+        ),
+      },
+    ];
+  });
+
+
   const rowActions = useMemo(() => ({
     onDelete: (member) => openModal('delete', member),
     deleteLabel: ROW_DELETE_LABEL__TEXTLABEL[LANGUAGE],
+
     deleteAriaLabel: (member) => `${ROW_DELETE_LABEL__TEXTLABEL[LANGUAGE]} ${member.name}`,
     inlineActions: [
       {
         id: 'badges',
+
         label: ROW_BADGES_LABEL__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.nav.profileBadges,
         iconClassName: 'data-table__inline-icon--badge-award',
@@ -342,6 +401,7 @@ export default function MembersHomeContent() {
         label: ROW_PROGRESS_LABEL__TEXTLABEL[LANGUAGE],
         iconFile: SVG_ICONS.actions.manageProgress,
         ariaLabel: ROW_PROGRESS_ARIA__TEXTLABEL[LANGUAGE],
+
         onSelect: (member) => openModal('progress', member),
       },
     ],
@@ -349,18 +409,22 @@ export default function MembersHomeContent() {
       {
         id: 'rank',
         label: ROW_RANK_LABEL__TEXTLABEL[LANGUAGE],
+
         description: ROW_RANK_DESC__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('rank', member),
       },
       {
+
         id: 'currency',
         label: ROW_CURRENCY_LABEL__TEXTLABEL[LANGUAGE],
         description: ROW_CURRENCY_DESC__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('currency', member),
+
       },
       {
         id: 'totalEarned',
         label: ROW_TOTAL_EARNED_LABEL__TEXTLABEL[LANGUAGE],
+
         description: ROW_TOTAL_EARNED_DESC__TEXTLABEL[LANGUAGE],
         onSelect: (member) => openModal('totalEarned', member),
       },
@@ -368,6 +432,7 @@ export default function MembersHomeContent() {
   }), [openModal, LANGUAGE]);
 
   const modalMember = activeModal?.member ?? null;
+
 
   if (error) {
     return (
@@ -378,6 +443,7 @@ export default function MembersHomeContent() {
         subNavAriaLabel={nav.ariaLabel}
       >
         <p className="members-page__error" role="alert">{error}</p>
+
       </SectionPageLayout>
     );
   }
@@ -390,14 +456,27 @@ export default function MembersHomeContent() {
       subNavAriaLabel={nav.ariaLabel}
       toolbar={(
         <div className="maq-section-page__toolbar-end">
-          <SearchBar
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
-            name="member-search"
-            className="members-page__search"
-            aria-label={SEARCH_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
-          />
+          <div style={{display: "flex", alignItems: "center", gap: "1%"}}>
+            {livesEnabled ? (
+              <Button
+                type="button"
+                variant="secondary"
+
+                size="sm"
+                onClick={() => setIsManageOpen(true)}
+              >
+                {MANAGEBUTTON__TEXTLABEL[LANGUAGE]}
+              </Button>
+            ) : null}
+            <SearchBar
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder={SEARCH_PLACEHOLDER__TEXTLABEL[LANGUAGE]}
+              name="member-search"
+              className="members-page__search"
+              aria-label={SEARCH_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
+            />
+          </div>
         </div>
       )}
     >
@@ -408,7 +487,7 @@ export default function MembersHomeContent() {
         <p className="members-page__empty page-unavailable__notice">{EMPTY_MESSAGE__TEXTLABEL[LANGUAGE]}</p>
       ) : (
         <DataTable
-          columns={memberColumns}
+          columns={[...memberColumns, ...(chancesColumn || [])]}
           data={members}
           rowKey="id"
           tiebreakerKey="position"
@@ -416,6 +495,7 @@ export default function MembersHomeContent() {
           paginationAriaLabel={PAGINATION_ARIA_LABEL__TEXTLABEL[LANGUAGE]}
           search={{
             external: true,
+
             value: searchQuery,
             filter: (member, query) => (
               member.name.toLowerCase().includes(query)
@@ -450,6 +530,7 @@ export default function MembersHomeContent() {
       />
       <MemberCurrencyModal
         isOpen={activeModal?.type === 'currency'}
+
         member={modalMember}
         onClose={closeModal}
         onConfirm={handleCurrencyConfirm}
@@ -477,6 +558,14 @@ export default function MembersHomeContent() {
         onConfirm={handleDeleteConfirm}
         isLoading={modalLoading}
       />
+
+      {isManageOpen ? (
+        <GroupSettingsHealthContentWindow
+          popupclose={() => setIsManageOpen(false)}
+          updatelives={refetch}
+          groupId={groupId}
+        />
+      ) : null}
     </SectionPageLayout>
   );
 }

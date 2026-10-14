@@ -395,6 +395,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       if (item.isExtraLife === true) {
         setIsEditingExtraLife(true);
         const resolved = resolveExtraLifeItemIcon(livesSymbol);
+        loadedIcon = resolved.emoji;
         setCurrentIcon(resolved.emoji);
         setIconBackground(resolved.iconBackground);
       } else {

@@ -95,6 +95,16 @@ const ERROR_DELETE__TEXTLABEL = {
   english: 'Failed to delete category.'
 };
 
+const NAME_REQUIRED_ERROR__TEXTLABEL = {
+  polish: 'Podaj nazwę kategorii.',
+  english: 'Please enter a category name.'
+};
+
+const COLOR_PICKER_TITLE__TEXTLABEL = {
+  polish: 'Wybierz kolor kategorii',
+  english: 'Choose category color'
+};
+
 export default function ShopCategoriesModal({
   isOpen,
   groupId,
@@ -102,7 +112,7 @@ export default function ShopCategoriesModal({
   onClose,
   onChanged,
 }) {
-  const LANGUAGE = READLANGUAGECOOKIE();
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -135,7 +145,7 @@ export default function ShopCategoriesModal({
   const handleSave = useCallback(async () => {
     const name = form.name.trim();
     if (!name) {
-      showError('Podaj nazwę kategorii.');
+      showError(NAME_REQUIRED_ERROR__TEXTLABEL[LANGUAGE]);
       return;
     }
 
@@ -270,7 +280,7 @@ export default function ShopCategoriesModal({
               <ColorPickerField
                 value={form.color}
                 onChange={(newColor) => setForm((current) => ({ ...current, color: newColor }))}
-                title="Wybierz kolor kategorii"
+                title={COLOR_PICKER_TITLE__TEXTLABEL[LANGUAGE]}
               />
             </div>
             <div className="shop-categories-modal__editor-actions">
