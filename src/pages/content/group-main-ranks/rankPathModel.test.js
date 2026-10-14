@@ -41,6 +41,7 @@ describe('rankPathModel', () => {
 
     const mapped = mapStudentForRankPath({
       accountId: 42,
+      position: 1,
       nickname: 'Jan',
       avatarUrl: null,
       rankId: null,
@@ -50,5 +51,6 @@ describe('rankPathModel', () => {
 
     expect(mapped.rankId).toBe('rank-2');
     expect(mapped.dbRankId).toBe(2);
+    expect(mapped.position).toBe(1);
   });
 });

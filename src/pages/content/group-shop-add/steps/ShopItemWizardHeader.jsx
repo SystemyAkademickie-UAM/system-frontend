@@ -3,8 +3,8 @@ import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 
 const STAGE_TITLES = {
   1: { polish: 'Informacje', english: 'Information' },
-  2: { polish: 'Wartość przedmiotu', english: 'Item Value' },
-  3: { polish: 'Dostępność', english: 'Availability' },
+  2: { polish: 'Dostępność', english: 'Availability' },
+  3: { polish: 'Wartość przedmiotu', english: 'Item Value' },
   4: { polish: 'Podsumowanie', english: 'Summary' },
 };
 
@@ -43,9 +43,11 @@ export default function ShopItemWizardHeader({
         <span className="shop-item-wizard-header__divider" aria-hidden="true">•</span>
         <span className="shop-item-wizard-header__stage-title">{stageTitle}</span>
       </div>
-      <div className="shop-item-wizard-header__indicator" aria-label={`Krok ${currentStep} z ${totalSteps}`}>
-        <span className="shop-item-wizard-header__badge">{currentStep}/{totalSteps}</span>
-      </div>
+      {!isEditing && (
+        <div className="shop-item-wizard-header__indicator" aria-label={`Krok ${currentStep} z ${totalSteps}`}>
+          <span className="shop-item-wizard-header__badge">{currentStep}/{totalSteps}</span>
+        </div>
+      )}
     </div>
   );
 }

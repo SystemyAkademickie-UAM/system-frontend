@@ -145,5 +145,9 @@ export function getShopStrikePriceHint(display) {
  * @returns {number}
  */
 export function compareShopItemsByEffectivePrice(left, right) {
-  return getShopItemEffectivePrice(left) - getShopItemEffectivePrice(right);
+  const priceLeft = Number(getShopItemEffectivePrice(left));
+  const priceRight = Number(getShopItemEffectivePrice(right));
+  const safeLeft = Number.isFinite(priceLeft) ? priceLeft : 0;
+  const safeRight = Number.isFinite(priceRight) ? priceRight : 0;
+  return safeLeft - safeRight;
 }

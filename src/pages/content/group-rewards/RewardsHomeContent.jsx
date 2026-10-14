@@ -211,8 +211,9 @@ export default function RewardsHomeContent() {
       label: COLNUMBER__TEXTLABEL[LANGUAGE],
       sort: 'number',
       width: '90px',
-      render: (rank) => (
-        <span className="rewards-table__position">#{rank.position}</span>
+      accessor: (rank) => Number(rank.position ?? 0),
+      render: (rank, rowIndex) => (
+        <span className="rewards-table__position">#{rowIndex != null ? rowIndex + 1 : rank.position}</span>
       ),
     },
     {

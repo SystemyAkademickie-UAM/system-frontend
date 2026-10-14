@@ -21,6 +21,18 @@ export function isPublicAuthEndpoint(pathOrUrl) {
   return PUBLIC_AUTH_PATHS.some((path) => pathOrUrl.includes(path));
 }
 
+function isAuthFailureMessage(data) {
+  const msg = typeof data === 'object' && data?.message ? String(data.message) : (typeof data === 'string' ? data : '');
+  const normalized = msg.toLowerCase();
+  return (
+    normalized.includes('not authorized') ||
+    normalized.includes('not authenticated') ||
+    normalized.includes('missing or invalid session') ||
+    normalized.includes('unauthorized') ||
+    normalized.includes('forbidden')
+  );
+}
+
 function handleResponseStatus(response, resourcePath, data = null) {
   if (isPublicAuthEndpoint(resourcePath)) {
     return;
@@ -29,16 +41,13 @@ function handleResponseStatus(response, resourcePath, data = null) {
     handleSessionExpired();
     return;
   }
-  if (response?.status === 403) {
-    const msg = typeof data === 'object' && data?.message ? String(data.message) : '';
-    if (msg.includes('Not authorized') || msg.includes('Missing or invalid session')) {
-      handleSessionExpired();
-    }
+  if (response?.status === 403 && isAuthFailureMessage(data)) {
+    handleSessionExpired();
   }
 }
 
 /**
- * Global response interceptor to catch any 401 from direct fetch calls.
+ * Global response interceptor to catch any 401/403 auth failures from direct fetch calls.
  */
 let interceptorInstalled = false;
 
@@ -51,10 +60,22 @@ export function setupGlobalFetchSessionInterceptor() {
 
   window.fetch = async function interceptedFetch(...args) {
     const response = await originalFetch.apply(this, args);
-    if (response && response.status === 401) {
+    if (response && (response.status === 401 || response.status === 403)) {
       const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
       if (!isPublicAuthEndpoint(url)) {
-        handleSessionExpired();
+        if (response.status === 401) {
+          handleSessionExpired();
+        } else if (response.status === 403 && typeof response.clone === 'function') {
+          try {
+            response.clone().json().then((body) => {
+              if (isAuthFailureMessage(body)) {
+                handleSessionExpired();
+              }
+            }).catch(() => {});
+          } catch {
+            // ignore clone errors
+          }
+        }
       }
     }
     return response;

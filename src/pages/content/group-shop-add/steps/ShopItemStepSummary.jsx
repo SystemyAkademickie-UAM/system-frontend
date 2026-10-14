@@ -270,68 +270,7 @@ export default function ShopItemStepSummary({
 
       <Divider />
 
-      {/* Sekcja 2: Wartość przedmiotu */}
-      <div className="shop-item-summary__section">
-        <div className="shop-item-summary__section-header">
-          <h4 className="shop-item-summary__section-title">{SECTIONPRICING__TEXTLABEL[LANGUAGE]}</h4>
-          {isEditing && onJumpToStep ? (
-            <button
-              type="button"
-              className="shop-item-summary__edit-btn"
-              onClick={() => onJumpToStep(2)}
-              title={EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}
-              aria-label={`${EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}: ${SECTIONPRICING__TEXTLABEL[LANGUAGE]}`}
-            >
-              <PencilIcon className="shop-item-summary__edit-icon" />
-              <span>{EDITBUTTON__TEXTLABEL[LANGUAGE]}</span>
-            </button>
-          ) : null}
-        </div>
-
-        <div className="shop-item-summary__key-value-list">
-          <div className="shop-item-summary__row">
-            <span className="shop-item-summary__label">{BASEPRICE__TEXTLABEL[LANGUAGE]}</span>
-            <span className="shop-item-summary__value shop-item-summary__value--price">
-              {cost || '0'} <CurrencyIcon size="sm" />
-            </span>
-          </div>
-
-          <div className="shop-item-summary__row">
-            <span className="shop-item-summary__label">{MINIMALPRICE__TEXTLABEL[LANGUAGE]}</span>
-            <span className="shop-item-summary__value">
-              {minPriceEnabled ? (
-                <span className="shop-item-summary__value--price">
-                  {MINIMALPRICEDISABLEDVALUE__TEXTLABEL[LANGUAGE]} ({minPrice || '0'} <CurrencyIcon size="sm" />)
-                </span>
-              ) : (
-                MINIMALPRICEDISABLED__TEXTLABEL[LANGUAGE]
-              )}
-            </span>
-          </div>
-
-          <div className="shop-item-summary__row">
-            <span className="shop-item-summary__label">{BADGEDISCOUNTS__TEXTLABEL[LANGUAGE]}</span>
-            <span className="shop-item-summary__value">
-              {badgeDiscounts.length > 0 ? (
-                <ul className="shop-item-summary__sub-list">
-                  {badgeDiscounts.map((d) => (
-                    <li key={`summary-badge-${d.id}`}>
-                      {d.badgename}: -{d.value.endsWith('%') ? d.value : `${d.value} `}
-                      {!d.value.endsWith('%') && <CurrencyIcon size="sm" />}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                NONE__TEXTLABEL[LANGUAGE]
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <Divider />
-
-      {/* Sekcja 3: Dostępność */}
+      {/* Sekcja 2: Dostępność */}
       <div className="shop-item-summary__section">
         <div className="shop-item-summary__section-header">
           <h4 className="shop-item-summary__section-title">{SECTIONAVAILABILITY__TEXTLABEL[LANGUAGE]}</h4>
@@ -339,7 +278,7 @@ export default function ShopItemStepSummary({
             <button
               type="button"
               className="shop-item-summary__edit-btn"
-              onClick={() => onJumpToStep(3)}
+              onClick={() => onJumpToStep(2)}
               title={EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}
               aria-label={`${EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}: ${SECTIONAVAILABILITY__TEXTLABEL[LANGUAGE]}`}
             >
@@ -388,6 +327,67 @@ export default function ShopItemStepSummary({
                 <span className="shop-item-summary__value--yes">{STUDENTLIMITENABLED__TEXTLABEL[LANGUAGE]} ({studentLimit} {GROUPLIMITNUMBER__TEXTLABEL[LANGUAGE]})</span>
               ) : (
                 <span className="shop-item-summary__value--no">{STUDENTLIMITDISABLED__TEXTLABEL[LANGUAGE]}</span>
+              )}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <Divider />
+
+      {/* Sekcja 3: Wartość przedmiotu */}
+      <div className="shop-item-summary__section">
+        <div className="shop-item-summary__section-header">
+          <h4 className="shop-item-summary__section-title">{SECTIONPRICING__TEXTLABEL[LANGUAGE]}</h4>
+          {isEditing && onJumpToStep ? (
+            <button
+              type="button"
+              className="shop-item-summary__edit-btn"
+              onClick={() => onJumpToStep(3)}
+              title={EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}
+              aria-label={`${EDIT_SECTION_TOOLTIP__TEXTLABEL[LANGUAGE]}: ${SECTIONPRICING__TEXTLABEL[LANGUAGE]}`}
+            >
+              <PencilIcon className="shop-item-summary__edit-icon" />
+              <span>{EDITBUTTON__TEXTLABEL[LANGUAGE]}</span>
+            </button>
+          ) : null}
+        </div>
+
+        <div className="shop-item-summary__key-value-list">
+          <div className="shop-item-summary__row">
+            <span className="shop-item-summary__label">{BASEPRICE__TEXTLABEL[LANGUAGE]}</span>
+            <span className="shop-item-summary__value shop-item-summary__value--price">
+              {cost || '0'} <CurrencyIcon size="sm" />
+            </span>
+          </div>
+
+          <div className="shop-item-summary__row">
+            <span className="shop-item-summary__label">{MINIMALPRICE__TEXTLABEL[LANGUAGE]}</span>
+            <span className="shop-item-summary__value">
+              {minPriceEnabled ? (
+                <span className="shop-item-summary__value--price">
+                  {MINIMALPRICEDISABLEDVALUE__TEXTLABEL[LANGUAGE]} ({minPrice || '0'} <CurrencyIcon size="sm" />)
+                </span>
+              ) : (
+                MINIMALPRICEDISABLED__TEXTLABEL[LANGUAGE]
+              )}
+            </span>
+          </div>
+
+          <div className="shop-item-summary__row">
+            <span className="shop-item-summary__label">{BADGEDISCOUNTS__TEXTLABEL[LANGUAGE]}</span>
+            <span className="shop-item-summary__value">
+              {badgeDiscounts.length > 0 ? (
+                <ul className="shop-item-summary__sub-list">
+                  {badgeDiscounts.map((d) => (
+                    <li key={`summary-badge-${d.id}`}>
+                      {d.badgename}: -{d.value.endsWith('%') ? d.value : `${d.value} `}
+                      {!d.value.endsWith('%') && <CurrencyIcon size="sm" />}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                NONE__TEXTLABEL[LANGUAGE]
               )}
             </span>
           </div>

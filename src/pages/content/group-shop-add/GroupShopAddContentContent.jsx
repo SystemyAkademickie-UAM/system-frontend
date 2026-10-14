@@ -93,7 +93,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   const editingItemId = itemId != null && itemId !== '' ? String(itemId) : null;
   const draftKey = `${DRAFT_STORAGE_KEY_PREFIX}${groupId}${editingItemId ? `_${editingItemId}` : ''}`;
 
-  // Krok kreatora (1 - Informacje, 2 - Wartość, 3 - Dostępność, 4 - Podsumowanie)
+  // Krok kreatora (1 - Informacje, 2 - Dostępność, 3 - Wartość, 4 - Podsumowanie)
   const [currentStep, setCurrentStepState] = useState(editingItemId ? 4 : 1);
 
   const setCurrentStep = useCallback((stepOrFn) => {
@@ -112,22 +112,13 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   // Stany formularza - Krok 1 (Informacje)
   const [itemName, setItemName] = useState('');
   const [currentIcon, setCurrentIcon] = useState('🥕');
-  const [iconBackground, setIconBackground] = useState('var(--color-bg-icon');
+  const [iconBackground, setIconBackground] = useState('rgb(40,40,52)');
   const [isEditingExtraLife, setIsEditingExtraLife] = useState(false);
   const [storyDescription, setStoryDescription] = useState('');
   const [didacticDescription, setDidacticDescription] = useState('');
   const [categories, setCategories] = useState([]);
 
-  // Stany formularza - Krok 2 (Wartość)
-  const [cost, setCost] = useState('');
-  const [minPrice, setMinPrice] = useState('');
-  const [minPriceEnabled, setMinPriceEnabled] = useState(false);
-  const [badges, setBadges] = useState([]);
-  const [badgeDiscounts, setBadgeDiscounts] = useState([]);
-  const [ranks, setRanks] = useState([]);
-  const [ranksFromBackend, setRanksFromBackend] = useState(0);
-
-  // Stany formularza - Krok 3 (Dostępność)
+  // Stany formularza - Krok 2 (Dostępność)
   const [isVisible, setIsVisible] = useState(false); // Domyślnie ukryty
   const [restrictRankEnabled, setRestrictRankEnabled] = useState(false);
   const [unlockRankId, setUnlockRankId] = useState('');
@@ -135,6 +126,15 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   const [groupLimit, setGroupLimit] = useState('');
   const [studentLimitEnabled, setStudentLimitEnabled] = useState(false);
   const [studentLimit, setStudentLimit] = useState('');
+
+  // Stany formularza - Krok 3 (Wartość)
+  const [cost, setCost] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [minPriceEnabled, setMinPriceEnabled] = useState(false);
+  const [badges, setBadges] = useState([]);
+  const [badgeDiscounts, setBadgeDiscounts] = useState([]);
+  const [ranks, setRanks] = useState([]);
+  const [ranksFromBackend, setRanksFromBackend] = useState(0);
 
   // Błędy walidacji
   const [nameError, setNameError] = useState('');
@@ -150,6 +150,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   const editFormHydratedRef = useRef(null);
   const initialSnapshotRef = useRef(null);
   const pendingEditCategoryIdsRef = useRef(null);
+  const justHydratedRef = useRef(false);
 
   // --- API: Pobieranie kategorii ---
   const fetchCategories = useCallback(async () => {
@@ -165,7 +166,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         },
       });
 
-      if (!response.ok) return;
+      if (!response.ok) return [];
       const data = await response.json();
       const received = Array.isArray(data) ? data : [];
 
@@ -193,8 +194,9 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       if (pendingEditCategoryIdsRef.current && received.length > 0) {
         pendingEditCategoryIdsRef.current = null;
       }
+      return received;
     } catch {
-      // ignore
+      return [];
     }
   }, [groupId]);
 
@@ -302,7 +304,7 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         },
       });
 
-      if (!response.ok) return;
+      if (!response.ok) return [];
       const data = await response.json();
       const received = Array.isArray(data) ? data : [];
 
@@ -323,8 +325,9 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
 
       setRanks(mapped);
       setRanksFromBackend(1);
+      return mapped;
     } catch {
-      // ignore
+      return [];
     }
   }, [groupId]);
 
@@ -342,21 +345,25 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         },
       });
 
-      if (!response.ok) return;
+      if (!response.ok) return [];
       const data = await response.json();
       const received = Array.isArray(data) ? data : [];
-      setBadges(received.map((b) => ({ id: b.id, name: b.name })));
+      const mapped = received.map((b) => ({ id: b.id, name: b.name }));
+      setBadges(mapped);
+      return mapped;
     } catch {
-      // ignore
+      return [];
     }
   }, [groupId]);
 
-  // Ładowanie danych początkowych
+  // Ładowanie danych początkowych (dla nowego przedmiotu)
   useEffect(() => {
-    fetchCategories();
-    fetchRanks();
-    fetchBadges();
-  }, [fetchCategories, fetchRanks, fetchBadges]);
+    if (!editingItemId) {
+      fetchCategories();
+      fetchRanks();
+      fetchBadges();
+    }
+  }, [editingItemId, fetchCategories, fetchRanks, fetchBadges]);
 
   // Sprawdzanie wersji roboczej w localStorage przy tworzeniu nowego przedmiotu
   useEffect(() => {
@@ -377,35 +384,40 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
 
   // Wczytanie istniejącego przedmiotu do edycji
   useEffect(() => {
-    if (!editingItemId || ranksFromBackend !== 1) return;
+    if (!editingItemId) return;
 
     let cancelled = false;
     (async () => {
-      const result = await fetchGroupShopItems(groupId);
-      if (!result.ok || cancelled) return;
+      const [shopResult, categoriesList, ranksList, badgesList] = await Promise.all([
+        fetchGroupShopItems(groupId),
+        fetchCategories(),
+        fetchRanks(),
+        fetchBadges(),
+      ]);
 
-      const item = result.items.find((entry) => entry.id === editingItemId);
+      if (!shopResult.ok || cancelled) return;
+
+      const item = shopResult.items.find((entry) => entry.id === editingItemId);
       if (!item || cancelled) return;
       if (editFormHydratedRef.current === editingItemId) return;
       editFormHydratedRef.current = editingItemId;
 
       let loadedIcon = '🥕';
-      let loadedIconBg = 'var(--color-bg-icon';
+      let loadedIconBg = 'rgb(40,40,52)';
 
       if (item.isExtraLife === true) {
         setIsEditingExtraLife(true);
         const resolved = resolveExtraLifeItemIcon(livesSymbol);
         loadedIcon = resolved.emoji;
-        setCurrentIcon(resolved.emoji);
-        setIconBackground(resolved.iconBackground);
+        loadedIconBg = resolved.iconBackground;
       } else {
         setIsEditingExtraLife(false);
         const imageParts = String(item.imageRef ?? '').split('*');
         loadedIcon = imageParts[0] || '🥕';
         loadedIconBg = imageParts[1] || 'rgb(40,40,52)';
-        if (imageParts[0]) setCurrentIcon(imageParts[0]);
-        if (imageParts[1]) setIconBackground(imageParts[1]);
       }
+      setCurrentIcon(loadedIcon);
+      setIconBackground(loadedIconBg);
 
       const priceAmount = String(item.priceAmount ?? '');
       setItemName(item.name ?? '');
@@ -413,59 +425,42 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       setStoryDescription(item.storyDescription ?? '');
       setDidacticDescription(item.didacticDescription ?? '');
 
-      if (item.minPrice != null && Number(item.minPrice) > 0) {
-        setMinPriceEnabled(true);
-        setMinPrice(String(item.minPrice));
-      } else {
-        setMinPriceEnabled(false);
-        setMinPrice('');
-      }
+      const isMinPrice = item.minPrice != null && Number(item.minPrice) > 0;
+      setMinPriceEnabled(isMinPrice);
+      setMinPrice(isMinPrice ? String(item.minPrice) : '');
 
-      if (item.stockQuantity != null) {
-        setGroupLimitEnabled(true);
-        setGroupLimit(String(item.stockQuantity));
-      }
+      const isGroupLimit = item.stockQuantity != null;
+      setGroupLimitEnabled(isGroupLimit);
+      setGroupLimit(isGroupLimit ? String(item.stockQuantity) : '');
 
-      if (item.perStudentLimit != null) {
-        setStudentLimitEnabled(true);
-        setStudentLimit(String(item.perStudentLimit));
-      }
+      const isStudentLimit = item.perStudentLimit != null;
+      setStudentLimitEnabled(isStudentLimit);
+      setStudentLimit(isStudentLimit ? String(item.perStudentLimit) : '');
 
-      setIsVisible(item.isPublished !== false);
+      const isItemVisible = item.isPublished !== false;
+      setIsVisible(isItemVisible);
 
       const selectedCategoryIds = new Set((item.categories ?? []).map(String));
-      pendingEditCategoryIdsRef.current = selectedCategoryIds;
+      const updatedCategories = (categoriesList || []).map((c) => ({
+        ...c,
+        checked: selectedCategoryIds.has(String(c.id)) ? 1 : 0,
+      }));
+      setCategories(updatedCategories);
 
-      setCategories((current) => {
-        if (current.length === 0) return current;
-        return current.map((c) => ({
-          ...c,
-          checked: selectedCategoryIds.has(String(c.id)) ? 1 : 0,
-        }));
-      });
-
-      let loadedRestrictRankEnabled = false;
-      let loadedUnlockRankId = '';
-      setRanks((current) => {
-        const rankRefs = current.map((r) => ({
-          dbId: r.id,
-          name: r.name,
-          shopItems: r.uniqueStoreItems || [],
-        }));
-        const owningRank = findRankUnlockingItem(editingItemId, rankRefs);
-        if (owningRank) {
-          loadedRestrictRankEnabled = true;
-          loadedUnlockRankId = String(owningRank.dbId);
-          setRestrictRankEnabled(true);
-          setUnlockRankId(String(owningRank.dbId));
-        }
-
-        return current;
-      });
+      const rankRefs = (ranksList || []).map((r) => ({
+        dbId: r.id,
+        name: r.name,
+        shopItems: r.uniqueStoreItems || [],
+      }));
+      const owningRank = findRankUnlockingItem(editingItemId, rankRefs);
+      const isRestrictRank = Boolean(owningRank);
+      const rankUnlockId = owningRank ? String(owningRank.dbId) : '';
+      setRestrictRankEnabled(isRestrictRank);
+      setUnlockRankId(rankUnlockId);
 
       const loadedBadgeDiscounts = (item.badgePromotions ?? []).map((promo, index) => {
         const badgeId = promo.badgeId ?? promo.id;
-        const badge = badges.find((b) => b.id === badgeId);
+        const badge = (badgesList || []).find((b) => b.id === badgeId);
         const value = promo.promotionType === 'percent' ? `${promo.value}%` : String(promo.value);
         return {
           id: index,
@@ -483,24 +478,25 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         storyDescription: item.storyDescription ?? '',
         didacticDescription: item.didacticDescription ?? '',
         cost: priceAmount,
-        minPriceEnabled: item.minPrice != null && Number(item.minPrice) > 0,
-        minPrice: item.minPrice != null && Number(item.minPrice) > 0 ? String(item.minPrice) : '',
-        checkedCategoryIds: Array.from(selectedCategoryIds),
+        minPriceEnabled: isMinPrice,
+        minPrice: isMinPrice ? String(item.minPrice) : '',
+        categories: updatedCategories,
         badgeDiscounts: loadedBadgeDiscounts,
-        isVisible: item.isPublished !== false,
-        restrictRankEnabled: loadedRestrictRankEnabled,
-        unlockRankId: loadedUnlockRankId,
-        groupLimitEnabled: item.stockQuantity != null,
-        groupLimit: item.stockQuantity != null ? String(item.stockQuantity) : '',
-        studentLimitEnabled: item.perStudentLimit != null,
-        studentLimit: item.perStudentLimit != null ? String(item.perStudentLimit) : '',
+        isVisible: isItemVisible,
+        restrictRankEnabled: isRestrictRank,
+        unlockRankId: rankUnlockId,
+        groupLimitEnabled: isGroupLimit,
+        groupLimit: isGroupLimit ? String(item.stockQuantity) : '',
+        studentLimitEnabled: isStudentLimit,
+        studentLimit: isStudentLimit ? String(item.perStudentLimit) : '',
       });
+      justHydratedRef.current = true;
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [badges, editingItemId, groupId, ranksFromBackend]);
+  }, [editingItemId, fetchBadges, fetchCategories, fetchRanks, groupId, livesSymbol]);
 
   // --- Obsługa wersji roboczej (Draft) ---
   const handleLoadDraft = () => {
@@ -593,6 +589,8 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
     } catch {
       // ignore
     }
+    initialSnapshotRef.current = null;
+    editFormHydratedRef.current = null;
     setIsUnsavedModalOpen(false);
     if (onClose) {
       onClose();
@@ -601,7 +599,6 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
     }
   };
 
-  // Sprawdzanie czy formularz ma wprowadzone dane / zmiany
   const currentSnapshot = buildFormSnapshot({
     itemName,
     currentIcon,
@@ -621,6 +618,11 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
     studentLimitEnabled,
     studentLimit,
   });
+
+  if (justHydratedRef.current) {
+    initialSnapshotRef.current = currentSnapshot;
+    justHydratedRef.current = false;
+  }
 
   const hasUserChanges = editingItemId
     ? Boolean(initialSnapshotRef.current && currentSnapshot !== initialSnapshotRef.current)
@@ -642,10 +644,14 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   const handleAttemptClose = useCallback(() => {
     if (hasUserChanges) {
       setIsUnsavedModalOpen(true);
-    } else if (onClose) {
-      onClose();
     } else {
-      window.location.href = `/groups/${groupId}/shop`;
+      initialSnapshotRef.current = null;
+      editFormHydratedRef.current = null;
+      if (onClose) {
+        onClose();
+      } else {
+        window.location.href = `/groups/${groupId}/shop`;
+      }
     }
   }, [hasUserChanges, onClose, groupId]);
 
@@ -669,17 +675,6 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         isValid = false;
       }
     } else if (step === 2) {
-      if (!cost || Number(cost) < 0) {
-        setCostError('Wpisz poprawną cenę bazową.');
-        showError('Wpisz poprawną cenę bazową.');
-        isValid = false;
-      }
-      if (minPriceEnabled && minPrice !== '' && Number(minPrice) > Number(cost)) {
-        setMinPriceError('Cena minimalna nie może być większa niż cena bazowa.');
-        showError('Cena minimalna nie może być większa niż cena bazowa.');
-        isValid = false;
-      }
-    } else if (step === 3) {
       if (groupLimitEnabled && (!groupLimit || Number(groupLimit) <= 0)) {
         setGroupLimitError('Wpisz limit sztuk na grupę.');
         showError('Wpisz limit sztuk na grupę.');
@@ -688,6 +683,17 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
       if (studentLimitEnabled && (!studentLimit || Number(studentLimit) <= 0)) {
         setStudentLimitError('Wpisz limit sztuk na studenta.');
         showError('Wpisz limit sztuk na studenta.');
+        isValid = false;
+      }
+    } else if (step === 3) {
+      if (!cost || Number(cost) < 0) {
+        setCostError('Wpisz poprawną cenę bazową.');
+        showError('Wpisz poprawną cenę bazową.');
+        isValid = false;
+      }
+      if (minPriceEnabled && minPrice !== '' && Number(minPrice) > Number(cost)) {
+        setMinPriceError('Cena minimalna nie może być większa niż cena bazowa.');
+        showError('Cena minimalna nie może być większa niż cena bazowa.');
         isValid = false;
       }
     }
@@ -845,26 +851,6 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
         )}
 
         {currentStep === 2 && (
-          <ShopItemStepPricing
-            cost={cost}
-            setCost={setCost}
-            minPrice={minPrice}
-            setMinPrice={setMinPrice}
-            minPriceEnabled={minPriceEnabled}
-            setMinPriceEnabled={setMinPriceEnabled}
-            badges={badges}
-            badgeDiscounts={badgeDiscounts}
-            setBadgeDiscounts={setBadgeDiscounts}
-            ranks={ranks}
-            setRanks={setRanks}
-            costError={costError}
-            setCostError={setCostError}
-            minPriceError={minPriceError}
-            setMinPriceError={setMinPriceError}
-          />
-        )}
-
-        {currentStep === 3 && (
           <ShopItemStepAvailability
             isVisible={isVisible}
             setIsVisible={setIsVisible}
@@ -883,6 +869,26 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
             setStudentLimit={setStudentLimit}
             groupLimitError={groupLimitError}
             studentLimitError={studentLimitError}
+          />
+        )}
+
+        {currentStep === 3 && (
+          <ShopItemStepPricing
+            cost={cost}
+            setCost={setCost}
+            minPrice={minPrice}
+            setMinPrice={setMinPrice}
+            minPriceEnabled={minPriceEnabled}
+            setMinPriceEnabled={setMinPriceEnabled}
+            badges={badges}
+            badgeDiscounts={badgeDiscounts}
+            setBadgeDiscounts={setBadgeDiscounts}
+            ranks={ranks}
+            setRanks={setRanks}
+            costError={costError}
+            setCostError={setCostError}
+            minPriceError={minPriceError}
+            setMinPriceError={setMinPriceError}
           />
         )}
 

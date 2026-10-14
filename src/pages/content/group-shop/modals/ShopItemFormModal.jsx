@@ -16,8 +16,8 @@ const ADD_ITEM_TITLE__TEXTLABEL = {
 
 const STAGE_TITLES = {
   1: { polish: 'Informacje', english: 'Information' },
-  2: { polish: 'Wartość przedmiotu', english: 'Item Value' },
-  3: { polish: 'Dostępność', english: 'Availability' },
+  2: { polish: 'Dostępność', english: 'Availability' },
+  3: { polish: 'Wartość przedmiotu', english: 'Item Value' },
   4: { polish: 'Podsumowanie', english: 'Summary' },
 };
 
@@ -43,7 +43,9 @@ export default function ShopItemFormModal({
   const [currentStep, setCurrentStep] = useState(itemId ? 4 : 1);
   const formRef = useRef(null);
 
-  const baseTitle = itemId
+  const isEditing = Boolean(itemId);
+
+  const baseTitle = isEditing
     ? EDIT_ITEM_TITLE__TEXTLABEL[LANGUAGE]
     : ADD_ITEM_TITLE__TEXTLABEL[LANGUAGE];
 
@@ -54,7 +56,9 @@ export default function ShopItemFormModal({
       <span className="shop-item-modal-title__main">{baseTitle}</span>
       <span className="shop-item-modal-title__divider">•</span>
       <span className="shop-item-modal-title__stage">{stageTitle}</span>
-      <span className="shop-item-modal-title__badge">{currentStep}/{TOTAL_STEPS}</span>
+      {!isEditing ? (
+        <span className="shop-item-modal-title__badge">{currentStep}/{TOTAL_STEPS}</span>
+      ) : null}
     </span>
   );
 

@@ -1,7 +1,8 @@
 import { Link, useSearchParams } from 'react-router-dom';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useToast } from '../../../components/ui/Toast/Toast.jsx';
-import { loginPath } from '../../../routes/pathRegistry.js';
+import { groupsListPath, loginPath } from '../../../routes/pathRegistry.js';
+import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { authLegalDocumentUrl } from '../../../constants/authLegalDocuments.constants.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './WelcomeContent.css';
@@ -174,6 +175,8 @@ export default function WelcomeContent() {
   }, [searchParams, setSearchParams, showSuccess, LANGUAGE]);
 
   const [isEasterEgg] = useState(() => Math.floor(Math.random() * 100) + 1 === 100);
+  const session = useSessionOptional();
+  const targetJoinPath = session?.isAuthenticated ? groupsListPath() : loginPath();
 
   const scrollToStory = () => {
     storySectionRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -191,7 +194,7 @@ export default function WelcomeContent() {
       {/* Górny pasek nawigacyjny z przyciskiem Dołącz */}
       <header className="welcome-nav">
         <Link
-          to={loginPath()}
+          to={targetJoinPath}
           className="welcome-nav__join-btn"
           aria-label={JOIN_BUTTON__TEXTLABEL[LANGUAGE]}
         >
@@ -292,7 +295,10 @@ export default function WelcomeContent() {
             </div>
 
             <div className="welcome-story-card__cta">
-              <Link to={loginPath()} className="welcome-story-card__btn">
+              <Link
+                to={targetJoinPath}
+                className="welcome-story-card__btn"
+              >
                 {JOIN_BUTTON__TEXTLABEL[LANGUAGE]}
               </Link>
             </div>

@@ -8,6 +8,26 @@
   flex-direction: column;
 }
 
+.login-pionierid__header {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: clamp(1rem, 1.67vw, 24px) var(--auth-card-body-padding-x) 0;
+}
+
+.login-pionierid__back-btn {
+  font-family: var(--font-family-app);
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.login-pionierid__back-btn:hover {
+  color: var(--color-text-primary);
+}
+
 .login-pionierid__body {
   box-sizing: border-box;
   display: flex;
@@ -16,7 +36,7 @@
   justify-content: center;
   width: 100%;
   flex: 1;
-  padding: clamp(2rem, 4vw, 48px) var(--auth-card-body-padding-x);
+  padding: clamp(1.25rem, 2.5vw, 32px) var(--auth-card-body-padding-x) clamp(2rem, 4vw, 48px);
 }
 
 .login-pionierid__logo {
@@ -49,8 +69,12 @@
     max-width: calc(100% - 1rem);
   }
 
+  .login-pionierid__header {
+    padding: 1rem 1.25rem 0;
+  }
+
   .login-pionierid__body {
-    padding: 2rem 1.25rem 1.75rem;
+    padding: 1.25rem 1.25rem 1.75rem;
   }
 
   .login-pionierid__actions {

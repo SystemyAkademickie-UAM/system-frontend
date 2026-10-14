@@ -209,8 +209,9 @@ const BADGE_COLUMNS = [
     width: '90px',
     mobileRole: 'primary',
     className: 'rewards-table__th--position',
-    render: (badge) => (
-      <span className="rewards-table__position">#{badge.position}</span>
+    accessor: (badge) => Number(badge.position ?? 0),
+    render: (badge, rowIndex) => (
+      <span className="rewards-table__position">#{rowIndex != null ? rowIndex + 1 : badge.position}</span>
     ),
   },
   {

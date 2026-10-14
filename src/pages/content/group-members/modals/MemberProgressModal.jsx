@@ -17,13 +17,11 @@ const SAVED_SUCCESS__TEXTLABEL = { polish: 'Postęp został zapisany.', english:
 const SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać postępu', english: 'Failed to save progress' };
 const ACTIVITY_SAVE_ERROR__TEXTLABEL = { polish: 'Nie udało się zapisać postępu aktywności', english: 'Failed to save activity progress' };
 
-function sortProgressStagesNewestFirst(stages) {
-  return [...stages]
-    .sort((a, b) => b.id - a.id)
-    .map((stage) => ({
-      ...stage,
-      activities: [...stage.activities].sort((a, b) => b.id - a.id),
-    }));
+export function formatProgressStages(stages) {
+  return [...stages].map((stage) => ({
+    ...stage,
+    activities: [...stage.activities].sort((a, b) => a.id - b.id),
+  }));
 }
 
 export default function MemberProgressModal({
@@ -74,7 +72,7 @@ export default function MemberProgressModal({
 
         initialProgressRef.current = { ...nextProgress };
         setProgress(nextProgress);
-        setStages(sortProgressStagesNewestFirst(progressStages));
+        setStages(formatProgressStages(progressStages));
       } catch (err) {
         if (cancelled) return;
         console.error('Failed to load student progress:', err);

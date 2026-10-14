@@ -1,4 +1,6 @@
 import { BROWSER_ID_SAML_PENDING_SESSION_KEY } from '../constants/browserId.constants.js';
+import { getApiBaseUrl } from '../constants/api.constants.js';
+import { getRememberMe } from '../services/rememberMeService.js';
 
 /** @type {Set<() => void>} */
 const clearListeners = new Set();
@@ -60,8 +62,9 @@ export function clearClientAuthState() {
 let sessionExpiredHandling = false;
 
 /**
- * Wywoływane, gdy sesja wygaśnie na backendzie (np. status 401 Unauthorized na chronionym zasobie).
- * Czyści stan sesji w aplikacji oraz przekierowuje na stronę główną/powitalną.
+ * Wywoływane, gdy sesja wygaśnie na backendzie (np. status 401 Unauthorized na chronionym zasobie)
+ * lub po upływie limitu bezczynności.
+ * Czyści stan sesji w aplikacji oraz przekierowuje na stronę powitalną /welcome.
  */
 export function handleSessionExpired() {
   if (isClientLogoutInProgress() || sessionExpiredHandling) {
@@ -70,6 +73,23 @@ export function handleSessionExpired() {
   sessionExpiredHandling = true;
   try {
     clearClientAuthState();
+
+    // Jeśli użytkownik nie wybrał "Zapamiętaj mnie", unieważnij sesję również po stronie backendu
+    try {
+      if (!getRememberMe() && typeof fetch === 'function') {
+        const baseUrl = getApiBaseUrl();
+        if (baseUrl.length > 0) {
+          void fetch(`${baseUrl}/auth/saml/logout`, {
+            method: 'POST',
+            credentials: 'include',
+            keepalive: true,
+          }).catch(() => {});
+        }
+      }
+    } catch {
+      // ignore network errors
+    }
+
     if (typeof window !== 'undefined' && typeof window.location?.replace === 'function') {
       const pathname = window.location.pathname || '';
       const isAuthPage = pathname.startsWith('/welcome')
@@ -78,7 +98,9 @@ export function handleSessionExpired() {
         || pathname.startsWith('/dev');
       if (!isAuthPage) {
         try {
-          window.location.replace('/welcome');
+          if (process.env.NODE_ENV !== 'test') {
+            window.location.replace('/welcome');
+          }
         } catch {
           // ignore navigation errors in test/unsupported environments
         }

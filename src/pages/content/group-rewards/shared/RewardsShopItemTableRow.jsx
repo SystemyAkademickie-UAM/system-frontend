@@ -6,7 +6,7 @@ import { resolveShopCategoryLabels } from '../../../../utils/shop/shopCategories
 import { useRewardsTablePreview } from './useRewardsTablePreview.js';
 import './rewardsTablePreview.css';
 
-export default function RewardsShopItemTableRow({ row, columns, rowActions, rowColor, onRowDoubleClick, isHighlighted = false }) {
+export default function RewardsShopItemTableRow({ row, rowIndex, columns, rowActions, rowColor, onRowDoubleClick, isHighlighted = false }) {
   const rowRef = useRef(null);
   const { previewVisible, layout, bubbleRef, showPreview, hidePreview, handleMenuOpenChange } = useRewardsTablePreview();
 
@@ -44,7 +44,7 @@ export default function RewardsShopItemTableRow({ row, columns, rowActions, rowC
               .filter(Boolean)
               .join(' ')}
           >
-            {column.render ? column.render(row) : String(row[column.key] ?? '')}
+            {column.render ? column.render(row, rowIndex) : String(row[column.key] ?? '')}
           </td>
         ))}
         {rowActions ? (
@@ -82,6 +82,7 @@ export default function RewardsShopItemTableRow({ row, columns, rowActions, rowC
               minPrice={row.minPrice}
               salePriceAmount={row.salePriceAmount}
               imageRef={row.imageRef}
+              requiredRank={row.requiredRank}
               categories={resolveShopCategoryLabels(row.categories)}
             />
           </div>,
