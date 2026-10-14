@@ -81,7 +81,7 @@ export default function MembersHomeContent() {
   const nav = useGroupSubNav('group-members');
 
   const { showSuccess } = useToast();
-  const { livesEnabled } = useGroupLives();
+  const { livesEnabled, symbol, label } = useGroupLives();
   const {
     groupId,
     members,
@@ -373,7 +373,7 @@ export default function MembersHomeContent() {
         render: (member) => (
           member.isLecturer
             ? <span className="members-table__stat">—</span>
-            : <CurrencyDisplay amount={member.lives} size="sm" />
+            : <span className="members-table__stat">{symbol} {member.lives}</span>
         ),
       },
     ];
@@ -564,6 +564,8 @@ export default function MembersHomeContent() {
           popupclose={() => setIsManageOpen(false)}
           updatelives={refetch}
           groupId={groupId}
+          liveslabel={label}
+          livesicon={symbol}
         />
       ) : null}
     </SectionPageLayout>
