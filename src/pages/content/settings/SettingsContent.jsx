@@ -251,7 +251,7 @@ export default function SettingsContent() {
   const [avatars, setAvatars] = useState([]);
   const [selectedAvatarId, setSelectedAvatarId] = useState(null);
   const [savedSnapshot, setSavedSnapshot] = useState(null);
-  const [DIVLANGUAGE, SETDIVLANGUAGE] = useState('polski');
+  const [DIVLANGUAGE, SETDIVLANGUAGE] = useState(() => (READLANGUAGECOOKIE() === 'english' ? 'English' : 'polski'));
   const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish');
 
   const loadSettings = useCallback(async () => {
@@ -285,6 +285,8 @@ export default function SettingsContent() {
       const CURRENTREMEMBERME = getRememberMe();
       setDraftTheme(CURRENTTHEME);
       setDraftRememberMe(CURRENTREMEMBERME);
+      SETLANGUAGE(CURRENTLANGUAGE);
+      SETDIVLANGUAGE(CURRENTLANGUAGE === 'english' ? 'English' : 'polski');
 
       setSavedSnapshot({
         nickname: profile.nickname || '',
@@ -313,8 +315,10 @@ export default function SettingsContent() {
     }
 
     const SELECTEDLANGUAGE = RESOLVELANGUAGECODE(DIVLANGUAGE);
+    const initialLanguage = savedSnapshot?.LANGUAGE ?? (READLANGUAGECOOKIE() || 'polish');
+    const hasLanguageChanged = SELECTEDLANGUAGE !== initialLanguage;
 
-    document.cookie = `CURRENTLANGUAGE=${SELECTEDLANGUAGE};path=/`;
+    document.cookie = `CURRENTLANGUAGE=${SELECTEDLANGUAGE};path=/;max-age=${365 * 24 * 60 * 60};SameSite=Lax`;
     SETLANGUAGE(SELECTEDLANGUAGE);
 
     setIsSaving(true);
@@ -344,7 +348,6 @@ export default function SettingsContent() {
       return false;
     }
 
-
     const savedNickname = result.profile?.nickname ?? trimmedNickname;
     setNickname(savedNickname);
 
@@ -369,10 +372,16 @@ export default function SettingsContent() {
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
 
-
     setIsSaving(false);
 
-    showSuccess(SUCMESSAGETEXT__TEXTLABEL[LANGUAGE]);
+    showSuccess(SUCMESSAGETEXT__TEXTLABEL[SELECTEDLANGUAGE] || SUCMESSAGETEXT__TEXTLABEL[LANGUAGE]);
+
+    if (hasLanguageChanged) {
+      if (typeof window !== 'undefined' && typeof window.location?.reload === 'function') {
+        window.location.reload();
+        return true;
+      }
+    }
 
     return true;
   }, [
@@ -384,6 +393,7 @@ export default function SettingsContent() {
     nickname,
     refetchProfile,
     role,
+    savedSnapshot,
     selectedAvatarId,
     setShowNickname,
     showError,
@@ -452,8 +462,12 @@ export default function SettingsContent() {
     if (savedSnapshot?.rememberMe !== undefined) {
       setDraftRememberMe(savedSnapshot.rememberMe);
     }
+    if (savedSnapshot?.LANGUAGE) {
+      SETDIVLANGUAGE(savedSnapshot.LANGUAGE === 'english' ? 'English' : 'polski');
+      SETLANGUAGE(savedSnapshot.LANGUAGE);
+    }
     discardChanges();
-  }, [discardChanges, savedSnapshot?.rememberMe, savedSnapshot?.theme]);
+  }, [discardChanges, savedSnapshot?.LANGUAGE, savedSnapshot?.rememberMe, savedSnapshot?.theme]);
 
   function onNicknamechange(stringvalue) {
     let nextValue = stringvalue;

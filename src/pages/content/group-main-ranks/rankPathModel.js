@@ -23,6 +23,7 @@ import { resolveRankIdFromTotalEarned } from '../../../utils/ranks/autoRankAssig
  * @typedef {Object} RankPathStudent
  * @property {string} id
  * @property {number} accountId
+ * @property {number} [position]
  * @property {string} nickname
  * @property {string | null} avatarUrl
  * @property {number} totalEarned
@@ -267,6 +268,7 @@ export function mapStudentForRankPath(student, ranks) {
   return {
     id: `student-${student.accountId}`,
     accountId: student.accountId,
+    position: student.position,
     nickname: (student.nickname || `${student.name} ${student.surname}`.trim() || 'Student').trim(),
     avatarUrl: student.avatarUrl ?? null,
     totalEarned: student.totalEarned ?? 0,

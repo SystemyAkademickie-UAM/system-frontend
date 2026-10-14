@@ -346,7 +346,12 @@ export function useGroupMembers() {
 
     if (result.ok) {
 
-      setMembers((prev) => prev.filter((item) => item.id !== member.id));
+      setMembers((prev) => prev
+        .filter((item) => item.id !== member.id)
+        .map((item, index) => ({
+          ...item,
+          position: index + 1,
+        })));
 
     }
 

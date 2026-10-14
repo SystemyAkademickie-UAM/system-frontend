@@ -61,7 +61,7 @@ function SortableHeader({ label, sortKey, sortRules, onSort, className = '' }) {
         ]
           .filter(Boolean)
           .join(' ')}
-        onClick={() => onSort(sortKey)}
+        onClick={(event) => onSort(sortKey, event)}
         aria-label={
           rule
             ? `Sortuj po ${label}: ${rule.direction === 'asc' ? 'rosnąco' : 'malejąco'}`
@@ -278,7 +278,7 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange, collapseInline
   );
 }
 
-function DefaultDataTableRow({ row, columns, rowActions, rowActionsPosition = 'end', rowColor }) {
+function DefaultDataTableRow({ row, rowIndex, columns, rowActions, rowActionsPosition = 'end', rowColor }) {
   const resolvedColor = rowColor ?? row.rowColor ?? row.color ?? null;
   const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
   const actionsCell = rowActions ? (
@@ -307,7 +307,7 @@ function DefaultDataTableRow({ row, columns, rowActions, rowActionsPosition = 'e
             .filter(Boolean)
             .join(' ')}
         >
-          {column.render ? column.render(row) : String(row[column.key] ?? '')}
+          {column.render ? column.render(row, rowIndex) : String(row[column.key] ?? '')}
         </td>
       ))}
       {rowActionsPosition === 'end' ? actionsCell : null}
@@ -403,8 +403,8 @@ export default function DataTable({
     return filteredRows.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredRows, page, totalPages, itemsPerPage]);
 
-  const handleSort = (key) => {
-    setSortRules((prev) => cycleSortRule(prev, key));
+  const handleSort = (key, event) => {
+    setSortRules((prev) => cycleSortRule(prev, key, Boolean(event?.shiftKey)));
     setPage(1);
   };
 
@@ -621,38 +621,46 @@ export default function DataTable({
                 {rowActionsPosition === 'end' ? actionsCol : null}
               </colgroup>
               <tbody className="data-table__body">
-                {paginatedRows.map((row) => (
-                  <RowComponent
-                    key={getRowKey(row)}
-                    row={row}
-                    columns={columns}
-                    rowActions={rowActions}
-                    rowActionsPosition={rowActionsPosition}
-                    getRowKey={getRowKey}
-                    rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
-                    onRowDoubleClick={onRowDoubleClick}
-                    isHighlighted={highlightedRowId != null && String(highlightedRowId) === String(getRowKey(row))}
-                  />
-                ))}
+                {paginatedRows.map((row, index) => {
+                  const rowIndex = (Math.min(page, totalPages) - 1) * itemsPerPage + index;
+                  return (
+                    <RowComponent
+                      key={getRowKey(row)}
+                      row={row}
+                      rowIndex={rowIndex}
+                      columns={columns}
+                      rowActions={rowActions}
+                      rowActionsPosition={rowActionsPosition}
+                      getRowKey={getRowKey}
+                      rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
+                      onRowDoubleClick={onRowDoubleClick}
+                      isHighlighted={highlightedRowId != null && String(highlightedRowId) === String(getRowKey(row))}
+                    />
+                  );
+                })}
               </tbody>
             </table>
           </div>
           </div>
 
           <ul className="data-table-mobile" aria-label="Lista rekordów">
-            {paginatedRows.map((row) => (
-              <MobileRowComponent
-                key={getRowKey(row)}
-                row={row}
-                columns={columns}
-                renderActions={renderMobileActions}
-                className={[
-                  getMobileItemClassName?.(row) ?? '',
-                  highlightedRowId != null && String(highlightedRowId) === String(getRowKey(row)) ? 'data-table-mobile__item--highlighted' : '',
-                ].filter(Boolean).join(' ')}
-                rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
-              />
-            ))}
+            {paginatedRows.map((row, index) => {
+              const rowIndex = (Math.min(page, totalPages) - 1) * itemsPerPage + index;
+              return (
+                <MobileRowComponent
+                  key={getRowKey(row)}
+                  row={row}
+                  rowIndex={rowIndex}
+                  columns={columns}
+                  renderActions={renderMobileActions}
+                  className={[
+                    getMobileItemClassName?.(row) ?? '',
+                    highlightedRowId != null && String(highlightedRowId) === String(getRowKey(row)) ? 'data-table-mobile__item--highlighted' : '',
+                  ].filter(Boolean).join(' ')}
+                  rowColor={getRowColor ? getRowColor(row) : (row.rowColor ?? row.color ?? null)}
+                />
+              );
+            })}
           </ul>
         </div>
 

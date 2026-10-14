@@ -118,6 +118,7 @@ export const STUDENT_SORT_OPTIONS = getStudentSortOptions();
  * @typedef {Object} TreasuryStudent
  * @property {string} id
  * @property {number} accountId
+ * @property {number} [position]
  * @property {string} nickname
  * @property {string | null} avatarUrl
  * @property {number} totalEarned
@@ -152,12 +153,15 @@ export function mapBadgeForTreasury(badge, index, earnedBadgeIds = null) {
 
 /**
  * @param {import('../../../services/students.api.js').StudentListItem} student
+ * @param {number} [index]
  * @returns {TreasuryStudent}
  */
-export function mapStudentForTreasury(student) {
+export function mapStudentForTreasury(student, index) {
+  const position = student.position ?? (typeof index === 'number' ? index + 1 : undefined);
   return {
     id: `student-${student.accountId}`,
     accountId: student.accountId,
+    position,
     nickname: student.nickname || `${student.name} ${student.surname}`.trim() || 'Student',
     avatarUrl: student.avatarUrl ?? null,
     totalEarned: student.totalEarned ?? 0,
@@ -174,9 +178,9 @@ export async function buildEarnersByBadgeId(groupId, students, fetchStudentBadge
   /** @type {Map<number, TreasuryStudent[]>} */
   const earnersByBadgeId = new Map();
 
-  await Promise.all(students.map(async (student) => {
+  await Promise.all(students.map(async (student, index) => {
     const studentBadges = await fetchStudentBadges(groupId, student.accountId);
-    const mappedStudent = mapStudentForTreasury(student);
+    const mappedStudent = mapStudentForTreasury(student, index);
 
     studentBadges
       .filter((badge) => badge.isEarned)

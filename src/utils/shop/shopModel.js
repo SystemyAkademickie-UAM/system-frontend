@@ -2,10 +2,16 @@ import { compareShopItemsByEffectivePrice } from './shopPricing.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 
 export const SHOP_SORT = {
+  default: 'default',
   nameAsc: 'nameAsc',
   nameDesc: 'nameDesc',
   priceAsc: 'priceAsc',
   priceDesc: 'priceDesc',
+};
+
+const SORTDEFAULT__TEXTLABEL = {
+  polish: 'Kolejność domyślna',
+  english: 'Default order'
 };
 
 const SORTNAMEASC__TEXTLABEL = {
@@ -35,6 +41,7 @@ const SORTPRICEDESC__TEXTLABEL = {
 export function getShopSortOptions(language) {
   const lang = language ?? READLANGUAGECOOKIE();
   return [
+    { id: SHOP_SORT.default, label: SORTDEFAULT__TEXTLABEL[lang] || SORTDEFAULT__TEXTLABEL.english },
     { id: SHOP_SORT.nameAsc, label: SORTNAMEASC__TEXTLABEL[lang] || SORTNAMEASC__TEXTLABEL.english },
     { id: SHOP_SORT.nameDesc, label: SORTNAMEDESC__TEXTLABEL[lang] || SORTNAMEDESC__TEXTLABEL.english },
     { id: SHOP_SORT.priceAsc, label: SORTPRICEASC__TEXTLABEL[lang] || SORTPRICEASC__TEXTLABEL.english },
@@ -43,6 +50,7 @@ export function getShopSortOptions(language) {
 }
 
 export const SHOP_SORT_OPTIONS = [
+  { id: SHOP_SORT.default, label: SORTDEFAULT__TEXTLABEL.english },
   { id: SHOP_SORT.nameAsc, label: SORTNAMEASC__TEXTLABEL.english },
   { id: SHOP_SORT.nameDesc, label: SORTNAMEDESC__TEXTLABEL.english },
   { id: SHOP_SORT.priceAsc, label: SORTPRICEASC__TEXTLABEL.english },
@@ -83,21 +91,65 @@ export function filterShopItems(items, { searchQuery = '', categoryFilter = 'all
  * @param {import('./shopItem.types.js').ShopItem[]} items
  * @param {string} sortBy
  */
-export function sortShopItems(items, sortBy) {
+export function sortShopItems(items, sortBy = SHOP_SORT.default) {
   const sorted = [...items];
 
   sorted.sort((left, right) => {
+    if (left.isExtraLife && !right.isExtraLife) return -1;
+    if (!left.isExtraLife && right.isExtraLife) return 1;
+
+    let comparison = 0;
+    const nameLeft = String(left.name ?? '').trim();
+    const nameRight = String(right.name ?? '').trim();
+
     switch (sortBy) {
       case SHOP_SORT.nameDesc:
-        return right.name.localeCompare(left.name, 'pl');
+        comparison = nameRight.localeCompare(nameLeft, 'pl', { sensitivity: 'base', numeric: true });
+        break;
       case SHOP_SORT.priceAsc:
-        return compareShopItemsByEffectivePrice(left, right);
+        comparison = compareShopItemsByEffectivePrice(left, right);
+        break;
       case SHOP_SORT.priceDesc:
-        return compareShopItemsByEffectivePrice(right, left);
+        comparison = compareShopItemsByEffectivePrice(right, left);
+        break;
       case SHOP_SORT.nameAsc:
-      default:
-        return left.name.localeCompare(right.name, 'pl');
+        comparison = nameLeft.localeCompare(nameRight, 'pl', { sensitivity: 'base', numeric: true });
+        break;
+      case SHOP_SORT.default:
+      default: {
+        const posA = Number(left.position);
+        const posB = Number(right.position);
+        if (Number.isFinite(posA) && Number.isFinite(posB) && posA !== posB) {
+          comparison = posA - posB;
+        } else {
+          const idA = Number(left.id);
+          const idB = Number(right.id);
+          if (Number.isFinite(idA) && Number.isFinite(idB) && idA !== idB) {
+            comparison = idA - idB;
+          }
+        }
+        break;
+      }
     }
+
+    if (comparison !== 0) {
+      return comparison;
+    }
+
+    // Tie-breakery:
+    const posA = Number(left.position);
+    const posB = Number(right.position);
+    if (Number.isFinite(posA) && Number.isFinite(posB) && posA !== posB) {
+      return posA - posB;
+    }
+
+    const idA = Number(left.id);
+    const idB = Number(right.id);
+    if (Number.isFinite(idA) && Number.isFinite(idB) && idA !== idB) {
+      return idA - idB;
+    }
+
+    return nameLeft.localeCompare(nameRight, 'pl', { sensitivity: 'base', numeric: true });
   });
 
   return sorted;

@@ -91,6 +91,7 @@
   font-weight: 800;
   font-size: 1rem;
   text-decoration: none;
+  cursor: pointer;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(8px);
   transition: all 0.2s ease;
@@ -331,6 +332,8 @@
   padding: 0.95rem 3rem;
   border-radius: 999px;
   background: var(--welcome-accent);
+  border: none;
+  cursor: pointer;
   color: #040905;
   font-family: 'Manrope', var(--font-family-app);
   font-weight: 800;

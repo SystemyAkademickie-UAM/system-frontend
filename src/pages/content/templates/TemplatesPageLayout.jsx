@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import SectionPageLayout from '../../../components/layout/sectionPage/SectionPageLayout.jsx';
 import useAppSubNav from '../../../navigation/useAppSubNav.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import '../shared/groupSectionPage.css';
 import './TemplatesPageLayout.css';
 
 const PAGE_TITLE__TEXTLABEL = {
@@ -15,13 +16,15 @@ export default function TemplatesPageLayout() {
   const nav = useAppSubNav('app-templates');
 
   return (
-    <SectionPageLayout
-      className="templates-page page-unavailable"
-      title={PAGE_TITLE__TEXTLABEL[LANGUAGE]}
-      subNavItems={nav.items}
-      subNavAriaLabel={nav.ariaLabel}
-    >
-      <Outlet />
-    </SectionPageLayout>
+    <div className="app-page-layout">
+      <SectionPageLayout
+        className="templates-page page-unavailable"
+        title={PAGE_TITLE__TEXTLABEL[LANGUAGE]}
+        subNavItems={nav.items}
+        subNavAriaLabel={nav.ariaLabel}
+      >
+        <Outlet />
+      </SectionPageLayout>
+    </div>
   );
 }

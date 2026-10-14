@@ -95,10 +95,10 @@ function OverflowBadge({ hiddenStudents, groupId }) {
             <ul className="rank-path-members__overflow-list">
               {hiddenStudents.map((student) => (
                 <li key={student.id}>
-                  {groupId && student.accountId ? (
+                  {groupId && (student.position || student.accountId) ? (
                     <Link
                       className="rank-path-members__overflow-link"
-                      to={groupStudentProfilePath(groupId, student.accountId)}
+                      to={groupStudentProfilePath(groupId, student.position ?? student.accountId)}
                     >
                       {student.nickname}
                     </Link>
@@ -148,8 +148,8 @@ export default function RankPathMembers({
           totalEarned={student.totalEarned}
           size="md"
           tooltipPlacement="left"
-          href={groupId && student.accountId
-            ? groupStudentProfilePath(groupId, student.accountId)
+          href={groupId && (student.position || student.accountId)
+            ? groupStudentProfilePath(groupId, student.position ?? student.accountId)
             : undefined}
         />
       ))}

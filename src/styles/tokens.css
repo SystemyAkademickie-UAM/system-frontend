@@ -11,6 +11,15 @@
  * Aliasy krótkie (--bg-app, --text-primary, --text-body) — wygodniejsze w komponentach.
  */
 
+@font-face {
+  font-family: 'Noto Color Emoji Flags';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/notocoloremoji/v47/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFab4.ttf') format('truetype');
+  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0061-E007F;
+}
+
 :root {
   --color-bg-svg: #1A1A2A;
   --color-bg-icon: #282834;
@@ -223,8 +232,8 @@
   --font-size-min: 12px;
   /** Domyślna czcionka aplikacji (bez Comic Sans / cursive w fallbacku) */
   --font-family-app: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /** Czcionka dla emoji z pełnym wsparciem flag */
-  --font-family-emoji: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  /** Czcionka dla emoji zgodna ze standardem tabeli (Segoe UI Emoji / Apple Color Emoji) z obsługą flag */
+  --font-family-emoji: 'Noto Color Emoji Flags', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   /** Komunikaty: toasty, alerty, statusy, błędy inline */
   --font-family-message: var(--font-family-app);
   /** Standardowy tekst (treść, przyciski, nawigacja podrzędna) */
@@ -489,8 +498,8 @@
   --font-size-min: 12px;
   /** Domyślna czcionka aplikacji */
   --font-family-app: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /** Czcionka dla emoji z pełnym wsparciem flag */
-  --font-family-emoji: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+  /** Czcionka dla emoji zgodna ze standardem tabeli (Segoe UI Emoji / Apple Color Emoji) z obsługą flag */
+  --font-family-emoji: 'Noto Color Emoji Flags', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   /** Komunikaty: toasty, alerty, statusy, błędy inline */
   --font-family-message: var(--font-family-app);
   /** Standardowy tekst */

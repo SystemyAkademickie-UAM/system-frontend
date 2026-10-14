@@ -34,7 +34,7 @@ import { updateProfile } from '../../../services/profile.api.js';
 import { setLeaderShowNickname } from '../../../hooks/useLeaderDisplayPreferences.js';
 import { applyTheme } from '../../../services/themeService.js';
 import { invalidateRegistrationStatusCache } from '../../../hooks/useRegistrationComplete.js';
-import { homePath, loginPath } from '../../../routes/pathRegistry.js';
+import { homePath, loginPath, welcomePath } from '../../../routes/pathRegistry.js';
 import AuthLogoutConfirmOverlay from '../../content/auth/AuthLogoutConfirmOverlay.jsx';
 import {
   LoginInstitution,
@@ -169,6 +169,10 @@ export default function LoginPage() {
       cancelled = true;
     };
   }, [session?.isAuthenticated, session?.isLoading, navigate, postLoginPath]);
+
+  const handlePionierBack = useCallback(() => {
+    navigate(welcomePath());
+  }, [navigate]);
 
   const handlePionierContinue = useCallback(() => {
     setStep(LOGIN_FLOW_STEP_INSTITUTION);
@@ -388,12 +392,19 @@ export default function LoginPage() {
       );
     }
 
-    return <LoginPionierId onContinue={handlePionierContinue} onEmailLogin={handleEmailLogin} />;
+    return (
+      <LoginPionierId
+        onContinue={handlePionierContinue}
+        onEmailLogin={handleEmailLogin}
+        onBack={handlePionierBack}
+      />
+    );
   }, [
     step,
     session?.isAuthenticated,
     session?.role,
     registrationCheckDone,
+    handlePionierBack,
     handlePionierContinue,
     handleEmailLogin,
     handleEmailBack,

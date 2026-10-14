@@ -49,7 +49,7 @@ const NORANKSAVAILABLE__TEXTLABEL = {
 };
 
 /**
- * Krok 3/4 kreatora przedmiotu: Dostępność, ograniczenia rangą i limity.
+ * Krok 2/4 kreatora przedmiotu: Dostępność, ograniczenia rangą i limity.
  */
 export default function ShopItemStepAvailability({
   isVisible,

@@ -16,14 +16,18 @@ export function normalizeShopItemId(value) {
 }
 
 /**
- * @param {{ shopItems?: string[] } | null | undefined} rank
+ * @param {{ shopItems?: string[], uniqueStoreItems?: string[] } | null | undefined} rank
  * @returns {string[]}
  */
 export function getRankShopItemIds(rank) {
-  if (!rank || !Array.isArray(rank.shopItems)) {
+  if (!rank) {
     return [];
   }
-  return rank.shopItems.map(normalizeShopItemId).filter(Boolean);
+  const items = rank.shopItems ?? rank.uniqueStoreItems;
+  if (!Array.isArray(items)) {
+    return [];
+  }
+  return items.map(normalizeShopItemId).filter(Boolean);
 }
 
 /**
@@ -33,10 +37,14 @@ export function getRankShopItemIds(rank) {
  * @returns {RankUnlockRef | null}
  */
 export function findRankOwningShopItem(itemId, ranks, excludeRankDbId = null) {
+  if (!Array.isArray(ranks)) {
+    return null;
+  }
   const normalizedId = normalizeShopItemId(itemId);
 
   for (const rank of ranks) {
-    if (excludeRankDbId != null && rank.dbId === excludeRankDbId) {
+    const rankId = rank.dbId ?? rank.id;
+    if (excludeRankDbId != null && rankId === excludeRankDbId) {
       continue;
     }
     if (getRankShopItemIds(rank).includes(normalizedId)) {
@@ -55,8 +63,13 @@ export function buildShopItemOwnerMap(ranks, excludeRankDbId = null) {
   /** @type {Map<string, RankUnlockRef>} */
   const map = new Map();
 
+  if (!Array.isArray(ranks)) {
+    return map;
+  }
+
   for (const rank of ranks) {
-    if (excludeRankDbId != null && rank.dbId === excludeRankDbId) {
+    const rankId = rank.dbId ?? rank.id;
+    if (excludeRankDbId != null && rankId === excludeRankDbId) {
       continue;
     }
     for (const itemId of getRankShopItemIds(rank)) {

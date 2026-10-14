@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   CatalogFilterGroup,
@@ -21,6 +21,8 @@ import {
 import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import { useGroupShopItems, useGroupShopOpen } from '../../../hooks/shop/useGroupShop.js';
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
+import { fetchGroupRanks } from '../../../services/ranks.api.js';
+import { buildShopItemOwnerMap, normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
 import './GroupShopContent.css';
 
 const LOADINGMESSAGE__TEXTLABEL = {
@@ -56,13 +58,14 @@ const CATEOGYFILTERLABEL__TEXTLABEL = {
  */
 export default function ShopStudentCatalogPanel({
   groupId,
+  ranks: ranksProp = null,
   showLecturerActions = false,
   onlyPublished = true,
   searchQuery = '',
   filtersExpanded = false,
   categoryFilter = 'all',
   onCategoryFilterChange,
-  sortBy = SHOP_SORT.nameAsc,
+  sortBy = SHOP_SORT.default,
   onSortByChange,
   onEdit,
   onDelete,
@@ -76,6 +79,26 @@ export default function ShopStudentCatalogPanel({
     isStudentView: !showLecturerActions,
   });
   const { categories, categoriesById } = useGroupItemCategories(groupId);
+
+  const [internalRanks, setInternalRanks] = useState([]);
+
+  useEffect(() => {
+    if (ranksProp != null || !groupId) return;
+    let isCancelled = false;
+    fetchGroupRanks(groupId)
+      .then((data) => {
+        if (!isCancelled && Array.isArray(data)) {
+          setInternalRanks(data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isCancelled = true;
+    };
+  }, [groupId, ranksProp]);
+
+  const activeRanks = ranksProp ?? internalRanks;
+  const shopItemRankMap = useMemo(() => buildShopItemOwnerMap(activeRanks), [activeRanks]);
 
   const categoryFilters = useMemo(
     () => buildShopCategoryFilters(categories, LANGUAGE),
@@ -168,6 +191,7 @@ export default function ShopStudentCatalogPanel({
                   onDoubleClick={() => onDoubleClick(item)}
                   isExtraLife={item.isExtraLife}
                   isPublished={item.isPublished}
+                  requiredRank={shopItemRankMap.get(normalizeShopItemId(item.id)) || item.requiredRank || null}
                   disabled={cardsDisabled || item.isLocked}
                   isRankLocked={!showLecturerActions && item.isLocked}
                   className={[

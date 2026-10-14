@@ -64,7 +64,24 @@ export function mapBackendShopItems(items) {
   if (!Array.isArray(items)) {
     return [];
   }
-  return items.map(mapBackendShopItem).filter((item) => item.id);
+  const mapped = items.map(mapBackendShopItem).filter((item) => item.id);
+  const ordered = mapped.sort((left, right) => {
+    if (left.isExtraLife && !right.isExtraLife) return -1;
+    if (!left.isExtraLife && right.isExtraLife) return 1;
+
+    const idA = Number(left.id);
+    const idB = Number(right.id);
+    if (Number.isFinite(idA) && Number.isFinite(idB) && idA !== idB) {
+      return idA - idB;
+    }
+    return String(left.id ?? '').localeCompare(String(right.id ?? ''), 'pl', { numeric: true });
+  });
+
+  return ordered.map((item, index) => ({
+    ...item,
+    position: index + 1,
+    displayId: index + 1,
+  }));
 }
 
 /**

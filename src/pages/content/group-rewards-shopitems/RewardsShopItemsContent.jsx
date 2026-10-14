@@ -42,6 +42,8 @@ import { useGroupLives } from '../../../context/GroupLivesContext.jsx';
 import { useGroupShopLivesSystem } from '../../../hooks/shop/useGroupShopLivesSystem.js';
 import RewardsShopItemTableRow from '../group-rewards/shared/RewardsShopItemTableRow.jsx';
 import RewardsBulkVisibilityButton from '../group-rewards/shared/RewardsBulkVisibilityButton.jsx';
+import { useGroupRanks } from '../group-rewards/useGroupRanks.js';
+import { buildShopItemOwnerMap, normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
 import '../group-rewards/shared/rewardsShared.css';
 import '../group-rewards/shared/rewardsTablePreview.css';
 import './RewardsShopItemsContent.css';
@@ -79,6 +81,11 @@ const COLUMNPRICE__TEXTLABEL = {
 const COLUMNMINPRICE__TEXTLABEL = {
   polish: 'Cena minimalna',
   english: 'Minimum price'
+};
+
+const COLUMNMINRANK__TEXTLABEL = {
+  polish: 'Min. ranga',
+  english: 'Min. rank'
 };
 
 const COLUMNSTORYDESCRIPTION__TEXTLABEL = {
@@ -234,20 +241,26 @@ function formatLimitValue(value, language) {
  * @param {Map<string, any>} categoriesById
  * @param {string} language
  * @param {string} [livesSymbol]
+ * @param {Map<string, any>} [shopItemRankMap]
  */
-function mapShopItemToRow(item, index, categoriesById, language, livesSymbol) {
+function mapShopItemToRow(item, index, categoriesById, language, livesSymbol, shopItemRankMap) {
   const categoryDetails = resolveShopCategoryDetails(item.categories, categoriesById);
   const categoryLabels = resolveShopCategoryLabels(item.categories, categoriesById);
   const categoryColor = getMixedShopCategoryColor(categoryDetails);
+  const resolvedPosition = item.position != null ? Number(item.position) : (index + 1);
+  const normalizedId = normalizeShopItemId(item.id);
+  const requiredRank = shopItemRankMap?.get(normalizedId) || item.requiredRank || null;
   return {
     ...item,
-    position: index + 1,
+    position: resolvedPosition,
+    displayId: resolvedPosition,
     categoryLabel: categoryLabels.join(', ') || '—',
     stockLabel: formatLimitValue(item.stockQuantity, language),
     livesSymbol: livesSymbol,
     studentLimitLabel: formatLimitValue(item.perStudentLimit, language),
     categoryColor,
     rowColor: categoryColor,
+    requiredRank,
   };
 }
 
@@ -261,9 +274,10 @@ function getShopItemColumns(language) {
       key: 'position',
       label: COLUMNNUMBER__TEXTLABEL[language],
       sort: 'number',
-      width: '5%',
+      width: '4%',
       mobileRole: 'primary',
       className: 'rewards-table__th--position',
+      accessor: (item) => Number(item.position ?? 0),
       render: (item) => (
         <span className="rewards-table__position">#{item.position}</span>
       ),
@@ -272,7 +286,7 @@ function getShopItemColumns(language) {
       key: 'name',
       label: COLUMNNAME__TEXTLABEL[language],
       sort: 'text',
-      width: '14%',
+      width: '13%',
       mobileRole: 'title',
       render: (item) => (
         <span className="rewards-table__name">{item.name}</span>
@@ -304,6 +318,12 @@ function getShopItemColumns(language) {
       sort: 'text',
       width: '4%',
       mobileRole: 'meta',
+      accessor: (item) => {
+        if (item.isExtraLife) {
+          return resolveExtraLifeItemIcon(item.livesSymbol).emoji;
+        }
+        return item.imageRef ? String(item.imageRef).split('*')[0] : '';
+      },
       render: (item) => {
         if (item.isExtraLife) {
           const { emoji } = resolveExtraLifeItemIcon(item.livesSymbol);
@@ -331,6 +351,7 @@ function getShopItemColumns(language) {
       sort: 'number',
       width: '6%',
       mobileRole: 'meta',
+      accessor: (item) => Number(item.priceAmount ?? 0),
       render: (item) => (
         <CurrencyDisplay
           amount={item.priceAmount}
@@ -342,7 +363,8 @@ function getShopItemColumns(language) {
       key: 'minPrice',
       label: COLUMNMINPRICE__TEXTLABEL[language],
       sort: 'number',
-      width: '8%',
+      width: '7%',
+      accessor: (item) => (item.minPrice != null && Number(item.minPrice) > 0 ? Number(item.minPrice) : null),
       render: (item) => (
         item.minPrice != null && Number(item.minPrice) > 0 ? (
           <CurrencyDisplay
@@ -355,10 +377,35 @@ function getShopItemColumns(language) {
       ),
     },
     {
+      key: 'requiredRank',
+      label: COLUMNMINRANK__TEXTLABEL[language],
+      sort: 'text',
+      width: '9%',
+      hiddenBelow: 768,
+      accessor: (item) => item.requiredRank?.name || '',
+      render: (item) => {
+        if (item.requiredRank && item.requiredRank.name) {
+          return (
+            <span className="rewards-table__cell-text rewards-table__cell-text--rank">
+              {item.requiredRank.icon ? (
+                <span className="rewards-table__icon-emoji" aria-hidden="true">
+                  {item.requiredRank.icon}{' '}
+                </span>
+              ) : null}
+              {item.requiredRank.name}
+            </span>
+          );
+        }
+        return (
+          <span className="rewards-table__cell-text rewards-table__cell-text--muted">—</span>
+        );
+      },
+    },
+    {
       key: 'storyDescription',
       label: COLUMNSTORYDESCRIPTION__TEXTLABEL[language],
       sort: 'text',
-      width: '13%',
+      width: '12%',
       cellClassName: 'rewards-table__cell--truncate',
       hiddenBelow: 768,
       render: (item) => (
@@ -371,7 +418,7 @@ function getShopItemColumns(language) {
       key: 'didacticDescription',
       label: COLUMNDIDACTICDESCRIPTION__TEXTLABEL[language],
       sort: 'text',
-      width: '13%',
+      width: '12%',
       cellClassName: 'rewards-table__cell--truncate',
       hiddenBelow: 768,
       render: (item) => (
@@ -384,7 +431,7 @@ function getShopItemColumns(language) {
       key: 'categoryLabel',
       label: COLUMNCATEGORY__TEXTLABEL[language],
       sort: 'text',
-      width: '11%',
+      width: '9%',
       cellClassName: 'rewards-table__cell--truncate',
       hiddenBelow: 768,
       render: (item) => (
@@ -396,9 +443,10 @@ function getShopItemColumns(language) {
     {
       key: 'stockLabel',
       label: COLUMNSTOCK__TEXTLABEL[language],
-      sort: 'text',
-      width: '9%',
+      sort: 'number',
+      width: '8%',
       hiddenBelow: 768,
+      accessor: (item) => (item.stockQuantity == null ? null : Number(item.stockQuantity)),
       render: (item) => (
         <span className="rewards-table__cell-text">{item.stockLabel}</span>
       ),
@@ -406,9 +454,10 @@ function getShopItemColumns(language) {
     {
       key: 'studentLimitLabel',
       label: COLUMNSTUDENTLIMIT__TEXTLABEL[language],
-      sort: 'text',
-      width: '9%',
+      sort: 'number',
+      width: '8%',
       hiddenBelow: 768,
+      accessor: (item) => (item.perStudentLimit == null ? null : Number(item.perStudentLimit)),
       render: (item) => (
         <span className="rewards-table__cell-text">{item.studentLimitLabel}</span>
       ),
@@ -440,13 +489,15 @@ export default function RewardsShopItemsContent() {
     refetch: refetchCategories,
   } = useGroupItemCategories(groupId);
   const { showExtraLifeProduct } = useGroupShopLivesSystem(groupId, { isStudentView: false });
+  const { ranks } = useGroupRanks();
+  const shopItemRankMap = useMemo(() => buildShopItemOwnerMap(ranks), [ranks]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeModal, setActiveModal] = useState(null);
   const [shopAccessOpen, setShopAccessOpen] = useState(false);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [sortBy, setSortBy] = useState(SHOP_SORT.nameAsc);
+  const [sortBy, setSortBy] = useState(SHOP_SORT.default);
   const [bulkVisibilityLoading, setBulkVisibilityLoading] = useState(false);
   const [value, setValue] = useState(0);
   const [highlightedItemId, setHighlightedItemId] = useState(null);
@@ -469,8 +520,8 @@ export default function RewardsShopItemsContent() {
     const filtered = filterCatalogShopItems(items, showExtraLifeProduct);
     const sorted = sortShopItems(filtered, sortBy);
     const withExtraLifeFirst = sortShopItemsWithExtraLifeFirst(sorted);
-    return withExtraLifeFirst.map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE, livesSymbol));
-  }, [items, categoriesById, showExtraLifeProduct, LANGUAGE, livesSymbol, sortBy]);
+    return withExtraLifeFirst.map((item, index) => mapShopItemToRow(item, index, categoriesById, LANGUAGE, livesSymbol, shopItemRankMap));
+  }, [items, categoriesById, showExtraLifeProduct, LANGUAGE, livesSymbol, sortBy, shopItemRankMap]);
 
   useEffect(() => {
     if (!targetHighlightId && !highlightNameFromState && !isExtraLifeHighlight) {
@@ -779,6 +830,7 @@ export default function RewardsShopItemsContent() {
           <ShopStudentCatalogPanel
             key={value}
             groupId={groupId}
+            ranks={ranks}
             showLecturerActions
             onlyPublished={false}
             searchQuery={searchQuery}
@@ -816,6 +868,7 @@ export default function RewardsShopItemsContent() {
               || item.categoryLabel.toLowerCase().includes(query)
               || item.stockLabel.toLowerCase().includes(query)
               || item.studentLimitLabel.toLowerCase().includes(query)
+              || (item.requiredRank?.name && item.requiredRank.name.toLowerCase().includes(query))
             ),
           }}
           rowActions={rowActions}

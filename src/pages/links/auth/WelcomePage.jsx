@@ -1,7 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../../../context/SessionContext.jsx';
 import { groupsListPath } from '../../../routes/pathRegistry.js';
-import { getRememberMe } from '../../../services/rememberMeService.js';
 import WelcomeContent from '../../content/auth/WelcomeContent.jsx';
 import '../../../components/guards/RouteGuard.css';
 
