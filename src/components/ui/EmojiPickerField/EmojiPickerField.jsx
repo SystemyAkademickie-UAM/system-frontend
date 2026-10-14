@@ -30,6 +30,28 @@ export default function EmojiPickerField({
       return;
     }
 
+    if (picker.shadowRoot && !picker.shadowRoot.querySelector('style[data-flags-font]')) {
+      const style = document.createElement('style');
+      style.setAttribute('data-flags-font', 'true');
+      style.textContent = `
+        .results > .group:last-child .button,
+        .group--flags .button,
+        .group-filter:last-child .button {
+          font-family: 'Noto Color Emoji Flags', 'Noto Color Emoji', 'Twemoji Country Flags', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif !important;
+        }
+      `;
+      picker.shadowRoot.appendChild(style);
+
+      try {
+        const flagsElement = picker.groupElements?.get?.(picker.groups?.get?.('flags'));
+        if (flagsElement) {
+          flagsElement.classList.add('group--flags');
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     picker.addEventListener('emoji-pick', (event) => {
       onChange?.(event.detail.emoji);
       setIsOpen(false);

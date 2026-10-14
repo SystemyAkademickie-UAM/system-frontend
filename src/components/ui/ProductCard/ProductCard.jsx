@@ -86,10 +86,29 @@ const MINPRICE__TEXTLABEL = {
   english: 'Min. price'
 };
 
+const MINRANK__TEXTLABEL = {
+  polish: 'Min. ranga',
+  english: 'Min. rank'
+};
+
 const INCART__TEXTLABEL = {
   polish: 'W koszyku',
   english: 'In cart'
 };
+
+function resolveRequiredRank(requiredRank) {
+  if (!requiredRank) return null;
+  if (typeof requiredRank === 'string') {
+    const trimmed = requiredRank.trim();
+    return trimmed ? { name: trimmed, icon: null } : null;
+  }
+  if (typeof requiredRank === 'object') {
+    const name = requiredRank.name || '';
+    const icon = requiredRank.icon || requiredRank.iconFile || null;
+    return name ? { name, icon } : null;
+  }
+  return null;
+}
 
 
 
@@ -361,11 +380,14 @@ export default function ProductCard({
 
   isPublished,
 
+  requiredRank = null,
+
 }) {
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { symbol: livesSymbol } = useGroupLives();
 
+  const rankInfo = resolveRequiredRank(requiredRank);
   const showLecturerTile = showLecturerActions && isPublished !== undefined;
 
   const icon = useMemo(
@@ -434,7 +456,7 @@ export default function ProductCard({
         .join(' ')}
 
       style={cardStyle}
-      title={isRankLocked ? (lockedReason ?? DEFAULTLOCKEDREASON__TEXTLABEL[LANGUAGE]) : undefined}
+      title={isRankLocked ? (lockedReason ?? (rankInfo?.name ? `${MINRANK__TEXTLABEL[LANGUAGE]}: ${rankInfo.name}` : DEFAULTLOCKEDREASON__TEXTLABEL[LANGUAGE])) : undefined}
       onDoubleClick={() => onDoubleClick() }
 
 
@@ -641,6 +663,20 @@ export default function ProductCard({
             </>
           ) : (
             <>
+          {rankInfo ? (
+            <div className="maq-product-card__rank-bar">
+              <span className="maq-product-card__section-label">{MINRANK__TEXTLABEL[LANGUAGE]}</span>
+              <span className="maq-product-card__rank-value">
+                {rankInfo.icon ? (
+                  <span className="maq-product-card__rank-icon" aria-hidden="true">
+                    {rankInfo.icon}
+                  </span>
+                ) : null}
+                <span className="maq-product-card__rank-name">{rankInfo.name}</span>
+              </span>
+            </div>
+          ) : null}
+
           <div className="maq-product-card__price-bar">
 
             <span className="maq-product-card__section-label">{PRICE__TEXTLABEL[LANGUAGE]}</span>

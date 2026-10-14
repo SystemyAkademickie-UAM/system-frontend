@@ -24,8 +24,8 @@ const NAMELABEL__TEXTLABEL = {
 };
 
 const COSTLABEL__TEXTLABEL = {
-  polish: 'Koszt*',
-  english: 'Cost*'
+  polish: 'Wymagana waluta*',
+  english: 'Required currency*'
 };
 
 const COSTPLACEHOLDER__TEXTLABEL = {

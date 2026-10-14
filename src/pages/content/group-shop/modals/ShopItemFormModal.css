@@ -337,6 +337,7 @@
 }
 
 .shop-item-form__icon-locked .maq-currency-icon {
+  font-family: var(--font-family-emoji);
   font-size: 2rem;
   line-height: 1;
   width: auto;
@@ -1275,8 +1276,15 @@
   background: var(--color-bg-elevated);
   border: 1px solid var(--color-divider);
   border-radius: 12px;
+  font-family: var(--font-family-emoji);
   font-size: 26px;
+  line-height: 1;
   flex-shrink: 0;
+}
+
+.shop-item-summary__icon-emoji {
+  font-family: var(--font-family-emoji);
+  line-height: 1;
 }
 
 .shop-item-summary__info-details {

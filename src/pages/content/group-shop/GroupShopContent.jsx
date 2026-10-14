@@ -48,6 +48,8 @@ import {
   useGroupShopOpen,
 } from '../../../hooks/shop/useGroupShop.js';
 import { useGroupCurrency } from '../../../context/GroupCurrencyContext.jsx';
+import { fetchGroupRanks } from '../../../services/ranks.api.js';
+import { buildShopItemOwnerMap, normalizeShopItemId } from '../../../utils/ranks/rankShopItemUnlock.js';
 import { groupProfileEqPath } from '../../../routes/pathRegistry.js';
 import { setShopPurchaseSummary } from '../group-profile-eq/ProfileEqContentWindow.jsx';
 import ShopBuyAllModal from './modals/ShopBuyAllModal.jsx';
@@ -349,15 +351,39 @@ export default function GroupShopContent() {
     refetch: refetchLives,
   } = useGroupShopLivesSystem(groupId, { isStudentView });
 
+  const [ranks, setRanks] = useState([]);
+
+  useEffect(() => {
+    if (!groupId) return;
+    let isCancelled = false;
+    fetchGroupRanks(groupId)
+      .then((data) => {
+        if (!isCancelled && Array.isArray(data)) {
+          setRanks(data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isCancelled = true;
+    };
+  }, [groupId]);
+
+  const shopItemRankMap = useMemo(() => buildShopItemOwnerMap(ranks), [ranks]);
+
   const catalogItems = useMemo(() => {
+    const attachRank = (list) => list.map((item) => ({
+      ...item,
+      requiredRank: shopItemRankMap.get(normalizeShopItemId(item.id)) || item.requiredRank || null,
+    }));
+
     if (isStudentView) {
       const publishedItems = items.filter((item) => item.isPublished !== false);
       const sourceItems = filterCatalogShopItems(publishedItems, showExtraLifeProduct);
-      return sortShopItemsWithExtraLifeFirst(sourceItems);
+      return attachRank(sortShopItemsWithExtraLifeFirst(sourceItems));
     }
 
-    return sortShopItemsWithExtraLifeFirst(items);
-  }, [items, isStudentView, showExtraLifeProduct]);
+    return attachRank(sortShopItemsWithExtraLifeFirst(items));
+  }, [items, isStudentView, showExtraLifeProduct, shopItemRankMap]);
 
   const extraLifeProduct = useMemo(
     () => findExtraLifeShopItem(items),
@@ -377,7 +403,7 @@ export default function GroupShopContent() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [sortBy, setSortBy] = useState(SHOP_SORT.nameAsc);
+  const [sortBy, setSortBy] = useState(SHOP_SORT.default);
   const [page, setPage] = useState(1);
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
@@ -817,6 +843,7 @@ export default function GroupShopContent() {
                         rankDiscountedPrice={item.rankDiscountedPrice}
                         appliedDiscounts={item.appliedDiscounts}
                         imageRef={item.imageRef}
+                        requiredRank={item.requiredRank}
                         categoryDetails={resolveShopCategoryDetails(item.categories, categoriesById)}
                         showLecturerActions={isLecturerView}
                         disabled={isShopItemPurchaseDisabled(item, purchaseOptions)}

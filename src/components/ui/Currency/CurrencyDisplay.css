@@ -18,6 +18,7 @@
 }
 
 .maq-currency-icon--emoji {
+  font-family: var(--font-family-emoji);
   font-style: normal;
 }
 

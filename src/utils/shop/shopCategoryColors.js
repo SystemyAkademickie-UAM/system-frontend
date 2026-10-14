@@ -138,6 +138,13 @@ export function getMixedCategoryColor(categories = []) {
  * @returns {Record<string, string>}
  */
 export function getProductCardColorVars(categories = []) {
+  if (categories.length == 0) {
+    return {
+      '--product-card-accent-color': 'var(--color-accent)',
+      '--product-card-stroke-color': 'var(--color-accent)'
+    }
+  }
+
   const accentColor = getMixedCategoryColor(categories);
 
   return {

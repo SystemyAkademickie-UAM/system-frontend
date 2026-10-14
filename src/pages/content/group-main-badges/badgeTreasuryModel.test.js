@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { BADGE_RARITY } from '../../../components/ui/Badge/badgeRarity.js';
 import {
+  buildEarnersByBadgeId,
   filterTreasuryBadges,
   getBadgeEarners,
+  mapStudentForTreasury,
   sortTreasuryBadges,
   TREASURY_SORT,
 } from './badgeTreasuryModel.js';
@@ -86,5 +88,14 @@ describe('badgeTreasuryModel', () => {
 
     expect(earners).toHaveLength(1);
     expect(earners[0].nickname).toBe('Bartek');
+  });
+
+  it('preserves student position when mapping for treasury and earners', async () => {
+    const student = { accountId: 5, nickname: 'Tomek', totalEarned: 50 };
+    const mapped = mapStudentForTreasury(student, 0);
+    expect(mapped.position).toBe(1);
+
+    const earnersMap = await buildEarnersByBadgeId('100001', [student], async () => [{ id: 10, isEarned: true }]);
+    expect(earnersMap.get(10)[0].position).toBe(1);
   });
 });

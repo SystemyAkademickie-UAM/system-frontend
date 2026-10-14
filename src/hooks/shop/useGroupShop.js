@@ -73,7 +73,14 @@ export function useGroupShopItems(groupId) {
       return result;
     }
 
-    setItemsState((current) => current.filter((item) => item.id !== String(itemId)));
+    setItemsState((current) => {
+      const remaining = current.filter((item) => item.id !== String(itemId));
+      return remaining.map((item, index) => ({
+        ...item,
+        position: index + 1,
+        displayId: index + 1,
+      }));
+    });
     const cartIds = getShopCartItemIds(groupId).filter((id) => id !== String(itemId));
     setShopCartItemIds(groupId, cartIds);
     return { ok: true };

@@ -115,11 +115,12 @@ export function filterCatalogShopItems(items, showExtraLifeProduct = false) {
     return [];
   }
 
-  if (showExtraLifeProduct) {
-    return items;
-  }
-
-  return items.filter((item) => !item.isExtraLife);
+  const filtered = showExtraLifeProduct ? items : items.filter((item) => !item.isExtraLife);
+  return filtered.map((item, index) => ({
+    ...item,
+    position: index + 1,
+    displayId: index + 1,
+  }));
 }
 
 /**

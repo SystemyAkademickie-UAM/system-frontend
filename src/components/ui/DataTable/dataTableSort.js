@@ -14,6 +14,20 @@ function compareByCustomOrder(valueA, valueB, orderedValues) {
 }
 
 /**
+ * Bezpiecznie parsuje wartość liczbową do sortowania.
+ * Zwraca null dla null/undefined/NaN/pustego ciągu.
+ * @param {unknown} val
+ * @returns {number | null}
+ */
+function parseSortNumber(val) {
+  if (val === null || val === undefined || val === '') {
+    return null;
+  }
+  const num = Number(val);
+  return Number.isFinite(num) ? num : null;
+}
+
+/**
  * @param {unknown} valueA
  * @param {unknown} valueB
  * @param {SortType | CustomSort | false | undefined} sort
@@ -22,15 +36,25 @@ export function compareSortValues(valueA, valueB, sort) {
   if (!sort) return 0;
 
   if (sort === 'number') {
-    return Number(valueA) - Number(valueB);
+    const numA = parseSortNumber(valueA);
+    const numB = parseSortNumber(valueB);
+    if (numA === null && numB === null) return 0;
+    if (numA === null) return 1;
+    if (numB === null) return -1;
+    return numA - numB;
   }
 
   if (sort === 'text') {
-    return String(valueA).localeCompare(String(valueB), 'pl', { sensitivity: 'base' });
+    const strA = valueA == null ? '' : String(valueA).trim();
+    const strB = valueB == null ? '' : String(valueB).trim();
+    if (!strA && !strB) return 0;
+    if (!strA) return 1;
+    if (!strB) return -1;
+    return strA.localeCompare(strB, 'pl', { sensitivity: 'base', numeric: true });
   }
 
   if (sort.type === 'custom') {
-    return compareByCustomOrder(String(valueA), String(valueB), sort.order);
+    return compareByCustomOrder(String(valueA ?? ''), String(valueB ?? ''), sort.order);
   }
 
   return 0;
@@ -78,11 +102,29 @@ export function sortRows(rows, sortRules, columns, tiebreakerKey) {
 }
 
 /**
+ * Cyklicznie przełącza reguły sortowania:
+ * - Przy pojedynczym kliknięciu (isMulti = false) nowa kolumna ZASTĘPUJE poprzednie sortowanie:
+ *   asc -> desc -> brak
+ * - Przy multi-sort (isMulti = true, np. z wciśniętym Shift):
+ *   dopisuje/modyfikuje regułę w tablicy wielu reguł.
+ *
  * @param {SortRule[]} prevRules
  * @param {string} key
+ * @param {boolean} [isMulti=false]
  * @returns {SortRule[]}
  */
-export function cycleSortRule(prevRules, key) {
+export function cycleSortRule(prevRules, key, isMulti = false) {
+  if (!isMulti) {
+    const active = prevRules.find((rule) => rule.key === key);
+    if (!active) {
+      return [{ key, direction: 'asc' }];
+    }
+    if (active.direction === 'asc') {
+      return [{ key, direction: 'desc' }];
+    }
+    return [];
+  }
+
   const index = prevRules.findIndex((rule) => rule.key === key);
 
   if (index === -1) {
@@ -97,3 +139,4 @@ export function cycleSortRule(prevRules, key) {
 
   return prevRules.filter((_, ruleIndex) => ruleIndex !== index);
 }
+

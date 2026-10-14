@@ -102,11 +102,9 @@
 
 
 .maq-product-card__icon-emoji {
-
+  font-family: var(--font-family-emoji);
   font-size: 2.5rem;
-
   line-height: 1;
-
 }
 
 
@@ -301,6 +299,38 @@
 
 
 
+.maq-product-card__rank-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-badge-divider);
+}
+
+.maq-product-card__rank-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-badge-body, 0.875rem);
+  font-weight: 600;
+  color: var(--color-badge-text);
+}
+
+.maq-product-card__rank-icon {
+  font-family: var(--font-family-emoji);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.maq-product-card__rank-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
 .maq-product-card__price-bar {
 
   display: flex;
@@ -408,7 +438,7 @@
 
   border-radius: 4px;
 
-  background: rgba(255, 179, 71, 0.12);
+  background: rgba(255, 179, 71, 0.24);
 
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
 
