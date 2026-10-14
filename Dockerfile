@@ -15,6 +15,8 @@ RUN npm run build
 # Serve static assets on port 3000 (matches host nginx proxy_pass http://localhost:3000)
 FROM nginx:alpine
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx/20-documents-path.sh /docker-entrypoint.d/20-documents-path.sh
+RUN chmod 755 /docker-entrypoint.d/20-documents-path.sh
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 3000
 CMD ["nginx", "-g", "daemon off;"]

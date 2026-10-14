@@ -9,6 +9,10 @@ services:
       - "host.docker.internal:host-gateway"
     ports:
       - "3000:3000"
+    environment:
+      MAQ_DOCUMENTS_PATH: /mnt/documents
+    volumes:
+      - ./public/documents:/mnt/documents:ro
     networks:
       - academy-network
 

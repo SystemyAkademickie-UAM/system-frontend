@@ -39,6 +39,14 @@ docker run -d -p 127.0.0.1:3000:3000 --name ui system-frontend:prod
 
 The container listens on **3000** inside the image (`docker/nginx/default.conf`).
 
+## Documents (`/documents/...`)
+
+Login links keep requesting `/documents/<file>.pdf`. Those files are still copied into the image from `public/documents/` so a container with no mount keeps working.
+
+`MAQ_DOCUMENTS_PATH` is a path inside the frontend container, read from the container environment at start. It is not a `VITE_` variable. This repo’s Compose file sets it to `/mnt/documents` and mounts `./public/documents` there. On start, if that directory contains any file, nginx serves it instead of the image copies. An empty directory leaves the image copies in place. Replacing a PDF does not require a new image. Set file mode so the nginx user can read them (`644`).
+
+Production Compose mounts host `/opt/maq/documents` at `/mnt/documents`. Put `MAQ_DOCUMENTS_PATH=/mnt/documents` in `/opt/maq/.frontend.env`. That container path is the host directory. `/mnt` is not the whole of `/opt/maq`.
+
 ## Helper scripts (Docker CLI only)
 
 From this service directory (`system-frontend`, where this `docs/` folder lives next to `scripts/`):

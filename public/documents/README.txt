@@ -23,4 +23,5 @@ PDF to plik binarny. Jeśli zostanie otwarty lub zapisany w edytorze (np. Cursor
 
 **Uwaga:** kopia w `Downloads/polityka-prywatnosci.pdf` jest obecnie taka sama uszkodzona jak ta w projekcie — trzeba pobrać **nowy** eksport ze źródła.
 
-- Oba pliki muszą istnieć. Brak pliku powoduje zwrot strony HTML aplikacji zamiast PDF.
+- Oba pliki muszą istnieć. W `npm run dev` brak pliku zwraca stronę HTML aplikacji. Obraz nginx zwraca 404.
+- W Dockerze katalog z dysku pod `/mnt/documents` zastępuje te pliki, gdy nie jest pusty. Pusty katalog zostawia kopie z obrazu. `MAQ_DOCUMENTS_PATH=/mnt/documents`.
