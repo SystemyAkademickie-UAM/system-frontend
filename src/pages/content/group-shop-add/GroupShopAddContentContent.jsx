@@ -96,6 +96,12 @@ const ShopItemFormContent = forwardRef(function ShopItemFormContent({
   // Krok kreatora (1 - Informacje, 2 - Dostępność, 3 - Wartość, 4 - Podsumowanie)
   const [currentStep, setCurrentStepState] = useState(editingItemId ? 4 : 1);
 
+  useEffect(() => {
+    const initialStep = editingItemId ? 4 : 1;
+    setCurrentStepState(initialStep);
+    onStepChange?.(initialStep);
+  }, [editingItemId, onStepChange]);
+
   const setCurrentStep = useCallback((stepOrFn) => {
     let next;
     if (typeof stepOrFn === 'function') {
