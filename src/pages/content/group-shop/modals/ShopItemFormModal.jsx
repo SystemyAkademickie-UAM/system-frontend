@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Modal } from '../../../../components/ui/index.js';
 import ShopItemFormContent from '../../group-shop-add/GroupShopAddContentContent.jsx';
 import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
@@ -43,6 +43,12 @@ export default function ShopItemFormModal({
   const [currentStep, setCurrentStep] = useState(itemId ? 4 : 1);
   const formRef = useRef(null);
 
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentStep(itemId ? 4 : 1);
+    }
+  }, [isOpen, itemId]);
+
   const isEditing = Boolean(itemId);
 
   const baseTitle = isEditing
@@ -80,6 +86,7 @@ export default function ShopItemFormModal({
       className="shop-item-form-modal"
     >
       <ShopItemFormContent
+        key={`${groupId}_${itemId ?? 'new'}`}
         ref={formRef}
         groupId={groupId}
         itemId={itemId}
