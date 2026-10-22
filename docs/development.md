@@ -18,7 +18,7 @@ Use `.nvmrc` with nvm / nvm-windows. CI uses Node **24.14.1** (see `.github/work
 
 - `.github/workflows/ci.yml` — install, test, build on `push` / `pull_request` to `main`.
 - `.github/workflows/docker-build.yml` — verify a Docker image build on `push` to `main` (no registry push).
-- `.github/workflows/docker-publish.yml` — build and push the image on `push` to `production` (GHCR).
+- `.github/workflows/docker-publish.yml` — push `:stable` and legacy `:latest` from `production`, and `:developer` from `developer` (GHCR). A developer push does not move `:latest`.
 
 ## Environment variables
 
