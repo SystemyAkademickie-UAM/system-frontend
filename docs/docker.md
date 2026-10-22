@@ -61,6 +61,6 @@ Default image tag is `system-frontend:local`. Override with `IMAGE_NAME`. Pass `
 ## CI image
 
 - `.github/workflows/docker-build.yml` — builds this Dockerfile on `push` to `main` (verification only).
-- `.github/workflows/docker-publish.yml` — pushes `ghcr.io/systemyakademickie-uam/system-frontend:stable` on `production`, and `:developer` on `developer`. It does not move `:latest`. Pass `VITE_API_BASE_URL` only when the deployed UI must call a separate API origin; otherwise leave unset so nginx same-origin `/api/` applies where your ingress mirrors this layout.
+- `.github/workflows/docker-publish.yml` — a `production` push publishes `:stable` and the legacy alias `:latest`. A `developer` push publishes `:developer` and does not move `:latest`. Pass `VITE_API_BASE_URL` only when the deployed UI must call a separate API origin; otherwise leave unset so nginx same-origin `/api/` applies where your ingress mirrors this layout.
 
 The build stage uses **Node.js 24.14.1** (Alpine) and **npm 11.11.0**, matching [prerequisites.md](./prerequisites.md).

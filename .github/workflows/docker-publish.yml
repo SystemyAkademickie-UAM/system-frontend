@@ -18,13 +18,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Choose image tag
+      - name: Choose image tags
         id: image
         run: |
+          image=ghcr.io/systemyakademickie-uam/system-frontend
           case "$GITHUB_REF_NAME" in
-            production) echo "tag=stable" >> "$GITHUB_OUTPUT" ;;
-            developer) echo "tag=developer" >> "$GITHUB_OUTPUT" ;;
-            *) echo "Ref $GITHUB_REF_NAME does not publish an image." >&2; exit 1 ;;
+            production)
+              {
+                echo "tags<<EOF"
+                echo "${image}:stable"
+                echo "${image}:latest"
+                echo "EOF"
+              } >> "$GITHUB_OUTPUT"
+              ;;
+            developer)
+              echo "tags=${image}:developer" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Ref $GITHUB_REF_NAME does not publish an image." >&2
+              exit 1
+              ;;
           esac
 
       - name: Log in to GitHub Container Registry
@@ -43,4 +56,4 @@ jobs:
           # Leave vars.VITE_API_BASE_URL unset. A set value pins a single host and breaks the other.
           build-args: |
             VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
-          tags: ghcr.io/systemyakademickie-uam/system-frontend:${{ steps.image.outputs.tag }}
+          tags: ${{ steps.image.outputs.tags }}
