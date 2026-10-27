@@ -35,6 +35,7 @@ const INTRO_LINE4_WORDS__TEXTLABEL = {
 const JOIN_BUTTON__TEXTLABEL = {
   polish: 'Dołącz',
   english: 'Join'
+
 };
 
 const SUBTITLE__TEXTLABEL = {
@@ -68,7 +69,7 @@ const FOOTER_COORDINATOR_HEADING__TEXTLABEL = {
 };
 
 const FOOTER_COORDINATOR_ROLE__TEXTLABEL = {
-  polish: 'Osoba koordynator projekt:',
+  polish: 'Osoba koordynująca projekt:',
   english: 'Project coordinator:',
 };
 
@@ -107,6 +108,7 @@ const FOOTER_AUTHORS = [
 
 function pickRandom(items) {
   return items[Math.floor(Math.random() * items.length)];
+
 }
 
 function useCoarsePointer() {
@@ -390,4 +392,5 @@ export default function WelcomeContent() {
     </div>
   );
 }
+
 

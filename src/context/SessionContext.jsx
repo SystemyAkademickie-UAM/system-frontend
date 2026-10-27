@@ -1,21 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import { AUTH_LOGIN_ME_PATH } from '../constants/authPaths.constants.js';
-import { handleSessionExpired, registerClientAuthClearListener } from '../auth/clientAuthState.js';
+import { registerClientAuthClearListener } from '../auth/clientAuthState.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 import { getJson } from '../services/api-client.js';
 
 const SessionContext = createContext(null);
-
-/** Domyślny czas bezczynności sesji: 15 minut. */
-export const SESSION_IDLE_TIMEOUT_MS = 15 * 60 * 1000;
-
-const RESOLVED_IDLE_TIMEOUT_MS = (() => {
-  const envVal = Number(import.meta.env.VITE_SESSION_IDLE_TIMEOUT_MS);
-  return Number.isFinite(envVal) && envVal > 0 ? envVal : SESSION_IDLE_TIMEOUT_MS;
-})();
-
-export const STORAGE_KEY_LAST_ACTIVITY = 'maq_last_activity';
 
 /** Retry delays after redirect — cookies may not be visible to fetch on the first tick. */
 const SESSION_CHECK_RETRY_DELAYS_MS = [0, 100, 250, 500];
@@ -137,93 +127,6 @@ export function SessionProvider({ children }) {
   useEffect(() => {
     checkSession({ initial: true });
   }, [checkSession]);
-
-  const lastActivityRef = useRef(Date.now());
-  const lastStorageWriteRef = useRef(0);
-
-  // Śledzenie bezczynności użytkownika (idle timeout 15 min)
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-
-    const now = Date.now();
-    lastActivityRef.current = now;
-
-    try {
-      const stored = Number(localStorage.getItem(STORAGE_KEY_LAST_ACTIVITY));
-      if (Number.isFinite(stored) && stored > 0 && now - stored < RESOLVED_IDLE_TIMEOUT_MS) {
-        lastActivityRef.current = Math.max(now, stored);
-      } else {
-        localStorage.setItem(STORAGE_KEY_LAST_ACTIVITY, String(now));
-      }
-    } catch {
-      // ignore storage errors
-    }
-
-    const recordActivity = () => {
-      const currentTime = Date.now();
-      lastActivityRef.current = currentTime;
-      if (currentTime - lastStorageWriteRef.current > 2000) {
-        lastStorageWriteRef.current = currentTime;
-        try {
-          localStorage.setItem(STORAGE_KEY_LAST_ACTIVITY, String(currentTime));
-        } catch {
-          // ignore storage errors
-        }
-      }
-    };
-
-    const handleStorageChange = (event) => {
-      if (event.key === STORAGE_KEY_LAST_ACTIVITY && event.newValue) {
-        const val = Number(event.newValue);
-        if (Number.isFinite(val) && val > lastActivityRef.current) {
-          lastActivityRef.current = val;
-        }
-      }
-    };
-
-    const checkIdleStatus = () => {
-      let latest = lastActivityRef.current;
-      try {
-        const stored = Number(localStorage.getItem(STORAGE_KEY_LAST_ACTIVITY));
-        if (Number.isFinite(stored) && stored > latest) {
-          latest = stored;
-          lastActivityRef.current = stored;
-        }
-      } catch {
-        // ignore storage errors
-      }
-
-      if (Date.now() - latest >= RESOLVED_IDLE_TIMEOUT_MS) {
-        handleSessionExpired();
-      }
-    };
-
-    const activityEvents = ['pointerdown', 'keydown', 'wheel', 'touchstart', 'mousemove'];
-    activityEvents.forEach((ev) => {
-      window.addEventListener(ev, recordActivity, { passive: true });
-    });
-    window.addEventListener('storage', handleStorageChange);
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        checkIdleStatus();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-
-    const intervalId = window.setInterval(checkIdleStatus, 3000);
-
-    return () => {
-      activityEvents.forEach((ev) => {
-        window.removeEventListener(ev, recordActivity);
-      });
-      window.removeEventListener('storage', handleStorageChange);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.clearInterval(intervalId);
-    };
-  }, [user]);
 
   const role = useMemo(() => mapBackendRoleToAppRole(user?.role), [user]);
 

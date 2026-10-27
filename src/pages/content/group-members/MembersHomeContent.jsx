@@ -35,7 +35,8 @@ const RANK_ASSIGNED__TEXTLABEL = { polish: 'Przyznano rangę: ${rankName}.', eng
 const PARTICIPANT_REMOVED__TEXTLABEL = { polish: 'Uczestnik został usunięty z grupy.', english: 'Participant has been removed from the group.' };
 const COLUMN_POSITION__TEXTLABEL = { polish: 'Numer', english: 'Number' };
 const COLUMN_NICKNAME__TEXTLABEL = { polish: 'Ksywka', english: 'Nickname' };
-const COLUMN_NAME__TEXTLABEL = { polish: 'Imię', english: 'First name' };
+const COLUMN_FIRST_NAME__TEXTLABEL = { polish: 'Imię', english: 'First name' };
+const COLUMN_LAST_NAME__TEXTLABEL = { polish: 'Nazwisko', english: 'Last name' };
 const COLUMN_EMAIL__TEXTLABEL = { polish: 'E-mail', english: 'E-mail' };
 const COLUMN_RANK__TEXTLABEL = { polish: 'Ranga', english: 'Rank' };
 const COLUMN_BADGES__TEXTLABEL = { polish: 'Odznaki', english: 'Badges' };
@@ -253,12 +254,22 @@ export default function MembersHomeContent() {
       ),
     },
     {
-      key: 'legalName',
-      label: COLUMN_NAME__TEXTLABEL[LANGUAGE],
-      width: '128px',
+      key: 'firstName',
+      label: COLUMN_FIRST_NAME__TEXTLABEL[LANGUAGE],
+      width: '96px',
       render: (member) => (
         <span className="members-table__cell-text">
-          {member.legalName}
+          {member.firstName}
+        </span>
+      ),
+    },
+    {
+      key: 'lastName',
+      label: COLUMN_LAST_NAME__TEXTLABEL[LANGUAGE],
+      width: '96px',
+      render: (member) => (
+        <span className="members-table__cell-text">
+          {member.lastName}
         </span>
       ),
     },
