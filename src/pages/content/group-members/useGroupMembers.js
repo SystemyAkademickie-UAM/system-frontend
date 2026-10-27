@@ -102,8 +102,11 @@ function mapStudentToMember(student, index, ranksMap, badgesCount) {
 
     legalName: getStudentLegalName(student),
 
-    email: student.email,
+    firstName: student.name || '',
 
+    lastName: student.surname || '',
+
+    email: student.email,
     avatar: student.avatarUrl || generateAvatarFallback(student.email, student.nickname),
 
     rankId: student.rankId,

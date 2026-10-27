@@ -153,8 +153,8 @@ const COLSTATUS__TEXTLABEL = {
 };
 
 const COLSHOPITEMS__TEXTLABEL = {
-  polish: 'Przedmioty sklepu',
-  english: 'Shop items'
+  polish: 'Odblokowane przedmioty',
+  english: 'Unlocked items'
 };
 
 const DELETERANKLABEL__TEXTLABEL = {
