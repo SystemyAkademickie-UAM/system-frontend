@@ -1,7 +1,7 @@
 /** Najniższa ranga — zielony akcent projektu. */
-export const RANK_GRADIENT_START = '#42f37d';
+export const RANK_GRADIENT_START = '#217a3f';
 /** Najwyższa ranga — czerwono-pomarańczowy. */
-export const RANK_GRADIENT_END = '#ff9142';
+export const RANK_GRADIENT_END = '#804921';
 /** Zablokowana ranga (student). */
 export const RANK_LOCKED_COLOR = '#859584';
 
