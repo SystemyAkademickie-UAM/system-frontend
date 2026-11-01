@@ -30,6 +30,9 @@ export const AUTH_LOGOUT_PATH = '/logout';
 /** Session check from HTTP-only session cookie (`maq_session`). */
 export const AUTH_LOGIN_ME_PATH = '/login/me';
 
+/** Confirm organization and role for the current session. */
+export const AUTH_LOGIN_CONTEXT_PATH = '/login/context';
+
 /** Login organizations for institution pickers (`?loginMethod=saml|email`). */
 export const AUTH_LOGIN_ORGANIZATIONS_PATH = '/login/organizations';
 

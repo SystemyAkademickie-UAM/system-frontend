@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROLE, ROLE_UI_LABEL } from '../../navigation/shellTemplates.config.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { GroupCurrencySettingsProvider } from '../../context/GroupCurrencyContext.jsx';
@@ -11,6 +11,8 @@ import { useCompactAppLayout } from '../../hooks/useCompactAppLayout.js';
 import { useLeaderDisplayPreferences } from '../../hooks/useLeaderDisplayPreferences.js';
 import { useShellGroupContext } from '../../hooks/useShellGroupContext.js';
 import { useStudentSuperBarStats } from '../../hooks/useStudentSuperBarStats.js';
+import { homePath } from '../../routes/pathRegistry.js';
+import OrganizationRoleDialog from './OrganizationRoleDialog.jsx';
 import Sidebar from './Sidebar.jsx';
 import SuperBar from './superbar/SuperBar.jsx';
 import SuperBarBreadcrumbMobile from './superbar/SuperBarBreadcrumbMobile.jsx';
@@ -50,9 +52,11 @@ export default function AppShell() {
 
 function AppShellLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const menuId = useId();
   const { role } = useAppRole();
-  const { user, isLoading: isSessionLoading } = useSession();
+  const { user, isLoading: isSessionLoading, refetchSession } = useSession();
+  const [isContextOpen, setIsContextOpen] = useState(false);
   const { profile, avatarUrl, isLoading: isProfileLoading } = useUserProfile();
   const { showNickname: leaderShowsNickname } = useLeaderDisplayPreferences(profile?.showNickname);
   const {
@@ -97,6 +101,13 @@ function AppShellLayout() {
   const closeMobileNav = useCallback(() => {
     setIsMobileNavOpen(false);
   }, []);
+
+  const selectionRequired = user?.selectionRequired === true;
+  const handleContextSaved = async () => {
+    await refetchSession({ force: true });
+    setIsContextOpen(false);
+    navigate(homePath());
+  };
 
   useEffect(() => {
     if (!isMobileNavOpen) {
@@ -162,6 +173,7 @@ function AppShellLayout() {
             onMenuToggle={() => setIsMobileNavOpen((open) => !open)}
             isLoading={isHeaderLoading}
             breadcrumb={breadcrumb}
+            onOpenLoginContext={() => setIsContextOpen(true)}
           />
           <SuperBarBreadcrumbMobile breadcrumb={breadcrumb} />
           <main id="main-content" className="app-shell__main" tabIndex={-1}>
@@ -171,6 +183,15 @@ function AppShellLayout() {
           </main>
         </div>
       </div>
+      <OrganizationRoleDialog
+        isOpen={selectionRequired || isContextOpen}
+        required={selectionRequired}
+        memberships={user?.memberships ?? []}
+        organizationId={user?.organizationId ?? null}
+        role={user?.role ?? null}
+        onClose={() => setIsContextOpen(false)}
+        onSaved={handleContextSaved}
+      />
     </div>
   );
 }
