@@ -1,14 +1,60 @@
-import { useState, useRef } from 'react';
-import { Button, useToast } from '../../../components/ui/index.js';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Button, useToast, LoadingSpinner } from '../../../components/ui/index.js';
 import {
   ADMIN_BACKUP_CONFIRM_WORD,
   BYTES_PER_MIB,
 } from '../../../constants/adminBackup.constants.js';
-import { getBackupExportUrl, importBackup } from '../../../services/backup.api.js';
+import {
+  fetchBackupStatus,
+  getAutoBackupDownloadUrl,
+  getBackupExportUrl,
+  importBackup,
+  triggerAutoBackup,
+} from '../../../services/backup.api.js';
 import './AdminBackupContent.css';
+
+function formatDate(isoString) {
+  if (!isoString) {
+    return 'Brak';
+  }
+  try {
+    const d = new Date(isoString);
+    if (Number.isNaN(d.getTime())) {
+      return isoString;
+    }
+    return d.toLocaleString('pl-PL', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  } catch {
+    return isoString;
+  }
+}
+
+function formatBytes(bytes) {
+  if (!bytes || bytes <= 0) {
+    return '0 MB';
+  }
+  const mib = bytes / BYTES_PER_MIB;
+  if (mib < 0.1) {
+    return `${(bytes / 1024).toFixed(1)} KB`;
+  }
+  return `${mib.toFixed(2)} MB`;
+}
 
 export default function AdminBackupContent() {
   const { showSuccess, showError } = useToast();
+
+  // Status & Telemetry
+  const [backupStatus, setBackupStatus] = useState(null);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
+
+  // Trigger auto backup state
+  const [isTriggeringAuto, setIsTriggeringAuto] = useState(false);
 
   // Export state
   const [isExporting, setIsExporting] = useState(false);
@@ -24,20 +70,46 @@ export default function AdminBackupContent() {
   const [confirmInput, setConfirmInput] = useState('');
   const fileInputRef = useRef(null);
 
-  // ── Export ──────────────────────────────────────────────────────────
+  const loadStatus = useCallback(async () => {
+    const result = await fetchBackupStatus();
+    if (result.ok && result.data) {
+      setBackupStatus(result.data);
+    }
+    setIsLoadingStatus(false);
+  }, []);
+
+  useEffect(() => {
+    loadStatus();
+  }, [loadStatus]);
+
+  // ── Trigger Auto Backup Now ─────────────────────────────────────────
+
+  const handleTriggerAutoBackup = async () => {
+    setIsTriggeringAuto(true);
+    try {
+      const result = await triggerAutoBackup();
+      if (result.ok) {
+        showSuccess('Utworzono automatyczną kopię zapasową na serwerze.');
+        await loadStatus();
+      } else {
+        showError(result.error || 'Nie udało się utworzyć kopii zapasowej.');
+      }
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd tworzenia kopii.');
+    } finally {
+      setIsTriggeringAuto(false);
+    }
+  };
+
+  // ── Export (Manual) ─────────────────────────────────────────────────
 
   const handleExport = () => {
     setIsExporting(true);
     setExportStatus(null);
 
     try {
-      // Zamiast fetch() pobieramy plik natywnie przez przeglądarkę,
-      // co oszczędza RAM klienta (szczególnie dla dużych plików).
-      // Serwer autoryzuje żądanie za pomocą ciasteczka sesji.
       const a = document.createElement('a');
       a.href = getBackupExportUrl();
-      // Atrybut download sugeruje pobieranie.
-      // Dokładna nazwa i tak przyjdzie z nagłówka Content-Disposition z serwera.
       a.download = 'backup.enc';
       document.body.appendChild(a);
       a.click();
@@ -45,6 +117,11 @@ export default function AdminBackupContent() {
 
       setExportStatus({ type: 'success', message: 'Rozpoczęto pobieranie kopii zapasowej.' });
       showSuccess('Kopia zapasowa pobierana pomyślnie.');
+
+      // Refresh status after a brief delay so server registers the manual backup
+      setTimeout(() => {
+        loadStatus();
+      }, 1200);
     } catch (err) {
       setExportStatus({ type: 'error', message: err.message || 'Błąd inicjacji pobierania.' });
       showError('Nie udało się rozpocząć pobierania.');
@@ -53,7 +130,19 @@ export default function AdminBackupContent() {
     }
   };
 
-  // ── Import ──────────────────────────────────────────────────────────
+  // ── Download specific auto-backup ───────────────────────────────────
+
+  const handleDownloadAutoBackup = (filename) => {
+    const a = document.createElement('a');
+    a.href = getAutoBackupDownloadUrl(filename);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showSuccess(`Pobieranie ${filename}...`);
+  };
+
+  // ── Import (Restore) ────────────────────────────────────────────────
 
   const handleFileChange = (event) => {
     const file = event.target.files?.[0] || null;
@@ -90,8 +179,12 @@ export default function AdminBackupContent() {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+      await loadStatus();
     } else {
-      setImportStatus({ type: 'error', message: result.error || 'Nie udało się przywrócić bazy danych.' });
+      setImportStatus({
+        type: 'error',
+        message: result.error || 'Nie udało się przywrócić bazy danych.',
+      });
       showError(result.error || 'Błąd importu.');
     }
   };
@@ -100,16 +193,149 @@ export default function AdminBackupContent() {
     <div className="admin-backup">
       <h1 className="admin-backup__title">Kopia zapasowa</h1>
       <p className="admin-backup__subtitle">
-        Twórz i przywracaj zaszyfrowane kopie zapasowe bazy danych.
+        Zarządzaj automatycznymi oraz ręcznymi kopiami zapasowymi bazy danych.
       </p>
 
-      {/* ── Export section ──────────────────────────────────────────── */}
+      {/* ── Warning Alert (Manual Backup Overdue) ────────────────────── */}
+      {backupStatus?.isManualBackupOverdue ? (
+        <div className="admin-backup__alert admin-backup__alert--warning">
+          <div className="admin-backup__alert-icon">⚠️</div>
+          <div className="admin-backup__alert-body">
+            <h3 className="admin-backup__alert-title">
+              Wymagane działanie: Baza danych dawno nie była zabezpieczana ręczną kopią zapasową!
+            </h3>
+            <p className="admin-backup__alert-desc">
+              {backupStatus.lastManualBackupAt
+                ? `Od ostatniego ręcznego pobrania kopii zapasowej minęło już ${backupStatus.daysSinceLastManualBackup} dni (zalecany interwał: maksymalnie ${backupStatus.manualBackupThresholdDays} dni).`
+                : 'W systemie nie odnotowano jeszcze żadnej ręcznej kopii zapasowej bazy danych.'}
+              {' '}Zaleca się niezwłoczne pobranie kopii zapasowej na zewnętrzny nośnik, aby zagwarantować niezależne bezpieczeństwo danych.
+            </p>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={handleExport}
+              disabled={isExporting}
+            >
+              {isExporting ? 'Generowanie…' : 'Wykonaj i pobierz kopię teraz'}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Overview Statistics Cards ───────────────────────────────── */}
+      <div className="admin-backup__overview-grid">
+        <div className="admin-backup__overview-card">
+          <span className="admin-backup__overview-card-label">Ostatnia kopia (ogółem)</span>
+          <span className="admin-backup__overview-card-value">
+            {isLoadingStatus ? <LoadingSpinner size="sm" /> : formatDate(backupStatus?.lastBackupAt)}
+          </span>
+          <span className="admin-backup__overview-card-hint">Najświeższy stan bazy danych</span>
+        </div>
+
+        <div className="admin-backup__overview-card">
+          <span className="admin-backup__overview-card-label">Ostatnia kopia ręczna</span>
+          <span
+            className={`admin-backup__overview-card-value ${
+              backupStatus?.isManualBackupOverdue
+                ? 'admin-backup__overview-card-value--overdue'
+                : 'admin-backup__overview-card-value--ok'
+            }`}
+          >
+            {isLoadingStatus ? <LoadingSpinner size="sm" /> : formatDate(backupStatus?.lastManualBackupAt)}
+          </span>
+          <span className="admin-backup__overview-card-hint">
+            {backupStatus?.isManualBackupOverdue ? '⚠️ Wymaga odświeżenia' : 'Stan aktualny'}
+          </span>
+        </div>
+
+        <div className="admin-backup__overview-card">
+          <span className="admin-backup__overview-card-label">Automatyczne na serwerze</span>
+          <span className="admin-backup__overview-card-value">
+            {isLoadingStatus ? (
+              <LoadingSpinner size="sm" />
+            ) : (
+              `${backupStatus?.autoBackupsCount ?? 0} kopii (${formatBytes(backupStatus?.totalStorageSizeBytes)})`
+            )}
+          </span>
+          <span className="admin-backup__overview-card-hint">
+            Retencja: {backupStatus?.retentionDays ?? 14} dni (automatyczne czyszczenie)
+          </span>
+        </div>
+      </div>
+
+      {/* ── Automated Backups Section ───────────────────────────────── */}
+      <section className="admin-backup__section">
+        <div className="admin-backup__section-header">
+          <h2 className="admin-backup__section-title">
+            🤖 Automatyczne kopie na serwerze
+          </h2>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={isTriggeringAuto}
+            onClick={handleTriggerAutoBackup}
+          >
+            {isTriggeringAuto ? 'Tworzenie kopii…' : 'Utwórz kopię na serwerze teraz'}
+          </Button>
+        </div>
+        <p className="admin-backup__section-desc">
+          Automatyczne kopie zapasowe wykonywane są codziennie w nocy (godz. 02:00) i bezpiecznie
+          zapisywane na wolumenie serwera systemowego w zaszyfrowanej postaci (AES-256-GCM).
+          Pliki starsze niż {backupStatus?.retentionDays ?? 14} dni są automatycznie usuwane, aby zapobiec przepełnieniu pamięci.
+        </p>
+
+        <div className="admin-backup__table-wrapper">
+          <table className="admin-backup__table">
+            <thead>
+              <tr>
+                <th>Plik</th>
+                <th>Data utworzenia</th>
+                <th>Rozmiar</th>
+                <th>Akcja</th>
+              </tr>
+            </thead>
+            <tbody>
+              {backupStatus?.autoBackups && backupStatus.autoBackups.length > 0 ? (
+                backupStatus.autoBackups.map((item) => (
+                  <tr key={item.filename}>
+                    <td>
+                      <code className="admin-backup__file-code">{item.filename}</code>
+                    </td>
+                    <td>{formatDate(item.createdAt)}</td>
+                    <td>{formatBytes(item.sizeBytes)}</td>
+                    <td>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="xs"
+                        onClick={() => handleDownloadAutoBackup(item.filename)}
+                      >
+                        Pobierz
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="admin-backup__table-empty">
+                    Brak zapisanych kopii automatycznych na serwerze.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* ── Export section (Manual Download) ────────────────────────── */}
       <section className="admin-backup__section">
         <h2 className="admin-backup__section-title">
-          📦 Eksport bazy danych
+          📦 Ręczny eksport bazy danych
         </h2>
         <p className="admin-backup__section-desc">
-          Pobierz zaszyfrowaną kopię zapasową całej bazy danych.
+          Pobierz bezpośrednio zaszyfrowaną kopię zapasową całej bazy danych na swój komputer.
           Plik jest kompresowany i szyfrowany algorytmem AES-256-GCM.
           Bez klucza szyfrowania zdefiniowanego na serwerze nie da się go odszyfrować.
         </p>
@@ -129,7 +355,7 @@ export default function AdminBackupContent() {
         ) : null}
       </section>
 
-      {/* ── Import section ──────────────────────────────────────────── */}
+      {/* ── Import section (Restore) ────────────────────────────────── */}
       <section className="admin-backup__section admin-backup__section--danger">
         <h2 className="admin-backup__section-title">
           ⚠️ Przywracanie bazy danych
