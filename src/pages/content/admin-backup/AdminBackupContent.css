@@ -1,5 +1,5 @@
 .admin-backup {
-  max-width: 720px;
+  max-width: 860px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
@@ -13,7 +13,96 @@
 .admin-backup__subtitle {
   font-size: 0.95rem;
   color: var(--color-text-secondary, #888);
-  margin: 0 0 2rem;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Warning Alert Banner ─────────────────────────────────────────── */
+
+.admin-backup__alert {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.75rem;
+  align-items: flex-start;
+}
+
+.admin-backup__alert--warning {
+  background: rgba(217, 119, 6, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.admin-backup__alert-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.admin-backup__alert-body {
+  flex: 1;
+}
+
+.admin-backup__alert-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: #fbbf24;
+}
+
+.admin-backup__alert-desc {
+  font-size: 0.875rem;
+  color: var(--color-text, #e2e8f0);
+  line-height: 1.5;
+  margin: 0 0 0.85rem;
+}
+
+/* ── Overview Stats Grid ──────────────────────────────────────────── */
+
+.admin-backup__overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.admin-backup__overview-card {
+  background: var(--color-surface, #1e1e2e);
+  border: 1px solid var(--color-border, #333);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-backup__overview-card-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, #888);
+  margin-bottom: 0.35rem;
+}
+
+.admin-backup__overview-card-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text, #fff);
+  margin-bottom: 0.35rem;
+  word-break: break-word;
+}
+
+.admin-backup__overview-card-value--overdue {
+  color: #f87171;
+}
+
+.admin-backup__overview-card-value--ok {
+  color: #34d399;
+}
+
+.admin-backup__overview-card-hint {
+  font-size: 0.775rem;
+  color: var(--color-text-secondary, #888);
+  margin-top: auto;
 }
 
 /* ── Section cards ────────────────────────────────────────────────── */
@@ -26,10 +115,19 @@
   margin-bottom: 1.5rem;
 }
 
+.admin-backup__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
 .admin-backup__section-title {
   font-size: 1.15rem;
   font-weight: 600;
-  margin: 0 0 0.25rem;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -40,6 +138,58 @@
   color: var(--color-text-secondary, #888);
   margin: 0 0 1.25rem;
   line-height: 1.5;
+}
+
+/* ── Auto Backups Table ───────────────────────────────────────────── */
+
+.admin-backup__table-wrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+  border: 1px solid var(--color-border, #333);
+  border-radius: 8px;
+}
+
+.admin-backup__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.admin-backup__table th {
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #999);
+  border-bottom: 1px solid var(--color-border, #333);
+}
+
+.admin-backup__table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--color-text, #eee);
+}
+
+.admin-backup__table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-backup__table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.admin-backup__table-empty {
+  text-align: center;
+  padding: 2rem 1rem !important;
+  color: var(--color-text-secondary, #888);
+}
+
+.admin-backup__file-code {
+  font-family: monospace;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
 }
 
 /* ── Restore section (danger zone) ────────────────────────────────── */
