@@ -21,6 +21,7 @@ import './Modal.css';
  * @param {boolean} [props.confirmDisabled=false]
  * @param {'sm' | 'md' | 'lg' | 'xl'} [props.size='md']
  * @param {string} [props.className]
+ * @param {boolean} [props.dismissible=true] — false keeps the dialog open (no backdrop, Escape, or close button)
  */
 export default function Modal({
   isOpen,
@@ -35,13 +36,16 @@ export default function Modal({
   confirmDisabled = false,
   size = 'md',
   className = '',
+  dismissible = true,
 }) {
   const titleId = useId();
   const subtitleId = useId();
 
   const handleKeyDown = useCallback((event) => {
     if (event.key === 'Escape') {
-      onClose();
+      if (dismissible) {
+        onClose();
+      }
       return;
     }
 
@@ -87,7 +91,7 @@ export default function Modal({
 
     event.preventDefault();
     onConfirm();
-  }, [confirmDisabled, onClose, onConfirm, showFooter]);
+  }, [confirmDisabled, dismissible, onClose, onConfirm, showFooter]);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -109,7 +113,7 @@ export default function Modal({
     <div className={['maq-modal', className].filter(Boolean).join(' ')}>
       <div
         className="maq-modal__backdrop"
-        onClick={onClose}
+        onClick={dismissible ? onClose : undefined}
         aria-hidden="true"
       />
       <div
@@ -132,14 +136,16 @@ export default function Modal({
               </p>
             ) : null}
           </div>
-          <button
-            type="button"
-            className="maq-modal__close"
-            onClick={onClose}
-            aria-label="Zamknij"
-          >
-            <AssetSvg name={SVG_ICONS.controls.close} className="maq-modal__close-icon" width={24} height={24} alt="" />
-          </button>
+          {dismissible ? (
+            <button
+              type="button"
+              className="maq-modal__close"
+              onClick={onClose}
+              aria-label="Zamknij"
+            >
+              <AssetSvg name={SVG_ICONS.controls.close} className="maq-modal__close-icon" width={24} height={24} alt="" />
+            </button>
+          ) : null}
         </header>
 
         <div className="maq-modal__body">

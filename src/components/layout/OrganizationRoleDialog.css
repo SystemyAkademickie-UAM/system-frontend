@@ -1,0 +1,46 @@
+.organization-role-dialog__field + .organization-role-dialog__field {
+  margin-top: 1rem;
+}
+
+.organization-role-dialog__label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1vw, 1.05rem);
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+}
+
+.organization-role-dialog__select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.85rem 2.75rem 0.85rem 1rem;
+  border: 1px solid var(--color-modal-border);
+  border-radius: 8px;
+  background-color: var(--color-bg-surface);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%23BDCABE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  appearance: none;
+  cursor: pointer;
+}
+
+.organization-role-dialog__error {
+  margin: 1rem 0 0;
+  font-size: var(--font-size-body-sm, 0.875rem);
+  line-height: 1.35;
+  color: #ff8a8a;
+}
+
+@media (max-width: 640px) {
+  .organization-role-dialog__select {
+    min-height: 2.75rem;
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+}

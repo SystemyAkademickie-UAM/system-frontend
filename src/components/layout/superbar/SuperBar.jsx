@@ -60,6 +60,7 @@ const MENUCLOSETEXT__TEXTLABEL = {
  * @param {() => void} [props.onMenuToggle]
  * @param {boolean} [props.isLoading] — czy trwa ładowanie sesji
  * @param {{ groupName: string | null, groupPath: string | null, segments: { label: string, to?: string }[], back?: { ariaLabel?: string, fallbackTo: string } | null, homePath?: string } | null} [props.breadcrumb]
+ * @param {() => void} [props.onOpenLoginContext]
  */
 export default function SuperBar({
   displayName,
@@ -80,6 +81,7 @@ export default function SuperBar({
   onMenuToggle,
   isLoading = false,
   breadcrumb = null,
+  onOpenLoginContext,
 }) {
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
@@ -156,6 +158,7 @@ export default function SuperBar({
           avatarUrl={avatarUrl}
           onNavigate={onNavigate}
           isLoading={isLoading}
+          onOpenLoginContext={onOpenLoginContext}
         />
       </div>
     </header>
