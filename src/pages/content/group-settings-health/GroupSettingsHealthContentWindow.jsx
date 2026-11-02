@@ -30,13 +30,18 @@ const SUBTITLESUFFIX__TEXTLABEL = {
   english: 'participants.'
 };
 
-const COLUMNNAME__TEXTLABEL = {
-  polish: 'Imię i nazwisko',
+const COLUMNFIRSTNAME__TEXTLABEL = {
+  polish: 'Imię',
+  english: 'Full name'
+};
+
+const COLUMNLASTNAME__TEXTLABEL = {
+  polish: 'Nazwisko',
   english: 'Full name'
 };
 
 const COLUMNNICKNAME__TEXTLABEL = {
-  polish: 'Nickname',
+  polish: 'Ksywka',
   english: 'Nickname'
 };
 
@@ -488,7 +493,19 @@ export default function GroupSettingsHealthContentWindow({
                   ].filter(Boolean).join(' ')}
                   onClick={() => sortBy('name')}
                 >
-                  {getSortLabel(COLUMNNAME__TEXTLABEL[LANGUAGE], 'name', sortField, sortReverse)}
+                  {getSortLabel(COLUMNFIRSTNAME__TEXTLABEL[LANGUAGE], 'name', sortField, sortReverse)}
+                </button>
+              </div>
+              <div className="lives-manage-table__head-cell">
+                <button
+                  type="button"
+                  className={[
+                    'lives-manage-sort-btn',
+                    sortField === 'surname' ? 'lives-manage-sort-btn--active' : '',
+                  ].filter(Boolean).join(' ')}
+                  onClick={() => sortBy('surname')}
+                >
+                  {getSortLabel(COLUMNLASTNAME__TEXTLABEL[LANGUAGE], 'surname', sortField, sortReverse)}
                 </button>
               </div>
               <div className="lives-manage-table__head-cell lives-manage-table__head-cell--nickname">
@@ -522,7 +539,7 @@ export default function GroupSettingsHealthContentWindow({
                   >
                     <div className="lives-manage-table__cell lives-manage-table__cell--primary">
                       <span className="lives-manage-table__cell-text lives-manage-table__cell-text--name">
-                        {student.name} {student.surname}
+                        {student.name}
                       </span>
                       {student.nickname && (
                         <span className="lives-manage-table__cell-text lives-manage-table__cell-text--mobile-nickname">
@@ -530,7 +547,16 @@ export default function GroupSettingsHealthContentWindow({
                         </span>
                       )}
                     </div>
-
+                    <div className="lives-manage-table__cell lives-manage-table__cell--primary">
+                      <span className="lives-manage-table__cell-text lives-manage-table__cell-text--name">
+                        {student.surname}
+                      </span>
+                      {student.nickname && (
+                        <span className="lives-manage-table__cell-text lives-manage-table__cell-text--mobile-nickname">
+                          {student.nickname}
+                        </span>
+                      )}
+                    </div>
                     <div className="lives-manage-table__cell lives-manage-table__cell--nickname">
                       <span className="lives-manage-table__cell-text">{student.nickname || '—'}</span>
                     </div>

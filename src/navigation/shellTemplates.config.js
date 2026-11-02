@@ -39,8 +39,8 @@ const ADMINISTRATOR__TEXTLABEL = {
 };
 
 const SUPERADMINISTRATOR__TEXTLABEL = {
-  polish: 'Nadrzędna osoba administrująca',
-  english: 'Superadmin',
+  polish: 'Osoba nadzorująca',
+  english: 'Supervisor',
 };
 
 const YOURGROUPS__TEXTLABEL = {

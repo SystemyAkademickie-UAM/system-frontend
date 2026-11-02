@@ -15,7 +15,7 @@ const COORDINATOR_SECTION__TEXTLABEL = {
 };
 
 const COORDINATOR_ROLE__TEXTLABEL = {
-  polish: 'Osoba koordynator projekt:',
+  polish: 'Osoba koordynująca projekt:',
   english: 'Project Coordinator:',
 };
 
@@ -35,6 +35,7 @@ const AUTHORS_LIST = [
   'Paweł Plewczyński',
   'Eryk Zerbin',
   'Jacek Jakubowicz',
+
 ];
 
 export default function HelpContent() {
