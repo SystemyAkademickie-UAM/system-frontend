@@ -25,6 +25,89 @@ export function getAutoBackupDownloadUrl(filename) {
 }
 
 /**
+ * Downloads manual backup export using authenticated fetch, handling HTTP errors cleanly.
+ * @returns {Promise<{ ok: boolean, filename?: string, error?: string }>}
+ */
+export async function downloadBackupExportFile() {
+  try {
+    const response = await fetch(getBackupExportUrl(), {
+      method: 'GET',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const json = await response.json();
+        if (json?.message) {
+          errorMessage = json.message;
+        }
+      } catch {
+        // use fallback
+      }
+      return { ok: false, error: errorMessage };
+    }
+    const blob = await response.blob();
+    const disposition = response.headers.get('Content-Disposition');
+    let filename = 'backup.enc';
+    if (disposition) {
+      const match = /filename=["']?([^"']+)["']?/.exec(disposition);
+      if (match && match[1]) {
+        filename = match[1];
+      }
+    }
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+    return { ok: true, filename };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Network error' };
+  }
+}
+
+/**
+ * Downloads a specific auto-backup file using authenticated fetch, handling HTTP errors cleanly.
+ * @param {string} filename
+ * @returns {Promise<{ ok: boolean, error?: string }>}
+ */
+export async function downloadAutoBackupFile(filename) {
+  try {
+    const response = await fetch(getAutoBackupDownloadUrl(filename), {
+      method: 'GET',
+      credentials: 'include',
+    });
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const json = await response.json();
+        if (json?.message) {
+          errorMessage = json.message;
+        }
+      } catch {
+        // use fallback
+      }
+      return { ok: false, error: errorMessage };
+    }
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Network error' };
+  }
+}
+
+/**
  * Fetches the backup status, timestamps, and warning alerts.
  * @returns {Promise<{ ok: boolean, data?: import('../types').BackupStatus, error?: string }>}
  */

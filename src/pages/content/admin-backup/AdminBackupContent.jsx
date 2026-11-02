@@ -5,9 +5,9 @@ import {
   BYTES_PER_MIB,
 } from '../../../constants/adminBackup.constants.js';
 import {
+  downloadAutoBackupFile,
+  downloadBackupExportFile,
   fetchBackupStatus,
-  getAutoBackupDownloadUrl,
-  getBackupExportUrl,
   importBackup,
   triggerAutoBackup,
 } from '../../../services/backup.api.js';
@@ -103,43 +103,30 @@ export default function AdminBackupContent() {
 
   // ── Export (Manual) ─────────────────────────────────────────────────
 
-  const handleExport = () => {
+  const handleExport = async () => {
     setIsExporting(true);
     setExportStatus(null);
 
-    try {
-      const a = document.createElement('a');
-      a.href = getBackupExportUrl();
-      a.download = 'backup.enc';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-
-      setExportStatus({ type: 'success', message: 'Rozpoczęto pobieranie kopii zapasowej.' });
-      showSuccess('Kopia zapasowa pobierana pomyślnie.');
-
-      // Refresh status after a brief delay so server registers the manual backup
-      setTimeout(() => {
-        loadStatus();
-      }, 1200);
-    } catch (err) {
-      setExportStatus({ type: 'error', message: err.message || 'Błąd inicjacji pobierania.' });
-      showError('Nie udało się rozpocząć pobierania.');
-    } finally {
-      setIsExporting(false);
+    const result = await downloadBackupExportFile();
+    if (result.ok) {
+      setExportStatus({ type: 'success', message: 'Kopia zapasowa pobrana pomyślnie.' });
+      showSuccess('Kopia zapasowa pobrana pomyślnie.');
+      await loadStatus();
+    } else {
+      setExportStatus({ type: 'error', message: result.error || 'Błąd pobierania kopii.' });
+      showError(result.error || 'Nie udało się pobrać kopii.');
     }
+    setIsExporting(false);
   };
 
   // ── Download specific auto-backup ───────────────────────────────────
 
-  const handleDownloadAutoBackup = (filename) => {
-    const a = document.createElement('a');
-    a.href = getAutoBackupDownloadUrl(filename);
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    showSuccess(`Pobieranie ${filename}...`);
+  const handleDownloadAutoBackup = async (filename) => {
+    showSuccess(`Rozpoczęto pobieranie ${filename}...`);
+    const result = await downloadAutoBackupFile(filename);
+    if (!result.ok) {
+      showError(result.error || `Błąd pobierania ${filename}.`);
+    }
   };
 
   // ── Import (Restore) ────────────────────────────────────────────────
