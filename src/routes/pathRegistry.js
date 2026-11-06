@@ -212,20 +212,31 @@ export function groupRankingActivitiesPath(groupId) {
 }
 
 export function appSettingsPath() {
-
-return '/settings';
+  return '/settings';
 }
 
 export function appHelpPath() {
   return '/help';
 }
 
-export function userManagementPath() {
-  return '/userManagement';
+/** Strona główna administratora (zarządzanie organizacją) — `/home`. */
+export function adminHomePath() {
+  return '/home';
 }
 
+/** Zarządzanie użytkownikami — `/users`. */
+export function userManagementPath() {
+  return '/users';
+}
+
+/** @deprecated Zastąpione przez {@link groupsListPath}. */
 export function courseManagementPath() {
-  return '/courseManagement';
+  return '/groups';
+}
+
+/** Zarządzanie przestrzenią dyskową — `/disk-space`. */
+export function diskSpacePath() {
+  return '/disk-space';
 }
 
 export function statisticsPath() {
@@ -236,13 +247,34 @@ export function organizationsPath() {
   return '/organizations';
 }
 
+/** Logi produkcyjne i systemowe — `/logs`. */
 export function superadminLogsPath() {
-  return '/system-logs';
+  return '/logs';
 }
 
-/** Kopia zapasowa bazy danych — `/admin/backup`. */
+/** Kopia zapasowa bazy danych — `/backups`. */
 export function adminBackupPath() {
-  return '/admin/backup';
+  return '/backups';
+}
+
+/** Zarządzanie patch notesami i dokumentami — `/documents`. */
+export function documentsPath() {
+  return '/documents';
+}
+
+/** Komunikaty i stan przerwy technicznej — `/broadcasts`. */
+export function broadcastsPath() {
+  return '/broadcasts';
+}
+
+/** Najczęściej zadawane pytania — `/faq`. */
+export function faqPath() {
+  return '/faq';
+}
+
+/** Informacje o aktualizacjach — `/patch-notes`. */
+export function patchNotesPath() {
+  return '/patch-notes';
 }
 
 /** Galeria szablonów — `/templates`. */

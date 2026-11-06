@@ -45,7 +45,15 @@ const UNAVAILABILEMESSAGE__TEXTLABEL = {
 english: 'This page is currently unavailable. The functionality will be available in the next version of the application.'
 };
 
-// === GŁÓWNY KOMPONENT WIDOKU ===
+// === ZARZĄDZANIE UŻYTKOWNIKAMI (OSOBA ADMINISTRUJĄCA: /users) ===
+/**
+ * Rola: Osoba administrująca (Admin).
+ * Ścieżka: /users.
+ * Uprawnienia:
+ * - Zarządzanie kontami użytkowników w wybranej organizacji
+ * - Nadawanie i zmiana ról systemowych
+ * - Kontrola uprawnień i statusu aktywności użytkowników
+ */
 export default function UserManagementContent() {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [activeSection, setActiveSection] = useState('users');

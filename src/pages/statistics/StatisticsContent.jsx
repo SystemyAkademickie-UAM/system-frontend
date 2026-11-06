@@ -20,7 +20,14 @@ const DESCRIPTION__TEXTLABEL = {
   english: 'Overview of activity, login, and platform usage metrics in the organization.'
 };
 
-// === GŁÓWNY KOMPONENT WIDOKU ===
+// === ZBIERANIE STATYSTYK (OSOBA NADZORUJĄCA / ADMINISTRUJĄCA: /statistics) ===
+/**
+ * Rola: Osoba nadzorująca (statystyki globalne organizacji) oraz Osoba administrująca (statystyki własnej organizacji).
+ * Ścieżka: /statistics.
+ * Uprawnienia:
+ * - Osoba nadzorująca: agregacja i zbieranie wskaźników w przekroju wszystkich organizacji
+ * - Osoba administrująca: analityka logowań, aktywności grup i postępów w obrębie organizacji
+ */
 export default function StatisticsContent() {
 
 const [LANGUAGE] = useState(READLANGUAGECOOKIE);

@@ -128,15 +128,33 @@
   flex-shrink: 0;
 }
 
+.super-bar-info-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .super-bar-settings {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
   color: var(--color-nav-icon-on-primary);
   text-decoration: none;
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.super-bar-settings:hover {
+  color: var(--color-nav-link);
 }
 
 .super-bar-settings:focus-visible {
@@ -290,6 +308,7 @@
   font-size: var(--font-size-body);
   font-weight: 600;
   text-align: left;
+  text-decoration: none;
   color: var(--color-text-primary);
   cursor: pointer;
 }
@@ -297,6 +316,7 @@
 .super-bar-user-menu__dropdown-item:hover {
   background: var(--color-nav-sub-active-bg);
   color: var(--color-accent);
+  text-decoration: none;
 }
 
 /* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
@@ -376,7 +396,14 @@
     line-height: 1.15;
   }
 
-  .super-bar-settings {
+  .super-bar-info-menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+.super-bar-settings {
     width: 26px;
     height: 26px;
     flex-shrink: 0;

@@ -140,7 +140,10 @@ const handleContextSaved = async () => {
 
 // === RENDEROWANIE WIDOKU ===
   return (
-    <div className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}>
+    <div
+      className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}
+      data-app-role={role}
+    >
       {isMobileNavOpen ? (
         <button
           type="button"

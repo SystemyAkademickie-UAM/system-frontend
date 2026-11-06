@@ -26,7 +26,7 @@ const TITLE = {
 };
 
 const CHANGE_TITLE = {
-  both: { polish: 'Zmień organizację i rolę', english: 'Change organization and role' },
+  both: { polish: 'Zmień rolę lub organizację', english: 'Change role or organization' },
   organization: { polish: 'Zmień organizację', english: 'Change organization' },
   role: { polish: 'Zmień rolę', english: 'Change role' },
 };

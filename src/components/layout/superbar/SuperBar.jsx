@@ -10,6 +10,7 @@ import SidebarBrand from '../sidebar/SidebarBrand.jsx';
 import SuperBarCurrencyStat from './SuperBarCurrencyStat.jsx';
 import SuperBarLivesStat from './SuperBarLivesStat.jsx';
 import SuperBarSettingsButton from './SuperBarSettingsButton.jsx';
+import SuperBarInfoMenu from './SuperBarInfoMenu.jsx';
 import BacklogNewNotificationAlert from './BacklogNewNotificationAlert.jsx';
 import NotificationBell from './NotificationBell.jsx';
 import SuperBarUserMenu from './SuperBarUserMenu.jsx';
@@ -163,6 +164,7 @@ const resolvedDisplayName = displayName || PLACEHOLDERDISPLAYNAME__TEXTLABEL[LAN
         ) : null}
         <NotificationBell />
         <SuperBarSettingsButton onNavigate={onNavigate} />
+        <SuperBarInfoMenu onNavigate={onNavigate} />
         <SuperBarUserMenu
           displayName={resolvedDisplayName}
           roleLabel={roleLabel}

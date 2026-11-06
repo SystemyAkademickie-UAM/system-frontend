@@ -61,6 +61,12 @@ const DevApiTestPage = withLazy(() => import('../pages/api-test/DevApiTestPage.j
 
 const CourseManagementPage = withLazy(() => import('../pages/course-management/CourseManagementContent.jsx'));
 const HelpPage = withLazy(() => import('../pages/help/HelpContent.jsx'));
+const FaqPage = withLazy(() => import('../pages/faq/FaqContent.jsx'));
+const PatchNotesPage = withLazy(() => import('../pages/patch-notes/PatchNotesContent.jsx'));
+const AdminHomePage = withLazy(() => import('../pages/admin-home/AdminHomeContent.jsx'));
+const DiskSpacePage = withLazy(() => import('../pages/disk-space/DiskSpaceContent.jsx'));
+const DocumentsPage = withLazy(() => import('../pages/documents/DocumentsContent.jsx'));
+const BroadcastsPage = withLazy(() => import('../pages/broadcasts/BroadcastsContent.jsx'));
 const OrganizationManagementPage = withLazy(() => import('../pages/organization-management/OrganizationManagementContent.jsx'));
 const SuperadminLogsPage = withLazy(() => import('../pages/superadmin-logs/SuperadminLogsContent.jsx'));
 const AdminBackupPage = withLazy(() => import('../pages/admin-backup/AdminBackupContent.jsx'));
@@ -138,12 +144,24 @@ const appRouteTree = [
         children: [
           { path: 'settings', element: withGuard(<SettingsPage />) },
           { path: 'help', element: withGuard(<HelpPage />) },
-          { path: 'userManagement', element: withGuard(<UserManagementPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
-          { path: 'courseManagement', element: withGuard(<CourseManagementPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
+          { path: 'faq', element: withGuard(<FaqPage />) },
+          { path: 'patch-notes', element: withGuard(<PatchNotesPage />) },
+
+          { path: 'home', element: withGuard(<AdminHomePage />, { allowedRoles: [APP_ROLE.ADMIN] }) },
+          { path: 'users', element: withGuard(<UserManagementPage />, { allowedRoles: [APP_ROLE.ADMIN] }) },
+          { path: 'userManagement', element: <Navigate to="/users" replace /> },
+          { path: 'courseManagement', element: <Navigate to="/groups" replace /> },
+          { path: 'disk-space', element: withGuard(<DiskSpacePage />, { allowedRoles: [APP_ROLE.ADMIN] }) },
           { path: 'statistics', element: withGuard(<StatisticsPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
+
           { path: 'organizations', element: withGuard(<OrganizationManagementPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
-          { path: 'system-logs', element: withGuard(<SuperadminLogsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
-          { path: 'admin/backup', element: withGuard(<AdminBackupPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
+          { path: 'backups', element: withGuard(<AdminBackupPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
+          { path: 'admin/backup', element: <Navigate to="/backups" replace /> },
+          { path: 'documents', element: withGuard(<DocumentsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
+          { path: 'broadcasts', element: withGuard(<BroadcastsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
+          { path: 'boardcasts', element: <Navigate to="/broadcasts" replace /> },
+          { path: 'logs', element: withGuard(<SuperadminLogsPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
+          { path: 'system-logs', element: <Navigate to="/logs" replace /> },
           {
             path: 'templates',
             element: withGuard(<TemplatesPageLayout />, { allowedRoles: LECTURER_ONLY }),

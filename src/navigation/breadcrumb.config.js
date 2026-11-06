@@ -5,16 +5,22 @@
 
 // === IMPORTY I STAŁE MODUŁU ===
 import {
+  adminBackupPath,
+  adminHomePath,
   appHelpPath,
   appSettingsPath,
+  broadcastsPath,
   courseManagementPath,
+  diskSpacePath,
+  documentsPath,
+  faqPath,
   groupActivitiesPath,
   groupMembersPath,
   groupRewardsPath,
   groupSettingsPath,
   groupsListPath,
-  adminBackupPath,
   organizationsPath,
+  patchNotesPath,
   statisticsPath,
   superadminLogsPath,
   templatesMyPath,
@@ -30,19 +36,24 @@ import {
 /** @type {Record<string, BreadcrumbSegmentDef[]>} */
 export const BREADCRUMB_BY_PATH = {
   [groupsListPath()]: [{ label: 'Grupy' }],
+  [adminHomePath()]: [{ label: 'Organizacja' }],
 
   [appSettingsPath()]: [{ label: 'Ustawienia' }],
   [appHelpPath()]: [
-    { label: 'Ustawienia', path: () => appSettingsPath() },
     { label: 'Centrum pomocy' },
   ],
+  [faqPath()]: [{ label: 'FAQ' }],
+  [patchNotesPath()]: [{ label: 'Informacje o aktualizacji' }],
 
-  [userManagementPath()]: [{ label: 'Zarządzanie dostępem' }],
+  [userManagementPath()]: [{ label: 'Użytkownicy' }],
+  [diskSpacePath()]: [{ label: 'Przestrzeń dyskowa' }],
   [courseManagementPath()]: [{ label: 'Zarządzanie grupami' }],
   [statisticsPath()]: [{ label: 'Statystyki' }],
-  [organizationsPath()]: [{ label: 'Zarządzanie organizacjami' }],
-  [superadminLogsPath()]: [{ label: 'Logi produkcyjne' }],
+  [organizationsPath()]: [{ label: 'Organizacje' }],
+  [superadminLogsPath()]: [{ label: 'Logi' }],
   [adminBackupPath()]: [{ label: 'Kopia zapasowa' }],
+  [documentsPath()]: [{ label: 'Dokumenty' }],
+  [broadcastsPath()]: [{ label: 'Komunikaty' }],
 
   [templatesPath()]: [{ label: 'Szablony' }, { label: 'Galeria szablonów' }],
   [templatesMyPath()]: [{ label: 'Szablony' }, { label: 'Moje szablony' }],

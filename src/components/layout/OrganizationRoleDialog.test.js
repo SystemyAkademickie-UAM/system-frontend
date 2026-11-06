@@ -134,6 +134,6 @@ describe('loginContextMenu', () => {
     ];
 
     expect(loginContextMenu(memberships).kind).toBe('both');
-    expect(loginContextMenuLabel(memberships, 'polish')).toBe('Zmień organizację i rolę');
+    expect(loginContextMenuLabel(memberships, 'polish')).toBe('Zmień rolę lub organizację');
   });
 });

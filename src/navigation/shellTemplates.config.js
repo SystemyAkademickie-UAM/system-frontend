@@ -228,6 +228,41 @@ const NAVIGATIONPRODUCTIONLOGS__TEXTLABEL = {
   english: 'Production Logs',
 };
 
+const NAVIGATIONADMINHOME__TEXTLABEL = {
+  polish: 'Organizacja',
+  english: 'Organization',
+};
+
+const NAVIGATIONDISKSPACE__TEXTLABEL = {
+  polish: 'Przestrzeń dyskowa',
+  english: 'Disk Space',
+};
+
+const NAVIGATIONDOCUMENTS__TEXTLABEL = {
+  polish: 'Dokumenty',
+  english: 'Documents',
+};
+
+const NAVIGATIONBROADCASTS__TEXTLABEL = {
+  polish: 'Komunikaty',
+  english: 'Broadcasts',
+};
+
+const NAVIGATIONBACKUPS__TEXTLABEL = {
+  polish: 'Kopia zapasowa',
+  english: 'Backups',
+};
+
+const NAVIGATIONLOGS__TEXTLABEL = {
+  polish: 'Logi',
+  english: 'Logs',
+};
+
+const NAVIGATIONFAQ__TEXTLABEL = {
+  polish: 'FAQ',
+  english: 'FAQ',
+};
+
 const SUBNAVIGATIONMAINPAGE__TEXTLABEL = {
   polish: 'Strona główna',
   english: 'Main Page',
@@ -479,12 +514,18 @@ export const HREF_BUILDERS = {
   GROUP_RANKING_ACTIVITIES: (ctx) => (ctx.groupId ? paths.groupRankingActivitiesPath(ctx.groupId) : null),
 
   APP_SETTINGS: () => paths.appSettingsPath(),
+  ADMIN_HOME: () => paths.adminHomePath(),
   USER_MANAGEMENT: () => paths.userManagementPath(),
   COURSE_MANAGEMENT: () => paths.courseManagementPath(),
+  GROUPS_LIST: () => paths.groupsListPath(),
+  DISK_SPACE: () => paths.diskSpacePath(),
   STATISTICS: () => paths.statisticsPath(),
   ORG_MANAGEMENT: () => paths.organizationsPath(),
   SYSTEM_LOGS: () => paths.superadminLogsPath(),
   ADMIN_BACKUP: () => paths.adminBackupPath(),
+  DOCUMENTS: () => paths.documentsPath(),
+  BROADCASTS: () => paths.broadcastsPath(),
+  FAQ: () => paths.faqPath(),
   TEMPLATES_MY: () => paths.templatesMyPath(),
   TEMPLATES_GALLERY: () => paths.templatesPath(),
 
@@ -902,21 +943,39 @@ const adminView = {
   ctaItems: [],
   primaryNavItems: [
     {
-      id: 'zarzadzanie-dostepem',
+      id: 'organizacja',
       enabled: true,
       kind: 'navlink',
-      label: NAVIGATIONACCESSMANAGEMENT__TEXTLABEL[LANGUAGE],
-      iconId: 'nav/users',
+      label: NAVIGATIONADMINHOME__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/organization-home',
+      hrefKey: 'ADMIN_HOME',
+      requiresGroup: false,
+    },
+    {
+      id: 'zarzadzanie-uzytkownikami',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONUSERS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/users-manage',
       hrefKey: 'USER_MANAGEMENT',
       requiresGroup: false,
     },
     {
-      id: 'zarzadzanie-kursami',
+      id: 'zarzadzanie-grupami',
       enabled: true,
       kind: 'navlink',
-      label: NAVIGATIONGROUPMANAGEMENT__TEXTLABEL[LANGUAGE],
+      label: YOURGROUPS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/groups',
-      hrefKey: 'COURSE_MANAGEMENT',
+      hrefKey: 'GROUPS_LIST',
+      requiresGroup: false,
+    },
+    {
+      id: 'przestrzen-dyskowa',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONDISKSPACE__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/disk-space',
+      hrefKey: 'DISK_SPACE',
       requiresGroup: false,
     },
     {
@@ -926,6 +985,15 @@ const adminView = {
       label: NAVIGATIONSTATISTICS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/stats',
       hrefKey: 'STATISTICS',
+      requiresGroup: false,
+    },
+    {
+      id: 'logi',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONLOGS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/logs',
+      hrefKey: 'SYSTEM_LOGS',
       requiresGroup: false,
     },
   ],
@@ -936,12 +1004,39 @@ const superadminView = {
   ctaItems: [],
   primaryNavItems: [
     {
-      id: 'zarzadzanie-organizacjami',
+      id: 'organizacje',
       enabled: true,
       kind: 'navlink',
       label: NAVIGATIONORGANIZATIONS__TEXTLABEL[LANGUAGE],
-      iconId: 'nav/organization',
+      iconId: 'nav/organizations',
       hrefKey: 'ORG_MANAGEMENT',
+      requiresGroup: false,
+    },
+    {
+      id: 'kopia-zapasowa',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONBACKUPS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/settings',
+      hrefKey: 'ADMIN_BACKUP',
+      requiresGroup: false,
+    },
+    {
+      id: 'dokumenty',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONDOCUMENTS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/documents',
+      hrefKey: 'DOCUMENTS',
+      requiresGroup: false,
+    },
+    {
+      id: 'komunikaty-broadcast',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONBROADCASTS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/broadcast',
+      hrefKey: 'BROADCASTS',
       requiresGroup: false,
     },
     {
@@ -954,21 +1049,21 @@ const superadminView = {
       requiresGroup: false,
     },
     {
-      id: 'logi-produkcyjne',
+      id: 'logi',
       enabled: true,
       kind: 'navlink',
-      label: NAVIGATIONPRODUCTIONLOGS__TEXTLABEL[LANGUAGE],
-      iconId: 'nav/stats',
+      label: NAVIGATIONLOGS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/logs',
       hrefKey: 'SYSTEM_LOGS',
       requiresGroup: false,
     },
     {
-      id: 'backup-bazy',
+      id: 'faq',
       enabled: true,
       kind: 'navlink',
-      label: 'Kopia zapasowa',
-      iconId: 'nav/stats',
-      hrefKey: 'ADMIN_BACKUP',
+      label: NAVIGATIONFAQ__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/faq',
+      hrefKey: 'FAQ',
       requiresGroup: false,
     },
   ],

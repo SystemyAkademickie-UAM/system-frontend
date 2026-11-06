@@ -444,3 +444,40 @@
   --text-page-description: var(--font-size-page-description);
   --text-nav-stat: var(--font-size-nav-stat);
 }
+
+/* === NAWIGACJA DLA OSOBY ADMINISTRUJĄCEJ I NADZORUJĄCEJ (WARIANT CZERWONY) === */
+.app-shell[data-app-role="admin"],
+.app-shell[data-app-role="superadmin"] {
+  --color-nav-primary: #3d2325;
+  --color-nav-scrollbar-track: color-mix(in srgb, var(--color-nav-primary) 80%, #000);
+  --color-nav-scrollbar-thumb: color-mix(in srgb, var(--color-nav-primary) 58%, #000);
+  --color-nav-scrollbar-thumb-hover: color-mix(in srgb, var(--color-nav-primary) 48%, #000);
+  --color-nav-cta: #c84141;
+  --color-nav-link: #fae5e5;
+  --color-nav-user-name: #fdf5f5;
+  --color-nav-user-role: rgba(250, 209, 209, 0.7);
+  --color-nav-logo-bg: #fae5e5;
+  --color-accent: #c84141;
+  --color-accent-on: #ffffff;
+  --color-accent-pressed: #ab3232;
+  --color-accent-muted: rgba(200, 65, 65, 0.22);
+}
+
+[data-theme="light"] .app-shell[data-app-role="admin"],
+[data-theme="light"] .app-shell[data-app-role="superadmin"] {
+  --color-nav-primary: #5f2b2b;
+  --color-nav-scrollbar-track: color-mix(in srgb, var(--color-nav-primary) 80%, #000);
+  --color-nav-scrollbar-thumb: color-mix(in srgb, var(--color-nav-primary) 58%, #000);
+  --color-nav-scrollbar-thumb-hover: color-mix(in srgb, var(--color-nav-primary) 48%, #000);
+  --color-nav-cta: #b32626;
+  --color-nav-link: #fae5e5;
+  --color-nav-user-name: #fdf5f5;
+  --color-nav-user-role: rgba(250, 209, 209, 0.75);
+  --color-nav-logo-bg: #fae5e5;
+  --color-nav-stat-bg: #451e1e;
+  --color-nav-sub-active-bg: #5f2b2b;
+  --color-accent: #b32626;
+  --color-accent-on: #ffffff;
+  --color-accent-pressed: #911c1c;
+  --color-accent-muted: rgba(179, 38, 38, 0.16);
+}

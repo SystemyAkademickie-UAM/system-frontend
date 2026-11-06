@@ -20,7 +20,15 @@ const PAGEDESCRIPTION__TEXTLABEL = {
   english: 'Create and configure organizations and assign administrator permissions.'
 };
 
-// === GŁÓWNY KOMPONENT WIDOKU ===
+// === TWORZENIE I ZARZĄDZANIE ORGANIZACJAMI (OSOBA NADZORUJĄCA: /organizations) ===
+/**
+ * Rola: Osoba nadzorująca (Superadmin).
+ * Ścieżka: /organizations (strona główna nadzorcy).
+ * Uprawnienia:
+ * - Tworzenie nowych organizacji w systemie
+ * - Konfiguracja parametrów i certyfikatów SAML IdP
+ * - Nadawanie i odbieranie uprawnień osób administrujących
+ */
 export default function OrganizationManagementContent() {
 
 const [LANGUAGE] = useState(READLANGUAGECOOKIE);

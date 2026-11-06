@@ -51,7 +51,15 @@ const SHOWBUTTON__TEXTLABEL = {
 
 const DEFAULT_LOG_TIME_ZONE = 'Europe/Warsaw';
 
-// === GŁÓWNY KOMPONENT WIDOKU ===
+// === PRZEGLĄDANIE I EKSPORT LOGÓW (OSOBA NADZORUJĄCA / ADMINISTRUJĄCA: /logs) ===
+/**
+ * Rola: Osoba nadzorująca oraz Osoba administrująca.
+ * Ścieżka: /logs (wcześniej /system-logs).
+ * Uprawnienia:
+ * - Pobieranie listy dostępnych dni z logami produkcyjnymi
+ * - Bezpieczny eksport zaszyfrowanych wpisów (ECDH + AES-GCM)
+ * - Lokalny odczyt i analiza zdarzeń systemowych w przeglądarce
+ */
 export default function SuperadminLogsContent() {
   const LANGUAGE = READLANGUAGECOOKIE();
   const [days, setDays] = useState([]);

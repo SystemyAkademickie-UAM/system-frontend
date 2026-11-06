@@ -53,7 +53,15 @@ function formatBytes(bytes) {
   return `${mib.toFixed(2)} MB`;
 }
 
-// === GŁÓWNY KOMPONENT WIDOKU ===
+// === ZARZĄDZANIE KOPIĄ BAZY DANYCH (OSOBA NADZORUJĄCA: /backups) ===
+/**
+ * Rola: Osoba nadzorująca (Superadmin).
+ * Ścieżka: /backups (wcześniej /admin/backup).
+ * Uprawnienia:
+ * - Wykonywanie i pobieranie ręcznych kopii zapasowych bazy danych
+ * - Wyzwalanie i pobieranie automatycznych kopii zapasowych
+ * - Przywracanie stanu bazy danych z pliku zaszyfrowanego
+ */
 export default function AdminBackupContent() {
   const { showSuccess, showError } = useToast();
 
@@ -183,7 +191,7 @@ const fileInputRef = useRef(null);
       {/* ── Warning Alert (Manual Backup Overdue) ────────────────────── */}
       {backupStatus?.isManualBackupOverdue ? (
         <div className="admin-backup__alert admin-backup__alert--warning">
-          <div className="admin-backup__alert-icon">⚠️</div>
+          <div className="admin-backup__alert-icon" aria-hidden="true">[!]</div>
           <div className="admin-backup__alert-body">
             <h3 className="admin-backup__alert-title">
               Wymagane działanie: Baza danych dawno nie była zabezpieczana ręczną kopią zapasową!

@@ -18,8 +18,11 @@ export function IconMoney({ className }) {
 }
 
 export function IconSettings({ className }) {
+  return <AssetSvg name={SVG_ICONS.content.settings} className={className} width={30} height={30} alt="" />;
+}
 
-return <AssetSvg name={SVG_ICONS.content.settings} className={className} width={30} height={30} alt="" />;
+export function IconInfo({ className }) {
+  return <AssetSvg name={SVG_ICONS.content.info} className={className} width={30} height={30} alt="" />;
 }
 
 export function IconUserPlaceholder({ className }) {
