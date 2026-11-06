@@ -1,8 +1,17 @@
+/**
+ * @file SuperBarUserIdentity.jsx
+ * @description Komponent interfejsu użytkownika SuperBarUserIdentity.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import './SuperBar.css';
 
 /** Nazwa i rola użytkownika — dane z sesji lub placeholdery. */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SuperBarUserIdentity({ displayName, roleLabel, isLoading = false }) {
-  if (isLoading) {
+
+if (isLoading) {
     return (
       <div className="super-bar-user-identity super-bar-user-identity--loading">
         <span className="super-bar-user-identity__skeleton" aria-hidden="true" />
@@ -11,6 +20,7 @@ export default function SuperBarUserIdentity({ displayName, roleLabel, isLoading
     );
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className="super-bar-user-identity">
       <p className="super-bar-user-identity__name">{displayName}</p>

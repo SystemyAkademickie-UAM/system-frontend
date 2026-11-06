@@ -1,3 +1,9 @@
+/**
+ * @file ShopToggleButton.jsx
+ * @description Komponent przycisku ShopToggleButton z obsługą wariantów wizualnych i interakcji.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import Button from '../Button/Button.jsx';
 import {
   SHOP_TOGGLE_STATE_CONFIG,
@@ -5,6 +11,7 @@ import {
 } from './shopToggleStates.js';
 import './ShopToggleButton.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Przełącznik otwarcia / zamknięcia sklepu (konfigurowalne stany).
  *
@@ -14,6 +21,8 @@ import './ShopToggleButton.css';
  * @param {boolean} [props.disabled=false]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ShopToggleButton({
   isShopOpen,
   onToggle,
@@ -21,8 +30,10 @@ export default function ShopToggleButton({
   className = '',
 }) {
   const stateKey = resolveShopToggleState(isShopOpen);
-  const config = SHOP_TOGGLE_STATE_CONFIG[stateKey];
 
+const config = SHOP_TOGGLE_STATE_CONFIG[stateKey];
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <Button
       type="button"

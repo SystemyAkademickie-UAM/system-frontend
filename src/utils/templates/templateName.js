@@ -1,7 +1,14 @@
+/**
+ * @file templateName.js
+ * @description Funkcje pomocnicze i narzędziowe modułu templateName.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { NAME_MAX_LENGTH } from '../../constants/fieldLimits.js';
 
 export const DEFAULT_TEMPLATE_NAME_SUFFIX = ' — szablon';
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * Buduje domyślną nazwę szablonu z nazwy grupy, obcinając końcówkę gdy przekracza limit.
  *
@@ -10,12 +17,14 @@ export const DEFAULT_TEMPLATE_NAME_SUFFIX = ' — szablon';
  * @param {string} [suffix]
  * @returns {string}
  */
+
 export function buildDefaultTemplateName(
   storyName,
   maxLength = NAME_MAX_LENGTH,
   suffix = DEFAULT_TEMPLATE_NAME_SUFFIX,
 ) {
-  const base = String(storyName ?? '').trim();
+
+const base = String(storyName ?? '').trim();
   if (base.length + suffix.length <= maxLength) {
     return `${base}${suffix}`;
   }

@@ -1,3 +1,9 @@
+/**
+ * @file HomeRedirect.jsx
+ * @description Komponent interfejsu użytkownika HomeRedirect.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../../context/SessionContext.jsx';
@@ -8,6 +14,7 @@ import {
 import { groupsListPath, registerPath, welcomePath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const REGISTRATION_STATE = {
   PENDING: 'pending',
   COMPLETE: 'complete',
@@ -19,9 +26,12 @@ const REGISTRATION_STATE = {
  * Session-aware entry route for `/`.
  * Anonymous → `/welcome`; authenticated + incomplete registration → `/login`; else → `/groups`.
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function HomeRedirect() {
   const { isAuthenticated, isLoading } = useSession();
-  const [registrationState, setRegistrationState] = useState(REGISTRATION_STATE.PENDING);
+
+const [registrationState, setRegistrationState] = useState(REGISTRATION_STATE.PENDING);
 
   useEffect(() => {
     if (isLoading) {
@@ -71,5 +81,6 @@ export default function HomeRedirect() {
     return <Navigate to={registerPath()} replace />;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return <Navigate to={groupsListPath()} replace />;
 }

@@ -1,3 +1,9 @@
+/**
+ * @file SmartPostCard.css
+ * @description Style karty komponentu SmartPostCard.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .smart-post-card {
   width: auto;
   max-width: 100%;

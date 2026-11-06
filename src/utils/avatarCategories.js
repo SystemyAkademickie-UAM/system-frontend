@@ -1,4 +1,10 @@
 /**
+ * @file avatarCategories.js
+ * @description Funkcje pomocnicze i narzędziowe modułu avatarCategories.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Narzędzie kategoryzacji i filtrowania awatarów.
  */
 
@@ -26,88 +32,82 @@ export const AVATAR_CATEGORY_TABS = [
  * Ustalona kolejność ID awatarów wewnątrz każdej z grup (dokładnie jak na grafice).
  */
 export const ORDERED_AVATAR_IDS = {
-  // Ludzie (12 awatarów)
   [AVATAR_CATEGORY.PEOPLE]: [
-    61, // Woman Beach
-    31, // Man Headphones
-    64, // Woman Hijab
-    46, // Senior Woman
-    63, // Woman Glasses
-    33, // Man Laptop
-    65, // Woman Reading
-    30, // Man Guitar
-    29, // Man Glasses
-    66, // Woman Smiling
-    32, // Man Hiker
-    62, // Woman Curly
+    61,
+    31,
+    64,
+    46,
+    63,
+    33,
+    65,
+    30,
+    29,
+    66,
+    32,
+    62,
   ],
 
-  // Fantasy (16 awatarów)
   [AVATAR_CATEGORY.FANTASY]: [
-    25, // Fantasy Treasure
-    26, // Fantasy Viking
-    8,  // Blue Wizard
-    12, // Fantasy Alchemist
-    13, // Fantasy Centaur
-    14, // Fantasy Dragon
-    15, // Fantasy Dwarf
-    16, // Fantasy Elf
-    17, // Fantasy Goblin
-    18, // Fantasy Griffin
-    19, // Fantasy Knight
-    20, // Fantasy Mage
-    21, // Fantasy Necromancer
-    22, // Fantasy Orc
-    23, // Fantasy Portal
-    24, // Fantasy Sword
+    25,
+    26,
+    8,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
   ],
 
-  // Roboty (6 awatarów)
   [AVATAR_CATEGORY.ROBOTS]: [
     1, 2, 3, 4, 5, 6
   ],
 
-  // Kosmos (13 awatarów)
   [AVATAR_CATEGORY.SPACE]: [
-    38, // Rabbit Blackhole
-    39, // Rabbit Mechanic
-    40, // Rabbit Nebula
-    41, // Rabbit Rocket
-    42, // Rabbit Rover
-    43, // Rabbit Satellite
-    44, // Rabbit Spacestation
-    47, // Space Carrots
-    58, // Ufo Alien
-    9,  // Carrot Radar
-    7,  // Astronaut Helmet
-    27, // Green Alien
-    45, // Retro Rocket
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    47,
+    58,
+    9,
+    7,
+    27,
+    45,
   ],
 
-  // Steampunk (9 awatarów)
   [AVATAR_CATEGORY.STEAMPUNK]: [
-    48, // Steampunk Airship
-    56, // Steampunk Rabbit
-    49, // Steampunk Binoculars
-    50, // Steampunk Clock
-    51, // Steampunk Gears
-    52, // Steampunk Gentleman
-    53, // Steampunk King
-    54, // Steampunk Machine
-    55, // Steampunk Orrery
+    48,
+    56,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
   ],
 
-  // Różne (9 awatarów)
   [AVATAR_CATEGORY.VARIOUS]: [
-    37, // Pizza Slice
-    59, // Vinyl Player
-    60, // Vinyl Record
-    10, // Desert Cactus
-    11, // Egyptian Pharaoh
-    28, // Green Chameleon
-    57, // Tiger Face
-    35, // Panda Eating
-    36, // Panda Leaf
+    37,
+    59,
+    60,
+    10,
+    11,
+    28,
+    57,
+    35,
+    36,
   ],
 };
 
@@ -123,6 +123,7 @@ export const ALL_ORDERED_AVATAR_IDS = [
 /**
  * Bezpośrednie mapowanie ID awatara do kategorii.
  */
+
 const AVATAR_ID_TO_CATEGORY = {};
 for (const [category, ids] of Object.entries(ORDERED_AVATAR_IDS)) {
   for (const id of ids) {
@@ -130,6 +131,7 @@ for (const [category, ids] of Object.entries(ORDERED_AVATAR_IDS)) {
   }
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * Sprawdza, czy dany awatar ma zostać wykluczony z wyboru (np. Nikita / nobodgeit).
  * @param {{ id: number, name?: string, imageUrl?: string }} avatar
@@ -148,7 +150,8 @@ export function isExcludedAvatar(avatar) {
  * @returns {string}
  */
 export function getAvatarCategory(avatar) {
-  if (!avatar || isExcludedAvatar(avatar)) return AVATAR_CATEGORY.VARIOUS;
+
+if (!avatar || isExcludedAvatar(avatar)) return AVATAR_CATEGORY.VARIOUS;
 
   if (avatar.id && AVATAR_ID_TO_CATEGORY[avatar.id]) {
     return AVATAR_ID_TO_CATEGORY[avatar.id];
@@ -236,7 +239,6 @@ function getAvatarSortIndex(avatar) {
 export function filterAvatarsByCategory(avatars, categoryId) {
   if (!Array.isArray(avatars)) return [];
 
-  // Wykluczamy Nikitę
   const available = avatars.filter((avatar) => !isExcludedAvatar(avatar));
 
   let result;

@@ -1,3 +1,9 @@
+/**
+ * @file clientAuthState.js
+ * @description Funkcje pomocnicze i narzędziowe modułu clientAuthState.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { BROWSER_ID_SAML_PENDING_SESSION_KEY } from '../constants/browserId.constants.js';
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import { getRememberMe } from '../services/rememberMeService.js';
@@ -17,6 +23,8 @@ export function isClientLogoutInProgress() {
 /**
  * Oznacza rozpoczęcie wylogowania — blokuje pośrednie przekierowania RouteGuard.
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function beginClientLogout() {
   logoutInProgress = true;
 }
@@ -35,7 +43,8 @@ export function endClientLogout() {
  */
 export function registerClientAuthClearListener(listener) {
   clearListeners.add(listener);
-  return () => {
+
+return () => {
     clearListeners.delete(listener);
   };
 }
@@ -48,14 +57,12 @@ export function clearClientAuthState() {
     try {
       listener();
     } catch {
-      // ignore listener failures during logout
     }
   });
 
   try {
     sessionStorage.removeItem(BROWSER_ID_SAML_PENDING_SESSION_KEY);
   } catch {
-    // ignore storage access errors
   }
 }
 
@@ -71,10 +78,10 @@ export function handleSessionExpired() {
     return;
   }
   sessionExpiredHandling = true;
-  try {
+
+try {
     clearClientAuthState();
 
-    // Jeśli użytkownik nie wybrał "Zapamiętaj mnie", unieważnij sesję również po stronie backendu
     try {
       if (!getRememberMe() && typeof fetch === 'function') {
         const baseUrl = getApiBaseUrl();
@@ -87,7 +94,6 @@ export function handleSessionExpired() {
         }
       }
     } catch {
-      // ignore network errors
     }
 
     if (typeof window !== 'undefined' && typeof window.location?.replace === 'function') {
@@ -102,7 +108,6 @@ export function handleSessionExpired() {
             window.location.replace('/welcome');
           }
         } catch {
-          // ignore navigation errors in test/unsupported environments
         }
       }
     }

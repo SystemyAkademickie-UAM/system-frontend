@@ -1,3 +1,9 @@
+/**
+ * @file DataTable.jsx
+ * @description Komponent interfejsu użytkownika DataTable.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Pagination from '../Pagination/Pagination.jsx';
@@ -10,6 +16,7 @@ import { cycleSortRule, sortRows } from './dataTableSort.js';
 import DataTableMobileRow from './DataTableMobileRow.jsx';
 import './DataTable.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const SUPERBAR_HEIGHT = 63;
 const HEADER_BORDER_RADIUS = '12px 12px 0 0';
 const INLINE_ACTION_ICON_SIZE = 20;
@@ -19,6 +26,8 @@ const MOBILE_TABLE_MAX_WIDTH = 639;
  * @param {Object[]} inlineActions
  * @returns {Object[]}
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function inlineActionsToMenuItems(inlineActions) {
   return inlineActions.map((item) => ({
     id: `__inline_${item.id}`,
@@ -279,7 +288,8 @@ function DataTableRowActions({ row, rowActions, onMenuOpenChange, collapseInline
 }
 
 function DefaultDataTableRow({ row, rowIndex, columns, rowActions, rowActionsPosition = 'end', rowColor }) {
-  const resolvedColor = rowColor ?? row.rowColor ?? row.color ?? null;
+
+const resolvedColor = rowColor ?? row.rowColor ?? row.color ?? null;
   const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
   const actionsCell = rowActions ? (
     <td className="data-table__cell data-table__cell--actions">
@@ -486,7 +496,8 @@ export default function DataTable({
     || rowActions?.inlineActions?.length
     || rowActions?.menuItems?.length,
   );
-  const tableDensityClass = columns.length >= 8
+
+const tableDensityClass = columns.length >= 8
     ? 'data-table--dense'
     : columns.length >= 6
       ? 'data-table--compact'
@@ -512,6 +523,7 @@ export default function DataTable({
     </th>
   ) : null;
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className={['data-table-wrap', className].filter(Boolean).join(' ')}>
       {showToolbar ? (

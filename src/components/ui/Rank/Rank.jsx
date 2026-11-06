@@ -1,3 +1,9 @@
+/**
+ * @file Rank.jsx
+ * @description Komponent interfejsu użytkownika Rank.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
@@ -9,6 +15,7 @@ import { formatRankDiscountLabel, hasRankShopDiscount } from '../../../utils/ran
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './Rank.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const STORYSTATUS__TEXTLABEL = {
   polish: 'Status fabularny',
   english: 'Story status'
@@ -27,6 +34,8 @@ const NOSHOOPITEMS__TEXTLABEL = {
 /**
  * Kafelek rangi (Figma: Background+VerticalBorder).
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function Rank({
   name,
   costAmount = 0,
@@ -42,8 +51,10 @@ export default function Rank({
   className = '',
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const emoji = normalizeRankBadgeIcon(icon ?? iconFile, DEFAULT_RANK_EMOJI);
 
+const emoji = normalizeRankBadgeIcon(icon ?? iconFile, DEFAULT_RANK_EMOJI);
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <article
       className={['maq-rank', isLocked ? 'maq-rank--locked' : '', className].filter(Boolean).join(' ')}

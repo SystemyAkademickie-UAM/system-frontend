@@ -1,9 +1,16 @@
+/**
+ * @file ProductCategoryStrip.jsx
+ * @description Komponent interfejsu użytkownika ProductCategoryStrip.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import {
   DEFAULT_CATEGORY_COLOR,
   getContrastingCategoryTextColor,
 } from '../../../utils/shop/shopCategoryColors.js';
 import './ProductCategoryStrip.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Pasek kategorii na prawej krawędzi kafelka produktu.
  * Domyślnie: ucięte kule wyrównane do prawej ścianki.
@@ -14,11 +21,15 @@ import './ProductCategoryStrip.css';
  *   className?: string,
  * }} props
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ProductCategoryStrip({ categories = [], className = '' }) {
-  if (categories.length === 0) {
+
+if (categories.length === 0) {
     return null;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div
       className={['maq-product-category-strip', className].filter(Boolean).join(' ')}

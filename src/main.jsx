@@ -1,3 +1,9 @@
+/**
+ * @file main.jsx
+ * @description Funkcje pomocnicze i narzędziowe modułu main.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { StrictMode } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
@@ -8,9 +14,12 @@ import { ToastProvider } from './components/ui/Toast/Toast.jsx';
 import { NotificationsProvider } from './context/NotificationsContext.jsx';
 import { createAppRouter } from './routes/createAppRouter.jsx';
 import { initTheme } from './services/themeService.js';
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 import { startProductionClientLogger } from './utils/startProductionClientLogger.js';
 import './styles/tokens.css';
 import './styles/messages.css';
+
 import './index.css';
 
 initTheme();
@@ -21,6 +30,7 @@ if (!rootElement) {
 }
 
 const router = createAppRouter();
+
 startProductionClientLogger();
 
 createRoot(rootElement).render(

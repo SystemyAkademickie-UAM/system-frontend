@@ -1,8 +1,15 @@
+/**
+ * @file SubNav.jsx
+ * @description Komponent interfejsu użytkownika SubNav.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useSubNavFitFontSize } from './useSubNavFitFontSize.js';
 import './SubNav.css';
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function itemClassName(isActive) {
   return ['maq-sub-nav__item', isActive ? 'maq-sub-nav__item--active' : ''].filter(Boolean).join(' ');
 }
@@ -19,11 +26,13 @@ function itemClassName(isActive) {
  */
 export default function SubNav({ ariaLabel, items, activeId, onSelect, className = '' }) {
   const navRef = useRef(null);
-  const location = useLocation();
+
+const location = useLocation();
   const fitDeps = [...items.map((item) => `${item.id}:${item.label}`), location.pathname, activeId];
 
   useSubNavFitFontSize(navRef, fitDeps);
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <nav
       ref={navRef}

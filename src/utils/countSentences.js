@@ -1,3 +1,9 @@
+/**
+ * @file countSentences.js
+ * @description Funkcje pomocnicze i narzędziowe modułu countSentences.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** Wykrywa zdania zakończone . ! ? … lub ostatni fragment bez interpunkcji końcowej. */
 const SENTENCE_PATTERN = /[^.!?…]+[.!?…]+(?:\s+|$)|[^.!?…]+$/g;
 
@@ -9,7 +15,9 @@ export const POST_CARD_WIDTH_STEPS = 8;
  */
 export const POST_CARD_MAX_CONTENT_FRACTION = 3 / 5;
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /** Dolny stopień szerokości — jak przy 4 zdaniach (4/8 maksimum). */
+
 export const POST_CARD_MIN_WIDTH_STEP = 4;
 
 /**
@@ -25,7 +33,8 @@ export function countSentences(text) {
   }
 
   const matches = trimmed.match(SENTENCE_PATTERN);
-  return matches ? matches.length : 1;
+
+return matches ? matches.length : 1;
 }
 
 /**

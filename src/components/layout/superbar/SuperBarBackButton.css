@@ -1,3 +1,9 @@
+/**
+ * @file SuperBarBackButton.css
+ * @description Style interfejsu użytkownika i układ dla modułu SuperBarBackButton.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .super-bar-back {
   display: inline-flex;
   align-items: center;
@@ -14,6 +20,7 @@
   cursor: pointer;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .super-bar-back:hover {
   background: rgba(255, 255, 255, 0.08);
 }
@@ -23,12 +30,14 @@
   outline-offset: 2px;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .super-bar-back__icon {
   display: block;
   width: 28px;
   height: 28px;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 899px) {
   .super-bar-back {
     width: 38px;

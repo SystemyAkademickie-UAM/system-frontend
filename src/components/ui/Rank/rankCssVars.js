@@ -1,14 +1,24 @@
+/**
+ * @file rankCssVars.js
+ * @description Komponent interfejsu użytkownika rankCssVars.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { getRankThemeConfig } from './rankTheme.js';
 import { hexToRgba, RANK_LOCKED_COLOR } from '../../../utils/rankGradient.js';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Zwraca zmienne CSS dla kafelka rangi.
  *
  * @param {string} [theme='default']
  * @param {{ accentColor?: string, isLocked?: boolean }} [options]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function getRankCssVars(theme = 'default', options = {}) {
-  const { accentColor, isLocked = false } = options;
+
+const { accentColor, isLocked = false } = options;
 
   if (isLocked) {
     return {
@@ -34,6 +44,7 @@ export function getRankCssVars(theme = 'default', options = {}) {
 
   const config = getRankThemeConfig(theme);
 
+// === RENDEROWANIE WIDOKU ===
   return {
     '--rank-accent-color': `var(${config.accentVar})`,
     '--rank-icon-bg': `var(${config.iconBgVar})`,

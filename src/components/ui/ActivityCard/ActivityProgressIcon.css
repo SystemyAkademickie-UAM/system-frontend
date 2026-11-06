@@ -1,3 +1,9 @@
+/**
+ * @file ActivityProgressIcon.css
+ * @description Style interfejsu użytkownika i układ dla modułu ActivityProgressIcon.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-activity-progress-icon {
   display: inline-flex;
   align-items: center;
@@ -12,6 +18,7 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-activity-progress-icon:hover {
   transform: scale(1.08);
 }
@@ -21,6 +28,7 @@
   background: var(--color-activity-icon-locked-bg);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-activity-progress-icon--unlocked {
   border: 0;
   background: var(--color-activity-icon-unlocked-bg);

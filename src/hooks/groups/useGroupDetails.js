@@ -1,10 +1,18 @@
+/**
+ * @file useGroupDetails.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupDetails.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useEffect, useState } from 'react';
 import { fetchGroupPreview } from '../../services/groups.api.js';
 
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useGroupDetails(groupId) {
   const [group, setGroup] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+
+const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -49,5 +57,6 @@ export function useGroupDetails(groupId) {
     };
   }, [groupId]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return { group, isLoading, errorMessage };
 }

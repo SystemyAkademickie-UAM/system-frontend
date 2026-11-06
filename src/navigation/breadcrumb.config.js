@@ -1,3 +1,9 @@
+/**
+ * @file breadcrumb.config.js
+ * @description Konfiguracja elementów nawigacji i menu dla breadcrumb.config.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import {
   appHelpPath,
   appSettingsPath,
@@ -43,6 +49,8 @@ export const BREADCRUMB_BY_PATH = {
 };
 
 /** Ścieżki grupowe — dopasowanie po regex (kolejność ma znaczenie). */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export const GROUP_BREADCRUMB_RULES = [
   {
     pattern: /^\/groups\/[^/]+\/posts\/?$/u,
@@ -163,6 +171,7 @@ export const GROUP_BREADCRUMB_RULES = [
 ];
 
 /** Etykieta sidebar → breadcrumb (gdy brak dopasowania reguły). */
+
 export const SIDEBAR_LABEL_BY_HREF_KEY = {
   GROUP_MAIN: 'Strona główna',
   GROUP_PROFILE: 'Dziennik aktywności',

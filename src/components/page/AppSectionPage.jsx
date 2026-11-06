@@ -1,7 +1,14 @@
+/**
+ * @file AppSectionPage.jsx
+ * @description Komponent interfejsu użytkownika AppSectionPage.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import SectionPageLayout from '../layout/sectionPage/SectionPageLayout.jsx';
-import '../../pages/content/shared/groupSectionPage.css';
+import '../../pages/shared/groupSectionPage.css';
 import './PageUnavailable.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const DEFAULT_UNAVAILABLE_MESSAGE =
   'Ta strona jest obecnie niedostępna. Funkcjonalność zostanie udostępniona w kolejnej wersji aplikacji.';
 
@@ -21,6 +28,8 @@ const DEFAULT_UNAVAILABLE_MESSAGE =
  * @param {string} [props.unavailableMessage]
  * @param {boolean} [props.showUnavailableNotice]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function AppSectionPage({
   title,
   description: _description,
@@ -34,8 +43,10 @@ export default function AppSectionPage({
   unavailableMessage = DEFAULT_UNAVAILABLE_MESSAGE,
   showUnavailableNotice,
 }) {
-  const showNotice = showUnavailableNotice ?? !children;
 
+const showNotice = showUnavailableNotice ?? !children;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className="app-page-layout">
       <SectionPageLayout

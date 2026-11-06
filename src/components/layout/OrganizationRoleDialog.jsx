@@ -1,3 +1,9 @@
+/**
+ * @file OrganizationRoleDialog.jsx
+ * @description Komponent interfejsu użytkownika OrganizationRoleDialog.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useState } from 'react';
 import Modal from '../ui/Modal/Modal.jsx';
 import { AUTH_LOGIN_CONTEXT_PATH } from '../../constants/authPaths.constants.js';
@@ -5,6 +11,7 @@ import { postJson } from '../../services/api-client.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './OrganizationRoleDialog.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const ROLE_LABEL = {
   student: { polish: 'Osoba studiująca', english: 'Student' },
   lecturer: { polish: 'Osoba prowadząca', english: 'Lecturer' },
@@ -41,6 +48,8 @@ const SAVE_ERROR = {
  * @param {unknown} memberships
  * @returns {{ canChange: boolean, kind: 'both' | 'organization' | 'role' }}
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function loginContextMenu(memberships) {
   const list = Array.isArray(memberships) ? memberships : [];
   const showOrganization = list.length > 1;
@@ -75,7 +84,8 @@ function roleLabel(role, language) {
   if (!labels) {
     return role;
   }
-  return labels[language];
+
+return labels[language];
 }
 
 /**
@@ -122,7 +132,8 @@ export default function OrganizationRoleDialog({
   const showRole = (selectedOrganization?.roles?.length ?? 0) > 1;
   const menu = loginContextMenu(memberships);
   const titleSource = required ? TITLE : CHANGE_TITLE;
-  const title = titleSource[menu.kind][LANGUAGE];
+
+const title = titleSource[menu.kind][LANGUAGE];
 
   const handleOrganizationChange = (event) => {
     const nextId = Number(event.target.value);
@@ -157,6 +168,7 @@ export default function OrganizationRoleDialog({
     }
   };
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <Modal
       isOpen={isOpen}

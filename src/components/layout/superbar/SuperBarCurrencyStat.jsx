@@ -1,3 +1,9 @@
+/**
+ * @file SuperBarCurrencyStat.jsx
+ * @description Komponent interfejsu użytkownika SuperBarCurrencyStat.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import CurrencyDisplay from '../../ui/Currency/CurrencyDisplay.jsx';
@@ -7,6 +13,7 @@ import { positionCenteredTooltip } from '../../../utils/ui/positionTooltipInView
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBar.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Statystyka waluty z podglądem zgromadzonej kwoty po najechaniu (jak mini odznaka).
  */
@@ -15,6 +22,7 @@ const TOTALCURRENCYSHOW__TEXTLABEL = {
   english: 'Total',
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SuperBarCurrencyStat({
   currentAmount,
   totalEarned,
@@ -25,7 +33,8 @@ export default function SuperBarCurrencyStat({
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [layout, setLayout] = useState(null);
+
+const [layout, setLayout] = useState(null);
 
   const updatePreviewPosition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -67,6 +76,7 @@ export default function SuperBarCurrencyStat({
     setPreviewVisible(false);
   };
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <div

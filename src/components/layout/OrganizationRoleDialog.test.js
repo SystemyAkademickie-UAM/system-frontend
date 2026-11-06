@@ -1,3 +1,9 @@
+/**
+ * @file OrganizationRoleDialog.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność OrganizationRoleDialog.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { act, createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -11,7 +17,8 @@ vi.mock('../../services/api-client.js', () => ({
 import { postJson } from '../../services/api-client.js';
 import OrganizationRoleDialog, {
   loginContextMenu,
-  loginContextMenuLabel,
+
+loginContextMenuLabel,
 } from './OrganizationRoleDialog.jsx';
 
 const MEMBERSHIPS = [
@@ -19,6 +26,7 @@ const MEMBERSHIPS = [
   { organizationId: 2, name: 'Localhost IdP', roles: ['lecturer', 'student'] },
 ];
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('OrganizationRoleDialog confirm', () => {
   let container;
   let root;

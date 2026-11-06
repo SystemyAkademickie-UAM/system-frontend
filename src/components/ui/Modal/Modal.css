@@ -1,3 +1,9 @@
+/**
+ * @file Modal.css
+ * @description Style wizualne i reguły układu okna dialogowego Modal.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-modal {
   position: fixed;
   inset: 0;
@@ -42,6 +48,7 @@
   max-width: min(var(--modal-max-width-sm), calc(100vw - 2rem));
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-modal__dialog--md {
   max-width: min(var(--modal-max-width-md), calc(100vw - 2rem));
 }
@@ -95,6 +102,7 @@
   transition: color 0.15s ease, background 0.15s ease;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-modal__close:hover {
   color: var(--color-text-primary);
   background: rgba(255, 255, 255, 0.06);

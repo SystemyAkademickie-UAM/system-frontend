@@ -1,3 +1,9 @@
+/**
+ * @file Modal.jsx
+ * @description Komponent okna modalnego Modal z obsługą formularza i akcji użytkownika.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import Button from '../Button/Button.jsx';
@@ -5,6 +11,7 @@ import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import './Modal.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Wyśrodkowany modal z przyciemnionym, rozmytym tłem.
  *
@@ -23,6 +30,8 @@ import './Modal.css';
  * @param {string} [props.className]
  * @param {boolean} [props.dismissible=true] — false keeps the dialog open (no backdrop, Escape, or close button)
  */
+
+// === KOMPONENT OKNA DIALOGOWEGO ===
 export default function Modal({
   isOpen,
   onClose,
@@ -39,7 +48,8 @@ export default function Modal({
   dismissible = true,
 }) {
   const titleId = useId();
-  const subtitleId = useId();
+
+const subtitleId = useId();
 
   const handleKeyDown = useCallback((event) => {
     if (event.key === 'Escape') {
@@ -109,6 +119,7 @@ export default function Modal({
     return null;
   }
 
+// === RENDEROWANIE OKNA MODALNEGO ===
   return createPortal(
     <div className={['maq-modal', className].filter(Boolean).join(' ')}>
       <div

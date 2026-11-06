@@ -1,3 +1,9 @@
+/**
+ * @file AppShell.jsx
+ * @description Komponent interfejsu użytkownika AppShell.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { APP_ROLE, ROLE_UI_LABEL } from '../../navigation/shellTemplates.config.js';
@@ -18,10 +24,13 @@ import SuperBar from './superbar/SuperBar.jsx';
 import SuperBarBreadcrumbMobile from './superbar/SuperBarBreadcrumbMobile.jsx';
 import './AppShell.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Buduje wyświetlaną nazwę użytkownika z danych sesji.
  * Priorytet: imię + nazwisko > email > placeholder
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function buildDisplayName(user) {
   if (!user) {
     return null;
@@ -59,7 +68,8 @@ function AppShellLayout() {
   const [isContextOpen, setIsContextOpen] = useState(false);
   const { profile, avatarUrl, isLoading: isProfileLoading } = useUserProfile();
   const { showNickname: leaderShowsNickname } = useLeaderDisplayPreferences(profile?.showNickname);
-  const {
+
+const {
     livesDisplay,
     currencyDisplay,
     totalEarnedDisplay,
@@ -103,7 +113,8 @@ function AppShellLayout() {
   }, []);
 
   const selectionRequired = user?.selectionRequired === true;
-  const handleContextSaved = async () => {
+
+const handleContextSaved = async () => {
     await refetchSession({ force: true });
     setIsContextOpen(false);
     navigate(homePath());
@@ -127,6 +138,7 @@ function AppShellLayout() {
     };
   }, [isMobileNavOpen]);
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className={['app-shell', isCompactLayout ? 'app-shell--compact' : ''].filter(Boolean).join(' ')}>
       {isMobileNavOpen ? (

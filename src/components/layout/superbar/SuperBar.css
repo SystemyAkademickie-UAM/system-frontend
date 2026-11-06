@@ -1,3 +1,9 @@
+/**
+ * @file SuperBar.css
+ * @description Style interfejsu użytkownika i układ dla modułu SuperBar.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .super-bar {
   position: sticky;
   top: 0;
@@ -70,6 +76,7 @@
 }
 
 .super-bar__menu-icon::before,
+
 .super-bar__menu-icon::after {
   content: '';
   position: absolute;
@@ -144,6 +151,7 @@
   height: 30px;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .super-bar-user-menu {
   position: relative;
   display: flex;
@@ -291,6 +299,7 @@
   color: var(--color-accent);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .super-bar-user-menu__dropdown-item:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
@@ -304,6 +313,7 @@
   color: #ff8a8a;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (min-width: 900px) {
   .super-bar__menu-btn {
     display: none;
@@ -393,6 +403,7 @@
 }
 
 .super-bar-stat--currency,
+
 .super-bar-stat--lives {
   cursor: default;
 }

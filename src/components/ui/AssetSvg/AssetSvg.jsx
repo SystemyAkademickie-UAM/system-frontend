@@ -1,3 +1,9 @@
+/**
+ * @file AssetSvg.jsx
+ * @description Komponent interfejsu użytkownika AssetSvg.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useState } from 'react';
 import {
   resolveSvgAssetName,
@@ -6,6 +12,7 @@ import {
 } from '../../../utils/svgAssetPath.js';
 import './AssetSvg.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Obrazek SVG z public/assets/svg/. Gdy brak pliku lub nieprawidłowa nazwa, wyświetla shared/placeholder.svg.
  *
@@ -17,6 +24,8 @@ import './AssetSvg.css';
  * @param {number} [props.height]
  * @param {string} [props.alt='']
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function AssetSvg({
   name,
   tone = 'mask',
@@ -26,7 +35,8 @@ export default function AssetSvg({
   alt = '',
   ...rest
 }) {
-  const placeholderSrc = svgPlaceholderPath();
+
+const placeholderSrc = svgPlaceholderPath();
   const assetName = resolveSvgAssetName(name);
   const [src, setSrc] = useState(() => svgAssetPath(assetName));
 
@@ -40,7 +50,8 @@ export default function AssetSvg({
 
   const classNames = ['maq-asset-svg', tone === 'mask' ? 'maq-asset-svg--mask' : '', className]
     .filter(Boolean)
-    .join(' ');
+
+.join(' ');
 
   if (tone === 'mask') {
     return (
@@ -68,6 +79,7 @@ export default function AssetSvg({
     );
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <img
       className={classNames}

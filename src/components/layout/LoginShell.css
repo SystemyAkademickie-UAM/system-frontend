@@ -1,4 +1,9 @@
-/* Zmienne zgodne z AppShell — spójny motyw bez paska bocznego */
+/**
+ * @file LoginShell.css
+ * @description Style interfejsu użytkownika i układ dla modułu LoginShell.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 :root {
   --shell-sidebar-top: #14532d;
   --shell-sidebar-bottom: #111827;
@@ -18,6 +23,7 @@
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .login-shell__header {
   flex: 0 0 auto;
   padding: 1rem clamp(1rem, 3vw, 2rem);
@@ -39,6 +45,7 @@
   flex-shrink: 0;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .login-shell__brand-title {
   font-size: var(--font-size-page-description);
   font-weight: 700;

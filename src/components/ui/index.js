@@ -1,3 +1,9 @@
+/**
+ * @file index.js
+ * @description Komponent interfejsu użytkownika index.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 export { default as AppLogo } from './AppLogo/AppLogo.jsx';
 export { default as Button } from './Button/Button.jsx';
 export { default as AssetSvg } from './AssetSvg/AssetSvg.jsx';
@@ -12,6 +18,7 @@ export { cycleSortRule, sortRows } from './DataTable/dataTableSort.js';
 export { default as Badge, BADGE_RARITY, BADGE_RARITY_LABELS, getBadgeRarityConfig } from './Badge/Badge.jsx';
 export { default as BadgeMini } from './Badge/BadgeMini.jsx';
 export { default as Rank, RANK_THEME, getRankThemeConfig } from './Rank/Rank.jsx';
+
 export { default as PlayerAvatar } from './PlayerAvatar/PlayerAvatar.jsx';
 export { default as CurrencyDisplay, CurrencyIcon } from './Currency/CurrencyDisplay.jsx';
 export { default as InfoTooltip } from './InfoTooltip/InfoTooltip.jsx';
@@ -26,6 +33,7 @@ export { default as ShopClosedOverlay } from './ShopClosedOverlay/ShopClosedOver
 export { default as ShopCartPanel } from './ShopCartPanel/ShopCartPanel.jsx';
 export { default as TexturedSurface } from './TexturedSurface/TexturedSurface.jsx';
 export { default as CharacterCounter } from './CharacterCounter/CharacterCounter.jsx';
+
 export { default as CharacterLimitedField } from './CharacterCounter/CharacterLimitedField.jsx';
 export { default as TextField } from './TextField/TextField.jsx';
 export { default as Divider } from './Divider/Divider.jsx';

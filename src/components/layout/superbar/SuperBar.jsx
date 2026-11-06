@@ -1,3 +1,9 @@
+/**
+ * @file SuperBar.jsx
+ * @description Komponent interfejsu użytkownika SuperBar.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import SuperBarBreadcrumb from './SuperBarBreadcrumb.jsx';
 import SuperBarBackButton from './SuperBarBackButton.jsx';
 import SidebarBrand from '../sidebar/SidebarBrand.jsx';
@@ -16,6 +22,7 @@ import './SuperBar.css';
 
 import { useState } from 'react';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /** Placeholdery — używane gdy brak danych z sesji. */
 const PLACEHOLDERDISPLAYNAME__TEXTLABEL = {
   polish: 'Osoba korzystająca z systemu',
@@ -62,6 +69,8 @@ const MENUCLOSETEXT__TEXTLABEL = {
  * @param {{ groupName: string | null, groupPath: string | null, segments: { label: string, to?: string }[], back?: { ariaLabel?: string, fallbackTo: string } | null, homePath?: string } | null} [props.breadcrumb]
  * @param {() => void} [props.onOpenLoginContext]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SuperBar({
   displayName,
   roleLabel = PLACEHOLDER_ROLE_LABEL__TEXTLABEL.polish,
@@ -87,8 +96,10 @@ export default function SuperBar({
   const groupId = useOptionalGroupId();
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const showStudentGroupStats = role === APP_ROLE.STUDENT && groupId !== null;
-  const resolvedDisplayName = displayName || PLACEHOLDERDISPLAYNAME__TEXTLABEL[LANGUAGE];
 
+const resolvedDisplayName = displayName || PLACEHOLDERDISPLAYNAME__TEXTLABEL[LANGUAGE];
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <BacklogNewNotificationAlert />

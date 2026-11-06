@@ -1,4 +1,10 @@
 /**
+ * @file rememberMeService.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla rememberMe.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
+/**
  * MyAcademyQuest — Remember Me Service
  * Obsługa trzymania sesji użytkownika ("Zapamiętaj mnie").
  * Preferencja zapisywana w ciasteczku `maq_remember_me` oraz localStorage.
@@ -13,8 +19,11 @@ const REMEMBER_ME_STORAGE_KEY = 'maq_remember_me';
  *
  * @returns {boolean}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function getRememberMe() {
-  try {
+
+try {
     const cookies = document.cookie.split(';');
     for (const c of cookies) {
       const trimmed = c.trim();
@@ -29,7 +38,6 @@ export function getRememberMe() {
       return local === '1' || local === 'true';
     }
   } catch {
-    // Ignoruj błędy dostępu do cookies/localStorage
   }
 
   return false;
@@ -40,13 +48,12 @@ export function getRememberMe() {
  *
  * @param {boolean} enabled
  */
+
 export function setRememberMe(enabled) {
   try {
     const val = enabled ? '1' : '0';
-    // Ciasteczko na 365 dni
     document.cookie = `${REMEMBER_ME_COOKIE_NAME}=${val};path=/;max-age=${365 * 24 * 60 * 60};SameSite=Lax`;
     localStorage.setItem(REMEMBER_ME_STORAGE_KEY, val);
   } catch {
-    // Ignoruj błędy zapisu
   }
 }

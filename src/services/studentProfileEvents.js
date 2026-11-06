@@ -1,4 +1,12 @@
+/**
+ * @file studentProfileEvents.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla studentProfileEvents.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 export const STUDENT_PROFILE_INVALIDATED = 'maq-student-profile-invalidated';
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export const GROUP_INVENTORY_INVALIDATED = 'maq-group-inventory-invalidated';
 
 /**
@@ -16,6 +24,7 @@ export function invalidateStudentProfile(groupId) {
 /**
  * @param {string | number | null | undefined} groupId
  */
+
 export function invalidateGroupInventory(groupId) {
   if (typeof window === 'undefined' || groupId == null) {
     return;
@@ -29,6 +38,7 @@ export function invalidateGroupInventory(groupId) {
  * @param {string} eventName
  * @param {(groupId: string) => void} handler
  */
+
 export function subscribeGroupScopedEvent(eventName, handler) {
   if (typeof window === 'undefined') {
     return () => {};

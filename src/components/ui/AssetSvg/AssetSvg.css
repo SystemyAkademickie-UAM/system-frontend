@@ -1,9 +1,16 @@
+/**
+ * @file AssetSvg.css
+ * @description Style interfejsu użytkownika i układ dla modułu AssetSvg.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-asset-svg {
   display: block;
   max-width: 100%;
   object-fit: contain;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-asset-svg--mask {
   flex-shrink: 0;
   color: inherit;
@@ -18,6 +25,7 @@
   -webkit-mask-size: contain;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-asset-svg__probe {
   position: absolute;
   width: 0;

@@ -1,24 +1,26 @@
+/**
+ * @file authService.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla auth.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import {
   beginClientLogout,
   clearClientAuthState,
-  endClientLogout,
+
+endClientLogout,
 } from '../auth/clientAuthState.js';
 
 import { getApiBaseUrl, getSamlLogoutUrl } from '../constants/api.constants.js';
 
 import { loginPath } from '../routes/pathRegistry.js';
 
-
-
 /** If the page is still active after redirect, treat logout navigation as failed. */
 
 const LOGOUT_NAVIGATION_FALLBACK_MS = 5000;
 
-
-
+// === OPERACJE I ZAPYTANIA REST API ===
 export const LOGOUT_SUCCESS_QUERY = 'loggedOut=1';
-
-
 
 /**
 
@@ -31,8 +33,6 @@ export function buildLoginAfterLogoutPath() {
   return `${loginPath()}?${LOGOUT_SUCCESS_QUERY}`;
 
 }
-
-
 
 /**
 
@@ -50,8 +50,6 @@ export function buildLoginAfterLogoutUrl() {
 
 }
 
-
-
 /** @deprecated Use {@link buildLoginAfterLogoutPath}. */
 
 export function buildWelcomeAfterLogoutPath() {
@@ -60,8 +58,6 @@ export function buildWelcomeAfterLogoutPath() {
 
 }
 
-
-
 /** @deprecated Use {@link buildLoginAfterLogoutUrl}. */
 
 export function buildWelcomeAfterLogoutUrl() {
@@ -69,8 +65,6 @@ export function buildWelcomeAfterLogoutUrl() {
   return buildLoginAfterLogoutUrl();
 
 }
-
-
 
 /**
 
@@ -83,8 +77,6 @@ export function isLogoutAvailable() {
   return getApiBaseUrl().length > 0;
 
 }
-
-
 
 /**
 
@@ -106,8 +98,6 @@ export async function logoutUser(onNavigationFailed, options = {}) {
 
   beginClientLogout();
 
-
-
   const loginAfterLogoutPath = buildLoginAfterLogoutPath();
 
   const loginAfterLogoutUrl = buildLoginAfterLogoutUrl();
@@ -117,8 +107,6 @@ export async function logoutUser(onNavigationFailed, options = {}) {
   const samlLogoutBase = getSamlLogoutUrl();
 
   const { navigate } = options;
-
-
 
   if (samlLogoutBase.length === 0) {
 
@@ -134,26 +122,17 @@ export async function logoutUser(onNavigationFailed, options = {}) {
 
     }
 
-
-
     window.location.replace(loginAfterLogoutUrl);
 
     return true;
 
   }
 
-
-
   const separator = samlLogoutBase.includes('?') ? '&' : '?';
 
   const samlLogoutUrl = `${samlLogoutBase}${separator}postLogoutRedirect=${postLogoutRedirect}`;
 
-
-
-  // Nie czyść stanu React przed pełnym przejściem — RouteGuard inaczej robi pośredni redirect SPA.
   window.location.replace(samlLogoutUrl);
-
-
 
   if (typeof onNavigationFailed === 'function') {
 
@@ -175,9 +154,6 @@ export async function logoutUser(onNavigationFailed, options = {}) {
 
   }
 
-
-
   return true;
 
 }
-

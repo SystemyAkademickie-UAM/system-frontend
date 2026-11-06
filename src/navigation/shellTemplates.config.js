@@ -1,4 +1,10 @@
 /**
+ * @file shellTemplates.config.js
+ * @description Konfiguracja elementów nawigacji i menu dla shellTemplates.config.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
 
  * Szablony nawigacji (widoki) — pojedyncze miejsce do definiowania przycisków paska bocznego per rola.
  *
@@ -21,7 +27,6 @@ import * as paths from '../routes/pathRegistry.js';
 import { READLANGUAGECOOKIE } from '../utils/LANGUAGECOOKIE.js';
 
 const LANGUAGE = READLANGUAGECOOKIE();
-
 
 const STUDENT__TEXTLABEL = {
   polish: 'Osoba studiująca',
@@ -163,7 +168,6 @@ const NAVIGATIONREWARDSBADGES__TEXTLABEL = {
   english: 'Badges',
 };
 
-
 const NAVIGATIONREWARDSRANKS__TEXTLABEL = {
   polish: 'Rangi',
   english: 'Ranks',
@@ -254,6 +258,7 @@ const SUBNAVIGATIONSTUDENTPROFILESUBTITLE__TEXTLABEL = {
   english: 'Student Profile Navigation',
 };
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 const SUBNAVIGATIONMEMBERS__TEXTLABEL = {
   polish: 'Osoby korzystające z systemu',
   english: 'Users',
@@ -386,7 +391,8 @@ const SUBNAVIGATIONREPORTS__TEXTLABEL = {
 
 const SUBNAVIGATIONSHOPITEMS__TEXTLABEL = {
   polish: 'Sklep',
-  english: 'Shop',
+
+english: 'Shop',
 };
 
 const SUBNAVIGATIONCREATOR__TEXTLABEL = {
@@ -420,13 +426,10 @@ export const ROLE_UI_LABEL = {
 
 /** Buduje href na podstawie kontekstu (groupId z URL). */
 export const HREF_BUILDERS = {
-  // Lista grup
   GROUPS_LIST: () => paths.groupsListPath(),
 
-  // Ekran główny
   GROUP_MAIN: (ctx) => (ctx.groupId ? paths.groupMainPath(ctx.groupId) : null),
 
-  // Student — płaskie trasy (poza /home)
   GROUP_STUDENT_FEED: (ctx) => (ctx.groupId ? paths.groupStudentPostsPath(ctx.groupId) : null),
   GROUP_STUDENT_PARTICIPANTS: (ctx) =>
     ctx.groupId ? paths.groupStudentUsersPath(ctx.groupId) : null,
@@ -435,7 +438,6 @@ export const HREF_BUILDERS = {
   GROUP_STUDENT_RANKS: (ctx) => (ctx.groupId ? paths.groupStudentRanksPath(ctx.groupId) : null),
   GROUP_STUDENT_BADGES: (ctx) => (ctx.groupId ? paths.groupStudentBadgesPath(ctx.groupId) : null),
 
-  // Profil studenta + podstrony
   GROUP_PROFILE: (ctx) => (ctx.groupId ? paths.groupProfilePath(ctx.groupId) : null),
   GROUP_STUDENT_PROFILE: (ctx) =>
     ctx.groupId && ctx.studentId ? paths.groupStudentProfilePath(ctx.groupId, ctx.studentId) : null,
@@ -449,42 +451,33 @@ export const HREF_BUILDERS = {
   GROUP_PROFILE_EQ: (ctx) => (ctx.groupId ? paths.groupProfileEqPath(ctx.groupId) : null),
   GROUP_PROFILE_PURCHASES: (ctx) => (ctx.groupId ? paths.groupProfilePurchasesPath(ctx.groupId) : null),
 
-  // Użytkownicy (lecturer) + podstrony
   GROUP_MEMBERS: (ctx) => (ctx.groupId ? paths.groupMembersPath(ctx.groupId) : null),
   GROUP_MEMBERS_LOG: (ctx) => (ctx.groupId ? paths.groupMembersLogPath(ctx.groupId) : null),
   GROUP_MEMBERS_CODE: (ctx) => (ctx.groupId ? paths.groupMembersCodesPath(ctx.groupId) : null),
 
-  // Korzeń grupy
   GROUP_ROOT: (ctx) => (ctx.groupId ? paths.groupRootPath(ctx.groupId) : null),
 
-  // Aktywności (lecturer) + podstrony
   GROUP_ACTIVITIES: (ctx) => (ctx.groupId ? paths.groupActivitiesPath(ctx.groupId) : null),
   GROUP_ACTIVITIES_TOOLS: (ctx) => (ctx.groupId ? paths.groupActivitiesToolsPath(ctx.groupId) : null),
 
-  // Wpisy (lecturer)
   GROUP_POSTS: (ctx) => (ctx.groupId ? paths.groupPostsPath(ctx.groupId) : null),
 
-  // Systemy nagród (lecturer) + podstrony
   GROUP_REWARDS: (ctx) => (ctx.groupId ? paths.groupRewardsPath(ctx.groupId) : null),
   GROUP_REWARDS_BADGES: (ctx) => (ctx.groupId ? paths.groupRewardsPath(ctx.groupId) : null),
   GROUP_REWARDS_RANKS: (ctx) => (ctx.groupId ? paths.groupRewardsRanksPath(ctx.groupId) : null),
   GROUP_SHOP_ITEMS: (ctx) => (ctx.groupId ? paths.groupShopItemsPath(ctx.groupId) : null),
 
-  // Ustawienia grupy (lecturer) + podstrony
   GROUP_SETTINGS: (ctx) => (ctx.groupId ? paths.groupSettingsPath(ctx.groupId) : null),
   GROUP_SETTINGS_CURRENCY: (ctx) => (ctx.groupId ? paths.groupSettingsCurrencyPath(ctx.groupId) : null),
   GROUP_SETTINGS_HEALTH: (ctx) => (ctx.groupId ? paths.groupSettingsHealthPath(ctx.groupId) : null),
 
-  // Sklep
   GROUP_SHOP: (ctx) => (ctx.groupId ? paths.groupShopPath(ctx.groupId) : null),
   GROUP_SHOP_ADD: (ctx) => (ctx.groupId ? paths.groupShopAddPath(ctx.groupId) : null),
 
-  // Ranking + podstrony
   GROUP_RANKING: (ctx) => (ctx.groupId ? paths.groupRankingPath(ctx.groupId) : null),
   GROUP_RANKING_GROUP: (ctx) => (ctx.groupId ? paths.groupRankingGroupPath(ctx.groupId) : null),
   GROUP_RANKING_ACTIVITIES: (ctx) => (ctx.groupId ? paths.groupRankingActivitiesPath(ctx.groupId) : null),
 
-  // App-level
   APP_SETTINGS: () => paths.appSettingsPath(),
   USER_MANAGEMENT: () => paths.userManagementPath(),
   COURSE_MANAGEMENT: () => paths.courseManagementPath(),
@@ -495,13 +488,8 @@ export const HREF_BUILDERS = {
   TEMPLATES_MY: () => paths.templatesMyPath(),
   TEMPLATES_GALLERY: () => paths.templatesPath(),
 
-  // Legacy
   GROUP_CONTROL_PANEL: (ctx) => (ctx.groupId ? paths.groupControlPath(ctx.groupId) : null),
 };
-
-// ============================================================================
-// STUDENT VIEW
-// ============================================================================
 
 const studentView = {
   ctaItems: [
@@ -677,10 +665,6 @@ const studentView = {
   ],
 };
 
-// ============================================================================
-// LECTURER VIEW - Zupełnie nowe menu
-// ============================================================================
-
 const lecturerView = {
   ctaItems: [
     {
@@ -693,7 +677,8 @@ const lecturerView = {
       matchEnd: true,
     },
   ],
-  primaryNavItems: [
+
+primaryNavItems: [
     {
       id: 'strona-glowna',
       enabled: true,
@@ -913,10 +898,6 @@ const lecturerView = {
   ],
 };
 
-// ============================================================================
-// ADMIN VIEW
-// ============================================================================
-
 const adminView = {
   ctaItems: [],
   primaryNavItems: [
@@ -950,10 +931,6 @@ const adminView = {
   ],
   footerItems: [],
 };
-
-// ============================================================================
-// SUPERADMIN VIEW
-// ============================================================================
 
 const superadminView = {
   ctaItems: [],
@@ -998,10 +975,6 @@ const superadminView = {
   footerItems: [],
 };
 
-// ============================================================================
-// EXPORTS
-// ============================================================================
-
 export const SHELL_VIEWS = {
   [APP_ROLE.STUDENT]: studentView,
   [APP_ROLE.LECTURER]: lecturerView,
@@ -1038,12 +1011,10 @@ export const SUB_NAV_META = {
  * Klucz = id strony głównej, wartość = tablica pozycji SubNav.
  */
 export const SUB_NAV_CONFIG = {
-  // Ekran główny (student + lecturer)
   'group-main': [
     { id: 'home', label: SUBNAVIGATIONMAINPAGE__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MAIN', end: true },
   ],
 
-  // Profil studenta
   'group-profile': [
     { id: 'log', label: SUBNAVIGATIONACTIVITYLOG__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_PROFILE', end: true },
     { id: 'badges', label: SUBNAVIGATIONEARNEDBADGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_PROFILE_LOG', end: true },
@@ -1051,42 +1022,36 @@ export const SUB_NAV_CONFIG = {
     { id: 'purchases', label: SUBNAVIGATIONPURCHASEHISTORY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_PROFILE_PURCHASES', end: true },
   ],
 
-  // Profil studenta (podgląd prowadzącego)
   'group-student-profile': [
     { id: 'badges', label: SUBNAVIGATIONEARNEDBADGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_STUDENT_PROFILE_BADGES', end: true },
     { id: 'eq', label: SUBNAVIGATIONINVENTORY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_STUDENT_PROFILE_EQ', end: true },
     { id: 'purchases', label: SUBNAVIGATIONPURCHASEHISTORY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_STUDENT_PROFILE_PURCHASES', end: true },
   ],
 
-  // Użytkownicy (lecturer)
   'group-members': [
     { id: 'list', label: SUBNAVIGATIONMEMBERSLIST__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MEMBERS', end: true },
     { id: 'log', label: SUBNAVIGATIONACTIVITYLOG__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MEMBERS_LOG', end: true },
     { id: 'code', label: SUBNAVIGATIONACCESSCODES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_MEMBERS_CODE', end: true },
   ],
 
-  // Aktywności (lecturer)
   'group-activities': [
     { id: 'stages', label: SUBNAVIGATIONSTAGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_ACTIVITIES', end: true },
     { id: 'posts', label: SUBNAVIGATIONPOSTS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_POSTS', end: true },
     { id: 'reports', label: SUBNAVIGATIONREPORTS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_ACTIVITIES_TOOLS', end: true },
   ],
 
-  // Systemy nagród (lecturer)
   'group-rewards': [
     { id: 'badges', label: NAVIGATIONREWARDSBADGES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS', end: true },
     { id: 'ranks', label: NAVIGATIONREWARDSRANKS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_REWARDS_RANKS', end: true },
     { id: 'shop-items', label: NAVIGATIONREWARDSITEMS__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SHOP_ITEMS', end: true },
   ],
 
-  // Ustawienia grupy (lecturer)
   'group-settings': [
     { id: 'creator', label: SUBNAVIGATIONCREATOR__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SETTINGS', end: true },
     { id: 'currency', label: SUBNAVIGATIONCURRENCY__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SETTINGS_CURRENCY' },
     { id: 'health', label: SUBNAVIGATIONLIVES__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_SETTINGS_HEALTH' },
   ],
 
-  // Ranking (student + lecturer)
   'group-ranking': [
     { id: 'info', label: SUBNAVIGATIONINFORMATION__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_RANKING', end: true },
     { id: 'group', label: SUBNAVIGATIONGROUPRANKING__TEXTLABEL[LANGUAGE], hrefKey: 'GROUP_RANKING_GROUP' },

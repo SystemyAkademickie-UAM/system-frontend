@@ -1,3 +1,9 @@
+/**
+ * @file AvatarPicker.jsx
+ * @description Komponent interfejsu użytkownika AvatarPicker.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Modal } from '../index.js';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
@@ -9,6 +15,7 @@ import {
 import { getStablePopularAvatars } from '../../../services/avatarListCache.js';
 import './AvatarPicker.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const AVATARPICKERLABELTEXT = {
   polish: 'Twój awatar',
   english: 'Your avatar',
@@ -44,6 +51,7 @@ const ALLAVATARSLABELTEXT = {
   english: 'All avatars',
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function AvatarPlaceholder({ className }) {
   return (
     <svg className={className} viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -81,7 +89,8 @@ export default function AvatarPicker({
   LANGUAGE = 'polish',
 }) {
   const [showAllModal, setShowAllModal] = useState(false);
-  const [activeCategory, setActiveCategory] = useState(AVATAR_CATEGORY.ALL);
+
+const [activeCategory, setActiveCategory] = useState(AVATAR_CATEGORY.ALL);
 
   const isCentered = align === 'center' || variant === 'compact' || variant === 'center';
 
@@ -178,8 +187,10 @@ export default function AvatarPicker({
   );
 
   const showAllButton = !isLoading && avatars.length > 0;
-  const skeletonTileCount = 4;
 
+const skeletonTileCount = 4;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <div
       className={[

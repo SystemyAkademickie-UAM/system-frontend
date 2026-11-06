@@ -1,3 +1,9 @@
+/**
+ * @file SuperBarBreadcrumbMobile.css
+ * @description Style interfejsu użytkownika i układ dla modułu SuperBarBreadcrumbMobile.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .super-bar-breadcrumb-mobile {
   display: none;
 }

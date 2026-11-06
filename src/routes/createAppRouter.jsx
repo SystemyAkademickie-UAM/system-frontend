@@ -1,11 +1,37 @@
+/**
+ * @file createAppRouter.jsx
+ * @description Konfiguracja routingu i definicja powiązań tras dla createAppRouter.
+ */
+
+// === IMPORTY I KONFIGURACJA TRAS ===
 import { Suspense, lazy } from 'react';
 import { Navigate, createBrowserRouter } from 'react-router-dom';
 import AppShell from '../components/layout/AppShell.jsx';
+import AuthShell from '../components/layout/AuthShell.jsx';
+import LoginShell from '../components/layout/LoginShell.jsx';
 import { LoadingSpinner } from '../components/ui/index.js';
-import { HomeRedirect, RouteGuard, GroupAccessGuard, GroupOwnerGuard, RankingDisabledRedirect } from '../components/guards/index.js';
+import {
+  GroupAccessGuard,
+  GroupOwnerGuard,
+  HomeRedirect,
+  RankingDisabledRedirect,
+  RouteGuard,
+} from '../components/guards/index.js';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
+import {
+  devApiTestPath,
+  homePath,
+  loginPath,
+  templatesPath,
+} from './pathRegistry.js';
+import {
+  GroupBannerLayout,
+  GroupMainLayout,
+  GroupShopRedirect,
+  GroupSimpleLayout,
+} from '../pages/groups/group-shared/GroupLayouts.jsx';
+import TemplatesPageLayout from '../pages/templates/TemplatesPageLayout.jsx';
 
-// Helper for lazy page loading with Suspense
 function withLazy(factory) {
   const Component = lazy(factory);
   return function LazyPageWrapper(props) {
@@ -17,92 +43,6 @@ function withLazy(factory) {
   };
 }
 
-// Login/Auth pages
-import AuthShell from '../components/layout/AuthShell.jsx';
-import LoginShell from '../components/layout/LoginShell.jsx';
-const LoginPage = withLazy(() => import('../pages/links/auth/LoginPage.jsx'));
-const LoginMagicPage = withLazy(() => import('../pages/links/auth/LoginMagicPage.jsx'));
-const WelcomePage = withLazy(() => import('../pages/links/auth/WelcomePage.jsx'));
-const DevApiTestPage = withLazy(() => import('../pages/links/dev/DevApiTestPage.jsx'));
-
-// App-level pages
-const CourseManagementPage = withLazy(() => import('../pages/links/app/CourseManagementPage.jsx'));
-const HelpPage = withLazy(() => import('../pages/links/app/HelpPage.jsx'));
-const OrganizationManagementPage = withLazy(() => import('../pages/links/app/OrganizationManagementPage.jsx'));
-const SuperadminLogsPage = withLazy(() => import('../pages/links/app/SuperadminLogsPage.jsx'));
-const AdminBackupPage = withLazy(() => import('../pages/links/app/AdminBackupPage.jsx'));
-const SettingsPage = withLazy(() => import('../pages/links/app/SettingsPage.jsx'));
-const StatisticsPage = withLazy(() => import('../pages/links/app/StatisticsPage.jsx'));
-const UserManagementPage = withLazy(() => import('../pages/links/app/UserManagementPage.jsx'));
-
-// Templates gallery - lecturer only
-import TemplatesLayout from '../pages/links/templates/TemplatesLayout.jsx';
-const TemplatesMyPage = withLazy(() => import('../pages/links/templates/TemplatesMyPage.jsx'));
-const TemplatesGalleryPage = withLazy(() => import('../pages/links/templates/TemplatesGalleryPage.jsx'));
-
-// Groups list
-const GroupsListPage = withLazy(() => import('../pages/links/groups/groups-list/GroupsListPage.jsx'));
-const GroupJoinPage = withLazy(() => import('../pages/links/groups/GroupJoinPage.jsx'));
-
-// Group Main (Ekran główny) - student + lecturer
-import GroupMainLayout from '../pages/links/groups/layouts/GroupMainLayout.jsx';
-const GroupMainHomePage = withLazy(() => import('../pages/links/groups/main/GroupMainHomePage.jsx'));
-const GroupMainPostsPage = withLazy(() => import('../pages/links/groups/main/GroupMainPostsPage.jsx'));
-const GroupMainMembersPage = withLazy(() => import('../pages/links/groups/main/GroupMainMembersPage.jsx'));
-const GroupMainActivitiesPage = withLazy(() => import('../pages/links/groups/main/GroupMainActivitiesPage.jsx'));
-const GroupMainRanksPage = withLazy(() => import('../pages/links/groups/main/GroupMainRanksPage.jsx'));
-const GroupMainBadgesPage = withLazy(() => import('../pages/links/groups/main/GroupMainBadgesPage.jsx'));
-
-// Profile (Profil) - student only
-import ProfileLayout from '../pages/links/groups/layouts/ProfileLayout.jsx';
-import StudentProfileLayout from '../pages/links/groups/layouts/StudentProfileLayout.jsx';
-const ProfileHomePage = withLazy(() => import('../pages/links/groups/profile/ProfileHomePage.jsx'));
-const ProfileLogPage = withLazy(() => import('../pages/links/groups/profile/ProfileLogPage.jsx'));
-const ProfileEqPage = withLazy(() => import('../pages/links/groups/profile/ProfileEqPage.jsx'));
-const ProfilePurchasesPage = withLazy(() => import('../pages/links/groups/profile/ProfilePurchasesPage.jsx'));
-const StudentProfileViewPage = withLazy(() => import('../pages/links/groups/student-profile/StudentProfileViewPage.jsx'));
-
-// Members (Użytkownicy) - lecturer only
-import MembersLayout from '../pages/links/groups/layouts/MembersLayout.jsx';
-const MembersHomePage = withLazy(() => import('../pages/links/groups/members/MembersHomePage.jsx'));
-const MembersLogPage = withLazy(() => import('../pages/links/groups/members/MembersLogPage.jsx'));
-const MembersCodePage = withLazy(() => import('../pages/links/groups/members/MembersCodePage.jsx'));
-
-// Activities (Aktywności) - lecturer only
-import ActivitiesLayout from '../pages/links/groups/layouts/ActivitiesLayout.jsx';
-const ActivitiesHomePage = withLazy(() => import('../pages/links/groups/activities/ActivitiesHomePage.jsx'));
-const ActivitiesToolsPage = withLazy(() => import('../pages/links/groups/activities/ActivitiesToolsPage.jsx'));
-
-// Posts (Wpisy) - lecturer only
-const PostsHomePage = withLazy(() => import('../pages/links/groups/posts/PostsHomePage.jsx'));
-
-// Rewards (Systemy nagród) - lecturer only
-import RewardsLayout from '../pages/links/groups/layouts/RewardsLayout.jsx';
-const RewardsHomePage = withLazy(() => import('../pages/links/groups/rewards/RewardsHomePage.jsx'));
-const RewardsBadgesPage = withLazy(() => import('../pages/links/groups/rewards/RewardsBadgesPage.jsx'));
-const ShopItemsPage = withLazy(() => import('../pages/links/groups/rewards/ShopItemsPage.jsx'));
-
-// Group Settings (Ustawienia grupy) - lecturer only
-import GroupSettingsLayout from '../pages/links/groups/layouts/GroupSettingsLayout.jsx';
-const GroupSettingsHomePage = withLazy(() => import('../pages/links/groups/group-settings/GroupSettingsHomePage.jsx'));
-const GroupSettingsCurrencyPage = withLazy(() => import('../pages/links/groups/group-settings/GroupSettingsCurrencyPage.jsx'));
-const GroupSettingsHealthPage = withLazy(() => import('../pages/links/groups/group-settings/GroupSettingsHealthPage.jsx'));
-
-// Shop (Sklep) - student + lecturer
-import ShopLayout from '../pages/links/groups/shop/ShopLayout.jsx';
-const ShopHomePage = withLazy(() => import('../pages/links/groups/shop/ShopHomePage.jsx'));
-const ShopAddRedirect = withLazy(() => import('../pages/links/groups/shop/ShopAddRedirect.jsx'));
-
-// Ranking — tymczasowo wyłączony (redirect do /main)
-
-import {
-  devApiTestPath,
-  homePath,
-  loginPath,
-  templatesPath,
-} from './pathRegistry.js';
-
-// Helper: wraps element with RouteGuard
 function withGuard(element, { requireAuth = true, allowedRoles, redirectTo } = {}) {
   return (
     <RouteGuard requireAuth={requireAuth} allowedRoles={allowedRoles} redirectTo={redirectTo}>
@@ -111,25 +51,69 @@ function withGuard(element, { requireAuth = true, allowedRoles, redirectTo } = {
   );
 }
 
-// Role constants for guards
 const LECTURER_ONLY = [APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN];
 const STUDENT_ONLY = [APP_ROLE.STUDENT];
-const ALL_AUTHENTICATED = undefined; // no role restriction, just auth
 
-/**
- * Drzewo tras — zsynchronizuj z `routeTable.js` i `shellTemplates.config.js`.
- * `pages/links/` — komponenty podpięte pod router; `pages/content/` — treść ekranów.
- * Trasy `login`, `dev/api-test`: layout `LoginShell` (bez paska bocznego).
- */
+const LoginPage = withLazy(() => import('../pages/auth/LoginPage.jsx'));
+const LoginMagicPage = withLazy(() => import('../pages/auth/LoginMagicPage.jsx'));
+const WelcomePage = withLazy(() => import('../pages/auth/WelcomePage.jsx'));
+const DevApiTestPage = withLazy(() => import('../pages/api-test/DevApiTestPage.jsx'));
+
+const CourseManagementPage = withLazy(() => import('../pages/course-management/CourseManagementContent.jsx'));
+const HelpPage = withLazy(() => import('../pages/help/HelpContent.jsx'));
+const OrganizationManagementPage = withLazy(() => import('../pages/organization-management/OrganizationManagementContent.jsx'));
+const SuperadminLogsPage = withLazy(() => import('../pages/superadmin-logs/SuperadminLogsContent.jsx'));
+const AdminBackupPage = withLazy(() => import('../pages/admin-backup/AdminBackupContent.jsx'));
+const SettingsPage = withLazy(() => import('../pages/settings/SettingsContent.jsx'));
+const StatisticsPage = withLazy(() => import('../pages/statistics/StatisticsContent.jsx'));
+const UserManagementPage = withLazy(() => import('../pages/user-management/UserManagementContent.jsx'));
+
+const TemplatesMyPage = withLazy(() => import('../pages/templates/TemplatesMyContent.jsx'));
+const TemplatesGalleryPage = withLazy(() => import('../pages/templates/TemplatesGalleryContent.jsx'));
+
+const GroupsListPage = withLazy(() => import('../pages/groups/groups-list/GroupsListContent.jsx'));
+const GroupJoinPage = withLazy(() => import('../pages/groups/group-join/GroupJoinContent.jsx'));
+
+const GroupMainHomePage = withLazy(() => import('../pages/groups/group-main/GroupMainHomeContent.jsx'));
+const GroupMainPostsPage = withLazy(() => import('../pages/groups/group-main/GroupMainPostsContent.jsx'));
+const GroupMainMembersPage = withLazy(() => import('../pages/groups/group-main/GroupMainMembersContent.jsx'));
+const GroupMainActivitiesPage = withLazy(() => import('../pages/groups/group-main-activities/GroupMainActivitiesContent.jsx'));
+const GroupMainRanksPage = withLazy(() => import('../pages/groups/group-main-ranks/GroupMainRanksContent.jsx'));
+const GroupMainBadgesPage = withLazy(() => import('../pages/groups/group-main-badges/GroupMainBadgesContent.jsx'));
+
+const ProfileHomePage = withLazy(() => import('../pages/groups/group-profile/ProfileHomeContent.jsx'));
+const ProfileLogPage = withLazy(() => import('../pages/groups/group-profile-log/ProfileLogContent.jsx'));
+const ProfileEqPage = withLazy(() => import('../pages/groups/group-profile-eq/ProfileEqContent.jsx'));
+const ProfilePurchasesPage = withLazy(() => import('../pages/groups/group-profile-purchases/ProfilePurchasesContent.jsx'));
+
+const MembersHomePage = withLazy(() => import('../pages/groups/group-members/MembersHomeContent.jsx'));
+const MembersLogPage = withLazy(() => import('../pages/groups/group-members-log/MembersLogContent.jsx'));
+const MembersCodePage = withLazy(() => import('../pages/groups/group-members-code/MembersCodeContent.jsx'));
+
+const ActivitiesHomePage = withLazy(() => import('../pages/groups/group-activities/ActivitiesHomeContent.jsx'));
+const ActivitiesToolsPage = withLazy(() => import('../pages/groups/group-activities-tools/ActivitiesToolsContent.jsx'));
+const PostsHomePage = withLazy(() => import('../pages/groups/group-posts/PostsHomeContent.jsx'));
+
+const RewardsHomePage = withLazy(() => import('../pages/groups/group-rewards/RewardsHomeContent.jsx'));
+
+// === DEFINICJE ŚCIEŻEK I STRAŻNICY ===
+const RewardsBadgesPage = withLazy(() => import('../pages/groups/group-rewards-badges/RewardsBadgesContent.jsx'));
+const ShopItemsPage = withLazy(() => import('../pages/groups/group-rewards-shopitems/RewardsShopItemsContent.jsx'));
+
+const GroupSettingsHomePage = withLazy(() => import('../pages/groups/group-settings/GroupSettingsHomeContent.jsx'));
+const GroupSettingsCurrencyPage = withLazy(() => import('../pages/groups/group-settings-currency/GroupSettingsCurrencyContent.jsx'));
+const GroupSettingsHealthPage = withLazy(() => import('../pages/groups/group-settings-health/GroupSettingsHealthContent.jsx'));
+
+const ShopHomePage = withLazy(() => import('../pages/groups/group-shop/GroupShopContent.jsx'));
+
+// === EKSPORTY I REJESTRACJA ===
+const ShopAddPage = withLazy(() => import('../pages/groups/group-shop-add/GroupShopAddContent.jsx'));
+
 const appRouteTree = [
   {
     path: '/',
     children: [
       { index: true, element: <HomeRedirect /> },
-
-      // ========================================
-      // AUTH PAGES (public, no auth required)
-      // ========================================
       {
         element: <AuthShell />,
         children: [
@@ -143,24 +127,15 @@ const appRouteTree = [
           { path: 'register', element: <Navigate to={loginPath()} replace /> },
         ],
       },
-
-      // ========================================
-      // DEV PAGES (LoginShell for dev tools)
-      // ========================================
       {
         element: <LoginShell />,
         children: [
           { path: 'dev/api-test', element: <DevApiTestPage /> },
         ],
       },
-
-      // ========================================
-      // APP SHELL (requires auth)
-      // ========================================
       {
         element: withGuard(<AppShell />),
         children: [
-          // App-level pages
           { path: 'settings', element: withGuard(<SettingsPage />) },
           { path: 'help', element: withGuard(<HelpPage />) },
           { path: 'userManagement', element: withGuard(<UserManagementPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
@@ -169,170 +144,130 @@ const appRouteTree = [
           { path: 'organizations', element: withGuard(<OrganizationManagementPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
           { path: 'system-logs', element: withGuard(<SuperadminLogsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
           { path: 'admin/backup', element: withGuard(<AdminBackupPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
-
           {
             path: 'templates',
-            element: withGuard(<TemplatesLayout />, { allowedRoles: LECTURER_ONLY }),
+            element: withGuard(<TemplatesPageLayout />, { allowedRoles: LECTURER_ONLY }),
             children: [
               { index: true, element: <TemplatesGalleryPage /> },
               { path: 'my', element: <TemplatesMyPage /> },
               { path: 'gallery', element: <Navigate to={templatesPath()} replace /> },
             ],
           },
-
-          // ========================================
-          // GROUPS
-          // ========================================
           {
             path: 'groups',
             children: [
-              // Groups list (requires auth)
               { index: true, element: withGuard(<GroupsListPage />) },
-
-              // ========================================
-              // GROUP ROUTES (requires groupId)
-              // ========================================
               {
                 path: ':groupId',
                 children: [
-                  // Landing — join code / brak dostępu (bez nawigacji grupowej w sidebarze)
                   { index: true, element: withGuard(<GroupJoinPage />) },
-
-                  // Podstrony grupy — wymagają dostępu (właściciel lub zapisany student)
                   {
                     element: withGuard(<GroupAccessGuard />),
                     children: [
-                  // ----------------------------------------
-                  // HOME + student flat routes (wspólny layout)
-                  // ----------------------------------------
-                  {
-                    element: withGuard(<GroupMainLayout />),
-                    children: [
                       {
-                        path: 'home',
+                        element: withGuard(<GroupMainLayout />),
                         children: [
-                          { index: true, element: <GroupMainHomePage /> },
+                          {
+                            path: 'home',
+                            children: [
+                              { index: true, element: <GroupMainHomePage /> },
+                            ],
+                          },
+                          { path: 'posts', element: withGuard(<GroupMainPostsPage />, { allowedRoles: STUDENT_ONLY }) },
+                          { path: 'users', element: withGuard(<GroupMainMembersPage />, { allowedRoles: STUDENT_ONLY }) },
+                          { path: 'activity-list', element: withGuard(<GroupMainActivitiesPage />, { allowedRoles: STUDENT_ONLY }) },
+                          { path: 'ranks', element: withGuard(<GroupMainRanksPage />, { allowedRoles: STUDENT_ONLY }) },
+                          { path: 'badges', element: withGuard(<GroupMainBadgesPage />, { allowedRoles: STUDENT_ONLY }) },
                         ],
                       },
-                      { path: 'posts', element: withGuard(<GroupMainPostsPage />, { allowedRoles: STUDENT_ONLY }) },
-                      { path: 'users', element: withGuard(<GroupMainMembersPage />, { allowedRoles: STUDENT_ONLY }) },
-                      { path: 'activity-list', element: withGuard(<GroupMainActivitiesPage />, { allowedRoles: STUDENT_ONLY }) },
-                      { path: 'ranks', element: withGuard(<GroupMainRanksPage />, { allowedRoles: STUDENT_ONLY }) },
-                      { path: 'badges', element: withGuard(<GroupMainBadgesPage />, { allowedRoles: STUDENT_ONLY }) },
-                    ],
-                  },
-
-                  // ----------------------------------------
-                  // GAME MASTER routes — group owner only
-                  // ----------------------------------------
-                  {
-                    element: withGuard(<GroupOwnerGuard />),
-                    children: [
-                  // STUDENT PROFILE (lecturer view) — ekwipunek, odznaki, zakupy uczestnika
-                  {
-                    path: 'student-profile/:studentId',
-                    element: withGuard(<StudentProfileLayout />, { allowedRoles: LECTURER_ONLY }),
-                    children: [
-                      { index: true, element: <ProfileHomePage /> },
-                      { path: 'activity', element: <Navigate to="." replace /> },
-                      { path: 'eq', element: <ProfileEqPage /> },
-                      { path: 'purchases', element: <ProfilePurchasesPage /> },
-                    ],
-                  },
-
-                  // MEMBERS (Użytkownicy) - lecturer only
-                  {
-                    path: 'members',
-                    element: withGuard(<MembersLayout />, { allowedRoles: LECTURER_ONLY }),
-                    children: [
-                      { index: true, element: <MembersHomePage /> },
-                      { path: 'codes', element: <MembersCodePage /> },
-                      { path: 'log', element: <MembersLogPage /> },
-                    ],
-                  },
-
-                  // ACTIVITIES (Aktywności) - lecturer only
-                  {
-                    path: 'activities',
-                    element: withGuard(<ActivitiesLayout />, { allowedRoles: LECTURER_ONLY }),
-                    children: [
-                      { index: true, element: <ActivitiesHomePage /> },
-                      { path: 'tools', element: <ActivitiesToolsPage /> },
-                      { path: 'posts', element: <PostsHomePage /> },
-                    ],
-                  },
-
-                  // REWARDS (Systemy nagród) - lecturer only
-                  {
-                    path: 'rewards',
-                    element: withGuard(<RewardsLayout />, { allowedRoles: LECTURER_ONLY }),
-                    children: [
-                      { index: true, element: <RewardsBadgesPage /> },
-                      { path: 'ranks', element: <RewardsHomePage /> },
-                      { path: 'shop-items', element: <ShopItemsPage /> },
-                      { path: 'shopitems', element: <Navigate to="shop-items" replace /> },
-                    ],
-                  },
-
-                  // GROUP SETTINGS (Ustawienia grupy) - lecturer only
-                  {
-                    path: 'group-settings',
-                    element: withGuard(<GroupSettingsLayout />, { allowedRoles: LECTURER_ONLY }),
-                    children: [
-                      { index: true, element: <GroupSettingsHomePage /> },
-                      { path: 'currency', element: <GroupSettingsCurrencyPage /> },
-                      { path: 'lives', element: <GroupSettingsHealthPage /> },
-                    ],
-                  },
-
-                  {
-                    path: 'shop/add',
-                    element: withGuard(<ShopAddRedirect />, { allowedRoles: LECTURER_ONLY }),
-                  },
-                    ],
-                  },
-
-                  // PROFILE - student only (own profile)
-                  {
-                    path: 'profile',
-                    element: withGuard(<ProfileLayout />, { allowedRoles: STUDENT_ONLY }),
-                    children: [
-                      { index: true, element: <ProfileLogPage /> },
-                      { path: 'activity', element: <ProfileHomePage /> },
-                      { path: 'eq', element: <ProfileEqPage /> },
-                      { path: 'purchases', element: <ProfilePurchasesPage /> },
-                    ],
-                  },
-
-                  // ----------------------------------------
-                  // SHOP (Sklep) — student only
-                  // ----------------------------------------
-                  {
-                    path: 'shop',
-                    element: withGuard(<ShopLayout />),
-                    children: [
-                      { index: true, element: <ShopHomePage /> },
-                    ],
-                  },
-
-                  // ----------------------------------------
-                  // RANKING — wyłączony (redirect do ekranu głównego grupy)
-                  // ----------------------------------------
-                  {
-                    path: 'ranking/*',
-                    element: withGuard(<RankingDisabledRedirect />),
-                  },
+                      {
+                        element: withGuard(<GroupOwnerGuard />),
+                        children: [
+                          {
+                            path: 'student-profile/:studentId',
+                            element: withGuard(<GroupSimpleLayout />, { allowedRoles: LECTURER_ONLY }),
+                            children: [
+                              { index: true, element: <ProfileHomePage /> },
+                              { path: 'activity', element: <Navigate to="." replace /> },
+                              { path: 'eq', element: <ProfileEqPage /> },
+                              { path: 'purchases', element: <ProfilePurchasesPage /> },
+                            ],
+                          },
+                          {
+                            path: 'members',
+                            element: withGuard(<GroupSimpleLayout />, { allowedRoles: LECTURER_ONLY }),
+                            children: [
+                              { index: true, element: <MembersHomePage /> },
+                              { path: 'codes', element: <MembersCodePage /> },
+                              { path: 'log', element: <MembersLogPage /> },
+                            ],
+                          },
+                          {
+                            path: 'activities',
+                            element: withGuard(<GroupSimpleLayout />, { allowedRoles: LECTURER_ONLY }),
+                            children: [
+                              { index: true, element: <ActivitiesHomePage /> },
+                              { path: 'tools', element: <ActivitiesToolsPage /> },
+                              { path: 'posts', element: <PostsHomePage /> },
+                            ],
+                          },
+                          {
+                            path: 'rewards',
+                            element: withGuard(<GroupSimpleLayout />, { allowedRoles: LECTURER_ONLY }),
+                            children: [
+                              { index: true, element: <RewardsBadgesPage /> },
+                              { path: 'ranks', element: <RewardsHomePage /> },
+                              { path: 'shop-items', element: <ShopItemsPage /> },
+                              { path: 'shopitems', element: <Navigate to="shop-items" replace /> },
+                            ],
+                          },
+                          {
+                            path: 'group-settings',
+                            element: withGuard(<GroupSimpleLayout />, { allowedRoles: LECTURER_ONLY }),
+                            children: [
+                              { index: true, element: <GroupSettingsHomePage /> },
+                              { path: 'currency', element: <GroupSettingsCurrencyPage /> },
+                              { path: 'lives', element: <GroupSettingsHealthPage /> },
+                            ],
+                          },
+                          {
+                            path: 'shop/add',
+                            element: withGuard(<ShopAddPage />, { allowedRoles: LECTURER_ONLY }),
+                          },
+                          {
+                            path: 'shop/add/*',
+                            element: withGuard(<GroupShopRedirect />, { allowedRoles: LECTURER_ONLY }),
+                          },
+                        ],
+                      },
+                      {
+                        path: 'profile',
+                        element: withGuard(<GroupSimpleLayout />, { allowedRoles: STUDENT_ONLY }),
+                        children: [
+                          { index: true, element: <ProfileLogPage /> },
+                          { path: 'activity', element: <ProfileHomePage /> },
+                          { path: 'eq', element: <ProfileEqPage /> },
+                          { path: 'purchases', element: <ProfilePurchasesPage /> },
+                        ],
+                      },
+                      {
+                        path: 'shop',
+                        element: withGuard(<GroupBannerLayout />),
+                        children: [
+                          { index: true, element: <ShopHomePage /> },
+                        ],
+                      },
+                      {
+                        path: 'ranking/*',
+                        element: withGuard(<RankingDisabledRedirect />),
+                      },
                     ],
                   },
                 ],
               },
             ],
           },
-
-          // Legacy redirect: /api-test -> /dev/api-test
           { path: 'api-test', element: <Navigate to={devApiTestPath()} replace /> },
-
-          // Catch-all: unknown paths → home (session-aware redirect from `/`)
           { path: '*', element: <Navigate to={homePath()} replace /> },
         ],
       },

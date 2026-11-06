@@ -1,3 +1,9 @@
+/**
+ * @file decryptProductionLogExport.js
+ * @description Funkcje pomocnicze i narzędziowe modułu decryptProductionLogExport.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { BASE64_ENCODE_CHUNK_SIZE } from '../constants/productionLogs.constants.js';
 
 /**
@@ -19,13 +25,16 @@ export function decodeBase64ToBytes(value) {
  * @param {Uint8Array} bytes
  * @returns {string}
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function encodeBytesToBase64(bytes) {
   const chunkSize = BASE64_ENCODE_CHUNK_SIZE;
   let binary = '';
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
     binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
   }
-  return btoa(binary);
+
+return btoa(binary);
 }
 
 /**
@@ -53,7 +62,8 @@ export async function generateLogExportKeyPair() {
  */
 export async function decryptProductionLogExport(exportBody, privateKey) {
   const serverRaw = decodeBase64ToBytes(exportBody.serverPublicKey);
-  const serverKey = await crypto.subtle.importKey(
+
+const serverKey = await crypto.subtle.importKey(
     'raw',
     serverRaw,
     { name: 'ECDH', namedCurve: 'P-256' },

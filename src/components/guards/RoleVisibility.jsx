@@ -1,5 +1,12 @@
+/**
+ * @file RoleVisibility.jsx
+ * @description Komponent interfejsu użytkownika RoleVisibility.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Warunkowe wyświetlanie elementów na podstawie roli użytkownika.
  *
@@ -9,13 +16,16 @@ import { useAppRole } from '../../context/AppRoleContext.jsx';
  * @param {string[]} [props.excludedRoles] — role które NIE widzą zawartości
  * @param {React.ReactNode} [props.fallback] — co wyświetlić gdy brak dostępu (domyślnie null)
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function RoleVisibility({
   children,
   allowedRoles,
   excludedRoles,
   fallback = null,
 }) {
-  const { role } = useAppRole();
+
+const { role } = useAppRole();
 
   if (excludedRoles && excludedRoles.length > 0) {
     if (excludedRoles.includes(role)) {
@@ -29,5 +39,6 @@ export default function RoleVisibility({
     }
   }
 
+// === RENDEROWANIE WIDOKU ===
   return children;
 }

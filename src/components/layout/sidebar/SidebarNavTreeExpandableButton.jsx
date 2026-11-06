@@ -1,3 +1,9 @@
+/**
+ * @file SidebarNavTreeExpandableButton.jsx
+ * @description Komponent przycisku SidebarNavTreeExpandableButton z obsługą wariantów wizualnych i interakcji.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useId, useState } from 'react';
 import AssetSvg from '../../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
@@ -5,6 +11,7 @@ import NavGlyph from '../NavGlyph.jsx';
 import { isAnyNavItemActive, useNavPathname } from './sidebarNavUtils.js';
 import '../navigation-shell.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Rozwijane drzewko — klik zwija/rozwija elementy potomne (bez nawigacji).
  *
@@ -15,6 +22,8 @@ import '../navigation-shell.css';
  * @param {{ to?: string, matchEnd?: boolean, children?: unknown[] }[]} [props.childItems]
  * @param {import('react').ReactNode} props.children
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SidebarNavTreeExpandableButton({
   label,
   iconId,
@@ -23,7 +32,8 @@ export default function SidebarNavTreeExpandableButton({
   children,
 }) {
   const pathname = useNavPathname();
-  const panelId = useId();
+
+const panelId = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const hasActiveChild = isAnyNavItemActive(pathname, childItems);
 
@@ -33,8 +43,10 @@ export default function SidebarNavTreeExpandableButton({
     hasActiveChild ? 'sidebar-nav__link--active' : '',
   ]
     .filter(Boolean)
-    .join(' ');
 
+.join(' ');
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <li className="sidebar-nav__item sidebar-nav__item--tree-expandable">
       <button

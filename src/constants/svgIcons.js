@@ -1,10 +1,17 @@
 /**
+ * @file svgIcons.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu svgIcons.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
+/**
  * Ścieżki względne do plików SVG w public/assets/svg/.
  * Używaj z AssetSvg: <AssetSvg name={SVG_ICONS.actions.add} />
  */
 
 /** @typedef {string} SvgAssetPath */
 
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 export const SVG_ICONS = {
   shared: {
     placeholder: 'shared/placeholder.svg',
@@ -23,7 +30,8 @@ export const SVG_ICONS = {
     conceal: 'actions/hide.svg',
     download: 'actions/download.svg',
   },
-  controls: {
+
+controls: {
     close: 'controls/close.svg',
     search: 'controls/search.svg',
     more: 'controls/more.svg',
@@ -44,7 +52,8 @@ export const SVG_ICONS = {
     checkCircle: 'status/check-circle.svg',
     info: 'status/info.svg',
   },
-  nav: {
+
+nav: {
     /** Domek w breadcrumb SuperBar — nie używać w sidebarze. */
     breadcrumbHome: 'nav/breadcrumb-home.svg',
     /** Legacy alias; preferuj breadcrumbHome w breadcrumb. */

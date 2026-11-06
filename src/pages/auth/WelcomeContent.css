@@ -1,0 +1,537 @@
+/**
+ * @file WelcomeContent.css
+ * @description Style interfejsu użytkownika i układ dla modułu WelcomeContent.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.welcome-hero {
+  --welcome-accent: #1ecc38;
+  --welcome-text: #d2ded0;
+  --welcome-text-dim: rgba(189, 202, 190, 0.75);
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  color: var(--welcome-text);
+  background: #060913;
+}
+
+.welcome-hero__bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.welcome-hero__bg-image {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(2, 4, 10, 0.3) 0%, rgba(2, 4, 10, 0.5) 42%, rgba(2, 4, 10, 0.88) 100%),
+    url('/images/welcome-moon-base.png') center bottom / cover no-repeat;
+  transform: scale(1.04);
+  animation: welcome-bg-breathe 18s ease-in-out infinite alternate;
+}
+
+.welcome-hero__bg-glow {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: min(36rem, 55vw);
+  height: min(36rem, 55vw);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(120, 180, 255, 0.16) 0%, rgba(30, 204, 56, 0.08) 40%, transparent 72%);
+  filter: blur(14px);
+  animation: welcome-earth-pulse 6s ease-in-out infinite;
+}
+
+.welcome-hero__stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 18%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(1px 1px at 22% 34%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(1.5px 1.5px at 35% 12%, rgba(255, 255, 255, 0.75), transparent 70%),
+    radial-gradient(1px 1px at 48% 28%, rgba(255, 255, 255, 0.45), transparent 70%),
+    radial-gradient(1px 1px at 61% 16%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(1.5px 1.5px at 74% 30%, rgba(255, 255, 255, 0.5), transparent 70%),
+    radial-gradient(1px 1px at 86% 20%, rgba(255, 255, 255, 0.8), transparent 70%),
+    radial-gradient(1px 1px at 15% 8%, rgba(255, 255, 255, 0.35), transparent 70%),
+    radial-gradient(1px 1px at 92% 12%, rgba(255, 255, 255, 0.4), transparent 70%);
+  opacity: 0.85;
+  animation: welcome-stars-twinkle 8s ease-in-out infinite alternate;
+}
+
+.welcome-hero__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 40%, transparent 35%, rgba(0, 0, 0, 0.65) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, transparent 28%, transparent 72%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.welcome-nav {
+  position: fixed;
+  top: 1.5rem;
+  right: 2rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+}
+
+.welcome-nav__join-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.8rem;
+  border-radius: 999px;
+  background: rgba(30, 204, 56, 0.15);
+  border: 1px solid rgba(30, 204, 56, 0.5);
+  color: var(--welcome-accent);
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 800;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.welcome-nav__join-btn:hover,
+.welcome-nav__join-btn:focus-visible {
+  background: var(--welcome-accent);
+  color: #040905;
+  border-color: var(--welcome-accent);
+  box-shadow: 0 4px 20px rgba(30, 204, 56, 0.4);
+  transform: translateY(-1px);
+}
+
+.welcome-scroll-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 204, 56, 0.35) rgba(6, 9, 19, 0.6);
+}
+
+.welcome-scroll-container::-webkit-scrollbar {
+  width: 7px;
+}
+
+.welcome-scroll-container::-webkit-scrollbar-track {
+  background: rgba(6, 9, 19, 0.6);
+}
+
+.welcome-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(30, 204, 56, 0.35);
+  border-radius: 999px;
+}
+
+.welcome-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: var(--welcome-accent);
+}
+
+.welcome-section {
+  min-height: 100dvh;
+  width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: clamp(2.5rem, 6vh, 5rem) clamp(1.5rem, 5vw, 4rem);
+  box-sizing: border-box;
+}
+
+.welcome-section--hero {
+  text-align: center;
+}
+
+.welcome-hero__main-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  max-width: 90vw;
+}
+
+.welcome-hero__brand {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
+.welcome-hero__brand-logo {
+  height: clamp(5.5rem, 12vw, 8.5rem);
+  max-width: min(85vw, 420px);
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 36px rgba(30, 204, 56, 0.35));
+  animation: welcome-logo-float 5s ease-in-out infinite;
+}
+
+.welcome-hero__brand-logo--easter-egg {
+  animation: welcome-logo-spin 0.25s linear infinite;
+}
+
+.welcome-hero__brand-a,
+
+.welcome-hero__brand-q {
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 900;
+  font-size: clamp(5rem, 11vw, 7.8rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  user-select: none;
+}
+
+.welcome-hero__brand-a {
+  color: #ffffff;
+}
+
+.welcome-hero__brand-q {
+  color: var(--welcome-accent);
+  text-shadow: 0 0 32px rgba(30, 204, 56, 0.5);
+}
+
+.welcome-hero__subtitle {
+  margin: 0;
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 600;
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  color: rgba(220, 230, 222, 0.9);
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-hero__text-gray {
+  color: var(--welcome-text);
+}
+
+.welcome-hero__text-green {
+  color: var(--welcome-accent);
+}
+
+.welcome-hero__scroll-indicator {
+  position: absolute;
+  bottom: 2.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: 0;
+  color: var(--welcome-text-dim);
+  font-family: 'Manrope', var(--font-family-app);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.welcome-hero__scroll-indicator:hover {
+  color: var(--welcome-accent);
+}
+
+.welcome-hero__scroll-chevron {
+  font-size: 1.25rem;
+  animation: welcome-scroll-bounce 2s infinite;
+}
+
+.welcome-section--story {
+  justify-content: center;
+}
+
+.welcome-story-card {
+  max-width: 66rem;
+  width: 100%;
+  padding: clamp(2.5rem, 4vw, 3.8rem);
+  border-radius: 24px;
+  background: rgba(13, 17, 28, 0.72);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.welcome-story-card__narrative {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.welcome-story-paragraph {
+  margin: 0;
+  font-family: 'Manrope', var(--font-family-app);
+  font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.85;
+  color: var(--welcome-text);
+  text-align: center;
+}
+
+.welcome-story-line {
+  display: block;
+}
+
+.welcome-swap-word {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  cursor: default;
+  vertical-align: baseline;
+  font-weight: 800;
+  color: var(--welcome-accent);
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.welcome-swap-word__inner {
+  display: inline;
+}
+
+.welcome-swap-word__suffix {
+  display: inline;
+  color: var(--welcome-text);
+  text-decoration: none;
+  font-weight: 600;
+  padding-left: 1px;
+}
+
+.welcome-swap-word:hover,
+.welcome-swap-word:focus-visible {
+  color: #4df068;
+  outline: none;
+}
+
+.welcome-story-card__cta {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.welcome-story-card__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 3rem;
+  border-radius: 999px;
+  background: var(--welcome-accent);
+  border: none;
+  cursor: pointer;
+  color: #040905;
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 800;
+  font-size: 1.2rem;
+  text-decoration: none;
+  box-shadow: 0 6px 28px rgba(30, 204, 56, 0.45);
+  transition: all 0.2s ease;
+}
+
+.welcome-story-card__btn:hover,
+
+.welcome-story-card__btn:focus-visible {
+  background: #25e042;
+  box-shadow: 0 8px 36px rgba(30, 204, 56, 0.6);
+  transform: translateY(-2px);
+}
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
+.welcome-section--footer {
+  min-height: auto;
+  padding: 4.5rem 2rem 2.5rem;
+  background: rgba(6, 9, 19, 0.92);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.welcome-footer__content {
+  max-width: 66rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.welcome-footer__grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1.3fr 1.1fr 1.1fr;
+  gap: 2.5rem;
+}
+
+.welcome-footer__logo-title {
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 900;
+  font-size: 1.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.welcome-footer__description {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--welcome-text-dim);
+}
+
+.welcome-footer__heading {
+  margin: 0 0 1.2rem;
+  font-family: 'Manrope', var(--font-family-app);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #ffffff);
+  letter-spacing: 0.04em;
+}
+
+.welcome-footer__coordinator {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.welcome-footer__coordinator-label {
+  font-size: 0.78rem;
+  color: var(--welcome-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.welcome-footer__coordinator-name {
+  color: var(--welcome-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.welcome-footer__coordinator-email {
+  word-break: break-all;
+}
+
+.welcome-footer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  font-size: 0.9rem;
+  color: var(--welcome-text-dim);
+}
+
+.welcome-footer__author-item {
+  color: var(--welcome-text);
+}
+
+.welcome-footer__link {
+  color: var(--welcome-text);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.welcome-footer__link:hover {
+  color: var(--welcome-accent);
+}
+
+.welcome-footer__link-disabled {
+  color: var(--welcome-text-dim);
+  opacity: 0.7;
+}
+
+.welcome-footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.9rem;
+  color: var(--welcome-text-dim);
+}
+
+@keyframes welcome-bg-breathe {
+  from { transform: scale(1.04); }
+  to { transform: scale(1.08); }
+}
+
+@keyframes welcome-earth-pulse {
+  0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@keyframes welcome-stars-twinkle {
+  from { opacity: 0.55; }
+  to { opacity: 0.95; }
+}
+
+@keyframes welcome-logo-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes welcome-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes welcome-scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
+@media (max-width: 960px) {
+  .welcome-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .welcome-footer__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .welcome-story-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .welcome-swap-word--disciplines .welcome-swap-word__inner,
+  .welcome-swap-word--skills .welcome-swap-word__inner,
+  .welcome-swap-word--lectures .welcome-swap-word__inner,
+  .welcome-swap-word--missions .welcome-swap-word__inner,
+  .welcome-swap-word--unity .welcome-swap-word__inner {
+    min-width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-hero__bg-image,
+  .welcome-hero__bg-glow,
+  .welcome-hero__stars,
+  .welcome-hero__brand-logo,
+  .welcome-hero__brand-logo--easter-egg,
+  .welcome-hero__scroll-chevron {
+    animation: none;
+    transform: none;
+  }
+}

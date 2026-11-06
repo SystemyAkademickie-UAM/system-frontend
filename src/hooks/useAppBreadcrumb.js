@@ -1,3 +1,9 @@
+/**
+ * @file useAppBreadcrumb.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useAppBreadcrumb.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useOptionalGroupId } from './useOptionalGroupId.js';
@@ -7,6 +13,7 @@ import { appHelpPath, appSettingsPath, groupMainPath, groupMembersPath, groupsLi
 
 const STUDENT_PROFILE_VIEW_PATTERN = /^\/groups\/[^/]+\/student-profile\/[^/]+\/?$/u;
 
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 function isStudentProfileViewPath(pathname) {
   return STUDENT_PROFILE_VIEW_PATTERN.test(pathname);
 }
@@ -14,11 +21,14 @@ function isStudentProfileViewPath(pathname) {
 /**
  * Buduje klikalną ścieżkę nawigacji dla SuperBar.
  */
+
 export function useAppBreadcrumb() {
   const { pathname } = useLocation();
   const groupId = useOptionalGroupId();
-  const { group } = useGroupDetails(groupId);
 
+const { group } = useGroupDetails(groupId);
+
+// === ZWRACANY STAN I INTERFEJS ===
   return useMemo(() => {
     const homePath = groupsListPath();
     const tailSegments = resolveAppBreadcrumb(pathname, groupId) ?? [];

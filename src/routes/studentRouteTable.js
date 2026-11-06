@@ -1,4 +1,10 @@
 /**
+ * @file studentRouteTable.js
+ * @description Definicje routingu i powiązań widoków dla modułu studentRouteTable.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Tablica routingu studenta — mapowanie nawigacji bocznej na ścieżki URL.
  * Synchronizuj z `studentView` w `shellTemplates.config.js`, `createAppRouter.jsx` i `routeTable.js`.
  *
@@ -32,6 +38,8 @@ import {
 } from './pathRegistry.js';
 
 /** @type {StudentRouteDefinition[]} */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export const STUDENT_ROUTE_TABLE = [
   {
     id: 'groups.list',
@@ -180,6 +188,7 @@ export const STUDENT_ROUTE_TABLE = [
  * @param {string} groupId
  * @param {string} [studentId]
  */
+
 export function buildStudentRouteExample(route, groupId, studentId = 'student-1') {
   const builders = {
     GROUPS_LIST: () => groupsListPath(),

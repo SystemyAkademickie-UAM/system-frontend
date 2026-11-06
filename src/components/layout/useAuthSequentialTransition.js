@@ -1,3 +1,9 @@
+/**
+ * @file useAuthSequentialTransition.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useAuthSequentialTransition.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   AUTH_CARD_TRANSITION_ENTER_MS,
@@ -17,9 +23,12 @@ export const AUTH_TRANSITION_PHASE = {
  * @param {React.ReactNode} options.currentNode
  * @param {(from: { key: string, node: React.ReactNode }, to: { key: string, node: React.ReactNode }) => ({ from: object, to: object, direction: 'forward' | 'back' } | null)} options.resolveTransition
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useAuthSequentialTransition({ locationKey, currentNode, resolveTransition }) {
   const commitRef = useRef({ key: locationKey, node: currentNode });
-  const [state, setState] = useState({ phase: AUTH_TRANSITION_PHASE.IDLE, payload: null });
+
+const [state, setState] = useState({ phase: AUTH_TRANSITION_PHASE.IDLE, payload: null });
 
   useLayoutEffect(() => {
     if (state.phase !== AUTH_TRANSITION_PHASE.IDLE) {
@@ -67,6 +76,7 @@ export function useAuthSequentialTransition({ locationKey, currentNode, resolveT
     return undefined;
   }, [state.phase, state.payload]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     phase: state.phase,
     payload: state.payload,

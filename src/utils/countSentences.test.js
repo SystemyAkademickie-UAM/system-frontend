@@ -1,3 +1,9 @@
+/**
+ * @file countSentences.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność countSentences.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, expect, it } from 'vitest';
 import {
   countSentences,
@@ -8,8 +14,10 @@ import {
 } from './countSentences.js';
 
 const minFraction = (POST_CARD_MIN_WIDTH_STEP / POST_CARD_WIDTH_STEPS) * POST_CARD_MAX_CONTENT_FRACTION;
+
 const stepFraction = (step) => (step / POST_CARD_WIDTH_STEPS) * POST_CARD_MAX_CONTENT_FRACTION;
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('countSentences', () => {
   it('returns 0 for empty text', () => {
     expect(countSentences('')).toBe(0);

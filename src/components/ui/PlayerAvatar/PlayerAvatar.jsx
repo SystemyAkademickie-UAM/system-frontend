@@ -1,3 +1,9 @@
+/**
+ * @file PlayerAvatar.jsx
+ * @description Komponent interfejsu użytkownika PlayerAvatar.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import { Link } from 'react-router-dom';
@@ -10,8 +16,7 @@ import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { positionSideTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './PlayerAvatar.css';
 
-
-
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
 
  * Okrągły awatar użytkownika z kafelkiem po najechaniu (nick + zgromadzona waluta).
@@ -42,6 +47,7 @@ import './PlayerAvatar.css';
  * @param {string} [props.href]
  */
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function PlayerAvatar({
 
   nickname,
@@ -72,7 +78,8 @@ export default function PlayerAvatar({
   const bubbleRef = useRef(null);
 
   const [tooltipVisible, setTooltipVisible] = useState(tooltipAlwaysVisible);
-  const [tooltipLayout, setTooltipLayout] = useState(null);
+
+const [tooltipLayout, setTooltipLayout] = useState(null);
 
   const updateTooltipPosition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -115,8 +122,6 @@ export default function PlayerAvatar({
     setTooltipVisible(true);
   };
 
-
-
   const handleMouseLeave = () => {
 
     if (tooltipAlwaysVisible) {
@@ -129,10 +134,9 @@ export default function PlayerAvatar({
 
   };
 
-
-
   const displayName = nickname?.trim() || 'Osoba korzystająca z systemu';
-  const label = ariaLabel ?? `Profil: ${displayName}`;
+
+const label = ariaLabel ?? `Profil: ${displayName}`;
 
   const sharedClassName = [
     'maq-player-avatar',
@@ -154,6 +158,7 @@ export default function PlayerAvatar({
     </span>
   );
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       {href ? (
@@ -184,8 +189,6 @@ export default function PlayerAvatar({
           {avatarContent}
         </div>
       )}
-
-
 
       {tooltipVisible
         ? createPortal(
@@ -231,5 +234,3 @@ export default function PlayerAvatar({
   );
 
 }
-
-

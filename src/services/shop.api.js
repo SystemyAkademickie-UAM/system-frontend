@@ -1,3 +1,9 @@
+/**
+ * @file shop.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla shop.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { deleteJson, getJson, patchJson, postJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 import {
@@ -72,7 +78,8 @@ export async function createGroupShopItemFromTemplate(groupId, payload) {
   if (!result.ok) {
     return { ok: false, error: extractApiError(result.data) };
   }
-  return { ok: true, item: mapBackendShopItem(result.data) };
+
+return { ok: true, item: mapBackendShopItem(result.data) };
 }
 
 /**
@@ -149,6 +156,7 @@ export async function fetchGroupInventory(groupId) {
  * @param {string | number} groupId
  * @param {string | number} accountId
  */
+
 export async function fetchStudentInventory(groupId, accountId) {
   const result = await getJson(`/groups/${groupId}/students/${accountId}/inventory`);
   if (!result.ok) {

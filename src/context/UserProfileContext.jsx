@@ -1,3 +1,9 @@
+/**
+ * @file UserProfileContext.jsx
+ * @description Kontekst globalnego stanu React oraz dostawca danych dla UserProfileContext.
+ */
+
+// === IMPORTY I INICJALIZACJA KONTEKSTU ===
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { fetchAvatars, fetchProfile } from '../services/profile.api.js';
 import { useSession } from './SessionContext.jsx';
@@ -7,11 +13,14 @@ const UserProfileContext = createContext(null);
 /**
  * Profil użytkownika (ksywka, awatar) — wspólne dla SuperBar i ustawień.
  */
+
+// === DOSTAWCA KONTEKSTU I ZARZĄDZANIE STANEM ===
 export function UserProfileProvider({ children }) {
   const { isAuthenticated } = useSession();
   const [profile, setProfile] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+const [isLoading, setIsLoading] = useState(false);
 
   const refetchProfile = useCallback(async () => {
     if (!isAuthenticated) {
@@ -59,8 +68,10 @@ export function UserProfileProvider({ children }) {
   return <UserProfileContext.Provider value={value}>{children}</UserProfileContext.Provider>;
 }
 
+// === HOOKI DOSTĘPOWE DO KONTEKSTU ===
 export function useUserProfile() {
-  const ctx = useContext(UserProfileContext);
+
+const ctx = useContext(UserProfileContext);
   if (!ctx) {
     throw new Error('useUserProfile must be used within UserProfileProvider');
   }

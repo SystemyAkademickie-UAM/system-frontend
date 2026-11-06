@@ -1,3 +1,9 @@
+/**
+ * @file TemplateListingCard.jsx
+ * @description Komponent karty TemplateListingCard prezentujący dane w spójnym formacie wizualnym.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { DataTableRowActions } from '../DataTable/DataTable.jsx';
@@ -5,6 +11,7 @@ import { isColorBannerRef, parseColorBannerRef } from '../../../constants/drive.
 import { SVG_ICONS, SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
 import './TemplateListingCard.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Poziomy kafelek szablonu (inspiracja: ogłoszenia oto-dom).
  *
@@ -27,6 +34,8 @@ import './TemplateListingCard.css';
  * @param {import('../DataTable/DataTable.jsx').DataTableRowActionsConfig} [props.rowActions]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function TemplateListingCard({
   name,
   description,
@@ -58,7 +67,8 @@ export default function TemplateListingCard({
 
   const formattedDate = createdAt
     ? new Date(createdAt).toLocaleDateString('pl-PL', { day: '2-digit', month: 'short', year: 'numeric' })
-    : null;
+
+: null;
 
   const headActions = hasHeadActions ? (
     <div
@@ -227,6 +237,7 @@ export default function TemplateListingCard({
     );
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <article className={classNames}>
       <div className="maq-template-listing-card__shell maq-template-listing-card__shell--static">

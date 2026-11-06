@@ -1,3 +1,9 @@
+/**
+ * @file useCompactAppLayout.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useCompactAppLayout.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useLocation } from 'react-router-dom';
 import {
   appHelpPath,
@@ -5,7 +11,8 @@ import {
   groupsListPath,
   isGroupJoinPath,
   templatesMyPath,
-  templatesPath,
+
+templatesPath,
 } from '../routes/pathRegistry.js';
 
 const COMPACT_LAYOUT_PATHS = new Set([
@@ -16,7 +23,9 @@ const COMPACT_LAYOUT_PATHS = new Set([
   templatesMyPath(),
 ]);
 
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useCompactAppLayout() {
-  const { pathname } = useLocation();
+
+const { pathname } = useLocation();
   return COMPACT_LAYOUT_PATHS.has(pathname) || isGroupJoinPath(pathname);
 }
