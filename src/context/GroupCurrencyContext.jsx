@@ -1,3 +1,9 @@
+/**
+ * @file GroupCurrencyContext.jsx
+ * @description Kontekst globalnego stanu React oraz dostawca danych dla GroupCurrencyContext.
+ */
+
+// === IMPORTY I INICJALIZACJA KONTEKSTU ===
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_CURRENCY_ICON_FILE, DEFAULT_CURRENCY_SYMBOL } from '../constants/currency.constants.js';
 import { fetchGroupCurrencyConfig } from '../services/groupCurrency.api.js';
@@ -18,8 +24,11 @@ const GroupCurrencyContext = createContext(defaultValue);
 /**
  * Udostępnia symbol i nazwę waluty grupy w drzewie komponentów.
  */
+
+// === DOSTAWCA KONTEKSTU I ZARZĄDZANIE STANEM ===
 export function GroupCurrencyProvider({ symbol, name, iconFile, iconUrl, isLoading, refetch, children }) {
-  const value = useMemo(() => ({
+
+const value = useMemo(() => ({
     symbol: symbol ?? DEFAULT_CURRENCY_SYMBOL,
     name: name ?? '',
     iconFile: iconFile ?? DEFAULT_CURRENCY_ICON_FILE,
@@ -43,7 +52,8 @@ export function GroupCurrencyProvider({ symbol, name, iconFile, iconUrl, isLoadi
 export function GroupCurrencySettingsProvider({ groupId, children }) {
   const [symbol, setSymbol] = useState(DEFAULT_CURRENCY_SYMBOL);
   const [name, setName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+const [isLoading, setIsLoading] = useState(false);
 
   const load = useCallback(async () => {
     if (!groupId) {
@@ -90,6 +100,7 @@ export function GroupCurrencySettingsProvider({ groupId, children }) {
   );
 }
 
+// === HOOKI DOSTĘPOWE DO KONTEKSTU ===
 export function useGroupCurrency() {
   return useContext(GroupCurrencyContext);
 }

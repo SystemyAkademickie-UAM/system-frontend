@@ -1,3 +1,9 @@
+/**
+ * @file api.constants.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność api.constants.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, expect, it, vi, afterEach } from 'vitest';
 
 import { AUTH_LOGIN_ME_PATH, AUTH_SAML_LOGIN_PATH, AUTH_SAML_ME_PATH } from './authPaths.constants.js';
@@ -6,6 +12,8 @@ import { getAssetUrl } from './api.constants.js';
 /**
  * Smoke: path segment must stay aligned with `system-backend` `SamlAuthController` (`auth/saml`) and `main` global prefix (`/api`).
  */
+
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('SAML login path', () => {
   it('uses /auth/saml/login relative to the API base', () => {
     expect(AUTH_SAML_LOGIN_PATH).toBe('/auth/saml/login');

@@ -1,26 +1,33 @@
 /**
+ * @file browserIdStorage.js
+ * @description Funkcje pomocnicze i narzędziowe modułu browserIdStorage.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Browser ID storage stub — X-Browser-ID has been removed from authentication.
  * These stubs maintain backwards compatibility for legacy code paths.
  */
 
 export function getOrCreateBrowserId() {
-  return '';
+
+return '';
 }
 
 export function getBrowserIdForAuth() {
   return '';
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function resetStoredBrowserId() {
-  return '';
+
+return '';
 }
 
 export function pinBrowserIdForSamlFlow() {
-  // no-op
 }
 
 export function clearPendingSamlBrowserId() {
-  // no-op
 }
 
 export function hasPendingSamlBrowserId() {

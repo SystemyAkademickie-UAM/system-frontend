@@ -1,3 +1,9 @@
+/**
+ * @file ProductCategoryStrip.css
+ * @description Style interfejsu użytkownika i układ dla modułu ProductCategoryStrip.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-product-category-strip {
   position: absolute;
   top: 50%;
@@ -18,6 +24,7 @@
   gap: 0.35rem;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-product-category-strip__item {
   display: flex;
   flex-direction: row;
@@ -38,6 +45,7 @@
   transition: margin-right 0.2s ease, transform 0.2s ease;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-product-category-strip__label {
   overflow: hidden;
   max-width: 0;
@@ -56,11 +64,13 @@
 }
 
 .maq-product-card:hover .maq-product-category-strip__orb,
+
 .maq-product-card:focus-within .maq-product-category-strip__orb {
   margin-right: 0;
 }
 
 .maq-product-card:hover .maq-product-category-strip__label,
+
 .maq-product-card:focus-within .maq-product-category-strip__label {
   max-width: 12rem;
   opacity: 1;

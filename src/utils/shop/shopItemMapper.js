@@ -1,3 +1,9 @@
+/**
+ * @file shopItemMapper.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopItemMapper.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { parseShopItemImageRef } from './shopItemIcon.js';
 
 /**
@@ -60,6 +66,7 @@ export function mapBackendShopItem(raw) {
  * @param {unknown[]} items
  * @returns {import('./shopItem.types.js').ShopItem[]}
  */
+
 export function mapBackendShopItems(items) {
   if (!Array.isArray(items)) {
     return [];
@@ -88,10 +95,13 @@ export function mapBackendShopItems(items) {
  * @param {unknown} raw
  * @returns {import('./shopItem.types.js').InventoryEntry | null}
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function mapBackendInventoryEntry(raw) {
   const row = /** @type {Record<string, unknown>} */ (raw ?? {});
   const itemRaw = row.item;
-  if (!itemRaw || typeof itemRaw !== 'object') {
+
+if (!itemRaw || typeof itemRaw !== 'object') {
     return null;
   }
 

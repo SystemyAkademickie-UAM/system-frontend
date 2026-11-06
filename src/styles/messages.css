@@ -1,10 +1,18 @@
 /**
+ * @file messages.css
+ * @description Style interfejsu użytkownika i układ dla modułu messages.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+/**
  * Spójna typografia komunikatów (toasty, alerty, puste stany, błędy formularzy).
  * Manrope — bez Comic Sans ani ogólnego fallbacku cursive.
  */
 :where(
   [role='alert'],
   [role='status'],
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
   [aria-live='polite'],
   [aria-live='assertive'],
   .maq-toast,
@@ -12,6 +20,8 @@
   .maq-toast__detail,
   .maq-toast__close,
   .maq-shop-closed-overlay__message,
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
   [class*='__error'],
   [class*='__message'],
   [class*='__empty'],

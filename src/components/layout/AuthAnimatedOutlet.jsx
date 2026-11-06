@@ -1,3 +1,9 @@
+/**
+ * @file AuthAnimatedOutlet.jsx
+ * @description Komponent interfejsu użytkownika AuthAnimatedOutlet.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
 import { resolveAuthRouteStep } from '../../utils/resolveAuthRouteStep.js';
@@ -5,9 +11,11 @@ import AuthSlideTransitionView from './AuthSlideTransitionView.jsx';
 import { useAuthSequentialTransition } from './useAuthSequentialTransition.js';
 import './authTransition.css';
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function AuthAnimatedOutlet() {
   const location = useLocation();
-  const outlet = useOutlet();
+
+const outlet = useOutlet();
 
   const resolveTransition = useCallback((from, to) => {
     const fromStep = resolveAuthRouteStep(from.key);
@@ -28,6 +36,7 @@ export default function AuthAnimatedOutlet() {
     resolveTransition,
   });
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <AuthSlideTransitionView
       phase={phase}

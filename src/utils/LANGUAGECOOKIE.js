@@ -1,3 +1,9 @@
+/**
+ * @file LANGUAGECOOKIE.js
+ * @description Funkcje pomocnicze i narzędziowe modułu LANGUAGECOOKIE.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 export function READLANGUAGECOOKIE() {
   const cookies = Object.fromEntries(
     document.cookie.split(';').map((entry) => {

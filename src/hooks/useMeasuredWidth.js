@@ -1,3 +1,9 @@
+/**
+ * @file useMeasuredWidth.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useMeasuredWidth.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useLayoutEffect, useState } from 'react';
 
 /**
@@ -7,6 +13,8 @@ import { useLayoutEffect, useState } from 'react';
  * @param {unknown[]} [deps=[]]
  * @returns {number | null}
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useMeasuredWidth(elementRef, deps = []) {
   const [width, setWidth] = useState(null);
 
@@ -30,5 +38,6 @@ export function useMeasuredWidth(elementRef, deps = []) {
     };
   }, [elementRef, ...deps]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return width;
 }

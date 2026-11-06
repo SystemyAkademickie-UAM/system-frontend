@@ -1,8 +1,15 @@
+/**
+ * @file ShopItemPriceRow.jsx
+ * @description Komponent interfejsu użytkownika ShopItemPriceRow.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 import InfoTooltip from '../InfoTooltip/InfoTooltip.jsx';
 import { getShopCatalogPriceHint, getShopItemPriceDisplay, getShopStrikePriceHint } from '../../../utils/shop/shopPricing.js';
 import '../ProductCard/ProductCard.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Wiersz ceny produktu — ten sam układ co na kafelku sklepu.
  *
@@ -15,6 +22,8 @@ import '../ProductCard/ProductCard.css';
  *   size?: 'sm' | 'md',
  * }} props
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ShopItemPriceRow({
   priceAmount,
   salePriceAmount,
@@ -29,7 +38,8 @@ export default function ShopItemPriceRow({
     rankDiscountedPrice,
     appliedDiscounts,
   });
-  const catalogPriceHint = getShopCatalogPriceHint(display);
+
+const catalogPriceHint = getShopCatalogPriceHint(display);
 
   if (display.mode === 'badge') {
     const strikeHint = getShopStrikePriceHint(display);
@@ -91,6 +101,7 @@ export default function ShopItemPriceRow({
     );
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <CurrencyDisplay
       amount={display.displayPrice}

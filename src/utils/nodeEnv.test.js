@@ -1,7 +1,14 @@
+/**
+ * @file nodeEnv.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność nodeEnv.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, expect, it } from 'vitest';
 
 import { resolveNodeProduction } from './nodeEnv.js';
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('resolveNodeProduction', () => {
   it('returns true only when NODE_ENV is production', () => {
     expect(resolveNodeProduction('production')).toBe(true);

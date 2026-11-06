@@ -1,3 +1,9 @@
+/**
+ * @file shopCategories.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopCategories.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { mixCategoryColors } from './shopCategoryColors.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 
@@ -29,6 +35,8 @@ export function buildShopCategoryFilters(categories = [], language) {
  * @param {Map<string, import('../../services/itemCategories.api.js').ItemCategory>} [categoriesById]
  * @returns {string[]}
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function resolveShopCategoryLabels(categoryIds = [], categoriesById = new Map()) {
   return categoryIds
     .map((id) => categoriesById.get(String(id))?.name ?? null)
@@ -46,7 +54,8 @@ export function resolveShopCategoryDetails(categoryIds = [], categoriesById = ne
   return categoryIds
     .map((id) => categoriesById.get(String(id)) ?? null)
     .filter(Boolean)
-    .filter((category) => {
+
+.filter((category) => {
       const categoryKey = String(category.id);
       if (seenIds.has(categoryKey)) {
         return false;

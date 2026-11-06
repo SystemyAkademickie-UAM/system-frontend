@@ -1,0 +1,127 @@
+/**
+ * @file ProfileEqContent.css
+ * @description Style interfejsu użytkownika i układ dla modułu ProfileEqContent.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.profile-eq-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.profile-eq-page__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.profile-eq-page__title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: rgb(--colour-text-other);
+}
+
+.profile-eq-page__toolbar {
+  align-items: center;
+}
+
+.profile-eq-page__counts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.profile-eq-page__search {
+  width: 18rem;
+  max-width: 100%;
+}
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
+.profile-eq-page__filters {
+  margin: 0;
+}
+
+.profile-eq-page__filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.profile-eq-page__toggle-categories {
+  flex-shrink: 0;
+}
+
+.profile-eq-page__divider {
+  margin: 0;
+}
+
+.profile-eq-page__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.profile-eq-page__grid .maq-product-card {
+  max-width: none;
+  height: 100%;
+}
+
+.profile-eq-page__error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--color-input-error);
+  font-size: var(--font-size-body);
+}
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
+.profile-eq-page__message {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-body);
+}
+
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
+@media (max-width: 1200px) {
+  .profile-eq-page__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .profile-eq-page__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .profile-eq-page__search {
+    width: 100%;
+  }
+
+  .profile-eq-page__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-eq-page__counts,
+  .maq-section-page__toolbar-end {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-eq-page__grid {
+    grid-template-columns: 1fr;
+  }
+}

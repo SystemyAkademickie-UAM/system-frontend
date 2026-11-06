@@ -1,8 +1,0 @@
-export { default as LoginPionierId } from './LoginPionierId.jsx';
-export { default as LoginEmail } from './LoginEmail.jsx';
-export { default as LoginInstitution } from './LoginInstitution.jsx';
-export { default as RegisterProfile } from './RegisterProfile.jsx';
-export { default as RegisterAvatar } from './RegisterAvatar.jsx';
-export { default as RegisterEula } from './RegisterEula.jsx';
-export { default as AuthWizardResolvingPanel } from './AuthWizardResolvingPanel.jsx';
-

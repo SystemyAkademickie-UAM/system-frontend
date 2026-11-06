@@ -1,3 +1,9 @@
+/**
+ * @file icons.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla icons.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson } from './api-client.js';
 
 /**
@@ -11,6 +17,7 @@ import { getJson } from './api-client.js';
  * Zwraca dostępne ikony z backendu.
  * @returns {Promise<IconCatalogItem[]>}
  */
+
 export async function fetchIconCatalog() {
   const result = await getJson('/gamification/icons');
   if (!result.ok || !Array.isArray(result.data)) {

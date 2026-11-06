@@ -1,3 +1,9 @@
+/**
+ * @file DataTable.css
+ * @description Style interfejsu użytkownika i układ dla modułu DataTable.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .data-table-wrap {
   display: flex;
   flex-direction: column;
@@ -214,6 +220,7 @@
   );
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .data-table__row--colored > .data-table__cell:first-child {
   box-shadow: inset 3px 0 0 var(--row-color);
 }
@@ -233,6 +240,7 @@
 }
 
 .data-table__th--actions,
+
 .data-table__cell--actions {
   position: sticky;
   right: 0;
@@ -425,6 +433,7 @@
   color: var(--color-accent);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .data-table__menu-item:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
@@ -458,6 +467,7 @@
 }
 
 .data-table-mobile__item:active,
+
 .data-table-mobile__item:focus-within {
   background: rgba(66, 243, 125, 0.04);
 }
@@ -579,6 +589,7 @@
   height: 2rem;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 768px) {
   .data-table__toolbar {
     flex-direction: column;

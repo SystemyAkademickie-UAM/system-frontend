@@ -1,3 +1,9 @@
+/**
+ * @file AuthShell.jsx
+ * @description Komponent interfejsu użytkownika AuthShell.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useLocation, useOutlet } from 'react-router-dom';
 import { welcomePath } from '../../routes/pathRegistry.js';
 import AuthAnimatedOutlet from './AuthAnimatedOutlet.jsx';
@@ -5,6 +11,7 @@ import './AuthShell.css';
 import './authLogos.css';
 import './authTransition.css';
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function normalizeAuthPath(pathname) {
   return pathname.replace(/\/+$/, '') || '/';
 }
@@ -12,8 +19,10 @@ function normalizeAuthPath(pathname) {
 export default function AuthShell() {
   const { pathname } = useLocation();
   const isWelcome = normalizeAuthPath(pathname) === welcomePath();
-  const outlet = useOutlet();
 
+const outlet = useOutlet();
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className={['auth-shell', isWelcome ? 'auth-shell--welcome' : ''].filter(Boolean).join(' ')}>
       {!isWelcome ? (

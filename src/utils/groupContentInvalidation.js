@@ -1,3 +1,9 @@
+/**
+ * @file groupContentInvalidation.js
+ * @description Funkcje pomocnicze i narzędziowe modułu groupContentInvalidation.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** @typedef {'ranks' | 'badges' | 'stages' | 'activities' | 'all'} GroupContentScope */
 
 export const GROUP_CONTENT_CHANGED_EVENT = 'maq:group-content-changed';
@@ -6,8 +12,11 @@ export const GROUP_CONTENT_CHANGED_EVENT = 'maq:group-content-changed';
  * @param {string | number} groupId
  * @param {GroupContentScope | GroupContentScope[]} scope
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function notifyGroupContentChanged(groupId, scope = 'all') {
-  if (groupId == null || groupId === '') {
+
+if (groupId == null || groupId === '') {
     return;
   }
 
@@ -32,7 +41,8 @@ export function subscribeGroupContentChanges(groupId, watchedScopes, onInvalidat
   }
 
   /** @param {Event} event */
-  const handler = (event) => {
+
+const handler = (event) => {
     const detail = /** @type {CustomEvent<{ groupId?: string, scopes?: GroupContentScope[] }>} */ (event).detail;
     if (String(detail?.groupId) !== String(groupId)) {
       return;

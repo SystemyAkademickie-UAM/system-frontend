@@ -1,3 +1,9 @@
+/**
+ * @file groups.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla groups.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, patchJson, postJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 import { buildDriveBannerUrl } from '../constants/drive.constants.js';
@@ -31,8 +37,6 @@ function mapBackendGroup(backendGroup, options = {}) {
   return {
     id: String(backendGroup.id),
     storyName: backendGroup.groupName || backendGroup.name || '',
-    // Backend nie ma jeszcze osobnej kolumny na nazwę przedmiotu —
-    // zwracamy pustą wartość, żeby pole nie kopiowało się z nazwy grupy.
     subject: backendGroup.subjectName || '',
     lecturer: backendGroup.lecturers || '',
     lecturerAvatarUrl: getAssetUrl(backendGroup.lecturerAvatarUrl),
@@ -68,6 +72,7 @@ export async function fetchUserGroups() {
  *
  * @returns {Promise<{ myGroups: GroupListItem[], otherGroups: GroupListItem[] }>}
  */
+
 export async function fetchGroupsCatalog() {
   const result = await getJson('/groups/catalog', { includeBrowserId: true });
   if (!result.ok) {
@@ -142,6 +147,7 @@ export async function fetchGroupById(groupId) {
  * @param {string} [groupData.imageRef]
  * @returns {Promise<{ ok: boolean, groupId?: number, error?: string }>}
  */
+
 export async function createGroup(groupData) {
   const result = await postJson('/groups/new', { group: groupData }, { includeBrowserId: true });
   if (!result.ok) {
@@ -193,6 +199,8 @@ export async function updateGroup(groupId, groupData) {
  * @param {string} query
  * @returns {GroupListItem[]}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function filterGroups(groups, query) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) {

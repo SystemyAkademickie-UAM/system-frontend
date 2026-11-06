@@ -1,3 +1,9 @@
+/**
+ * @file avatarListCache.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla avatarListCache.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { fetchAvatars } from './profile.api.js';
 import { pickRandomAvatars } from '../utils/avatarCategories.js';
 
@@ -14,6 +20,8 @@ let inFlightRequest = null;
  * Zwraca listę awatarów z pamięci podręcznej (jeśli już pobrano).
  * @returns {import('./profile.api.js').Avatar[] | null}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function getCachedAvatarList() {
   return cachedAvatarList;
 }
@@ -25,7 +33,8 @@ export function getCachedAvatarList() {
  * @returns {import('./profile.api.js').Avatar[]}
  */
 export function getStablePopularAvatars(avatars, count = 4) {
-  if (cachedPopularAvatars && cachedPopularAvatars.length === count) {
+
+if (cachedPopularAvatars && cachedPopularAvatars.length === count) {
     return cachedPopularAvatars;
   }
   const source = Array.isArray(avatars) && avatars.length > 0 ? avatars : cachedAvatarList;
@@ -58,6 +67,7 @@ export function prefetchAvatarImages(list, limit = 16) {
  * Pobiera listę awatarów raz i współdzieli wynik między widokami logowania / ustawień.
  * @returns {Promise<import('./profile.api.js').Avatar[]>}
  */
+
 export function loadAvatarList() {
   if (cachedAvatarList) {
     return Promise.resolve(cachedAvatarList);

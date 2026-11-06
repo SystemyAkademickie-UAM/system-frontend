@@ -1,3 +1,9 @@
+/**
+ * @file profile.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla profile.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, patchJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 
@@ -29,6 +35,7 @@ import { getAssetUrl } from '../constants/api.constants.js';
  *
  * @returns {Promise<UserProfile | null>}
  */
+
 export async function fetchProfile() {
   const result = await getJson('/profile');
   if (!result.ok) {
@@ -46,7 +53,8 @@ export async function fetchProfile() {
  */
 export async function fetchAvatars() {
   const result = await getJson('/profile/avatars');
-  if (!result.ok) {
+
+if (!result.ok) {
     console.error('Failed to fetch avatars:', result.status, result.data);
     return [];
   }

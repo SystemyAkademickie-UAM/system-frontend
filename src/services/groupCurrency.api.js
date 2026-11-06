@@ -1,3 +1,9 @@
+/**
+ * @file groupCurrency.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla groupCurrency.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, patchJson } from './api-client.js';
 import { DEFAULT_CURRENCY_SYMBOL } from '../constants/currency.constants.js';
 
@@ -21,7 +27,8 @@ export async function fetchGroupCurrencyConfig(groupId) {
   }
 
   const currencyResult = await getJson(`/groups/${groupId}/currency`);
-  if (currencyResult.ok && currencyResult.data && typeof currencyResult.data === 'object') {
+
+if (currencyResult.ok && currencyResult.data && typeof currencyResult.data === 'object') {
     const data = /** @type {{ currency?: string | null, currencyEmoji?: string | null }} */ (
       currencyResult.data
     );
@@ -63,6 +70,7 @@ export async function fetchGroupCurrencyConfig(groupId) {
  * @param {{ currency?: string, currencyEmoji?: string }} payload
  * @returns {Promise<{ ok: boolean, config?: GroupCurrencyConfig }>}
  */
+
 export async function updateGroupCurrencyConfig(groupId, payload) {
   const result = await patchJson(`/groups/${groupId}/currency`, payload);
   if (!result.ok || result.status === 403 || !result.data || typeof result.data !== 'object') {

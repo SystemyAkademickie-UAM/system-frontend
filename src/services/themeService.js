@@ -1,3 +1,9 @@
+/**
+ * @file themeService.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla theme.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { READLANGUAGECOOKIE } from '../utils/LANGUAGECOOKIE.js';
 
 /**
@@ -5,7 +11,7 @@ import { READLANGUAGECOOKIE } from '../utils/LANGUAGECOOKIE.js';
  * Obsługa motywów aplikacji: systemowy (domyślny), jasny, ciemny.
  */
 
-
+// === OPERACJE I ZAPYTANIA REST API ===
 export const THEME_MODE = {
   SYSTEM: 'system',
   LIGHT: 'light',
@@ -34,7 +40,8 @@ let currentTheme = THEME_MODE.SYSTEM;
 let systemThemeMediaQuery = null;
 
 function handleSystemThemeChange(e) {
-  if (currentTheme === THEME_MODE.SYSTEM) {
+
+if (currentTheme === THEME_MODE.SYSTEM) {
     const isDark = e.matches;
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 
@@ -54,7 +61,6 @@ export function getSavedTheme() {
       return saved;
     }
   } catch {
-    // localStorage niedostępne
   }
   return THEME_MODE.SYSTEM;
 }
@@ -65,10 +71,10 @@ export function getSavedTheme() {
  */
 export function applyTheme(theme) {
   currentTheme = theme;
-  try {
+
+try {
     localStorage.setItem(STORAGE_KEY, theme);
   } catch {
-    // Ignoruj błędy zapisu
   }
 
   if (theme === THEME_MODE.SYSTEM) {

@@ -1,3 +1,9 @@
+/**
+ * @file SuperBarUserMenu.jsx
+ * @description Komponent interfejsu użytkownika SuperBarUserMenu.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +18,7 @@ import { positionDropdownMenu } from '../../../utils/ui/positionTooltipInViewpor
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBar.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Awatar + rozwijane menu (Wyloguj → /login).
  */
@@ -36,6 +43,7 @@ const ACCOUNTMENU__TEXTLABEL = {
   english: 'User account menu',
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SuperBarUserMenu({
   displayName,
   roleLabel,
@@ -54,7 +62,8 @@ export default function SuperBarUserMenu({
   const changeContextLabel = loginContextMenuLabel(user?.memberships, LANGUAGE);
   const [open, setOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [logoutError, setLogoutError] = useState(null);
+
+const [logoutError, setLogoutError] = useState(null);
 
   const getMenuLayout = useCallback(({ triggerRect, panelRect }) => positionDropdownMenu({
     triggerRect,
@@ -113,6 +122,7 @@ export default function SuperBarUserMenu({
     }, { navigate });
   };
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className="super-bar-user-menu" ref={rootRef}>
       <SuperBarUserIdentity displayName={displayName} roleLabel={roleLabel} isLoading={isLoading} />

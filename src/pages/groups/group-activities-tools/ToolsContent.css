@@ -1,0 +1,84 @@
+/**
+ * @file ToolsContent.css
+ * @description Style interfejsu użytkownika i układ dla modułu ToolsContent.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.activities-tools-page__body {
+  width: 100%;
+}
+
+.activities-tools-page__tool-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.activities-tools-page__tool-btn {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.25rem 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
+.activities-tools-page__tool-btn img {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.activities-tools-page__tool-icon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.activities-tools-page__tool-icon--flipped {
+  transform: rotate(180deg);
+}
+
+.activities-tools-page__tool-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
+.activities-tools-page__tool-btn:hover:not(:disabled) {
+  color: var(--color-accent);
+}
+
+.activities-tools-page__tool-btn:hover:not(:disabled) .activities-tools-page__tool-icon {
+  color: var(--color-accent-pressed);
+}
+
+.activities-tools-page__tool-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.activities-tools-page__checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.activities-tools-page__checkbox {
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}

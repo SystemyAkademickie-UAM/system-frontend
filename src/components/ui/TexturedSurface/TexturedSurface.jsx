@@ -1,6 +1,13 @@
+/**
+ * @file TexturedSurface.jsx
+ * @description Komponent interfejsu użytkownika TexturedSurface.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useId } from 'react';
 import './TexturedSurface.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Tło z „postrzępioną” krawędzią — odpowiednik efektu Figma Texture (radius + size).
  *
@@ -18,6 +25,8 @@ import './TexturedSurface.css';
  * @param {string} [props.surfaceColor] — kolor panelu (domyślnie token)
  * @param {boolean} [props.fill=false] — rozciągnij na pełną wysokość rodzica / min-height
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function TexturedSurface({
   children,
   className = '',
@@ -29,7 +38,8 @@ export default function TexturedSurface({
   fill = false,
   style: externalStyle,
 }) {
-  const rawId = useId();
+
+const rawId = useId();
   const filterId = `maq-textured-surface-${rawId.replace(/:/g, '')}`;
 
   const style = {
@@ -41,6 +51,7 @@ export default function TexturedSurface({
     ...externalStyle,
   };
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div
       className={['maq-textured-surface', fill ? 'maq-textured-surface--fill' : '', className]

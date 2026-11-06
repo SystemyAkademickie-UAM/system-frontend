@@ -1,14 +1,22 @@
+/**
+ * @file groupBannerUpload.js
+ * @description Funkcje pomocnicze i narzędziowe modułu groupBannerUpload.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** Zgodne z domyślnym limitem backendu (`DRIVE_MAX_FILE_BYTES_DEFAULT`). */
 export const GROUP_BANNER_MAX_FILE_BYTES = 4 * 1024 * 1024;
 
 const GROUP_BANNER_MAX_FILE_LABEL = '4 MB';
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {File | null | undefined} file
  * @returns {{ valid: boolean, error: string | null }}
  */
 export function validateGroupBannerFile(file) {
-  if (!file) {
+
+if (!file) {
     return { valid: false, error: 'Nie wybrano pliku.' };
   }
 
@@ -27,5 +35,6 @@ export function validateGroupBannerFile(file) {
 }
 
 export function getGroupBannerMaxFileSizeLabel() {
-  return GROUP_BANNER_MAX_FILE_LABEL;
+
+return GROUP_BANNER_MAX_FILE_LABEL;
 }

@@ -1,5 +1,12 @@
+/**
+ * @file Divider.jsx
+ * @description Komponent interfejsu użytkownika Divider.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import './Divider.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Cienka kreska odzielająca sekcje (lekko ciemniejsza od tła aplikacji).
  *
@@ -8,13 +15,17 @@ import './Divider.css';
  * @param {string} [props.className]
  * @param {string} [props.length] — np. '100%', '12rem', '1px' (vertical: wysokość)
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function Divider({ orientation = 'horizontal', className = '', length }) {
   const style = length
     ? orientation === 'vertical'
       ? { height: length }
       : { width: length }
-    : undefined;
 
+: undefined;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <hr
       className={[

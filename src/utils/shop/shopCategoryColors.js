@@ -1,9 +1,17 @@
+/**
+ * @file shopCategoryColors.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopCategoryColors.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 export const DEFAULT_CATEGORY_COLOR = '#42f37d';
 
 export const CATEGORY_LABEL_TEXT_LIGHT = '#e3e0f7';
 export const CATEGORY_LABEL_TEXT_DARK = '#10101a';
 
 /** Próg jasności tła — powyżej używamy ciemnego tekstu. */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 const LIGHT_BACKGROUND_LUMINANCE_THRESHOLD = 0.58;
 
 /**
@@ -22,7 +30,8 @@ export function parseCssColor(input) {
   const value = input.trim();
 
   const hexMatch = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
-  if (hexMatch) {
+
+if (hexMatch) {
     const hex = hexMatch[1];
     if (hex.length === 3) {
       return {

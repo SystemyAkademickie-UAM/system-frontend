@@ -1,9 +1,18 @@
+/**
+ * @file dataTableMobile.js
+ * @description Komponent interfejsu użytkownika dataTableMobile.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 /** @typedef {'primary' | 'title' | 'meta' | 'hidden'} DataTableMobileRole */
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {Object} column
  * @returns {boolean}
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function isSpacerColumn(column) {
   if (column.mobileHidden) {
     return true;
@@ -28,7 +37,8 @@ export function getMobileEligibleColumns(columns) {
  * @returns {import('react').ReactNode}
  */
 export function renderDataTableCell(column, row) {
-  if (column.render) {
+
+if (column.render) {
     return column.render(row);
   }
   return String(row[column.key] ?? '');
@@ -61,7 +71,8 @@ export function getMobileColumnSlots(columns) {
   const hiddenKeys = new Set(
     eligible.filter((column) => column.mobileRole === 'hidden').map((column) => column.key),
   );
-  const ordered = eligible.filter((column) => !hiddenKeys.has(column.key));
+
+const ordered = eligible.filter((column) => !hiddenKeys.has(column.key));
 
   if (explicit.length > 0) {
     slots.primary = ordered.find((column) => column.mobileRole === 'primary') ?? ordered[0] ?? null;
@@ -89,5 +100,6 @@ export function getMobileColumnSlots(columns) {
     slots.meta = [];
   }
 
+// === RENDEROWANIE WIDOKU ===
   return slots;
 }

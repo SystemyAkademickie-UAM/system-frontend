@@ -1,3 +1,9 @@
+/**
+ * @file AppLogo.css
+ * @description Style interfejsu użytkownika i układ dla modułu AppLogo.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .maq-app-logo {
   display: block;
   max-width: 100%;

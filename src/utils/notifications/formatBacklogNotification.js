@@ -1,3 +1,9 @@
+/**
+ * @file formatBacklogNotification.js
+ * @description Funkcje pomocnicze i narzędziowe modułu formatBacklogNotification.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import {
   groupActivitiesPath,
@@ -333,7 +339,8 @@ const CURRENCYTOTALDECREASED__TEXTLABEL = {
 };
 
 const CURRENCYTOTALUPDATED__TEXTLABEL = {
-  polish: 'zaktualizowano walutę zgromadzoną',
+
+polish: 'zaktualizowano walutę zgromadzoną',
   english: 'total earned updated',
 };
 
@@ -342,6 +349,7 @@ const JOINEDGROUP__TEXTLABEL = {
   english: 'You joined the group',
 };
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 const NEWPRODUCT__TEXTLABEL = {
   polish: 'Nowy produkt',
   english: 'New product',
@@ -625,7 +633,8 @@ function buildFallbackTitle(type, payload, isStudentView, studentLabel, language
   const livesDelta = resolveLivesDelta(payload);
   const lives = readNumber(payload.newLives ?? payload.lives);
   const livesLabel = formatLivesChangeLabel(livesDelta, lives, language);
-  const isExtraLife = payload.isExtraLife === true;
+
+const isExtraLife = payload.isExtraLife === true;
 
   if (!isStudentView && studentLabel) {
     switch (type) {

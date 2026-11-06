@@ -1,0 +1,115 @@
+/**
+ * @file GroupCard.jsx
+ * @description Główny komponent widoku strony dla obszaru GroupCard.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
+import { isColorBannerRef, parseColorBannerRef } from '../../../constants/drive.constants.js';
+import { SVG_PLACEHOLDER } from '../../../constants/svgIcons.js';
+import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useUserProfile } from '../../../context/UserProfileContext.jsx';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
+import './GroupCard.css';
+
+// === STAŁE I ETYKIETY JĘZYKOWE ===
+const NOIMAGE__TEXTLABEL = {
+  polish: 'Brak baneru',
+  english: 'No banner',
+};
+const SUBJECT__TEXTLABEL = {
+  polish: 'Przedmiot',
+  english: 'Subject',
+};
+const LECTURER__TEXTLABEL = {
+  polish: 'Osoba prowadząca',
+  english: 'Lecturer',
+};
+
+/**
+ * @param {Object} props
+ * @param {import('../../../services/groups.api.js').GroupListItem} props.group
+ */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
+export default function GroupCard({ group }) {
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
+  const isColorBanner = isColorBannerRef(group.bannerUrl);
+  const colorBannerValue = parseColorBannerRef(group.bannerUrl);
+
+const showFallback = !isColorBanner && (bannerFailed || !group.bannerUrl);
+
+  const { profile } = useUserProfile();
+  const { role } = useAppRole();
+
+  var userNickname = profile.nickname;
+
+  var displayLecturer = group.lecturer;
+
+if (group.isMine && role == APP_ROLE.LECTURER && !displayLecturer.startsWith(userNickname + ' (')) {
+    displayLecturer = userNickname + ' (' + group.lecturer + ')';
+  }
+
+  useEffect(() => {
+    setBannerFailed(!group.bannerUrl || isColorBannerRef(group.bannerUrl));
+  }, [group.bannerUrl]);
+
+  const targetPath = group.isMine ? groupMainPath(group.id) : groupRootPath(group.id);
+
+// === RENDEROWANIE WIDOKU ===
+  return (
+    <article className="group-card">
+      <Link className="group-card__link" to={targetPath}>
+        <div className="group-card__banner-wrap">
+          {isColorBanner ? (
+            <div
+              className="group-card__banner group-card__banner--color"
+              style={{ backgroundColor: colorBannerValue ?? '#3b82f6' }}
+              aria-hidden="true"
+            />
+          ) : showFallback ? (
+            <div className="group-card__banner-fallback" aria-hidden="true">
+              <AssetSvg
+                name={SVG_PLACEHOLDER}
+                className="group-card__banner-fallback-icon"
+                width={48}
+                height={48}
+                alt=""
+              />
+              <span className="group-card__banner-fallback-text">{NOIMAGE__TEXTLABEL[LANGUAGE]}</span>
+            </div>
+          ) : (
+            <img
+              className="group-card__banner"
+              src={group.bannerUrl}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              onError={() => setBannerFailed(true)}
+            />
+          )}
+        </div>
+
+        <div className="group-card__body">
+          <h2 className="group-card__title">{group.storyName}</h2>
+
+          <dl className="group-card__meta">
+            <div className="group-card__meta-col">
+              <dt className="group-card__label">{SUBJECT__TEXTLABEL[LANGUAGE]}</dt>
+              <dd className="group-card__value">{group.subject}</dd>
+            </div>
+            <div className="group-card__meta-col">
+              <dt className="group-card__label">{LECTURER__TEXTLABEL[LANGUAGE]}</dt>
+              <dd className="group-card__value">{displayLecturer}</dd>
+            </div>
+          </dl>
+        </div>
+      </Link>
+    </article>
+  );
+}

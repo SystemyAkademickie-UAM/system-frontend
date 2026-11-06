@@ -1,0 +1,63 @@
+/**
+ * @file GroupLayout.css
+ * @description Style powłoki i układu stron dla modułu GroupLayout.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.group-main-layout {
+  --group-main-subnav-height: 2.75rem;
+  --group-main-layout-gap: 1.25rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--group-main-layout-gap);
+  min-height: 100%;
+  width: 100%;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+}
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
+.group-main-layout__content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.group-main-layout__error {
+  margin: 0;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid var(--color-input-error-border);
+  font-size: var(--font-size-body);
+  color: var(--color-input-error);
+}
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
+.group-main-layout__sub-nav-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.group-main-layout__sub-nav {
+  width: 100%;
+  max-width: 100%;
+}
+
+.group-main-layout--no-sub-nav .group-main-subpage__title-row,
+
+.group-main-layout--no-sub-nav .badge-treasury__title-row,
+.group-main-layout--no-sub-nav .group-main-ranks__title-row,
+.group-main-layout--no-sub-nav .group-shop-page__title-row {
+  min-height: 0;
+  margin-top: 0;
+}

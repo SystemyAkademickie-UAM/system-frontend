@@ -1,3 +1,9 @@
+/**
+ * @file ProductCard.css
+ * @description Style karty komponentu ProductCard.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-product-card {
   --product-card-accent-color: var(--color-product-card-accent, #b45309);
   --product-card-stroke-color: color-mix(in srgb, var(--product-card-accent-color) 58%, black);
@@ -71,15 +77,11 @@
 
 }
 
-
-
 .maq-product-card__icon-wrap {
 
   flex-shrink: 0;
 
 }
-
-
 
 .maq-product-card__icon-circle {
 
@@ -99,15 +101,11 @@
 
 }
 
-
-
 .maq-product-card__icon-emoji {
   font-family: var(--font-family-emoji);
   font-size: 2.5rem;
   line-height: 1;
 }
-
-
 
 .maq-product-card__icon-img {
 
@@ -120,8 +118,6 @@
   object-fit: cover;
 
 }
-
-
 
 .maq-product-card__heading {
 
@@ -143,8 +139,6 @@
 
 }
 
-
-
 .maq-product-card__name {
 
   margin: 0;
@@ -160,8 +154,6 @@
   color: var(--color-badge-text);
 
 }
-
-
 
 .maq-product-card__meta {
 
@@ -181,8 +173,6 @@
 
 }
 
-
-
 .maq-product-card__descriptions {
 
   display: flex;
@@ -197,8 +187,6 @@
 
 }
 
-
-
 .maq-product-card__section {
 
   display: flex;
@@ -208,8 +196,6 @@
   align-items: flex-start;
 
 }
-
-
 
 .maq-product-card__section-label {
 
@@ -228,8 +214,6 @@
   color: var(--product-card-accent-color);
 
 }
-
-
 
 .maq-product-card__story-text {
 
@@ -257,8 +241,7 @@
 
 }
 
-
-
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-product-card__didactic-text {
 
   margin: 0;
@@ -283,8 +266,6 @@
 
 }
 
-
-
 .maq-product-card__footer {
 
   display: flex;
@@ -296,8 +277,6 @@
   padding: 0 26px 10px;
 
 }
-
-
 
 .maq-product-card__rank-bar {
   display: flex;
@@ -364,8 +343,6 @@
   font-weight: 500;
 }
 
-
-
 .maq-product-card__price-row--rank {
   align-items: center;
 }
@@ -382,8 +359,6 @@
 
 }
 
-
-
 .maq-product-card__price-row {
 
   display: flex;
@@ -398,15 +373,11 @@
 
 }
 
-
-
 .maq-product-card__price-value--original {
 
   color: var(--color-text-secondary);
 
 }
-
-
 
 .maq-product-card__price-value--original .maq-currency-display__amount {
 
@@ -419,8 +390,6 @@
   color: var(--color-text-secondary);
 
 }
-
-
 
 .maq-product-card__sale-tag {
 
@@ -446,15 +415,11 @@
 
 }
 
-
-
 .maq-product-card__price-value--sale {
 
   color: var(--product-card-sale-color);
 
 }
-
-
 
 .maq-product-card__price-value--sale .maq-currency-display__amount {
 
@@ -470,8 +435,6 @@
   color: var(--color-text-primary);
 }
 
-
-
 .maq-product-card__actions {
 
   display: flex;
@@ -484,8 +447,6 @@
 
 }
 
-
-
 .maq-product-card__cart-btn,
 
 .maq-product-card__buy-btn {
@@ -496,8 +457,7 @@
 
 }
 
-
-
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-product-card--extra-life {
   background: color-mix(in srgb, #7f1d1d 18%, var(--color-bg-surface));
 }
@@ -514,15 +474,11 @@
 
 }
 
-
-
 .maq-product-card--extra-life .maq-product-card__buy-btn {
 
   flex: 1 1 100%;
 
 }
-
-
 
 .maq-product-card:hover .maq-product-card__lecturer-actions {
 
@@ -531,8 +487,6 @@
   pointer-events: auto;
 
 }
-
-
 
 .maq-product-card__lecturer-actions {
 
@@ -551,8 +505,6 @@
   transition: opacity 0.15s ease;
 
 }
-
-
 
 .maq-product-card__action-btn {
 
@@ -580,8 +532,6 @@
 
 }
 
-
-
 .maq-product-card__action-btn:hover {
 
   background: var(--color-bg-elevated);
@@ -590,15 +540,11 @@
 
 }
 
-
-
 .maq-product-card__action-btn--danger:hover {
 
   color: #f87171;
 
 }
-
-
 
 .maq-product-card__action-btn:focus-visible {
 
@@ -608,15 +554,11 @@
 
 }
 
-
-
 .maq-product-card__action-icon {
 
   display: block;
 
 }
-
-
 
 .maq-product-card__buy-btn {
 
@@ -624,15 +566,11 @@
 
 }
 
-
-
 .maq-product-card--preview {
 
   max-width: none;
 
 }
-
-
 
 .maq-product-card--preview .maq-product-card__story-text,
 
@@ -650,15 +588,11 @@
 
 }
 
-
-
 .maq-product-card--preview .maq-product-card__footer {
 
   padding-bottom: 20px;
 
 }
-
-
 
 .maq-product-card--preview .maq-product-card__price-bar {
 
@@ -668,8 +602,7 @@
 
 }
 
-
-
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 560px) {
 
   .maq-product-card__main {
@@ -677,8 +610,6 @@
     padding-inline: 10px;
 
   }
-
-
 
   .maq-product-card__header {
 
@@ -688,8 +619,6 @@
 
   }
 
-
-
   .maq-product-card__heading {
 
     flex: 1 1 calc(100% - 74px);
@@ -698,15 +627,11 @@
 
   }
 
-
-
   .maq-product-card__descriptions {
 
     padding-inline: 8px;
 
   }
-
-
 
   .maq-product-card__footer {
 
@@ -716,8 +641,6 @@
 
 }
 
-
-
 @media (max-width: 360px) {
 
   .maq-product-card__actions {
@@ -725,8 +648,6 @@
     flex-direction: column;
 
   }
-
-
 
   .maq-product-card__cart-btn,
 
@@ -768,4 +689,3 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 
 }
-

@@ -1,3 +1,9 @@
+/**
+ * @file autoRankAssignment.js
+ * @description Funkcje pomocnicze i narzędziowe modułu autoRankAssignment.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** Wartość opcji „Automatyczna” w modalu rangi. */
 export const AUTO_RANK_OPTION = '__auto__';
 
@@ -10,12 +16,14 @@ export function isAutoRankEnabled(member) {
   return member.autoRankEnabled !== false;
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * Wylicza rangę na podstawie zgromadzonej waluty (totalEarned).
  * @param {Array<{ id: number, requiredPoints?: number }>} ranks
  * @param {number} totalEarned
  * @returns {number | null}
  */
+
 export function resolveRankIdFromTotalEarned(ranks, totalEarned) {
   if (!Array.isArray(ranks) || ranks.length === 0) {
     return null;
@@ -27,7 +35,8 @@ export function resolveRankIdFromTotalEarned(ranks, totalEarned) {
   );
 
   const match = sorted.find((rank) => points >= (rank.requiredPoints ?? 0));
-  return match?.id ?? null;
+
+return match?.id ?? null;
 }
 
 /**

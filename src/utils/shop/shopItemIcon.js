@@ -1,3 +1,9 @@
+/**
+ * @file shopItemIcon.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopItemIcon.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { buildDriveBannerUrl } from '../../constants/drive.constants.js';
 
 const DEFAULT_ICON_BG = 'var(--color-bg-icon';
@@ -8,7 +14,8 @@ const DEFAULT_EMOJI = '📦';
  * @returns {{ emoji: string, iconBackground: string, imageUrl: string | null }}
  */
 export function parseShopItemImageRef(imageRef) {
-  if (imageRef == null || typeof imageRef !== 'string') {
+
+if (imageRef == null || typeof imageRef !== 'string') {
     return { emoji: DEFAULT_EMOJI, iconBackground: DEFAULT_ICON_BG, imageUrl: null };
   }
 
@@ -25,7 +32,8 @@ export function parseShopItemImageRef(imageRef) {
   }
 
   const imageUrl = buildDriveBannerUrl(trimmed);
-  if (imageUrl && !imageUrl.startsWith('color:')) {
+
+if (imageUrl && !imageUrl.startsWith('color:')) {
     return { emoji: null, iconBackground: DEFAULT_ICON_BG, imageUrl };
   }
 

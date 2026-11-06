@@ -1,3 +1,9 @@
+/**
+ * @file GroupLivesContext.jsx
+ * @description Kontekst globalnego stanu React oraz dostawca danych dla GroupLivesContext.
+ */
+
+// === IMPORTY I INICJALIZACJA KONTEKSTU ===
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../constants/lives.constants.js';
 import { fetchGroupLivesConfig } from '../services/groupLives.api.js';
@@ -19,6 +25,8 @@ const GroupLivesContext = createContext(defaultValue);
 /**
  * Udostępnia emoji i etykietę systemu żyć grupy w drzewie komponentów.
  */
+
+// === DOSTAWCA KONTEKSTU I ZARZĄDZANIE STANEM ===
 export function GroupLivesProvider({
   symbol,
   label,
@@ -29,7 +37,8 @@ export function GroupLivesProvider({
   refetch,
   children,
 }) {
-  const value = useMemo(() => ({
+
+const value = useMemo(() => ({
     symbol: symbol ?? DEFAULT_LIVES_SYMBOL,
     label: label ?? DEFAULT_LIVES_LABEL,
     livesEnabled: Boolean(livesEnabled),
@@ -57,7 +66,8 @@ export function GroupLivesSettingsProvider({ groupId, children }) {
   const [livesEnabled, setLivesEnabled] = useState(false);
   const [livesMax, setLivesMax] = useState(null);
   const [livesShopEnabled, setLivesShopEnabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
+const [isLoading, setIsLoading] = useState(false);
 
   const load = useCallback(async () => {
     if (!groupId) {
@@ -119,6 +129,7 @@ export function GroupLivesSettingsProvider({ groupId, children }) {
   );
 }
 
+// === HOOKI DOSTĘPOWE DO KONTEKSTU ===
 export function useGroupLives() {
   return useContext(GroupLivesContext);
 }

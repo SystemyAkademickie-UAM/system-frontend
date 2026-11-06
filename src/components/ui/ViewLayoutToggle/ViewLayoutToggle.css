@@ -1,3 +1,9 @@
+/**
+ * @file ViewLayoutToggle.css
+ * @description Style powłoki i układu stron dla modułu ViewLayoutToggle.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .maq-view-layout-toggle {
   white-space: nowrap;
 }

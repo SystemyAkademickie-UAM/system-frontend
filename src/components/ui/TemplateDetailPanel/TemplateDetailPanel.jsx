@@ -1,12 +1,21 @@
-import { getTemplateSummaryStats } from '../../../pages/content/templates/groupSnapshotForTemplate.js';
+/**
+ * @file TemplateDetailPanel.jsx
+ * @description Komponent interfejsu użytkownika TemplateDetailPanel.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
+import { getTemplateSummaryStats } from '../../../pages/templates/groupSnapshotForTemplate.js';
 import './TemplateDetailPanel.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {Object} props
  * @param {import('../../../services/groupTemplates.api.js').GroupTemplateData | null | undefined} props.data
  * @param {boolean} [props.isLoading=false]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function TemplateDetailPanel({ data, isLoading = false, className = '' }) {
   if (isLoading) {
     return (
@@ -25,8 +34,10 @@ export default function TemplateDetailPanel({ data, isLoading = false, className
   }
 
   const stats = getTemplateSummaryStats(data);
-  const { group, badges, ranks, items, posts, stages } = data;
 
+const { group, badges, ranks, items, posts, stages } = data;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className={['maq-template-detail-panel', className].filter(Boolean).join(' ')}>
       <section className="maq-template-detail-panel__section">

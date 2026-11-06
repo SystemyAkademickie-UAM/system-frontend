@@ -1,5 +1,9 @@
-/* Sidebar + wspólne style nawigacji bocznej */
+/**
+ * @file navigation-shell.css
+ * @description Style interfejsu użytkownika i układ dla modułu navigation-shell.
+ */
 
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .sidebar {
   position: relative;
   display: flex;
@@ -121,6 +125,7 @@
   transition: filter 0.15s ease, transform 0.1s ease;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .sidebar-cta__btn:hover {
   filter: brightness(1.05);
 }
@@ -195,6 +200,7 @@
 }
 
 .sidebar-nav__link--active .maq-asset-svg--mask,
+
 .sidebar-nav__link--active .nav-glyph,
 .sidebar-nav__link--active .sidebar-nav__chevron {
   color: var(--color-nav-cta);
@@ -239,6 +245,7 @@
   list-style: none;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .sidebar-nav__link--unavailable {
   opacity: 0.42;
   cursor: not-allowed;
@@ -257,6 +264,7 @@
 }
 
 .sidebar-nav__link--tree-item,
+
 .sidebar-nav__link--tree-group,
 .sidebar-nav__link--tree-expandable {
   border-radius: 8px 0 0 8px;

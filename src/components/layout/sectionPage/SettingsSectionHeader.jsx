@@ -1,5 +1,12 @@
+/**
+ * @file SettingsSectionHeader.jsx
+ * @description Komponent interfejsu użytkownika SettingsSectionHeader.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import './SettingsSectionHeader.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Nagłówek sekcji na stronach ustawień (np. Ogólne, Awatar).
  *
@@ -8,6 +15,8 @@ import './SettingsSectionHeader.css';
  * @param {string} [props.id]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SettingsSectionHeader({ title, id, className = '' }) {
   return (
     <h2

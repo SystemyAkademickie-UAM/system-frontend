@@ -1,3 +1,9 @@
+/**
+ * @file authTransition.css
+ * @description Style interfejsu użytkownika i układ dla modułu authTransition.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .auth-shell__transition-viewport {
   position: relative;
   width: 100%;
@@ -28,6 +34,7 @@
   animation: auth-card-exit-forward var(--auth-card-transition-exit-ms) ease forwards;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .auth-shell__transition-pane--enter {
   z-index: 1;
   animation: auth-card-enter-forward var(--auth-card-transition-enter-ms) ease forwards;
@@ -65,6 +72,7 @@
   }
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 @keyframes auth-card-exit-back {
   from {
     opacity: 1;
@@ -89,6 +97,7 @@
   }
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (prefers-reduced-motion: reduce) {
   .auth-shell__transition-pane--exit,
   .auth-shell__transition-pane--enter {

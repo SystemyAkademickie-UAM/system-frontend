@@ -1,3 +1,9 @@
+/**
+ * @file rankGradient.js
+ * @description Funkcje pomocnicze i narzędziowe modułu rankGradient.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** Najniższa ranga — zielony akcent projektu. */
 export const RANK_GRADIENT_START = '#217a3f';
 /** Najwyższa ranga — czerwono-pomarańczowy. */
@@ -29,6 +35,8 @@ function hexToRgb(hex) {
  * @param {number} channel
  * @returns {string}
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 function channelToHex(channel) {
   return Math.round(channel).toString(16).padStart(2, '0');
 }
@@ -61,6 +69,7 @@ export function interpolateHexColor(startHex, endHex, t) {
  * @param {number} total
  * @returns {string}
  */
+
 export function getRankGradientColor(index, total) {
   if (total <= 1) {
     return RANK_GRADIENT_START;

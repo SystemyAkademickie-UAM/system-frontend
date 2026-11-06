@@ -1,5 +1,12 @@
+/**
+ * @file useResponsivePopularCount.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useResponsivePopularCount.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useEffect, useState } from 'react';
 
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 function resolvePopularCount(width) {
   if (width < 400) {
     return 2;
@@ -7,7 +14,8 @@ function resolvePopularCount(width) {
   if (width < 600) {
     return 3;
   }
-  return 4;
+
+return 4;
 }
 
 /**
@@ -16,7 +24,8 @@ function resolvePopularCount(width) {
  * @returns {number}
  */
 export function useResponsivePopularCount() {
-  const [count, setCount] = useState(() => {
+
+const [count, setCount] = useState(() => {
     if (typeof window === 'undefined') {
       return 4;
     }
@@ -32,5 +41,6 @@ export function useResponsivePopularCount() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return count;
 }

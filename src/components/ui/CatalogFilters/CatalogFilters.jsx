@@ -1,7 +1,14 @@
+/**
+ * @file CatalogFilters.jsx
+ * @description Komponent interfejsu użytkownika CatalogFilters.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import './CatalogFilters.css';
 import { useState } from 'react';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const TOGGLEBUTTON__TEXTLABEL = {
   polish: 'Filtry i sortowanie',
   english: 'Filters and sorting'
@@ -18,6 +25,8 @@ const SORT__TEXTLABEL = {
  * @param {() => void} props.onToggle
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function CatalogFiltersToggle({ expanded, onToggle, className = '' }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
@@ -42,6 +51,7 @@ export function CatalogFiltersToggle({ expanded, onToggle, className = '' }) {
  * @param {import('react').ReactNode} props.children
  * @param {string} [props.className]
  */
+
 export function CatalogFiltersPanel({ children, className = '' }) {
   return (
     <div className={['catalog-filters__panel', className].filter(Boolean).join(' ')}>
@@ -87,6 +97,7 @@ export function CatalogFilterGroup({ ariaLabel, filters, activeId, onSelect }) {
  * @param {'panel' | 'toolbar'} [props.variant]
  * @param {string} [props.selectId]
  */
+
 export function CatalogSortSelect({
   value,
   onChange,
@@ -100,6 +111,7 @@ export function CatalogSortSelect({
 
   const SORTLABEL = label ?? SORT__TEXTLABEL[LANGUAGE];
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <label
       className={[

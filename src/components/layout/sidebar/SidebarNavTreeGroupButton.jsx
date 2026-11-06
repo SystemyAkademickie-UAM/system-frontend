@@ -1,19 +1,29 @@
+/**
+ * @file SidebarNavTreeGroupButton.jsx
+ * @description Komponent przycisku SidebarNavTreeGroupButton z obsługą wariantów wizualnych i interakcji.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { NavLink } from 'react-router-dom';
 import NavGlyph from '../NavGlyph.jsx';
 import { getFirstNavChildPath, isAnyNavItemActive, useNavPathname } from './sidebarNavUtils.js';
 import '../navigation-shell.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Nagłówek grupy drzewka — klik prowadzi do pierwszego elementu potomnego;
  * aktywny, gdy aktywny jest dowolny element potomny.
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SidebarNavTreeGroupButton({
   label,
   iconId,
   children = [],
   onNavigate,
 }) {
-  const pathname = useNavPathname();
+
+const pathname = useNavPathname();
   const firstChildPath = getFirstNavChildPath(children);
   const isGroupActive = isAnyNavItemActive(pathname, children);
 
@@ -26,9 +36,11 @@ export default function SidebarNavTreeGroupButton({
     'sidebar-nav__link--tree-group',
     isGroupActive ? 'sidebar-nav__link--active' : '',
   ]
-    .filter(Boolean)
+
+.filter(Boolean)
     .join(' ');
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <NavLink
       to={firstChildPath}

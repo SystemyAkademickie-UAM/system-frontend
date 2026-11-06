@@ -1,3 +1,9 @@
+/**
+ * @file SubNav.css
+ * @description Style interfejsu użytkownika i układ dla modułu SubNav.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-sub-nav {
   display: inline-flex;
   flex-direction: row;
@@ -13,6 +19,7 @@
   border-radius: 10px;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-sub-nav__item {
   display: inline-flex;
   align-items: center;
@@ -51,11 +58,13 @@
   color: var(--color-accent-on);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-sub-nav__item--active:hover {
   background: var(--color-accent-pressed);
   color: var(--color-accent-on);
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 639px) {
   .maq-sub-nav {
     display: flex;
