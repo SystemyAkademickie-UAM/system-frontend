@@ -1,6 +1,13 @@
+/**
+ * @file productionLogs.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla productionLogs.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, postJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
+// === PUNKTY KOŃCOWE I STAŁE ZAPYTAŃ ===
 export const ADMIN_LOGS_PATH = '/admin/logs';
 export const ADMIN_LOGS_EXPORT_PATH = '/admin/logs/export';
 export const CLIENT_LOGS_PATH = '/client-logs';
@@ -10,7 +17,8 @@ export const CLIENT_LOGS_PATH = '/client-logs';
  */
 export async function fetchProductionLogDays() {
   const result = await getJson(ADMIN_LOGS_PATH);
-  if (!result.ok) {
+
+if (!result.ok) {
     throw new Error(extractApiError(result.data, 'Nie udało się pobrać listy logów'));
   }
   return result.data;
@@ -22,7 +30,8 @@ export async function fetchProductionLogDays() {
  */
 export async function exportEncryptedProductionLogs(payload) {
   const result = await postJson(ADMIN_LOGS_EXPORT_PATH, payload);
-  if (!result.ok) {
+
+if (!result.ok) {
     throw new Error(extractApiError(result.data, 'Nie udało się pobrać logów'));
   }
   return result.data;
@@ -32,6 +41,8 @@ export async function exportEncryptedProductionLogs(payload) {
  * Fire-and-forget browser line. Failures must not throw into the UI.
  * @param {{ level: 'error' | 'warn', message: string, source?: string }} payload
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function ingestClientLog(payload) {
   postJson(CLIENT_LOGS_PATH, payload).catch(() => undefined);
 }

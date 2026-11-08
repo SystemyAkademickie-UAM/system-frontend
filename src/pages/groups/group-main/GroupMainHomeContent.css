@@ -1,0 +1,191 @@
+/**
+ * @file GroupMainHomeContent.css
+ * @description Style interfejsu użytkownika i układ dla modułu GroupMainHomeContent.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.group-main-home {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1rem;
+  width: 100%;
+}
+
+.group-main-home__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: flex-start;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.group-main-home__surface.maq-textured-surface {
+  width: 100%;
+  max-width: 100%;
+}
+
+.group-main-home__surface.maq-textured-surface.group-main-home__surface--notifications,
+.group-main-home__surface.maq-textured-surface.group-main-home__surface--overview {
+  width: 100%;
+  max-width: 100%;
+}
+
+.group-main-home__surface--notifications,
+.group-main-home__surface--overview {
+  width: 100%;
+  max-width: 100%;
+}
+
+.group-main-home__surface--overview .maq-textured-surface__panel-content,
+.group-main-home__surface--notifications .maq-textured-surface__panel-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.group-main-home__overview-divider {
+  align-self: stretch;
+  width: 100%;
+  margin: 0 clamp(1rem, 2vw, 1.5rem);
+  max-width: calc(100% - 2 * clamp(1rem, 2vw, 1.5rem));
+}
+
+.group-main-home__surface .maq-textured-surface__panel,
+.group-main-home__surface .maq-textured-surface__panel-content {
+  width: 100%;
+  min-width: 0;
+}
+
+.group-main-home__surface.maq-textured-surface.group-main-home__surface--notifications .maq-textured-surface__panel,
+.group-main-home__surface.maq-textured-surface.group-main-home__surface--notifications .maq-textured-surface__panel-content,
+.group-main-home__surface.maq-textured-surface.group-main-home__surface--overview .maq-textured-surface__panel,
+
+.group-main-home__surface.maq-textured-surface.group-main-home__surface--overview .maq-textured-surface__panel-content {
+  width: 100%;
+}
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
+.group-main-home__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem clamp(1rem, 2vw, 1.5rem) 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.group-main-home__surface--overview .group-main-home__section {
+  width: 100%;
+  max-width: 100%;
+}
+
+.group-main-home__surface--notifications .group-main-home__section {
+  width: 100%;
+  max-width: 100%;
+}
+
+.group-main-home__surface--notifications .notifications-feed {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.group-main-home__surface--overview .group-main-home__section--description {
+  padding-bottom: 0.5rem;
+}
+
+.group-main-home__section-title {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  width: 100%;
+  max-width: 100%;
+}
+
+.group-main-home__description {
+  margin: 0;
+  font-size: var(--font-size-page-description);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  width: 100%;
+  max-width: 100%;
+}
+
+.maq-divider.group-main-home__description-divider {
+  width: auto;
+  background: var(--color-text-primary);
+}
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
+.group-main-home__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 0.35rem 0.75rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.group-main-home__label {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.group-main-home__value {
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.group-main-home__message,
+
+.group-main-home__empty-notice {
+  margin: 0;
+  font-size: var(--font-size-body);
+  line-height: 1.5;
+  text-align: left;
+  color: var(--color-text-secondary);
+}
+
+.group-main-home__message--error {
+  color: var(--color-input-error);
+}
+
+.group-main-home__empty-link {
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.group-main-home__empty-link:hover {
+  color: var(--color-accent-pressed);
+}
+
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
+@media (max-width: 960px) {
+  .group-main-home__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .group-main-home__row {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .group-main-home__label,
+  .group-main-home__value {
+    white-space: normal;
+  }
+}

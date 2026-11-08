@@ -1,3 +1,9 @@
+/**
+ * @file groupReports.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla groupReports.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { buildFullUrl } from './api-client.js';
 
 function parseAttachmentFilename(contentDisposition) {
@@ -24,7 +30,8 @@ function parseAttachmentFilename(contentDisposition) {
  * @returns {Promise<void>}
  */
 async function downloadCsvReport(resourcePath, defaultFilename) {
-  const response = await fetch(buildFullUrl(resourcePath), {
+
+const response = await fetch(buildFullUrl(resourcePath), {
     method: 'GET',
     credentials: 'include',
   });
@@ -57,13 +64,16 @@ async function downloadCsvReport(resourcePath, defaultFilename) {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(objectUrl);
+
+URL.revokeObjectURL(objectUrl);
 }
 
 /**
  * GET /groups/:groupId/reports/group
  * @param {string | number} groupId
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function downloadGroupReport(groupId) {
   return downloadCsvReport(`/groups/${groupId}/reports/group`, 'report-group.csv');
 }

@@ -1,3 +1,9 @@
+/**
+ * @file SuperBarBreadcrumb.jsx
+ * @description Komponent interfejsu użytkownika SuperBarBreadcrumb.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Link } from 'react-router-dom';
 import AssetSvg from '../../ui/AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
@@ -7,6 +13,7 @@ import './SuperBarBreadcrumb.css';
 
 import { useState } from 'react';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {Object} props
  * @param {string} [props.homePath]
@@ -24,6 +31,7 @@ const HOMELABEL__TEXTLABEL = {
   english: 'Group list',
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SuperBarBreadcrumb({
   homePath = groupsListPath(),
   groupName,
@@ -31,7 +39,8 @@ export default function SuperBarBreadcrumb({
   segments,
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const items = [
+
+const items = [
     {
       key: 'home',
       type: 'home',
@@ -64,6 +73,7 @@ export default function SuperBarBreadcrumb({
     return null;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <nav className="super-bar-breadcrumb" aria-label={BREADCRUMB__TEXTLABEL[LANGUAGE]}>
       <ol className="super-bar-breadcrumb__list">

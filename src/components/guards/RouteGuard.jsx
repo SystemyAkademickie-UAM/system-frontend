@@ -1,3 +1,9 @@
+/**
+ * @file RouteGuard.jsx
+ * @description Komponent interfejsu użytkownika RouteGuard.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Navigate, useLocation } from 'react-router-dom';
 import { isClientLogoutInProgress } from '../../auth/clientAuthState.js';
 import { useSession } from '../../context/SessionContext.jsx';
@@ -6,6 +12,7 @@ import { useRegistrationComplete } from '../../hooks/useRegistrationComplete.js'
 import { groupsListPath, loginPath, welcomePath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Strażnik tras — sprawdza uwierzytelnienie i uprawnienia roli.
  *
@@ -15,13 +22,16 @@ import './RouteGuard.css';
  * @param {string[]} [props.allowedRoles] — dozwolone role (puste = wszystkie zalogowane)
  * @param {string} [props.redirectTo] — gdzie przekierować przy braku dostępu
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function RouteGuard({
   children,
   requireAuth = true,
   allowedRoles,
   redirectTo,
 }) {
-  const location = useLocation();
+
+const location = useLocation();
   const { isAuthenticated, isLoading } = useSession();
   const { role } = useAppRole();
   const { isChecking: isRegistrationChecking, isComplete: isRegistrationComplete } = useRegistrationComplete();
@@ -66,5 +76,6 @@ export default function RouteGuard({
     }
   }
 
+// === RENDEROWANIE WIDOKU ===
   return children;
 }

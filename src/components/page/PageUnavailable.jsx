@@ -1,6 +1,13 @@
+/**
+ * @file PageUnavailable.jsx
+ * @description Komponent interfejsu użytkownika PageUnavailable.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { PageHeader, SubNav } from '../ui/index.js';
 import './PageUnavailable.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Placeholder strony w budowie: nagłówek, opcjonalny SubNav, komunikat o niedostępności.
  *
@@ -15,6 +22,8 @@ import './PageUnavailable.css';
  * @param {string} [props.className]
  * @param {import('react').ReactNode} [props.children]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function PageUnavailable({
   title,
   description,
@@ -26,7 +35,9 @@ export default function PageUnavailable({
   className = '',
   children,
 }) {
-  return (
+
+// === RENDEROWANIE WIDOKU ===
+return (
     <section className={['page-unavailable', className].filter(Boolean).join(' ')} aria-label={title}>
       <PageHeader title={title} description={description} />
 

@@ -1,3 +1,9 @@
+/**
+ * @file ProductCard.jsx
+ * @description Komponent karty ProductCard prezentujący dane w spójnym formacie wizualnym.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useMemo, useState } from 'react';
 
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
@@ -21,6 +27,7 @@ import { getTileVisibilityLabel } from '../../../utils/rewards/visibilityStatusL
 import './ProductCard.css';
 import './lecturerTileActions.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const PRICEPREVIOUSLY__TEXTLABEL = {
   polish: 'Cena ${price}, poprzednio ${oldPrice}',
   english: 'Price ${price}, previously ${oldPrice}'
@@ -96,6 +103,7 @@ const INCART__TEXTLABEL = {
   english: 'In cart'
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function resolveRequiredRank(requiredRank) {
   if (!requiredRank) return null;
   if (typeof requiredRank === 'string') {
@@ -109,8 +117,6 @@ function resolveRequiredRank(requiredRank) {
   }
   return null;
 }
-
-
 
 function ProductCardPrice({
   priceAmount,
@@ -202,8 +208,6 @@ function ProductCardPrice({
   );
 }
 
-
-
 function EditIcon() {
 
   return (
@@ -228,13 +232,9 @@ function EditIcon() {
 
 }
 
-
-
 function ProductItemIcon({ emoji, iconBackground, imageUrl, imageAlt }) {
 
   const [imageFailed, setImageFailed] = useState(!imageUrl);
-
-
 
   if (imageUrl && !imageFailed) {
 
@@ -270,8 +270,6 @@ function ProductItemIcon({ emoji, iconBackground, imageUrl, imageAlt }) {
 
   }
 
-
-
   return (
 
     <div
@@ -289,8 +287,6 @@ function ProductItemIcon({ emoji, iconBackground, imageUrl, imageAlt }) {
   );
 
 }
-
-
 
 /**
 
@@ -385,7 +381,8 @@ export default function ProductCard({
 }) {
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const { symbol: livesSymbol } = useGroupLives();
+
+const { symbol: livesSymbol } = useGroupLives();
 
   const rankInfo = resolveRequiredRank(requiredRank);
   const showLecturerTile = showLecturerActions && isPublished !== undefined;
@@ -414,7 +411,8 @@ export default function ProductCard({
 
   const resolvedCategories = categoryDetails.length > 0
     ? categoryDetails
-    : categories.map((name, index) => ({
+
+: categories.map((name, index) => ({
       id: `label-${index}`,
       name,
       color: null,
@@ -425,8 +423,7 @@ export default function ProductCard({
     [resolvedCategories],
   );
 
-
-
+// === RENDEROWANIE WIDOKU ===
   return (
 
     <article
@@ -459,7 +456,6 @@ export default function ProductCard({
       title={isRankLocked ? (lockedReason ?? (rankInfo?.name ? `${MINRANK__TEXTLABEL[LANGUAGE]}: ${rankInfo.name}` : DEFAULTLOCKEDREASON__TEXTLABEL[LANGUAGE])) : undefined}
       onDoubleClick={() => onDoubleClick() }
 
-
     >
 
       <ProductCategoryStrip categories={resolvedCategories} />
@@ -484,8 +480,6 @@ export default function ProductCard({
 
           </div>
 
-
-
           <div className="maq-product-card__heading">
 
             <h3 className="maq-product-card__name" title={isPreview ? undefined : name}>
@@ -495,8 +489,6 @@ export default function ProductCard({
             </h3>
 
           </div>
-
-
 
           {showLecturerTile ? (
             <span
@@ -581,8 +573,6 @@ export default function ProductCard({
 
         </header>
 
-
-
         {(storyDescription || didacticDescription || !isPreview) ? (
           <div className="maq-product-card__descriptions">
             {(storyDescription || !isPreview) ? (
@@ -612,8 +602,6 @@ export default function ProductCard({
         ) : null}
 
       </div>
-
-
 
       {showFooter ? (
 
@@ -711,8 +699,6 @@ export default function ProductCard({
             </div>
           ) : null}
 
-
-
           {hideActions ? null : (
 
             <div className="maq-product-card__actions">
@@ -740,8 +726,6 @@ export default function ProductCard({
                 </Button>
 
               ) : null}
-
-
 
               <Button
 
@@ -779,5 +763,3 @@ export default function ProductCard({
   );
 
 }
-
-

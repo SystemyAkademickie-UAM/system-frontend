@@ -1,3 +1,9 @@
+/**
+ * @file NotificationsFeed.jsx
+ * @description Komponent interfejsu użytkownika NotificationsFeed.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AssetSvg from '../ui/AssetSvg/AssetSvg.jsx';
@@ -13,6 +19,7 @@ import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import NotificationItemPreview from './NotificationItemPreview.jsx';
 import './NotificationsFeed.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const EMPTYMESSAGE__TEXTLABEL = {
   polish: 'Brak powiadomień.',
   english: 'No notifications.',
@@ -38,6 +45,7 @@ const READNOW__TEXTLABEL = {
   english: 'Read now',
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function renderNotificationTextWithPreview(text, notification, groupId, onMarkRead) {
   if (!text || !groupId) {
     return text;
@@ -126,6 +134,7 @@ function isSameNavigationTarget(location, href) {
  *   persistLastSeenOnLeave?: boolean,
  * }} props
  */
+
 export default function NotificationsFeed({
   groupId,
   role,
@@ -146,7 +155,8 @@ export default function NotificationsFeed({
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const resolvedEmptyMessage = emptyMessage ?? EMPTYMESSAGE__TEXTLABEL[LANGUAGE];
-  const [lastSeenAt, setLastSeenAt] = useState(null);
+
+const [lastSeenAt, setLastSeenAt] = useState(null);
 
   useEffect(() => {
     if (!showDivider || !groupId) {
@@ -231,6 +241,7 @@ export default function NotificationsFeed({
     return <p className="notifications-feed__status">{resolvedEmptyMessage}</p>;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div
       className={[

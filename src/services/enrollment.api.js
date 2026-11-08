@@ -1,3 +1,9 @@
+/**
+ * @file enrollment.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla enrollment.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, postJson } from './api-client.js';
 
 /**
@@ -39,6 +45,7 @@ function pickLatestActiveEnrollmentCode(codes) {
  * @param {string | number} groupId
  * @returns {Promise<{ ok: boolean, code?: string, error?: string }>}
  */
+
 export async function fetchAccessCode(groupId) {
   const result = await getJson(`/groups/${groupId}/enrollment-codes`, { includeBrowserId: true });
   if (!result.ok) {
@@ -81,7 +88,8 @@ export async function enrollByCode(groupId, code) {
   const result = await getJson(`/groups/${groupId}/invite?code=${encodeURIComponent(code)}`, {
     includeBrowserId: true,
   });
-  if (!result.ok) {
+
+if (!result.ok) {
     const errorData = /** @type {{ message?: string }} */ (result.data);
     return { ok: false, error: errorData?.message || 'Nie udało się dołączyć do grupy' };
   }

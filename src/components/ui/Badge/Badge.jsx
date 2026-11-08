@@ -1,3 +1,9 @@
+/**
+ * @file Badge.jsx
+ * @description Komponent interfejsu użytkownika Badge.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useState } from 'react';
 import { getBadgeCssVars } from './badgeCssVars.js';
 import BadgeIcon from './BadgeIcon.jsx';
@@ -6,6 +12,7 @@ import { BADGE_RARITY, getBadgeRarityConfig } from './badgeRarity.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './Badge.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const STORYDESCRIPTION__TEXTLABEL = {
   polish: 'Opis fabularny',
   english: 'Story Description',
@@ -39,6 +46,8 @@ const REWARD__TEXTLABEL = {
 
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function Badge({
   rarity = BADGE_RARITY.common,
   name,
@@ -55,8 +64,10 @@ export default function Badge({
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const config = getBadgeRarityConfig(rarity);
-  const showDate = showEarnedAt && Boolean(earnedAt);
 
+const showDate = showEarnedAt && Boolean(earnedAt);
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <article
       className={['maq-badge', isLocked ? 'maq-badge--locked' : '', className].filter(Boolean).join(' ')}

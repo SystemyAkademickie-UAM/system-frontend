@@ -1,3 +1,9 @@
+/**
+ * @file TexturedSurface.css
+ * @description Style interfejsu użytkownika i układ dla modułu TexturedSurface.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-textured-surface {
   --texture-radius: 20px;
   --texture-displacement: 35;
@@ -13,6 +19,7 @@
   background: var(--texture-frame-color);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-textured-surface--fill {
   min-height: 100%;
   height: 100%;
@@ -35,6 +42,7 @@
   isolation: isolate;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-textured-surface__panel-bg {
   position: absolute;
   inset: 0;

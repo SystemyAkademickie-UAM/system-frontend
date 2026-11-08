@@ -1,7 +1,14 @@
+/**
+ * @file useLeaderDisplayPreferences.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useLeaderDisplayPreferences.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'maq.leader.showNickname';
 
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 function readShowNickname() {
   if (typeof window === 'undefined') {
     return true;
@@ -17,7 +24,8 @@ export function setLeaderShowNickname(enabled) {
   if (typeof window === 'undefined') {
     return;
   }
-  window.localStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
+
+window.localStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false');
   window.dispatchEvent(new CustomEvent('maq:leader-display-preferences'));
 }
 
@@ -27,8 +35,10 @@ export function setLeaderShowNickname(enabled) {
  *
  * @param {boolean | undefined} profileShowNickname — z GET /profile
  */
+
 export function useLeaderDisplayPreferences(profileShowNickname) {
-  const [showNickname, setShowNicknameState] = useState(readShowNickname);
+
+const [showNickname, setShowNicknameState] = useState(readShowNickname);
 
   useEffect(() => {
     if (profileShowNickname === undefined) {
@@ -53,5 +63,6 @@ export function useLeaderDisplayPreferences(profileShowNickname) {
     setShowNicknameState(enabled);
   }, []);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return { showNickname, setShowNickname };
 }

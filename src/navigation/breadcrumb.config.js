@@ -1,14 +1,26 @@
+/**
+ * @file breadcrumb.config.js
+ * @description Konfiguracja elementów nawigacji i menu dla breadcrumb.config.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import {
+  adminBackupPath,
+  adminHomePath,
   appHelpPath,
   appSettingsPath,
+  broadcastsPath,
   courseManagementPath,
+  diskSpacePath,
+  documentsPath,
+  faqPath,
   groupActivitiesPath,
   groupMembersPath,
   groupRewardsPath,
   groupSettingsPath,
   groupsListPath,
-  adminBackupPath,
   organizationsPath,
+  patchNotesPath,
   statisticsPath,
   superadminLogsPath,
   templatesMyPath,
@@ -24,25 +36,32 @@ import {
 /** @type {Record<string, BreadcrumbSegmentDef[]>} */
 export const BREADCRUMB_BY_PATH = {
   [groupsListPath()]: [{ label: 'Grupy' }],
+  [adminHomePath()]: [{ label: 'Organizacja' }],
 
   [appSettingsPath()]: [{ label: 'Ustawienia' }],
   [appHelpPath()]: [
-    { label: 'Ustawienia', path: () => appSettingsPath() },
     { label: 'Centrum pomocy' },
   ],
+  [faqPath()]: [{ label: 'FAQ' }],
+  [patchNotesPath()]: [{ label: 'Informacje o aktualizacji' }],
 
-  [userManagementPath()]: [{ label: 'Zarządzanie dostępem' }],
+  [userManagementPath()]: [{ label: 'Użytkownicy' }],
+  [diskSpacePath()]: [{ label: 'Przestrzeń dyskowa' }],
   [courseManagementPath()]: [{ label: 'Zarządzanie grupami' }],
   [statisticsPath()]: [{ label: 'Statystyki' }],
-  [organizationsPath()]: [{ label: 'Zarządzanie organizacjami' }],
-  [superadminLogsPath()]: [{ label: 'Logi produkcyjne' }],
+  [organizationsPath()]: [{ label: 'Organizacje' }],
+  [superadminLogsPath()]: [{ label: 'Logi' }],
   [adminBackupPath()]: [{ label: 'Kopia zapasowa' }],
+  [documentsPath()]: [{ label: 'Dokumenty' }],
+  [broadcastsPath()]: [{ label: 'Komunikaty' }],
 
   [templatesPath()]: [{ label: 'Szablony' }, { label: 'Galeria szablonów' }],
   [templatesMyPath()]: [{ label: 'Szablony' }, { label: 'Moje szablony' }],
 };
 
 /** Ścieżki grupowe — dopasowanie po regex (kolejność ma znaczenie). */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export const GROUP_BREADCRUMB_RULES = [
   {
     pattern: /^\/groups\/[^/]+\/posts\/?$/u,
@@ -163,6 +182,7 @@ export const GROUP_BREADCRUMB_RULES = [
 ];
 
 /** Etykieta sidebar → breadcrumb (gdy brak dopasowania reguły). */
+
 export const SIDEBAR_LABEL_BY_HREF_KEY = {
   GROUP_MAIN: 'Strona główna',
   GROUP_PROFILE: 'Dziennik aktywności',

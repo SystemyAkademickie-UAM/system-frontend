@@ -1,3 +1,9 @@
+/**
+ * @file Badge.css
+ * @description Style interfejsu użytkownika i układ dla modułu Badge.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-badge {
   --badge-rarity-color: var(--color-badge-rarity-common);
   --badge-icon-bg: var(--color-badge-icon-bg-common);
@@ -70,6 +76,7 @@
   padding: 0 12px;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-badge__name {
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -136,6 +143,7 @@
   color: var(--color-badge-text);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-badge__didactic-text {
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -178,6 +186,7 @@
   flex: 1 1 auto;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 560px) {
   .maq-badge__main {
     padding-inline: 10px;

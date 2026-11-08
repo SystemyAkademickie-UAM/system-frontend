@@ -1,12 +1,21 @@
+/**
+ * @file SmartPostCard.jsx
+ * @description Komponent karty SmartPostCard prezentujący dane w spójnym formacie wizualnym.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useRef } from 'react';
 import { useSmartPostCardWidth } from '../../../hooks/useSmartPostCardWidth.js';
 import TexturedSurface from '../TexturedSurface/TexturedSurface.jsx';
 import TitleWithDivider from '../TitleWithDivider/TitleWithDivider.jsx';
 import './SmartPostCard.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Kafelek wpisu z szerokością zależną od liczby zdań i kreską pod tytułem.
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SmartPostCard({
   title,
   text,
@@ -22,7 +31,8 @@ export default function SmartPostCard({
   emptyTitle = 'Bez tytułu',
   emptyText = 'Brak treści.',
 }) {
-  const innerRef = useRef(null);
+
+const innerRef = useRef(null);
 
   const displayTitle = title?.trim() || emptyTitle;
   const displayText = text?.trim() || emptyText;
@@ -32,6 +42,7 @@ export default function SmartPostCard({
     text: displayText,
   });
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <TexturedSurface
       className={['smart-post-card', surfaceClassName].filter(Boolean).join(' ')}

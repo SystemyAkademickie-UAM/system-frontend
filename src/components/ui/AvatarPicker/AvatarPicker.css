@@ -1,3 +1,9 @@
+/**
+ * @file AvatarPicker.css
+ * @description Style interfejsu użytkownika i układ dla modułu AvatarPicker.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-avatar-picker {
   display: flex;
   flex-direction: column;
@@ -41,6 +47,7 @@
 }
 
 .maq-avatar-picker__current-image,
+
 .maq-avatar-picker__tile-image {
   display: block;
   width: 100%;
@@ -82,6 +89,7 @@
   transform: translateY(-1px);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-avatar-picker__tile--active {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 1px rgba(30, 204, 56, 0.35);
@@ -107,6 +115,7 @@
   display: none;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 @keyframes maq-avatar-picker-skeleton {
   0% {
     background-position: 100% 0;
@@ -117,13 +126,13 @@
   }
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (prefers-reduced-motion: reduce) {
   .maq-avatar-picker__skeleton {
     animation: none;
   }
 }
 
-/* Wariant wyrównany do lewej (np. Ustawienia) */
 .maq-avatar-picker--left {
   align-items: flex-start;
   text-align: left;
@@ -149,7 +158,6 @@
   justify-content: flex-start;
 }
 
-/* Wariant wyśrodkowany (np. /login) */
 .maq-avatar-picker--center {
   align-items: center;
   text-align: center;
@@ -157,6 +165,7 @@
 
 .maq-avatar-picker--center .maq-avatar-picker__current,
 .maq-avatar-picker--center .maq-avatar-picker__popular,
+
 .maq-avatar-picker--center .maq-avatar-picker__more {
   width: 100%;
   text-align: center;
@@ -175,7 +184,6 @@
   justify-content: center;
 }
 
-/* Pop-up modal */
 .maq-avatar-picker__modal-content {
   display: flex;
   flex-direction: column;

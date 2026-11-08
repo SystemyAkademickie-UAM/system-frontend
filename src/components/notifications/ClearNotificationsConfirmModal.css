@@ -1,3 +1,9 @@
+/**
+ * @file ClearNotificationsConfirmModal.css
+ * @description Style wizualne i reguły układu okna dialogowego ClearNotificationsConfirmModal.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .clear-notifications-modal__text {
   margin: 0;
   font-size: var(--font-size-body);

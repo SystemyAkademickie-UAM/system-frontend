@@ -1,3 +1,9 @@
+/**
+ * @file NotificationsFeed.css
+ * @description Style interfejsu użytkownika i układ dla modułu NotificationsFeed.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .notifications-feed {
   display: flex;
   flex-direction: column;
@@ -63,6 +69,7 @@
   background: color-mix(in srgb, var(--color-notification-item-used, #d4a017) 28%, transparent);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .notifications-feed__item {
   box-sizing: border-box;
   width: 100%;
@@ -87,6 +94,7 @@
 }
 
 .notifications-feed__item--linkable:hover,
+
 .notifications-feed__item--linkable:focus-visible {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-elevated));
   outline: none;
@@ -151,6 +159,7 @@
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .notifications-feed--compact .notifications-feed__mark-read {
   width: 2.35rem;
 }

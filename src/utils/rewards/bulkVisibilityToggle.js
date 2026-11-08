@@ -1,3 +1,9 @@
+/**
+ * @file bulkVisibilityToggle.js
+ * @description Funkcje pomocnicze i narzędziowe modułu bulkVisibilityToggle.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 
 /**
@@ -13,10 +19,12 @@ export function areAllRewardsItemsPublished(items) {
 }
 
 const HIDEALL__TEXTLABEL = {
-  polish: 'Ukryj wszystkie',
+
+polish: 'Ukryj wszystkie',
   english: 'Hide all'
 };
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 const SHOWALL__TEXTLABEL = {
   polish: 'Odkryj wszystkie',
   english: 'Show all'
@@ -27,6 +35,7 @@ const SHOWALL__TEXTLABEL = {
  * @param {string} [language]
  * @returns {string}
  */
+
 export function getBulkVisibilityToggleLabel(items, language) {
   const lang = language ?? READLANGUAGECOOKIE();
   return areAllRewardsItemsPublished(items) ? HIDEALL__TEXTLABEL[lang] || HIDEALL__TEXTLABEL.english : SHOWALL__TEXTLABEL[lang] || SHOWALL__TEXTLABEL.english;

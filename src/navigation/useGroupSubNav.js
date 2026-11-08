@@ -1,3 +1,9 @@
+/**
+ * @file useGroupSubNav.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupSubNav.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useParams } from 'react-router-dom';
 import { buildSubNavItems, SUB_NAV_META } from './shellTemplates.config.js';
 
@@ -6,10 +12,12 @@ import { buildSubNavItems, SUB_NAV_META } from './shellTemplates.config.js';
  *
  * @param {keyof typeof SUB_NAV_META} configKey
  */
+
 export default function useGroupSubNav(configKey) {
   const { groupId, studentId } = useParams();
   const meta = SUB_NAV_META[configKey] ?? { title: '', ariaLabel: 'Nawigacja podstrony' };
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     sectionTitle: meta.title,
     ariaLabel: meta.ariaLabel,

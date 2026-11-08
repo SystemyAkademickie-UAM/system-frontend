@@ -1,3 +1,9 @@
+/**
+ * @file ActivityProgressIcon.jsx
+ * @description Komponent interfejsu użytkownika ActivityProgressIcon.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
@@ -6,6 +12,7 @@ import ActivityCard from './ActivityCard.jsx';
 import { positionCursorTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './ActivityProgressIcon.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Okrągła ikona postępu aktywności — klik przełącza stan, hover pokazuje ActivityCard.
  *
@@ -15,6 +22,8 @@ import './ActivityProgressIcon.css';
  * @param {() => void} [props.onToggle]
  * @param {string} [props.ariaLabel]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ActivityProgressIcon({
   activity,
   unlocked,
@@ -24,7 +33,8 @@ export default function ActivityProgressIcon({
   const bubbleRef = useRef(null);
   const cursorRef = useRef({ x: 0, y: 0 });
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewLayout, setPreviewLayout] = useState(null);
+
+const [previewLayout, setPreviewLayout] = useState(null);
 
   const updatePreviewPosition = useCallback(() => {
     const bubble = bubbleRef.current;
@@ -78,6 +88,7 @@ export default function ActivityProgressIcon({
 
   const label = ariaLabel ?? `${activity.name} — ${unlocked ? 'odblokowana' : 'zablokowana'}`;
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <button

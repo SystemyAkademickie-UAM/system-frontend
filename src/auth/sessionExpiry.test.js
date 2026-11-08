@@ -1,7 +1,15 @@
+/**
+ * @file sessionExpiry.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność sessionExpiry.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handleSessionExpired, registerClientAuthClearListener } from './clientAuthState.js';
+
 import { isPublicAuthEndpoint } from '../services/api-client.js';
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('Session expiry handling', () => {
   beforeEach(() => {
     vi.restoreAllMocks();

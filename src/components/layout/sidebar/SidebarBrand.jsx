@@ -1,7 +1,14 @@
+/**
+ * @file SidebarBrand.jsx
+ * @description Komponent interfejsu użytkownika SidebarBrand.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { NavLink } from 'react-router-dom';
 import AppLogo from '../../../components/ui/AppLogo/AppLogo.jsx';
 import '../navigation-shell.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Logo + nazwa aplikacji (lewy górny róg sidebara).
  * Kliknięcie prowadzi do listy grup — jak przycisk „Twoje grupy”.
@@ -11,8 +18,11 @@ import '../navigation-shell.css';
  * @param {() => void} [props.onNavigate]
  * @param {boolean} [props.highlightActive=true] — obramowanie aktywnej trasy (wyłącz w SuperBar)
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SidebarBrand({ to, onNavigate, highlightActive = true }) {
-  const content = (
+
+const content = (
     <>
       <span className="sidebar-brand__logo-wrap">
         <AppLogo className="sidebar-brand__logo" width={46} height={46} alt="" />
@@ -25,6 +35,7 @@ export default function SidebarBrand({ to, onNavigate, highlightActive = true })
     return <div className="sidebar-brand">{content}</div>;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <NavLink
       to={to}

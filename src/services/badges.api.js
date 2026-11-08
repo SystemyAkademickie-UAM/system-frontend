@@ -1,3 +1,9 @@
+/**
+ * @file badges.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla badges.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, postJson, patchJson, deleteJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
@@ -26,7 +32,8 @@ export async function fetchGroupBadges(groupId) {
     console.error('Failed to fetch badges:', result.status, result.data);
     return [];
   }
-  return Array.isArray(result.data) ? result.data : [];
+
+return Array.isArray(result.data) ? result.data : [];
 }
 
 /**
@@ -48,7 +55,8 @@ export async function createBadge(groupId, badgeData) {
   if (!result.ok) {
     return { ok: false, error: extractApiError(result.data, 'Nie udało się utworzyć odznaki') };
   }
-  return { ok: true, badge: /** @type {Badge} */ (result.data) };
+
+return { ok: true, badge: /** @type {Badge} */ (result.data) };
 }
 
 /**

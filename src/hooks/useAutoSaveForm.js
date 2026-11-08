@@ -1,3 +1,9 @@
+/**
+ * @file useAutoSaveForm.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useAutoSaveForm.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useRef } from 'react';
 
 /**
@@ -11,6 +17,8 @@ import { useCallback, useEffect, useRef } from 'react';
  * @param {unknown[]} [options.watchValues] — wartości poza polami tekstowymi (select, checkbox, baner…)
  * @param {() => void | Promise<void>} options.onSave
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useAutoSaveForm({
   ready,
   getFingerprint,
@@ -22,7 +30,8 @@ export function useAutoSaveForm({
   const onSaveRef = useRef(onSave);
   const isSavingRef = useRef(false);
   getFingerprintRef.current = getFingerprint;
-  onSaveRef.current = onSave;
+
+onSaveRef.current = onSave;
 
   useEffect(() => {
     if (!ready) {
@@ -76,6 +85,7 @@ export function useAutoSaveForm({
     }
   }, [commitSave]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     commitSave,
     handleTextFieldKeyDown,

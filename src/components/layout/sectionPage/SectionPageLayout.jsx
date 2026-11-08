@@ -1,6 +1,13 @@
+/**
+ * @file SectionPageLayout.jsx
+ * @description Komponent interfejsu użytkownika SectionPageLayout.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Divider, SubNav } from '../../ui/index.js';
 import './SectionPageLayout.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Standardowy układ strony (nagłówek 32px, opcjonalny SubNav, kreska, treść).
  * Nie stosować na /main/* ani profilu studenta.
@@ -17,6 +24,8 @@ import './SectionPageLayout.css';
  * @param {string} [props.className]
  * @param {import('react').ReactNode} props.children
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SectionPageLayout({
   title,
   eyebrow,
@@ -29,7 +38,9 @@ export default function SectionPageLayout({
   className = '',
   children,
 }) {
-  return (
+
+// === RENDEROWANIE WIDOKU ===
+return (
     <section
       className={['maq-section-page', className].filter(Boolean).join(' ')}
       aria-labelledby="maq-section-page-title"

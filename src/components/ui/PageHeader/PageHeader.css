@@ -1,3 +1,9 @@
+/**
+ * @file PageHeader.css
+ * @description Style interfejsu użytkownika i układ dla modułu PageHeader.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-page-header {
   display: flex;
   flex-direction: column;
@@ -8,6 +14,7 @@
   max-width: 72rem;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-page-header__title {
   margin: 0;
   width: 100%;
@@ -18,6 +25,7 @@
   color: var(--color-text-primary);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-page-header__description {
   margin: 0;
   max-width: 36rem;

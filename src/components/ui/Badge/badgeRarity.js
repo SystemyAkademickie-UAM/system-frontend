@@ -1,5 +1,12 @@
+/**
+ * @file badgeRarity.js
+ * @description Komponent interfejsu użytkownika badgeRarity.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /** Identyfikatory rzadkości odznak. */
 export const BADGE_RARITY = {
   common: 'common',
@@ -17,7 +24,8 @@ const BADGERARITY__TEXTLABEL = {
     [BADGE_RARITY.rare]: 'Rzadka',
     [BADGE_RARITY.epic]: 'Epicka',
   },
-  english: {
+
+english: {
     [BADGE_RARITY.common]: 'Common',
     [BADGE_RARITY.uncommon]: 'Uncommon',
     [BADGE_RARITY.rare]: 'Rare',
@@ -46,7 +54,8 @@ export const BADGE_RARITY_CONFIG = {
     iconColorVar: '--color-badge-icon-uncommon',
     selectedBgVar: '--color-badge-mini-selected-uncommon',
   },
-  [BADGE_RARITY.rare]: {
+
+[BADGE_RARITY.rare]: {
     label: BADGE_RARITY_LABELS[BADGE_RARITY.rare],
     cssVar: '--color-badge-rarity-rare',
     iconBgVar: '--color-badge-icon-bg-rare',
@@ -66,6 +75,8 @@ export const BADGE_RARITY_CONFIG = {
  * @param {string} rarity
  * @returns {typeof BADGE_RARITY_CONFIG[keyof typeof BADGE_RARITY_CONFIG]}
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function getBadgeRarityConfig(rarity) {
   return BADGE_RARITY_CONFIG[rarity] ?? BADGE_RARITY_CONFIG[BADGE_RARITY.common];
 }

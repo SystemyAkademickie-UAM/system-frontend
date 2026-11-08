@@ -1,3 +1,9 @@
+/**
+ * @file IconPicker.css
+ * @description Style interfejsu użytkownika i układ dla modułu IconPicker.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .icon-picker {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
@@ -7,6 +13,7 @@
   padding: 4px;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .icon-picker__option {
   display: flex;
   align-items: center;
@@ -28,6 +35,7 @@
   box-shadow: inset 0 0 0 1px rgba(66, 243, 125, 0.25);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .icon-picker__input {
   position: absolute;
   opacity: 0;

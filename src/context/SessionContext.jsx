@@ -1,3 +1,9 @@
+/**
+ * @file SessionContext.jsx
+ * @description Kontekst globalnego stanu React oraz dostawca danych dla SessionContext.
+ */
+
+// === IMPORTY I INICJALIZACJA KONTEKSTU ===
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import { AUTH_LOGIN_ME_PATH } from '../constants/authPaths.constants.js';
@@ -51,7 +57,8 @@ function delay(ms) {
  */
 async function loadSessionUser() {
   const result = await getJson(AUTH_LOGIN_ME_PATH, {});
-  if (result.ok && result.data?.authenticated && result.data?.user) {
+
+if (result.ok && result.data?.authenticated && result.data?.user) {
     return result.data.user;
   }
   return null;
@@ -61,11 +68,14 @@ async function loadSessionUser() {
  * Kontekst sesji użytkownika.
  * Sprawdza GET /login/me (session cookie maq_session).
  */
+
+// === DOSTAWCA KONTEKSTU I ZARZĄDZANIE STANEM ===
 export function SessionProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sessionError, setSessionError] = useState(null);
-  const sessionCheckInFlightRef = useRef(false);
+
+const sessionCheckInFlightRef = useRef(false);
 
   const clearSession = useCallback(() => {
     setUser(null);
@@ -146,6 +156,7 @@ export function SessionProvider({ children }) {
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 
+// === HOOKI DOSTĘPOWE DO KONTEKSTU ===
 export function useSession() {
   const ctx = useContext(SessionContext);
   if (!ctx) {

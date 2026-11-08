@@ -1,4 +1,10 @@
 /**
+ * @file authPaths.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu authPaths.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
+/**
  * Session / current user (relative to API base that ends with `/api`).
  */
 export const AUTH_SAML_ME_PATH = '/auth/saml/me';
@@ -13,6 +19,7 @@ export const AUTH_SAML_STATUS_PATH = '/auth/saml/status';
  * Resource path for starting SAML SSO (relative to API base that ends with `/api`).
  * Full URL: `getSamlLoginUrl(organizationId)`.
  */
+
 export const AUTH_SAML_LOGIN_PATH = '/auth/saml/login';
 
 /**
@@ -28,9 +35,12 @@ export const AUTH_LOGIN_PATH = '/login';
 export const AUTH_LOGOUT_PATH = '/logout';
 
 /** Session check from HTTP-only session cookie (`maq_session`). */
+
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 export const AUTH_LOGIN_ME_PATH = '/login/me';
 
 /** Confirm organization and role for the current session. */
+
 export const AUTH_LOGIN_CONTEXT_PATH = '/login/context';
 
 /** Login organizations for institution pickers (`?loginMethod=saml|email`). */

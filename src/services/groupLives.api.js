@@ -1,3 +1,9 @@
+/**
+ * @file groupLives.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla groupLives.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, patchJson } from './api-client.js';
 import { DEFAULT_LIVES_LABEL, DEFAULT_LIVES_SYMBOL } from '../constants/lives.constants.js';
 
@@ -24,7 +30,8 @@ export async function fetchGroupLivesConfig(groupId) {
   }
 
   const result = await getJson(`/groups/${groupId}/lives-config`);
-  if (!result.ok || !result.data || typeof result.data !== 'object') {
+
+if (!result.ok || !result.data || typeof result.data !== 'object') {
     return { ok: false };
   }
 
@@ -58,6 +65,7 @@ export async function fetchGroupLivesConfig(groupId) {
  * @param {Record<string, unknown>} payload
  * @returns {Promise<{ ok: boolean, config?: GroupLivesConfig }>}
  */
+
 export async function updateGroupLivesConfig(groupId, payload) {
   const result = await patchJson(`/groups/${groupId}/lives-config`, payload);
   return { ok: result.ok };
@@ -75,4 +83,3 @@ export async function bulkUpdateStudentLives(groupId, students) {
   const result = await patchJson(`/groups/${groupId}/students/lives/bulk-update`, { students }, { includeBrowserId: true });
   return result;
 }
-

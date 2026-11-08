@@ -1,3 +1,9 @@
+/**
+ * @file useSubNavFitFontSize.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useSubNavFitFontSize.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useLayoutEffect } from 'react';
 
 const MIN_FONT_SIZE_PX = 10;
@@ -6,6 +12,8 @@ const FONT_SIZE_STEP_PX = 0.5;
 /**
  * @returns {number}
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 function readMaxFontSizePx() {
   const raw = getComputedStyle(document.documentElement).getPropertyValue('--font-size-body').trim();
   const parsed = Number.parseFloat(raw);
@@ -27,12 +35,16 @@ function hasOverflowingItems(nav) {
  * @param {import('react').RefObject<HTMLElement | null>} navRef
  * @param {unknown[]} deps
  */
+
 function isMobileSubNavLayout() {
+
+// === ZWRACANY STAN I INTERFEJS ===
   return window.matchMedia('(max-width: 639px)').matches;
 }
 
 export function useSubNavFitFontSize(navRef, deps = []) {
-  const fitFontSize = useCallback(() => {
+
+const fitFontSize = useCallback(() => {
     const nav = navRef.current;
     if (!nav) {
       return;

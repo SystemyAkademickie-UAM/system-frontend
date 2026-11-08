@@ -1,3 +1,9 @@
+/**
+ * @file useProfileInventory.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useProfileInventory.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useState } from 'react';
 import {
   fetchGroupInventory,
@@ -14,10 +20,13 @@ import {
  * @param {string | number | null | undefined} groupId
  * @param {{ studentAccountId?: string | number | null, readOnly?: boolean }} [options]
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useProfileInventory(groupId, { studentAccountId = null, readOnly = false, enabled = true } = {}) {
   const [entries, setEntries] = useState([]);
   const [isLoading, setIsLoading] = useState(enabled);
-  const [error, setError] = useState('');
+
+const [error, setError] = useState('');
 
   const refetch = useCallback(async () => {
     if (!groupId || !enabled) {
@@ -91,6 +100,7 @@ export function useProfileInventory(groupId, { studentAccountId = null, readOnly
     return { ok: true };
   }, [groupId, readOnly, studentAccountId]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     entries,
     isLoading,

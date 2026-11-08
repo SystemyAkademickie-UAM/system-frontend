@@ -1,3 +1,9 @@
+/**
+ * @file useProfileInventoryHistory.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useProfileInventoryHistory.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useState } from 'react';
 import {
   fetchGroupInventoryHistory,
@@ -12,10 +18,13 @@ import {
  * @param {string | number | null | undefined} groupId
  * @param {{ studentAccountId?: string | number | null }} [options]
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useProfileInventoryHistory(groupId, { studentAccountId = null, enabled = true } = {}) {
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(enabled);
-  const [error, setError] = useState('');
+
+const [error, setError] = useState('');
 
   const refetch = useCallback(async () => {
     if (!groupId || !enabled) {
@@ -55,7 +64,6 @@ export function useProfileInventoryHistory(groupId, { studentAccountId = null, e
       return undefined;
     }
 
-    // Refresh history when inventory is invalidated (e.g. item bought or used)
     return subscribeGroupScopedEvent(GROUP_INVENTORY_INVALIDATED, (eventGroupId) => {
       if (eventGroupId === String(groupId)) {
         refetch();
@@ -63,6 +71,7 @@ export function useProfileInventoryHistory(groupId, { studentAccountId = null, e
     });
   }, [groupId, refetch]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     history,
     isLoading,

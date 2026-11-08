@@ -1,3 +1,9 @@
+/**
+ * @file Pagination.jsx
+ * @description Komponent interfejsu użytkownika Pagination.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
@@ -5,6 +11,7 @@ import { buildPaginationItems } from './buildPaginationItems.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './Pagination.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const PAG__TEXTLABEL = {
   polish: 'Paginacja',
   english: 'Pagination',
@@ -36,6 +43,8 @@ const PAGELABEL__TEXTLABEL = {
  * @param {string} [props.ariaLabel]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function Pagination({
   totalPages,
   page: pageProp,
@@ -44,7 +53,8 @@ export default function Pagination({
   ariaLabel,
   className = '',
 }) {
-  const [internalPage, setInternalPage] = useState(defaultPage);
+
+const [internalPage, setInternalPage] = useState(defaultPage);
   const isControlled = pageProp !== undefined;
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
@@ -57,7 +67,8 @@ export default function Pagination({
 
   const currentPage = isControlled
     ? Math.min(Math.max(1, pageProp), total)
-    : Math.min(Math.max(1, internalPage), total);
+
+: Math.min(Math.max(1, internalPage), total);
 
   const setPage = (nextPage) => {
     const clamped = Math.min(Math.max(1, nextPage), total);
@@ -71,6 +82,7 @@ export default function Pagination({
 
   const items = buildPaginationItems(currentPage, total);
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <nav className={['maq-pagination', className].filter(Boolean).join(' ')} aria-label={resolvedAriaLabel}>
       <button

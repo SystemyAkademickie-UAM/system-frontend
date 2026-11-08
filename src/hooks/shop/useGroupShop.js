@@ -1,3 +1,9 @@
+/**
+ * @file useGroupShop.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupShop.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   buyGroupShopItem,
@@ -21,6 +27,8 @@ import {
 /**
  * @param {string | number | null | undefined} groupId
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useGroupShopItems(groupId) {
   const [items, setItemsState] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -168,6 +176,7 @@ export function useGroupShopItems(groupId) {
  * @param {string | number | null | undefined} groupId
  * @param {import('../../utils/shop/shopItem.types.js').ShopItem[]} [items]
  */
+
 export function useGroupShopCart(groupId, items = []) {
   const cartItemIds = useShopCartItemIds(groupId);
 
@@ -332,6 +341,7 @@ export function useGroupShopOpen(groupId) {
  *
  * @param {string | number | null | undefined} groupId
  */
+
 export function useGroupShopLives(groupId) {
   const livesBlocked = useShopLivesBlocked(groupId);
 
@@ -416,6 +426,7 @@ export function useGroupInventory(groupId) {
     return { ok: true };
   }, [groupId]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     entries,
     isLoading,

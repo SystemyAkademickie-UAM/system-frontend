@@ -1,3 +1,9 @@
+/**
+ * @file useGroupShopLivesSystem.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupShopLivesSystem.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useState } from 'react';
 import { fetchGroupLivesConfig } from '../../services/groupLives.api.js';
 import { GROUP_LIVES_INVALIDATED } from '../../services/groupLivesEvents.js';
@@ -23,12 +29,15 @@ import { STUDENT_PROFILE_INVALIDATED, subscribeGroupScopedEvent } from '../../se
  * @param {{ isStudentView?: boolean }} [options]
  * @returns {GroupShopLivesState}
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useGroupShopLivesSystem(groupId, { isStudentView = false } = {}) {
   const [livesEnabled, setLivesEnabled] = useState(false);
   const [livesShopEnabled, setLivesShopEnabled] = useState(false);
   const [livesMax, setLivesMax] = useState(null);
   const [studentLives, setStudentLives] = useState(null);
-  const [isLoading, setIsLoading] = useState(Boolean(groupId));
+
+const [isLoading, setIsLoading] = useState(Boolean(groupId));
 
   const refetch = useCallback(async () => {
     if (!groupId) {
@@ -106,12 +115,14 @@ export function useGroupShopLivesSystem(groupId, { isStudentView = false } = {})
   }, [groupId, isStudentView, refetch]);
 
   const isGameOver = isStudentView
-    && livesEnabled
+
+&& livesEnabled
     && studentLives !== null
     && studentLives <= 0;
 
   const showExtraLifeProduct = livesEnabled && livesShopEnabled;
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     livesEnabled,
     livesShopEnabled,

@@ -1,3 +1,9 @@
+/**
+ * @file backup.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla backup.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getApiBaseUrl } from '../constants/api.constants.js';
 import {
   ADMIN_BACKUP_AUTO_DOWNLOAD_PATH,
@@ -11,6 +17,8 @@ import {
  * Same-origin (or VITE) URL for cookie-authenticated backup download.
  * @returns {string}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function getBackupExportUrl() {
   return `${getApiBaseUrl()}${ADMIN_BACKUP_EXPORT_PATH}`;
 }
@@ -42,7 +50,6 @@ export async function downloadBackupExportFile() {
           errorMessage = json.message;
         }
       } catch {
-        // use fallback
       }
       return { ok: false, error: errorMessage };
     }
@@ -74,6 +81,7 @@ export async function downloadBackupExportFile() {
  * @param {string} filename
  * @returns {Promise<{ ok: boolean, error?: string }>}
  */
+
 export async function downloadAutoBackupFile(filename) {
   try {
     const response = await fetch(getAutoBackupDownloadUrl(filename), {
@@ -88,7 +96,6 @@ export async function downloadAutoBackupFile(filename) {
           errorMessage = json.message;
         }
       } catch {
-        // use fallback
       }
       return { ok: false, error: errorMessage };
     }
@@ -125,7 +132,6 @@ export async function fetchBackupStatus() {
           errorMessage = json.message;
         }
       } catch {
-        // keep status text
       }
       return { ok: false, error: errorMessage };
     }
@@ -141,6 +147,7 @@ export async function fetchBackupStatus() {
  * Triggers an automated backup immediately on the host/container volume.
  * @returns {Promise<{ ok: boolean, data?: any, error?: string }>}
  */
+
 export async function triggerAutoBackup() {
   try {
     const response = await fetch(`${getApiBaseUrl()}${ADMIN_BACKUP_TRIGGER_AUTO_PATH}`, {
@@ -155,7 +162,6 @@ export async function triggerAutoBackup() {
           errorMessage = json.message;
         }
       } catch {
-        // keep status text
       }
       return { ok: false, error: errorMessage };
     }
@@ -190,7 +196,6 @@ export async function importBackup(file) {
           errorMessage = json.message;
         }
       } catch {
-        // keep status text
       }
       return { ok: false, error: errorMessage };
     }
@@ -200,4 +205,3 @@ export async function importBackup(file) {
     return { ok: false, error: message };
   }
 }
-

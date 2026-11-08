@@ -1,3 +1,9 @@
+/**
+ * @file fieldLimits.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu fieldLimits.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 /** Maks. długość nazwy kategorii przedmiotu sklepu. */
 export const ITEM_CATEGORY_NAME_MAX_LENGTH = 100;
 
@@ -23,6 +29,8 @@ export const GROUP_DESCRIPTION_MAX_LENGTH = 500;
 export const POST_CONTENT_MAX_LENGTH = 1500;
 
 /** Maks. długość tematu wpisu. */
+
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 export const POST_TITLE_MAX_LENGTH = NAME_MAX_LENGTH;
 
 /** @deprecated Użyj NAME_MAX_LENGTH */
@@ -48,7 +56,8 @@ export const ENROLLMENT_CODES_MAX_COUNT = 10;
 
 /** Presety pól tekstowych dla komponentu TextField. */
 export const TEXT_FIELD_PRESETS = {
-  name: {
+
+name: {
     maxLength: NAME_MAX_LENGTH,
     multiline: false,
   },

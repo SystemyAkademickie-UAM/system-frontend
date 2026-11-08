@@ -1,0 +1,157 @@
+/**
+ * @file useGroupStudentProfile.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupStudentProfile.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
+import { useCallback, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { fetchGroupStudentProfile } from '../../../services/studentProfile.api.js';
+import { fetchGroupStudents, fetchStudentBadges } from '../../../services/students.api.js';
+import { fetchGroupRanks } from '../../../services/ranks.api.js';
+
+const PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL = {
+  polish: 'Nie znaleziono uczestnika w tej grupie.',
+  english: 'Participant not found in this group.'
+};
+
+const MISSING_GROUP_ID_ERROR__TEXTLABEL = {
+  polish: 'Brak ID grupy',
+  english: 'Group ID missing'
+};
+
+const NO_RANK_TEXT__TEXTLABEL = {
+  polish: 'Brak rangi',
+  english: 'No rank'
+};
+
+const PROFILE_LOAD_ERROR__TEXTLABEL = {
+  polish: 'Nie udało się pobrać profilu studenta',
+  english: 'Failed to load student profile'
+};
+
+async function loadStudentFallback(groupId, student, ranksData) {
+  let ranks = ranksData;
+  if (!ranks) {
+    try {
+      ranks = await fetchGroupRanks(groupId);
+    } catch {
+      ranks = [];
+    }
+  }
+
+  let earnedBadges = [];
+  try {
+    const studentBadges = await fetchStudentBadges(groupId, student.accountId);
+    earnedBadges = (studentBadges || [])
+      .filter((b) => b.isEarned)
+      .map((b) => ({
+        id: b.id,
+        name: b.name,
+        icon: b.icon,
+        rarity: b.rarity,
+        storyDescription: b.storyDescription,
+        educationalDescription: b.educationalDescription,
+        rewardAmount: b.rewardAmount,
+      }));
+  } catch {
+  }
+
+  const rankObj = ranks.find((r) => r.id === student.rankId);
+
+const rankName = rankObj?.name || student.rankName || NO_RANK_TEXT__TEXTLABEL.polish;
+
+  return {
+    ok: true,
+    profile: {
+      studentAccountId: student.accountId,
+      groupId: Number(groupId),
+      nickname: student.nickname,
+      name: student.name,
+      surname: student.surname,
+      avatarId: student.avatarId,
+      avatarUrl: student.avatarUrl,
+      rankId: student.rankId,
+      rankName,
+      currency: student.currency ?? 0,
+      totalEarned: student.totalEarned ?? 0,
+      badgesCount: student.badgesCount ?? earnedBadges.length,
+      purchasedItemsCount: student.purchasedItemsCount ?? 0,
+      usedItemsCount: student.usedItemsCount ?? 0,
+      lostLivesCount: student.lostLivesCount ?? 0,
+      groupCurrency: null,
+      lives: student.lives ?? null,
+      livesEnabled: student.livesEnabled ?? null,
+      earnedBadges,
+      completedActivities: [],
+    },
+  };
+}
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
+export function useGroupStudentProfile() {
+  const { groupId, studentId } = useParams();
+  const [profile, setProfile] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+const [error, setError] = useState('');
+
+  const loadProfile = useCallback(async () => {
+    if (!groupId) {
+      setError(MISSING_GROUP_ID_ERROR__TEXTLABEL.polish);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    let result;
+
+    if (studentId) {
+      const students = await fetchGroupStudents(groupId);
+      let targetStudent = null;
+
+      const num = parseInt(String(studentId).replace(/^student-/, ''), 10);
+      if (!Number.isNaN(num) && num >= 1 && num <= students.length) {
+        targetStudent = students[num - 1];
+      } else {
+        targetStudent = students.find((s) => String(s.accountId) === String(studentId))
+          ?? students.find((s) => String(s.enrollmentId) === String(studentId));
+      }
+
+      if (targetStudent) {
+        result = await fetchGroupStudentProfile(groupId, targetStudent.accountId);
+        if (!result.ok) {
+          result = await loadStudentFallback(groupId, targetStudent);
+        }
+      } else {
+        result = { ok: false, error: PARTICIPANT_NOT_FOUND_ERROR__TEXTLABEL.polish };
+      }
+    } else {
+      result = await fetchGroupStudentProfile(groupId);
+    }
+
+    setIsLoading(false);
+
+    if (result.ok && result.profile) {
+      setProfile(result.profile);
+      return;
+    }
+
+    setProfile(null);
+    setError(result.error || PROFILE_LOAD_ERROR__TEXTLABEL.polish);
+  }, [groupId, studentId]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
+
+// === ZWRACANY STAN I INTERFEJS ===
+  return {
+    groupId,
+    studentId: studentId ?? null,
+    profile,
+    isLoading,
+    error,
+    refetch: loadProfile,
+  };
+}

@@ -1,7 +1,14 @@
+/**
+ * @file CurrencyDisplay.jsx
+ * @description Komponent interfejsu użytkownika CurrencyDisplay.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useGroupCurrency } from '../../../context/GroupCurrencyContext.jsx';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import './CurrencyDisplay.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Ikona waluty grupy — emoji lub SVG z kontekstu / props.
  *
@@ -13,6 +20,8 @@ import './CurrencyDisplay.css';
  * @param {string} [props.className]
  * @param {string} [props.ariaLabel]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function CurrencyIcon({
   symbol,
   iconFile,
@@ -24,7 +33,8 @@ export function CurrencyIcon({
   const groupCurrency = useGroupCurrency();
   const resolvedSymbol = symbol ?? groupCurrency.symbol;
   const resolvedIconFile = iconFile ?? groupCurrency.iconFile;
-  const resolvedIconUrl = iconUrl ?? groupCurrency.iconUrl;
+
+const resolvedIconUrl = iconUrl ?? groupCurrency.iconUrl;
 
   if (resolvedIconUrl) {
     return (
@@ -70,6 +80,7 @@ export function CurrencyIcon({
  * @param {boolean} [props.showIcon=true]
  * @param {string} [props.className]
  */
+
 export default function CurrencyDisplay({
   amount,
   symbol,
@@ -79,6 +90,8 @@ export default function CurrencyDisplay({
   showIcon = true,
   className = '',
 }) {
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <span className={['maq-currency-display', `maq-currency-display--${size}`, className].filter(Boolean).join(' ')}>
       <span className="maq-currency-display__amount">{amount}</span>

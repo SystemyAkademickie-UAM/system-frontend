@@ -1,18 +1,27 @@
 /**
+ * @file avatarDisplay.js
+ * @description Funkcje pomocnicze i narzędziowe modułu avatarDisplay.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Awatary z /assets/avatars/ mają większy margines w grafice — lekko powiększamy je w kółku.
  *
  * @param {string | null | undefined} imageUrl
  * @returns {boolean}
  */
 export function isScaledAvatarImage(imageUrl) {
-  return typeof imageUrl === 'string' && imageUrl.includes('/assets/avatars/');
+
+return typeof imageUrl === 'string' && imageUrl.includes('/assets/avatars/');
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {string} [className]
  * @param {string | null | undefined} imageUrl
  * @returns {string}
  */
+
 export function getAvatarImageClassName(imageUrl, className = '') {
   return [
     className,

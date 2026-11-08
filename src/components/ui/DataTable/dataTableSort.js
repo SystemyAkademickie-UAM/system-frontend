@@ -1,10 +1,17 @@
 /**
+ * @file dataTableSort.js
+ * @description Komponent interfejsu użytkownika dataTableSort.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
+/**
  * @typedef {'asc' | 'desc'} SortDirection
  * @typedef {{ key: string, direction: SortDirection }} SortRule
  * @typedef {'number' | 'text'} SortType
  * @typedef {{ type: 'custom', order: readonly string[] }} CustomSort
  */
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function compareByCustomOrder(valueA, valueB, orderedValues) {
   const indexA = orderedValues.indexOf(valueA);
   const indexB = orderedValues.indexOf(valueB);
@@ -33,7 +40,8 @@ function parseSortNumber(val) {
  * @param {SortType | CustomSort | false | undefined} sort
  */
 export function compareSortValues(valueA, valueB, sort) {
-  if (!sort) return 0;
+
+if (!sort) return 0;
 
   if (sort === 'number') {
     const numA = parseSortNumber(valueA);
@@ -84,7 +92,8 @@ export function compareRowsByColumn(rowA, rowB, key, direction, columns) {
  * @param {string} [tiebreakerKey]
  */
 export function sortRows(rows, sortRules, columns, tiebreakerKey) {
-  const effectiveRules = [...sortRules];
+
+const effectiveRules = [...sortRules];
 
   if (tiebreakerKey && !effectiveRules.some((rule) => rule.key === tiebreakerKey)) {
     effectiveRules.push({ key: tiebreakerKey, direction: 'asc' });
@@ -137,6 +146,6 @@ export function cycleSortRule(prevRules, key, isMulti = false) {
     );
   }
 
+// === RENDEROWANIE WIDOKU ===
   return prevRules.filter((_, ruleIndex) => ruleIndex !== index);
 }
-

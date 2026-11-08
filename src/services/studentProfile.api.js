@@ -1,3 +1,9 @@
+/**
+ * @file studentProfile.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla studentProfile.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 
@@ -48,12 +54,14 @@ import { getAssetUrl } from '../constants/api.constants.js';
  * @param {string | number} [studentAccountId]
  * @returns {Promise<{ ok: boolean, profile?: GroupStudentProfile, error?: string }>}
  */
+
 export async function fetchGroupStudentProfile(groupId, studentAccountId) {
   const url = studentAccountId
     ? `/groups/${groupId}/student-profile?studentAccountId=${studentAccountId}`
     : `/groups/${groupId}/student-profile`;
   const result = await getJson(url, { includeBrowserId: true });
-  if (!result.ok) {
+
+if (!result.ok) {
     const errorData = /** @type {{ message?: string, error?: string }} */ (result.data);
     return {
       ok: false,
@@ -79,6 +87,8 @@ export async function fetchGroupStudentProfile(groupId, studentAccountId) {
  * @param {number} value
  * @returns {string}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function formatProfileNumber(value) {
   return new Intl.NumberFormat('pl-PL').format(value ?? 0);
 }

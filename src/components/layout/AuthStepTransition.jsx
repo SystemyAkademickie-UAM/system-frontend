@@ -1,8 +1,15 @@
+/**
+ * @file AuthStepTransition.jsx
+ * @description Komponent interfejsu użytkownika AuthStepTransition.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback } from 'react';
 import AuthSlideTransitionView from './AuthSlideTransitionView.jsx';
 import { useAuthSequentialTransition } from './useAuthSequentialTransition.js';
 import './authTransition.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * In-page wizard transitions (URL stays on `/login`).
  * @param {Object} props
@@ -10,8 +17,11 @@ import './authTransition.css';
  * @param {Record<string, number>} props.stepOrder
  * @param {React.ReactNode} props.children
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function AuthStepTransition({ activeKey, stepOrder, children }) {
-  const resolveTransition = useCallback((from, to) => {
+
+const resolveTransition = useCallback((from, to) => {
     const fromOrder = stepOrder[from.key];
     const toOrder = stepOrder[to.key];
     if (fromOrder === undefined || toOrder === undefined || fromOrder === toOrder) {
@@ -30,6 +40,7 @@ export default function AuthStepTransition({ activeKey, stepOrder, children }) {
     resolveTransition,
   });
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <AuthSlideTransitionView
       phase={phase}

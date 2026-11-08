@@ -1,0 +1,115 @@
+/**
+ * @file ProfileActivitiesContent.jsx
+ * @description Komponent listy ukończonych aktywności studenta w profilu grupy z obsługą zwijania i formatowania dat.
+ */
+
+// === IMPORTY I FUNKCJE FORMATOWANIA ===
+import { useMemo, useState } from 'react';
+import { CurrencyDisplay } from '../../../components/ui/index.js';
+import { useProfileStudentProfileContext } from '../group-profile/ProfileStudentProfileContext.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import './ProfileActivitiesSection.css';
+
+const COMPLETED_AT_LOCALE = {
+  polish: 'pl-PL',
+  english: 'en-GB',
+};
+
+function formatCompletedAt(value, language) {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '—';
+  const locale = COMPLETED_AT_LOCALE[language] ?? COMPLETED_AT_LOCALE.polish;
+  return date.toLocaleString(locale);
+}
+
+// === SŁOWNIKI I ETYKIETY JĘZYKOWE ===
+const ACTIVITIESTITLE__TEXTLABEL = {
+  polish: 'Aktywności',
+  english: 'Activities',
+};
+
+const TOGGLEBUTTON__TEXTLABEL = {
+  polish: [
+    { id: 'hide', label: 'Ukryj aktywności' },
+    { id: 'show', label: 'Wszystkie aktywności' },
+  ],
+  english: [
+    { id: 'hide', label: 'Hide activities' },
+    { id: 'show', label: 'All activities' },
+  ],
+};
+
+const EMPTYMESSAGE__TEXTLABEL = {
+  polish: 'Brak ukończonych aktywności w tej grupie.',
+  english: 'No completed activities in this group.',
+};
+
+const STAGELABEL__TEXTLABEL = {
+  polish: 'Etap',
+  english: 'Stage',
+};
+
+// === LOGIKA STANU I FILTROWANIA AKTYWNOŚCI ===
+export default function ProfileActivitiesContent() {
+  const { profile, isLoading } = useProfileStudentProfileContext();
+  const [showAll, setShowAll] = useState(false);
+  const LANGUAGE = READLANGUAGECOOKIE();
+
+  const activities = profile?.completedActivities ?? [];
+
+  const visibleActivities = useMemo(
+    () => (showAll ? activities : activities.slice(0, 5)),
+    [activities, showAll],
+  );
+
+  if (isLoading) {
+    return null;
+  }
+
+  // === RENDEROWANIE LISTY I KART AKTYWNOŚCI ===
+  return (
+    <div className="profile-activities-section">
+      <div className="profile-activities-section__header">
+        <h2 className="profile-activities-section__title">{ACTIVITIESTITLE__TEXTLABEL[LANGUAGE]}</h2>
+        {activities.length > 5 ? (
+          <button
+            type="button"
+            className="profile-activities-section__toggle"
+            onClick={() => setShowAll((current) => !current)}
+          >
+            {showAll ? TOGGLEBUTTON__TEXTLABEL[LANGUAGE].find((item) => item.id === 'hide').label : TOGGLEBUTTON__TEXTLABEL[LANGUAGE].find((item) => item.id === 'show').label}
+          </button>
+        ) : null}
+      </div>
+
+      {activities.length === 0 ? (
+        <p className="profile-activities-section__empty">
+          {EMPTYMESSAGE__TEXTLABEL[LANGUAGE]}
+        </p>
+      ) : (
+        <ul className="profile-activities-section__list">
+          {visibleActivities.map((activity) => (
+            <li key={activity.id} className="profile-activities-section__item">
+              <div className="profile-activities-section__item-main">
+                <span className="profile-activities-section__item-name">{activity.name}</span>
+                {activity.stageName ? (
+                  <span className="profile-activities-section__item-stage">
+                    {STAGELABEL__TEXTLABEL[LANGUAGE]}: {activity.stageName}
+                  </span>
+                ) : null}
+                <span className="profile-activities-section__item-description">
+                  {activity.educationalDescription || activity.storyDescription || '—'}
+                </span>
+              </div>
+              <div className="profile-activities-section__item-meta">
+                <CurrencyDisplay amount={activity.currency} size="sm" />
+                <span>{formatCompletedAt(activity.completedAt, LANGUAGE)}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

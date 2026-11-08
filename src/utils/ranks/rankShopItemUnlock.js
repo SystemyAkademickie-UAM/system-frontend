@@ -1,3 +1,9 @@
+/**
+ * @file rankShopItemUnlock.js
+ * @description Funkcje pomocnicze i narzędziowe modułu rankShopItemUnlock.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { updateRank } from '../../services/ranks.api.js';
 
 /**
@@ -51,9 +57,11 @@ export function findRankOwningShopItem(itemId, ranks, excludeRankDbId = null) {
       return rank;
     }
   }
-  return null;
+
+return null;
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {RankUnlockRef[]} ranks
  * @param {number | null | undefined} [excludeRankDbId]
@@ -95,7 +103,8 @@ export function findRankUnlockingItem(itemId, ranks) {
  * @returns {string[]}
  */
 export function resolveShopItemLabels(itemIds, catalogItems = []) {
-  const nameById = new Map(
+
+const nameById = new Map(
     catalogItems.map((item) => [normalizeShopItemId(item.id), item.name || normalizeShopItemId(item.id)]),
   );
 

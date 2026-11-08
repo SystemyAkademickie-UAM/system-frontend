@@ -1,3 +1,9 @@
+/**
+ * @file SuperBarLivesStat.jsx
+ * @description Komponent interfejsu użytkownika SuperBarLivesStat.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import LivesIcon from '../../ui/Lives/LivesIcon.jsx';
@@ -6,6 +12,7 @@ import { positionCenteredTooltip } from '../../../utils/ui/positionTooltipInView
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './SuperBar.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {number | null} livesMax
  * @returns {string}
@@ -35,6 +42,8 @@ function formatLivesMaxLabel(livesMax, language) {
 /**
  * Statystyka żyć z podglądem konfiguracji po najechaniu.
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SuperBarLivesStat({
   currentAmount,
   livesLabel = 'Życia',
@@ -42,11 +51,13 @@ export default function SuperBarLivesStat({
   livesShopEnabled = false,
   ariaLabel,
 }) {
-  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+
+const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [layout, setLayout] = useState(null);
+
+const [layout, setLayout] = useState(null);
 
   const updatePreviewPosition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -88,6 +99,7 @@ export default function SuperBarLivesStat({
     setPreviewVisible(false);
   };
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <div

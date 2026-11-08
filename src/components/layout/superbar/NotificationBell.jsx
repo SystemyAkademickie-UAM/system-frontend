@@ -1,3 +1,9 @@
+/**
+ * @file NotificationBell.jsx
+ * @description Komponent interfejsu użytkownika NotificationBell.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import NotificationsFeed from '../../notifications/NotificationsFeed.jsx';
@@ -12,6 +18,7 @@ import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './NotificationBell.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const BELL_LIMIT = 10;
 
 const NOTIFICATIONBELLLABEL__TEXTLABEL = {
@@ -41,6 +48,8 @@ const VIEWALL__TEXTLABEL = {
 /**
  * Dzwonek powiadomień w SuperBar — ostatnie 10 wpisów z API backlogu.
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function NotificationBell() {
   const panelId = useId();
   const rootRef = useRef(null);
@@ -64,7 +73,8 @@ export default function NotificationBell() {
   });
 
   const viewAllTarget = isStudentView && groupId
-    ? `${groupMainPath(groupId)}#group-notifications`
+
+? `${groupMainPath(groupId)}#group-notifications`
     : groupId
       ? groupMembersLogPath(groupId)
       : null;
@@ -115,6 +125,7 @@ export default function NotificationBell() {
     return null;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className="notification-bell" ref={rootRef}>
       <button

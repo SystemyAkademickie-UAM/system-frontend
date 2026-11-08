@@ -1,3 +1,9 @@
+/**
+ * @file shopItemAccentColor.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopItemAccentColor.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { getProductCardColorVars } from './shopCategoryColors.js';
 
 /**

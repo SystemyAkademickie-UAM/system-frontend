@@ -1,13 +1,16 @@
+/**
+ * @file membersLecturerRow.js
+ * @description Funkcje pomocnicze i narzędziowe modułu membersLecturerRow.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
 
 import { resolveGroupLecturerDisplay } from '../resolveGroupLecturerDisplay.js';
 
-
-
 const AVATAR_BASE = 'https://api.dicebear.com/7.x/adventurer/svg?seed=';
 
-
-
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function generateMemberAvatarFallback(seed) {
 
   const normalized = String(seed || 'lecturer').trim() || 'lecturer';
@@ -15,8 +18,6 @@ export function generateMemberAvatarFallback(seed) {
   return `${AVATAR_BASE}${encodeURIComponent(normalized)}`;
 
 }
-
-
 
 /**
 
@@ -46,21 +47,15 @@ export function resolveLecturerAvatarUrl({
 
   }
 
-
-
   if (lecturerAvatarUrl) {
 
     return lecturerAvatarUrl;
 
   }
 
-
-
   return generateMemberAvatarFallback(lecturerDisplayName);
 
 }
-
-
 
 export function buildLecturerMemberRow({
 
@@ -78,15 +73,11 @@ export function buildLecturerMemberRow({
 
   const lecturerDisplayName = group ? resolveGroupLecturerDisplay(group) : '';
 
-
-
   if (!lecturerDisplayName.trim()) {
 
     return null;
 
   }
-
-
 
   const avatar = resolveLecturerAvatarUrl({
 
@@ -101,8 +92,6 @@ export function buildLecturerMemberRow({
     lecturerAvatarUrl: group?.lecturerAvatarUrl ?? null,
 
   });
-
-
 
   return {
 
@@ -139,4 +128,3 @@ export function buildLecturerMemberRow({
   };
 
 }
-

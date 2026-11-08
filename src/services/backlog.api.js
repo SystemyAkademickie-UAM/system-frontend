@@ -1,3 +1,9 @@
+/**
+ * @file backlog.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla backlog.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, patchJson, deleteJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
@@ -40,7 +46,8 @@ export async function fetchGroupBacklog(groupId, { take = 50, skip = 0, studentV
   const path = studentView
     ? `/groups/${groupId}/backlog/me?take=${take}&skip=${skip}`
     : `/groups/${groupId}/backlog?take=${take}&skip=${skip}`;
-  const result = await getJson(path, { includeBrowserId: true });
+
+const result = await getJson(path, { includeBrowserId: true });
   if (!result.ok) {
     return { ok: false, items: [], error: extractApiError(result.data) };
   }
@@ -79,7 +86,8 @@ export async function fetchGroupBacklogTotalCount(groupId) {
 
   const count = typeof result.data === 'object' && result.data !== null
     ? Number(/** @type {{ count?: number }} */ (result.data).count ?? 0)
-    : 0;
+
+: 0;
 
   return { ok: true, count: Number.isFinite(count) ? count : 0 };
 }

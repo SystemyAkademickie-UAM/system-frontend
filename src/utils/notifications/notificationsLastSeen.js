@@ -1,4 +1,10 @@
 /**
+ * @file notificationsLastSeen.js
+ * @description Funkcje pomocnicze i narzędziowe modułu notificationsLastSeen.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * @param {string | number} groupId
  * @param {string} role
  * @returns {string}
@@ -18,7 +24,8 @@ export function getNotificationsLastSeen(groupId, role) {
   }
 
   const raw = window.localStorage.getItem(storageKey(groupId, role));
-  if (!raw) {
+
+if (!raw) {
     return null;
   }
 
@@ -26,13 +33,15 @@ export function getNotificationsLastSeen(groupId, role) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {string | number} groupId
  * @param {string} role
  * @param {Date} [date]
  */
 export function setNotificationsLastSeen(groupId, role, date = new Date()) {
-  if (typeof window === 'undefined') {
+
+if (typeof window === 'undefined') {
     return;
   }
 
