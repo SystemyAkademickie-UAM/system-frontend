@@ -1,0 +1,213 @@
+/**
+ * @file FaqContent.css
+ * @description Style interfejsu użytkownika i układ dla widoku strony FAQ (odczyt oraz edycja przez osobę nadzorującą).
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.faq-page {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 960px;
+  text-align: left;
+  font-family: var(--font-family-app);
+}
+
+/* === SEKCJE KATEGORII I LISTA PYTAŃ (TRYB ODCZYTU) === */
+.faq-page__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.faq-page__category-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.faq-page__category-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+.faq-page__category-divider {
+  margin: 0.25rem 0;
+}
+
+.faq-page__items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.faq-page__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-divider);
+  text-align: left;
+}
+
+.faq-page__item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.faq-page__question {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+.faq-page__answer {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
+}
+
+/* === TRYB EDYCJI STRONY FAQ (OSOBA NADZORUJĄCA) === */
+.faq-page__editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  text-align: left;
+}
+
+.faq-page__edit-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.faq-page__edit-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.faq-page__edit-card-index {
+  font-size: var(--font-size-page-description);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.faq-page__edit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.faq-page__editor-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding-top: 0.5rem;
+}
+
+.faq-page__editor-footer-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* === STANY ŁADOWANIA, PUSTEJ LISTY I BŁĘDÓW === */
+.faq-page__loading,
+.faq-page__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.faq-page__loading-text,
+.faq-page__empty-text {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.faq-page__error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-input-error-border);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  box-sizing: border-box;
+  font-family: var(--font-family-message);
+  text-align: left;
+}
+
+.faq-page__error-text {
+  margin: 0;
+  font-size: var(--font-size-body);
+  color: var(--color-input-error);
+}
+
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
+@media (max-width: 768px) {
+  .faq-page__category-group,
+  .faq-page__edit-card {
+    padding: 1.15rem;
+  }
+
+  .faq-page__editor-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .faq-page__editor-footer-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
