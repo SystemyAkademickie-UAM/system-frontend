@@ -1,27 +1,33 @@
 /**
  * @file AdminBackupContent.css
- * @description Style interfejsu użytkownika i układ dla modułu AdminBackupContent.
+ * @description Style interfejsu użytkownika i układ dla modułu AdminBackupContent (zarządzanie kopiami zapasowymi).
  */
 
 /* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .admin-backup {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
+  max-width: 920px;
+  margin: 0;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  text-align: left;
+  font-family: var(--font-family-app, system-ui, sans-serif);
 }
 
 .admin-backup__title {
-  font-size: 1.75rem;
+  font-size: var(--font-size-section-title, 2rem);
   font-weight: 700;
+  color: var(--color-text-primary, #d9d9d9);
   margin: 0 0 0.5rem;
+  text-align: left;
 }
 
 .admin-backup__subtitle {
-  font-size: 0.95rem;
-  color: var(--color-text-secondary, #888);
+  font-size: var(--font-size-body, 1rem);
+  color: var(--color-text-secondary, #BBCBB9);
   margin: 0 0 1.5rem;
+  text-align: left;
 }
 
+/* === ALERTY SYSTEMOWE === */
 .admin-backup__alert {
   display: flex;
   gap: 1rem;
@@ -29,6 +35,7 @@
   border-radius: 12px;
   margin-bottom: 1.75rem;
   align-items: flex-start;
+  text-align: left;
 }
 
 .admin-backup__alert--warning {
@@ -38,58 +45,64 @@
 }
 
 .admin-backup__alert-icon {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   line-height: 1;
   flex-shrink: 0;
+  font-weight: 700;
 }
 
 .admin-backup__alert-body {
   flex: 1;
+  text-align: left;
 }
 
 .admin-backup__alert-title {
   font-size: 1.05rem;
   font-weight: 700;
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.5rem;
   color: #fbbf24;
+  text-align: left;
 }
 
 .admin-backup__alert-desc {
-  font-size: 0.875rem;
-  color: var(--color-text, #e2e8f0);
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-primary, #d9d9d9);
   line-height: 1.5;
-  margin: 0 0 0.85rem;
+  margin: 0 0 1rem;
+  text-align: left;
 }
 
+/* === KAFELKI PODSUMOWANIA (GRID) === */
 .admin-backup__overview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 1rem;
   margin-bottom: 1.75rem;
 }
 
 .admin-backup__overview-card {
-  background: var(--color-surface, #1e1e2e);
-  border: 1px solid var(--color-border, #333);
+  background: var(--color-bg-surface, #1a1a2a);
+  border: 1px solid var(--color-separator, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 
 .admin-backup__overview-card-label {
-  font-size: 0.8rem;
+  font-size: 0.875rem; /* 14px */
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-secondary, #888);
-  margin-bottom: 0.35rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary, #BBCBB9);
+  margin-bottom: 0.5rem;
 }
 
 .admin-backup__overview-card-value {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  color: var(--color-text, #fff);
-  margin-bottom: 0.35rem;
+  color: var(--color-text-primary, #d9d9d9);
+  margin-bottom: 0.5rem;
   word-break: break-word;
 }
 
@@ -101,19 +114,20 @@
   color: #34d399;
 }
 
-/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .admin-backup__overview-card-hint {
-  font-size: 0.775rem;
-  color: var(--color-text-secondary, #888);
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-secondary, #BBCBB9);
   margin-top: auto;
 }
 
+/* === SEKCJE STRONY === */
 .admin-backup__section {
-  background: var(--color-surface, #1e1e2e);
-  border: 1px solid var(--color-border, #333);
+  background: var(--color-bg-surface, #1a1a2a);
+  border: 1px solid var(--color-separator, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  text-align: left;
 }
 
 .admin-backup__section-header {
@@ -126,32 +140,159 @@
 }
 
 .admin-backup__section-title {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 600;
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  color: var(--color-text-primary, #d9d9d9);
+  text-align: left;
 }
 
 .admin-backup__section-desc {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary, #888);
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-secondary, #BBCBB9);
   margin: 0 0 1.25rem;
   line-height: 1.5;
+  text-align: left;
 }
 
+/* === FORMULARZ HARMONOGRAMU === */
+.admin-backup__schedule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-backup__toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.admin-backup__checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--color-accent, #1ecc38);
+  cursor: pointer;
+}
+
+.admin-backup__toggle-text {
+  font-size: var(--font-size-body, 1rem);
+  font-weight: 600;
+  color: var(--color-text-primary, #d9d9d9);
+}
+
+.admin-backup__schedule-fields {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-backup__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.admin-backup__form-group--spaced {
+  margin-top: 1rem;
+}
+
+.admin-backup__field-label {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 600;
+  color: var(--color-text-secondary, #BBCBB9);
+  text-align: left;
+}
+
+.admin-backup__select,
+.admin-backup__time-input,
+.admin-backup__input {
+  font-size: 0.875rem; /* 14px */
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  background: var(--color-bg-elevated, #292839);
+  border: 1px solid var(--color-separator, rgba(255, 255, 255, 0.12));
+  color: var(--color-text-primary, #d9d9d9);
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.admin-backup__select:disabled,
+.admin-backup__time-input:disabled,
+.admin-backup__input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-backup__select:focus,
+.admin-backup__time-input:focus,
+.admin-backup__input:focus {
+  border-color: var(--color-accent, #1ecc38);
+}
+
+.admin-backup__input {
+  width: 100%;
+}
+
+.admin-backup__input--confirm {
+  margin-top: 0.5rem;
+}
+
+.admin-backup__field-hint {
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-secondary, #BBCBB9);
+  margin: 0.25rem 0 0;
+  line-height: 1.4;
+}
+
+.admin-backup__error-text {
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-input-error, #f87171);
+  margin: 0.25rem 0 0;
+  font-weight: 600;
+}
+
+.admin-backup__schedule-next-run {
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-secondary, #BBCBB9);
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-elevated, #292839);
+  border-radius: 8px;
+  border: 1px solid var(--color-separator, rgba(255, 255, 255, 0.06));
+}
+
+.admin-backup__next-run-label {
+  font-weight: 600;
+  color: var(--color-text-secondary, #BBCBB9);
+}
+
+.admin-backup__next-run-value {
+  color: var(--color-text-primary, #d9d9d9);
+  font-weight: 600;
+}
+
+.admin-backup__schedule-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 0.25rem;
+}
+
+/* === TABELA KOPII AUTOMATYCZNYCH === */
 .admin-backup__table-wrapper {
   overflow-x: auto;
   margin-top: 1rem;
-  border: 1px solid var(--color-border, #333);
+  border: 1px solid var(--color-separator, rgba(255, 255, 255, 0.08));
   border-radius: 8px;
 }
 
 .admin-backup__table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.875rem; /* 14px */
   text-align: left;
 }
 
@@ -159,14 +300,16 @@
   background: rgba(255, 255, 255, 0.04);
   padding: 0.75rem 1rem;
   font-weight: 600;
-  color: var(--color-text-secondary, #999);
-  border-bottom: 1px solid var(--color-border, #333);
+  color: var(--color-text-secondary, #BBCBB9);
+  border-bottom: 1px solid var(--color-separator, rgba(255, 255, 255, 0.08));
+  text-align: left;
 }
 
 .admin-backup__table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--color-text, #eee);
+  border-bottom: 1px solid var(--color-separator, rgba(255, 255, 255, 0.05));
+  color: var(--color-text-primary, #d9d9d9);
+  text-align: left;
 }
 
 .admin-backup__table tr:last-child td {
@@ -178,29 +321,29 @@
 }
 
 .admin-backup__table-empty {
-  text-align: center;
+  text-align: center !important;
   padding: 2rem 1rem !important;
-  color: var(--color-text-secondary, #888);
+  color: var(--color-text-secondary, #BBCBB9);
 }
 
 .admin-backup__file-code {
   font-family: monospace;
-  font-size: 0.8rem;
+  font-size: 0.875rem; /* 14px */
   background: rgba(255, 255, 255, 0.06);
-  padding: 0.15rem 0.35rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 4px;
 }
 
+/* === SEKCJA PRZYWRACANIA (DANGER) === */
 .admin-backup__section--danger {
-  border-color: var(--color-danger-border, #5c2020);
-  background: var(--color-danger-surface, #1e1015);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(45, 17, 24, 0.4);
 }
 
 .admin-backup__section--danger .admin-backup__section-title {
-  color: var(--color-danger, #e74c3c);
+  color: #f87171;
 }
 
-/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .admin-backup__file-row {
   display: flex;
   align-items: center;
@@ -209,97 +352,61 @@
 }
 
 .admin-backup__file-input {
-  font-size: 0.875rem;
-}
-
-.admin-backup__restore-actions {
-  margin-top: 1rem;
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-primary, #d9d9d9);
 }
 
 .admin-backup__file-name {
-  font-size: 0.85rem;
-  color: var(--color-text-secondary, #888);
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-secondary, #BBCBB9);
   font-style: italic;
 }
 
+.admin-backup__restore-actions {
+  margin-top: 1.25rem;
+}
+
+/* === STATUS BANNERY === */
 .admin-backup__status {
   margin-top: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 8px;
-  font-size: 0.875rem;
+  font-size: 0.875rem; /* 14px */
+  text-align: left;
 }
 
 .admin-backup__status--success {
-  background: var(--color-success-surface, #0d2818);
-  color: var(--color-success, #2ecc71);
-  border: 1px solid var(--color-success-border, #1e5631);
+  background: rgba(30, 204, 56, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .admin-backup__status--error {
-  background: var(--color-danger-surface, #1e1015);
-  color: var(--color-danger, #e74c3c);
-  border: 1px solid var(--color-danger-border, #5c2020);
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.admin-backup__modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+/* === MODALE === */
+.admin-backup__modal-form {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: left;
+  padding: 0.5rem 0;
 }
 
-.admin-backup__modal {
-  background: var(--color-surface, #1e1e2e);
-  border: 1px solid var(--color-border, #333);
-  border-radius: 12px;
-  padding: 2rem;
-  max-width: 480px;
-  width: 90%;
+.admin-backup__modal-warning {
+  font-size: 0.875rem; /* 14px */
+  color: #f87171;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 600;
 }
 
-.admin-backup__modal-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-danger, #e74c3c);
-  margin: 0 0 1rem;
-}
-
-.admin-backup__modal-text {
-  font-size: 0.9rem;
-  color: var(--color-text-secondary, #ccc);
-  line-height: 1.6;
-  margin: 0 0 1rem;
-}
-
-.admin-backup__modal-text code {
-  background: var(--color-code-bg, #2a2a3a);
-  padding: 0.15em 0.4em;
-  border-radius: 4px;
-  font-weight: 700;
-  color: var(--color-danger, #e74c3c);
-}
-
-.admin-backup__modal-input {
-  width: 100%;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.9rem;
-  border: 1px solid var(--color-border, #444);
-  border-radius: 8px;
-  background: var(--color-input-bg, #12121a);
-  color: var(--color-text, #eee);
-  margin-bottom: 1.25rem;
-  outline: none;
-}
-
-.admin-backup__modal-input:focus {
-  border-color: var(--color-danger, #e74c3c);
-}
-
-.admin-backup__modal-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
+.admin-backup__modal-instruction {
+  font-size: 0.875rem; /* 14px */
+  color: var(--color-text-primary, #d9d9d9);
+  line-height: 1.5;
+  margin: 0;
 }
