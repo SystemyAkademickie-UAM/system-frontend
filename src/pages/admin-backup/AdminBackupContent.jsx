@@ -116,6 +116,7 @@ const TEXTS = {
     restoreProgress: 'Przywracanie bazy danych...',
     restoreSuccess: 'Baza danych została pomyślnie przywrócona.',
     selectFileError: 'Wybierz plik kopii zapasowej (.enc).',
+    fileTooLargeError: 'Plik przekracza maksymalny dopuszczalny rozmiar (100 MB).',
   },
   english: {
     pageTitle: 'Database Backup',
@@ -208,6 +209,7 @@ const TEXTS = {
     restoreProgress: 'Restoring database...',
     restoreSuccess: 'Database restored successfully.',
     selectFileError: 'Please select a backup file (.enc).',
+    fileTooLargeError: 'The file exceeds the maximum allowed size (100 MB).',
   },
 };
 
@@ -400,6 +402,18 @@ export default function AdminBackupContent() {
   // === HANDLERY: PRZYWRACANIE (IMPORT) ===
   const handleFileChange = (event) => {
     const file = event.target.files?.[0] || null;
+    if (file && !file.name.endsWith('.enc')) {
+      showError(t.selectFileError);
+      event.target.value = '';
+      setSelectedFile(null);
+      return;
+    }
+    if (file && file.size > 100 * BYTES_PER_MIB) {
+      showError(t.fileTooLargeError);
+      event.target.value = '';
+      setSelectedFile(null);
+      return;
+    }
     setSelectedFile(file);
     setImportStatus(null);
   };
