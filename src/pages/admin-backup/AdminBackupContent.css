@@ -238,6 +238,10 @@
   width: 100%;
 }
 
+.admin-backup__input--number {
+  max-width: 160px;
+}
+
 .admin-backup__input--confirm {
   margin-top: 0.5rem;
 }

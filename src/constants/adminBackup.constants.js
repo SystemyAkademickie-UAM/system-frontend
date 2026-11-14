@@ -24,4 +24,5 @@ export const AUTO_BACKUP_INTERVAL_OPTIONS = [
   { value: 'every_3_days', label: { polish: 'Co 3 dni', english: 'Every 3 days' } },
   { value: 'weekly', label: { polish: 'Co tydzień', english: 'Weekly' } },
   { value: 'every_2_weeks', label: { polish: 'Co 2 tygodnie', english: 'Every 2 weeks' } },
+  { value: 'custom', label: { polish: 'Własny interwał (w dniach)', english: 'Custom interval (in days)' } },
 ];
