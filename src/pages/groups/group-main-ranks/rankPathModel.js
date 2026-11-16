@@ -36,6 +36,8 @@ import { resolveRankIdFromTotalEarned } from '../../../utils/ranks/autoRankAssig
  * @property {number} totalEarned
  * @property {number | null} dbRankId
  * @property {string | null} rankId
+ * @property {string} [firstName]
+ * @property {string} [lastName]
  */
 
 /**
@@ -287,5 +289,7 @@ export function mapStudentForRankPath(student, ranks) {
     totalEarned: student.totalEarned ?? 0,
     dbRankId: effectiveDbRankId,
     rankId: matchedRank?.id ?? null,
+    firstName: student.name || '',
+    lastName: student.surname || '',
   };
 }

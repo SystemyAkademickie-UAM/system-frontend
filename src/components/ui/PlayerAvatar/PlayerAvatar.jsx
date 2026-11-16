@@ -45,32 +45,37 @@ import './PlayerAvatar.css';
 
  * @param {string} [props.ariaLabel]
  * @param {string} [props.href]
+
  */
 
 // === GŁÓWNY KOMPONENT WIDOKU ===
 export default function PlayerAvatar({
 
-  nickname,
+ nickname,
 
-  avatarUrl,
+ avatarUrl,
 
-  totalEarned,
+ totalEarned,
 
-  currencySymbol,
+ currencySymbol,
 
-  size = 'md',
+ size = 'md',
 
-  tooltipPlacement = 'right',
+ tooltipPlacement = 'right',
 
-  tooltipAlwaysVisible = false,
+ tooltipAlwaysVisible = false,
 
-  tooltipPlain = false,
+ tooltipPlain = false,
 
-  className = '',
+ className = '',
 
-  ariaLabel,
+ ariaLabel,
 
-  href,
+ href,
+
+ firstName,
+
+ lastName,
 
 }) {
 
@@ -134,9 +139,19 @@ const [tooltipLayout, setTooltipLayout] = useState(null);
 
   };
 
-  const displayName = nickname?.trim() || 'Osoba korzystająca z systemu';
+  var displayName = '';
 
-const label = ariaLabel ?? `Profil: ${displayName}`;
+  if (firstName == undefined && lastName == undefined) {
+    displayName = nickname;
+  } else if (firstName != undefined && lastName == undefined) {
+    displayName = lastName + ' (' + nickname + ')';
+  } else if (firstName == undefined && lastName != undefined) {
+    displayName = firstName + ' (' + nickname + ')';
+  } else {
+    displayName = firstName + ' ' + lastName + ' (' + nickname + ')';
+  }
+
+  const label = ariaLabel ?? 'Profil: ' + displayName;
 
   const sharedClassName = [
     'maq-player-avatar',
