@@ -68,7 +68,7 @@ const DiskSpacePage = withLazy(() => import('../pages/disk-space/DiskSpaceConten
 const DocumentsPage = withLazy(() => import('../pages/documents/DocumentsContent.jsx'));
 const BroadcastsPage = withLazy(() => import('../pages/broadcasts/BroadcastsContent.jsx'));
 const OrganizationManagementPage = withLazy(() => import('../pages/organization-management/OrganizationManagementContent.jsx'));
-const SuperadminLogsPage = withLazy(() => import('../pages/superadmin-logs/SuperadminLogsContent.jsx'));
+const SuperadminLogsPage = withLazy(() => import('../pages/admin-logs/LogsPage.jsx'));
 const AdminBackupPage = withLazy(() => import('../pages/admin-backup/AdminBackupContent.jsx'));
 const SettingsPage = withLazy(() => import('../pages/settings/SettingsContent.jsx'));
 const StatisticsPage = withLazy(() => import('../pages/statistics/StatisticsContent.jsx'));
