@@ -198,7 +198,7 @@ const MAINTENANCECONFIRMATIONTITLE__TEXTLABEL = {
 
 const MAINTENANCEENABLECONFIRMATIONTEXT__TEXTLABEL = {
   polish: 'Czy na pewno włączyć tryb prac technicznych? Włączenie go uniemożliwi korzystanie z platformy osobom studiującym, osobom prowadzącym i osobom administrującym.',
-  english: 'Are you sure you want to enable maintenance mode? Enabling it will not allow students, lecturers, and administrators use the platfrom.'
+  english: 'Are you sure you want to enable maintenance mode? Enabling it will not allow students, lecturers, and administrators to use the platform.'
 };
 
 const MAINTENANCEDISABLECONFIRMATIONTEXT__TEXTLABEL = {
@@ -209,6 +209,11 @@ const MAINTENANCEDISABLECONFIRMATIONTEXT__TEXTLABEL = {
 const MAINTENANCECONTROL__TEXTLABEL = {
   polish: 'Kontrola przerwy technicznej',
   english: 'Maintenance control'
+};
+
+const MAINTENANCESAVEERROR__TEXTLABEL = {
+  polish: 'Nie udało się zapisać przerwy technicznej.',
+  english: 'Failed to save maintenance mode.'
 };
 
 const BROADCASTDELETECONFIRMATIONTITLE__TEXTLABEL = {
@@ -280,7 +285,11 @@ function concatenatedatetime(datevalue, timevalue) {
   if (timevalue == null || timevalue == '') {
     timevalue = '00:00';
   }
-  return new Date(datevalue + 'T' + timevalue).toISOString();
+  const parsed = new Date(datevalue + 'T' + timevalue);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+  return parsed.toISOString();
 }
 
 function concatenateexpiration(data) {
@@ -309,6 +318,7 @@ export default function BroadcastsContentContent() {
   const [systemupdatedat, setSystemupdatedat] = useState('');
   const [systemservertime, setSystemservertime] = useState('');
   const [maintenanceconfirmationopen, setMaintenanceconfirmationopen] = useState(0);
+  const [maintenancesaveerror, setMaintenancesaveerror] = useState('');
   const [broadcastdeleteconfirmationopen, setBroadcastdeleteconfirmationopen] = useState(0);
   const [broadcastdeleteconfirmationid, setBroadcastdeleteconfirmationid] = useState(0);
   const [broadcastdeleteconfirmationtitle, setBroadcastdeleteconfirmationtitle] = useState('');
@@ -498,6 +508,10 @@ export default function BroadcastsContentContent() {
 
       let receiveddata = data;
 
+      if (!response.ok || receiveddata?.maintenance == null) {
+        return;
+      }
+
       if (receiveddata.maintenance.enabled == true) {
         setSystemenabled(1);
       } else {
@@ -671,15 +685,20 @@ export default function BroadcastsContentContent() {
 
       }
 
+      if (!response.ok) {
+        const message = data && typeof data.message === 'string'
+          ? data.message
+          : MAINTENANCESAVEERROR__TEXTLABEL[LANGUAGE];
+        setMaintenancesaveerror(message);
+        return;
+      }
 
-
+      setMaintenancesaveerror('');
       onFetchMaintenance();
       onFetchSystemStatus();
 
     } catch (error) {
-
-
-
+      setMaintenancesaveerror(MAINTENANCESAVEERROR__TEXTLABEL[LANGUAGE]);
     }
   }
 
@@ -1038,6 +1057,9 @@ export default function BroadcastsContentContent() {
           <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', marginTop: '0vh'}}><span>{MAINTENANCESECTION__TEXTLABEL[LANGUAGE]}</span></div>
           <div style = {{width: '100%', display: 'flex', justifyContent: 'flex-start', paddingLeft: '1%', marginTop: '2vh'}}>
             <Button onClick = {openMaintenanceConfirmation} style = {{width: '20%', height: '5vh', color: maintenanceenabled === 1 ? '#000000' : '#ffffff', marginTop: '1vh'}} variant = "primary">{maintenancebuttontext}</Button>
+            {maintenancesaveerror ? (
+              <div role = "alert" style = {{color: 'var(--color-danger, #b42318)', marginTop: '1vh'}}>{maintenancesaveerror}</div>
+            ) : null}
 
 
           </div>

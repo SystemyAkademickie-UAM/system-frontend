@@ -59,6 +59,10 @@ export default function BroadcastsContentMaintenance() {
 
       let receiveddata = data;
 
+      if (!response.ok || receiveddata?.maintenance == null) {
+        return;
+      }
+
       if (receiveddata.maintenance.enabled == true) {
         setMaintenanceon(1);
       } else {
