@@ -182,8 +182,8 @@
 .superadmin-logs__error-banner {
   padding: 0.85rem 1.25rem;
   background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-input-error-border, #ef4444);
-  color: var(--color-input-error, #f87171);
+  border: 1px solid var(--color-input-error-border);
+  color: var(--color-input-error);
   border-radius: var(--border-radius-base, 8px);
   font-size: 14px;
   font-weight: 500;
@@ -267,29 +267,29 @@
 
 .superadmin-logs__badge--error,
 .superadmin-logs__badge--fatal {
-  background-color: rgba(239, 68, 68, 0.18);
-  color: var(--color-input-error, #f87171);
-  border: 1px solid var(--color-input-error-border, #ef4444);
+  background-color: var(--color-bg-elevated);
+  color: var(--color-input-error);
+  border: 1px solid var(--color-input-error-border);
 }
 
 .superadmin-logs__badge--warn {
-  background-color: rgba(245, 158, 11, 0.18);
-  color: var(--color-notification-item-used-bright, #f0c940);
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  background-color: var(--color-bg-elevated);
+  color: var(--color-notification-item-used-bright);
+  border: 1px solid var(--color-notification-item-used);
 }
 
 .superadmin-logs__badge--log,
 .superadmin-logs__badge--info {
-  background-color: rgba(30, 204, 56, 0.15);
+  background-color: var(--color-bg-elevated);
   color: var(--color-accent);
-  border: 1px solid rgba(30, 204, 56, 0.3);
+  border: 1px solid var(--color-accent);
 }
 
 .superadmin-logs__badge--debug,
 .superadmin-logs__badge--verbose {
-  background-color: rgba(148, 163, 184, 0.15);
+  background-color: var(--color-bg-elevated);
   color: var(--color-text-secondary);
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  border: 1px solid var(--color-divider);
 }
 
 /* Tag organizacji */
@@ -335,24 +335,24 @@
 }
 
 .superadmin-logs__http-method.is-get {
-  background-color: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
+  background-color: var(--color-bg-elevated);
+  color: var(--color-badge-rarity-common);
 }
 
 .superadmin-logs__http-method.is-post {
-  background-color: rgba(30, 204, 56, 0.2);
+  background-color: var(--color-bg-elevated);
   color: var(--color-accent);
 }
 
 .superadmin-logs__http-method.is-put,
 .superadmin-logs__http-method.is-patch {
-  background-color: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
+  background-color: var(--color-bg-elevated);
+  color: var(--color-notification-item-used-bright);
 }
 
 .superadmin-logs__http-method.is-delete {
-  background-color: rgba(239, 68, 68, 0.2);
-  color: var(--color-input-error, #f87171);
+  background-color: var(--color-bg-elevated);
+  color: var(--color-input-error);
 }
 
 .superadmin-logs__http-path {
@@ -375,11 +375,11 @@
 }
 
 .superadmin-logs__http-status.is-4xx {
-  color: var(--color-notification-item-used-bright, #f0c940);
+  color: var(--color-notification-item-used-bright);
 }
 
 .superadmin-logs__http-status.is-5xx {
-  color: var(--color-input-error, #f87171);
+  color: var(--color-input-error);
 }
 
 .superadmin-logs__http-duration {
