@@ -22,6 +22,8 @@ import OrganizationRoleDialog from './OrganizationRoleDialog.jsx';
 import Sidebar from './Sidebar.jsx';
 import SuperBar from './superbar/SuperBar.jsx';
 import SuperBarBreadcrumbMobile from './superbar/SuperBarBreadcrumbMobile.jsx';
+import BroadcastsContentWindow from '../../pages/broadcasts/BroadcastsContentWindow.jsx';
+import BroadcastsContentMaintenance from '../../pages/broadcasts/BroadcastsContentMaintenance.jsx';
 import './AppShell.css';
 
 // === STAŁE I ETYKIETY JĘZYKOWE ===
@@ -207,6 +209,8 @@ const handleContextSaved = async () => {
         onClose={() => setIsContextOpen(false)}
         onSaved={handleContextSaved}
       />
+      <BroadcastsContentWindow />
+      <BroadcastsContentMaintenance />
     </div>
   );
 }
