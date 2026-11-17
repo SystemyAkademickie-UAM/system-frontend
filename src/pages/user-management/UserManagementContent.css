@@ -1,9 +1,3 @@
-/**
- * @file UserManagementContent.css
- * @description Style interfejsu użytkownika i układ dla modułu UserManagementContent.
- */
-
-/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .user-management-page__toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -12,7 +6,72 @@
   width: 100%;
 }
 
-.user-management-page__toolbar .maq-search-bar {
-  flex: 1 1 16rem;
-  min-width: 12rem;
+.user-management {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+}
+
+.user-management__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.user-management__form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  width: min(100%, 36rem);
+  padding: 1.25rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: 12px;
+}
+
+.user-management__role {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+}
+
+.user-management__role select {
+  min-width: 16rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.75rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-divider);
+  border-radius: 8px;
+  font-size: var(--font-size-body);
+}
+
+.user-management__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.user-management .data-table-wrap {
+  width: 100%;
+}
+
+.user-management .data-table__cell {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }

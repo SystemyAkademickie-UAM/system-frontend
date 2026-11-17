@@ -160,9 +160,9 @@ export const ROUTE_TABLE = [
     id: 'app.logs',
     section: 'app',
     pathPattern: '/logs',
-    pageTitle: 'Logi produkcyjne',
-    pageModule: 'pages/superadmin-logs/SuperadminLogsContent.jsx',
-    contentModule: 'pages/superadmin-logs/SuperadminLogsContent.jsx',
+    pageTitle: 'Logi',
+    pageModule: 'pages/admin-logs/LogsPage.jsx',
+    contentModule: 'pages/admin-logs/LogsPage.jsx',
     roles: ['admin', 'superadmin'],
   },
   {
