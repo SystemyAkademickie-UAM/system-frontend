@@ -1,40 +1,501 @@
 /**
  * @file SuperadminLogsContent.css
- * @description Style interfejsu użytkownika i układ dla modułu SuperadminLogsContent.
+ * @description Style widoku audytu logów systemowych dla osoby nadzorującej.
+ * Wszystkie kolory, marginesy i typografia zgodne z tokens.css oraz Frontend Workflow Guidelines.
  */
 
-/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+/* === GŁÓWNY KONTENER STRONY === */
 .superadmin-logs {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+/* === SIATKA KART KPI (STATYSTYKI RUCHU I STABILNOŚCI) === */
+.superadmin-logs__kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.superadmin-logs__kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.25rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base, 8px);
+  text-align: left;
+}
+
+.superadmin-logs__kpi-label {
+  font-family: var(--font-family-app);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.superadmin-logs__kpi-value {
+  font-family: var(--font-family-app);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.superadmin-logs__kpi-sub {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+/* === PASEK STEROWANIA I AKCJI === */
+.superadmin-logs__controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base, 8px);
+}
+
+.superadmin-logs__date-picker {
+  display: flex;
+  align-items: center;
   gap: 0.75rem;
-  max-width: 56rem;
 }
 
-.superadmin-logs__hint,
+.superadmin-logs__control-label {
+  font-family: var(--font-family-app);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
 
-/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
-.superadmin-logs__label {
+.superadmin-logs__actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Przełącznik widoku: Tabela vs Raw */
+.superadmin-logs__view-toggle {
+  display: inline-flex;
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base, 8px);
+  padding: 2px;
+}
+
+.superadmin-logs__toggle-btn {
+  font-family: var(--font-family-app);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.superadmin-logs__toggle-btn.is-active {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.superadmin-logs__toggle-btn:hover:not(.is-active) {
+  color: var(--color-text-primary);
+}
+
+/* === KARTA FILTRÓW I SORTOWANIA === */
+.superadmin-logs__filters-card {
+  padding: 1.25rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base, 8px);
+}
+
+.superadmin-logs__filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.superadmin-logs__filter-field--search {
+  grid-column: 1 / -1;
+}
+
+.superadmin-logs__filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+}
+
+.superadmin-logs__filter-field--reset {
+  justify-content: flex-end;
+}
+
+.superadmin-logs__filter-label {
+  font-family: var(--font-family-app);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.superadmin-logs__select,
+.superadmin-logs__input {
+  font-family: var(--font-family-app);
+  font-size: 14px;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base, 8px);
+  box-sizing: border-box;
+}
+
+.superadmin-logs__input:focus,
+.superadmin-logs__select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+/* === BANER BŁĘDU === */
+.superadmin-logs__error-banner {
+  padding: 0.85rem 1.25rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-input-error-border);
+  color: var(--color-input-error);
+  border-radius: var(--border-radius-base, 8px);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+
+/* === TABELA USTRUKTURYZOWANA === */
+.superadmin-logs__table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base, 8px);
+  overflow-x: auto;
+}
+
+.superadmin-logs__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: var(--font-family-app);
+  font-size: 14px;
+}
+
+.superadmin-logs__table th {
+  padding: 0.85rem 1rem;
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-divider);
+  white-space: nowrap;
+}
+
+.superadmin-logs__th-time { width: 140px; }
+.superadmin-logs__th-level { width: 90px; }
+.superadmin-logs__th-org { width: 180px; }
+.superadmin-logs__th-context { width: 140px; }
+.superadmin-logs__th-action { width: 90px; text-align: center; }
+
+.superadmin-logs__row {
+  border-bottom: 1px solid var(--color-divider);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.superadmin-logs__row:hover {
+  background-color: var(--color-bg-elevated);
+}
+
+.superadmin-logs__row.is-expanded {
+  background-color: var(--color-bg-elevated);
+}
+
+.superadmin-logs__table td {
+  padding: 0.75rem 1rem;
+  color: var(--color-text-primary);
+  vertical-align: top;
+  font-size: 14px;
+}
+
+.superadmin-logs__td-time {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+/* Odznaki poziomów logów */
+.superadmin-logs__badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 48px;
+  box-sizing: border-box;
+}
+
+.superadmin-logs__badge--error,
+.superadmin-logs__badge--fatal {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-input-error);
+  border: 1px solid var(--color-input-error-border);
+}
+
+.superadmin-logs__badge--warn {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-notification-item-used-bright);
+  border: 1px solid var(--color-notification-item-used);
+}
+
+.superadmin-logs__badge--log,
+.superadmin-logs__badge--info {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.superadmin-logs__badge--debug,
+.superadmin-logs__badge--verbose {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-divider);
+}
+
+/* Tag organizacji */
+.superadmin-logs__org-tag {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  background-color: var(--color-bg-app);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-divider);
+  font-size: 14px;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tag kontekstu */
+.superadmin-logs__context-tag {
+  display: inline-block;
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-app);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+/* Linia ruchu HTTP */
+.superadmin-logs__http-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.superadmin-logs__http-method {
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+.superadmin-logs__http-method.is-get {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-badge-rarity-common);
+}
+
+.superadmin-logs__http-method.is-post {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-accent);
+}
+
+.superadmin-logs__http-method.is-put,
+.superadmin-logs__http-method.is-patch {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-notification-item-used-bright);
+}
+
+.superadmin-logs__http-method.is-delete {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-input-error);
+}
+
+.superadmin-logs__http-path {
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  word-break: break-all;
+}
+
+.superadmin-logs__http-status {
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.superadmin-logs__http-status.is-2xx {
+  color: var(--color-accent);
+}
+
+.superadmin-logs__http-status.is-4xx {
+  color: var(--color-notification-item-used-bright);
+}
+
+.superadmin-logs__http-status.is-5xx {
+  color: var(--color-input-error);
+}
+
+.superadmin-logs__http-duration {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.superadmin-logs__message-text {
+  font-size: 14px;
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+.superadmin-logs__row-toggle {
+  background: transparent;
+  border: none;
+  color: var(--color-accent);
+  font-family: var(--font-family-app);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Rozwinięte szczegóły wpisu */
+.superadmin-logs__expanded-details {
+  margin-top: 0.85rem;
+  padding: 0.85rem 1rem;
+  background-color: var(--color-bg-app);
+  border: 1px solid var(--color-divider);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.superadmin-logs__detail-row strong {
+  color: var(--color-text-primary);
+}
+
+.superadmin-logs__detail-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.superadmin-logs__detail-block strong {
+  color: var(--color-text-primary);
+}
+
+.superadmin-logs__stack-trace,
+.superadmin-logs__raw-line {
   margin: 0;
+  padding: 0.5rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 16rem;
+  overflow-y: auto;
 }
 
-.superadmin-logs__select {
-  max-width: 16rem;
+/* === PAGINACJA === */
+.superadmin-logs__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--color-divider);
+  background-color: var(--color-bg-surface);
 }
 
-.superadmin-logs__error {
-  color: #c0392b;
+.superadmin-logs__page-info {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.superadmin-logs__pagination-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* === STAN PUSTY === */
+.superadmin-logs__empty-state {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+/* === WIDOK SUROWY (TERMINAL) === */
+.superadmin-logs__raw-container {
+  width: 100%;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--border-radius-base, 8px);
+  overflow: hidden;
+}
+
+.superadmin-logs__raw-output {
   margin: 0;
-}
-
-/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
-.superadmin-logs__output {
-  min-height: 16rem;
-  max-height: 32rem;
+  padding: 1.25rem;
+  min-height: 20rem;
+  max-height: 40rem;
   overflow: auto;
-  padding: 0.75rem;
-  background: #1e1e28;
-  color: #e3e0f7;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
   white-space: pre-wrap;
   word-break: break-word;
+  text-align: left;
 }
