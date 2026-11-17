@@ -98,6 +98,20 @@ describe('OrganizationRoleDialog confirm', () => {
     expect(onSaved).not.toHaveBeenCalled();
     expect(document.body.textContent).toContain('Could not save the choice.');
   });
+
+  it('shows maintenance blocked message when role switch is rejected with 409 conflict during maintenance', async () => {
+    const onSaved = vi.fn();
+    postJson.mockResolvedValue({
+      ok: false,
+      status: 409,
+      data: { error: 'MAINTENANCE_ROLE_SWITCH_BLOCKED' },
+    });
+    await renderDialog(onSaved);
+    await confirm();
+
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain('Cannot change role while technical maintenance mode is active.');
+  });
 });
 
 describe('loginContextMenu', () => {

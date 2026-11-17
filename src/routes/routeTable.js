@@ -35,6 +35,14 @@ export const ROUTE_TABLE = [
     pageModule: 'pages/auth/LoginPage.jsx',
     contentModule: 'pages/auth/LoginPionierId.jsx',
   },
+  {
+    id: 'app.maintenance',
+    section: 'app',
+    pathPattern: '/maintenance',
+    pageTitle: 'Przerwa techniczna',
+    pageModule: 'pages/maintenance/MaintenancePage.jsx',
+    contentModule: 'pages/maintenance/MaintenancePage.jsx',
+  },
 
   {
     id: 'dev.apiTest',

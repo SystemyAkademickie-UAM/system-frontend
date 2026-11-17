@@ -57,6 +57,7 @@ const STUDENT_ONLY = [APP_ROLE.STUDENT];
 const LoginPage = withLazy(() => import('../pages/auth/LoginPage.jsx'));
 const LoginMagicPage = withLazy(() => import('../pages/auth/LoginMagicPage.jsx'));
 const WelcomePage = withLazy(() => import('../pages/auth/WelcomePage.jsx'));
+const MaintenancePage = withLazy(() => import('../pages/maintenance/MaintenancePage.jsx'));
 const DevApiTestPage = withLazy(() => import('../pages/api-test/DevApiTestPage.jsx'));
 
 const CourseManagementPage = withLazy(() => import('../pages/course-management/CourseManagementContent.jsx'));
@@ -120,6 +121,7 @@ const appRouteTree = [
     path: '/',
     children: [
       { index: true, element: <HomeRedirect /> },
+      { path: 'maintenance', element: <MaintenancePage /> },
       {
         element: <AuthShell />,
         children: [

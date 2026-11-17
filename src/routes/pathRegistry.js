@@ -22,6 +22,11 @@ export function welcomePath() {
   return '/welcome';
 }
 
+/** Strona informacyjna o przerwie technicznej. */
+export function maintenancePath() {
+  return '/maintenance';
+}
+
 /** Magic link landing route (`?token=` from email). */
 export function loginMagicPath() {
   return '/login/magic';
