@@ -75,3 +75,11 @@ export async function listOrganizationLog(query) {
   }
   return requireOk(await getJson(`/admin/organization-log?${params}`));
 }
+
+export async function getOrganizationDashboard(organizationId) {
+  return requireOk(await getJson(`/admin/organizations/${organizationId}/dashboard`));
+}
+
+export async function getOrganizationStorage(organizationId) {
+  return requireOk(await getJson(`/admin/organizations/${organizationId}/storage`));
+}

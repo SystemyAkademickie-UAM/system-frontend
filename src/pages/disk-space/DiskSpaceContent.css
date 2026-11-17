@@ -1,0 +1,516 @@
+/**
+ * @file DiskSpaceContent.css
+ * @description Style dla widoku zarządzania przestrzenią dyskową dla osoby administrującej.
+ */
+
+.disk-space-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  text-align: left;
+}
+
+.disk-space-loading-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  gap: 1rem;
+  text-align: center;
+}
+
+.disk-space-loading-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Top control bar */
+.disk-space-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.disk-space-org-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.disk-space-picker-label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.disk-space-org-select {
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-separator-one);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  font-family: var(--font-family-app);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.disk-space-org-select:focus {
+  border-color: var(--color-accent);
+}
+
+.disk-space-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Error banner */
+.disk-space-error-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-input-error);
+  border-radius: 8px;
+  color: var(--color-input-error);
+  font-size: 14px;
+}
+
+/* 4 KPI Cards Grid */
+.disk-space-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.disk-space-kpi-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-separator-one);
+  border-radius: 12px;
+  text-align: left;
+}
+
+.disk-space-kpi-label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.disk-space-kpi-value-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.disk-space-kpi-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.disk-space-kpi-sub {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.disk-space-usage-badge {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.disk-space-badge-normal {
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.disk-space-badge-warning {
+  background: rgba(240, 201, 64, 0.15);
+  color: var(--color-notification-item-used-bright);
+  border: 1px solid var(--color-notification-item-used-bright);
+}
+
+.disk-space-badge-critical {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--color-input-error);
+  border: 1px solid var(--color-input-error);
+}
+
+/* Card base */
+.disk-space-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-separator-one);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.disk-space-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-align: left;
+}
+
+/* Technical Parameters Card */
+.disk-space-tech-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.disk-space-tech-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.disk-space-mode-pill {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: var(--color-accent-muted);
+  border: 1px solid var(--color-accent);
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+}
+
+.disk-space-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.disk-space-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.disk-space-progress-label {
+  color: var(--color-text-primary);
+}
+
+.disk-space-progress-bytes {
+  color: var(--color-text-secondary);
+}
+
+.disk-space-bar-wrapper {
+  width: 100%;
+  height: 10px;
+  background: var(--color-bg-elevated);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.disk-space-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.disk-space-bar-normal {
+  background: var(--color-accent);
+}
+
+.disk-space-bar-warning {
+  background: var(--color-notification-item-used-bright);
+}
+
+.disk-space-bar-critical {
+  background: var(--color-input-error);
+}
+
+.disk-space-folder-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1rem;
+  background: var(--color-bg-elevated);
+  border-radius: 8px;
+  border: 1px solid var(--color-separator-one);
+}
+
+.disk-space-folder-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.disk-space-folder-code {
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--color-badge-rarity-common);
+  word-break: break-all;
+}
+
+.disk-space-rules-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-divider);
+  padding-top: 1rem;
+}
+
+.disk-space-rules-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  text-align: left;
+}
+
+.disk-space-rules-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.disk-space-rules-list li {
+  margin-bottom: 0.25rem;
+}
+
+/* Files Inventory Section */
+.disk-space-files-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.disk-space-files-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.disk-space-files-title-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.disk-space-files-count {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.disk-space-filters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.disk-space-search-input {
+  flex: 1;
+  min-width: 260px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-separator-one);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  padding: 0.6rem 1rem;
+  font-size: 14px;
+  font-family: var(--font-family-app);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.disk-space-search-input:focus {
+  border-color: var(--color-accent);
+}
+
+.disk-space-sort-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.disk-space-sort-label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.disk-space-sort-select {
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-separator-one);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  padding: 0.5rem 0.85rem;
+  font-size: 14px;
+  font-family: var(--font-family-app);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.disk-space-sort-select:focus {
+  border-color: var(--color-accent);
+}
+
+.disk-space-empty-box {
+  padding: 3rem 1rem;
+  text-align: center;
+  border: 1px dashed var(--color-separator-one);
+  border-radius: 8px;
+}
+
+.disk-space-empty-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Table layout */
+.disk-space-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-separator-one);
+  border-radius: 8px;
+}
+
+.disk-space-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 14px;
+}
+
+.disk-space-table th {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--color-divider);
+  white-space: nowrap;
+  text-align: left;
+}
+
+.disk-space-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--color-divider);
+  color: var(--color-text-primary);
+  vertical-align: middle;
+  text-align: left;
+}
+
+.disk-space-table tr:last-child td {
+  border-bottom: none;
+}
+
+.disk-space-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.disk-space-thumbnail-box {
+  width: 48px;
+  height: 36px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-separator-one);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.disk-space-thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.disk-space-group-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.disk-space-group-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.disk-space-subject-name {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.disk-space-lecturer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.disk-space-lecturer-name {
+  font-weight: 600;
+}
+
+.disk-space-lecturer-email {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.disk-space-ref-code {
+  font-family: monospace;
+  font-size: 14px;
+  color: var(--color-badge-rarity-common);
+  word-break: break-all;
+}
+
+.disk-space-mime-tag {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-elevated);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.disk-space-unassigned {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+.disk-space-link-btn {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-separator-one);
+  border-radius: 6px;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.disk-space-link-btn:hover {
+  background: var(--color-accent-muted);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
