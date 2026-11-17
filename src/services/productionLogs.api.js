@@ -11,6 +11,7 @@ import { extractApiError } from './apiErrors.js';
 export const ADMIN_LOGS_PATH = '/admin/logs';
 export const ADMIN_LOGS_EXPORT_PATH = '/admin/logs/export';
 export const CLIENT_LOGS_PATH = '/client-logs';
+export const ADMIN_ORGANIZATIONS_PATH = '/admin/organizations';
 
 /**
  * @returns {Promise<{ days: string[], timeZone: string }>}
@@ -25,7 +26,19 @@ if (!result.ok) {
 }
 
 /**
- * @param {{ clientPublicKey: string, day: string }} payload
+ * @returns {Promise<Array<{ id: number, name: string, isActive: boolean, domain: string }>>}
+ */
+export async function fetchOrganizations() {
+  const result = await getJson(ADMIN_ORGANIZATIONS_PATH);
+
+  if (!result.ok) {
+    return [];
+  }
+  return Array.isArray(result.data) ? result.data : [];
+}
+
+/**
+ * @param {{ clientPublicKey: string, day: string, organizationId?: string }} payload
  * @returns {Promise<object>}
  */
 export async function exportEncryptedProductionLogs(payload) {
