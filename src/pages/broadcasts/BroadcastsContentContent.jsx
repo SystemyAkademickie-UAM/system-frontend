@@ -3,7 +3,7 @@ import {getApiBaseUrl} from '../../constants/api.constants.js';
 import {getOrCreateBrowserId} from '../../auth/browserIdStorage.js';
 import {READLANGUAGECOOKIE} from '../../utils/LANGUAGECOOKIE.js';
 import {publicIconPath} from '../../utils/publicAssetUrl.js';
-import Button from '../../components/ui/Button/Button.jsx';
+import {Button, useToast} from '../../components/ui/index.js';
 import {Divider} from '../../components/ui/index.js';
 
 const theme = document.documentElement.getAttribute('data-theme');
@@ -56,9 +56,19 @@ const BROADCASTSSECTION__TEXTLABEL = {
   english: 'Broadcasted messages'
 };
 
+const BROADCASTSSECTIONDESCRIPTION__TEXTLABEL = {
+  polish: 'Sekcja pozwalająca tworzyć i emitować globalne ogłoszenia.',
+  english: 'Section allowing creating and broadcasting global messages.'
+};
+
 const MAINTENANCESECTION__TEXTLABEL = {
   polish: 'Przerwa techniczna',
   english: 'Maintenance'
+};
+
+const MAINTENANCESECTIONDESCRIPTION__TEXTLABEL = {
+  polish: 'Moduł umożliwiający włączenie i wyłączenie przerwy technicznej oraz jej konfigurację.',
+  english: 'A module that allows toggling and configuration of the maintenance.'
 };
 
 const NEWBROADCASTBUTTON__TEXTLABEL = {
@@ -241,6 +251,26 @@ const YESBUTTON__TEXTLABEL = {
   english: 'Yes'
 };
 
+const BROADCASTSAVINGSUCCESS__TEXTLABEL = {
+  polish: 'Ogłoszenie zostało zapisane.',
+  english: 'The broadcast has been saved.'
+};
+
+const BROADCASTDELETIONSUCCESS__TEXTLABEL = {
+  polish: 'Ogłoszenie zostało usunięte.',
+  english: 'The broadcast has been deleted.'
+};
+
+const MAINTENANCEONSUCCESS__TEXTLABEL = {
+  polish: 'Zapisano zmianę. Przerwa techniczna jest obecnie włączona.',
+  english: 'The change has been saved. The maintenance mode is currently enabled.'
+};
+
+const MAINTENANCEOFFSUCCESS__TEXTLABEL = {
+  polish: 'Zapisano zmianę. Przerwa techniczna jest obecnie wyłączona.',
+  english: 'The change has been saved. The maintenance mode is currently disabled.'
+};
+
 function preparedate(data) {
   if (data == null || data == '') {
     return '';
@@ -300,6 +330,7 @@ function concatenateexpiration(data) {
 }
 
 export default function BroadcastsContentContent() {
+  const {showSuccess, showError} = useToast();
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
@@ -591,7 +622,9 @@ export default function BroadcastsContentContent() {
       } catch {
 
       }
-
+      if (response.ok) {
+        showSuccess(BROADCASTSAVINGSUCCESS__TEXTLABEL[LANGUAGE]);
+      }
 
 
     } catch (error) {
@@ -605,7 +638,7 @@ export default function BroadcastsContentContent() {
 
 
 
-  async function onDeleteBroadcast(broadcastId) {
+  async function onDeleteBroadcast(broadcastId, toast) {
 
 
     try {
@@ -635,7 +668,9 @@ export default function BroadcastsContentContent() {
       } catch {
 
       }
-
+      if (response.ok && toast == 1) {
+        showSuccess(BROADCASTDELETIONSUCCESS__TEXTLABEL[LANGUAGE]);
+      }
 
 
       onFetchBroadcasts();
@@ -684,7 +719,13 @@ export default function BroadcastsContentContent() {
       } catch {
 
       }
-
+      if (response.ok) {
+        if (isEnabled == true) {
+          showSuccess(MAINTENANCEONSUCCESS__TEXTLABEL[LANGUAGE]);
+        } else {
+          showSuccess(MAINTENANCEOFFSUCCESS__TEXTLABEL[LANGUAGE]);
+        }
+      }
       if (!response.ok) {
         const message = data && typeof data.message === 'string'
           ? data.message
@@ -778,7 +819,7 @@ export default function BroadcastsContentContent() {
     }
 
     if (editormode == 1) {
-      await onDeleteBroadcast(editorid);
+      await onDeleteBroadcast(editorid, 0);
     }
 
     let i = 0;
@@ -862,7 +903,7 @@ export default function BroadcastsContentContent() {
 
   function confirmBroadcastDelete() {
     setBroadcastdeleteconfirmationopen(0);
-    onDeleteBroadcast(broadcastdeleteconfirmationid);
+    onDeleteBroadcast(broadcastdeleteconfirmationid, 1);
   }
 
 
@@ -994,8 +1035,8 @@ export default function BroadcastsContentContent() {
     <div>
       <div>
         <div style = {{width: '98%', height: '7%', position: 'absolute', top: '1vh', left: '1%', color: 'var(--text-primary)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>{BROADCASTSSECTION__TEXTLABEL[LANGUAGE]}</span></div>
-
-        <div style = {{width: '98%', top: '9vh', position: 'absolute', left: '1%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
+        <div style = {{width: '98%', height: '7%', position: 'absolute', top: '6vh', left: '1%', color: 'var(--text-primary)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>{BROADCASTSSECTIONDESCRIPTION__TEXTLABEL[LANGUAGE]}</span></div>
+        <div style = {{width: '98%', top: '14vh', position: 'absolute', left: '1%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
           <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
             <div style = {{width: '98%', height: '10vh', position: 'relative', top: '2%', left: '1%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>
               <div onClick = {firstpage} style = {{backgroundColor: 'var(--bg-surface)', height: '40px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: currentpageindex > 0 ? 'pointer' : 'default', opacity: currentpageindex > 0 ? 1 : 0.5}}>
@@ -1055,6 +1096,7 @@ export default function BroadcastsContentContent() {
           </div>
           <Divider className="group-main-subpage__divider" />
           <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', marginTop: '0vh'}}><span>{MAINTENANCESECTION__TEXTLABEL[LANGUAGE]}</span></div>
+          <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%', marginTop: '0vh'}}><span>{MAINTENANCESECTIONDESCRIPTION__TEXTLABEL[LANGUAGE]}</span></div>
           <div style = {{width: '100%', display: 'flex', justifyContent: 'flex-start', paddingLeft: '1%', marginTop: '2vh'}}>
             <Button onClick = {openMaintenanceConfirmation} style = {{width: '20%', height: '5vh', color: maintenanceenabled === 1 ? '#000000' : '#ffffff', marginTop: '1vh'}} variant = "primary">{maintenancebuttontext}</Button>
             {maintenancesaveerror ? (
