@@ -27,6 +27,7 @@ export const ACCOUNT_ROLE_ALL = 'all';
 export const ACCOUNT_ROLE_STUDENT = 'student';
 export const ACCOUNT_ROLE_LECTURER = 'lecturer';
 export const ACCOUNT_ROLE_ADMINISTRATOR = 'administrator';
+export const ACCOUNT_ROLE_SUPER = 'super';
 
 export const LOGIN_METHOD_EMAIL = 'email';
 

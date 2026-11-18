@@ -16,10 +16,15 @@ import {
 import {
   adminHomePath,
   groupsListPath,
+  maintenancePath,
   organizationsPath,
   registerPath,
   welcomePath,
 } from '../../routes/pathRegistry.js';
+import {
+  fetchMaintenanceStatus,
+  isCachedMaintenanceActive,
+} from '../../services/maintenance.api.js';
 import './RouteGuard.css';
 
 // === STAŁE I ETYKIETY JĘZYKOWE ===
@@ -40,20 +45,32 @@ export default function HomeRedirect() {
   const { isAuthenticated, isLoading } = useSession();
   const { role } = useAppRole();
   const [registrationState, setRegistrationState] = useState(REGISTRATION_STATE.PENDING);
+  const [isMaintenance, setIsMaintenance] = useState(
+    role !== APP_ROLE.SUPERADMIN && isCachedMaintenanceActive(),
+  );
 
   useEffect(() => {
     if (isLoading) {
       return;
     }
 
-    if (!isAuthenticated) {
-      setRegistrationState(REGISTRATION_STATE.ANONYMOUS);
-      return;
-    }
-
     let cancelled = false;
 
-    async function resolveRegistrationState() {
+    async function checkMaintenanceAndState() {
+      if (role !== APP_ROLE.SUPERADMIN) {
+        const mStatus = await fetchMaintenanceStatus();
+        if (cancelled) return;
+        if (mStatus?.enabled) {
+          setIsMaintenance(true);
+          return;
+        }
+      }
+
+      if (!isAuthenticated) {
+        setRegistrationState(REGISTRATION_STATE.ANONYMOUS);
+        return;
+      }
+
       const status = await fetchRegistrationStatus();
       if (cancelled) {
         return;
@@ -66,12 +83,16 @@ export default function HomeRedirect() {
     }
 
     setRegistrationState(REGISTRATION_STATE.PENDING);
-    void resolveRegistrationState();
+    void checkMaintenanceAndState();
 
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, role]);
+
+  if (isMaintenance && role !== APP_ROLE.SUPERADMIN) {
+    return <Navigate to={maintenancePath()} replace />;
+  }
 
   if (isLoading || (isAuthenticated && registrationState === REGISTRATION_STATE.PENDING)) {
     return (

@@ -121,3 +121,36 @@ try {
     }
   }
 }
+
+let maintenanceRedirectHandling = false;
+
+/**
+ * Przekierowuje użytkownika na dedykowaną stronę /maintenance, gdy wykryto aktywną przerwę techniczną.
+ */
+export function handleMaintenanceRedirect() {
+  if (maintenanceRedirectHandling) {
+    return;
+  }
+  maintenanceRedirectHandling = true;
+  try {
+    if (typeof window !== 'undefined' && typeof window.location?.replace === 'function') {
+      const pathname = window.location.pathname || '';
+      if (!pathname.startsWith('/maintenance')) {
+        try {
+          if (process.env.NODE_ENV !== 'test') {
+            window.location.replace('/maintenance');
+          }
+        } catch {
+        }
+      }
+    }
+  } finally {
+    if (typeof window !== 'undefined') {
+      window.setTimeout(() => {
+        maintenanceRedirectHandling = false;
+      }, 500);
+    } else {
+      maintenanceRedirectHandling = false;
+    }
+  }
+}

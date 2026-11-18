@@ -5,7 +5,8 @@
 
 // === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getApiBaseUrl } from '../constants/api.constants.js';
-import { handleSessionExpired } from '../auth/clientAuthState.js';
+import { handleMaintenanceRedirect, handleSessionExpired } from '../auth/clientAuthState.js';
+import { updateCachedMaintenanceStatus } from './maintenance.api.js';
 
 /**
  * Lightweight API client using native `fetch`.
@@ -22,10 +23,20 @@ const PUBLIC_AUTH_PATHS = [
   '/auth/saml/status',
 ];
 
+const PUBLIC_SYSTEM_PATHS = [
+  '/system/status',
+  '/system/maintenance',
+];
+
 // === OPERACJE I ZAPYTANIA REST API ===
 export function isPublicAuthEndpoint(pathOrUrl) {
   if (!pathOrUrl || typeof pathOrUrl !== 'string') return false;
   return PUBLIC_AUTH_PATHS.some((path) => pathOrUrl.includes(path));
+}
+
+export function isPublicSystemEndpoint(pathOrUrl) {
+  if (!pathOrUrl || typeof pathOrUrl !== 'string') return false;
+  return PUBLIC_SYSTEM_PATHS.some((path) => pathOrUrl.includes(path));
 }
 
 function isAuthFailureMessage(data) {
@@ -41,6 +52,18 @@ function isAuthFailureMessage(data) {
 }
 
 function handleResponseStatus(response, resourcePath, data = null) {
+  if (isPublicSystemEndpoint(resourcePath)) {
+    return;
+  }
+  if (response?.status === 503) {
+    if (data && typeof data === 'object' && data.maintenance) {
+      updateCachedMaintenanceStatus(data.maintenance);
+    } else {
+      updateCachedMaintenanceStatus({ enabled: true, message: typeof data?.message === 'string' ? data.message : '' });
+    }
+    handleMaintenanceRedirect();
+    return;
+  }
   if (isPublicAuthEndpoint(resourcePath)) {
     return;
   }
@@ -68,8 +91,23 @@ const originalFetch = window.fetch;
 
   window.fetch = async function interceptedFetch(...args) {
     const response = await originalFetch.apply(this, args);
+    const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+    if (response && response.status === 503 && !isPublicSystemEndpoint(url)) {
+      if (typeof response.clone === 'function') {
+        try {
+          response.clone().json().then((body) => {
+            if (body && typeof body === 'object' && body.maintenance) {
+              updateCachedMaintenanceStatus(body.maintenance);
+            } else {
+              updateCachedMaintenanceStatus({ enabled: true, message: typeof body?.message === 'string' ? body.message : '' });
+            }
+          }).catch(() => {});
+        } catch {
+        }
+      }
+      handleMaintenanceRedirect();
+    }
     if (response && (response.status === 401 || response.status === 403)) {
-      const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
       if (!isPublicAuthEndpoint(url)) {
         if (response.status === 401) {
           handleSessionExpired();

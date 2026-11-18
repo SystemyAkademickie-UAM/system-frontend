@@ -16,6 +16,27 @@
   font-size: var(--font-size-body);
 }
 
+.user-management__org-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-divider, #e5e7eb);
+  border-radius: 8px;
+  width: 100%;
+}
+
+.user-management__org-selector select {
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-divider, #d1d5db);
+  background: var(--color-bg-elevated, #ffffff);
+  color: var(--color-text-primary, #111827);
+  font-size: var(--font-size-body);
+  min-width: 220px;
+}
+
 .user-management__toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -54,6 +75,37 @@
   border: 1px solid var(--color-divider);
   border-radius: 8px;
   font-size: var(--font-size-body);
+}
+
+.user-management__role-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+}
+
+.user-management__grant-roles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-elevated, #f9fafb);
+  border: 1px dashed var(--color-divider, #e5e7eb);
+  border-radius: 8px;
+  width: 100%;
+}
+
+.user-management__grant-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.user-management__grant-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .user-management__file {

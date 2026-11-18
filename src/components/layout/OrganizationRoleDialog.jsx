@@ -43,6 +43,10 @@ const SAVE_ERROR = {
   polish: 'Nie udało się zapisać wyboru.',
   english: 'Could not save the choice.',
 };
+const MAINTENANCE_BLOCKED_ERROR = {
+  polish: 'Nie można zmienić roli podczas trwania przerwy technicznej.',
+  english: 'Cannot change role while technical maintenance mode is active.',
+};
 
 /**
  * @param {unknown} memberships
@@ -157,6 +161,10 @@ const title = titleSource[menu.kind][LANGUAGE];
         role: selectedRole,
       });
       if (!result.ok) {
+        if (result.data?.error === 'MAINTENANCE_ROLE_SWITCH_BLOCKED' || result.status === 409) {
+          setError(MAINTENANCE_BLOCKED_ERROR[LANGUAGE]);
+          return;
+        }
         setError(SAVE_ERROR[LANGUAGE]);
         return;
       }

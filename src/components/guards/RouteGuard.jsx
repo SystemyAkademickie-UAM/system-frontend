@@ -8,8 +8,10 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { isClientLogoutInProgress } from '../../auth/clientAuthState.js';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
 import { useRegistrationComplete } from '../../hooks/useRegistrationComplete.js';
-import { groupsListPath, loginPath, welcomePath } from '../../routes/pathRegistry.js';
+import { groupsListPath, loginPath, maintenancePath, welcomePath } from '../../routes/pathRegistry.js';
+import { isCachedMaintenanceActive } from '../../services/maintenance.api.js';
 import './RouteGuard.css';
 
 // === STAŁE I ETYKIETY JĘZYKOWE ===
@@ -50,6 +52,10 @@ const location = useLocation();
         <span className="route-guard-loading__spinner" />
       </div>
     );
+  }
+
+  if (role !== APP_ROLE.SUPERADMIN && isCachedMaintenanceActive()) {
+    return <Navigate to={maintenancePath()} replace />;
   }
 
   if (requireAuth && !isAuthenticated) {

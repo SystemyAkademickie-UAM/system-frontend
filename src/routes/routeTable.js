@@ -35,6 +35,14 @@ export const ROUTE_TABLE = [
     pageModule: 'pages/auth/LoginPage.jsx',
     contentModule: 'pages/auth/LoginPionierId.jsx',
   },
+  {
+    id: 'app.maintenance',
+    section: 'app',
+    pathPattern: '/maintenance',
+    pageTitle: 'Przerwa techniczna',
+    pageModule: 'pages/maintenance/MaintenancePage.jsx',
+    contentModule: 'pages/maintenance/MaintenancePage.jsx',
+  },
 
   {
     id: 'dev.apiTest',
@@ -93,7 +101,7 @@ export const ROUTE_TABLE = [
     pageTitle: 'Zarządzanie użytkownikami',
     pageModule: 'pages/user-management/UserManagementContent.jsx',
     contentModule: 'pages/user-management/UserManagementContent.jsx',
-    roles: ['admin'],
+    roles: ['admin', 'superadmin'],
   },
   {
     id: 'app.diskSpace',
