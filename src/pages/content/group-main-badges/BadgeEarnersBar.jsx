@@ -180,6 +180,8 @@ export default function BadgeEarnersBar({
           nickname={student.nickname}
           avatarUrl={student.avatarUrl}
           totalEarned={student.totalEarned}
+          firstName={student.firstName}
+          lastName={student.lastName}
           size="md"
           tooltipPlacement="top"
           href={!isStudentView && groupId && (student.position || student.accountId)
