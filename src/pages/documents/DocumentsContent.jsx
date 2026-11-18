@@ -4,20 +4,7 @@
  */
 
 // === IMPORTY I ZALEŻNOŚCI ===
-import { useState } from 'react';
-import AppSectionPage from '../../components/page/AppSectionPage.jsx';
-import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
-
-// === STAŁE I ETYKIETY JĘZYKOWE ===
-const PAGETITLE__TEXTLABEL = {
-  polish: 'Zarządzanie dokumentami i patch notes',
-  english: 'Document and Patch Notes Management',
-};
-
-const PAGEDESCRIPTION__TEXTLABEL = {
-  polish: 'Publikuj i zarządzaj dokumentacją wydań, plikami PDF z informacjami o aktualizacjach oraz regulaminami.',
-  english: 'Publish and manage release documentation, patch note PDF documents, and institutional regulations.',
-};
+import DocumentsContentContent from './DocumentsContentContent.jsx';
 
 // === ZARZĄDZANIE DOKUMENTAMI (OSOBA NADZORUJĄCA: /documents) ===
 /**
@@ -29,14 +16,10 @@ const PAGEDESCRIPTION__TEXTLABEL = {
  * - Zarządzanie dokumentami prawnymi i regulaminami
  */
 export default function DocumentsContent() {
-  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   // === RENDEROWANIE WIDOKU ===
   return (
-    <AppSectionPage
-      title={PAGETITLE__TEXTLABEL[LANGUAGE]}
-      description={PAGEDESCRIPTION__TEXTLABEL[LANGUAGE]}
-    />
+    <DocumentsContentContent />
   );
 }
 
