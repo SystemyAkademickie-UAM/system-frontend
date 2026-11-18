@@ -66,6 +66,10 @@ export default function PlayerAvatar({
 
   href,
 
+  firstName,
+
+  lastName,
+
 }) {
 
   const triggerRef = useRef(null);
@@ -131,8 +135,19 @@ export default function PlayerAvatar({
 
 
 
-  const displayName = nickname?.trim() || 'Osoba korzystająca z systemu';
-  const label = ariaLabel ?? `Profil: ${displayName}`;
+  var displayName = '';
+
+  if (firstName == undefined && lastName == undefined) {
+    displayName = nickname;
+  } else if (firstName != undefined && lastName == undefined) {
+    displayName = lastName + ' (' + nickname + ')';
+  } else if (firstName == undefined && lastName != undefined) {
+    displayName = firstName + ' (' + nickname + ')';
+  } else {
+    displayName = firstName + ' ' + lastName + ' (' + nickname + ')';
+  }
+
+  const label = ariaLabel ?? 'Profil: ' + displayName;
 
   const sharedClassName = [
     'maq-player-avatar',

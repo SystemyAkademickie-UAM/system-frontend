@@ -274,5 +274,7 @@ export function mapStudentForRankPath(student, ranks) {
     totalEarned: student.totalEarned ?? 0,
     dbRankId: effectiveDbRankId,
     rankId: matchedRank?.id ?? null,
+    firstName: student.name,
+    lastName: student.surname
   };
 }
