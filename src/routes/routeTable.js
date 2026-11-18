@@ -101,7 +101,7 @@ export const ROUTE_TABLE = [
     pageTitle: 'Zarządzanie użytkownikami',
     pageModule: 'pages/user-management/UserManagementContent.jsx',
     contentModule: 'pages/user-management/UserManagementContent.jsx',
-    roles: ['admin'],
+    roles: ['admin', 'superadmin'],
   },
   {
     id: 'app.diskSpace',

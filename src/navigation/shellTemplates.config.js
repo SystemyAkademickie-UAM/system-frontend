@@ -1013,6 +1013,15 @@ const superadminView = {
       requiresGroup: false,
     },
     {
+      id: 'zarzadzanie-uzytkownikami',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONUSERS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/users-manage',
+      hrefKey: 'USER_MANAGEMENT',
+      requiresGroup: false,
+    },
+    {
       id: 'kopia-zapasowa',
       enabled: true,
       kind: 'navlink',

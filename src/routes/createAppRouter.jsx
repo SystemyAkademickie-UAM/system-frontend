@@ -150,7 +150,7 @@ const appRouteTree = [
           { path: 'patch-notes', element: withGuard(<PatchNotesPage />) },
 
           { path: 'home', element: withGuard(<AdminHomePage />, { allowedRoles: [APP_ROLE.ADMIN] }) },
-          { path: 'users', element: withGuard(<UserManagementPage />, { allowedRoles: [APP_ROLE.ADMIN] }) },
+          { path: 'users', element: withGuard(<UserManagementPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
           { path: 'userManagement', element: <Navigate to="/users" replace /> },
           { path: 'courseManagement', element: <Navigate to="/groups" replace /> },
           { path: 'disk-space', element: withGuard(<DiskSpacePage />, { allowedRoles: [APP_ROLE.ADMIN] }) },

@@ -72,6 +72,17 @@ describe('UserManagementContent', () => {
     expect(container.textContent).toContain('Zmień');
   });
 
+  it('renders organization selector when multiple manageable organizations exist', async () => {
+    listManageableOrganizations.mockResolvedValue([
+      { id: 3, name: 'Org A', loginMethod: 'email' },
+      { id: 4, name: 'Org B', loginMethod: 'email' },
+    ]);
+    listOrganizationAccounts.mockResolvedValue({ items: [], nextAfterAccountId: null });
+    await renderPeople();
+    expect(container.textContent).toContain('Organizacja:');
+    expect(container.querySelector('#user-org-select')).not.toBeNull();
+  });
+
   it('keeps the empty sentence after the first load fails', async () => {
     listOrganizationAccounts.mockRejectedValue(new Error('Sieć'));
     await renderPeople();

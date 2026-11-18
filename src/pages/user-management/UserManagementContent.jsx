@@ -15,6 +15,7 @@ import {
   ACCOUNT_ROLE_ALL,
   ACCOUNT_ROLE_LECTURER,
   ACCOUNT_ROLE_STUDENT,
+  ACCOUNT_ROLE_SUPER,
   LOGIN_METHOD_EMAIL,
 } from '../../constants/organizationAdmin.constants.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
@@ -36,7 +37,7 @@ const COPY = {
   polish: {
     title: 'Osoby w organizacji',
     empty: 'W tej organizacji nie ma jeszcze kont.',
-    loading: 'Wczytywanie osób',
+    loading: 'Wczytywanie osób...',
     add: 'Dodaj osobę',
     export: 'Eksport',
     import: 'Importuj',
@@ -58,6 +59,7 @@ const COPY = {
     student: 'Osoba studiująca',
     lecturer: 'Osoba prowadząca',
     administrator: 'Osoba administrująca',
+    superadmin: 'Osoba nadzorująca',
     search: 'Szukaj osoby',
     saved: 'Zapisano.',
     removed: 'Rola została usunięta.',
@@ -65,13 +67,14 @@ const COPY = {
     sent: 'Łącze logowania zostało wysłane.',
     emailInvalid: 'Podaj adres e-mail.',
     nameRequired: 'Podaj imię i nazwisko.',
-    roleInvalid: 'Wybierz rolę osoby studiującej albo osoby prowadzącej.',
+    roleInvalid: 'Wybierz prawidłową rolę użytkownika.',
     importInvalid: 'Plik musi zawierać kolumny email, name, surname i role.',
+    selectOrg: 'Organizacja',
   },
   english: {
     title: 'People in the organization',
     empty: 'This organization has no accounts yet.',
-    loading: 'Loading people',
+    loading: 'Loading people...',
     add: 'Add a person',
     export: 'Export',
     import: 'Import',
@@ -80,7 +83,7 @@ const COPY = {
     saveAnother: 'Save and add another',
     exit: 'Exit',
     remove: 'Remove this role',
-    grant: 'Grant the other role',
+    grant: 'Grant another role',
     link: 'Send a login link',
     change: 'Change',
     name: 'Name',
@@ -93,6 +96,7 @@ const COPY = {
     student: 'Studying person',
     lecturer: 'Leading person',
     administrator: 'Administering person',
+    superadmin: 'Supervisor',
     search: 'Find a person',
     saved: 'Saved.',
     removed: 'The role was removed.',
@@ -100,35 +104,52 @@ const COPY = {
     sent: 'The login link was sent.',
     emailInvalid: 'Enter an email address.',
     nameRequired: 'Enter a name and a surname.',
-    roleInvalid: 'Choose a studying person or a leading person.',
+    roleInvalid: 'Choose a valid user role.',
     importInvalid: 'The file needs the columns email, name, surname, and role.',
+    selectOrg: 'Organization',
   },
 };
 
 const EMPTY_FORM = { email: '', name: '', surname: '', nickname: '', role: ACCOUNT_ROLE_STUDENT };
-const ROLE_FILTERS = [ACCOUNT_ROLE_ALL, ACCOUNT_ROLE_STUDENT, ACCOUNT_ROLE_LECTURER, ACCOUNT_ROLE_ADMINISTRATOR];
+const ROLE_FILTERS = [
+  ACCOUNT_ROLE_ALL,
+  ACCOUNT_ROLE_STUDENT,
+  ACCOUNT_ROLE_LECTURER,
+  ACCOUNT_ROLE_ADMINISTRATOR,
+  ACCOUNT_ROLE_SUPER,
+];
 
 function roleLabel(role, copy) {
   if (role === ACCOUNT_ROLE_LECTURER) return copy.lecturer;
   if (role === ACCOUNT_ROLE_STUDENT) return copy.student;
   if (role === ACCOUNT_ROLE_ADMINISTRATOR) return copy.administrator;
-  return '';
+  if (role === ACCOUNT_ROLE_SUPER) return copy.superadmin;
+  return role ?? '';
 }
 
 function validatePerson(form, needsEmail, copy) {
   if (needsEmail && !form.email.trim().includes('@')) return copy.emailInvalid;
   if (!form.name.trim() || !form.surname.trim()) return copy.nameRequired;
-  if (form.role !== ACCOUNT_ROLE_STUDENT && form.role !== ACCOUNT_ROLE_LECTURER) return copy.roleInvalid;
+  const allowed = [ACCOUNT_ROLE_STUDENT, ACCOUNT_ROLE_LECTURER, ACCOUNT_ROLE_ADMINISTRATOR, ACCOUNT_ROLE_SUPER];
+  if (!allowed.includes(form.role)) return copy.roleInvalid;
   return '';
 }
 
 export default function UserManagementContent() {
   const language = READLANGUAGECOOKIE();
-  const copy = COPY[language] ?? COPY.english;
+  const copy = COPY[language] ?? COPY.polish;
   const [searchParams] = useSearchParams();
   const session = useSession();
   const { showSuccess, showError } = useToast();
-  const organizationId = session.user?.organizationId;
+
+  const isSuperAdmin =
+    session.user?.roles?.includes('super') ||
+    session.user?.activeRole === 'super' ||
+    session.user?.role === 'super';
+
+  const [organizations, setOrganizations] = useState([]);
+  const [activeOrgId, setActiveOrgId] = useState(session.user?.organizationId ?? null);
+
   const fileInputRef = useRef(null);
   const openedLinkedAccount = useRef(false);
   const [loginMethod, setLoginMethod] = useState('');
@@ -154,79 +175,104 @@ export default function UserManagementContent() {
     setMode('edit');
   }, []);
 
-  const loadPage = useCallback(async (appendAfter) => {
-    if (!organizationId) {
-      setLoading(false);
-      setItems([]);
-      setReady(true);
-      return;
-    }
-    setLoading(true);
-    try {
-      const organizations = await listManageableOrganizations();
-      const current = Array.isArray(organizations)
-        ? organizations.find((item) => item.id === organizationId)
-        : null;
-      setLoginMethod(current?.loginMethod ?? '');
-      const page = await listOrganizationAccounts(organizationId, appendAfter);
-      const rows = Array.isArray(page?.items) ? page.items : [];
-      setItems((currentItems) => (appendAfter ? [...currentItems, ...rows] : rows));
-      setAfterAccountId(page?.nextAfterAccountId ?? null);
-      const requestedId = Number(searchParams.get('accountId'));
-      const linked = rows.find((item) => Number(item.accountId) === requestedId);
-      if (!appendAfter && linked && !openedLinkedAccount.current) {
-        openedLinkedAccount.current = true;
-        openEdit(linked);
+  const loadPage = useCallback(
+    async (appendAfter, targetOrgId = activeOrgId) => {
+      setLoading(true);
+      try {
+        const orgList = await listManageableOrganizations().catch(() => []);
+        const validOrgs = Array.isArray(orgList) ? orgList : [];
+        setOrganizations(validOrgs);
+
+        let orgId = targetOrgId;
+        if (!orgId && validOrgs.length > 0) {
+          orgId = validOrgs[0].id;
+          setActiveOrgId(orgId);
+        }
+
+        if (!orgId) {
+          setLoading(false);
+          setItems([]);
+          setReady(true);
+          return;
+        }
+
+        const current = validOrgs.find((item) => item.id === orgId);
+        setLoginMethod(current?.loginMethod ?? '');
+
+        const page = await listOrganizationAccounts(orgId, appendAfter);
+        const rows = Array.isArray(page?.items) ? page.items : [];
+        setItems((currentItems) => (appendAfter ? [...currentItems, ...rows] : rows));
+        setAfterAccountId(page?.nextAfterAccountId ?? null);
+
+        const requestedId = Number(searchParams.get('accountId'));
+        const linked = rows.find((item) => Number(item.accountId) === requestedId);
+        if (!appendAfter && linked && !openedLinkedAccount.current) {
+          openedLinkedAccount.current = true;
+          openEdit(linked);
+        }
+        setReady(true);
+      } catch (err) {
+        if (!appendAfter) {
+          setItems([]);
+          setAfterAccountId(null);
+        }
+        setReady(true);
+        showError(err instanceof Error ? err.message : copy.empty);
+      } finally {
+        setLoading(false);
       }
-      setReady(true);
-    } catch (err) {
-      if (!appendAfter) {
-        setItems([]);
-        setAfterAccountId(null);
-      }
-      setReady(true);
-      showError(err instanceof Error ? err.message : copy.empty);
-    } finally {
-      setLoading(false);
-    }
-  }, [copy.empty, openEdit, organizationId, searchParams, showError]);
+    },
+    [activeOrgId, copy.empty, openEdit, searchParams, showError]
+  );
 
   useEffect(() => {
-    loadPage(null);
-  }, [loadPage]);
+    loadPage(null, activeOrgId);
+  }, [activeOrgId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const visibleItems = roleFilter === ACCOUNT_ROLE_ALL
-    ? items
-    : items.filter((item) => item.role === roleFilter);
+  function handleOrgChange(newOrgId) {
+    setActiveOrgId(newOrgId);
+    setItems([]);
+    setAfterAccountId(null);
+  }
 
-  const columns = useMemo(() => ([
-    {
-      key: 'person',
-      label: copy.person,
-      width: ACCOUNT_COLUMN_WIDTH_PERSON,
-      sort: 'text',
-      accessor: (row) => `${row.name} ${row.surname}`,
-      render: (row) => `${row.name} ${row.surname}`,
-    },
-    { key: 'email', label: copy.email, width: ACCOUNT_COLUMN_WIDTH_EMAIL, sort: 'text' },
-    {
-      key: 'role',
-      label: copy.role,
-      width: ACCOUNT_COLUMN_WIDTH_ROLE,
-      sort: 'text',
-      accessor: (row) => roleLabel(row.role, copy),
-      render: (row) => roleLabel(row.role, copy),
-    },
-    {
-      key: 'change',
-      label: copy.change,
-      width: ACCOUNT_COLUMN_WIDTH_CHANGE,
-      sort: false,
-      render: (row) => (
-        <Button size="sm" variant="secondary" onClick={() => openEdit(row)}>{copy.change}</Button>
-      ),
-    },
-  ]), [copy, openEdit]);
+  const visibleItems =
+    roleFilter === ACCOUNT_ROLE_ALL
+      ? items
+      : items.filter((item) => item.role === roleFilter);
+
+  const columns = useMemo(
+    () => [
+      {
+        key: 'person',
+        label: copy.person,
+        width: ACCOUNT_COLUMN_WIDTH_PERSON,
+        sort: 'text',
+        accessor: (row) => `${row.name} ${row.surname}`,
+        render: (row) => `${row.name} ${row.surname}`,
+      },
+      { key: 'email', label: copy.email, width: ACCOUNT_COLUMN_WIDTH_EMAIL, sort: 'text' },
+      {
+        key: 'role',
+        label: copy.role,
+        width: ACCOUNT_COLUMN_WIDTH_ROLE,
+        sort: 'text',
+        accessor: (row) => roleLabel(row.role, copy),
+        render: (row) => roleLabel(row.role, copy),
+      },
+      {
+        key: 'change',
+        label: copy.change,
+        width: ACCOUNT_COLUMN_WIDTH_CHANGE,
+        sort: false,
+        render: (row) => (
+          <Button size="sm" variant="secondary" onClick={() => openEdit(row)}>
+            {copy.change}
+          </Button>
+        ),
+      },
+    ],
+    [copy, openEdit]
+  );
 
   function updateField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -239,7 +285,7 @@ export default function UserManagementContent() {
       return;
     }
     try {
-      await createOrganizationAccount(organizationId, {
+      await createOrganizationAccount(activeOrgId, {
         email: form.email.trim(),
         name: form.name.trim(),
         surname: form.surname.trim(),
@@ -263,7 +309,7 @@ export default function UserManagementContent() {
       return;
     }
     try {
-      await updateOrganizationAccount(organizationId, editing.accountId, {
+      await updateOrganizationAccount(activeOrgId, editing.accountId, {
         name: form.name.trim(),
         surname: form.surname.trim(),
         nickname: form.nickname.trim(),
@@ -276,16 +322,15 @@ export default function UserManagementContent() {
     }
   }
 
-  async function grantOtherRole() {
+  async function handleGrantRole(targetRole) {
     if (!editing) return;
-    const otherRole = editing.role === ACCOUNT_ROLE_STUDENT ? ACCOUNT_ROLE_LECTURER : ACCOUNT_ROLE_STUDENT;
     try {
-      await createOrganizationAccount(organizationId, {
+      await createOrganizationAccount(activeOrgId, {
         email: editing.email,
         name: form.name.trim(),
         surname: form.surname.trim(),
         nickname: form.nickname.trim(),
-        role: otherRole,
+        role: targetRole,
       });
       showSuccess(copy.saved);
       await loadPage(null);
@@ -297,7 +342,7 @@ export default function UserManagementContent() {
   async function removeRole() {
     if (!editing) return;
     try {
-      await deleteOrganizationAccount(organizationId, editing.accountId);
+      await deleteOrganizationAccount(activeOrgId, editing.accountId);
       showSuccess(copy.removed);
       setMode('list');
       setEditing(null);
@@ -310,7 +355,7 @@ export default function UserManagementContent() {
   async function sendLink() {
     if (!editing) return;
     try {
-      await sendOrganizationLoginLink(organizationId, editing.accountId);
+      await sendOrganizationLoginLink(activeOrgId, editing.accountId);
       showSuccess(copy.sent);
     } catch (err) {
       showError(err instanceof Error ? err.message : copy.empty);
@@ -319,7 +364,7 @@ export default function UserManagementContent() {
 
   async function exportAccounts() {
     try {
-      const blob = await downloadOrganizationAccounts(organizationId);
+      const blob = await downloadOrganizationAccounts(activeOrgId);
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
@@ -341,7 +386,7 @@ export default function UserManagementContent() {
       return;
     }
     try {
-      const result = await importOrganizationAccounts(organizationId, users);
+      const result = await importOrganizationAccounts(activeOrgId, users);
       showSuccess(`${copy.imported} ${result?.created ?? 0}`);
       await loadPage(null);
     } catch (err) {
@@ -354,17 +399,48 @@ export default function UserManagementContent() {
     [ACCOUNT_ROLE_STUDENT]: copy.student,
     [ACCOUNT_ROLE_LECTURER]: copy.lecturer,
     [ACCOUNT_ROLE_ADMINISTRATOR]: copy.administrator,
+    [ACCOUNT_ROLE_SUPER]: copy.superadmin,
   };
 
   return (
     <AppSectionPage title={copy.title}>
       <div className="user-management">
+        {organizations.length > 1 ? (
+          <div className="user-management__org-selector">
+            <label htmlFor="user-org-select">
+              <strong>{copy.selectOrg}:</strong>
+            </label>
+            <select
+              id="user-org-select"
+              value={activeOrgId ?? ''}
+              onChange={(e) => handleOrgChange(Number(e.target.value))}
+            >
+              {organizations.map((org) => (
+                <option key={org.id} value={org.id}>
+                  {org.name} (ID: {org.id})
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
+
         {mode === 'list' ? (
           <>
             <div className="user-management__toolbar">
-              <Button onClick={() => { setForm(EMPTY_FORM); setMode('create'); }}>{copy.add}</Button>
-              <Button variant="secondary" onClick={exportAccounts}>{copy.export}</Button>
-              <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>{copy.import}</Button>
+              <Button
+                onClick={() => {
+                  setForm(EMPTY_FORM);
+                  setMode('create');
+                }}
+              >
+                {copy.add}
+              </Button>
+              <Button variant="secondary" onClick={exportAccounts}>
+                {copy.export}
+              </Button>
+              <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                {copy.import}
+              </Button>
               <input
                 ref={fileInputRef}
                 className="user-management__file"
@@ -397,13 +473,18 @@ export default function UserManagementContent() {
                 rowKey="accountId"
                 search={{
                   placeholder: copy.search,
-                  filter: (row, query) => `${row.name} ${row.surname} ${row.email} ${row.nickname ?? ''}`.toLowerCase().includes(query),
+                  filter: (row, query) =>
+                    `${row.name} ${row.surname} ${row.email} ${row.nickname ?? ''}`
+                      .toLowerCase()
+                      .includes(query),
                 }}
                 onRowDoubleClick={openEdit}
               />
             ) : null}
             {afterAccountId ? (
-              <Button variant="secondary" onClick={() => loadPage(afterAccountId)}>{copy.more}</Button>
+              <Button variant="secondary" onClick={() => loadPage(afterAccountId)}>
+                {copy.more}
+              </Button>
             ) : null}
           </>
         ) : (
@@ -412,10 +493,11 @@ export default function UserManagementContent() {
             form={form}
             copy={{ ...copy, roleLabel: roleLabel(editing?.role, copy) }}
             emailOrganization={emailOrganization}
+            isSuperAdmin={isSuperAdmin}
             onChange={updateField}
             onSave={mode === 'create' ? () => saveNew(false) : saveEdit}
             onSaveAnother={() => saveNew(true)}
-            onGrant={grantOtherRole}
+            onGrantRole={handleGrantRole}
             onRemove={removeRole}
             onSendLink={sendLink}
             onExit={() => setMode('list')}
