@@ -4,7 +4,7 @@
  */
 
 // === IMPORTY I KONFIGURACJA KLIENTA API ===
-import { getJson, patchJson, postJson } from './api-client.js';
+import { getJson, patchJson, postJson, deleteJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 import { buildDriveBannerUrl } from '../constants/drive.constants.js';
 
@@ -190,6 +190,55 @@ export async function updateGroup(groupId, groupData) {
     return { ok: false, error: 'Nie udało się zapisać zmian grupy' };
   }
   return { ok: true, groupId: data.group, updated: Boolean(data.updated) };
+}
+
+export async function deleteGroup(groupId) {
+  const result = await deleteJson(`/groups/${groupId}`);
+  if (!result.ok) {
+    return { ok: false, error: typeof result.data === 'object' && result.data?.message ? String(result.data.message) : 'Nie udało się usunąć grupy' };
+  }
+  return { ok: true };
+}
+
+/**
+ * Pobiera kandydatów na prowadzących i studentów w organizacji.
+ * GET /groups/organization-candidates
+ */
+export async function fetchOrganizationCandidates() {
+  const result = await getJson('/groups/organization-candidates');
+  if (!result.ok || !result.data) {
+    return { ok: false, lecturers: [], students: [], error: 'Nie udało się pobrać kandydatów' };
+  }
+  const data = /** @type {{ lecturers: any[], students: any[] }} */ (result.data);
+  return {
+    ok: true,
+    lecturers: Array.isArray(data.lecturers) ? data.lecturers : [],
+    students: Array.isArray(data.students) ? data.students : [],
+  };
+}
+
+/**
+ * Pobiera dane do zarządzania użytkownikami grupy.
+ * GET /groups/:groupId/members-manage
+ */
+export async function fetchGroupMembersManage(groupId) {
+  const result = await getJson(`/groups/${groupId}/members-manage`);
+  if (!result.ok || !result.data) {
+    return { ok: false, error: 'Nie udało się pobrać danych członków grupy' };
+  }
+  return { ok: true, ...result.data };
+}
+
+/**
+ * Aktualizuje prowadzącego i/lub studentów grupy.
+ * PATCH /groups/:groupId/members-manage
+ */
+export async function updateGroupMembersManage(groupId, data) {
+  const result = await patchJson(`/groups/${groupId}/members-manage`, data);
+  if (!result.ok) {
+    return { ok: false, error: typeof result.data === 'object' && result.data?.message ? String(result.data.message) : 'Nie udało się zaktualizować członków grupy' };
+  }
+  return { ok: true };
 }
 
 /**

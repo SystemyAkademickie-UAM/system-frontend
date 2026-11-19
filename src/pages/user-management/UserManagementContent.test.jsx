@@ -65,11 +65,16 @@ describe('UserManagementContent', () => {
     });
   }
 
-  it('renders a person and a change button', async () => {
+  it('renders a person and row actions menu with change option', async () => {
     listOrganizationAccounts.mockResolvedValue({ items: [ADA], nextAfterAccountId: null });
     await renderPeople();
     expect(container.textContent).toContain('Ada Local');
-    expect(container.textContent).toContain('Zmień');
+    const moreBtn = container.querySelector('.data-table__action-btn--more');
+    expect(moreBtn).not.toBeNull();
+    act(() => {
+      moreBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(document.body.textContent).toContain('Zmień');
   });
 
   it('renders organization selector when multiple manageable organizations exist', async () => {

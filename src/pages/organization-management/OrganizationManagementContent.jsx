@@ -157,7 +157,7 @@ export default function OrganizationManagementContent() {
     {
       key: 'id',
       label: 'ID',
-      width: '6%',
+      width: '8%',
       sort: 'number',
       accessor: (row) => row.id,
       render: (row) => <span className="org-cell-id">{row.id}</span>,
@@ -165,7 +165,7 @@ export default function OrganizationManagementContent() {
     {
       key: 'name',
       label: copy.name,
-      width: '24%',
+      width: '26%',
       sort: 'text',
       accessor: (row) => row.name,
       render: (row) => (
@@ -180,7 +180,7 @@ export default function OrganizationManagementContent() {
     {
       key: 'domain',
       label: copy.domain,
-      width: '16%',
+      width: '18%',
       sort: 'text',
       accessor: (row) => row.domain,
       render: (row) => <code className="org-cell-domain">{row.domain}</code>,
@@ -188,7 +188,7 @@ export default function OrganizationManagementContent() {
     {
       key: 'loginMethod',
       label: copy.loginMethod,
-      width: '12%',
+      width: '14%',
       sort: 'text',
       accessor: (row) => row.loginMethod,
       render: (row) => (
@@ -236,26 +236,25 @@ export default function OrganizationManagementContent() {
         </span>
       ),
     },
-    {
-      key: 'actions',
-      label: copy.actions,
-      width: '14%',
-      sort: false,
-      render: (row) => (
-        <div className="org-cell-actions">
-          <Button size="sm" variant="secondary" onClick={() => handleManageAdmins(row)}>
-            {copy.manageAdmins}
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => handleEdit(row)}>
-            {copy.edit}
-          </Button>
-          <Button size="sm" variant="danger" onClick={() => handleDelete(row)}>
-            {copy.delete}
-          </Button>
-        </div>
-      ),
-    },
   ], [adminsByOrg, copy]);
+
+  const rowActions = useMemo(() => ({
+    onDelete: (org) => handleDelete(org),
+    deleteLabel: copy.delete,
+    deleteAriaLabel: (org) => `${copy.delete} ${org.name}`,
+    menuItems: [
+      {
+        id: 'manage-admins',
+        label: copy.manageAdmins,
+        onSelect: (org) => handleManageAdmins(org),
+      },
+      {
+        id: 'edit',
+        label: copy.edit,
+        onSelect: (org) => handleEdit(org),
+      },
+    ],
+  }), [copy, handleDelete, handleEdit, handleManageAdmins]);
 
   return (
     <AppSectionPage
@@ -294,6 +293,7 @@ export default function OrganizationManagementContent() {
               columns={columns}
               data={organizations}
               rowKey="id"
+              rowActions={rowActions}
               search={{
                 placeholder: copy.searchPlaceholder,
                 filter: (row, query) =>

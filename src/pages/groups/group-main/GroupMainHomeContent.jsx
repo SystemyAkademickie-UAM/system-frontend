@@ -118,6 +118,7 @@ export default function GroupMainHomeContent() {
   const [templatePopupData, setTemplatePopupData] = useState(null);
   const { group, isLoading, errorMessage } = useGroupDetails(groupId);
   const isStudentView = role === APP_ROLE.STUDENT;
+  const isAdminPerspective = location.pathname.includes(`/groups/${groupId}/admin`);
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
   const {
@@ -200,7 +201,7 @@ export default function GroupMainHomeContent() {
     <div className="group-main-home">
       <GroupMainSubpageHeader eyebrow={WELCOMETITLE__TEXTLABEL[LANGUAGE]} title={HOMEPAGETITLE__TEXTLABEL[LANGUAGE]} />
 
-      <div className="group-main-home__grid">
+      <div className={['group-main-home__grid', isAdminPerspective ? 'group-main-home__grid--single' : ''].filter(Boolean).join(' ')}>
         <TexturedSurface className="group-main-home__surface group-main-home__surface--overview">
           <section className="group-main-home__section group-main-home__section--description" aria-label={GROUPDESCRIPTION__TEXTLABEL[LANGUAGE]}>
             <ContentWithMeasuredDivider
@@ -223,30 +224,32 @@ export default function GroupMainHomeContent() {
           </section>
         </TexturedSurface>
 
-        <TexturedSurface className="group-main-home__surface group-main-home__surface--notifications">
-          <section
-            id="group-notifications"
-            className="group-main-home__section group-main-home__section--notifications"
-            aria-label={sectionTitle}
-          >
-            <h2 className="group-main-home__section-title">{sectionTitle}</h2>
-            <NotificationsFeed
-              groupId={groupId}
-              role={role}
-              notifications={previewNotifications}
-              isLoading={previewLoading}
-              error={previewError}
-              limit={NOTIFICATIONS_PREVIEW_LIMIT}
-              showDivider
-              linkable={isStudentView}
-              onMarkRead={(id) => markRead(id)}
-              footerLink={{
-                label: SEE_MORE_BUTTON__TEXTLABEL[LANGUAGE],
-                to: notificationsSeeMorePath,
-              }}
-            />
-          </section>
-        </TexturedSurface>
+        {!isAdminPerspective && (
+          <TexturedSurface className="group-main-home__surface group-main-home__surface--notifications">
+            <section
+              id="group-notifications"
+              className="group-main-home__section group-main-home__section--notifications"
+              aria-label={sectionTitle}
+            >
+              <h2 className="group-main-home__section-title">{sectionTitle}</h2>
+              <NotificationsFeed
+                groupId={groupId}
+                role={role}
+                notifications={previewNotifications}
+                isLoading={previewLoading}
+                error={previewError}
+                limit={NOTIFICATIONS_PREVIEW_LIMIT}
+                showDivider
+                linkable={isStudentView}
+                onMarkRead={(id) => markRead(id)}
+                footerLink={{
+                  label: SEE_MORE_BUTTON__TEXTLABEL[LANGUAGE],
+                  to: notificationsSeeMorePath,
+                }}
+              />
+            </section>
+          </TexturedSurface>
+        )}
       </div>
 
       {showTemplatePopup && templatePopupData != null ? (

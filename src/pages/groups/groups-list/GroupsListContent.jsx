@@ -9,10 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { SearchBar, Button } from '../../../components/ui/index.js';
 import { RoleVisibility } from '../../../components/guards/index.js';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
-import { templatesPath, groupMainPath } from '../../../routes/pathRegistry.js';
+import { templatesPath, groupMainPath, groupAdminPerspectivePath } from '../../../routes/pathRegistry.js';
 import GroupCard from './GroupCard.jsx';
 import GroupsListCreator from './GroupsListCreator.jsx';
 import GroupsListHero from './GroupsListHero.jsx';
+import GroupEditModal from './modals/GroupEditModal.jsx';
+import GroupDeleteConfirmModal from './modals/GroupDeleteConfirmModal.jsx';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
 import { useGroupsList } from './useGroupsList.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
@@ -73,7 +75,7 @@ const NOOTHERGROUPS__TEXTLABEL = {
 };
 
 // === GŁÓWNY KOMPONENT WIDOKU ===
-function GroupsGrid({ groups, emptyMessage }) {
+function GroupsGrid({ groups, emptyMessage, onEditGroup, onDeleteGroup }) {
 
 if (groups.length === 0) {
     return <p className="groups-list__message groups-list__message--section">{emptyMessage}</p>;
@@ -83,7 +85,11 @@ if (groups.length === 0) {
     <ul className="groups-list__grid">
       {groups.map((group) => (
         <li key={group.id} className="groups-list__grid-item">
-          <GroupCard group={group} />
+          <GroupCard
+            group={group}
+            onEditGroup={onEditGroup}
+            onDeleteGroup={onDeleteGroup}
+          />
         </li>
       ))}
     </ul>
@@ -104,6 +110,8 @@ export default function GroupsListContent() {
   } = useGroupsList();
   const { role } = useAppRole();
   const [isCreatorOpen, setIsCreatorOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState(null);
+  const [deletingGroup, setDeletingGroup] = useState(null);
 
   const showOtherGroups = role !== APP_ROLE.LECTURER;
   const hasAnyGroups = myGroups.length > 0 || (showOtherGroups && otherGroups.length > 0);
@@ -127,7 +135,12 @@ const isFiltering = searchQuery.trim().length > 0;
       ? `Grupa „${groupName}” (${trimmedSubject}) została utworzona.`
       : `Grupa „${groupName}” została utworzona.`;
 
-    navigate(groupMainPath(String(groupId)), {
+    const isAdminOrSuper = role === APP_ROLE.ADMIN || role === APP_ROLE.SUPERADMIN;
+    const targetUrl = isAdminOrSuper
+      ? groupAdminPerspectivePath(String(groupId))
+      : groupMainPath(String(groupId));
+
+    navigate(targetUrl, {
       state: { joinSuccessMessage: successMessage },
     });
   };
@@ -149,7 +162,7 @@ const isFiltering = searchQuery.trim().length > 0;
             placeholder={SEARCHPLACEHOLDER__TEXTLABEL[LANGUAGE]}
             aria-label={SEARCH__TEXTLABEL[LANGUAGE]}
           />
-          <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
+          <RoleVisibility allowedRoles={[APP_ROLE.LECTURER]}>
             <Button
               type="button"
               variant="secondary"
@@ -158,6 +171,8 @@ const isFiltering = searchQuery.trim().length > 0;
             >
               {TEMPLATESGALLERYBUTTON__TEXTLABEL[LANGUAGE]}
             </Button>
+          </RoleVisibility>
+          <RoleVisibility allowedRoles={[APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN]}>
             <Button
               type="button"
               variant="primary"
@@ -174,6 +189,20 @@ const isFiltering = searchQuery.trim().length > 0;
         isOpen={isCreatorOpen}
         onClose={handleCreatorClose}
         onCreated={handleGroupCreated}
+      />
+
+      <GroupEditModal
+        isOpen={Boolean(editingGroup)}
+        group={editingGroup}
+        onClose={() => setEditingGroup(null)}
+        onSaved={() => void refetch()}
+      />
+
+      <GroupDeleteConfirmModal
+        isOpen={Boolean(deletingGroup)}
+        group={deletingGroup}
+        onClose={() => setDeletingGroup(null)}
+        onDeleted={() => void refetch()}
       />
 
       {errorMessage ? (
@@ -202,6 +231,8 @@ const isFiltering = searchQuery.trim().length > 0;
                   ? NOMYGROUPSSEARCH__TEXTLABEL[LANGUAGE]
                   : NOTINANYGROUP__TEXTLABEL[LANGUAGE]
               }
+              onEditGroup={(g) => setEditingGroup(g)}
+              onDeleteGroup={(g) => setDeletingGroup(g)}
             />
           </div>
 
@@ -218,6 +249,8 @@ const isFiltering = searchQuery.trim().length > 0;
                       ? NOOTHERGROUPSSEARCH__TEXTLABEL[LANGUAGE]
                       : NOOTHERGROUPS__TEXTLABEL[LANGUAGE]
                   }
+                  onEditGroup={(g) => setEditingGroup(g)}
+                  onDeleteGroup={(g) => setDeletingGroup(g)}
                 />
               </div>
             </>
