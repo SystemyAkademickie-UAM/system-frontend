@@ -24,6 +24,11 @@ describe('safeOrganizationLogLink', () => {
     expect(safeOrganizationLogLink('/users?accountId=11')).toBe('/users?accountId=11');
   });
 
+  it('redirects group links to virtual perspective', () => {
+    expect(safeOrganizationLogLink('/groups/100001')).toBe('/groups/100001/admin/home');
+    expect(safeOrganizationLogLink('/groups/100001/student-profile/42')).toBe('/groups/100001/admin/student-profile/42');
+  });
+
   it('drops an external address', () => {
     expect(safeOrganizationLogLink('https://example.com/users?accountId=11')).toBeNull();
   });

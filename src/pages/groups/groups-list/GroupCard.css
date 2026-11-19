@@ -134,3 +134,73 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* === AKCJE ADMINISTRATORA (3 KROPKI I DROPDOWN) === */
+.group-card__admin-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+}
+
+.group-card__menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.group-card__menu-trigger:hover {
+  background: var(--color-bg-surface);
+  border-color: var(--color-accent);
+}
+
+.group-card__menu-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 190px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 10;
+}
+
+.group-card__menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.group-card__menu-item:hover {
+  background: var(--color-bg-surface);
+}
+
+.group-card__menu-item--danger {
+  color: #ef4444;
+}
+
+.group-card__menu-item--danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+}

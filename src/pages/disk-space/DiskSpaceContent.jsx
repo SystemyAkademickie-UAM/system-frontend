@@ -145,6 +145,11 @@ export default function DiskSpaceContent() {
   const copy = TEXTS[language] ?? TEXTS.english;
   const session = useSession();
 
+  const isSuperAdmin =
+    session.user?.roles?.includes('super') ||
+    session.user?.activeRole === 'super' ||
+    session.user?.role === 'super';
+
   const [organizations, setOrganizations] = useState([]);
   const [selectedOrgId, setSelectedOrgId] = useState(null);
   const [storageData, setStorageData] = useState(null);
@@ -275,7 +280,7 @@ export default function DiskSpaceContent() {
       <div className="disk-space-container">
         {/* Top Control Bar */}
         <div className="disk-space-top-bar">
-          {organizations.length > 1 && (
+          {isSuperAdmin && organizations.length > 1 && (
             <div className="disk-space-org-picker">
               <label htmlFor="disk-space-org-select" className="disk-space-picker-label">
                 {copy.orgSelectorLabel}:

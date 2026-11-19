@@ -336,6 +336,8 @@ export default function ProductCard({
 
   onDelete,
 
+  onAdminDelete = null,
+
   showLecturerActions = false,
 
   hideAddToCart = false,
@@ -569,6 +571,48 @@ const { symbol: livesSymbol } = useGroupLives();
 
             </div>
 
+          ) : onAdminDelete ? (
+
+            <div className="maq-product-card__lecturer-actions">
+
+              <button
+
+                type="button"
+
+                className="maq-product-card__action-btn maq-product-card__action-btn--danger"
+
+                aria-label={DELETEBUTTON__TEXTLABEL[LANGUAGE].replace('${name}', name)}
+
+                title="Usuń"
+
+                onClick={(event) => {
+
+                  event.stopPropagation();
+
+                  onAdminDelete?.();
+
+                }}
+
+              >
+
+                <AssetSvg
+
+                  name={SVG_ICONS.actions.delete}
+
+                  className="maq-product-card__action-icon"
+
+                  width={18}
+
+                  height={18}
+
+                  alt=""
+
+                />
+
+              </button>
+
+            </div>
+
           ) : null}
 
         </header>
@@ -608,9 +652,27 @@ const { symbol: livesSymbol } = useGroupLives();
         <footer className="maq-product-card__footer">
 
           {isUsed ? (
-            <div className="maq-product-card__price-bar">
-              <span className="maq-product-card__section-label">{dateLabel || USEDITEM__TEXTLABEL[LANGUAGE]}</span>
-            </div>
+            <>
+              <div className="maq-product-card__price-bar">
+                <span className="maq-product-card__section-label">{dateLabel || USEDITEM__TEXTLABEL[LANGUAGE]}</span>
+              </div>
+              {onAdminDelete ? (
+                <div className="maq-product-card__actions">
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onAdminDelete?.();
+                    }}
+                    className="maq-product-card__buy-btn"
+                  >
+                    Usuń
+                  </Button>
+                </div>
+              ) : null}
+            </>
           ) : isPurchasedHistory ? (
             <>
               <div className="maq-product-card__price-bar">
@@ -634,18 +696,34 @@ const { symbol: livesSymbol } = useGroupLives();
                 <span className="maq-product-card__owned-count">{ownedQuantity}</span>
               </div>
 
-              {!readOnly && !hideActions ? (
+              {(!readOnly && !hideActions) || onAdminDelete ? (
                 <div className="maq-product-card__actions">
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="sm"
-                    disabled={disabled}
-                    onClick={onUse}
-                    className="maq-product-card__buy-btn"
-                  >
-                    {USEBUTTON__TEXTLABEL[LANGUAGE]}
-                  </Button>
+                  {onAdminDelete ? (
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onAdminDelete?.();
+                      }}
+                      className="maq-product-card__cart-btn"
+                    >
+                      Usuń
+                    </Button>
+                  ) : null}
+                  {!readOnly && !hideActions ? (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      disabled={disabled}
+                      onClick={onUse}
+                      className="maq-product-card__buy-btn"
+                    >
+                      {USEBUTTON__TEXTLABEL[LANGUAGE]}
+                    </Button>
+                  ) : null}
                 </div>
               ) : null}
             </>

@@ -9,7 +9,7 @@ import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 import { registerClientAuthClearListener } from '../auth/clientAuthState.js';
 import { useSessionOptional } from './SessionContext.jsx';
 
-const AppRoleContext = createContext(null);
+export const AppRoleContext = createContext(null);
 
 /**
  * Provider roli aplikacji.

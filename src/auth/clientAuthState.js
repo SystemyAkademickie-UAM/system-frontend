@@ -6,7 +6,7 @@
 // === IMPORTY I STAŁE MODUŁU ===
 import { BROWSER_ID_SAML_PENDING_SESSION_KEY } from '../constants/browserId.constants.js';
 import { getApiBaseUrl } from '../constants/api.constants.js';
-import { getRememberMe } from '../services/rememberMeService.js';
+import { clearRememberMe, getRememberMe } from '../services/rememberMeService.js';
 
 /** @type {Set<() => void>} */
 const clearListeners = new Set();
@@ -64,6 +64,8 @@ export function clearClientAuthState() {
     sessionStorage.removeItem(BROWSER_ID_SAML_PENDING_SESSION_KEY);
   } catch {
   }
+
+  clearRememberMe();
 }
 
 let sessionExpiredHandling = false;
