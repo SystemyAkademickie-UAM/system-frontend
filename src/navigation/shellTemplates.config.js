@@ -987,6 +987,15 @@ const adminView = {
       hrefKey: 'STATISTICS',
       requiresGroup: false,
     },
+    {
+      id: 'logi',
+      enabled: true,
+      kind: 'navlink',
+      label: NAVIGATIONLOGS__TEXTLABEL[LANGUAGE],
+      iconId: 'nav/logs',
+      hrefKey: 'SYSTEM_LOGS',
+      requiresGroup: false,
+    },
   ],
   footerItems: [],
 };

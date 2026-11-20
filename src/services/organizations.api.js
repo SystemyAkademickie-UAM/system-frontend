@@ -106,12 +106,13 @@ export async function grantOrganizationAdministrator(organizationId, userId) {
 }
 
 /**
- * Tworzy pierwszą osobę w organizacji logującej się łączem e-mail i nadaje jej rolę administrującą.
+ * Tworzy lub znajduje osobę w organizacji logującej się łączem e-mail i nadaje jej rolę administrującą.
+ * Działa także wtedy, gdy organizacja ma już inne konta.
  * @param {number} organizationId
  * @param {{ email: string, name: string, surname: string }} body
  */
-export async function createFirstOrganizationAdministrator(organizationId, body) {
-  return requireOk(await postJson(`/admin/organizations/${organizationId}/administrators/first`, body));
+export async function grantOrganizationAdministratorByEmail(organizationId, body) {
+  return requireOk(await postJson(`/admin/organizations/${organizationId}/administrators/email`, body));
 }
 
 /**
