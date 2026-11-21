@@ -66,20 +66,37 @@ export function groupMainPath(groupId) {
   return `/groups/${groupId}/home`;
 }
 
+/** Wirtualna perspektywa grupy dla administratora/nadzorcy — `/groups/:groupId/admin/home`. */
+export function groupAdminPerspectivePath(groupId) {
+  return `/groups/${groupId}/admin/home`;
+}
+
 /** Profil innego użytkownika — `/groups/:groupId/student-profile/:studentId`. */
 export function groupStudentProfilePath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}`;
 }
 
 export function groupStudentProfileBadgesPath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}`;
 }
 
 export function groupStudentProfileEqPath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}/eq`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}/eq`;
 }
 
 export function groupStudentProfilePurchasesPath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}/purchases`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}/purchases`;
 }
 

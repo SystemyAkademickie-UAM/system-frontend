@@ -69,10 +69,6 @@ function handleResponseStatus(response, resourcePath, data = null) {
   }
   if (response?.status === 401) {
     handleSessionExpired();
-    return;
-  }
-  if (response?.status === 403 && isAuthFailureMessage(data)) {
-    handleSessionExpired();
   }
 }
 
@@ -107,20 +103,9 @@ const originalFetch = window.fetch;
       }
       handleMaintenanceRedirect();
     }
-    if (response && (response.status === 401 || response.status === 403)) {
+    if (response && response.status === 401) {
       if (!isPublicAuthEndpoint(url)) {
-        if (response.status === 401) {
-          handleSessionExpired();
-        } else if (response.status === 403 && typeof response.clone === 'function') {
-          try {
-            response.clone().json().then((body) => {
-              if (isAuthFailureMessage(body)) {
-                handleSessionExpired();
-              }
-            }).catch(() => {});
-          } catch {
-          }
-        }
+        handleSessionExpired();
       }
     }
     return response;
@@ -139,6 +124,24 @@ async function parseResponseBody(response) {
     return response.json();
   }
   return response.text();
+}
+
+let impersonatedStudentId = null;
+
+export function setImpersonatedStudentId(id) {
+  impersonatedStudentId = id != null ? String(id) : null;
+}
+
+export function getImpersonatedStudentId() {
+  return impersonatedStudentId;
+}
+
+function buildRequestHeaders(customHeaders = {}) {
+  const headers = { ...customHeaders };
+  if (impersonatedStudentId) {
+    headers['X-Impersonate-Student'] = impersonatedStudentId;
+  }
+  return headers;
 }
 
 /**
@@ -163,6 +166,7 @@ export async function getJson(resourcePath, _options = {}) {
 
   const response = await fetch(url, {
     method: 'GET',
+    headers: buildRequestHeaders(),
     credentials: 'include',
   });
 
@@ -184,7 +188,7 @@ export async function postJson(resourcePath, body, _options = {}) {
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildRequestHeaders({ 'Content-Type': 'application/json' }),
     credentials: 'include',
     body: JSON.stringify(body),
   });
@@ -208,7 +212,7 @@ export async function patchJson(resourcePath, body, _options = {}) {
 
   const response = await fetch(url, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildRequestHeaders({ 'Content-Type': 'application/json' }),
     credentials: 'include',
     body: JSON.stringify(body),
   });
@@ -231,7 +235,7 @@ export async function putJson(resourcePath, body, _options = {}) {
 
   const response = await fetch(url, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildRequestHeaders({ 'Content-Type': 'application/json' }),
     credentials: 'include',
     body: JSON.stringify(body),
   });
@@ -253,6 +257,7 @@ export async function deleteJson(resourcePath, _options = {}) {
 
   const response = await fetch(url, {
     method: 'DELETE',
+    headers: buildRequestHeaders(),
     credentials: 'include',
   });
 

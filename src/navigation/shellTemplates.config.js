@@ -1177,9 +1177,24 @@ export function buildSubNavItems(configKey, context) {
   const config = SUB_NAV_CONFIG[configKey];
   if (!config) return [];
 
-  return config.map((item) => {
+  return config
+    .filter((item) => {
+      // Administrator w perspektywie grupy nie powinien widzieć zakładki Dziennik aktywności
+      if (context?.isAdminPerspective && item.id === 'log') {
+        return false;
+      }
+      return true;
+    })
+    .map((item) => {
     const builder = HREF_BUILDERS[item.hrefKey];
-    const to = builder ? builder(context) : null;
+    let to = builder ? builder(context) : null;
+    if (to && context?.isAdminPerspective && context?.groupId) {
+      const normalPrefix = `/groups/${context.groupId}/`;
+      const adminPrefix = `/groups/${context.groupId}/admin/`;
+      if (to.startsWith(normalPrefix) && !to.startsWith(adminPrefix)) {
+        to = to.replace(normalPrefix, adminPrefix);
+      }
+    }
     return {
       id: item.id,
       label: item.label,

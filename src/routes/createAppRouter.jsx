@@ -115,6 +115,13 @@ const ShopHomePage = withLazy(() => import('../pages/groups/group-shop/GroupShop
 
 // === EKSPORTY I REJESTRACJA ===
 const ShopAddPage = withLazy(() => import('../pages/groups/group-shop-add/GroupShopAddContent.jsx'));
+const AdminGroupPerspectiveLayout = withLazy(() => import('../pages/groups/admin-group-perspective/AdminGroupPerspectiveLayout.jsx'));
+
+function AdminRouteRedirect() {
+  const { groupId, p1, p2, p3 } = useParams();
+  const subpath = [p1, p2, p3].filter(Boolean).join('/');
+  return <Navigate to={`/groups/${groupId}/admin/${subpath || 'home'}`} replace />;
+}
 
 const appRouteTree = [
   {
@@ -181,6 +188,48 @@ const appRouteTree = [
                 path: ':groupId',
                 children: [
                   { index: true, element: withGuard(<GroupJoinPage />) },
+                  {
+                    path: 'admin',
+                    element: withGuard(<AdminGroupPerspectiveLayout />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }),
+                    children: [
+                      { index: true, element: <Navigate to="home" replace /> },
+                      { path: 'home', element: <GroupMainHomePage /> },
+                      // Lecturer perspective routes:
+                      { path: 'members', element: <MembersHomePage /> },
+                      { path: 'members/codes', element: <MembersCodePage /> },
+                      { path: 'members/log', element: <Navigate to="../members" replace /> },
+                      { path: 'activities', element: <ActivitiesHomePage /> },
+                      { path: 'activities/tools', element: <ActivitiesToolsPage /> },
+                      { path: 'activities/posts', element: <PostsHomePage /> },
+                      { path: 'rewards', element: <RewardsBadgesPage /> },
+                      { path: 'rewards/ranks', element: <RewardsHomePage /> },
+                      { path: 'rewards/shop-items', element: <ShopItemsPage /> },
+                      { path: 'rewards/shopitems', element: <Navigate to="shop-items" replace /> },
+                      { path: 'group-settings', element: <GroupSettingsHomePage /> },
+                      { path: 'group-settings/currency', element: <GroupSettingsCurrencyPage /> },
+                      { path: 'group-settings/lives', element: <GroupSettingsHealthPage /> },
+                      { path: 'student-profile/:studentId', element: <ProfileHomePage /> },
+                      { path: 'student-profile/:studentId/eq', element: <ProfileEqPage /> },
+                      { path: 'student-profile/:studentId/purchases', element: <ProfilePurchasesPage /> },
+                      // Student perspective routes:
+                      { path: 'posts', element: <GroupMainPostsPage /> },
+                      { path: 'users', element: <GroupMainMembersPage /> },
+                      { path: 'activity-list', element: <GroupMainActivitiesPage /> },
+                      { path: 'ranks', element: <GroupMainRanksPage /> },
+                      { path: 'badges', element: <GroupMainBadgesPage /> },
+                      { path: 'profile', element: <ProfileLogPage /> },
+                      { path: 'profile/activity', element: <ProfileHomePage /> },
+                      { path: 'profile/eq', element: <ProfileEqPage /> },
+                      { path: 'profile/purchases', element: <ProfilePurchasesPage /> },
+                      // Shared routes:
+                      { path: 'shop', element: <ShopHomePage /> },
+                      { path: 'shop/add', element: <ShopAddPage /> },
+                      { path: '*', element: <Navigate to="home" replace /> },
+                    ],
+                  },
+                  { path: ':p1/admin', element: withGuard(<AdminRouteRedirect />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
+                  { path: ':p1/:p2/admin', element: withGuard(<AdminRouteRedirect />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
+                  { path: ':p1/:p2/:p3/admin', element: withGuard(<AdminRouteRedirect />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
                   {
                     element: withGuard(<GroupAccessGuard />),
                     children: [

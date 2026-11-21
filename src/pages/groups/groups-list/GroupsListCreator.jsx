@@ -4,11 +4,11 @@
  */
 
 // === IMPORTY I ZALEŻNOŚCI ===
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getApiBaseUrl } from '../../../constants/api.constants.js';
 import { getOrCreateBrowserId } from '../../../auth/browserIdStorage.js';
 import GroupBannerPicker from '../group-shared/GroupBannerPicker/GroupBannerPicker.jsx';
-import { Button, CharacterLimitedField, Modal, useToast } from '../../../components/ui/index.js';
+import { Button, CharacterLimitedField, Modal, SearchBar, useToast } from '../../../components/ui/index.js';
 import {
   GROUP_NAME_MAX_LENGTH,
   GROUP_SUBJECT_NAME_MAX_LENGTH,
@@ -19,15 +19,17 @@ import {
   createDefaultBannerPickerValue,
 } from '../../../utils/groupBannerRef.js';
 import { validateGroupBannerFile } from '../../../utils/groupBannerUpload.js';
-import { createGroup } from '../../../services/groups.api.js';
+import { createGroup, fetchOrganizationCandidates } from '../../../services/groups.api.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { useSessionOptional } from '../../../context/SessionContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import GroupCreatorUnsavedModal from './modals/GroupCreatorUnsavedModal.jsx';
 import GroupCreatorDraftPromptModal from './modals/GroupCreatorDraftPromptModal.jsx';
 import './GroupsListCreator.css';
 
 // === STAŁE I ETYKIETY JĘZYKOWE ===
 const DRAFT_STORAGE_KEY = 'maq_group_creator_draft';
-const TOTAL_STEPS = 2;
 
 const CREATORTITLE__TEXTLABEL = {
   polish: 'Kreator grupy',
@@ -37,6 +39,7 @@ const CREATORTITLE__TEXTLABEL = {
 const STAGE_TITLES = {
   1: { polish: 'Informacje', english: 'Information' },
   2: { polish: 'Baner grupy', english: 'Group Banner' },
+  3: { polish: 'Użytkownicy (opcjonalnie)', english: 'Users (Optional)' },
 };
 
 const GROUPNAMEMIN__TEXTLABEL = {
@@ -117,6 +120,11 @@ export default function GroupsListCreator({
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const { showSuccess, showError } = useToast();
 
+  const { role } = useAppRole();
+  const session = useSessionOptional();
+  const isAdminOrSuper = role === APP_ROLE.ADMIN || role === APP_ROLE.SUPERADMIN || session?.role === APP_ROLE.ADMIN || session?.role === APP_ROLE.SUPERADMIN;
+  const totalSteps = isAdminOrSuper ? 3 : 2;
+
   const [step, setStep] = useState(1);
   const [groupName, setGroupName] = useState('');
   const [subjectName, setSubjectName] = useState('');
@@ -128,9 +136,25 @@ export default function GroupsListCreator({
   const [groupDescriptionError, setGroupDescriptionError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
+  // Admin step 3 candidates
+  const [availableLecturers, setAvailableLecturers] = useState([]);
+  const [availableStudents, setAvailableStudents] = useState([]);
+  const [selectedTeacherId, setSelectedTeacherId] = useState('');
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+  const [studentSearchQuery, setStudentSearchQuery] = useState('');
 
-const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
+  const [isUnsavedModalOpen, setIsUnsavedModalOpen] = useState(false);
+  const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || !isAdminOrSuper) return;
+    fetchOrganizationCandidates().then((res) => {
+      if (res.ok) {
+        setAvailableLecturers(res.lecturers || []);
+        setAvailableStudents(res.students || []);
+      }
+    });
+  }, [isOpen, isAdminOrSuper]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -152,6 +176,8 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
     || subjectName.trim()
     || groupDescription.trim()
     || step > 1
+    || selectedTeacherId
+    || selectedStudentIds.length > 0
   );
 
   const resetForm = useCallback(() => {
@@ -163,6 +189,9 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
     setGroupNameError('');
     setSubjectNameError('');
     setGroupDescriptionError('');
+    setSelectedTeacherId('');
+    setSelectedStudentIds([]);
+    setStudentSearchQuery('');
     setIsSubmitting(false);
   }, []);
 
@@ -258,13 +287,30 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
   };
 
   const handleNextStep = () => {
-    if (!validateStep1()) return;
-    setStep(2);
+    if (step === 1) {
+      if (!validateStep1()) return;
+      setStep(2);
+      return;
+    }
+    if (step === 2 && isAdminOrSuper) {
+      setStep(3);
+    }
   };
 
   const handlePrevStep = () => {
-    setStep(1);
+    setStep((prev) => Math.max(1, prev - 1));
   };
+
+  const filteredAvailableStudents = useMemo(() => {
+    const query = studentSearchQuery.trim().toLowerCase();
+    if (!query) return availableStudents;
+    return availableStudents.filter((s) => {
+      const matchName = s.name?.toLowerCase().includes(query);
+      const matchEmail = s.email?.toLowerCase().includes(query);
+      const matchNum = s.studentNumber?.toLowerCase().includes(query);
+      return matchName || matchEmail || matchNum;
+    });
+  }, [availableStudents, studentSearchQuery]);
 
   const uploadBannerToDrive = async (url, browserid, file) => {
     const formdata = new FormData();
@@ -328,6 +374,14 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
       if (imageref !== undefined) {
         payload.imageRef = imageref;
       }
+      if (isAdminOrSuper) {
+        if (selectedTeacherId) {
+          payload.teacherAccountId = Number(selectedTeacherId);
+        }
+        if (selectedStudentIds.length > 0) {
+          payload.studentAccountIds = selectedStudentIds.map(Number);
+        }
+      }
 
       const result = await createGroup(payload);
       if (!result.ok) {
@@ -365,7 +419,7 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
       <span className="group-creator-modal-title__main">{CREATORTITLE__TEXTLABEL[LANGUAGE]}</span>
       <span className="group-creator-modal-title__divider">•</span>
       <span className="group-creator-modal-title__stage">{stageTitle}</span>
-      <span className="group-creator-modal-title__badge">{step}/{TOTAL_STEPS}</span>
+      <span className="group-creator-modal-title__badge">{step}/{totalSteps}</span>
     </span>
   );
 
@@ -376,7 +430,7 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
         isOpen={isOpen}
         onClose={handleAttemptClose}
         title={modalTitle}
-        size={step === 2 ? 'xl' : 'lg'}
+        size={step === 2 || step === 3 ? 'xl' : 'lg'}
         showFooter={false}
         className="group-creator-form-modal"
       >
@@ -480,6 +534,81 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
                 </div>
               </div>
             )}
+
+            {step === 3 && (
+              <div className="group-creator-step group-creator-step--users">
+                <div className="group-creator__section">
+                  <div className="group-creator__field">
+                    <label className="group-creator__label" htmlFor="group-creator-teacher">
+                      Osoba prowadząca (opcjonalnie)
+                    </label>
+                    <select
+                      id="group-creator-teacher"
+                      className="group-creator__select"
+                      value={selectedTeacherId}
+                      onChange={(e) => setSelectedTeacherId(e.target.value)}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">(Brak przypisanego prowadzącego)</option>
+                      {availableLecturers.map((lec) => (
+                        <option key={lec.accountId} value={lec.accountId}>
+                          {lec.name} {lec.email ? `(${lec.email})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="group-creator__field">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label className="group-creator__label">
+                        Studenci w organizacji (opcjonalnie)
+                      </label>
+                      <span className="group-creator__selected-count">
+                        Wybrano: {selectedStudentIds.length}
+                      </span>
+                    </div>
+                    <SearchBar
+                      value={studentSearchQuery}
+                      onChange={(e) => setStudentSearchQuery(e.target.value)}
+                      placeholder="Szukaj studenta po nazwisku, e-mailu lub indeksie..."
+                    />
+                    <div className="group-creator__students-picker">
+                      {filteredAvailableStudents.length === 0 ? (
+                        <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', padding: '0.5rem', margin: 0 }}>
+                          Brak dostępnych studentów w organizacji.
+                        </p>
+                      ) : (
+                        filteredAvailableStudents.map((s) => {
+                          const isSelected = selectedStudentIds.includes(s.accountId);
+                          return (
+                            <label key={s.accountId} className="group-creator__student-row">
+                              <input
+                                type="checkbox"
+                                className="group-creator__student-checkbox"
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedStudentIds((prev) => [...prev, s.accountId]);
+                                  } else {
+                                    setSelectedStudentIds((prev) => prev.filter((id) => id !== s.accountId));
+                                  }
+                                }}
+                              />
+                              <div className="group-creator__student-row-info">
+                                <span className="group-creator__student-row-name">{s.name}</span>
+                                <span className="group-creator__student-row-meta">
+                                  {s.email} {s.studentNumber ? `• Nr indeksu: ${s.studentNumber}` : ''}
+                                </span>
+                              </div>
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="group-creator-wizard__footer">
@@ -496,7 +625,7 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
             </div>
 
             <div className="group-creator-wizard__footer-right">
-              {step === 2 && (
+              {step > 1 && (
                 <Button
                   type="button"
                   variant="secondary"
@@ -508,7 +637,7 @@ const [isDraftPromptOpen, setIsDraftPromptOpen] = useState(false);
                 </Button>
               )}
 
-              {step === 1 ? (
+              {step < totalSteps ? (
                 <Button
                   type="button"
                   variant="primary"

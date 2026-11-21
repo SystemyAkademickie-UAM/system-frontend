@@ -149,6 +149,11 @@ export default function AdminHomeContent() {
   const navigate = useNavigate();
   const session = useSession();
 
+  const isSuperAdmin =
+    session.user?.roles?.includes('super') ||
+    session.user?.activeRole === 'super' ||
+    session.user?.role === 'super';
+
   const [organizations, setOrganizations] = useState([]);
   const [selectedOrgId, setSelectedOrgId] = useState(null);
   const [dashboard, setDashboard] = useState(null);
@@ -229,7 +234,7 @@ export default function AdminHomeContent() {
       <div className="admin-home-container">
         {/* Top Control Bar */}
         <div className="admin-home-top-bar">
-          {organizations.length > 1 && (
+          {isSuperAdmin && organizations.length > 1 && (
             <div className="admin-home-org-picker">
               <label htmlFor="admin-home-org-select" className="admin-home-picker-label">
                 {copy.orgSelectorLabel}:

@@ -5,10 +5,10 @@
 
 // === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useState } from 'react';
-
 import { useToast } from '../../ui/Toast/Toast.jsx';
-
 import { useOptionalGroupId } from '../../../hooks/useOptionalGroupId.js';
+import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 
 import {
 
@@ -41,31 +41,23 @@ const NEWNOTIFICATIONMESSAGE__TEXTLABEL = {
 
 // === GŁÓWNY KOMPONENT WIDOKU ===
 export default function BacklogNewNotificationAlert() {
-
+  const { role } = useAppRole();
   const groupId = useOptionalGroupId();
-
   const { showInfo } = useToast();
-
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
 
+  const isAdminOrSuper = role === APP_ROLE.ADMIN || role === APP_ROLE.SUPERADMIN;
+
   useEffect(() => {
-
-    if (!groupId) {
-
+    if (!groupId || isAdminOrSuper) {
       return undefined;
-
     }
-
     return ensureBacklogUnreadCountPolling(groupId);
-
-  }, [groupId]);
+  }, [groupId, isAdminOrSuper]);
 
   useEffect(() => {
-
-    if (!groupId) {
-
+    if (!groupId || isAdminOrSuper) {
       return undefined;
-
     }
 
     return subscribeBacklogNotificationSync(groupId, (event) => {
