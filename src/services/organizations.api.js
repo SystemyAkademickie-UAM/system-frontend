@@ -105,3 +105,4 @@ export async function grantOrganizationAdministrator(organizationId, email) {
 export async function revokeOrganizationAdministrator(organizationId, accountId) {
   return requireOk(await deleteJson(`/admin/organizations/${organizationId}/administrators/${accountId}`));
 }
+

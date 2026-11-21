@@ -259,20 +259,19 @@ export default function UserManagementContent() {
         accessor: (row) => roleLabel(row.role, copy),
         render: (row) => roleLabel(row.role, copy),
       },
+    ],
+    [copy]
+  );
+
+  const rowActions = useMemo(() => ({
+    menuItems: [
       {
-        key: 'change',
+        id: 'edit',
         label: copy.change,
-        width: ACCOUNT_COLUMN_WIDTH_CHANGE,
-        sort: false,
-        render: (row) => (
-          <Button size="sm" variant="secondary" onClick={() => openEdit(row)}>
-            {copy.change}
-          </Button>
-        ),
+        onSelect: (row) => openEdit(row),
       },
     ],
-    [copy, openEdit]
-  );
+  }), [copy.change, openEdit]);
 
   function updateField(key, value) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -471,6 +470,7 @@ export default function UserManagementContent() {
                 columns={columns}
                 data={visibleItems}
                 rowKey="accountId"
+                rowActions={rowActions}
                 search={{
                   placeholder: copy.search,
                   filter: (row, query) =>

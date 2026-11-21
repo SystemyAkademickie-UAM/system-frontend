@@ -227,3 +227,33 @@ export async function updateGroupShopOpenStatus(groupId, shopOpen) {
   }
   return { ok: true, shopOpen };
 }
+
+/**
+ * Usuwa zakupiony przedmiot ze stanu ekwipunku studenta.
+ * DELETE /groups/:groupId/inventory/:itemId
+ *
+ * @param {string | number} groupId
+ * @param {string | number} itemId
+ */
+export async function deleteGroupPurchasedItem(groupId, itemId) {
+  const result = await deleteJson(`/groups/${groupId}/inventory/${itemId}`);
+  if (!result.ok) {
+    return { ok: false, error: extractApiError(result.data) };
+  }
+  return { ok: true };
+}
+
+/**
+ * Usuwa wpis z historii ekwipunku (np. pozycję użytego przedmiotu).
+ * DELETE /groups/:groupId/inventory-history/:historyId
+ *
+ * @param {string | number} groupId
+ * @param {string | number} historyId
+ */
+export async function deleteGroupUsedItemHistory(groupId, historyId) {
+  const result = await deleteJson(`/groups/${groupId}/inventory-history/${historyId}`);
+  if (!result.ok) {
+    return { ok: false, error: extractApiError(result.data) };
+  }
+  return { ok: true };
+}

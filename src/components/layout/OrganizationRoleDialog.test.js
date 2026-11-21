@@ -89,6 +89,27 @@ describe('OrganizationRoleDialog confirm', () => {
     expect(onSaved).toHaveBeenCalledOnce();
   });
 
+  it('hides organization select and picks supervisor role when super is chosen', async () => {
+    const onSaved = vi.fn().mockResolvedValue(undefined);
+    postJson.mockResolvedValue({ ok: true });
+    await renderDialog(onSaved);
+
+    const roleSelect = document.getElementById('login-context-role');
+    await act(async () => {
+      roleSelect.value = 'super';
+      roleSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    // Organization select should now be hidden
+    expect(document.getElementById('login-context-organization')).toBeNull();
+
+    await confirm();
+    expect(postJson).toHaveBeenCalledWith(AUTH_LOGIN_CONTEXT_PATH, {
+      organizationId: 1,
+      role: 'super',
+    });
+  });
+
   it('shows the save error and does not continue when the request fails', async () => {
     const onSaved = vi.fn();
     postJson.mockResolvedValue({ ok: false });

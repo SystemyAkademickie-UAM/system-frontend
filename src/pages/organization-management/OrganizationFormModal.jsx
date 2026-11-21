@@ -363,3 +363,4 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
     </Modal>
   );
 }
+

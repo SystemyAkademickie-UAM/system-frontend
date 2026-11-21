@@ -106,8 +106,23 @@ export function organizationLogSentence(item, language) {
   }
 }
 
-const SAFE_LINK = /^\/(groups\/\d+(?:\/student-profile\/\d+)?|users\?accountId=\d+)$/;
+const SAFE_LINK = /^\/(groups\/\d+(?:\/admin\/home|\/admin\/student-profile\/\d+|\/student-profile\/\d+)?|users\?accountId=\d+)$/;
 
 export function safeOrganizationLogLink(path) {
-  return typeof path === 'string' && SAFE_LINK.test(path) ? path : null;
+  if (typeof path !== 'string') return null;
+
+  // Przekierowania na grupę lub profil studenta w grupie powinny prowadzić do wirtualnego podglądu (/admin/)
+  const groupProfileMatch = path.match(/^\/groups\/(\d+)\/student-profile\/(\d+)$/);
+  if (groupProfileMatch) {
+    const [, groupId, studentId] = groupProfileMatch;
+    return `/groups/${groupId}/admin/student-profile/${studentId}`;
+  }
+
+  const groupMatch = path.match(/^\/groups\/(\d+)\/?$/);
+  if (groupMatch) {
+    const [, groupId] = groupMatch;
+    return `/groups/${groupId}/admin/home`;
+  }
+
+  return SAFE_LINK.test(path) ? path : null;
 }
