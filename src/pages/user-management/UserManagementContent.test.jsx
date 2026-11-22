@@ -89,6 +89,35 @@ describe('UserManagementContent', () => {
     expect(container.textContent).toContain('Zmień organizację');
   });
 
+  it('hides the administering role from an organization administrator', async () => {
+    listOrganizationAccounts.mockResolvedValue({
+      items: [{ ...ADA, role: 'administrator', accountId: 9 }],
+      nextAfterAccountId: null,
+    });
+    await renderPeople();
+    const addButton = [...container.querySelectorAll('button')].find((node) => node.textContent.includes('Dodaj osobę'));
+    act(() => {
+      addButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    const roleSelect = document.body.querySelector('#account-role');
+    const optionValues = [...roleSelect.options].map((option) => option.value);
+    expect(optionValues).toEqual(['student', 'lecturer']);
+    act(() => {
+      [...document.body.querySelectorAll('button')].find((node) => node.textContent === 'Anuluj')
+        .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    const moreBtn = container.querySelector('.data-table__action-btn--more');
+    act(() => {
+      moreBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    act(() => {
+      [...document.body.querySelectorAll('button')].find((node) => node.textContent === 'Zmień')
+        .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(document.body.textContent).not.toContain('Usuń tę rolę');
+    expect(document.body.textContent).not.toContain('+ Osoba administrująca');
+  });
+
   it('keeps the empty sentence after the first load fails', async () => {
     listOrganizationAccounts.mockRejectedValue(new Error('Sieć'));
     await renderPeople();

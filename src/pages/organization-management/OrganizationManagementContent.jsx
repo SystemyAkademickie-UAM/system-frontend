@@ -47,6 +47,7 @@ const COPY = {
     confirmDelete: 'Czy na pewno chcesz usunąć organizację: ',
     samlLabel: 'SAML 2.0',
     emailLabel: 'E-mail',
+    internalLabel: 'Wewnętrzne',
   },
   english: {
     title: 'Organization Management',
@@ -73,6 +74,7 @@ const COPY = {
     confirmDelete: 'Are you sure you want to remove the organization: ',
     samlLabel: 'SAML 2.0',
     emailLabel: 'Email',
+    internalLabel: 'Internal',
   },
 };
 
@@ -272,7 +274,11 @@ export default function OrganizationManagementContent() {
       accessor: (row) => row.loginMethod,
       render: (row) => (
         <span className={`org-cell-badge org-cell-badge--${row.loginMethod}`}>
-          {row.loginMethod === 'saml' ? copy.samlLabel : copy.emailLabel}
+          {row.loginMethod === 'saml'
+            ? copy.samlLabel
+            : row.loginMethod === 'email'
+              ? copy.emailLabel
+              : copy.internalLabel}
         </span>
       ),
     },
