@@ -1,0 +1,206 @@
+/**
+ * @file GroupCard.css
+ * @description Style karty komponentu GroupCard.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.group-card {
+  min-width: 0;
+}
+
+.group-card__link {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 16px;
+  background: var(--color-bg-surface);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.group-card__link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.group-card__link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.group-card__banner-wrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: var(--color-bg-elevated);
+  overflow: hidden;
+}
+
+.group-card__banner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
+.group-card__banner--color {
+  object-fit: unset;
+}
+
+.group-card__banner-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  color: var(--color-text-secondary);
+  background: linear-gradient(145deg, var(--color-bg-elevated) 0%, var(--color-bg-surface) 100%);
+}
+
+.group-card__banner-fallback-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  opacity: 0.65;
+}
+
+.group-card__banner-fallback-text {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.group-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem 0.9rem 1rem;
+}
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
+.group-card__title {
+  margin: 0;
+  min-height: 2.6rem;
+  font-size: calc(var(--font-size-body) + 2px);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.group-card__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.group-card__meta-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.group-card__label {
+  margin: 0;
+  min-height: 1rem;
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--color-accent);
+}
+
+.group-card__value {
+  margin: 0;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === AKCJE ADMINISTRATORA (3 KROPKI I DROPDOWN) === */
+.group-card__admin-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+}
+
+.group-card__menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.group-card__menu-trigger:hover {
+  background: var(--color-bg-surface);
+  border-color: var(--color-accent);
+}
+
+.group-card__menu-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 190px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 10;
+}
+
+.group-card__menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.group-card__menu-item:hover {
+  background: var(--color-bg-surface);
+}
+
+.group-card__menu-item--danger {
+  color: #ef4444;
+}
+
+.group-card__menu-item--danger:hover {
+  background: rgba(239, 68, 68, 0.12);
+}

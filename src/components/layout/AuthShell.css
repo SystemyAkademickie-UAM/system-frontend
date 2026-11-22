@@ -1,3 +1,9 @@
+/**
+ * @file AuthShell.css
+ * @description Style interfejsu użytkownika i układ dla modułu AuthShell.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .auth-shell {
   --auth-panel-max-width: min(1113px, 58vw);
   --auth-card-max-width: min(569px, 29.64vw);
@@ -7,7 +13,6 @@
   --auth-card-body-padding-top: clamp(2rem, 3.75vw, 72px);
   --auth-card-body-padding-x: clamp(1rem, 1.67vw, 32px);
   --auth-card-body-padding-bottom: clamp(1.75rem, 2.5vw, 48px);
-  /** Institution step: back arrow (36px) + gap (20px) + top (16px) matches 72px body-padding-top */
   --auth-card-back-padding-top: clamp(0.75rem, 1vw, 16px);
   --auth-card-logo-to-content-gap: clamp(2rem, 4vw, 64px);
   --auth-card-logo-to-label-gap: clamp(1.5rem, 2.5vw, 36px);
@@ -15,7 +20,6 @@
   --auth-card-field-to-button-gap: clamp(1rem, 1.5vw, 24px);
   --auth-card-field-gap: clamp(1rem, 1.5vw, 20px);
   --auth-card-back-to-logo-gap: clamp(1rem, 1.25vw, 20px);
-  /** Institution: label → dropdown */
   --auth-institution-label-to-field-gap: clamp(0.5rem, 0.8vw, 10px);
   --auth-card-transition-exit-ms: 240ms;
   --auth-card-transition-enter-ms: 240ms;
@@ -59,6 +63,7 @@
   );
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .auth-shell__main {
   position: relative;
   z-index: 1;
@@ -120,6 +125,7 @@
   object-fit: contain;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .auth-shell__footer-text {
   font-family: 'Manrope', sans-serif;
   font-weight: 700;
@@ -129,6 +135,7 @@
   text-align: center;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 768px) {
   .auth-shell {
     --auth-panel-max-width: 100%;

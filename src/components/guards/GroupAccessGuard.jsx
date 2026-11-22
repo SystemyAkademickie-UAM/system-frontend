@@ -1,11 +1,20 @@
+/**
+ * @file GroupAccessGuard.jsx
+ * @description Komponent interfejsu użytkownika GroupAccessGuard.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Navigate, Outlet, useParams } from 'react-router-dom';
 import { groupRootPath } from '../../routes/pathRegistry.js';
 import { useGroupPreview } from '../../hooks/groups/useGroupPreview.js';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Blokuje dostęp do podstron grupy bez uprawnień (właściciel / zapisany student).
  * Przekierowuje na landing `/groups/:groupId` z formularzem kodu lub komunikatem.
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function GroupAccessGuard() {
   const { groupId } = useParams();
   const { group, hasAccess, isLoading, errorMessage } = useGroupPreview(groupId);
@@ -22,5 +31,6 @@ export default function GroupAccessGuard() {
     return <Navigate to={groupRootPath(groupId)} replace />;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return <Outlet />;
 }

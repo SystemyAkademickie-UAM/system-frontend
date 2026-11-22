@@ -1,5 +1,12 @@
+/**
+ * @file CharacterCounter.jsx
+ * @description Komponent interfejsu użytkownika CharacterCounter.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import './CharacterCounter.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Licznik znaków w formacie „12/50”.
  *
@@ -8,6 +15,8 @@ import './CharacterCounter.css';
  * @param {number} props.maxLength — limit znaków
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function CharacterCounter({ value, maxLength, className = '' }) {
   const current = String(value ?? '').length;
   const ratio = maxLength > 0 ? current / maxLength : 0;

@@ -1,5 +1,12 @@
+/**
+ * @file PageHeader.jsx
+ * @description Komponent interfejsu użytkownika PageHeader.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import './PageHeader.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Nagłówek strony + opis podstrony (Figma: Heading 1 + Container).
  *
@@ -8,6 +15,8 @@ import './PageHeader.css';
  * @param {string} [props.description]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function PageHeader({ title, description, className = '' }) {
   return (
     <header className={['maq-page-header', className].filter(Boolean).join(' ')}>

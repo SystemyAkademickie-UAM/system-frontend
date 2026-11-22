@@ -1,0 +1,164 @@
+/**
+ * @file GroupEditModal.css
+ * @description Style modalu edycji grupy i zarządzania użytkownikami.
+ */
+
+.group-edit-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.group-edit-modal__loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.group-edit-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.group-edit-modal__section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.group-edit-modal__section-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.group-edit-modal__subsection-title {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.group-edit-modal__grid-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 600px) {
+  .group-edit-modal__grid-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.group-edit-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.group-edit-modal__label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.group-edit-modal__input,
+.group-edit-modal__select,
+.group-edit-modal__textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: var(--color-bg-elevated, #292839);
+  color: var(--color-text-primary, #ffffff);
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.group-edit-modal__input:focus,
+.group-edit-modal__select:focus,
+.group-edit-modal__textarea:focus {
+  border-color: var(--color-accent, #1ecc38);
+  box-shadow: 0 0 0 1px var(--color-accent, #1ecc38);
+}
+
+.group-edit-modal__empty-hint {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+
+.group-edit-modal__students-list,
+.group-edit-modal__available-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: var(--color-bg-surface, #1a1a2a);
+}
+
+.group-edit-modal__student-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-bg-elevated, #292839);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.group-edit-modal__student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.group-edit-modal__student-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+}
+
+.group-edit-modal__student-meta {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.group-edit-modal__student-stats {
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.group-edit-modal__search {
+  margin-bottom: 0.5rem;
+}
+
+.group-edit-modal__add-students-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.group-edit-modal__add-students-header {
+  display: flex;
+  align-items: center;
+}
+

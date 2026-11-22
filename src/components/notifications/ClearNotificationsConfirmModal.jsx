@@ -1,8 +1,15 @@
+/**
+ * @file ClearNotificationsConfirmModal.jsx
+ * @description Komponent okna modalnego ClearNotificationsConfirmModal z obsługą formularza i akcji użytkownika.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useState } from 'react';
 import { Modal } from '../ui/index.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './ClearNotificationsConfirmModal.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const CLEARALLTITLE__TEXTLABEL = {
   polish: 'Wyczyść powiadomienia',
   english: 'Clear notifications',
@@ -29,7 +36,8 @@ const CLEARPART__TEXTLABEL = {
 };
 
 const CLEARPARTCONFIRMLABEL__TEXTLABEL = {
-  polish: 'Wyczyść (oprócz użyć przedmiotów)',
+
+polish: 'Wyczyść (oprócz użyć przedmiotów)',
   english: 'Clear (except item uses)',
 };
 
@@ -62,6 +70,8 @@ const MODEMAP = {
  *   onConfirm: () => void | Promise<void>,
  * }} props
  */
+
+// === KOMPONENT OKNA DIALOGOWEGO ===
 export default function ClearNotificationsConfirmModal({
   isOpen,
   mode,
@@ -77,6 +87,7 @@ export default function ClearNotificationsConfirmModal({
 
   const map = MODEMAP[mode];
 
+// === RENDEROWANIE OKNA MODALNEGO ===
   return (
     <Modal
       isOpen={isOpen}

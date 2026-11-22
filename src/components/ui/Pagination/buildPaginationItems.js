@@ -1,4 +1,10 @@
 /**
+ * @file buildPaginationItems.js
+ * @description Komponent interfejsu użytkownika buildPaginationItems.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
+/**
  * Buduje listę elementów paginacji (numery stron + wielokropek).
  *
  * Okno 3 stron: dla strony >= 3 środkowa to bieżąca (np. 6 → 4,5,6).
@@ -9,9 +15,12 @@
  * @param {number} totalPages
  * @returns {({ type: 'page', page: number } | { type: 'ellipsis' })[]}
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function buildPaginationItems(currentPage, totalPages) {
   const total = Math.max(0, Math.floor(totalPages));
-  if (total <= 0) {
+
+if (total <= 0) {
     return [];
   }
 
@@ -26,7 +35,8 @@ export function buildPaginationItems(currentPage, totalPages) {
   }
 
   const items = [];
-  for (let page = windowStart; page <= windowEnd; page += 1) {
+
+for (let page = windowStart; page <= windowEnd; page += 1) {
     items.push({ type: 'page', page });
   }
 
@@ -38,5 +48,6 @@ export function buildPaginationItems(currentPage, totalPages) {
     items.push({ type: 'page', page: total });
   }
 
+// === RENDEROWANIE WIDOKU ===
   return items;
 }

@@ -1,0 +1,14 @@
+/**
+ * @file MembersLogContentContent.css
+ * @description Style interfejsu użytkownika i układ dla modułu MembersLogContentContent.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
+.members-log {
+  width: 100%;
+}
+
+.members-log__surface.maq-textured-surface {
+  width: 100%;
+  max-width: 100%;
+}

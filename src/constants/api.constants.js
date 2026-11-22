@@ -1,3 +1,9 @@
+/**
+ * @file api.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu api.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 import { AUTH_SAML_LOGIN_PATH, AUTH_SAML_LOGOUT_PATH } from './authPaths.constants.js';
 
 /**
@@ -39,9 +45,11 @@ export function getSamlLoginUrl(organizationId) {
   if (!Number.isFinite(parsedId) || parsedId <= 0) {
     return '';
   }
-  return `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGIN_PATH}?organizationId=${parsedId}`;
+
+return `${base.replace(/\/+$/, '')}${AUTH_SAML_LOGIN_PATH}?organizationId=${parsedId}`;
 }
 
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 /**
  * Absolute URL for SAML Single Logout (redirects to IdP for full logout).
  */
@@ -79,7 +87,8 @@ export function getApiBaseUrl() {
   if (typeof globalThis.location?.origin === 'string' && globalThis.location.origin.length > 0) {
     return `${globalThis.location.origin}/api`;
   }
-  return '';
+
+return '';
 }
 
 /**

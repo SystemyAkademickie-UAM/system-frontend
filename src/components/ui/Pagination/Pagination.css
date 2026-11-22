@@ -1,3 +1,9 @@
+/**
+ * @file Pagination.css
+ * @description Style interfejsu użytkownika i układ dla modułu Pagination.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-pagination {
   display: flex;
   flex-direction: row;
@@ -38,6 +44,7 @@
     box-shadow 0.15s ease;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-pagination__btn--nav {
   color: #e3e0f7;
 }
@@ -56,6 +63,7 @@
   outline-offset: 2px;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-pagination__btn:disabled {
   opacity: 0.35;
   cursor: not-allowed;

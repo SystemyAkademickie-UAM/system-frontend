@@ -1,10 +1,17 @@
 /**
+ * @file svgIcons.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu svgIcons.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
+/**
  * Ścieżki względne do plików SVG w public/assets/svg/.
  * Używaj z AssetSvg: <AssetSvg name={SVG_ICONS.actions.add} />
  */
 
 /** @typedef {string} SvgAssetPath */
 
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 export const SVG_ICONS = {
   shared: {
     placeholder: 'shared/placeholder.svg',
@@ -23,7 +30,8 @@ export const SVG_ICONS = {
     conceal: 'actions/hide.svg',
     download: 'actions/download.svg',
   },
-  controls: {
+
+controls: {
     close: 'controls/close.svg',
     search: 'controls/search.svg',
     more: 'controls/more.svg',
@@ -37,6 +45,7 @@ export const SVG_ICONS = {
     user: 'content/user.svg',
     calendar: 'content/calendar.svg',
     clock: 'content/clock.svg',
+    info: 'content/info.svg',
   },
   status: {
     check: 'status/check.svg',
@@ -44,7 +53,8 @@ export const SVG_ICONS = {
     checkCircle: 'status/check-circle.svg',
     info: 'status/info.svg',
   },
-  nav: {
+
+nav: {
     /** Domek w breadcrumb SuperBar — nie używać w sidebarze. */
     breadcrumbHome: 'nav/breadcrumb-home.svg',
     /** Legacy alias; preferuj breadcrumbHome w breadcrumb. */
@@ -74,7 +84,16 @@ export const SVG_ICONS = {
     groups: 'nav/groups.svg',
     stats: 'nav/stats.svg',
     organization: 'nav/organization.svg',
-    backup: 'nav/stats.svg',
+    organizationHome: 'nav/organization-home.svg',
+    organizations: 'nav/organizations.svg',
+    usersManage: 'nav/users-manage.svg',
+    diskSpace: 'nav/disk-space.svg',
+    documents: 'nav/documents.svg',
+    broadcast: 'nav/broadcast.svg',
+    faq: 'nav/faq.svg',
+    logs: 'nav/logs.svg',
+    info: 'nav/info.svg',
+    backup: 'nav/settings.svg',
     courses: 'nav/courses.svg',
     logout: 'nav/logout.svg',
   },

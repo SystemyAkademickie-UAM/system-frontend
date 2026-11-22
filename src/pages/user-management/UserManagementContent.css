@@ -1,0 +1,403 @@
+/**
+ * @file UserManagementContent.css
+ * @description Style dla widoku zarządzania użytkownikami w organizacji.
+ */
+
+.user-management-page__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.user-management {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  width: 100%;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+}
+
+/* Karta wyboru organizacji */
+.user-management__org-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  background-color: var(--color-bg-surface, #1a1a2a);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 8px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.user-management__org-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.user-management__org-label {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.user-management__org-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #ffffff);
+}
+
+.user-management__org-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.user-management__org-badge--email {
+  background-color: var(--color-accent-muted, rgba(200, 65, 65, 0.16));
+  color: #fca5a5;
+  border: 1px solid var(--color-accent-2, rgba(200, 65, 65, 0.35));
+}
+
+.user-management__org-badge--saml {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.user-management__org-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Górny pasek narzędzi */
+.user-management__action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.user-management__actions-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.user-management__actions-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  position: relative;
+}
+
+/* Menu Opcje */
+.user-management__options-dropdown {
+  position: relative;
+}
+
+.user-management__options-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 100;
+  min-width: 160px;
+  background-color: var(--color-bg-elevated, #292839);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.4rem 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+}
+
+.user-management__options-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  color: var(--color-text-primary, #ffffff);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.user-management__options-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-accent, #1ecc38);
+}
+
+/* Sekcja filtrów (zwijana) */
+.user-management__filters-panel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-bg-surface, #1a1a2a);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.user-management__filters-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary, #9ca3af);
+  margin-right: 0.4rem;
+}
+
+.user-management__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* Formularz wewnątrz modalu */
+.user-management__form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+}
+
+.user-management__modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.user-management__form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  width: min(100%, 36rem);
+  padding: 1.25rem;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: 12px;
+}
+
+.user-management__role {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+}
+
+.user-management__role select {
+  min-width: 16rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.75rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-divider);
+  border-radius: 8px;
+  font-size: var(--font-size-body);
+}
+
+.user-management__roles-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.user-management__roles-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background-color: var(--color-bg-elevated, #292839);
+  border: 1px solid var(--color-divider, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.user-management__role-error {
+  font-size: var(--font-size-body, 14px);
+  color: var(--color-input-error, #f87171);
+}
+
+.user-management__role-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-body);
+  color: var(--color-text-primary);
+}
+
+.user-management__grant-roles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-elevated, #f9fafb);
+  border: 1px dashed var(--color-divider, #e5e7eb);
+  border-radius: 8px;
+  width: 100%;
+}
+
+.user-management__grant-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+.user-management__grant-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.user-management__file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.user-management .data-table-wrap {
+  width: 100%;
+}
+
+.user-management .data-table__cell {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Modal wyboru organizacji */
+.org-picker-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.org-picker-modal__filters {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.org-picker-modal__method-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.org-picker-modal__table-wrap {
+  max-height: 380px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  background-color: var(--color-bg-elevated, #292839);
+}
+
+.org-picker-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.org-picker-modal__table th {
+  position: sticky;
+  top: 0;
+  padding: 0.65rem 0.9rem;
+  background-color: #1f1e2e;
+  color: var(--color-text-secondary, #9ca3af);
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1;
+}
+
+.org-picker-modal__table td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary, #ffffff);
+}
+
+.org-picker-modal__row {
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.org-picker-modal__row:hover {
+  background-color: var(--color-accent-muted, rgba(200, 65, 65, 0.1));
+}
+
+.org-picker-modal__row--active {
+  background-color: var(--color-accent-muted, rgba(200, 65, 65, 0.2));
+  border-left: 3px solid var(--color-accent, #c84141);
+}
+
+.org-picker-modal__empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--color-text-secondary, #9ca3af);
+  font-style: italic;
+}
+
+/* Styl kolumny z badge metody logowania (współdzielony design z /organizations) */
+.user-management__login-method-badge {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm, 4px);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.user-management__login-method-badge--saml {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.user-management__login-method-badge--email {
+  background-color: var(--color-accent-muted, rgba(200, 65, 65, 0.16));
+  color: #fca5a5;
+  border: 1px solid var(--color-accent-2, rgba(200, 65, 65, 0.35));
+}
+

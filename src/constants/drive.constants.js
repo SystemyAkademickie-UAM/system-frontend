@@ -1,3 +1,9 @@
+/**
+ * @file drive.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu drive.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 import { getApiBaseUrl, getAssetUrl } from './api.constants.js';
 
 const HTTP_URL_PATTERN = /^https?:\/\//i;
@@ -10,12 +16,14 @@ export function isColorBannerRef(ref) {
   return typeof ref === 'string' && ref.trim().startsWith('color:');
 }
 
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 /**
  * @param {string | null | undefined} ref
  * @returns {string | null}
  */
 export function parseColorBannerRef(ref) {
-  if (!isColorBannerRef(ref)) {
+
+if (!isColorBannerRef(ref)) {
     return null;
   }
   const color = ref.trim().slice('color:'.length);
@@ -33,7 +41,8 @@ export function buildDriveBannerUrl(driveRef) {
     return null;
   }
   const trimmed = String(driveRef).trim();
-  if (trimmed.length === 0) {
+
+if (trimmed.length === 0) {
     return null;
   }
   if (isColorBannerRef(trimmed)) {

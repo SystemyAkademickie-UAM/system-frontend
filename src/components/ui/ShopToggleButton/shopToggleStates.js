@@ -1,5 +1,12 @@
+/**
+ * @file shopToggleStates.js
+ * @description Komponent interfejsu użytkownika shopToggleStates.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 /** Konfiguracja stanów przycisku otwarcia/zamknięcia sklepu. */
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 export const SHOP_TOGGLE_STATE = {
   open: 'open',
   closed: 'closed',
@@ -7,13 +14,15 @@ export const SHOP_TOGGLE_STATE = {
 
 /** @type {Record<string, { label: string, variant: 'primary' | 'danger' | 'secondary', nextState: string, ariaLabel: string }>} */
 export const SHOP_TOGGLE_STATE_CONFIG = {
-  [SHOP_TOGGLE_STATE.open]: {
+
+[SHOP_TOGGLE_STATE.open]: {
     label: 'Zamknij sklep',
     variant: 'danger',
     nextState: SHOP_TOGGLE_STATE.closed,
     ariaLabel: 'Zamknij sklep dla uczestników',
   },
-  [SHOP_TOGGLE_STATE.closed]: {
+
+[SHOP_TOGGLE_STATE.closed]: {
     label: 'Otwórz sklep',
     variant: 'primary',
     nextState: SHOP_TOGGLE_STATE.open,
@@ -25,6 +34,8 @@ export const SHOP_TOGGLE_STATE_CONFIG = {
  * @param {boolean} isShopOpen
  * @returns {keyof typeof SHOP_TOGGLE_STATE_CONFIG}
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function resolveShopToggleState(isShopOpen) {
   return isShopOpen ? SHOP_TOGGLE_STATE.open : SHOP_TOGGLE_STATE.closed;
 }

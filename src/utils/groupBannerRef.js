@@ -1,3 +1,9 @@
+/**
+ * @file groupBannerRef.js
+ * @description Funkcje pomocnicze i narzędziowe modułu groupBannerRef.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { getAssetUrl } from '../constants/api.constants.js';
 import { isColorBannerRef, parseColorBannerRef } from '../constants/drive.constants.js';
 
@@ -52,12 +58,14 @@ export function getPredefinedBannerPreviewUrl(assetPath) {
  * @property {boolean} cleared
  */
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * Stabilny klucz wartości banera do autozapisu (bez trybu UI zakładek).
  *
  * @param {BannerPickerValue} value
  * @returns {string}
  */
+
 export function serializeBannerPickerValue(value) {
   return JSON.stringify({
     mode: value.mode,
@@ -92,7 +100,8 @@ export function createDefaultBannerPickerValue() {
 export function parseImageRefToBannerPickerValue(imageRef, bannerUrl) {
   const base = createDefaultBannerPickerValue();
   const ref = typeof imageRef === 'string' ? imageRef.trim() : '';
-  const resolvedRef = ref || (typeof bannerUrl === 'string' && isColorBannerRef(bannerUrl) ? bannerUrl.trim() : '');
+
+const resolvedRef = ref || (typeof bannerUrl === 'string' && isColorBannerRef(bannerUrl) ? bannerUrl.trim() : '');
 
   if (!resolvedRef) {
     return { ...base, mode: 'gallery', cleared: false };

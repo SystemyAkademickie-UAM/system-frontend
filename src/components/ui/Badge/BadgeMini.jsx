@@ -1,3 +1,9 @@
+/**
+ * @file BadgeMini.jsx
+ * @description Komponent interfejsu użytkownika BadgeMini.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Badge from './Badge.jsx';
@@ -8,12 +14,15 @@ import { BADGE_RARITY, getBadgeRarityConfig } from './badgeRarity.js';
 import { positionSideTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './BadgeMini.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const PREVIEW_GAP = 12;
 
 /**
  * Mini kafelek odznaki — ten sam układ co Badge, w mniejszej skali.
  * Opcjonalny podgląd pełnej odznaki przy najechaniu (jak w SuperBar / tabelach).
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function BadgeMini({
   rarity = BADGE_RARITY.common,
   name,
@@ -40,7 +49,8 @@ export default function BadgeMini({
 
   const isSelected = selected !== undefined ? selected : internalSelected;
   const config = getBadgeRarityConfig(rarity);
-  const canPreview = previewOnHover && storyDescription && didacticDescription;
+
+const canPreview = previewOnHover && storyDescription && didacticDescription;
 
   const toggleSelected = () => {
     const next = !isSelected;
@@ -93,6 +103,7 @@ export default function BadgeMini({
     setPreviewVisible(false);
   };
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <button

@@ -1,9 +1,17 @@
+/**
+ * @file LoginShell.jsx
+ * @description Komponent interfejsu użytkownika LoginShell.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Outlet } from 'react-router-dom';
 import AppLogo from '../ui/AppLogo/AppLogo.jsx';
 import './LoginShell.css';
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function LoginShell() {
-  return (
+
+return (
     <div className="login-shell">
       <header className="login-shell__header">
         <div className="login-shell__brand">

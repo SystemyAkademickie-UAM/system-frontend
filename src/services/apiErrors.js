@@ -1,12 +1,21 @@
 /**
+ * @file apiErrors.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla apiErrors.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
+/**
  * Wyciąga czytelny komunikat błędu z odpowiedzi API (NestJS validation, plain text, itp.).
  *
  * @param {unknown} data
  * @param {string} [fallback='Operacja nie powiodła się']
  * @returns {string}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function extractApiError(data, fallback = 'Operacja nie powiodła się') {
-  if (typeof data === 'string' && data.trim()) {
+
+if (typeof data === 'string' && data.trim()) {
     return data.trim();
   }
 

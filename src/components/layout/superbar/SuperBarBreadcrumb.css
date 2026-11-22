@@ -1,3 +1,9 @@
+/**
+ * @file SuperBarBreadcrumb.css
+ * @description Style interfejsu użytkownika i układ dla modułu SuperBarBreadcrumb.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .super-bar-breadcrumb {
   flex: 1 1 auto;
   min-width: 0;
@@ -30,6 +36,8 @@
 }
 
 .super-bar-breadcrumb__link,
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .super-bar-breadcrumb__current {
   display: inline-block;
   max-width: 100%;
@@ -67,7 +75,9 @@
   color: var(--color-nav-user-name);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .super-bar-breadcrumb__home-link,
+
 .super-bar-breadcrumb__home-current {
   display: inline-flex;
   align-items: center;
@@ -95,6 +105,7 @@
   display: block;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 899px) {
   .super-bar-breadcrumb {
     display: none;

@@ -1,4 +1,10 @@
 /**
+ * @file stageCloneName.js
+ * @description Funkcje pomocnicze i narzędziowe modułu stageCloneName.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Buduje domyślną nazwę sklonowanego etapu: „Kopia (nazwa)”, „Kopia 2 (nazwa)” itd.
  * @param {string} sourceName
  * @param {string[]} existingNames
@@ -6,7 +12,8 @@
  */
 export function buildStageCloneName(sourceName, existingNames = []) {
   const base = sourceName.trim();
-  let maxCopyNumber = 0;
+
+let maxCopyNumber = 0;
 
   for (const name of existingNames) {
     const trimmed = name.trim();
@@ -21,5 +28,6 @@ export function buildStageCloneName(sourceName, existingNames = []) {
   }
 
   const nextNumber = maxCopyNumber + 1;
-  return nextNumber === 1 ? `Kopia (${base})` : `Kopia ${nextNumber} (${base})`;
+
+return nextNumber === 1 ? `Kopia (${base})` : `Kopia ${nextNumber} (${base})`;
 }

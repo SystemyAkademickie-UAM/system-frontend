@@ -1,3 +1,9 @@
+/**
+ * @file extraLifeItem.js
+ * @description Funkcje pomocnicze i narzędziowe modułu extraLifeItem.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** Helpers for the built-in "Dodatkowe życie" shop product. */
 
 import { DEFAULT_LIVES_SYMBOL } from '../../constants/lives.constants.js';
@@ -36,6 +42,7 @@ export function resolveExtraLifeItemIcon(livesSymbol) {
   };
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * Czy student osiągnął limit żyć ustawiony przez prowadzącego.
  *
@@ -44,7 +51,8 @@ export function resolveExtraLifeItemIcon(livesSymbol) {
  * @returns {boolean}
  */
 export function isExtraLifePurchaseAtLimit(studentLives, livesMax) {
-  if (studentLives == null || livesMax == null) {
+
+if (studentLives == null || livesMax == null) {
     return false;
   }
 
@@ -94,6 +102,7 @@ export function isShopItemPurchaseDisabled(item, {
 /**
  * @returns {import('./shopItem.types.js').ShopItem | null}
  */
+
 export function findExtraLifeShopItem(items) {
   if (!Array.isArray(items)) {
     return null;

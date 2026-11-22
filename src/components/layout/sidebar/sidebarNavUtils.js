@@ -1,10 +1,19 @@
+/**
+ * @file sidebarNavUtils.js
+ * @description Komponent interfejsu użytkownika sidebarNavUtils.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useLocation } from 'react-router-dom';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {string} pathname
  * @param {string} path
  * @param {boolean} [matchEnd]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export function isPathActive(pathname, path, matchEnd = false) {
   if (!path) {
     return false;
@@ -12,7 +21,8 @@ export function isPathActive(pathname, path, matchEnd = false) {
   if (matchEnd) {
     return pathname === path;
   }
-  return pathname === path || pathname.startsWith(`${path}/`);
+
+return pathname === path || pathname.startsWith(`${path}/`);
 }
 
 /**
@@ -20,7 +30,8 @@ export function isPathActive(pathname, path, matchEnd = false) {
  * @param {{ to?: string, matchEnd?: boolean, children?: { to?: string, matchEnd?: boolean }[] }[]} items
  */
 export function isAnyNavItemActive(pathname, items) {
-  return items.some((item) => {
+
+return items.some((item) => {
     if (item.to && isPathActive(pathname, item.to, item.matchEnd)) {
       return true;
     }
@@ -40,5 +51,7 @@ export function getFirstNavChildPath(children = []) {
 }
 
 export function useNavPathname() {
+
+// === RENDEROWANIE WIDOKU ===
   return useLocation().pathname;
 }

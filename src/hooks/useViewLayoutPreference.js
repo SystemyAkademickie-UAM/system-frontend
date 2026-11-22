@@ -1,13 +1,21 @@
+/**
+ * @file useViewLayoutPreference.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useViewLayoutPreference.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useState } from 'react';
 import { VIEW_LAYOUT, getNextViewLayout } from '../components/ui/ViewLayoutToggle/viewLayoutStates.js';
 
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 function readCookieValue(cookieName) {
   const entry = document.cookie
     .split(';')
     .map((part) => part.trim())
-    .find((part) => part.startsWith(`${cookieName}=`));
+
+.find((part) => part.startsWith(`${cookieName}=`));
 
   if (!entry) {
     return null;
@@ -22,8 +30,10 @@ function readCookieValue(cookieName) {
  * @param {string} cookieKey
  * @param {'table' | 'tiles'} [defaultLayout]
  */
+
 export function useViewLayoutPreference(cookieKey, defaultLayout = VIEW_LAYOUT.table) {
-  const [layout, setLayout] = useState(() => {
+
+const [layout, setLayout] = useState(() => {
     const stored = readCookieValue(cookieKey);
     return stored === VIEW_LAYOUT.tiles || stored === VIEW_LAYOUT.table ? stored : defaultLayout;
   });
@@ -38,6 +48,7 @@ export function useViewLayoutPreference(cookieKey, defaultLayout = VIEW_LAYOUT.t
     setLayoutPreference(getNextViewLayout(layout));
   }, [layout, setLayoutPreference]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     layout,
     setLayoutPreference,

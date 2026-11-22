@@ -1,3 +1,9 @@
+/**
+ * @file publicUiIcons.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu publicUiIcons.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 import { publicIconPath } from '../utils/publicAssetUrl.js';
 
 /** URL-e ikon z public/assets/icons/ — nie importować plików z public/ w JS. */
@@ -6,7 +12,8 @@ export const PUBLIC_UI_ICONS = {
   delete: publicIconPath('trash-01-svgrepo-com.svg'),
   accept: publicIconPath('check-svgrepo-com.svg'),
   cancel: publicIconPath('x-close-svgrepo-com.svg'),
-  close: publicIconPath('x-close-svgrepo-com.svg'),
+
+close: publicIconPath('x-close-svgrepo-com.svg'),
   unlocked: publicIconPath('check-circle-broken-svgrepo-com.svg'),
   locked: publicIconPath('x-circle-svgrepo-com.svg'),
   arrowRight: publicIconPath('arrow-right-svgrepo-com.svg'),
@@ -15,7 +22,8 @@ export const PUBLIC_UI_ICONS = {
   info: publicIconPath('info-circle-svgrepo-com.svg'),
   chevronLeft: publicIconPath('chevron-left-svgrepo-com.svg'),
   chevronLeftDouble: publicIconPath('chevron-left-double-svgrepo-com.svg'),
-  chevronRight: publicIconPath('chevron-right-svgrepo-com.svg'),
+
+chevronRight: publicIconPath('chevron-right-svgrepo-com.svg'),
   chevronRightDouble: publicIconPath('chevron-right-double-svgrepo-com.svg'),
   decrease: publicIconPath('minus-circle-svgrepo-com.svg'),
   increase: publicIconPath('plus-circle-svgrepo-com.svg'),

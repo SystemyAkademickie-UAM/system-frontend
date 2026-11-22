@@ -1,5 +1,12 @@
+/**
+ * @file DataTableMobileRow.jsx
+ * @description Komponent interfejsu użytkownika DataTableMobileRow.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { getMobileColumnSlots, renderDataTableCell } from './dataTableMobile.js';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {Object} props
  * @param {Object} props.row
@@ -8,6 +15,8 @@ import { getMobileColumnSlots, renderDataTableCell } from './dataTableMobile.js'
  * @param {string} [props.className]
  * @param {string | null} [props.rowColor]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function DataTableMobileRow({
   row,
   columns,
@@ -19,8 +28,10 @@ export default function DataTableMobileRow({
   const actions = typeof renderActions === 'function' ? renderActions(row) : renderActions;
   const metaItems = meta.filter(Boolean);
   const resolvedColor = rowColor ?? row.rowColor ?? row.color ?? null;
-  const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
 
+const colorStyle = resolvedColor ? { '--row-color': resolvedColor } : undefined;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <li
       className={[

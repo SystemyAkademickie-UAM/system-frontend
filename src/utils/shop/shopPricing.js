@@ -1,4 +1,10 @@
 /**
+ * @file shopPricing.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopPricing.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * @param {import('./shopItem.types.js').ShopItem | { priceAmount?: number, salePriceAmount?: number, rankDiscountedPrice?: number }} item
  * @returns {boolean}
  */
@@ -38,6 +44,8 @@ export function getShopItemEffectivePrice(item) {
  * @param {import('./shopItem.types.js').ShopItem | { priceAmount?: number, salePriceAmount?: number, rankDiscountedPrice?: number, appliedDiscounts?: Array<{ source: 'rank' | 'badge', name: string, type: 'percent' | 'fixed', value: number, formattedText: string }> }} item
  * @returns {ShopItemPriceDisplay}
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function getShopItemPriceDisplay(item) {
   const catalogBase = Number(item?.priceAmount ?? 0);
   const rankPrice = item?.rankDiscountedPrice != null
@@ -49,7 +57,8 @@ export function getShopItemPriceDisplay(item) {
   const appliedDiscounts = Array.isArray(item?.appliedDiscounts) ? item.appliedDiscounts : [];
 
   const hasBadgeDiscount = finalPrice < rankPrice;
-  const hasRankDiscount = rankPrice < catalogBase;
+
+const hasRankDiscount = rankPrice < catalogBase;
 
   if (hasBadgeDiscount) {
     return {
@@ -111,6 +120,7 @@ export function getShopCatalogPriceHint(display) {
  * @param {ShopItemPriceDisplay | null | undefined} display
  * @returns {string | null}
  */
+
 export function getShopStrikePriceHint(display) {
   if (!display || display.tooltipBasePrice == null) {
     return null;

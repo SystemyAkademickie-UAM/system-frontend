@@ -1,0 +1,787 @@
+/**
+ * @file GroupMainActivities.jsx
+ * @description Główny komponent widoku strony dla obszaru GroupMainActivities.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
+import {useState, useEffect, useCallback} from 'react';
+import {useParams} from 'react-router-dom';
+import {getApiBaseUrl} from '../../../constants/api.constants.js';
+import {getOrCreateBrowserId} from '../../../auth/browserIdStorage.js';
+import {useAppRole} from '../../../context/AppRoleContext.jsx';
+import {APP_ROLE} from '../../../navigation/shellTemplates.config.js';
+import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
+
+import { Button, CurrencyDisplay } from '../../../components/ui/index.js';
+import { PUBLIC_UI_ICONS } from '../../../constants/publicUiIcons.js';
+import { publicIconPath } from '../../../utils/publicAssetUrl.js';
+import GroupMainSubpageHeader from '../group-main/shared/GroupMainSubpageHeader.jsx';
+import GroupMainEmptyNotice from '../../../components/group-main/GroupMainEmptyNotice.jsx';
+import { useGroupMainEmptyLink } from '../../../hooks/group-main/useGroupMainEmptyLink.js';
+import '../group-main/GroupMainHomeContent.css';
+import GroupMainActivitiesWindow from './GroupMainActivitiesWindow.jsx';
+import '../group-main/shared/groupMainSubpageHeader.css';
+import './GroupMainActivities.css';
+
+// === STAŁE I ETYKIETY JĘZYKOWE ===
+const TITLE__TEXTLABEL = {
+  polish: 'Kampania',
+  english: 'Campaign',
+};
+
+const PAGETITLE__TEXTLABEL = {
+  polish: 'Aktywności',
+  english: 'Activities',
+};
+
+const LOADINGMESSAGE__TEXTLABEL = {
+  polish: 'Ładowanie aktywności…',
+  english: 'Loading activities…',
+};
+
+const COMPLETEDLABEL__TEXTLABEL = {
+  polish: 'ukończonych',
+  english: 'completed',
+};
+
+const TOTALACTIVITIES__TEXTLABEL = {
+  polish: 'aktywności',
+  english: 'activities',
+};
+
+const EARNEDLABEL__TEXTLABEL = {
+  polish: 'Zdobyto:',
+  english: 'Earned:',
+};
+
+const AVAILABLELABEL__TEXTLABEL = {
+  polish: 'możliwych do zdobycia',
+  english: 'available',
+};
+
+const ASSIGNBUTTON__TEXTLABEL = {
+  polish: 'Przypisz aktywność',
+  english: 'Assign activity',
+};
+
+const FIRSTSTAGEBUTTON__TEXTLABEL = {
+  polish: 'Pierwszy etap',
+  english: 'First stage',
+};
+
+const PREVIOUSESTAGEBUTTON__TEXTLABEL = {
+  polish: 'Poprzedni etap',
+  english: 'Previous stage',
+};
+
+const NEXTSTAGEBUTTON__TEXTLABEL = {
+  polish: 'Następny etap',
+  english: 'Next stage',
+};
+
+const LASTSTAGEBUTTON__TEXTLABEL = {
+  polish: 'Ostatni etap',
+  english: 'Last stage',
+};
+
+const SORTCOMPLETED__TEXTLABEL = {
+  polish: 'Sortowanie: Ukończone na początku',
+  english: 'Sorting: Completed first',
+};
+
+const SORTINCOMPLETE__TEXTLABEL = {
+  polish: 'Sortowanie: Ukończone na końcu',
+  english: 'Sorting: Completed last',
+};
+
+const arrowrighticon = PUBLIC_UI_ICONS.arrowRight;
+const arrowlefticon = PUBLIC_UI_ICONS.arrowLeft;
+const arrowcirclerighticon = PUBLIC_UI_ICONS.arrowCircleRight;
+const editicon = PUBLIC_UI_ICONS.info;
+const unlockedicon = PUBLIC_UI_ICONS.unlocked;
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
+function themechosen() {
+  const theme = document.documentElement.getAttribute('data-theme');
+  return theme;
+}
+
+const lefticondark = PUBLIC_UI_ICONS.chevronLeft;
+const lefticonlight = publicIconPath('chevron-left-svgrepo-com-light.svg');
+const leftlefticondark = PUBLIC_UI_ICONS.chevronLeftDouble;
+const leftlefticonlight = publicIconPath('chevron-left-double-svgrepo-com-light.svg');
+const righticondark = PUBLIC_UI_ICONS.chevronRight;
+const righticonlight = publicIconPath('chevron-right-svgrepo-com-light.svg');
+const rightrighticondark = PUBLIC_UI_ICONS.chevronRightDouble;
+const rightrighticonlight = publicIconPath('chevron-right-double-svgrepo-com-light.svg');
+const lockedicondark = PUBLIC_UI_ICONS.locked;
+const lockediconlight = publicIconPath('x-circle-svgrepo-com-light.svg');
+
+function getlefticon() {
+  if (themechosen() == 'dark') {
+    return lefticondark;
+  } else if (themechosen() == 'light') {
+    return lefticonlight;
+  }
+}
+
+function getleftlefticon() {
+  if (themechosen() == 'dark') {
+    return leftlefticondark;
+  } else if (themechosen() == 'light') {
+    return leftlefticonlight;
+  }
+}
+
+function getrighticon() {
+  if (themechosen() == 'dark') {
+    return righticondark;
+  } else if (themechosen() == 'light') {
+    return righticonlight;
+  }
+}
+
+function getrightrighticon() {
+  if (themechosen() == 'dark') {
+    return rightrighticondark;
+  } else if (themechosen() == 'light') {
+    return rightrighticonlight;
+  }
+}
+
+function getlockedicon() {
+  if (themechosen() == 'dark') {
+    return lockedicondark;
+  } else if (themechosen() == 'light') {
+    return lockediconlight;
+  }
+}
+
+export default function GroupMainActivities() {
+
+  const {groupId} = useParams();
+  const {role} = useAppRole();
+  const emptyLink = useGroupMainEmptyLink('activities', groupId);
+  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const [stages, setStages] = useState([]);
+  const [hasLoadedStages, setHasLoadedStages] = useState(false);
+  const [currentstageindex, setCurrentstageindex] = useState(0);
+  const [whichfirst, setWhichfirst] = useState(0);
+  const [completedids, setCompletedids] = useState([]);
+  const [windowopen, setWindowopen] = useState(0);
+  const [selectedactivityid, setSelectedactivityid] = useState(0);
+
+const [selectedactivityname, setSelectedactivityname] = useState('');
+
+  const onFetchStages = useCallback(async () => {
+    if (!groupId) return;
+
+    setErrorMessage('');
+
+    try {
+
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+
+      const url = base + '/stages';
+
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
+        },
+        body: JSON.stringify({
+          method: 'retrieve',
+          groupId: Number(groupId),
+        })
+      });
+
+      const responsetext = await response.text();
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+
+      }
+
+      const receivedstages = (data?.stages ?? []).map((stage) => ({
+          id: stage.id,
+          name: stage.name,
+          activities: [],
+        }));
+
+      setStages(receivedstages);
+
+      receivedstages.forEach((stage) => {
+        onFetchActivities(stage.id);
+      });
+
+      setHasLoadedStages(true);
+
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+      setHasLoadedStages(true);
+    }
+  }, [groupId]);
+
+  async function onFetchActivities(stageId) {
+
+    setErrorMessage('');
+
+    try {
+
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+
+      const url = base + '/activities';
+
+      const response = await fetch(url, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
+        },
+        body: JSON.stringify({
+          method: 'retrieve',
+          stageId: stageId
+        })
+      });
+
+      const responsetext = await response.text();
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+
+      }
+
+      let receiveddata = data;
+
+      setStages(function (prevStages) {
+
+        const newstages = [];
+
+        let i = 0;
+
+        while (i < prevStages.length) {
+
+          if (prevStages[i].id == stageId) {
+
+            const newactivities = [];
+
+            let j = 0;
+
+            const activitiesList = receiveddata?.activities ?? [];
+
+            while (j < activitiesList.length) {
+
+              newactivities.push({id: activitiesList[j].id, name: activitiesList[j].name, description0: activitiesList[j].storyDescription, description1: activitiesList[j].educationalDescription, reward: activitiesList[j].currency, unlocked: 1});
+
+              j = j + 1;
+            }
+
+            newstages.push({id: prevStages[i].id, name: prevStages[i].name, activities: newactivities});
+
+          } else {
+
+            newstages.push(prevStages[i]);
+          }
+
+          i = i + 1;
+        }
+
+        return newstages;
+      });
+
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+    }
+  }
+
+  async function onFetchStudentProfile() {
+
+    setErrorMessage('');
+
+    try {
+
+      const base = getApiBaseUrl();
+      const browserid = getOrCreateBrowserId();
+
+      const url = base + '/groups/' + groupId + '/student-profile';
+
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Browser-ID': browserid
+        }
+      });
+
+      const responsetext = await response.text();
+
+      let data;
+
+      try {
+        data = JSON.parse(responsetext);
+      } catch {
+
+      }
+
+      let receiveddata = data;
+
+      if (receiveddata.completedActivities) {
+
+        const newcompletedids = [];
+
+        let i = 0;
+
+        while (i < receiveddata.completedActivities.length) {
+
+          newcompletedids.push(receiveddata.completedActivities[i].id);
+
+          i = i + 1;
+        }
+
+        setCompletedids(newcompletedids);
+      }
+
+    } catch (error) {
+
+      let message;
+
+      if (error instanceof Error) {
+        message = error.message;
+      } else {
+        message = String(error);
+      }
+
+      setErrorMessage(message);
+    }
+  }
+
+  function assign(activityId) {
+
+    var activitynamevalue = '';
+
+    if (stages.length > 0 && currentstageindex < stages.length) {
+
+      let i = 0;
+
+      while (i < stages[currentstageindex].activities.length) {
+
+        if (stages[currentstageindex].activities[i].id == activityId) {
+          activitynamevalue = stages[currentstageindex].activities[i].name;
+        }
+
+        i = i + 1;
+      }
+
+    }
+
+    setSelectedactivityid(activityId);
+    setSelectedactivityname(activitynamevalue);
+    setWindowopen(1);
+  }
+
+  function closewindow() {
+    setWindowopen(0);
+  }
+
+  function firststage() {
+    if (currentstageindex > 0) {
+      setCurrentstageindex(0);
+    }
+  }
+
+  function previousstage() {
+    if (currentstageindex > 0) {
+      setCurrentstageindex(currentstageindex - 1);
+    }
+  }
+
+  function nextstage() {
+    if (currentstageindex < stages.length - 1) {
+      setCurrentstageindex(currentstageindex + 1);
+    }
+  }
+
+  function laststage() {
+    if (currentstageindex < stages.length - 1) {
+      setCurrentstageindex(stages.length - 1);
+    }
+  }
+
+  function togglewhichfirst() {
+    if (whichfirst == 0) {
+      setWhichfirst(1);
+    } else {
+      setWhichfirst(0);
+    }
+  }
+
+  useEffect(() => {
+    onFetchStages();
+  }, [onFetchStages]);
+
+  useEffect(() => {
+    if (!groupId || role !== APP_ROLE.STUDENT) return;
+    onFetchStudentProfile();
+  }, [groupId, role]);
+
+  var currentstagename = '';
+  var activities = [];
+  var totalactivities = 0;
+  var totalrewards = 0;
+  var completedcount = 99;
+  var earnedrewards = 99;
+  var completedactivities = [];
+  var incompleteactivities = [];
+  var displayactivities = [];
+  var isstudent = 0;
+  var islecturer = 0;
+  var atfirststage = 1;
+  var atlaststage = 1;
+
+var currentpagenumber = 0;
+
+  if (role == APP_ROLE.STUDENT) {
+    isstudent = 1;
+  }
+
+  if (role == APP_ROLE.LECTURER) {
+    islecturer = 1;
+  }
+
+  if (stages.length > 0 && currentstageindex < stages.length) {
+
+    currentstagename = stages[currentstageindex].name;
+    activities = stages[currentstageindex].activities;
+    totalactivities = activities.length;
+    currentpagenumber = currentstageindex + 1;
+
+    if (currentstageindex > 0) {
+      atfirststage = 0;
+    }
+
+    if (currentstageindex < stages.length - 1) {
+      atlaststage = 0;
+    }
+
+    var i = 0;
+
+    while (i < activities.length) {
+
+      totalrewards = totalrewards + activities[i].reward;
+
+      i = i + 1;
+    }
+
+    if (isstudent == 1) {
+
+      completedcount = 0;
+      earnedrewards = 0;
+
+      i = 0;
+
+      while (i < activities.length) {
+
+        var iscompleted = 0;
+
+        var j = 0;
+
+        while (j < completedids.length) {
+
+          if (completedids[j] == activities[i].id) {
+            iscompleted = 1;
+          }
+
+          j = j + 1;
+        }
+
+        if (iscompleted == 1) {
+          completedcount = completedcount + 1;
+          earnedrewards = earnedrewards + activities[i].reward;
+          completedactivities.push({id: activities[i].id, name: activities[i].name, description0: activities[i].description0, description1: activities[i].description1, reward: activities[i].reward, unlocked: 1, bordercolour: 'var(--color-accent)'});
+        } else {
+          incompleteactivities.push({id: activities[i].id, name: activities[i].name, description0: activities[i].description0, description1: activities[i].description1, reward: activities[i].reward, unlocked: 0, bordercolour: 'rgb(128, 128, 128)'});
+        }
+
+        i = i + 1;
+      }
+
+      if (whichfirst == 0) {
+
+        i = 0;
+
+        while (i < completedactivities.length) {
+          displayactivities.push(completedactivities[i]);
+          i = i + 1;
+        }
+
+        i = 0;
+
+        while (i < incompleteactivities.length) {
+          displayactivities.push(incompleteactivities[i]);
+          i = i + 1;
+        }
+
+      } else {
+
+        i = 0;
+
+        while (i < incompleteactivities.length) {
+          displayactivities.push(incompleteactivities[i]);
+          i = i + 1;
+        }
+
+        i = 0;
+
+        while (i < completedactivities.length) {
+          displayactivities.push(completedactivities[i]);
+          i = i + 1;
+        }
+
+      }
+
+    } else {
+
+      i = 0;
+
+      while (i < activities.length) {
+        displayactivities.push({id: activities[i].id, name: activities[i].name, description0: activities[i].description0, description1: activities[i].description1, reward: activities[i].reward, bordercolour: 'rgb(66, 243, 125)'});
+        i = i + 1;
+      }
+
+    }
+
+  }
+
+// === RENDEROWANIE WIDOKU ===
+  return (
+    <section className="group-main-activities" aria-label={PAGETITLE__TEXTLABEL[LANGUAGE]}>
+      <GroupMainSubpageHeader
+        eyebrow={TITLE__TEXTLABEL[LANGUAGE]}
+        title={PAGETITLE__TEXTLABEL[LANGUAGE]}
+      />
+
+      {errorMessage ? (
+        <p className="group-main-posts__error" role="alert">{errorMessage}</p>
+      ) : null}
+
+      {!hasLoadedStages ? (
+        <p className="group-main-home__message">{LOADINGMESSAGE__TEXTLABEL[LANGUAGE]}</p>
+      ) : stages.length === 0 ? (
+        <GroupMainEmptyNotice
+          message={emptyLink.message}
+          linkLabel={emptyLink.linkLabel}
+          linkTo={emptyLink.linkTo}
+        />
+      ) : (
+      <div className="group-main-activities__stage">
+
+        <div className="group-main-activities__pagination">
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? firststage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getleftlefticon()} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? previousstage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getlefticon()} alt="" />
+          </button>
+          <span className="group-main-activities__page-number">{currentpagenumber}</span>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? nextstage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getrighticon()} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? laststage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getrightrighticon()} alt="" />
+          </button>
+        </div>
+
+        <header className="group-main-activities__stage-header">
+          <h2 className="group-main-activities__stage-name">{currentstagename}</h2>
+          <div className="group-main-activities__stage-stats">
+            <span>
+              {isstudent === 1
+                ? `${completedcount} / ${totalactivities} ${COMPLETEDLABEL__TEXTLABEL[LANGUAGE]}`
+                : `${totalactivities} ${TOTALACTIVITIES__TEXTLABEL[LANGUAGE]}`}
+            </span>
+            <span className="group-main-activities__stage-stat">
+              {isstudent === 1 ? (
+                <>
+                  {EARNEDLABEL__TEXTLABEL[LANGUAGE]}
+                  {' '}
+                  <CurrencyDisplay amount={earnedrewards} size="sm" />
+                  {' / '}
+                  <CurrencyDisplay amount={totalrewards} size="sm" />
+                </>
+              ) : (
+                <>
+                  <CurrencyDisplay amount={totalrewards} size="sm" />
+                  {' '}
+                  {AVAILABLELABEL__TEXTLABEL[LANGUAGE]}
+                </>
+              )}
+            </span>
+          </div>
+        </header>
+
+        <div className="group-main-activities__list">
+          {displayactivities.map((activity) => (
+            <article
+              key={`activity${activity.id}`}
+              className="group-main-activities__item"
+              style={{ borderLeftColor: activity.bordercolour }}
+            >
+              <img
+                className="group-main-activities__item-icon"
+                src={islecturer === 1 ? arrowcirclerighticon : (activity.unlocked === 1 ? unlockedicon : getlockedicon())}
+                alt=""
+              />
+              <div className="group-main-activities__item-body">
+                <h3 className="group-main-activities__item-name">{activity.name}</h3>
+                <p className="group-main-activities__item-desc">{activity.description0}</p>
+                <p className="group-main-activities__item-desc">{activity.description1}</p>
+              </div>
+              {islecturer === 1 ? (
+                <div className="group-main-activities__item-actions">
+                  <button
+                    type="button"
+                    className="group-main-activities__assign-btn"
+                    onClick={() => assign(activity.id)}
+                    aria-label={ASSIGNBUTTON__TEXTLABEL[LANGUAGE]}
+                  >
+                    <img src={editicon} alt="" />
+                  </button>
+                  <CurrencyDisplay
+                    amount={activity.reward}
+                    size="sm"
+                    className="group-main-activities__item-reward"
+                  />
+                </div>
+              ) : (
+                <CurrencyDisplay
+                  amount={activity.reward}
+                  size="sm"
+                  className="group-main-activities__item-reward"
+                />
+              )}
+            </article>
+          ))}
+        </div>
+
+        <div className="group-main-activities__pagination">
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? firststage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label={FIRSTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getleftlefticon()} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atfirststage === 0 ? previousstage : undefined}
+            disabled={atfirststage !== 0}
+            aria-label={PREVIOUSESTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getlefticon()} alt="" />
+          </button>
+          <span className="group-main-activities__page-number">{currentpagenumber}</span>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? nextstage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label={NEXTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getrighticon()} alt="" />
+          </button>
+          <button
+            type="button"
+            className="group-main-activities__page-btn"
+            onClick={atlaststage === 0 ? laststage : undefined}
+            disabled={atlaststage !== 0}
+            aria-label={LASTSTAGEBUTTON__TEXTLABEL[LANGUAGE]}
+          >
+            <img src={getrightrighticon()} alt="" />
+          </button>
+        </div>
+
+        {isstudent === 1 ? (
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="group-main-activities__sort-toggle"
+            onClick={togglewhichfirst}
+          >
+            {whichfirst === 0 ? SORTCOMPLETED__TEXTLABEL[LANGUAGE] : SORTINCOMPLETE__TEXTLABEL[LANGUAGE]}
+          </Button>
+        ) : null}
+      </div>
+      )}
+
+      {windowopen === 1 ? (
+        <GroupMainActivitiesWindow
+          popupclose={closewindow}
+          groupId={groupId}
+          stagename={currentstagename}
+          activityname={selectedactivityname}
+          activityid={selectedactivityid}
+        />
+      ) : null}
+    </section>
+  );
+}

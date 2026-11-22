@@ -1,3 +1,9 @@
+/**
+ * @file SectionPageLayout.css
+ * @description Style powłoki i układu stron dla modułu SectionPageLayout.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-section-page {
   box-sizing: border-box;
   width: 100%;
@@ -41,6 +47,7 @@
   width: 100%;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-section-page__title {
   margin: 0;
   font-family: inherit;
@@ -57,6 +64,7 @@
   gap: 0.5rem;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-section-page__sub-nav {
   box-sizing: border-box;
   width: fit-content;
@@ -64,6 +72,7 @@
   padding: 4px;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 639px) {
   .maq-section-page__sub-nav {
     width: 100%;

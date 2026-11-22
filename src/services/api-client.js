@@ -1,5 +1,12 @@
+/**
+ * @file api-client.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla api-client.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getApiBaseUrl } from '../constants/api.constants.js';
-import { handleSessionExpired } from '../auth/clientAuthState.js';
+import { handleMaintenanceRedirect, handleSessionExpired } from '../auth/clientAuthState.js';
+import { updateCachedMaintenanceStatus } from './maintenance.api.js';
 
 /**
  * Lightweight API client using native `fetch`.
@@ -16,9 +23,20 @@ const PUBLIC_AUTH_PATHS = [
   '/auth/saml/status',
 ];
 
+const PUBLIC_SYSTEM_PATHS = [
+  '/system/status',
+  '/system/maintenance',
+];
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function isPublicAuthEndpoint(pathOrUrl) {
   if (!pathOrUrl || typeof pathOrUrl !== 'string') return false;
   return PUBLIC_AUTH_PATHS.some((path) => pathOrUrl.includes(path));
+}
+
+export function isPublicSystemEndpoint(pathOrUrl) {
+  if (!pathOrUrl || typeof pathOrUrl !== 'string') return false;
+  return PUBLIC_SYSTEM_PATHS.some((path) => pathOrUrl.includes(path));
 }
 
 function isAuthFailureMessage(data) {
@@ -34,14 +52,22 @@ function isAuthFailureMessage(data) {
 }
 
 function handleResponseStatus(response, resourcePath, data = null) {
+  if (isPublicSystemEndpoint(resourcePath)) {
+    return;
+  }
+  if (response?.status === 503) {
+    if (data && typeof data === 'object' && data.maintenance) {
+      updateCachedMaintenanceStatus(data.maintenance);
+    } else {
+      updateCachedMaintenanceStatus({ enabled: true, message: typeof data?.message === 'string' ? data.message : '' });
+    }
+    handleMaintenanceRedirect();
+    return;
+  }
   if (isPublicAuthEndpoint(resourcePath)) {
     return;
   }
   if (response?.status === 401) {
-    handleSessionExpired();
-    return;
-  }
-  if (response?.status === 403 && isAuthFailureMessage(data)) {
     handleSessionExpired();
   }
 }
@@ -56,26 +82,30 @@ export function setupGlobalFetchSessionInterceptor() {
     return;
   }
   interceptorInstalled = true;
-  const originalFetch = window.fetch;
+
+const originalFetch = window.fetch;
 
   window.fetch = async function interceptedFetch(...args) {
     const response = await originalFetch.apply(this, args);
-    if (response && (response.status === 401 || response.status === 403)) {
-      const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
-      if (!isPublicAuthEndpoint(url)) {
-        if (response.status === 401) {
-          handleSessionExpired();
-        } else if (response.status === 403 && typeof response.clone === 'function') {
-          try {
-            response.clone().json().then((body) => {
-              if (isAuthFailureMessage(body)) {
-                handleSessionExpired();
-              }
-            }).catch(() => {});
-          } catch {
-            // ignore clone errors
-          }
+    const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+    if (response && response.status === 503 && !isPublicSystemEndpoint(url)) {
+      if (typeof response.clone === 'function') {
+        try {
+          response.clone().json().then((body) => {
+            if (body && typeof body === 'object' && body.maintenance) {
+              updateCachedMaintenanceStatus(body.maintenance);
+            } else {
+              updateCachedMaintenanceStatus({ enabled: true, message: typeof body?.message === 'string' ? body.message : '' });
+            }
+          }).catch(() => {});
+        } catch {
         }
+      }
+      handleMaintenanceRedirect();
+    }
+    if (response && response.status === 401) {
+      if (!isPublicAuthEndpoint(url)) {
+        handleSessionExpired();
       }
     }
     return response;
@@ -94,6 +124,24 @@ async function parseResponseBody(response) {
     return response.json();
   }
   return response.text();
+}
+
+let impersonatedStudentId = null;
+
+export function setImpersonatedStudentId(id) {
+  impersonatedStudentId = id != null ? String(id) : null;
+}
+
+export function getImpersonatedStudentId() {
+  return impersonatedStudentId;
+}
+
+function buildRequestHeaders(customHeaders = {}) {
+  const headers = { ...customHeaders };
+  if (impersonatedStudentId) {
+    headers['X-Impersonate-Student'] = impersonatedStudentId;
+  }
+  return headers;
 }
 
 /**
@@ -118,6 +166,7 @@ export async function getJson(resourcePath, _options = {}) {
 
   const response = await fetch(url, {
     method: 'GET',
+    headers: buildRequestHeaders(),
     credentials: 'include',
   });
 
@@ -139,13 +188,14 @@ export async function postJson(resourcePath, body, _options = {}) {
 
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildRequestHeaders({ 'Content-Type': 'application/json' }),
     credentials: 'include',
     body: JSON.stringify(body),
   });
 
   const data = await parseResponseBody(response);
-  handleResponseStatus(response, resourcePath, data);
+
+handleResponseStatus(response, resourcePath, data);
   return { ok: response.ok, status: response.status, data };
 }
 
@@ -162,7 +212,7 @@ export async function patchJson(resourcePath, body, _options = {}) {
 
   const response = await fetch(url, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildRequestHeaders({ 'Content-Type': 'application/json' }),
     credentials: 'include',
     body: JSON.stringify(body),
   });
@@ -185,7 +235,7 @@ export async function putJson(resourcePath, body, _options = {}) {
 
   const response = await fetch(url, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildRequestHeaders({ 'Content-Type': 'application/json' }),
     credentials: 'include',
     body: JSON.stringify(body),
   });
@@ -207,6 +257,7 @@ export async function deleteJson(resourcePath, _options = {}) {
 
   const response = await fetch(url, {
     method: 'DELETE',
+    headers: buildRequestHeaders(),
     credentials: 'include',
   });
 

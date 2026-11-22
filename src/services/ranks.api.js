@@ -1,3 +1,9 @@
+/**
+ * @file ranks.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla ranks.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, postJson, patchJson, deleteJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
@@ -35,7 +41,8 @@ function mapRankWritePayload(rankData) {
   if (globalDiscountType !== undefined) {
     payload.globalDiscountType = globalDiscountType;
   }
-  if (globalDiscountValue !== undefined) {
+
+if (globalDiscountValue !== undefined) {
     payload.globalDiscountValue = globalDiscountValue;
   }
 
@@ -80,6 +87,7 @@ export async function fetchGroupRanks(groupId) {
  * @param {string[]} [rankData.uniqueStoreItems]
  * @returns {Promise<{ ok: boolean, rank?: Rank, error?: string }>}
  */
+
 export async function createRank(groupId, rankData) {
   const result = await postJson(`/groups/${groupId}/ranks`, mapRankWritePayload(rankData));
   if (!result.ok) {

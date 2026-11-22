@@ -1,9 +1,16 @@
+/**
+ * @file useSmartPostCardWidth.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useSmartPostCardWidth.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useLayoutEffect, useState } from 'react';
 import { countSentences, getPostWidthFraction } from '../utils/countSentences.js';
 
 const MIN_TEXT_WIDTH = 96;
 const LIST_SELECTORS = '.posts-islands, .group-main-posts__list';
 
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 function getListWidth(anchor) {
   const listElement = anchor.closest(LIST_SELECTORS);
   if (listElement) {
@@ -17,12 +24,14 @@ function getListWidth(anchor) {
  * Szerokość kafelka wpisu: min. 4/8 … 8/8 maks. (cap = 3/5 listy).
  * Kafelek nie jest węższy niż tytuł.
  */
+
 export function useSmartPostCardWidth({
   anchorRef,
   text,
   enabled = true,
 }) {
-  const [cardWidth, setCardWidth] = useState(null);
+
+const [cardWidth, setCardWidth] = useState(null);
 
   useLayoutEffect(() => {
     const anchor = anchorRef.current;
@@ -75,5 +84,6 @@ export function useSmartPostCardWidth({
     };
   }, [anchorRef, text, enabled]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return cardWidth;
 }

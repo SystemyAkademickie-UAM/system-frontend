@@ -1,3 +1,9 @@
+/**
+ * @file PagePlaceholder.css
+ * @description Style interfejsu użytkownika i układ dla modułu PagePlaceholder.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .page-placeholder {
   padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
   min-height: 12rem;

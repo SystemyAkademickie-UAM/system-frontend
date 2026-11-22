@@ -1,3 +1,9 @@
+/**
+ * @file Divider.css
+ * @description Style interfejsu użytkownika i układ dla modułu Divider.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-divider {
   flex-shrink: 0;
   margin: 0;
@@ -6,12 +12,14 @@
   background: var(--color-divider);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-divider:not(.maq-divider--vertical) {
   width: 100%;
   height: 2px;
   min-height: 2px;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-divider--vertical {
   width: 2px;
   min-width: 2px;

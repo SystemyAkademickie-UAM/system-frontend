@@ -1,11 +1,19 @@
+/**
+ * @file shopModel.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność shopModel.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, expect, it } from 'vitest';
 import {
   filterShopItems,
   paginateShopItems,
   SHOP_SORT,
-  sortShopItems,
+
+sortShopItems,
 } from './shopModel.js';
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('shopModel', () => {
   const sampleItems = [
     { id: '2', name: 'Zbroja płytowa', priceAmount: 100, isExtraLife: false },
@@ -46,10 +54,8 @@ describe('shopModel', () => {
 
     it('sortuje po cenie rosnąco z tie-breakerem po nazwie i ID', () => {
       const sorted = sortShopItems(sampleItems, SHOP_SORT.priceAsc);
-      // Dodatkowe życie na początku
       expect(sorted[0].name).toBe('Dodatkowe życie');
 
-      // Dla produktów po 50 zł: "Produkt 2" (id 3) vs "Produkt 10" (id 4)
       expect(sorted[1].name).toBe('Produkt 2');
       expect(sorted[2].name).toBe('Produkt 10');
       expect(sorted[3].name).toBe('Zbroja płytowa');

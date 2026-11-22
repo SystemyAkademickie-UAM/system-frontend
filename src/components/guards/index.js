@@ -1,3 +1,9 @@
+/**
+ * @file index.js
+ * @description Komponent interfejsu użytkownika index.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 export { default as RouteGuard } from './RouteGuard.jsx';
 export { default as GroupAccessGuard } from './GroupAccessGuard.jsx';
 export { default as GroupOwnerGuard } from './GroupOwnerGuard.jsx';

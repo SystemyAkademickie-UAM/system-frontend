@@ -1,3 +1,9 @@
+/**
+ * @file NotificationItemPreview.jsx
+ * @description Komponent interfejsu użytkownika NotificationItemPreview.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +16,7 @@ import { positionCenteredTooltip } from '../../utils/ui/positionTooltipInViewpor
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './NotificationItemPreview.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const EXTRALIFE__TEXTLABEL = {
   polish: 'Dodatkowe życie',
   english: 'Extra life',
@@ -29,6 +36,8 @@ const ITEM__TEXTLABEL = {
  *   onMarkRead?: (id: number) => void | Promise<unknown>,
  * }} props
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function NotificationItemPreview({
   groupId,
   notification,
@@ -47,7 +56,8 @@ export default function NotificationItemPreview({
   const [resolvedItem, setResolvedItem] = useState(null);
 
   const raw = notification.rawPayload ?? {};
-  const effectiveIsExtraLife = isExtraLife || notification.isExtraLife || raw.isExtraLife === true;
+
+const effectiveIsExtraLife = isExtraLife || notification.isExtraLife || raw.isExtraLife === true;
 
   const loadItemDetails = useCallback(async () => {
     if (!groupId) return;
@@ -78,7 +88,7 @@ export default function NotificationItemPreview({
 
     const triggerRect = trigger.getBoundingClientRect();
     const bubbleRect = bubble.getBoundingClientRect();
-    const superbarHeight = 72; // safe offset under fixed superbar header
+    const superbarHeight = 72;
 
     const spaceAbove = triggerRect.top - 10 - superbarHeight;
     const spaceBelow = window.innerHeight - triggerRect.bottom - 10 - 12;
@@ -161,7 +171,8 @@ export default function NotificationItemPreview({
   };
 
   const popover = open && typeof document !== 'undefined'
-    ? createPortal(
+
+? createPortal(
         <div
           ref={bubbleRef}
           id={popoverId}
@@ -194,6 +205,7 @@ export default function NotificationItemPreview({
       )
     : null;
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <span

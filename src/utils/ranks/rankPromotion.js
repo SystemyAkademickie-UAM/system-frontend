@@ -1,4 +1,10 @@
 /**
+ * @file rankPromotion.js
+ * @description Funkcje pomocnicze i narzędziowe modułu rankPromotion.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Wykrywanie awansu rangi po aktualizacji punktów uczestnika.
  * Backend przypisuje rangę; UI tylko porównuje stan przed/po.
  */
@@ -9,9 +15,11 @@
  */
 export function getRankRequiredPoints(ranks, rankId) {
   if (rankId == null) return -1;
-  return ranks.find((rank) => rank.id === rankId)?.requiredPoints ?? -1;
+
+return ranks.find((rank) => rank.id === rankId)?.requiredPoints ?? -1;
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {Array<{ id: number, requiredPoints?: number }>} ranks
  * @param {number | null | undefined} previousRankId
@@ -19,7 +27,8 @@ export function getRankRequiredPoints(ranks, rankId) {
  */
 export function isRankPromotion(ranks, previousRankId, nextRankId) {
   if (nextRankId == null) return false;
-  return getRankRequiredPoints(ranks, nextRankId) > getRankRequiredPoints(ranks, previousRankId);
+
+return getRankRequiredPoints(ranks, nextRankId) > getRankRequiredPoints(ranks, previousRankId);
 }
 
 /**

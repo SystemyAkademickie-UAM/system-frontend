@@ -1,0 +1,162 @@
+/**
+ * @file GroupsListContent.css
+ * @description Style interfejsu użytkownika i układ dla modułu GroupsListContent.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
+.groups-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.25rem;
+  padding: 1.25rem clamp(1rem, 3vw, 2.5rem) 2rem;
+  width: 100%;
+}
+
+.groups-list__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.groups-list__section-title {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.groups-list__actions {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.groups-list__create-btn,
+.groups-list__templates-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
+.groups-list__creator-overlay {
+  position: fixed;
+  z-index: var(--z-index-page-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    max(1rem, env(safe-area-inset-top, 0px))
+    clamp(1rem, 3vw, 2.5rem)
+    max(1rem, env(safe-area-inset-bottom, 0px));
+  background: rgba(8, 8, 16, 0.72);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.groups-list__search {
+  flex: 0 0 18rem;
+  width: 18rem;
+  max-width: 18rem;
+}
+
+.groups-list__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.groups-list__grid-item {
+  min-width: 0;
+}
+
+.groups-list__message {
+  margin: 0;
+  padding: 1rem 0;
+  font-size: var(--font-size-page-description);
+  color: var(--color-text-secondary);
+}
+
+.groups-list__message--error {
+  color: #f87171;
+}
+
+.groups-list__subsection-title {
+  margin: 0 0 0.75rem;
+  font-size: var(--font-size-page-description);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
+.groups-list__divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 0.5rem 0 1.25rem;
+  width: 100%;
+}
+
+.groups-list__section {
+  width: 100%;
+}
+
+.groups-list__message--section {
+  padding: 0.5rem 0 0.25rem;
+}
+
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
+@media (max-width: 1199px) {
+  .groups-list__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 899px) {
+  .groups-list__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 539px) {
+  .groups-list__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .groups-list__controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .groups-list__actions {
+    flex-wrap: wrap;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .groups-list__search {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: none;
+  }
+
+  .groups-list__section-title {
+    width: 100%;
+    text-align: left;
+  }
+}

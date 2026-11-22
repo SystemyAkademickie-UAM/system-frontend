@@ -1,3 +1,9 @@
+/**
+ * @file NotificationsContext.jsx
+ * @description Kontekst globalnego stanu React oraz dostawca danych dla NotificationsContext.
+ */
+
+// === IMPORTY I INICJALIZACJA KONTEKSTU ===
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 /**
@@ -11,8 +17,10 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 
 const NotificationsContext = createContext(null);
 
+// === DOSTAWCA KONTEKSTU I ZARZĄDZANIE STANEM ===
 export function NotificationsProvider({ children }) {
-  const [items, setItems] = useState(/** @type {AppNotification[]} */ ([]));
+
+const [items, setItems] = useState(/** @type {AppNotification[]} */ ([]));
 
   const addNotification = useCallback((notification) => {
     const id = notification.id ?? `notification-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -49,8 +57,10 @@ export function NotificationsProvider({ children }) {
   );
 }
 
+// === HOOKI DOSTĘPOWE DO KONTEKSTU ===
 export function useNotifications() {
-  const context = useContext(NotificationsContext);
+
+const context = useContext(NotificationsContext);
   if (!context) {
     throw new Error('useNotifications must be used within NotificationsProvider');
   }

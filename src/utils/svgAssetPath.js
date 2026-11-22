@@ -1,9 +1,16 @@
+/**
+ * @file svgAssetPath.js
+ * @description Funkcje pomocnicze i narzędziowe modułu svgAssetPath.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { publicAssetPath } from './publicAssetUrl.js';
 import { SVG_PLACEHOLDER } from '../constants/svgIcons.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 
 export { SVG_PLACEHOLDER as SVG_PLACEHOLDER_FILENAME };
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * Zwraca ścieżkę względną pliku SVG albo placeholder, gdy brak prawidłowego pliku .svg.
  * Emoji, puste wartości i nazwy bez rozszerzenia .svg → shared/placeholder.svg.
@@ -12,7 +19,8 @@ export { SVG_PLACEHOLDER as SVG_PLACEHOLDER_FILENAME };
  * @returns {string}
  */
 export function resolveSvgAssetName(filename) {
-  if (filename == null || typeof filename !== 'string') {
+
+if (filename == null || typeof filename !== 'string') {
     return SVG_PLACEHOLDER;
   }
 
@@ -28,6 +36,7 @@ export function resolveSvgAssetName(filename) {
  * URL do pliku SVG w public/assets/svg/ (obsługuje podfoldery).
  * @param {string} filename — np. "actions/add.svg"
  */
+
 export function svgAssetPath(filename) {
   const resolved = resolveSvgAssetName(filename);
 

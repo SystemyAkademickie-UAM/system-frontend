@@ -1,3 +1,9 @@
+/**
+ * @file EmojiPickerField.css
+ * @description Style interfejsu użytkownika i układ dla modułu EmojiPickerField.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-emoji-picker-field {
   display: flex;
   flex-direction: column;
@@ -24,6 +30,7 @@
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-emoji-picker-field__trigger:hover {
   border-color: rgba(66, 243, 125, 0.45);
   transform: translateY(-1px);
@@ -58,6 +65,7 @@
   overscroll-behavior: contain;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-emoji-picker-field__dialog {
   position: relative;
   width: min(640px, calc(100vw - 2rem));

@@ -1,3 +1,9 @@
+/**
+ * @file itemCategories.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla itemCategories.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { deleteJson, getJson, patchJson, postJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
@@ -17,7 +23,8 @@ import { extractApiError } from './apiErrors.js';
  */
 function mapItemCategory(raw) {
   const row = /** @type {Record<string, unknown>} */ (raw ?? {});
-  return {
+
+return {
     id: Number(row.id),
     groupId: Number(row.groupId),
     name: String(row.name ?? ''),
@@ -48,7 +55,8 @@ export async function fetchGroupItemCategories(groupId) {
  */
 export async function createGroupItemCategory(groupId, payload) {
   const result = await postJson(`/groups/${groupId}/item-categories`, payload, { includeBrowserId: true });
-  if (!result.ok) {
+
+if (!result.ok) {
     return { ok: false, error: extractApiError(result.data) };
   }
   return { ok: true, category: mapItemCategory(result.data) };

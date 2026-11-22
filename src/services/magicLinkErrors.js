@@ -1,3 +1,9 @@
+/**
+ * @file magicLinkErrors.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla magicLinkErrors.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 /** @typedef {{ message?: string, error?: string }} MagicLinkApiError */
 
 const MAGIC_LINK_ERROR_MESSAGES = {
@@ -15,6 +21,8 @@ const MAGIC_LINK_ERROR_MESSAGES = {
  * @param {number} [httpStatus]
  * @returns {string}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function getMagicLinkErrorMessage(data, fallback, httpStatus) {
   if (data && typeof data === 'object') {
     const retryAfterSeconds = /** @type {{ retryAfterSeconds?: number }} */ (data).retryAfterSeconds;
@@ -28,7 +36,8 @@ export function getMagicLinkErrorMessage(data, fallback, httpStatus) {
   }
 
   const error = /** @type {MagicLinkApiError & { retryAfterSeconds?: number }} */ (data);
-  const code = error.error;
+
+const code = error.error;
   if (code && typeof code === 'string' && MAGIC_LINK_ERROR_MESSAGES[code]) {
     return MAGIC_LINK_ERROR_MESSAGES[code];
   }

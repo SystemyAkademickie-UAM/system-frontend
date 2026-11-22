@@ -1,3 +1,9 @@
+/**
+ * @file PlayerAvatar.css
+ * @description Style interfejsu użytkownika i układ dla modułu PlayerAvatar.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-player-avatar {
   display: inline-flex;
   align-items: center;
@@ -26,6 +32,7 @@
 }
 
 .maq-player-avatar--link:hover,
+
 .maq-player-avatar--link:focus-visible {
   transform: translateY(-1px);
 }
@@ -45,6 +52,7 @@
   height: 48px;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-player-avatar__image {
   display: block;
   width: 100%;
@@ -93,6 +101,7 @@
   gap: 4px;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-player-avatar__tooltip-label {
   font-size: var(--font-size-min);
   font-weight: 600;
@@ -102,6 +111,7 @@
 }
 
 .maq-player-avatar__tooltip .maq-currency-display__amount,
+
 .maq-player-avatar__tooltip .maq-currency-icon {
   font-size: var(--font-size-min);
 }

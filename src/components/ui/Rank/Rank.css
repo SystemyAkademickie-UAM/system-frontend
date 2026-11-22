@@ -1,3 +1,9 @@
+/**
+ * @file Rank.css
+ * @description Style interfejsu użytkownika i układ dla modułu Rank.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-rank {
   --rank-accent-color: rgba(66, 243, 125, 0.3);
   --rank-icon-bg: rgba(227, 224, 247, 0.1);
@@ -58,6 +64,7 @@
   color: var(--rank-name-color, var(--color-rank-text));
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-rank__cost {
   flex-shrink: 0;
   display: inline-flex;
@@ -128,6 +135,7 @@
   color: var(--color-text-secondary);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-rank__shop-item--discount {
   padding: 0.35rem 0.5rem;
   border-radius: 8px;
@@ -153,6 +161,7 @@
   opacity: 0.82;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 640px) {
   .maq-rank {
     padding: 16px 16px 20px 18px;

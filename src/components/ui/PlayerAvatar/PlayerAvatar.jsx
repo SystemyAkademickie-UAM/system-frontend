@@ -1,3 +1,9 @@
+/**
+ * @file PlayerAvatar.jsx
+ * @description Komponent interfejsu użytkownika PlayerAvatar.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
 import { Link } from 'react-router-dom';
@@ -10,8 +16,7 @@ import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
 import { positionSideTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './PlayerAvatar.css';
 
-
-
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
 
  * Okrągły awatar użytkownika z kafelkiem po najechaniu (nick + zgromadzona waluta).
@@ -40,31 +45,37 @@ import './PlayerAvatar.css';
 
  * @param {string} [props.ariaLabel]
  * @param {string} [props.href]
+
  */
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function PlayerAvatar({
 
-  nickname,
+ nickname,
 
-  avatarUrl,
+ avatarUrl,
 
-  totalEarned,
+ totalEarned,
 
-  currencySymbol,
+ currencySymbol,
 
-  size = 'md',
+ size = 'md',
 
-  tooltipPlacement = 'right',
+ tooltipPlacement = 'right',
 
-  tooltipAlwaysVisible = false,
+ tooltipAlwaysVisible = false,
 
-  tooltipPlain = false,
+ tooltipPlain = false,
 
-  className = '',
+ className = '',
 
-  ariaLabel,
+ ariaLabel,
 
-  href,
+ href,
+
+ firstName,
+
+ lastName,
 
 }) {
 
@@ -72,7 +83,8 @@ export default function PlayerAvatar({
   const bubbleRef = useRef(null);
 
   const [tooltipVisible, setTooltipVisible] = useState(tooltipAlwaysVisible);
-  const [tooltipLayout, setTooltipLayout] = useState(null);
+
+const [tooltipLayout, setTooltipLayout] = useState(null);
 
   const updateTooltipPosition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -115,8 +127,6 @@ export default function PlayerAvatar({
     setTooltipVisible(true);
   };
 
-
-
   const handleMouseLeave = () => {
 
     if (tooltipAlwaysVisible) {
@@ -129,10 +139,19 @@ export default function PlayerAvatar({
 
   };
 
+  var displayName = '';
 
+  if (firstName == undefined && lastName == undefined) {
+    displayName = nickname;
+  } else if (firstName != undefined && lastName == undefined) {
+    displayName = lastName + ' (' + nickname + ')';
+  } else if (firstName == undefined && lastName != undefined) {
+    displayName = firstName + ' (' + nickname + ')';
+  } else {
+    displayName = firstName + ' ' + lastName + ' (' + nickname + ')';
+  }
 
-  const displayName = nickname?.trim() || 'Osoba korzystająca z systemu';
-  const label = ariaLabel ?? `Profil: ${displayName}`;
+  const label = ariaLabel ?? 'Profil: ' + displayName;
 
   const sharedClassName = [
     'maq-player-avatar',
@@ -154,6 +173,7 @@ export default function PlayerAvatar({
     </span>
   );
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       {href ? (
@@ -184,8 +204,6 @@ export default function PlayerAvatar({
           {avatarContent}
         </div>
       )}
-
-
 
       {tooltipVisible
         ? createPortal(
@@ -231,5 +249,3 @@ export default function PlayerAvatar({
   );
 
 }
-
-

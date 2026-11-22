@@ -1,4 +1,10 @@
 /**
+ * @file criticalValuesText.js
+ * @description Funkcje pomocnicze i narzędziowe modułu criticalValuesText.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Buduje ciąg znaków o dokładnie podanej długości — do testów granicznych pól tekstowych.
  *
  * @param {number} maxLength
@@ -11,7 +17,8 @@ export function buildCriticalText(maxLength, label = 'max') {
   }
 
   const safeLabel = String(label).replace(/[\[\]]/g, '');
-  const prefix = `[${safeLabel}] `;
+
+const prefix = `[${safeLabel}] `;
 
   let text;
   if (prefix.length >= maxLength) {
@@ -29,10 +36,12 @@ export function buildCriticalText(maxLength, label = 'max') {
   return text;
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {string} text
  * @returns {string}
  */
+
 export function formatCriticalLength(text) {
   return `${text.length} znaków`;
 }

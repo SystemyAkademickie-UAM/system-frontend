@@ -1,3 +1,9 @@
+/**
+ * @file students.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla students.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson, patchJson, deleteJson, postJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 import { invalidateStudentProfile } from './studentProfileEvents.js';
@@ -78,7 +84,8 @@ export async function bulkUpdateStudents(groupId, students) {
     return { ok: false, error: errorData?.message || 'Nie udało się zaktualizować studentów' };
   }
   const data = /** @type {{ updated?: number }} */ (result.data);
-  return { ok: true, updated: data.updated };
+
+return { ok: true, updated: data.updated };
 }
 
 /**
@@ -168,6 +175,7 @@ export async function toggleStudentBadge(groupId, accountId, badgeId) {
  * @param {number} accountId
  * @returns {Promise<ProgressStage[]>}
  */
+
 export async function fetchStudentProgress(groupId, accountId) {
   const result = await getJson(`/groups/${groupId}/students/${accountId}/progress`);
   if (!result.ok) {

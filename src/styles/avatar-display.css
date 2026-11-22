@@ -1,3 +1,9 @@
+/**
+ * @file avatar-display.css
+ * @description Style interfejsu użytkownika i układ dla modułu avatar-display.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .maq-avatar-image--scaled {
   object-fit: cover;
   transform: scale(1.45);

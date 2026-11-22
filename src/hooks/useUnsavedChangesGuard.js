@@ -1,3 +1,9 @@
+/**
+ * @file useUnsavedChangesGuard.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useUnsavedChangesGuard.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useBlocker } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -8,9 +14,12 @@ import { useCallback, useEffect, useState } from 'react';
  * @param {boolean} options.when — czy formularz ma niezapisane zmiany
  * @param {() => boolean | Promise<boolean>} [options.onSave] — zapis przed opuszczeniem; `true` = kontynuuj nawigację
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useUnsavedChangesGuard({ when, onSave }) {
   const blocker = useBlocker(when);
-  const [isPromptOpen, setIsPromptOpen] = useState(false);
+
+const [isPromptOpen, setIsPromptOpen] = useState(false);
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
@@ -67,6 +76,7 @@ export function useUnsavedChangesGuard({ when, onSave }) {
     }
   }, [blocker, discardChanges, onSave]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     isPromptOpen: isPromptOpen && blocker.state === 'blocked',
     dismissPrompt,

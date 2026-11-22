@@ -1,7 +1,14 @@
+/**
+ * @file Toast.jsx
+ * @description Komponent interfejsu użytkownika Toast.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './Toast.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const ToastContext = createContext(null);
 
 const DEFAULT_DURATION_MS = 4000;
@@ -9,6 +16,7 @@ const EXIT_ANIMATION_MS = 450;
 
 let toastCounter = 0;
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function parseToastMessage(message, variant = 'success') {
   if (Array.isArray(message)) {
     const detail = message.map((item) => String(item).trim()).filter(Boolean).join(', ');
@@ -53,7 +61,8 @@ function parseToastMessage(message, variant = 'success') {
 }
 
 function ToastItem({ toast, onRemove, onRegisterDismiss }) {
-  const [phase, setPhase] = useState('enter');
+
+const [phase, setPhase] = useState('enter');
 
   const beginDismiss = useCallback(() => {
     setPhase((current) => {
@@ -126,7 +135,8 @@ function ToastViewport({ toasts, onRemove, onRegisterDismiss }) {
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const timersRef = useRef(new Map());
-  const dismissHandlersRef = useRef(new Map());
+
+const dismissHandlersRef = useRef(new Map());
 
   const removeToast = useCallback((id) => {
     setToasts((prev) => prev.filter((item) => item.id !== id));
@@ -194,5 +204,7 @@ export function useToast() {
   if (!context) {
     throw new Error('useToast must be used within ToastProvider');
   }
+
+// === RENDEROWANIE WIDOKU ===
   return context;
 }

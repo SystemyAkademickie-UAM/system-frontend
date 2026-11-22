@@ -1,3 +1,9 @@
+/**
+ * @file NotificationItemPreview.css
+ * @description Style interfejsu użytkownika i układ dla modułu NotificationItemPreview.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .notification-item-preview__trigger {
   display: inline;
   color: var(--color-accent, #c9933b);
@@ -16,6 +22,8 @@
 }
 
 .notification-item-preview__trigger:hover,
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .notification-item-preview__trigger:focus-visible {
   color: var(--color-accent-hover, #e5a94b);
   text-decoration-style: solid;
@@ -33,6 +41,7 @@
   animation: notification-preview-fade 0.16s ease-out;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .notification-item-preview__card {
   max-width: 100% !important;
   margin: 0 !important;

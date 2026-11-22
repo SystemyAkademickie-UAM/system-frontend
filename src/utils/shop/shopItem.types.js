@@ -1,4 +1,10 @@
 /**
+ * @file shopItem.types.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopItem.types.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * @typedef {Object} ShopItem
  * @property {string} id
  * @property {string} name
@@ -29,6 +35,7 @@
  * @property {number} basePrice
  */
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @typedef {Object} InventoryEntry
  * @property {number} id

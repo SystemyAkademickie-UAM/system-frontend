@@ -1,5 +1,12 @@
+/**
+ * @file GroupMainEmptyNotice.jsx
+ * @description Komponent interfejsu użytkownika GroupMainEmptyNotice.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Link } from 'react-router-dom';
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function GroupMainEmptyNotice({ message, linkLabel, linkTo }) {
   return (
     <p className="group-main-home__empty-notice">

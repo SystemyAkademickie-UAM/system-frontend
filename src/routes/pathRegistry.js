@@ -1,11 +1,13 @@
 /**
+ * @file pathRegistry.js
+ * @description Definicje routingu i powiązań widoków dla modułu pathRegistry.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
+/**
  * Centralne budowanie ścieżek URL (wspólne dla Sidebara, linków i testów).
  * Pełne ścieżki absolutne w obrębie aplikacji (bez domeny — zgodnie z React Router).
  */
-
-// ============================================================================
-// LOGIN / AUTH
-// ============================================================================
 
 export function homePath() {
   return '/';
@@ -18,6 +20,11 @@ export function loginPath() {
 /** Strona powitalna dla niezalogowanych użytkowników. */
 export function welcomePath() {
   return '/welcome';
+}
+
+/** Strona informacyjna o przerwie technicznej. */
+export function maintenancePath() {
+  return '/maintenance';
 }
 
 /** Magic link landing route (`?token=` from email). */
@@ -40,17 +47,9 @@ export function registerEulaPath() {
   return loginPath();
 }
 
-// ============================================================================
-// GROUPS LIST
-// ============================================================================
-
 export function groupsListPath() {
   return '/groups';
 }
-
-// ============================================================================
-// GROUP ROOT
-// ============================================================================
 
 /** Korzeń grupy — `/groups/:groupId`. */
 export function groupRootPath(groupId) {
@@ -62,35 +61,44 @@ export function isGroupJoinPath(pathname) {
   return /^\/groups\/[^/]+\/?$/.test(pathname);
 }
 
-// ============================================================================
-// GROUP HOME (Strona główna) - student + lecturer
-// ============================================================================
-
 /** Strona główna grupy — `/groups/:groupId/home`. */
 export function groupMainPath(groupId) {
   return `/groups/${groupId}/home`;
 }
 
+/** Wirtualna perspektywa grupy dla administratora/nadzorcy — `/groups/:groupId/admin/home`. */
+export function groupAdminPerspectivePath(groupId) {
+  return `/groups/${groupId}/admin/home`;
+}
+
 /** Profil innego użytkownika — `/groups/:groupId/student-profile/:studentId`. */
 export function groupStudentProfilePath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}`;
 }
 
 export function groupStudentProfileBadgesPath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}`;
 }
 
 export function groupStudentProfileEqPath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}/eq`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}/eq`;
 }
 
 export function groupStudentProfilePurchasesPath(groupId, studentId) {
+  if (typeof window !== 'undefined' && window.location?.pathname?.includes(`/groups/${groupId}/admin`)) {
+    return `/groups/${groupId}/admin/student-profile/${studentId}/purchases`;
+  }
   return `/groups/${groupId}/student-profile/${studentId}/purchases`;
 }
-
-// ============================================================================
-// STUDENT FLAT ROUTES (poza /home — osobne pozycje w sidebarze)
-// ============================================================================
 
 /** Wpisy studenta — `/groups/:groupId/posts`. */
 export function groupStudentPostsPath(groupId) {
@@ -117,13 +125,10 @@ export function groupStudentBadgesPath(groupId) {
   return `/groups/${groupId}/badges`;
 }
 
-// ============================================================================
-// PROFILE (Profil) - student only
-// ============================================================================
-
 /** Profil studenta — `/groups/:groupId/profile`. */
 export function groupProfilePath(groupId) {
-  return `/groups/${groupId}/profile`;
+
+return `/groups/${groupId}/profile`;
 }
 
 /** Dziennik aktywności profilu — `/groups/:groupId/profile/activity`. */
@@ -141,10 +146,6 @@ export function groupProfilePurchasesPath(groupId) {
   return `/groups/${groupId}/profile/purchases`;
 }
 
-// ============================================================================
-// MEMBERS (Użytkownicy) - lecturer only
-// ============================================================================
-
 /** Użytkownicy grupy — `/groups/:groupId/members`. */
 export function groupMembersPath(groupId) {
   return `/groups/${groupId}/members`;
@@ -160,10 +161,6 @@ export function groupMembersCodesPath(groupId) {
   return `/groups/${groupId}/members/codes`;
 }
 
-// ============================================================================
-// ACTIVITIES (Aktywności / Etapy) - lecturer only
-// ============================================================================
-
 /** Aktywności / Etapy — `/groups/:groupId/activities`. */
 export function groupActivitiesPath(groupId) {
   return `/groups/${groupId}/activities`;
@@ -174,18 +171,10 @@ export function groupActivitiesToolsPath(groupId) {
   return `/groups/${groupId}/activities/tools`;
 }
 
-// ============================================================================
-// POSTS (Wpisy) - lecturer only
-// ============================================================================
-
 /** Wpisy prowadzącego — `/groups/:groupId/activities/posts`. */
 export function groupPostsPath(groupId) {
   return `/groups/${groupId}/activities/posts`;
 }
-
-// ============================================================================
-// REWARDS (Systemy nagród) - lecturer only
-// ============================================================================
 
 /** Systemy nagród / Odznaki (index) — `/groups/:groupId/rewards`. */
 export function groupRewardsPath(groupId) {
@@ -193,6 +182,8 @@ export function groupRewardsPath(groupId) {
 }
 
 /** Rangi — `/groups/:groupId/rewards/ranks`. */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function groupRewardsRanksPath(groupId) {
   return `/groups/${groupId}/rewards/ranks`;
 }
@@ -201,10 +192,6 @@ export function groupRewardsRanksPath(groupId) {
 export function groupShopItemsPath(groupId) {
   return `/groups/${groupId}/rewards/shop-items`;
 }
-
-// ============================================================================
-// GROUP SETTINGS (Ustawienia grupy) - lecturer only
-// ============================================================================
 
 /** Ustawienia grupy / Kreator — `/groups/:groupId/group-settings`. */
 export function groupSettingsPath(groupId) {
@@ -221,10 +208,6 @@ export function groupSettingsHealthPath(groupId) {
   return `/groups/${groupId}/group-settings/lives`;
 }
 
-// ============================================================================
-// SHOP (Sklep) - student + lecturer
-// ============================================================================
-
 /** Sklep — `/groups/:groupId/shop`. */
 export function groupShopPath(groupId) {
   return `/groups/${groupId}/shop`;
@@ -234,10 +217,6 @@ export function groupShopPath(groupId) {
 export function groupShopAddPath(groupId) {
   return `/groups/${groupId}/shop/add`;
 }
-
-// ============================================================================
-// RANKING - student + lecturer
-// ============================================================================
 
 /** Ranking — `/groups/:groupId/ranking`. */
 export function groupRankingPath(groupId) {
@@ -254,10 +233,6 @@ export function groupRankingActivitiesPath(groupId) {
   return `/groups/${groupId}/ranking/activities`;
 }
 
-// ============================================================================
-// APP-LEVEL (settings, help, admin)
-// ============================================================================
-
 export function appSettingsPath() {
   return '/settings';
 }
@@ -266,12 +241,24 @@ export function appHelpPath() {
   return '/help';
 }
 
-export function userManagementPath() {
-  return '/userManagement';
+/** Strona główna administratora (zarządzanie organizacją) — `/my-organization`. */
+export function adminHomePath() {
+  return '/my-organization';
 }
 
+/** Zarządzanie użytkownikami — `/users`. */
+export function userManagementPath() {
+  return '/users';
+}
+
+/** @deprecated Zastąpione przez {@link groupsListPath}. */
 export function courseManagementPath() {
-  return '/courseManagement';
+  return '/groups';
+}
+
+/** Zarządzanie przestrzenią dyskową — `/disk-space`. */
+export function diskSpacePath() {
+  return '/disk-space';
 }
 
 export function statisticsPath() {
@@ -282,13 +269,34 @@ export function organizationsPath() {
   return '/organizations';
 }
 
+/** Logi produkcyjne i systemowe — `/logs`. */
 export function superadminLogsPath() {
-  return '/system-logs';
+  return '/logs';
 }
 
-/** Kopia zapasowa bazy danych — `/admin/backup`. */
+/** Kopia zapasowa bazy danych — `/backups`. */
 export function adminBackupPath() {
-  return '/admin/backup';
+  return '/backups';
+}
+
+/** Zarządzanie patch notesami i dokumentami — `/documents`. */
+export function documentsPath() {
+  return '/documents';
+}
+
+/** Komunikaty i stan przerwy technicznej — `/broadcasts`. */
+export function broadcastsPath() {
+  return '/broadcasts';
+}
+
+/** Najczęściej zadawane pytania — `/faq`. */
+export function faqPath() {
+  return '/faq';
+}
+
+/** Informacje o aktualizacjach — `/patch-notes`. */
+export function patchNotesPath() {
+  return '/patch-notes';
 }
 
 /** Galeria szablonów — `/templates`. */
@@ -306,9 +314,10 @@ export function templatesGalleryPath() {
   return templatesPath();
 }
 
-// ============================================================================
-// DEV
-// ============================================================================
+/** Developer tools page (/dev/tools). */
+export function devToolsPath() {
+  return '/dev/tools';
+}
 
 /** Developer-only API test workspace (Login shell). */
 export function devApiTestPath() {
@@ -319,10 +328,6 @@ export function devApiTestPath() {
 export function apiTestPath() {
   return devApiTestPath();
 }
-
-// ============================================================================
-// LEGACY / DEPRECATED (do usunięcia po migracji)
-// ============================================================================
 
 /** @deprecated Use groupMainPath instead */
 export function groupActivityPath(groupId) {

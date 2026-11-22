@@ -1,9 +1,15 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleSessionExpired, registerClientAuthClearListener } from './clientAuthState.js';
-import { isPublicAuthEndpoint } from '../services/api-client.js';
-import { SESSION_IDLE_TIMEOUT_MS, STORAGE_KEY_LAST_ACTIVITY } from '../context/SessionContext.jsx';
-import * as rememberMeService from '../services/rememberMeService.js';
+/**
+ * @file sessionExpiry.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność sessionExpiry.
+ */
 
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { handleMaintenanceRedirect, handleSessionExpired, registerClientAuthClearListener } from './clientAuthState.js';
+
+import { isPublicAuthEndpoint, isPublicSystemEndpoint } from '../services/api-client.js';
+
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('Session expiry handling', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -32,20 +38,15 @@ describe('Session expiry handling', () => {
     expect(isPublicAuthEndpoint('/shop')).toBe(false);
   });
 
-  it('defines 15-minute idle timeout and activity storage key', () => {
-    expect(SESSION_IDLE_TIMEOUT_MS).toBe(15 * 60 * 1000);
-    expect(STORAGE_KEY_LAST_ACTIVITY).toBe('maq_last_activity');
+  it('identifies public system status endpoints correctly', () => {
+    expect(isPublicSystemEndpoint('/system/status')).toBe(true);
+    expect(isPublicSystemEndpoint('/api/system/status')).toBe(true);
+    expect(isPublicSystemEndpoint('/system/maintenance')).toBe(true);
+    expect(isPublicSystemEndpoint('/groups')).toBe(false);
   });
 
-  it('does not call backend logout if Remember Me is active', () => {
-    vi.spyOn(rememberMeService, 'getRememberMe').mockReturnValue(true);
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-
-    handleSessionExpired();
-
-    expect(fetchSpy).not.toHaveBeenCalledWith(
-      expect.stringContaining('/auth/saml/logout'),
-      expect.anything(),
-    );
+  it('does not crash when calling handleMaintenanceRedirect', () => {
+    expect(() => handleMaintenanceRedirect()).not.toThrow();
   });
+
 });

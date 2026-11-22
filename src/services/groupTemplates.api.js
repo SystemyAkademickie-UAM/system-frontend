@@ -1,3 +1,9 @@
+/**
+ * @file groupTemplates.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla groupTemplates.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { deleteJson, getJson, patchJson, postJson, putJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
@@ -68,7 +74,8 @@ export async function fetchGroupTemplates({
   offset = 0,
   favoritesOnly = false,
 } = {}) {
-  const query = new URLSearchParams({
+
+const query = new URLSearchParams({
     scope,
     limit: String(limit),
     offset: String(offset),
@@ -140,7 +147,8 @@ export async function createGroupFromTemplate(templateId, payload) {
   if (!data.group) {
     return { ok: false, error: 'Nie udało się utworzyć grupy ze szablonu' };
   }
-  return { ok: true, groupId: data.group };
+
+return { ok: true, groupId: data.group };
 }
 
 /**
@@ -191,6 +199,8 @@ export async function setGroupTemplateFavorite(templateId, favorite) {
  * @param {GroupTemplateListItem[]} templates
  * @param {string} query
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function filterTemplatesByName(templates, query) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) return templates;

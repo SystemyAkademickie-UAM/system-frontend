@@ -1,11 +1,20 @@
+/**
+ * @file RouteGuard.jsx
+ * @description Komponent interfejsu użytkownika RouteGuard.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Navigate, useLocation } from 'react-router-dom';
 import { isClientLogoutInProgress } from '../../auth/clientAuthState.js';
 import { useSession } from '../../context/SessionContext.jsx';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
 import { useRegistrationComplete } from '../../hooks/useRegistrationComplete.js';
-import { groupsListPath, loginPath, welcomePath } from '../../routes/pathRegistry.js';
+import { adminHomePath, groupsListPath, loginPath, maintenancePath, organizationsPath, welcomePath } from '../../routes/pathRegistry.js';
+import { isCachedMaintenanceActive } from '../../services/maintenance.api.js';
 import './RouteGuard.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Strażnik tras — sprawdza uwierzytelnienie i uprawnienia roli.
  *
@@ -15,13 +24,16 @@ import './RouteGuard.css';
  * @param {string[]} [props.allowedRoles] — dozwolone role (puste = wszystkie zalogowane)
  * @param {string} [props.redirectTo] — gdzie przekierować przy braku dostępu
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function RouteGuard({
   children,
   requireAuth = true,
   allowedRoles,
   redirectTo,
 }) {
-  const location = useLocation();
+
+const location = useLocation();
   const { isAuthenticated, isLoading } = useSession();
   const { role } = useAppRole();
   const { isChecking: isRegistrationChecking, isComplete: isRegistrationComplete } = useRegistrationComplete();
@@ -40,6 +52,10 @@ export default function RouteGuard({
         <span className="route-guard-loading__spinner" />
       </div>
     );
+  }
+
+  if (role !== APP_ROLE.SUPERADMIN && isCachedMaintenanceActive()) {
+    return <Navigate to={maintenancePath()} replace />;
   }
 
   if (requireAuth && !isAuthenticated) {
@@ -61,10 +77,17 @@ export default function RouteGuard({
   if (allowedRoles && allowedRoles.length > 0) {
     const hasAccess = allowedRoles.includes(role);
     if (!hasAccess) {
-      const fallback = redirectTo ?? (isAuthenticated ? groupsListPath() : welcomePath());
+      let defaultRoleFallback = groupsListPath();
+      if (role === APP_ROLE.SUPERADMIN) {
+        defaultRoleFallback = organizationsPath();
+      } else if (role === APP_ROLE.ADMIN) {
+        defaultRoleFallback = adminHomePath();
+      }
+      const fallback = redirectTo ?? (isAuthenticated ? defaultRoleFallback : welcomePath());
       return <Navigate to={fallback} replace />;
     }
   }
 
+// === RENDEROWANIE WIDOKU ===
   return children;
 }

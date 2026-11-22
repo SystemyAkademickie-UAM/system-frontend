@@ -1,3 +1,9 @@
+/**
+ * @file useStudentSuperBarStats.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useStudentSuperBarStats.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useGroupCurrency } from '../context/GroupCurrencyContext.jsx';
@@ -20,6 +26,8 @@ const DEFAULT_LIVES_LABEL = 'Życia';
  * @param {number | string | null | undefined} lives
  * @returns {string}
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 function formatLivesCount(lives) {
   if (lives == null || Number.isNaN(Number(lives))) {
     return '0';
@@ -47,12 +55,14 @@ function resolveCurrencyLabel(profileCurrency, contextCurrency) {
 /**
  * Statystyki studenta w kontekście grupy (SuperBar: życia, waluta, zgromadzona).
  */
+
 export function useStudentSuperBarStats() {
   const { pathname } = useLocation();
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
   const { name: groupCurrencyName } = useGroupCurrency();
-  const {
+
+const {
     label: groupLivesLabel,
     livesEnabled,
     livesMax,
@@ -62,7 +72,8 @@ export function useStudentSuperBarStats() {
   const [currencyDisplay, setCurrencyDisplay] = useState('0');
   const [totalEarnedDisplay, setTotalEarnedDisplay] = useState('0');
   const [currencyLabel, setCurrencyLabel] = useState(DEFAULT_CURRENCY_LABEL);
-  const [livesLabel, setLivesLabel] = useState(DEFAULT_LIVES_LABEL);
+
+const [livesLabel, setLivesLabel] = useState(DEFAULT_LIVES_LABEL);
 
   const loadStats = useCallback(async () => {
     if (role !== APP_ROLE.STUDENT || !groupId) {
@@ -152,6 +163,7 @@ export function useStudentSuperBarStats() {
     ));
   }, [groupCurrencyName]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     livesDisplay,
     currencyDisplay,

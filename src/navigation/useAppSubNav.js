@@ -1,3 +1,9 @@
+/**
+ * @file useAppSubNav.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useAppSubNav.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useMemo } from 'react';
 import { buildSubNavItems, SUB_NAV_META } from './shellTemplates.config.js';
 
@@ -6,9 +12,11 @@ import { buildSubNavItems, SUB_NAV_META } from './shellTemplates.config.js';
  *
  * @param {keyof typeof SUB_NAV_META} configKey
  */
+
 export default function useAppSubNav(configKey) {
   const meta = SUB_NAV_META[configKey] ?? { title: '', ariaLabel: 'Nawigacja podstrony' };
 
+// === ZWRACANY STAN I INTERFEJS ===
   return useMemo(() => {
     const items = buildSubNavItems(configKey, { groupId: null });
     return {

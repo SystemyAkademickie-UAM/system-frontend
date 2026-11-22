@@ -1,8 +1,15 @@
+/**
+ * @file EmojiPickerField.jsx
+ * @description Komponent interfejsu użytkownika EmojiPickerField.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 import 'unicode-emoji-picker';
 import './EmojiPickerField.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Pole wyboru emoji (ten sam wzorzec co w ustawieniach waluty grupy).
  *
@@ -14,6 +21,8 @@ import './EmojiPickerField.css';
  * @param {string} [props.ariaLabel]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function EmojiPickerField({
   value,
   onChange,
@@ -23,7 +32,8 @@ export default function EmojiPickerField({
   className = '',
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const displayEmoji = value?.trim() || defaultEmoji;
+
+const displayEmoji = value?.trim() || defaultEmoji;
 
   const onPickerMounted = useCallback((picker) => {
     if (!picker) {
@@ -48,7 +58,6 @@ export default function EmojiPickerField({
           flagsElement.classList.add('group--flags');
         }
       } catch {
-        // ignore
       }
     }
 
@@ -58,6 +67,7 @@ export default function EmojiPickerField({
     });
   }, [onChange]);
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className={['maq-emoji-picker-field', className].filter(Boolean).join(' ')}>
       {label ? (

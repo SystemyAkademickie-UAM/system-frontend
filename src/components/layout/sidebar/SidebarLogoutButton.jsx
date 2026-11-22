@@ -1,13 +1,24 @@
+/**
+ * @file SidebarLogoutButton.jsx
+ * @description Komponent przycisku SidebarLogoutButton z obsługą wariantów wizualnych i interakcji.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import NavGlyph from '../NavGlyph.jsx';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {{ enabled: boolean, onLogoutClick: () => void, onNavigate?: () => void }} props
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SidebarLogoutButton({ enabled, onLogoutClick, onNavigate }) {
-  if (!enabled) {
+
+if (!enabled) {
     return null;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <li>
       <button

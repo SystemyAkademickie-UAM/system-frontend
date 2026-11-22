@@ -1,3 +1,9 @@
+/**
+ * @file PageUnavailable.css
+ * @description Style interfejsu użytkownika i układ dla modułu PageUnavailable.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .page-unavailable {
   display: flex;
   flex-direction: column;
@@ -8,12 +14,15 @@
   min-height: 12rem;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .group-main-layout .page-unavailable,
+
 .app-page-layout .page-unavailable,
 .maq-section-page.page-unavailable {
   padding: 0;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .page-unavailable__notice {
   margin: 0;
   width: 100%;

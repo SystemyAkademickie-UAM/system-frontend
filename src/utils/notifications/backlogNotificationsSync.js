@@ -1,3 +1,9 @@
+/**
+ * @file backlogNotificationsSync.js
+ * @description Funkcje pomocnicze i narzędziowe modułu backlogNotificationsSync.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { fetchGroupBacklogUnreadCount } from '../../services/backlog.api.js';
 import { BACKLOG_NEW_NOTIFICATION_POLL_MS } from '../../constants/backlogNotifications.constants.js';
 
@@ -42,6 +48,8 @@ function publishBacklogNotificationSync(groupId, event) {
  * @param {string | number} groupId
  * @param {number} backlogId
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function notifyBacklogNotificationRead(groupId, backlogId) {
   publishBacklogNotificationSync(groupId, { type: 'itemRead', backlogId });
 }
@@ -50,7 +58,8 @@ export function notifyBacklogNotificationRead(groupId, backlogId) {
  * @param {string | number} groupId
  */
 export function notifyBacklogNotificationsAllRead(groupId) {
-  publishBacklogNotificationSync(groupId, { type: 'allRead' });
+
+publishBacklogNotificationSync(groupId, { type: 'allRead' });
 }
 
 /**
@@ -106,7 +115,8 @@ export function resetBacklogUnreadTracking(groupId) {
  * @param {string | number} groupId
  */
 async function pollUnreadCount(groupId) {
-  const result = await fetchGroupBacklogUnreadCount(groupId);
+
+const result = await fetchGroupBacklogUnreadCount(groupId);
   if (result.ok) {
     reportBacklogUnreadCount(groupId, result.count);
   }

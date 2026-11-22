@@ -1,3 +1,9 @@
+/**
+ * @file Toast.css
+ * @description Style interfejsu użytkownika i układ dla modułu Toast.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-toast-viewport {
   position: fixed;
   top: calc(var(--shell-superbar-height, 63px) + 12px);
@@ -37,6 +43,7 @@
   border-color: var(--color-accent);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-toast--error {
   border-color: var(--color-input-error-border);
 }
@@ -74,6 +81,7 @@
   color: var(--color-text-secondary);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-toast__close {
   flex-shrink: 0;
   width: 24px;

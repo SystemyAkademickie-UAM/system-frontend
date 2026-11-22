@@ -1,3 +1,9 @@
+/**
+ * @file AppShell.css
+ * @description Style interfejsu użytkownika i układ dla modułu AppShell.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .app-shell {
   height: 100vh;
   min-height: 100vh;
@@ -35,6 +41,7 @@
   height: 100%;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .app-shell__main-column {
   display: flex;
   flex: 1;
@@ -56,11 +63,13 @@
   outline: none;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .app-shell__content {
   min-height: 100%;
   background: var(--color-bg-app);
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (max-width: 899px) {
   .app-shell__sidebar-wrap {
     position: fixed;

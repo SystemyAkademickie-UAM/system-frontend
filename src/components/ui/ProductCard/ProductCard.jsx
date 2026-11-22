@@ -1,3 +1,9 @@
+/**
+ * @file ProductCard.jsx
+ * @description Komponent karty ProductCard prezentujący dane w spójnym formacie wizualnym.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useMemo, useState } from 'react';
 
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
@@ -21,6 +27,7 @@ import { getTileVisibilityLabel } from '../../../utils/rewards/visibilityStatusL
 import './ProductCard.css';
 import './lecturerTileActions.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const PRICEPREVIOUSLY__TEXTLABEL = {
   polish: 'Cena ${price}, poprzednio ${oldPrice}',
   english: 'Price ${price}, previously ${oldPrice}'
@@ -96,6 +103,7 @@ const INCART__TEXTLABEL = {
   english: 'In cart'
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function resolveRequiredRank(requiredRank) {
   if (!requiredRank) return null;
   if (typeof requiredRank === 'string') {
@@ -109,8 +117,6 @@ function resolveRequiredRank(requiredRank) {
   }
   return null;
 }
-
-
 
 function ProductCardPrice({
   priceAmount,
@@ -202,8 +208,6 @@ function ProductCardPrice({
   );
 }
 
-
-
 function EditIcon() {
 
   return (
@@ -228,13 +232,9 @@ function EditIcon() {
 
 }
 
-
-
 function ProductItemIcon({ emoji, iconBackground, imageUrl, imageAlt }) {
 
   const [imageFailed, setImageFailed] = useState(!imageUrl);
-
-
 
   if (imageUrl && !imageFailed) {
 
@@ -270,8 +270,6 @@ function ProductItemIcon({ emoji, iconBackground, imageUrl, imageAlt }) {
 
   }
 
-
-
   return (
 
     <div
@@ -289,8 +287,6 @@ function ProductItemIcon({ emoji, iconBackground, imageUrl, imageAlt }) {
   );
 
 }
-
-
 
 /**
 
@@ -340,6 +336,8 @@ export default function ProductCard({
 
   onDelete,
 
+  onAdminDelete = null,
+
   showLecturerActions = false,
 
   hideAddToCart = false,
@@ -385,7 +383,8 @@ export default function ProductCard({
 }) {
 
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const { symbol: livesSymbol } = useGroupLives();
+
+const { symbol: livesSymbol } = useGroupLives();
 
   const rankInfo = resolveRequiredRank(requiredRank);
   const showLecturerTile = showLecturerActions && isPublished !== undefined;
@@ -414,7 +413,8 @@ export default function ProductCard({
 
   const resolvedCategories = categoryDetails.length > 0
     ? categoryDetails
-    : categories.map((name, index) => ({
+
+: categories.map((name, index) => ({
       id: `label-${index}`,
       name,
       color: null,
@@ -425,8 +425,7 @@ export default function ProductCard({
     [resolvedCategories],
   );
 
-
-
+// === RENDEROWANIE WIDOKU ===
   return (
 
     <article
@@ -459,7 +458,6 @@ export default function ProductCard({
       title={isRankLocked ? (lockedReason ?? (rankInfo?.name ? `${MINRANK__TEXTLABEL[LANGUAGE]}: ${rankInfo.name}` : DEFAULTLOCKEDREASON__TEXTLABEL[LANGUAGE])) : undefined}
       onDoubleClick={() => onDoubleClick() }
 
-
     >
 
       <ProductCategoryStrip categories={resolvedCategories} />
@@ -484,8 +482,6 @@ export default function ProductCard({
 
           </div>
 
-
-
           <div className="maq-product-card__heading">
 
             <h3 className="maq-product-card__name" title={isPreview ? undefined : name}>
@@ -495,8 +491,6 @@ export default function ProductCard({
             </h3>
 
           </div>
-
-
 
           {showLecturerTile ? (
             <span
@@ -577,11 +571,51 @@ export default function ProductCard({
 
             </div>
 
+          ) : onAdminDelete ? (
+
+            <div className="maq-product-card__lecturer-actions">
+
+              <button
+
+                type="button"
+
+                className="maq-product-card__action-btn maq-product-card__action-btn--danger"
+
+                aria-label={DELETEBUTTON__TEXTLABEL[LANGUAGE].replace('${name}', name)}
+
+                title="Usuń"
+
+                onClick={(event) => {
+
+                  event.stopPropagation();
+
+                  onAdminDelete?.();
+
+                }}
+
+              >
+
+                <AssetSvg
+
+                  name={SVG_ICONS.actions.delete}
+
+                  className="maq-product-card__action-icon"
+
+                  width={18}
+
+                  height={18}
+
+                  alt=""
+
+                />
+
+              </button>
+
+            </div>
+
           ) : null}
 
         </header>
-
-
 
         {(storyDescription || didacticDescription || !isPreview) ? (
           <div className="maq-product-card__descriptions">
@@ -613,16 +647,32 @@ export default function ProductCard({
 
       </div>
 
-
-
       {showFooter ? (
 
         <footer className="maq-product-card__footer">
 
           {isUsed ? (
-            <div className="maq-product-card__price-bar">
-              <span className="maq-product-card__section-label">{dateLabel || USEDITEM__TEXTLABEL[LANGUAGE]}</span>
-            </div>
+            <>
+              <div className="maq-product-card__price-bar">
+                <span className="maq-product-card__section-label">{dateLabel || USEDITEM__TEXTLABEL[LANGUAGE]}</span>
+              </div>
+              {onAdminDelete ? (
+                <div className="maq-product-card__actions">
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onAdminDelete?.();
+                    }}
+                    className="maq-product-card__buy-btn"
+                  >
+                    Usuń
+                  </Button>
+                </div>
+              ) : null}
+            </>
           ) : isPurchasedHistory ? (
             <>
               <div className="maq-product-card__price-bar">
@@ -646,18 +696,34 @@ export default function ProductCard({
                 <span className="maq-product-card__owned-count">{ownedQuantity}</span>
               </div>
 
-              {!readOnly && !hideActions ? (
+              {(!readOnly && !hideActions) || onAdminDelete ? (
                 <div className="maq-product-card__actions">
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="sm"
-                    disabled={disabled}
-                    onClick={onUse}
-                    className="maq-product-card__buy-btn"
-                  >
-                    {USEBUTTON__TEXTLABEL[LANGUAGE]}
-                  </Button>
+                  {onAdminDelete ? (
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onAdminDelete?.();
+                      }}
+                      className="maq-product-card__cart-btn"
+                    >
+                      Usuń
+                    </Button>
+                  ) : null}
+                  {!readOnly && !hideActions ? (
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      disabled={disabled}
+                      onClick={onUse}
+                      className="maq-product-card__buy-btn"
+                    >
+                      {USEBUTTON__TEXTLABEL[LANGUAGE]}
+                    </Button>
+                  ) : null}
                 </div>
               ) : null}
             </>
@@ -711,8 +777,6 @@ export default function ProductCard({
             </div>
           ) : null}
 
-
-
           {hideActions ? null : (
 
             <div className="maq-product-card__actions">
@@ -740,8 +804,6 @@ export default function ProductCard({
                 </Button>
 
               ) : null}
-
-
 
               <Button
 
@@ -779,5 +841,3 @@ export default function ProductCard({
   );
 
 }
-
-

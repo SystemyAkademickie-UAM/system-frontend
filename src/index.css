@@ -1,12 +1,20 @@
+/**
+ * @file index.css
+ * @description Style interfejsu użytkownika i układ dla modułu index.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 @import './styles/avatar-display.css';
 @import './styles/scrollbars.css';
 
 *,
 *::before,
+
 *::after {
   box-sizing: border-box;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 body {
   margin: 0;
   min-height: 100vh;
@@ -30,8 +38,9 @@ body {
   border: 0;
 }
 
-
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 select[data-sort-select],
+
 .catalog-filters__sort-select,
 .badge-treasury__sort-select,
 .group-shop__sort-select,

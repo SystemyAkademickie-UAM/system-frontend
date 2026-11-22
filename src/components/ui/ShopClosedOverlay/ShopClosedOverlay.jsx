@@ -1,8 +1,15 @@
+/**
+ * @file ShopClosedOverlay.jsx
+ * @description Komponent interfejsu użytkownika ShopClosedOverlay.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useState } from 'react';
 import ProductCard from '../ProductCard/ProductCard.jsx';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import './ShopClosedOverlay.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Zasłona nad katalogiem produktów — zamknięty sklep lub koniec gry (brak żyć).
  * Zamknięcie sklepu ma priorytet nad blokadą żyć.
@@ -32,9 +39,11 @@ const GAMEOVERSUBTITLE__TEXTLABEL = {
 
 const EXTRALIFEHINT__TEXTLABEL = {
   polish: 'Aby odblokować ponownie sklep zakup dodatkowe życie',
-  english: 'To unlock the shop again, buy an extra life',
+
+english: 'To unlock the shop again, buy an extra life',
 };
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ShopClosedOverlay({
   isClosed,
   isGameOver = false,
@@ -47,8 +56,10 @@ export default function ShopClosedOverlay({
 
   const showClosed = isClosed;
   const showGameOver = !isClosed && isGameOver;
-  const isVisible = showClosed || showGameOver;
 
+const isVisible = showClosed || showGameOver;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <div
       className={[

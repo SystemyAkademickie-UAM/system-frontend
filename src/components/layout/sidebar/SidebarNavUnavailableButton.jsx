@@ -1,7 +1,14 @@
+/**
+ * @file SidebarNavUnavailableButton.jsx
+ * @description Komponent przycisku SidebarNavUnavailableButton z obsługą wariantów wizualnych i interakcji.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { NavLink } from 'react-router-dom';
 import NavGlyph from '../NavGlyph.jsx';
 import '../navigation-shell.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Niedostępna pozycja nawigacji — wyblakła, z podpowiedzią po najechaniu.
  *
@@ -13,6 +20,8 @@ import '../navigation-shell.css';
  * @param {string} [props.to]
  * @param {() => void} [props.onNavigate]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SidebarNavUnavailableButton({
   label,
   iconId,
@@ -21,13 +30,15 @@ export default function SidebarNavUnavailableButton({
   to,
   onNavigate,
 }) {
-  const className = [
+
+const className = [
     'sidebar-nav__link',
     'sidebar-nav__link--unavailable',
     clickable ? 'sidebar-nav__link--unavailable-clickable' : '',
   ]
     .filter(Boolean)
-    .join(' ');
+
+.join(' ');
 
   const content = (
     <>
@@ -36,6 +47,7 @@ export default function SidebarNavUnavailableButton({
     </>
   );
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <li className="sidebar-nav__item">
       {clickable && to ? (

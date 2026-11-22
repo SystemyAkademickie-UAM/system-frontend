@@ -1,8 +1,15 @@
+/**
+ * @file ProductCardMini.jsx
+ * @description Komponent karty ProductCardMini prezentujący dane w spójnym formacie wizualnym.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useMemo, useState } from 'react';
 import CurrencyDisplay from '../Currency/CurrencyDisplay.jsx';
 import { parseShopItemImageRef } from '../../../utils/shop/shopItemIcon.js';
 import './ProductCardMini.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Kompaktowy wiersz produktu (np. lista koszyka).
  *
@@ -14,6 +21,8 @@ import './ProductCardMini.css';
  * @param {string} [props.imageUrl]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ProductCardMini({
   name,
   priceAmount,
@@ -22,13 +31,16 @@ export default function ProductCardMini({
   imageUrl,
   className = '',
 }) {
-  const icon = useMemo(
+
+const icon = useMemo(
     () => parseShopItemImageRef(imageRef ?? imageUrl),
     [imageRef, imageUrl],
   );
   const [imageFailed, setImageFailed] = useState(!icon.imageUrl);
-  const showEmoji = !icon.imageUrl || imageFailed;
 
+const showEmoji = !icon.imageUrl || imageFailed;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <article className={['maq-product-card-mini', className].filter(Boolean).join(' ')}>
       <div

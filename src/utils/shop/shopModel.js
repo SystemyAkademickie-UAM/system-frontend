@@ -1,3 +1,9 @@
+/**
+ * @file shopModel.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopModel.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { compareShopItemsByEffectivePrice } from './shopPricing.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 
@@ -34,6 +40,7 @@ const SORTPRICEDESC__TEXTLABEL = {
   english: 'Price descending'
 };
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {string} [language]
  * @returns {Array<{id: string, label: string}>}
@@ -61,6 +68,7 @@ export const SHOP_SORT_OPTIONS = [
  * @param {import('./shopItem.types.js').ShopItem[]} items
  * @param {{ searchQuery?: string, categoryFilter?: string }} filters
  */
+
 export function filterShopItems(items, { searchQuery = '', categoryFilter = 'all' } = {}) {
   const query = searchQuery.trim().toLowerCase();
 
@@ -92,7 +100,8 @@ export function filterShopItems(items, { searchQuery = '', categoryFilter = 'all
  * @param {string} sortBy
  */
 export function sortShopItems(items, sortBy = SHOP_SORT.default) {
-  const sorted = [...items];
+
+const sorted = [...items];
 
   sorted.sort((left, right) => {
     if (left.isExtraLife && !right.isExtraLife) return -1;
@@ -136,7 +145,6 @@ export function sortShopItems(items, sortBy = SHOP_SORT.default) {
       return comparison;
     }
 
-    // Tie-breakery:
     const posA = Number(left.position);
     const posB = Number(right.position);
     if (Number.isFinite(posA) && Number.isFinite(posB) && posA !== posB) {

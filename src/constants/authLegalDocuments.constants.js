@@ -1,3 +1,9 @@
+/**
+ * @file authLegalDocuments.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu authLegalDocuments.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 import { publicAssetPath } from '../utils/publicAssetUrl.js';
 
 /** Pliki prawne serwowane z `public/documents/` (URL: `/documents/...`). */
@@ -7,12 +13,14 @@ export const AUTH_LEGAL_DOCUMENTS = {
     publicPath: 'documents/warunki-uzytkowania.pdf',
     fileName: 'warunki-uzytkowania.pdf',
   },
-  documentation: {
+
+documentation: {
     label: 'Dokumentacja',
     publicPath: 'documents/warunki-uzytkowania.pdf',
     fileName: 'warunki-uzytkowania.pdf',
   },
-  privacyPolicy: {
+
+privacyPolicy: {
     label: 'Polityka prywatności',
     publicPath: 'documents/polityka-prywatnosci.pdf',
     fileName: 'polityka-prywatnosci.pdf',

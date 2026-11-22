@@ -1,13 +1,33 @@
+/**
+ * @file HomeRedirect.jsx
+ * @description Komponent interfejsu użytkownika HomeRedirect.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../../context/SessionContext.jsx';
+import { useAppRole } from '../../context/AppRoleContext.jsx';
+import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
 import {
   fetchRegistrationStatus,
   isRegistrationComplete,
 } from '../../services/registrationStatus.api.js';
-import { groupsListPath, registerPath, welcomePath } from '../../routes/pathRegistry.js';
+import {
+  adminHomePath,
+  groupsListPath,
+  maintenancePath,
+  organizationsPath,
+  registerPath,
+  welcomePath,
+} from '../../routes/pathRegistry.js';
+import {
+  fetchMaintenanceStatus,
+  isCachedMaintenanceActive,
+} from '../../services/maintenance.api.js';
 import './RouteGuard.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const REGISTRATION_STATE = {
   PENDING: 'pending',
   COMPLETE: 'complete',
@@ -19,23 +39,38 @@ const REGISTRATION_STATE = {
  * Session-aware entry route for `/`.
  * Anonymous → `/welcome`; authenticated + incomplete registration → `/login`; else → `/groups`.
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function HomeRedirect() {
   const { isAuthenticated, isLoading } = useSession();
+  const { role } = useAppRole();
   const [registrationState, setRegistrationState] = useState(REGISTRATION_STATE.PENDING);
+  const [isMaintenance, setIsMaintenance] = useState(
+    role !== APP_ROLE.SUPERADMIN && isCachedMaintenanceActive(),
+  );
 
   useEffect(() => {
     if (isLoading) {
       return;
     }
 
-    if (!isAuthenticated) {
-      setRegistrationState(REGISTRATION_STATE.ANONYMOUS);
-      return;
-    }
-
     let cancelled = false;
 
-    async function resolveRegistrationState() {
+    async function checkMaintenanceAndState() {
+      if (role !== APP_ROLE.SUPERADMIN) {
+        const mStatus = await fetchMaintenanceStatus();
+        if (cancelled) return;
+        if (mStatus?.enabled) {
+          setIsMaintenance(true);
+          return;
+        }
+      }
+
+      if (!isAuthenticated) {
+        setRegistrationState(REGISTRATION_STATE.ANONYMOUS);
+        return;
+      }
+
       const status = await fetchRegistrationStatus();
       if (cancelled) {
         return;
@@ -48,12 +83,16 @@ export default function HomeRedirect() {
     }
 
     setRegistrationState(REGISTRATION_STATE.PENDING);
-    void resolveRegistrationState();
+    void checkMaintenanceAndState();
 
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, role]);
+
+  if (isMaintenance && role !== APP_ROLE.SUPERADMIN) {
+    return <Navigate to={maintenancePath()} replace />;
+  }
 
   if (isLoading || (isAuthenticated && registrationState === REGISTRATION_STATE.PENDING)) {
     return (
@@ -71,5 +110,12 @@ export default function HomeRedirect() {
     return <Navigate to={registerPath()} replace />;
   }
 
+// === RENDEROWANIE WIDOKU ===
+  if (role === APP_ROLE.SUPERADMIN) {
+    return <Navigate to={organizationsPath()} replace />;
+  }
+  if (role === APP_ROLE.ADMIN) {
+    return <Navigate to={adminHomePath()} replace />;
+  }
   return <Navigate to={groupsListPath()} replace />;
 }

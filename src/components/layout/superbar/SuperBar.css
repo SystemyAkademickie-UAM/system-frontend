@@ -1,3 +1,9 @@
+/**
+ * @file SuperBar.css
+ * @description Style interfejsu użytkownika i układ dla modułu SuperBar.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .super-bar {
   position: sticky;
   top: 0;
@@ -70,6 +76,7 @@
 }
 
 .super-bar__menu-icon::before,
+
 .super-bar__menu-icon::after {
   content: '';
   position: absolute;
@@ -121,15 +128,33 @@
   flex-shrink: 0;
 }
 
+.super-bar-info-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .super-bar-settings {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 30px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
   color: var(--color-nav-icon-on-primary);
   text-decoration: none;
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.super-bar-settings:hover {
+  color: var(--color-nav-link);
 }
 
 .super-bar-settings:focus-visible {
@@ -144,6 +169,7 @@
   height: 30px;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .super-bar-user-menu {
   position: relative;
   display: flex;
@@ -282,6 +308,7 @@
   font-size: var(--font-size-body);
   font-weight: 600;
   text-align: left;
+  text-decoration: none;
   color: var(--color-text-primary);
   cursor: pointer;
 }
@@ -289,8 +316,10 @@
 .super-bar-user-menu__dropdown-item:hover {
   background: var(--color-nav-sub-active-bg);
   color: var(--color-accent);
+  text-decoration: none;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .super-bar-user-menu__dropdown-item:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: -2px;
@@ -304,6 +333,7 @@
   color: #ff8a8a;
 }
 
+/* === RESPONSYWNOŚĆ I WIDOK MOBILNY === */
 @media (min-width: 900px) {
   .super-bar__menu-btn {
     display: none;
@@ -366,7 +396,14 @@
     line-height: 1.15;
   }
 
-  .super-bar-settings {
+  .super-bar-info-menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+.super-bar-settings {
     width: 26px;
     height: 26px;
     flex-shrink: 0;
@@ -393,6 +430,7 @@
 }
 
 .super-bar-stat--currency,
+
 .super-bar-stat--lives {
   cursor: default;
 }

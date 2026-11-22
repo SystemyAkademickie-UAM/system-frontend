@@ -1,7 +1,14 @@
+/**
+ * @file ColorPickerField.jsx
+ * @description Komponent interfejsu użytkownika ColorPickerField.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import './ColorPickerField.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 const DEFAULT_PRESET_COLORS = [
   '#42f37d', '#00eeff', '#ffd000', '#ff9142', '#ff4d4f',
   '#d843ff', '#4378ff', '#00c48c', '#e056fd', '#38bdf8',
@@ -9,6 +16,7 @@ const DEFAULT_PRESET_COLORS = [
   '#14b8a6', '#6366f1', '#64748b', '#94a3b8', '#ffffff',
 ];
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 function CloseIcon({ className = '' }) {
   return (
     <svg
@@ -68,7 +76,8 @@ export default function ColorPickerField({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [draftColor, setDraftColor] = useState(() => normalizeHex(value));
-  const [hexInputValue, setHexInputValue] = useState(() => normalizeHex(value));
+
+const [hexInputValue, setHexInputValue] = useState(() => normalizeHex(value));
 
   useEffect(() => {
     if (isOpen) {
@@ -130,6 +139,7 @@ export default function ColorPickerField({
 
   const resolvedValue = normalizeHex(value);
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className={['maq-color-picker-field', className].filter(Boolean).join(' ')}>
       {typeof triggerComponent === 'function' ? (

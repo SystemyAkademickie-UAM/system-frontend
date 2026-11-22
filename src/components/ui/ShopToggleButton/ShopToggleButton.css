@@ -1,3 +1,9 @@
+/**
+ * @file ShopToggleButton.css
+ * @description Style interfejsu użytkownika i układ dla modułu ShopToggleButton.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .maq-shop-toggle-btn {
   white-space: nowrap;
 }

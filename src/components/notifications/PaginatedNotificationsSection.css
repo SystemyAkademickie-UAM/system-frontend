@@ -1,3 +1,9 @@
+/**
+ * @file PaginatedNotificationsSection.css
+ * @description Style interfejsu użytkownika i układ dla modułu PaginatedNotificationsSection.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .paginated-notifications__surface.maq-textured-surface {
   width: 100%;
   max-width: min(42rem, 100%);
@@ -30,6 +36,7 @@
   color: var(--color-text-secondary);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .paginated-notifications__actions {
   display: flex;
   flex-wrap: wrap;
@@ -65,6 +72,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .paginated-notifications__menu-item {
   display: block;
   width: 100%;

@@ -1,3 +1,9 @@
+/**
+ * @file shop.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla shop.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { deleteJson, getJson, patchJson, postJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 import {
@@ -72,7 +78,8 @@ export async function createGroupShopItemFromTemplate(groupId, payload) {
   if (!result.ok) {
     return { ok: false, error: extractApiError(result.data) };
   }
-  return { ok: true, item: mapBackendShopItem(result.data) };
+
+return { ok: true, item: mapBackendShopItem(result.data) };
 }
 
 /**
@@ -149,6 +156,7 @@ export async function fetchGroupInventory(groupId) {
  * @param {string | number} groupId
  * @param {string | number} accountId
  */
+
 export async function fetchStudentInventory(groupId, accountId) {
   const result = await getJson(`/groups/${groupId}/students/${accountId}/inventory`);
   if (!result.ok) {
@@ -218,4 +226,34 @@ export async function updateGroupShopOpenStatus(groupId, shopOpen) {
     return { ok: false, error: extractApiError(result.data) };
   }
   return { ok: true, shopOpen };
+}
+
+/**
+ * Usuwa zakupiony przedmiot ze stanu ekwipunku studenta.
+ * DELETE /groups/:groupId/inventory/:itemId
+ *
+ * @param {string | number} groupId
+ * @param {string | number} itemId
+ */
+export async function deleteGroupPurchasedItem(groupId, itemId) {
+  const result = await deleteJson(`/groups/${groupId}/inventory/${itemId}`);
+  if (!result.ok) {
+    return { ok: false, error: extractApiError(result.data) };
+  }
+  return { ok: true };
+}
+
+/**
+ * Usuwa wpis z historii ekwipunku (np. pozycję użytego przedmiotu).
+ * DELETE /groups/:groupId/inventory-history/:historyId
+ *
+ * @param {string | number} groupId
+ * @param {string | number} historyId
+ */
+export async function deleteGroupUsedItemHistory(groupId, historyId) {
+  const result = await deleteJson(`/groups/${groupId}/inventory-history/${historyId}`);
+  if (!result.ok) {
+    return { ok: false, error: extractApiError(result.data) };
+  }
+  return { ok: true };
 }

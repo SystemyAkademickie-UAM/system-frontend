@@ -1,9 +1,15 @@
+/**
+ * @file AppRoleContext.jsx
+ * @description Kontekst globalnego stanu React oraz dostawca danych dla AppRoleContext.
+ */
+
+// === IMPORTY I INICJALIZACJA KONTEKSTU ===
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { APP_ROLE } from '../navigation/shellTemplates.config.js';
 import { registerClientAuthClearListener } from '../auth/clientAuthState.js';
 import { useSessionOptional } from './SessionContext.jsx';
 
-const AppRoleContext = createContext(null);
+export const AppRoleContext = createContext(null);
 
 /**
  * Provider roli aplikacji.
@@ -17,9 +23,12 @@ const AppRoleContext = createContext(null);
  * - W produkcji rola pochodzi z sesji backendowej
  * - W trybie dev (api-test) można ręcznie przełączać role do testów
  */
+
+// === DOSTAWCA KONTEKSTU I ZARZĄDZANIE STANEM ===
 export function AppRoleProvider({ children }) {
   const session = useSessionOptional();
-  const [roleOverride, setRoleOverride] = useState(null);
+
+const [roleOverride, setRoleOverride] = useState(null);
 
   useEffect(() => {
     return registerClientAuthClearListener(() => {
@@ -37,6 +46,12 @@ export function AppRoleProvider({ children }) {
     return APP_ROLE.STUDENT;
   }, [roleOverride, session?.role]);
 
+  useEffect(() => {
+    if (role) {
+      document.documentElement.setAttribute('data-app-role', role);
+    }
+  }, [role]);
+
   const value = useMemo(
     () => ({
       role,
@@ -51,8 +66,10 @@ export function AppRoleProvider({ children }) {
   return <AppRoleContext.Provider value={value}>{children}</AppRoleContext.Provider>;
 }
 
+// === HOOKI DOSTĘPOWE DO KONTEKSTU ===
 export function useAppRole() {
-  const ctx = useContext(AppRoleContext);
+
+const ctx = useContext(AppRoleContext);
   if (!ctx) {
     throw new Error('useAppRole must be used within AppRoleProvider');
   }

@@ -1,3 +1,9 @@
+/**
+ * @file InfoTooltip.jsx
+ * @description Komponent interfejsu użytkownika InfoTooltip.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
@@ -5,6 +11,7 @@ import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import { positionCenteredTooltip } from '../../../utils/ui/positionTooltipInViewport.js';
 import './InfoTooltip.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Mała ikona informacji z podpowiedzią po najechaniu (portal — zawsze nad oknami).
  * Opcjonalnie `children` — podpowiedź po najechaniu na przekazany element (np. cenę).
@@ -16,6 +23,8 @@ import './InfoTooltip.css';
  * @param {string} [props.ariaLabel='Informacja']
  * @param {import('react').ReactNode} [props.children]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function InfoTooltip({
   text,
   iconFile = SVG_ICONS.status.info,
@@ -27,7 +36,8 @@ export default function InfoTooltip({
   const triggerRef = useRef(null);
   const bubbleRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const [layout, setLayout] = useState(null);
+
+const [layout, setLayout] = useState(null);
 
   const updateLayout = useCallback(() => {
     const trigger = triggerRef.current;
@@ -89,8 +99,10 @@ export default function InfoTooltip({
         </span>,
         document.body,
       )
-    : null;
 
+: null;
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <span

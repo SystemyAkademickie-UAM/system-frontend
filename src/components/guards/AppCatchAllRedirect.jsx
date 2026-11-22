@@ -1,10 +1,18 @@
+/**
+ * @file AppCatchAllRedirect.jsx
+ * @description Komponent interfejsu użytkownika AppCatchAllRedirect.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Navigate } from 'react-router-dom';
 import { useSession } from '../../context/SessionContext.jsx';
 import { groupsListPath, welcomePath } from '../../routes/pathRegistry.js';
 import './RouteGuard.css';
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function AppCatchAllRedirect() {
-  const { isAuthenticated, isLoading } = useSession();
+
+const { isAuthenticated, isLoading } = useSession();
 
   if (isLoading) {
     return (
@@ -14,5 +22,6 @@ export default function AppCatchAllRedirect() {
     );
   }
 
+// === RENDEROWANIE WIDOKU ===
   return <Navigate to={isAuthenticated ? groupsListPath() : welcomePath()} replace />;
 }

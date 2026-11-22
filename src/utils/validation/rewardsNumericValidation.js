@@ -1,3 +1,9 @@
+/**
+ * @file rewardsNumericValidation.js
+ * @description Funkcje pomocnicze i narzędziowe modułu rewardsNumericValidation.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** Maksymalna wartość liczbowa w polach nagród, kosztów i cen. */
 export const REWARD_NUMERIC_MAX = 999_999_999;
 
@@ -24,11 +30,13 @@ export function sanitizeWholeNumberInput(raw, max = REWARD_NUMERIC_MAX) {
   return normalized;
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {string} value
  * @param {number} [max]
  * @returns {{ valid: boolean, value: number | null, error: string | null }}
  */
+
 export function validateWholeNumberInput(value, max = REWARD_NUMERIC_MAX) {
   const trimmed = value.trim();
 
@@ -57,6 +65,7 @@ export function validateWholeNumberInput(value, max = REWARD_NUMERIC_MAX) {
 }
 
 /** Zniżka procentowa rangi (0–100). Puste pole = 0. */
+
 export function validateDiscountPercentInput(value) {
   const trimmed = value.trim();
 

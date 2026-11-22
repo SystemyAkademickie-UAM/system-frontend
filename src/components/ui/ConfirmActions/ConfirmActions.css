@@ -1,3 +1,9 @@
+/**
+ * @file ConfirmActions.css
+ * @description Style interfejsu użytkownika i układ dla modułu ConfirmActions.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .maq-confirm-actions {
   display: inline-flex;
   flex-direction: row;

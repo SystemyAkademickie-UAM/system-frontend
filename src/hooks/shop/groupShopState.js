@@ -1,3 +1,9 @@
+/**
+ * @file groupShopState.js
+ * @description Funkcje pomocnicze i narzędziowe modułu groupShopState.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 const SHOP_OPEN_PREFIX = 'maq-shop-open:';
@@ -56,6 +62,7 @@ export function getShopIsOpen(groupId) {
  * @param {string | number} groupId
  * @param {boolean} isOpen
  */
+
 export function setShopIsOpen(groupId, isOpen) {
   sessionStorage.setItem(`${SHOP_OPEN_PREFIX}${groupId}`, isOpen ? 'open' : 'closed');
   emitShopStateChange();
@@ -65,6 +72,8 @@ export function setShopIsOpen(groupId, isOpen) {
  * @param {string | number | null | undefined} groupId
  * @returns {string[]}
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function getShopCartItemIds(groupId) {
   if (!groupId || typeof window === 'undefined') {
     return [];
@@ -108,11 +117,13 @@ export function setShopCartItemIds(groupId, itemIds) {
  * Tymczasowy mock braku żyć — docelowo z API użytkownika.
  * @param {string | number | null | undefined} groupId
  */
+
 export function getShopLivesBlocked(groupId) {
   if (!groupId || typeof window === 'undefined') {
     return false;
   }
-  return sessionStorage.getItem(`${SHOP_LIVES_BLOCKED_PREFIX}${groupId}`) === 'true';
+
+return sessionStorage.getItem(`${SHOP_LIVES_BLOCKED_PREFIX}${groupId}`) === 'true';
 }
 
 /**

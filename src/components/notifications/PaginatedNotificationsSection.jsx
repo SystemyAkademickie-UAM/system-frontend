@@ -1,3 +1,9 @@
+/**
+ * @file PaginatedNotificationsSection.jsx
+ * @description Komponent interfejsu użytkownika PaginatedNotificationsSection.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AssetSvg, Button, Pagination, TexturedSurface, useToast } from '../ui/index.js';
@@ -10,6 +16,7 @@ import { BACKLOG_LIST_POLL_MS } from '../../constants/backlogNotifications.const
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import './PaginatedNotificationsSection.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 export const NOTIFICATIONS_PAGE_SIZE = 10;
 
 const MARKALLREAD__TEXTLABEL = {
@@ -85,6 +92,7 @@ const MOREOPTIONSLABEL__TEXTLABEL = {
 
  */
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function PaginatedNotificationsSection({
 
   groupId,
@@ -122,7 +130,8 @@ export default function PaginatedNotificationsSection({
   const [page, setPage] = useState(initialPage);
   const [confirmClearMode, setConfirmClearMode] = useState(null);
   const [isClearing, setIsClearing] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const raw = searchParams.get('page');
@@ -223,8 +232,7 @@ export default function PaginatedNotificationsSection({
     handlePageChange(1);
   };
 
-
-
+// === RENDEROWANIE WIDOKU ===
   return (
 
     <TexturedSurface
@@ -314,8 +322,6 @@ export default function PaginatedNotificationsSection({
           </div>
         </div>
 
-
-
         <NotificationsFeed
 
           groupId={groupId}
@@ -338,8 +344,6 @@ export default function PaginatedNotificationsSection({
 
         />
 
-
-
         {totalCount > pageSize ? (
 
           <div className="paginated-notifications__pagination">
@@ -361,8 +365,6 @@ export default function PaginatedNotificationsSection({
         ) : null}
 
       </section>
-
-
 
       <ClearNotificationsConfirmModal
 
@@ -391,5 +393,3 @@ export default function PaginatedNotificationsSection({
   );
 
 }
-
-

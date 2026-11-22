@@ -1,6 +1,13 @@
+/**
+ * @file ActivityCard.jsx
+ * @description Komponent karty ActivityCard prezentujący dane w spójnym formacie wizualnym.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import './ActivityCard.css';
 import { CurrencyIcon } from '../Currency/CurrencyDisplay.jsx';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Kompaktowy kafelek ze szczegółami aktywności (podgląd przy najechaniu).
  *
@@ -12,6 +19,8 @@ import { CurrencyIcon } from '../Currency/CurrencyDisplay.jsx';
  * @param {string} [props.rewardEmoji] — opcjonalne nadpisanie symbolu waluty
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ActivityCard({
   name,
   storyDescription,
@@ -20,7 +29,9 @@ export default function ActivityCard({
   rewardEmoji,
   className = '',
 }) {
-  return (
+
+// === RENDEROWANIE WIDOKU ===
+return (
     <article className={['maq-activity-card', className].filter(Boolean).join(' ')}>
       <h3 className="maq-activity-card__name">{name}</h3>
       {storyDescription ? (

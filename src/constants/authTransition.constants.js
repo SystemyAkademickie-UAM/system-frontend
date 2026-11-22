@@ -1,3 +1,9 @@
+/**
+ * @file authTransition.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu authTransition.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 /** Exit phase duration (ms) — synced with `--auth-card-transition-exit-ms`. */
 export const AUTH_CARD_TRANSITION_EXIT_MS = 240;
 

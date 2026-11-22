@@ -1,6 +1,13 @@
+/**
+ * @file Button.jsx
+ * @description Komponent przycisku Button z obsługą wariantów wizualnych i interakcji.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { Link } from 'react-router-dom';
 import './Button.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {Object} props
  * @param {import('react').ReactNode} props.children
@@ -13,6 +20,8 @@ import './Button.css';
  * @param {boolean} [props.fullWidth]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function Button({
   children,
   onClick,
@@ -32,7 +41,8 @@ export default function Button({
     fullWidth ? 'maq-btn--full' : '',
     className,
   ]
-    .filter(Boolean)
+
+.filter(Boolean)
     .join(' ');
 
   if (to && !disabled) {
@@ -43,6 +53,7 @@ export default function Button({
     );
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <button type={type} className={classNames} onClick={onClick} disabled={disabled} {...rest}>
       {children}

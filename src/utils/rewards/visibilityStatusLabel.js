@@ -1,3 +1,9 @@
+/**
+ * @file visibilityStatusLabel.js
+ * @description Funkcje pomocnicze i narzędziowe modułu visibilityStatusLabel.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 
 const VISIBILITYPUBLICITEM__TEXTLABEL = {
@@ -29,6 +35,7 @@ const VISIBILITY_LABELS = {
  * @param {string} language
  * @returns {{public: string, hidden: string}}
  */
+
 function getVisibilityLabelsForLanguage(language) {
   const lang = language ?? READLANGUAGECOOKIE();
   return {
@@ -37,6 +44,7 @@ function getVisibilityLabelsForLanguage(language) {
   };
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {boolean | undefined} isPublished
  * @param {'badge' | 'item'} [entity='item']
@@ -54,6 +62,7 @@ export function getVisibilityStatusLabel(isPublished, entity = 'item', language)
  * @param {'badge' | 'item'} [entity='item']
  * @returns {'Publiczna' | 'Ukryta' | 'Odkryty' | 'Ukryty'}
  */
+
 const TILEVISIBLEBADGE__TEXTLABEL = {
   polish: 'Publiczna',
   english: 'Public'

@@ -1,3 +1,9 @@
+/**
+ * @file registrationStatus.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla registrationStatus.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson } from './api-client.js';
 import { AUTH_LOGIN_REGISTRATION_STATUS_PATH } from '../constants/authPaths.constants.js';
 import {
@@ -18,6 +24,7 @@ import {
 /**
  * @returns {Promise<RegistrationStatus | null>}
  */
+
 export async function fetchRegistrationStatus() {
   const result = await getJson(AUTH_LOGIN_REGISTRATION_STATUS_PATH);
   if (!result.ok || !result.data || typeof result.data !== 'object') {
@@ -30,6 +37,8 @@ export async function fetchRegistrationStatus() {
  * @param {RegistrationStatus | null | undefined} status
  * @returns {boolean}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function isRegistrationComplete(status) {
   return status?.registrationCompleted === true && status?.eulaAccepted === true;
 }

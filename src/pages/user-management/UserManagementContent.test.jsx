@@ -1,0 +1,132 @@
+import { act, createElement } from 'react';
+import { createRoot } from 'react-dom/client';
+import { MemoryRouter } from 'react-router-dom';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('../../context/SessionContext.jsx', () => ({
+  useSession: () => ({ user: { organizationId: 3 } }),
+}));
+
+vi.mock('../../services/organizationAdmin.api.js', () => ({
+  listManageableOrganizations: vi.fn(),
+  listOrganizationAccounts: vi.fn(),
+  createOrganizationAccount: vi.fn(),
+  updateOrganizationAccount: vi.fn(),
+  deleteOrganizationAccount: vi.fn(),
+  downloadOrganizationAccounts: vi.fn(),
+  importOrganizationAccounts: vi.fn(),
+  sendOrganizationLoginLink: vi.fn(),
+}));
+
+import { ToastProvider } from '../../components/ui/Toast/Toast.jsx';
+import {
+  listManageableOrganizations,
+  listOrganizationAccounts,
+} from '../../services/organizationAdmin.api.js';
+import UserManagementContent from './UserManagementContent.jsx';
+
+const ADA = {
+  accountId: 2,
+  name: 'Ada',
+  surname: 'Local',
+  email: 'ada@example.com',
+  nickname: 'ada',
+  role: 'lecturer',
+};
+
+describe('UserManagementContent', () => {
+  let container;
+  let root;
+
+  beforeEach(() => {
+    globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+    document.cookie = 'CURRENTLANGUAGE=polish';
+    container = document.createElement('div');
+    document.body.appendChild(container);
+    root = createRoot(container);
+    vi.clearAllMocks();
+    listManageableOrganizations.mockResolvedValue([{ id: 3, loginMethod: 'email' }]);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+  });
+
+  async function renderPeople() {
+    await act(async () => {
+      root.render(createElement(
+        MemoryRouter,
+        { initialEntries: ['/users'] },
+        createElement(ToastProvider, null, createElement(UserManagementContent)),
+      ));
+    });
+  }
+
+  it('renders a person and row actions menu with change option and displays login method badge', async () => {
+    listOrganizationAccounts.mockResolvedValue({ items: [ADA], nextAfterAccountId: null });
+    await renderPeople();
+    expect(container.textContent).toContain('Ada Local');
+    expect(container.textContent).toContain('Magic Links');
+    const badge = container.querySelector('.user-management__login-method-badge--email');
+    expect(badge).not.toBeNull();
+    const moreBtn = container.querySelector('.data-table__action-btn--more');
+    expect(moreBtn).not.toBeNull();
+    act(() => {
+      moreBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(document.body.textContent).toContain('Zmień');
+  });
+
+  it('renders organization selector when multiple manageable organizations exist', async () => {
+    listManageableOrganizations.mockResolvedValue([
+      { id: 3, name: 'Org A', loginMethod: 'email' },
+      { id: 4, name: 'Org B', loginMethod: 'email' },
+    ]);
+    listOrganizationAccounts.mockResolvedValue({ items: [], nextAfterAccountId: null });
+    await renderPeople();
+    expect(container.textContent).toContain('Organizacja:');
+    expect(container.textContent).toContain('Org A');
+    expect(container.textContent).toContain('Zmień organizację');
+  });
+
+  it('hides the administering role from an organization administrator', async () => {
+    listOrganizationAccounts.mockResolvedValue({
+      items: [{ ...ADA, role: 'administrator', accountId: 9 }],
+      nextAfterAccountId: null,
+    });
+    await renderPeople();
+    const addButton = [...container.querySelectorAll('button')].find((node) => node.textContent.includes('Dodaj osobę'));
+    act(() => {
+      addButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    const adminCheckbox = document.body.querySelector('#account-role-administrator');
+    expect(adminCheckbox).toBeNull();
+    const studentCheckbox = document.body.querySelector('#account-role-student');
+    const lecturerCheckbox = document.body.querySelector('#account-role-lecturer');
+    expect(studentCheckbox).not.toBeNull();
+    expect(lecturerCheckbox).not.toBeNull();
+    act(() => {
+      [...document.body.querySelectorAll('button')].find((node) => node.textContent === 'Anuluj')
+        .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    const moreBtn = container.querySelector('.data-table__action-btn--more');
+    act(() => {
+      moreBtn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    act(() => {
+      [...document.body.querySelectorAll('button')].find((node) => node.textContent === 'Zmień')
+        .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(document.body.textContent).not.toContain('Usuń tę rolę');
+  });
+
+  it('keeps the empty sentence after the first load fails', async () => {
+    listOrganizationAccounts.mockRejectedValue(new Error('Sieć'));
+    await renderPeople();
+    expect(container.textContent).toContain('W tej organizacji nie ma jeszcze kont.');
+    expect(document.body.textContent).toContain('Sieć');
+  });
+});

@@ -1,3 +1,9 @@
+/**
+ * @file CharacterCounter.css
+ * @description Style interfejsu użytkownika i układ dla modułu CharacterCounter.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-char-counter {
   font-size: var(--font-size-min);
   font-weight: 600;
@@ -14,6 +20,7 @@
   color: var(--color-input-error);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-char-limited-field {
   display: flex;
   flex-direction: column;
@@ -31,7 +38,10 @@
 }
 
 .maq-char-limited-field--inside > input,
+
 .maq-char-limited-field--inside > textarea,
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-char-limited-field--inside .maq-text-field__control {
   padding-right: 3.5rem !important;
 }

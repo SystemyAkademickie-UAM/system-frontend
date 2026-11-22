@@ -1,3 +1,9 @@
+/**
+ * @file ViewLayoutToggle.jsx
+ * @description Komponent interfejsu użytkownika ViewLayoutToggle.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import Button from '../Button/Button.jsx';
 import {
   VIEW_LAYOUT_CONFIG,
@@ -6,6 +12,7 @@ import {
 } from './viewLayoutStates.js';
 import './ViewLayoutToggle.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Dwustanowy przełącznik widoku tabelka / kafelki (jak przycisk sklepu).
  *
@@ -15,14 +22,18 @@ import './ViewLayoutToggle.css';
  * @param {boolean} [props.disabled]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ViewLayoutToggle({
   layout,
   onToggle,
   disabled = false,
   className = '',
 }) {
-  const config = VIEW_LAYOUT_CONFIG[resolveViewLayoutConfigKey(layout)];
 
+const config = VIEW_LAYOUT_CONFIG[resolveViewLayoutConfigKey(layout)];
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <Button
       type="button"

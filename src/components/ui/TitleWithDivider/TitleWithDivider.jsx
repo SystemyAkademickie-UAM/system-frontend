@@ -1,7 +1,14 @@
+/**
+ * @file TitleWithDivider.jsx
+ * @description Komponent interfejsu użytkownika TitleWithDivider.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useRef } from 'react';
 import { useMeasuredWidth } from '../../../hooks/useMeasuredWidth.js';
 import Divider from '../Divider/Divider.jsx';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Tytuł z kreską dopasowaną do jego szerokości.
  *
@@ -12,6 +19,8 @@ import Divider from '../Divider/Divider.jsx';
  * @param {keyof JSX.IntrinsicElements} [props.as='h3']
  * @param {string} [props.titleDataAttr]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function TitleWithDivider({
   title,
   className = '',
@@ -20,8 +29,10 @@ export default function TitleWithDivider({
   titleDataAttr,
 }) {
   const titleRef = useRef(null);
-  const dividerWidth = useMeasuredWidth(titleRef, [title]);
 
+const dividerWidth = useMeasuredWidth(titleRef, [title]);
+
+// === RENDEROWANIE WIDOKU ===
   return (
     <>
       <TitleTag

@@ -1,3 +1,9 @@
+/**
+ * @file Button.css
+ * @description Style interfejsu użytkownika i układ dla modułu Button.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-btn {
   display: inline-flex;
   align-items: center;
@@ -30,6 +36,7 @@
   transform: translateY(1px);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -71,6 +78,7 @@
   border: 1px solid color-mix(in srgb, var(--color-accent) 60%, var(--color-divider));
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-btn--secondary:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-surface));
   border-color: var(--color-accent);

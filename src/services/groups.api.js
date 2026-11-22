@@ -1,4 +1,10 @@
-import { getJson, patchJson, postJson } from './api-client.js';
+/**
+ * @file groups.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla groups.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
+import { getJson, patchJson, postJson, deleteJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 import { buildDriveBannerUrl } from '../constants/drive.constants.js';
 
@@ -31,8 +37,6 @@ function mapBackendGroup(backendGroup, options = {}) {
   return {
     id: String(backendGroup.id),
     storyName: backendGroup.groupName || backendGroup.name || '',
-    // Backend nie ma jeszcze osobnej kolumny na nazwę przedmiotu —
-    // zwracamy pustą wartość, żeby pole nie kopiowało się z nazwy grupy.
     subject: backendGroup.subjectName || '',
     lecturer: backendGroup.lecturers || '',
     lecturerAvatarUrl: getAssetUrl(backendGroup.lecturerAvatarUrl),
@@ -68,6 +72,7 @@ export async function fetchUserGroups() {
  *
  * @returns {Promise<{ myGroups: GroupListItem[], otherGroups: GroupListItem[] }>}
  */
+
 export async function fetchGroupsCatalog() {
   const result = await getJson('/groups/catalog', { includeBrowserId: true });
   if (!result.ok) {
@@ -142,6 +147,7 @@ export async function fetchGroupById(groupId) {
  * @param {string} [groupData.imageRef]
  * @returns {Promise<{ ok: boolean, groupId?: number, error?: string }>}
  */
+
 export async function createGroup(groupData) {
   const result = await postJson('/groups/new', { group: groupData }, { includeBrowserId: true });
   if (!result.ok) {
@@ -186,6 +192,55 @@ export async function updateGroup(groupId, groupData) {
   return { ok: true, groupId: data.group, updated: Boolean(data.updated) };
 }
 
+export async function deleteGroup(groupId) {
+  const result = await deleteJson(`/groups/${groupId}`);
+  if (!result.ok) {
+    return { ok: false, error: typeof result.data === 'object' && result.data?.message ? String(result.data.message) : 'Nie udało się usunąć grupy' };
+  }
+  return { ok: true };
+}
+
+/**
+ * Pobiera kandydatów na prowadzących i studentów w organizacji.
+ * GET /groups/organization-candidates
+ */
+export async function fetchOrganizationCandidates() {
+  const result = await getJson('/groups/organization-candidates');
+  if (!result.ok || !result.data) {
+    return { ok: false, lecturers: [], students: [], error: 'Nie udało się pobrać kandydatów' };
+  }
+  const data = /** @type {{ lecturers: any[], students: any[] }} */ (result.data);
+  return {
+    ok: true,
+    lecturers: Array.isArray(data.lecturers) ? data.lecturers : [],
+    students: Array.isArray(data.students) ? data.students : [],
+  };
+}
+
+/**
+ * Pobiera dane do zarządzania użytkownikami grupy.
+ * GET /groups/:groupId/members-manage
+ */
+export async function fetchGroupMembersManage(groupId) {
+  const result = await getJson(`/groups/${groupId}/members-manage`);
+  if (!result.ok || !result.data) {
+    return { ok: false, error: 'Nie udało się pobrać danych członków grupy' };
+  }
+  return { ok: true, ...result.data };
+}
+
+/**
+ * Aktualizuje prowadzącego i/lub studentów grupy.
+ * PATCH /groups/:groupId/members-manage
+ */
+export async function updateGroupMembersManage(groupId, data) {
+  const result = await patchJson(`/groups/${groupId}/members-manage`, data);
+  if (!result.ok) {
+    return { ok: false, error: typeof result.data === 'object' && result.data?.message ? String(result.data.message) : 'Nie udało się zaktualizować członków grupy' };
+  }
+  return { ok: true };
+}
+
 /**
  * Filtruje grupy po zapytaniu (nazwa fabularna, przedmiot, prowadzący).
  *
@@ -193,6 +248,8 @@ export async function updateGroup(groupId, groupData) {
  * @param {string} query
  * @returns {GroupListItem[]}
  */
+
+// === OPERACJE I ZAPYTANIA REST API ===
 export function filterGroups(groups, query) {
   const normalized = query.trim().toLowerCase();
   if (!normalized) {

@@ -1,3 +1,9 @@
+/**
+ * @file useGroupShopSchedule.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupShopSchedule.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useState } from 'react';
 import { fetchGroupPreview, updateGroup } from '../../services/groups.api.js';
 import { notifyGroupContentChanged } from '../../utils/groupContentInvalidation.js';
@@ -5,9 +11,12 @@ import { notifyGroupContentChanged } from '../../utils/groupContentInvalidation.
 /**
  * @param {string | number | null | undefined} groupId
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useGroupRankPathSettings(groupId) {
   const [showMemberAvatars, setShowMemberAvatars] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+
+const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!groupId) {
@@ -57,9 +66,11 @@ export function useGroupRankPathSettings(groupId) {
 /**
  * @param {string | number | null | undefined} groupId
  */
+
 export function useGroupShopSchedule(groupId) {
   const [shopOpensAt, setShopOpensAt] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+
+const [isLoading, setIsLoading] = useState(true);
 
   const load = useCallback(async () => {
     if (!groupId) {
@@ -91,6 +102,7 @@ export function useGroupShopSchedule(groupId) {
     return { ok: false, error: result.error ?? 'Nie udało się zapisać harmonogramu otwarcia sklepu.' };
   }, [groupId]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     shopOpensAt,
     isLoading,

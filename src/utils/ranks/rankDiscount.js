@@ -1,3 +1,9 @@
+/**
+ * @file rankDiscount.js
+ * @description Funkcje pomocnicze i narzędziowe modułu rankDiscount.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 /** Domyślna zniżka sklepowa nowej rangi (brak zniżki). */
 export const DEFAULT_RANK_DISCOUNT = 0;
 
@@ -11,8 +17,10 @@ export function calculateDefaultRankDiscount(_ranks = []) {
   return DEFAULT_RANK_DISCOUNT;
 }
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 const RANKDISCOUNTLABEL__TEXTLABEL = {
-  polish: 'Zniżka w sklepie: {}%',
+
+polish: 'Zniżka w sklepie: {}%',
   english: 'Shop discount: {}%'
 };
 
@@ -24,7 +32,8 @@ const RANKDISCOUNTLABEL__TEXTLABEL = {
 export function formatRankDiscountLabel(discount, language) {
   const value = Number(discount ?? 0);
   const normalized = Number.isFinite(value) ? value : 0;
-  const formatted = Number.isInteger(normalized) ? String(normalized) : normalized.toFixed(2).replace(/\.?0+$/, '');
+
+const formatted = Number.isInteger(normalized) ? String(normalized) : normalized.toFixed(2).replace(/\.?0+$/, '');
   const lang = language ?? 'polish';
   return RANKDISCOUNTLABEL__TEXTLABEL[lang].replace('{}', formatted);
 }

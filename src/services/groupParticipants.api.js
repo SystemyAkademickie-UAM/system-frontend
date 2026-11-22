@@ -1,3 +1,9 @@
+/**
+ * @file groupParticipants.api.js
+ * @description Moduł komunikacji z API backendu realizujący operacje dla groupParticipants.
+ */
+
+// === IMPORTY I KONFIGURACJA KLIENTA API ===
 import { getJson } from './api-client.js';
 import { getAssetUrl } from '../constants/api.constants.js';
 import { fetchGroupStudents } from './students.api.js';
@@ -11,7 +17,8 @@ import { fetchGroupStudents } from './students.api.js';
  */
 export async function fetchGroupParticipants(groupId) {
   const result = await getJson(`/groups/${groupId}/participants`, { includeBrowserId: true });
-  if (!result.ok) {
+
+if (!result.ok) {
     return [];
   }
 
@@ -30,6 +37,7 @@ export async function fetchGroupParticipants(groupId) {
  * @param {{ isStudentView?: boolean }} [options]
  * @returns {Promise<import('./students.api.js').StudentListItem[]>}
  */
+
 export async function fetchMembersPageStudents(groupId, { isStudentView = false } = {}) {
   if (!isStudentView) {
     return fetchGroupStudents(groupId);

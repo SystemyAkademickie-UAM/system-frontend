@@ -1,3 +1,9 @@
+/**
+ * @file TextField.css
+ * @description Style interfejsu użytkownika i układ dla modułu TextField.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-text-field {
   display: flex;
   flex-direction: column;
@@ -11,6 +17,7 @@
   color: var(--color-text-secondary);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-text-field__control {
   width: 100%;
   box-sizing: border-box;
@@ -29,6 +36,7 @@
   resize: vertical;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-text-field__control:focus {
   border-color: var(--color-accent);
 }

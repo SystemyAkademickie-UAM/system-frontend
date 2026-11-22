@@ -1,11 +1,19 @@
+/**
+ * @file rankShopItemUnlock.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność rankShopItemUnlock.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, it, expect } from 'vitest';
 import {
   getRankShopItemIds,
   findRankOwningShopItem,
   buildShopItemOwnerMap,
-  normalizeShopItemId,
+
+normalizeShopItemId,
 } from './rankShopItemUnlock.js';
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('rankShopItemUnlock', () => {
   describe('normalizeShopItemId', () => {
     it('normalizuje id do stringa i trimuje', () => {

@@ -1,3 +1,9 @@
+/**
+ * @file decryptProductionLogExport.webcrypto.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność decryptProductionLogExport.webcrypto.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -16,7 +22,8 @@ async function encryptLikeServer(plaintext, clientPublicKeyBase64) {
     false,
     [],
   );
-  const serverPair = await crypto.subtle.generateKey(
+
+const serverPair = await crypto.subtle.generateKey(
     { name: 'ECDH', namedCurve: 'P-256' },
     true,
     ['deriveBits'],
@@ -35,7 +42,8 @@ async function encryptLikeServer(plaintext, clientPublicKeyBase64) {
     await crypto.subtle.encrypt({ name: 'AES-GCM', iv, tagLength: 128 }, aesKey, new TextEncoder().encode(plaintext)),
   );
   const ciphertext = encrypted.slice(0, encrypted.length - 16);
-  const authTag = encrypted.slice(encrypted.length - 16);
+
+const authTag = encrypted.slice(encrypted.length - 16);
   const serverRaw = new Uint8Array(await crypto.subtle.exportKey('raw', serverPair.publicKey));
   return {
     serverPublicKey: encodeBytesToBase64(serverRaw),
@@ -45,6 +53,7 @@ async function encryptLikeServer(plaintext, clientPublicKeyBase64) {
   };
 }
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('decryptProductionLogExport (Web Crypto)', () => {
   it('decrypts a payload produced with the same ECDH+AES-GCM contract', async () => {
     const keyPair = await generateLogExportKeyPair();

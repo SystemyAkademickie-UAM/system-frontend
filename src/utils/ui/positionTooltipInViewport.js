@@ -1,3 +1,9 @@
+/**
+ * @file positionTooltipInViewport.js
+ * @description Funkcje pomocnicze i narzędziowe modułu positionTooltipInViewport.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 export const VIEWPORT_EDGE_MARGIN = 8;
 export const TOOLTIP_GAP = 8;
 
@@ -81,6 +87,8 @@ export function positionCenteredTooltip({
  * @param {number} [options.gap]
  * @returns {{ left: number, top: number }}
  */
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 export function positionAnchoredTooltip({
   triggerRect,
   bubbleRect,
@@ -162,6 +170,7 @@ export function positionSideTooltip({
  * @param {number} [options.gap]
  * @returns {{ left: number, top: number, placement: 'below' | 'above' }}
  */
+
 export function positionDropdownMenu({
   triggerRect,
   panelRect,

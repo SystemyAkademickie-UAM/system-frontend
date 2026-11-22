@@ -1,4 +1,10 @@
 /**
+ * @file authLogos.css
+ * @description Style interfejsu użytkownika i układ dla modułu authLogos.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
+/**
  * Shared auth logo treatments (Figma-aligned).
  * Import from auth pages and AuthShell.
  */
@@ -8,7 +14,6 @@
   filter: grayscale(1) brightness(1.15);
 }
 
-/* Colors live in pionierid-logo.png in dark mode, and pionierid-logo-dark.png in light mode. */
 .auth-logo--pionier {
   display: block;
 }

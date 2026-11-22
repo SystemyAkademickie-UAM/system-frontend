@@ -1,0 +1,15 @@
+/**
+ * @file ProfileHomeContent.css
+ * @description Style interfejsu użytkownika i układ dla modułu ProfileHomeContent.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
+  width: 100%;
+  min-height: 12rem;
+}

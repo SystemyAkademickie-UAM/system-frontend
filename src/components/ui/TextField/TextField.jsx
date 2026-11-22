@@ -1,9 +1,16 @@
+/**
+ * @file TextField.jsx
+ * @description Komponent interfejsu użytkownika TextField.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useMemo } from 'react';
 import CharacterLimitedField from '../CharacterCounter/CharacterLimitedField.jsx';
 import { TEXT_FIELD_PRESETS } from '../../../constants/fieldLimits.js';
 import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../utils/validation/rewardsNumericValidation.js';
 import './TextField.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @typedef {'name' | 'stageName' | 'shortDescription' | 'groupDescription' | 'postContent' | 'postTitle'} TextFieldPreset
  */
@@ -27,6 +34,8 @@ import './TextField.css';
  * @param {boolean} [props.required]
  * @param {(event: import('react').KeyboardEvent) => void} [props.onKeyDown]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function TextField({
   id,
   label,
@@ -45,7 +54,8 @@ export default function TextField({
   required = false,
   onKeyDown,
 }) {
-  const preset = fieldKind ? TEXT_FIELD_PRESETS[fieldKind] : null;
+
+const preset = fieldKind ? TEXT_FIELD_PRESETS[fieldKind] : null;
   const multiline = multilineProp ?? preset?.multiline ?? false;
   const rows = rowsProp ?? preset?.rows ?? 4;
   const maxLength = maxLengthProp ?? preset?.maxLength;
@@ -106,6 +116,7 @@ export default function TextField({
     />
   );
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className={['maq-text-field', className].filter(Boolean).join(' ')}>
       {label ? (

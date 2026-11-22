@@ -1,3 +1,9 @@
+/**
+ * @file useGroupPreview.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupPreview.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useEffect, useState } from 'react';
 import { fetchGroupPreview } from '../../services/groups.api.js';
 
@@ -16,13 +22,16 @@ import { fetchGroupPreview } from '../../services/groups.api.js';
  * @param {string | undefined} groupId
  * @returns {GroupPreviewState}
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useGroupPreview(groupId) {
   const [group, setGroup] = useState(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+
+const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -76,5 +85,6 @@ export function useGroupPreview(groupId) {
     };
   }, [groupId]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return { group, hasAccess, isOwner, isEnrolled, isLoading, errorMessage };
 }

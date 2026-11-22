@@ -1,3 +1,9 @@
+/**
+ * @file lecturerTileActions.css
+ * @description Style interfejsu użytkownika i układ dla modułu lecturerTileActions.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 @media (max-width: 768px) {
   .rank-path-row__rank--lecturer .rank-path-row__actions,
   .badge-treasury-card--lecturer .badge-treasury-card__actions,

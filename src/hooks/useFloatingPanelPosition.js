@@ -1,3 +1,9 @@
+/**
+ * @file useFloatingPanelPosition.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useFloatingPanelPosition.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useLayoutEffect, useState } from 'react';
 
 /**
@@ -11,6 +17,8 @@ import { useCallback, useLayoutEffect, useState } from 'react';
  * @param {unknown[]} [options.deps]
  * @returns {Record<string, unknown> | null}
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useFloatingPanelPosition({
   open,
   triggerRef,
@@ -52,5 +60,6 @@ export function useFloatingPanelPosition({
     };
   }, [open, updateLayout, ...deps]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return layout;
 }

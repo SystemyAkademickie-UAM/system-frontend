@@ -1,9 +1,17 @@
+/**
+ * @file shopItemsCache.js
+ * @description Funkcje pomocnicze i narzędziowe modułu shopItemsCache.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { fetchGroupShopItems } from '../../services/shop.api.js';
 
 /** @type {Map<string, { timestamp: number, items: any[] }>} */
 const shopItemsCache = new Map();
 /** @type {Map<string, Promise<any[]>>} */
 const inFlightRequests = new Map();
+
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 const CACHE_TTL_MS = 60 * 1000;
 
 /**
@@ -23,7 +31,8 @@ export async function getCachedGroupShopItems(groupId) {
   }
 
   const promise = fetchGroupShopItems(groupId)
-    .then((res) => {
+
+.then((res) => {
       inFlightRequests.delete(key);
       if (res.ok && res.items) {
         shopItemsCache.set(key, { timestamp: Date.now(), items: res.items });
@@ -37,7 +46,8 @@ export async function getCachedGroupShopItems(groupId) {
     });
 
   inFlightRequests.set(key, promise);
-  return promise;
+
+return promise;
 }
 
 /**

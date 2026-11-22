@@ -1,3 +1,9 @@
+/**
+ * @file ProductCardMini.css
+ * @description Style karty komponentu ProductCardMini.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-product-card-mini {
   display: flex;
   align-items: center;
@@ -17,6 +23,7 @@
   background: var(--color-bg-elevated);
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-product-card-mini__thumb {
   display: block;
   width: 100%;
@@ -29,6 +36,7 @@
   line-height: 1;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-product-card-mini__content {
   display: flex;
   flex: 1 1 auto;

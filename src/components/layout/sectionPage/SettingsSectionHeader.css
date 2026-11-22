@@ -1,3 +1,9 @@
+/**
+ * @file SettingsSectionHeader.css
+ * @description Style interfejsu użytkownika i układ dla modułu SettingsSectionHeader.
+ */
+
+/* === STYLE BAZOWE I UKŁAD ELEMENTU === */
 .settings-section-header {
   margin: 0 0 0.75rem;
   font-size: clamp(1.1rem, 1.6vw, 1.35rem);
@@ -11,4 +17,3 @@
   display: inline-flex;
   align-items: center;
 }
-

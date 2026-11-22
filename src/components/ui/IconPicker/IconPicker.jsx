@@ -1,6 +1,13 @@
+/**
+ * @file IconPicker.jsx
+ * @description Komponent interfejsu użytkownika IconPicker.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import './IconPicker.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Siatka wyboru ikony z podglądem grafiki zamiast samego tekstu.
  *
@@ -11,6 +18,8 @@ import './IconPicker.css';
  * @param {string} [props.name='icon-picker']
  * @param {string} [props.ariaLabel='Wybierz ikonę']
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function IconPicker({
   icons = [],
   value,
@@ -18,10 +27,12 @@ export default function IconPicker({
   name = 'icon-picker',
   ariaLabel = 'Wybierz ikonę',
 }) {
-  if (icons.length === 0) {
+
+if (icons.length === 0) {
     return <p className="icon-picker__empty">Brak dostępnych ikon.</p>;
   }
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div className="icon-picker" role="radiogroup" aria-label={ariaLabel}>
       {icons.map((icon) => {

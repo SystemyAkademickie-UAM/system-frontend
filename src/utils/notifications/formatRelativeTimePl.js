@@ -1,3 +1,9 @@
+/**
+ * @file formatRelativeTimePl.js
+ * @description Funkcje pomocnicze i narzędziowe modułu formatRelativeTimePl.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 import { READLANGUAGECOOKIE } from '../LANGUAGECOOKIE.js';
 
 const SECOND_MS = 1000;
@@ -6,6 +12,7 @@ const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
 const WEEK_MS = 7 * DAY_MS;
 
+// === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
 /**
  * @param {number} count
  * @param {[string, string, string]} forms — [1, 2–4, 5+]
@@ -40,6 +47,7 @@ function pluralForm(count, polishForms, englishForms, language) {
  * @param {[string, string, string]} unitForms
  * @returns {string}
  */
+
 function timeLabel(count, polishUnitForms, englishUnitForms, language) {
   if (language === 'english') {
     return `${count} ${pluralForm(count, englishUnitForms, englishUnitForms, language)} ago`;
@@ -61,7 +69,8 @@ export function formatRelativeTimePl(value, nowMs = Date.now(), language) {
   }
 
   const diffMs = nowMs - date.getTime();
-  if (diffMs < 45 * SECOND_MS) {
+
+if (diffMs < 45 * SECOND_MS) {
     if (languageSelected === 'english') {
       return 'just now';
     } else if (languageSelected === 'polish') {

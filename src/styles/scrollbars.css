@@ -1,3 +1,9 @@
+/**
+ * @file scrollbars.css
+ * @description Style interfejsu użytkownika i układ dla modułu scrollbars.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-scroll,
 #main-content,
 .app-shell__main,
@@ -17,6 +23,8 @@
 .maq-modal__body::-webkit-scrollbar,
 .shop-item-form-modal .shop-item-form__layout::-webkit-scrollbar,
 .data-table-mobile__list::-webkit-scrollbar,
+
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .data-table__scroll-wrap::-webkit-scrollbar {
   width: var(--shell-page-scrollbar-width, 10px);
   height: var(--shell-page-scrollbar-width, 10px);
@@ -38,6 +46,8 @@
 #main-content::-webkit-scrollbar-thumb,
 .app-shell__main::-webkit-scrollbar-thumb,
 .auth-shell__panel-inner::-webkit-scrollbar-thumb,
+
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-modal__body::-webkit-scrollbar-thumb,
 .shop-item-form-modal .shop-item-form__layout::-webkit-scrollbar-thumb,
 .data-table-mobile__list::-webkit-scrollbar-thumb,

@@ -1,3 +1,9 @@
+/**
+ * @file ShopCartPanel.jsx
+ * @description Komponent interfejsu użytkownika ShopCartPanel.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import AssetSvg from '../AssetSvg/AssetSvg.jsx';
 import Button from '../Button/Button.jsx';
@@ -6,6 +12,7 @@ import ProductCardMini from '../ProductCardMini/ProductCardMini.jsx';
 import { SVG_ICONS } from '../../../constants/svgIcons.js';
 import './ShopCartPanel.css';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Pływający koszyk sklepu z listą pozycji.
  *
@@ -18,6 +25,8 @@ import './ShopCartPanel.css';
  * @param {boolean} [props.disabled=false]
  * @param {string} [props.className]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function ShopCartPanel({
   cartCount,
   cartItems,
@@ -31,7 +40,8 @@ export default function ShopCartPanel({
   const [offsetShift, setOffsetShift] = useState(0);
   const panelId = useId();
   const rootRef = useRef(null);
-  const panelRef = useRef(null);
+
+const panelRef = useRef(null);
 
   const closePanel = useCallback(() => {
     setIsOpen(false);
@@ -99,6 +109,7 @@ export default function ShopCartPanel({
     };
   }, [isOpen, closePanel]);
 
+// === RENDEROWANIE WIDOKU ===
   return (
     <div
       ref={rootRef}

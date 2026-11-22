@@ -1,3 +1,9 @@
+/**
+ * @file useGroupItemCategories.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupItemCategories.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { fetchGroupItemCategories } from '../../services/itemCategories.api.js';
@@ -5,10 +11,13 @@ import { fetchGroupItemCategories } from '../../services/itemCategories.api.js';
 /**
  * @param {string | number | undefined} groupId
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useGroupItemCategories(groupId) {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+
+const [error, setError] = useState('');
 
   const refetch = useCallback(async () => {
     if (!groupId) {
@@ -40,6 +49,7 @@ export function useGroupItemCategories(groupId) {
     [categories],
   );
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     categories,
     categoriesById,

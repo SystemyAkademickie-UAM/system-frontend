@@ -1,29 +1,43 @@
+/**
+ * @file Sidebar.jsx
+ * @description Komponent interfejsu użytkownika Sidebar.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { useOptionalGroupId } from '../../hooks/useOptionalGroupId.js';
 import { useGroupPreview } from '../../hooks/groups/useGroupPreview.js';
-import { resolveShellView } from '../../navigation/shellTemplates.config.js';
+import { APP_ROLE, resolveShellView } from '../../navigation/shellTemplates.config.js';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
-import { groupsListPath } from '../../routes/pathRegistry.js';
+import { adminHomePath, groupsListPath, organizationsPath } from '../../routes/pathRegistry.js';
 import SidebarBrand from './sidebar/SidebarBrand.jsx';
 import SidebarGroupsCtaButton from './sidebar/SidebarGroupsCtaButton.jsx';
 import SidebarNavItem from './sidebar/SidebarNavItem.jsx';
 import SidebarNavRail from './sidebar/SidebarNavRail.jsx';
 import './navigation-shell.css';
 
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function Sidebar({ onNavigate }) {
   const { role } = useAppRole();
   const groupId = useOptionalGroupId();
   const { isOwner } = useGroupPreview(groupId);
-  const shell = resolveShellView(role, { groupId, isGroupOwner: isOwner });
+
+const shell = resolveShellView(role, { groupId, isGroupOwner: isOwner });
 
   const handleNav = () => {
     onNavigate?.();
   };
 
-  const groupsListRoute = shell.ctaItems.find((item) => item.id === 'twoje-kursy')?.to ?? groupsListPath();
+  const defaultRoute =
+    role === APP_ROLE.SUPERADMIN
+      ? organizationsPath()
+      : role === APP_ROLE.ADMIN
+        ? adminHomePath()
+        : (shell.ctaItems.find((item) => item.id === 'twoje-kursy')?.to ?? groupsListPath());
 
+  // === RENDEROWANIE WIDOKU ===
   return (
     <aside className="sidebar" aria-label="Nawigacja aplikacji">
-      <SidebarBrand to={groupsListRoute} onNavigate={handleNav} />
+      <SidebarBrand to={defaultRoute} onNavigate={handleNav} />
 
       <div className="sidebar__cta-group">
         {shell.ctaItems.map((item) => (

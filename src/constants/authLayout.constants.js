@@ -1,13 +1,23 @@
+/**
+ * @file authLayout.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu authLayout.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 /** Card width as fraction of 1920px Figma artboard (569 / 1920). */
 export const AUTH_CARD_VIEWPORT_WIDTH_RATIO = 569 / 1920;
 
 /** Inner content width as fraction of 1920px artboard (501 / 1920). */
+
 export const AUTH_CONTENT_VIEWPORT_WIDTH_RATIO = 501 / 1920;
 
 /** Panel width as fraction of 1920px artboard (1113 / 1920). */
+
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 export const AUTH_PANEL_VIEWPORT_WIDTH_RATIO = 1113 / 1920;
 
 /** Auth card min height at 1920px — synced with `--auth-card-min-height` in AuthShell.css. */
+
 export const AUTH_CARD_MIN_HEIGHT_PX = 558;
 
 /** Footer MAQ logo opacity — matches muted footer text on `#282834`. */

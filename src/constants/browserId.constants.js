@@ -1,13 +1,23 @@
+/**
+ * @file browserId.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu browserId.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 /** localStorage key for stable `X-Browser-ID` across reloads. */
 export const BROWSER_ID_LOCAL_STORAGE_KEY = 'maq.browserId';
 
 /** @deprecated Migrated automatically to {@link BROWSER_ID_LOCAL_STORAGE_KEY}. */
+
 export const BROWSER_ID_LOCAL_STORAGE_KEY_LEGACY = 'maq.smokeTest.browserUuid';
 
 /** @deprecated Orphan key from an older frontend build; removed during migration. */
+
+// === SŁOWNIKI, MAPOWANIA I EKSPORTY ===
 export const BROWSER_ID_LOCAL_STORAGE_KEY_ORPHAN = 'maq.browserUuid';
 
 /** sessionStorage: browser id pinned when starting SAML (must match ACS RelayState). */
+
 export const BROWSER_ID_SAML_PENDING_SESSION_KEY = 'maq.samlPendingBrowserId';
 
 /** RFC 4122 UUID (matches backend `BROWSER_ID_UUID_REGEX`). */

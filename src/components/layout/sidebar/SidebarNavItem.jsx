@@ -1,3 +1,9 @@
+/**
+ * @file SidebarNavItem.jsx
+ * @description Komponent interfejsu użytkownika SidebarNavItem.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import SidebarNavLinkButton from './SidebarNavLinkButton.jsx';
 import SidebarNavSpacer from './SidebarNavSpacer.jsx';
 import SidebarNavTreeExpandableButton from './SidebarNavTreeExpandableButton.jsx';
@@ -5,6 +11,7 @@ import SidebarNavTreeGroupButton from './SidebarNavTreeGroupButton.jsx';
 import SidebarNavTreeItemButton from './SidebarNavTreeItemButton.jsx';
 import SidebarNavUnavailableButton from './SidebarNavUnavailableButton.jsx';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * Renderuje pojedynczą pozycję paska nawigacji (w tym zagnieżdżone drzewka).
  *
@@ -12,8 +19,11 @@ import SidebarNavUnavailableButton from './SidebarNavUnavailableButton.jsx';
  * @param {Object} props.item — pozycja po `resolveShellView`
  * @param {() => void} [props.onNavigate]
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function SidebarNavItem({ item, onNavigate }) {
-  if (!item) {
+
+if (!item) {
     return null;
   }
 

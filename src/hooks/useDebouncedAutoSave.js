@@ -1,16 +1,25 @@
+/**
+ * @file useDebouncedAutoSave.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useDebouncedAutoSave.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useEffect, useRef } from 'react';
 
 /**
  * Uruchamia zapis po zmianie wartości formularza (z debounce).
  * Pierwszy przebieg po `enabled === true` jest pomijany — to hydratacja danych.
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useDebouncedAutoSave({
   enabled,
   values,
   onSave,
   delay = 450,
 }) {
-  const isReadyRef = useRef(false);
+
+const isReadyRef = useRef(false);
   const timeoutRef = useRef(null);
   const onSaveRef = useRef(onSave);
   onSaveRef.current = onSave;

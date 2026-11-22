@@ -1,0 +1,290 @@
+/**
+ * @file MaintenancePage.css
+ * @description Style dedykowanej strony przerwy technicznej (/maintenance).
+ */
+
+.maintenance-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-app, #282834);
+  color: var(--color-text-primary, #d9d9d9);
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.maintenance-page__header.super-bar {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.maintenance-page__header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.maintenance-page__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.maintenance-page__logo {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.maintenance-page__app-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary, #d9d9d9);
+}
+
+.maintenance-page__status-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  background: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.maintenance-page__main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+}
+
+.maintenance-card {
+  max-width: 580px;
+  width: 100%;
+  background: var(--color-bg-surface, #1a1a2a);
+  border: 1px solid var(--color-separator-one, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.maintenance-card__icon-container {
+  width: 54px;
+  height: 54px;
+  border-radius: 8px;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.maintenance-card__icon {
+  width: 28px;
+  height: 28px;
+  color: #facc15;
+}
+
+.maintenance-card__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary, #ffffff);
+}
+
+.maintenance-card__message {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-secondary, #bbcbb9);
+  margin: 0 0 1.5rem 0;
+  max-width: 480px;
+}
+
+.maintenance-card__skeleton {
+  width: 100%;
+  max-width: 460px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  animation: maintenance-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes maintenance-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.maintenance-card__estimate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-separator, rgba(255, 255, 255, 0.06));
+  font-size: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+.maintenance-card__estimate-label {
+  color: var(--color-text-secondary, #bbcbb9);
+}
+
+.maintenance-card__estimate-value {
+  color: var(--color-accent, #1ecc38);
+  font-weight: 600;
+}
+
+.maintenance-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.maintenance-card__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.65rem 1.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.maintenance-card__button--primary {
+  background: var(--color-accent, #1ecc38);
+  color: #002a10;
+}
+
+.maintenance-card__button--primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.maintenance-card__button--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.maintenance-card__button--secondary {
+  background: var(--color-bg-elevated, #292839);
+  color: var(--color-text-primary, #ffffff);
+  border-color: var(--color-separator-one, rgba(255, 255, 255, 0.12));
+}
+
+.maintenance-card__button--secondary:hover {
+  background: color-mix(in srgb, var(--color-bg-elevated, #292839) 80%, white);
+}
+
+.maintenance-card__button--ghost {
+  background: transparent;
+  color: var(--color-text-secondary, #bbcbb9);
+  border-color: var(--color-separator-one, rgba(255, 255, 255, 0.12));
+}
+
+.maintenance-card__button--ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary, #ffffff);
+}
+
+.maintenance-card__feedback {
+  font-size: 0.85rem;
+  color: #facc15;
+}
+
+.maintenance-card__super-box {
+  width: 100%;
+  background: rgba(30, 204, 56, 0.06);
+  border: 1px solid rgba(30, 204, 56, 0.2);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  text-align: left;
+  box-sizing: border-box;
+  margin-top: 0.5rem;
+}
+
+.maintenance-card__super-header {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-accent, #1ecc38);
+  margin-bottom: 0.35rem;
+}
+
+.maintenance-card__super-desc {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary, #bbcbb9);
+  margin: 0 0 0.85rem 0;
+}
+
+.maintenance-card__super-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.maintenance-card__secondary-links {
+  margin-top: 0.5rem;
+}
+
+.maintenance-card__text-link {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary, #bbcbb9);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem;
+}
+
+.maintenance-card__text-link:hover {
+  color: var(--color-text-primary, #ffffff);
+}
+
+.maintenance-page__footer {
+  max-width: 860px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-separator, rgba(255, 255, 255, 0.06));
+}
+
+@media (max-width: 640px) {
+  .maintenance-card {
+    padding: 1.75rem 1.25rem;
+  }
+  .maintenance-page__header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+}
+

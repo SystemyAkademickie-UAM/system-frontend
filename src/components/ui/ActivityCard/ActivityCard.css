@@ -1,3 +1,9 @@
+/**
+ * @file ActivityCard.css
+ * @description Style karty komponentu ActivityCard.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-activity-card {
   box-sizing: border-box;
   display: flex;
@@ -15,6 +21,7 @@
   overflow-y: auto;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-activity-card__name {
   margin: 0;
   font-size: var(--font-size-activity-title);
@@ -31,6 +38,7 @@
   color: var(--color-text-secondary);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-activity-card__didactic {
   margin: 0;
   font-size: var(--font-size-activity-body);

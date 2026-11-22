@@ -1,3 +1,9 @@
+/**
+ * @file useGroupBacklogNotifications.js
+ * @description Niestandardowy hook React enkapsulujący logikę dla useGroupBacklogNotifications.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI HOOKA ===
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   fetchGroupBacklog,
@@ -29,6 +35,8 @@ const FETCHERROR__TEXTLABEL = {
  * @param {string | number | null | undefined} groupId
  * @param {{ isStudentView?: boolean, enabled?: boolean, take?: number, skip?: number, pollMs?: number }} [options]
  */
+
+// === DEFINICJA HOOKA I ZARZĄDZANIE STANEM ===
 export function useGroupBacklogNotifications(groupId, {
   isStudentView = false,
   enabled = true,
@@ -44,7 +52,8 @@ export function useGroupBacklogNotifications(groupId, {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(Boolean(groupId) && isEnabled);
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-  const [error, setError] = useState('');
+
+const [error, setError] = useState('');
 
   const refetch = useCallback(async ({ silent = false } = {}) => {
     if (!groupId || !isEnabled) {
@@ -230,6 +239,7 @@ export function useGroupBacklogNotifications(groupId, {
     return result;
   }, [groupId]);
 
+// === ZWRACANY STAN I INTERFEJS ===
   return {
     items,
     notifications,

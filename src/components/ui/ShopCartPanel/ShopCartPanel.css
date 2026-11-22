@@ -1,3 +1,9 @@
+/**
+ * @file ShopCartPanel.css
+ * @description Style interfejsu użytkownika i układ dla modułu ShopCartPanel.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-shop-cart {
   position: relative;
   z-index: 20;
@@ -56,6 +62,7 @@
   text-align: center;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-shop-cart__panel {
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -102,6 +109,7 @@
   min-width: 0;
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-shop-cart__remove-btn {
   flex-shrink: 0;
   display: inline-flex;

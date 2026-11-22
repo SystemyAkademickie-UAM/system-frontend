@@ -1,3 +1,9 @@
+/**
+ * @file alphanumericValidation.js
+ * @description Funkcje pomocnicze i narzędziowe modułu alphanumericValidation.
+ */
+
+// === IMPORTY I STAŁE MODUŁU ===
 export function validateAlphanumericInput(value) {
   const trimmed = value.trim();
 

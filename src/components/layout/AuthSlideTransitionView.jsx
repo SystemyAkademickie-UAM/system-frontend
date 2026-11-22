@@ -1,5 +1,12 @@
+/**
+ * @file AuthSlideTransitionView.jsx
+ * @description Komponent interfejsu użytkownika AuthSlideTransitionView.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
 import { AUTH_TRANSITION_PHASE } from './useAuthSequentialTransition.js';
 
+// === STAŁE I ETYKIETY JĘZYKOWE ===
 /**
  * @param {Object} props
  * @param {'idle' | 'exit' | 'enter'} props.phase
@@ -7,8 +14,11 @@ import { AUTH_TRANSITION_PHASE } from './useAuthSequentialTransition.js';
  * @param {React.ReactNode} props.settledNode
  * @param {{ from: { node: React.ReactNode }, to: { node: React.ReactNode }, direction: 'forward' | 'back' } | null} props.payload
  */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function AuthSlideTransitionView({ phase, direction, settledNode, payload }) {
-  return (
+
+return (
     <div className="auth-shell__transition-viewport">
       {phase === AUTH_TRANSITION_PHASE.IDLE && (
         <div className="auth-shell__transition-pane auth-shell__transition-pane--settled">

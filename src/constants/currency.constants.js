@@ -1,3 +1,9 @@
+/**
+ * @file currency.constants.js
+ * @description Zestaw stałych konfiguracyjnych i parametrów systemowych dla modułu currency.
+ */
+
+// === STAŁE BAZOWE I PARAMETRY SYSTEMOWE ===
 /** Domyślny symbol waluty grupy (placeholder do czasu API konfiguracji waluty). */
 export const DEFAULT_CURRENCY_SYMBOL = '🥕';
 

@@ -1,9 +1,18 @@
-import GroupBanner from '../../pages/content/group-shared/GroupBanner/GroupBanner.jsx';
+/**
+ * @file GroupBannerSection.jsx
+ * @description Komponent interfejsu użytkownika GroupBannerSection.
+ */
+
+// === IMPORTY I ZALEŻNOŚCI ===
+import GroupBanner from '../../pages/groups/group-shared/GroupBanner/GroupBanner.jsx';
 import { useGroupDetails } from '../../hooks/groups/useGroupDetails.js';
 
 /** Baner grupy współdzielony między widokami studenta (main, sklep, ranking). */
+
+// === GŁÓWNY KOMPONENT WIDOKU ===
 export default function GroupBannerSection({ groupId }) {
-  const { group, isLoading, errorMessage } = useGroupDetails(groupId);
+
+const { group, isLoading, errorMessage } = useGroupDetails(groupId);
 
   return (
     <>

@@ -1,0 +1,252 @@
+/**
+ * @file DevToolsPage.css
+ * @description Nowoczesne, czytelne i schludne style dla widoku Narzędzi Deweloperskich (/dev/tools).
+ */
+
+.dev-tools-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+}
+
+.dev-tools-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dev-tools-header__title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #ffffff);
+}
+
+.dev-tools-header__desc {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary, #9ca3af);
+  line-height: 1.5;
+}
+
+/* Kontekst globalny dla narzędzi */
+.dev-tools-context-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--color-bg-surface, #1a1a2a);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 8px);
+  flex-wrap: wrap;
+}
+
+.dev-tools-context-card__info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.dev-tools-context-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dev-tools-context-item__label {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #9ca3af);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dev-tools-context-item__value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #ffffff);
+}
+
+/* 4 Segmenty ról */
+.dev-tools-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+}
+
+.dev-role-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background-color: var(--color-bg-surface, #1a1a2a);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 8px);
+}
+
+.dev-role-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.85rem;
+}
+
+.dev-role-section__title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dev-role-section__title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #ffffff);
+}
+
+.dev-role-section__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.dev-role-section__badge--super {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.dev-role-section__badge--admin {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.dev-role-section__badge--lecturer {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.dev-role-section__badge--student {
+  background-color: rgba(30, 204, 56, 0.15);
+  color: #86efac;
+  border: 1px solid rgba(30, 204, 56, 0.3);
+}
+
+.dev-role-section__desc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary, #9ca3af);
+}
+
+/* Siatka narzędzi wewnątrz segmentu */
+.dev-role-section__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.dev-tool-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm, 6px);
+  transition: all 0.15s ease;
+}
+
+.dev-tool-card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.dev-tool-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.dev-tool-card__name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #ffffff);
+}
+
+.dev-tool-card__details {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary, #9ca3af);
+  line-height: 1.4;
+}
+
+.dev-tool-card__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.dev-tool-card__controls select,
+.dev-tool-card__controls input {
+  padding: 0.35rem 0.6rem;
+  background-color: var(--color-bg-elevated, #292839);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm, 4px);
+  color: var(--color-text-primary, #ffffff);
+  font-size: 0.85rem;
+}
+
+.dev-tool-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+/* Wyniki logów operacji */
+.dev-tools-console {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #12121a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md, 8px);
+  max-height: 240px;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+}
+
+.dev-tools-console__entry {
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.dev-tools-console__entry--success {
+  color: #86efac;
+}
+
+.dev-tools-console__entry--error {
+  color: #fca5a5;
+}
+
+.dev-tools-console__entry--info {
+  color: #93c5fd;
+}
+

@@ -1,6 +1,13 @@
+/**
+ * @file formatBacklogNotification.test.js
+ * @description Zestaw testów jednostkowych weryfikujących funkcjonalność formatBacklogNotification.
+ */
+
+// === IMPORTY I ŚRODOWISKO TESTOWE ===
 import { describe, expect, it } from 'vitest';
 import { formatBacklogNotification } from './formatBacklogNotification.js';
 
+// === SCENARIUSZE TESTOWE (SUITE) ===
 describe('formatBacklogNotification', () => {
   const groupId = 100001;
 

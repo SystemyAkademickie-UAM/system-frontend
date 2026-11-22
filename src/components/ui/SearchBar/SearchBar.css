@@ -1,3 +1,9 @@
+/**
+ * @file SearchBar.css
+ * @description Style interfejsu użytkownika i układ dla modułu SearchBar.
+ */
+
+/* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .maq-search-bar {
   position: relative;
   display: flex;
@@ -9,6 +15,7 @@
   border-radius: 10px;
 }
 
+/* === ELEMENTY WEWNĘTRZNE I TREŚĆ === */
 .maq-search-bar__icon {
   position: absolute;
   left: 0.75rem;
@@ -39,6 +46,7 @@
   color: var(--color-text-primary);
 }
 
+/* === WARIANTY WIZUALNE I STANY INTERAKCJI === */
 .maq-search-bar__input::placeholder {
   color: var(--color-input-placeholder);
 }
