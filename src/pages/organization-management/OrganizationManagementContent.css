@@ -260,9 +260,13 @@
 }
 
 .org-admins-modal__hint {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   color: var(--color-text-secondary, #9ca3af);
   margin: 0;
+}
+
+.org-admins-modal__form .maq-text-field {
+  margin-bottom: 0.75rem;
 }
 
 .org-admins-modal__list-container {
