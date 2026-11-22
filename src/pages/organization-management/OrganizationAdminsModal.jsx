@@ -3,7 +3,7 @@
  * @description Wybór osoby z organizacji i nadanie jej roli osoby administrującej.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../../components/ui/Modal/Modal.jsx';
 import TextField from '../../components/ui/TextField/TextField.jsx';
 import SearchBar from '../../components/ui/SearchBar/SearchBar.jsx';
@@ -13,7 +13,7 @@ import { useToast } from '../../components/ui/Toast/Toast.jsx';
 import { useSessionOptional } from '../../context/SessionContext.jsx';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import {
-  createFirstOrganizationAdministrator,
+  grantOrganizationAdministratorByEmail,
   grantOrganizationAdministrator,
   listOrganizationAdministratorCandidates,
   listOrganizationAdministrators,
@@ -35,14 +35,14 @@ const COPY = {
     emptyPeople: 'Wszyscy użytkownicy w tej organizacji posiadają uprawnienia administratora.',
     emptyAssigned: 'Nikt jeszcze nie administruje tą organizacją.',
     noMatch: 'Brak osób pasujących do wyszukiwania.',
-    samlEmpty: 'Osoby pojawią się tutaj po pierwszym logowaniu przez instytucję.',
-    firstTitle: 'Pierwsza osoba administrująca',
-    firstHint: 'W tej organizacji nie ma jeszcze nikogo. Podaj dane osoby. Dostanie konto i będzie mogła wejść łączem z wiadomości e-mail.',
-    firstName: 'Imię',
-    firstSurname: 'Nazwisko',
-    firstEmail: 'Adres e-mail',
-    firstSave: 'Dodaj osobę administrującą',
-    firstSaving: 'Dodawanie...',
+    samlEmpty: 'Logowanie przez instytucję nie nadaje tej roli. Gdy osoba ma już konto w tej organizacji, wybierz ją na liście.',
+    addTitle: 'Dodaj osobę administrującą',
+    addHint: 'W organizacji z logowaniem e-mail nikt nie dołącza sam. Podaj imię, nazwisko i adres. Osoba dostanie konto i wejdzie łączem z wiadomości.',
+    personName: 'Imię',
+    personSurname: 'Nazwisko',
+    personEmail: 'Adres e-mail',
+    addPerson: 'Dodaj i nadaj rolę',
+    addingPerson: 'Dodawanie...',
     granted: 'Rola osoby administrującej została nadana.',
     created: 'Konto zostało utworzone. Ta osoba może poprosić o łącze logowania.',
     revoked: 'Rola osoby administrującej została odebrana.',
@@ -67,14 +67,14 @@ const COPY = {
     emptyPeople: 'All users in this organization already have the administrator role.',
     emptyAssigned: 'Nobody administers this organization yet.',
     noMatch: 'No people match this search.',
-    samlEmpty: 'People appear here after they sign in through their institution.',
-    firstTitle: 'First administering person',
-    firstHint: 'This organization has nobody yet. Enter the person. They receive an account and can sign in with an email link.',
-    firstName: 'Name',
-    firstSurname: 'Surname',
-    firstEmail: 'Email address',
-    firstSave: 'Add administering person',
-    firstSaving: 'Adding...',
+    samlEmpty: 'Institutional sign-in does not grant this role. When a person already has an account in this organization, choose them in the list.',
+    addTitle: 'Add an administering person',
+    addHint: 'Nobody joins an email organization on their own. Enter the name, surname, and address. They receive an account and sign in with an email link.',
+    personName: 'Name',
+    personSurname: 'Surname',
+    personEmail: 'Email address',
+    addPerson: 'Add and grant the role',
+    addingPerson: 'Adding...',
     granted: 'The administering role was granted.',
     created: 'The account was created. This person can request a login link.',
     revoked: 'The administering role was removed.',
@@ -104,8 +104,8 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
   const [query, setQuery] = useState('');
   const [grantingId, setGrantingId] = useState(null);
   const [revokingId, setRevokingId] = useState(null);
-  const [firstPerson, setFirstPerson] = useState({ name: '', surname: '', email: '' });
-  const [creatingFirst, setCreatingFirst] = useState(false);
+  const [emailPerson, setEmailPerson] = useState({ name: '', surname: '', email: '' });
+  const [grantingByEmail, setGrantingByEmail] = useState(false);
 
   const loadPeople = useCallback(async () => {
     if (!organization) {
@@ -129,7 +129,7 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
   useEffect(() => {
     if (isOpen && organization) {
       setQuery('');
-      setFirstPerson({ name: '', surname: '', email: '' });
+      setEmailPerson({ name: '', surname: '', email: '' });
       loadPeople();
     }
   }, [isOpen, organization, loadPeople]);
@@ -157,8 +157,8 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
     });
   }, [candidates, query, callerUserId]);
 
-  const organizationIsEmpty = admins.length === 0 && candidates.length === 0;
-  const canCreateFirstPerson = organizationIsEmpty && organization?.loginMethod === 'email';
+  const waitingListEmpty = admins.length === 0 && candidates.length === 0;
+  const canAddByEmail = organization?.loginMethod === 'email';
 
   async function handleGrant(person) {
     setGrantingId(person.userId);
@@ -176,25 +176,25 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
     }
   }
 
-  async function handleCreateFirst(event) {
+  async function handleGrantByEmail(event) {
     event.preventDefault();
-    if (!firstPerson.name.trim() || !firstPerson.surname.trim()) {
+    if (!emailPerson.name.trim() || !emailPerson.surname.trim()) {
       showError(copy.nameRequired);
       return;
     }
-    if (!firstPerson.email.includes('@')) {
+    if (!emailPerson.email.includes('@')) {
       showError(copy.emailRequired);
       return;
     }
-    setCreatingFirst(true);
+    setGrantingByEmail(true);
     try {
-      await createFirstOrganizationAdministrator(organization.id, {
-        email: firstPerson.email.trim(),
-        name: firstPerson.name.trim(),
-        surname: firstPerson.surname.trim(),
+      await grantOrganizationAdministratorByEmail(organization.id, {
+        email: emailPerson.email.trim(),
+        name: emailPerson.name.trim(),
+        surname: emailPerson.surname.trim(),
       });
       showSuccess(copy.created);
-      setFirstPerson({ name: '', surname: '', email: '' });
+      setEmailPerson({ name: '', surname: '', email: '' });
       await loadPeople();
       if (onAdminListChanged) {
         onAdminListChanged();
@@ -202,7 +202,7 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
     } catch (err) {
       showError(err instanceof Error ? err.message : copy.grantError);
     } finally {
-      setCreatingFirst(false);
+      setGrantingByEmail(false);
     }
   }
 
@@ -243,42 +243,42 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
           </div>
         ) : (
           <>
-            {canCreateFirstPerson ? (
-              <form className="org-admins-modal__form" onSubmit={handleCreateFirst}>
-                <h4 className="org-admins-modal__list-title">{copy.firstTitle}</h4>
-                <p className="org-admins-modal__hint">{copy.firstHint}</p>
+            {canAddByEmail ? (
+              <form className="org-admins-modal__form" onSubmit={handleGrantByEmail}>
+                <h4 className="org-admins-modal__list-title">{copy.addTitle}</h4>
+                <p className="org-admins-modal__hint">{copy.addHint}</p>
                 <TextField
-                  id="first-admin-name"
-                  label={copy.firstName}
-                  value={firstPerson.name}
-                  onChange={(event) => setFirstPerson((current) => ({ ...current, name: event.target.value }))}
-                  disabled={creatingFirst}
+                  id="admin-email-name"
+                  label={copy.personName}
+                  value={emailPerson.name}
+                  onChange={(event) => setEmailPerson((current) => ({ ...current, name: event.target.value }))}
+                  disabled={grantingByEmail}
                 />
                 <TextField
-                  id="first-admin-surname"
-                  label={copy.firstSurname}
-                  value={firstPerson.surname}
-                  onChange={(event) => setFirstPerson((current) => ({ ...current, surname: event.target.value }))}
-                  disabled={creatingFirst}
+                  id="admin-email-surname"
+                  label={copy.personSurname}
+                  value={emailPerson.surname}
+                  onChange={(event) => setEmailPerson((current) => ({ ...current, surname: event.target.value }))}
+                  disabled={grantingByEmail}
                 />
                 <TextField
-                  id="first-admin-email"
-                  label={copy.firstEmail}
-                  value={firstPerson.email}
-                  onChange={(event) => setFirstPerson((current) => ({ ...current, email: event.target.value }))}
-                  disabled={creatingFirst}
+                  id="admin-email-address"
+                  label={copy.personEmail}
+                  value={emailPerson.email}
+                  onChange={(event) => setEmailPerson((current) => ({ ...current, email: event.target.value }))}
+                  disabled={grantingByEmail}
                 />
-                <Button type="submit" disabled={creatingFirst}>
-                  {creatingFirst ? copy.firstSaving : copy.firstSave}
+                <Button type="submit" disabled={grantingByEmail}>
+                  {grantingByEmail ? copy.addingPerson : copy.addPerson}
                 </Button>
               </form>
             ) : null}
 
-            {organizationIsEmpty && organization?.loginMethod !== 'email' ? (
+            {!canAddByEmail && waitingListEmpty ? (
               <p className="org-admins-modal__hint">{copy.samlEmpty}</p>
             ) : null}
 
-            {!organizationIsEmpty ? (
+            {!waitingListEmpty ? (
               <div className="org-admins-modal__search-wrapper">
                 <SearchBar
                   value={query}
@@ -289,7 +289,7 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
               </div>
             ) : null}
 
-            {!organizationIsEmpty ? (
+            {!waitingListEmpty ? (
               <div className="org-admins-modal__list-container">
                 <h4 className="org-admins-modal__list-title">{copy.assigned} ({admins.length})</h4>
                 {visibleAdmins.length === 0 ? (
@@ -319,7 +319,7 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
               </div>
             ) : null}
 
-            {!organizationIsEmpty ? (
+            {!waitingListEmpty ? (
               <div className="org-admins-modal__list-container">
                 <h4 className="org-admins-modal__list-title">{copy.peopleWithoutAdmin} ({candidates.length})</h4>
                 {visibleCandidates.length === 0 ? (
@@ -357,4 +357,3 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
     </Modal>
   );
 }
-

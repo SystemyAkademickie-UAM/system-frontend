@@ -163,11 +163,15 @@ function roleLabel(role, copy) {
   return role ?? '';
 }
 
-function validatePerson(form, needsEmail, copy) {
+function validatePerson(form, needsEmail, copy, canManageAdministrators = false) {
   if (needsEmail && (!form.email || !form.email.trim().includes('@'))) return copy.emailInvalid;
   if (!form.name?.trim() || !form.surname?.trim() || !form.nickname?.trim()) return copy.nameRequired;
   const roles = Array.isArray(form.roles) ? form.roles : (form.role ? [form.role] : []);
   if (roles.length === 0) return copy.atLeastOneRoleRequired;
+  if (!canManageAdministrators && roles.includes(ACCOUNT_ROLE_ADMINISTRATOR)) {
+    // If user cannot manage administrators and is attempting to add administrator role
+    return copy.roleInvalid;
+  }
   return '';
 }
 
@@ -182,6 +186,8 @@ export default function UserManagementContent() {
     session.user?.roles?.includes('super') ||
     session.user?.activeRole === 'super' ||
     session.user?.role === 'super';
+  const canManageAdministrators =
+    session.user?.activeRole === ACCOUNT_ROLE_SUPER || session.user?.role === ACCOUNT_ROLE_SUPER;
 
   const [organizations, setOrganizations] = useState([]);
   const [activeOrgId, setActiveOrgId] = useState(session.user?.organizationId ?? null);
@@ -477,7 +483,7 @@ export default function UserManagementContent() {
   }
 
   async function saveNew(addAnother) {
-    const problem = validatePerson(form, true, copy);
+    const problem = validatePerson(form, true, copy, canManageAdministrators);
     if (problem) {
       showError(problem);
       return;
@@ -509,7 +515,7 @@ export default function UserManagementContent() {
 
   async function saveEdit() {
     if (!editing) return;
-    const problem = validatePerson(form, false, copy);
+    const problem = validatePerson(form, false, copy, canManageAdministrators);
     if (problem) {
       showError(problem);
       return;
@@ -836,6 +842,7 @@ export default function UserManagementContent() {
           onRemove={removeRole}
           onSendLink={sendLink}
           onExit={() => setUserModalOpen(false)}
+          canManageAdministrators={canManageAdministrators}
         />
       </Modal>
 

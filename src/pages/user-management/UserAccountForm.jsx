@@ -49,6 +49,7 @@ export default function UserAccountForm({
   onRemove,
   onSendLink,
   onExit,
+  canManageAdministrators = false,
 }) {
   const selectedRoles = Array.isArray(form.roles)
     ? form.roles
@@ -73,10 +74,14 @@ export default function UserAccountForm({
     ...(allowSuper || selectedRoles.includes(ACCOUNT_ROLE_SUPER)
       ? [{ value: ACCOUNT_ROLE_SUPER, label: copy.superadmin ?? 'Osoba nadzorująca' }]
       : []),
-    { value: ACCOUNT_ROLE_ADMINISTRATOR, label: copy.administrator },
+    ...(canManageAdministrators || selectedRoles.includes(ACCOUNT_ROLE_ADMINISTRATOR)
+      ? [{ value: ACCOUNT_ROLE_ADMINISTRATOR, label: copy.administrator }]
+      : []),
     { value: ACCOUNT_ROLE_LECTURER, label: copy.lecturer },
     { value: ACCOUNT_ROLE_STUDENT, label: copy.student },
   ];
+
+  const showRemove = canManageAdministrators || !selectedRoles.includes(ACCOUNT_ROLE_ADMINISTRATOR);
 
   return (
     <form className="user-management__form-modal" onSubmit={(event) => event.preventDefault()}>
@@ -162,7 +167,7 @@ export default function UserAccountForm({
         <Button variant="ghost" onClick={onExit}>
           {copy.exit}
         </Button>
-        {mode === 'edit' ? (
+        {mode === 'edit' && showRemove ? (
           <Button variant="danger" onClick={onRemove}>
             {copy.remove}
           </Button>

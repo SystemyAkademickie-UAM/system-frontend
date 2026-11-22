@@ -6,14 +6,14 @@ vi.mock('../../services/organizations.api.js', () => ({
   listOrganizationAdministrators: vi.fn(),
   listOrganizationAdministratorCandidates: vi.fn(),
   grantOrganizationAdministrator: vi.fn(),
-  createFirstOrganizationAdministrator: vi.fn(),
+  grantOrganizationAdministratorByEmail: vi.fn(),
   revokeOrganizationAdministrator: vi.fn(),
 }));
 
 import { ToastProvider } from '../../components/ui/Toast/Toast.jsx';
 import {
-  createFirstOrganizationAdministrator,
   grantOrganizationAdministrator,
+  grantOrganizationAdministratorByEmail,
   listOrganizationAdministratorCandidates,
   listOrganizationAdministrators,
 } from '../../services/organizations.api.js';
@@ -87,30 +87,43 @@ describe('OrganizationAdminsModal', () => {
     expect(grantOrganizationAdministrator).toHaveBeenCalledWith(3, 8);
   });
 
-  it('asks for the first person only when an email organization has nobody', async () => {
+  it('adds an administering person by email even when the organization already has people', async () => {
     listOrganizationAdministrators.mockResolvedValue([]);
-    listOrganizationAdministratorCandidates.mockResolvedValue([]);
-    createFirstOrganizationAdministrator.mockResolvedValue({ accountId: 1, userId: 2 });
+    listOrganizationAdministratorCandidates.mockResolvedValue([
+      { userId: 9, name: 'Existing', surname: 'Person', nickname: '', email: 'existing@university.example' },
+    ]);
+    grantOrganizationAdministratorByEmail.mockResolvedValue({ accountId: 1, userId: 2 });
 
-    await renderModal({ id: 4, name: 'New email org', loginMethod: 'email' });
+    await renderModal({ id: 4, name: 'Email org', loginMethod: 'email' });
 
-    expect(document.body.textContent).toContain('Pierwsza osoba administrująca');
-    const name = document.body.querySelector('#first-admin-name');
-    const surname = document.body.querySelector('#first-admin-surname');
-    const email = document.body.querySelector('#first-admin-email');
+    expect(document.body.textContent).toContain('Dodaj osobę administrującą');
+    expect(document.body.textContent).toContain('Existing Person');
+    const name = document.body.querySelector('#admin-email-name');
+    const surname = document.body.querySelector('#admin-email-surname');
+    const email = document.body.querySelector('#admin-email-address');
     await act(async () => {
       typeInto(name, 'Ada');
       typeInto(surname, 'Lovelace');
       typeInto(email, 'ada@university.example');
     });
-    const save = [...document.body.querySelectorAll('button')].find((button) => button.textContent === 'Dodaj osobę administrującą');
+    const save = [...document.body.querySelectorAll('button')].find((button) => button.textContent === 'Dodaj i nadaj rolę');
     await act(async () => {
       save.click();
     });
-    expect(createFirstOrganizationAdministrator).toHaveBeenCalledWith(4, {
+    expect(grantOrganizationAdministratorByEmail).toHaveBeenCalledWith(4, {
       email: 'ada@university.example',
       name: 'Ada',
       surname: 'Lovelace',
     });
+  });
+
+  it('does not offer email creation for a SAML organization', async () => {
+    listOrganizationAdministrators.mockResolvedValue([]);
+    listOrganizationAdministratorCandidates.mockResolvedValue([]);
+
+    await renderModal({ id: 5, name: 'SAML org', loginMethod: 'saml' });
+
+    expect(document.body.querySelector('#admin-email-address')).toBeNull();
+    expect(document.body.textContent).toContain('nie nadaje tej roli');
   });
 });

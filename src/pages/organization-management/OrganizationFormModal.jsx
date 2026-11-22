@@ -134,14 +134,8 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
     if (!form.name.trim()) return false;
     if (!form.domain.trim()) return false;
 
-    if (form.loginMethod === 'saml' && !isEdit) {
-      const hasMetadata = Boolean(form.metadataUrl.trim());
-      const hasManual = Boolean(
-        form.entityId.trim() &&
-        form.ssoLoginUrl.trim() &&
-        form.certificatePem.trim()
-      );
-      if (!hasMetadata && !hasManual) return false;
+    if (form.loginMethod === 'saml' && !isEdit && !form.metadataUrl.trim()) {
+      return false;
     }
 
     if (form.representativeEmail.trim() && !form.representativeEmail.includes('@')) {
@@ -160,12 +154,8 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
       return 'Przydzielona przestrzeń dyskowa musi wynosić od 1 do 5120 MB (maks. 5 GB).';
     }
 
-    if (form.loginMethod === 'saml' && !isEdit) {
-      const hasMetadata = Boolean(form.metadataUrl.trim());
-      const hasManual = Boolean(form.entityId.trim() && form.ssoLoginUrl.trim() && form.certificatePem.trim());
-      if (!hasMetadata && !hasManual) {
-        return 'Dla logowania SAML wymagany jest URL metadanych lub komplet: Entity ID, SSO Login URL i Certyfikat PEM.';
-      }
+    if (form.loginMethod === 'saml' && !isEdit && !form.metadataUrl.trim()) {
+      return 'Dla logowania SAML podaj URL metadanych IdP. System odczyta z niego Entity ID, adres logowania i certyfikat.';
     }
 
     if (form.representativeEmail.trim() && !form.representativeEmail.includes('@')) {
@@ -242,14 +232,7 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
         createPayload.storageQuotaMb = Number(form.storageQuotaMb) || 100;
 
         if (form.loginMethod === 'saml') {
-          if (form.metadataUrl.trim()) {
-            createPayload.metadataUrl = form.metadataUrl.trim();
-          } else {
-            createPayload.entityId = form.entityId.trim();
-            createPayload.ssoLoginUrl = form.ssoLoginUrl.trim();
-            createPayload.certificatePem = form.certificatePem.trim();
-            if (form.ssoLogoutUrl.trim()) createPayload.ssoLogoutUrl = form.ssoLogoutUrl.trim();
-          }
+          createPayload.metadataUrl = form.metadataUrl.trim();
         }
 
         await createOrganization(createPayload);
@@ -374,8 +357,8 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
                 id="org-saml-metadata"
                 label={
                   <span>
-                    URL metadanych IdP {!form.entityId.trim() && <span className="org-form__required">*</span>}
-                    <HelpTooltip text="Bezpośredni link do pliku XML z metadanymi dostawcy tożsamości. Jeśli go podasz, system pobierze konfigurację automatycznie." />
+                    URL metadanych IdP {!isEdit && <span className="org-form__required">*</span>}
+                    <HelpTooltip text="Link do XML metadanych IdP. System odczyta z niego Entity ID, adres logowania SSO i certyfikat." />
                   </span>
                 }
                 placeholder="https://sso.amu.edu.pl/simplesaml/saml2/idp/metadata.php"
@@ -383,52 +366,6 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
                 onChange={(e) => handleChange('metadataUrl', e.target.value)}
               />
             </div>
-            {!isEdit && !form.metadataUrl.trim() ? (
-              <>
-                <div className="org-form__row">
-                  <TextField
-                    id="org-saml-entity"
-                    label={
-                      <span>
-                        Entity ID IdP <span className="org-form__required">*</span>
-                        <HelpTooltip text="Unikalny identyfikator URI dostawcy tożsamości (np. https://sso.amu.edu.pl/idp)." />
-                      </span>
-                    }
-                    placeholder="https://sso.amu.edu.pl/idp"
-                    value={form.entityId}
-                    onChange={(e) => handleChange('entityId', e.target.value)}
-                  />
-                  <TextField
-                    id="org-saml-login"
-                    label={
-                      <span>
-                        SSO Login URL <span className="org-form__required">*</span>
-                        <HelpTooltip text="Adres URL usługi logowania jednokrotnego (Single Sign-On Service), na który kierowany jest użytkownik w celu uwierzytelnienia." />
-                      </span>
-                    }
-                    placeholder="https://sso.amu.edu.pl/saml2/idp/SSOService.php"
-                    value={form.ssoLoginUrl}
-                    onChange={(e) => handleChange('ssoLoginUrl', e.target.value)}
-                  />
-                </div>
-                <div className="org-form__row">
-                  <TextField
-                    id="org-saml-cert"
-                    label={
-                      <span>
-                        Certyfikat IdP (PEM) <span className="org-form__required">*</span>
-                        <HelpTooltip text="Klucz publiczny certyfikatu X.509 dostawcy tożsamości w formacie PEM (zaczynający się od -----BEGIN CERTIFICATE-----)." />
-                      </span>
-                    }
-                    placeholder="-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----"
-                    multiline
-                    rows={4}
-                    value={form.certificatePem}
-                    onChange={(e) => handleChange('certificatePem', e.target.value)}
-                  />
-                </div>
-              </>
-            ) : null}
           </fieldset>
         ) : null}
 
