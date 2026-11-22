@@ -15,6 +15,7 @@ import { useToast } from '../../components/ui/Toast/Toast.jsx';
 import { useSession } from '../../context/SessionContext.jsx';
 import {
   ACCOUNT_COLUMN_WIDTH_EMAIL,
+  ACCOUNT_COLUMN_WIDTH_LOGIN_METHOD,
   ACCOUNT_COLUMN_WIDTH_PERSON,
   ACCOUNT_COLUMN_WIDTH_ROLE,
   ACCOUNT_ROLE_ADMINISTRATOR,
@@ -75,6 +76,7 @@ const COPY = {
     search: 'Szukaj osoby',
     saved: 'Zapisano.',
     removed: 'Rola została usunięta.',
+    atLeastOneRoleRequired: 'Wybierz co najmniej jedną rolę.',
     imported: 'Import zakończony.',
     sent: 'Łącze logowania zostało wysłane.',
     emailInvalid: 'Podaj adres e-mail.',
@@ -122,6 +124,7 @@ const COPY = {
     search: 'Find a person',
     saved: 'Saved.',
     removed: 'The role was removed.',
+    atLeastOneRoleRequired: 'Select at least one role.',
     imported: 'Import finished.',
     sent: 'The login link was sent.',
     emailInvalid: 'Enter an email address.',
@@ -136,7 +139,14 @@ const COPY = {
   },
 };
 
-const EMPTY_FORM = { email: '', name: '', surname: '', nickname: '', role: ACCOUNT_ROLE_STUDENT };
+const EMPTY_FORM = {
+  email: '',
+  name: '',
+  surname: '',
+  nickname: '',
+  role: ACCOUNT_ROLE_STUDENT,
+  roles: [ACCOUNT_ROLE_STUDENT],
+};
 const ROLE_FILTERS = [
   ACCOUNT_ROLE_ALL,
   ACCOUNT_ROLE_STUDENT,
@@ -153,14 +163,15 @@ function roleLabel(role, copy) {
   return role ?? '';
 }
 
-function validatePerson(form, needsEmail, copy, canManageAdministrators) {
-  if (needsEmail && !form.email.trim().includes('@')) return copy.emailInvalid;
-  if (!form.name.trim() || !form.surname.trim() || !form.nickname.trim()) return copy.nameRequired;
-  const allowed = [ACCOUNT_ROLE_STUDENT, ACCOUNT_ROLE_LECTURER];
-  if (canManageAdministrators) {
-    allowed.push(ACCOUNT_ROLE_ADMINISTRATOR);
+function validatePerson(form, needsEmail, copy, canManageAdministrators = false) {
+  if (needsEmail && (!form.email || !form.email.trim().includes('@'))) return copy.emailInvalid;
+  if (!form.name?.trim() || !form.surname?.trim() || !form.nickname?.trim()) return copy.nameRequired;
+  const roles = Array.isArray(form.roles) ? form.roles : (form.role ? [form.role] : []);
+  if (roles.length === 0) return copy.atLeastOneRoleRequired;
+  if (!canManageAdministrators && roles.includes(ACCOUNT_ROLE_ADMINISTRATOR)) {
+    // If user cannot manage administrators and is attempting to add administrator role
+    return copy.roleInvalid;
   }
-  if (!allowed.includes(form.role)) return copy.roleInvalid;
   return '';
 }
 
@@ -177,6 +188,7 @@ export default function UserManagementContent() {
     session.user?.role === 'super';
   const canManageAdministrators =
     session.user?.activeRole === ACCOUNT_ROLE_SUPER || session.user?.role === ACCOUNT_ROLE_SUPER;
+  const currentUserId = session.user?.sub ? Number(session.user.sub) : null;
 
   const [organizations, setOrganizations] = useState([]);
   const [activeOrgId, setActiveOrgId] = useState(session.user?.organizationId ?? null);
@@ -205,6 +217,8 @@ export default function UserManagementContent() {
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
 
+  const isEditingSelf = userModalMode === 'edit' && editing && currentUserId !== null && Number(editing.userId) === currentUserId;
+
   // Czy wybrana organizacja obsługuje logowanie przez Magic Links
   const isEmailOrganization = !isAllOrganizations && loginMethod === LOGIN_METHOD_EMAIL;
 
@@ -224,14 +238,31 @@ export default function UserManagementContent() {
   }, [optionsMenuOpen]);
 
   const openEdit = useCallback((personGroup) => {
-    const primaryAccount = personGroup.accounts?.[0] || personGroup;
-    setEditing(primaryAccount);
+    const accounts = Array.isArray(personGroup.accounts) && personGroup.accounts.length > 0
+      ? personGroup.accounts
+      : (personGroup.accountId ? [personGroup] : []);
+    const roles = Array.isArray(personGroup.roles) && personGroup.roles.length > 0
+      ? personGroup.roles
+      : (personGroup.role ? [personGroup.role] : []);
+    const primaryAccount = accounts[0] || personGroup;
+    const initialRoles = roles.length > 0 ? roles : (primaryAccount.role ? [primaryAccount.role] : [ACCOUNT_ROLE_STUDENT]);
+
+    setEditing({
+      ...personGroup,
+      accountId: primaryAccount.accountId || primaryAccount.id,
+      primaryAccountId: primaryAccount.accountId || primaryAccount.id,
+      organizationId: personGroup.organizationId || primaryAccount.organizationId,
+      initialRoles: [...initialRoles],
+      accounts: [...accounts],
+      roles: [...initialRoles],
+    });
     setForm({
       email: personGroup.email ?? '',
       name: personGroup.name ?? '',
       surname: personGroup.surname ?? '',
       nickname: personGroup.nickname ?? '',
-      role: primaryAccount.role,
+      role: initialRoles[0] ?? ACCOUNT_ROLE_STUDENT,
+      roles: [...initialRoles],
     });
     setUserModalMode('edit');
     setUserModalOpen(true);
@@ -259,6 +290,7 @@ export default function UserManagementContent() {
                 ...item,
                 organizationId: org.id,
                 organizationName: org.name,
+                loginMethod: org.loginMethod ?? 'email',
               }));
             } catch {
               return [];
@@ -295,6 +327,7 @@ export default function UserManagementContent() {
           ...r,
           organizationId: orgId,
           organizationName: current?.name ?? '',
+          loginMethod: current?.loginMethod ?? 'email',
         }));
 
         setRawItems((currentItems) => (appendAfter ? [...currentItems, ...rowsWithOrg] : rowsWithOrg));
@@ -361,6 +394,7 @@ export default function UserManagementContent() {
           nickname: item.nickname,
           organizationId: item.organizationId,
           organizationName: item.organizationName,
+          loginMethod: item.loginMethod || 'email',
           roles: [item.role],
           accounts: [item],
         });
@@ -407,6 +441,18 @@ export default function UserManagementContent() {
         accessor: (row) => row.roleDisplay,
         render: (row) => row.roleDisplay,
       },
+      {
+        key: 'loginMethod',
+        label: copy.loginMethod,
+        width: ACCOUNT_COLUMN_WIDTH_LOGIN_METHOD,
+        sort: 'text',
+        accessor: (row) => row.loginMethod || 'email',
+        render: (row) => (
+          <span className={`user-management__login-method-badge user-management__login-method-badge--${row.loginMethod || 'email'}`}>
+            {row.loginMethod === 'saml' ? copy.samlMethod : copy.emailMethod}
+          </span>
+        ),
+      },
     ];
 
     if (isAllOrganizations) {
@@ -445,14 +491,20 @@ export default function UserManagementContent() {
       showError(problem);
       return;
     }
+    const selectedRoles = Array.isArray(form.roles) && form.roles.length > 0
+      ? form.roles
+      : [form.role || ACCOUNT_ROLE_STUDENT];
+
     try {
-      await createOrganizationAccount(activeOrgId, {
-        email: form.email.trim(),
-        name: form.name.trim(),
-        surname: form.surname.trim(),
-        nickname: form.nickname.trim(),
-        role: form.role,
-      });
+      for (const role of selectedRoles) {
+        await createOrganizationAccount(activeOrgId, {
+          email: form.email.trim(),
+          name: form.name.trim(),
+          surname: form.surname.trim(),
+          nickname: form.nickname.trim(),
+          role,
+        });
+      }
       showSuccess(copy.saved);
       setForm(EMPTY_FORM);
       if (!addAnother) {
@@ -471,34 +523,45 @@ export default function UserManagementContent() {
       showError(problem);
       return;
     }
+
+    const selectedRoles = Array.isArray(form.roles) && form.roles.length > 0
+      ? form.roles
+      : [form.role || ACCOUNT_ROLE_STUDENT];
+    const initialRoles = editing.initialRoles ?? (editing.role ? [editing.role] : []);
+    const addedRoles = selectedRoles.filter((r) => !initialRoles.includes(r));
+    const removedRoles = initialRoles.filter((r) => !selectedRoles.includes(r));
+
     try {
       const targetOrg = editing.organizationId || activeOrgId;
-      await updateOrganizationAccount(targetOrg, editing.accountId, {
-        name: form.name.trim(),
-        surname: form.surname.trim(),
-        nickname: form.nickname.trim(),
-      });
+      const primaryAccountId = editing.primaryAccountId || editing.accountId || editing.id;
+      if (primaryAccountId) {
+        await updateOrganizationAccount(targetOrg, primaryAccountId, {
+          name: form.name.trim(),
+          surname: form.surname.trim(),
+          nickname: form.nickname.trim(),
+        });
+      }
+
+      for (const roleToAdd of addedRoles) {
+        await createOrganizationAccount(targetOrg, {
+          email: form.email || editing.email,
+          name: form.name.trim(),
+          surname: form.surname.trim(),
+          nickname: form.nickname.trim(),
+          role: roleToAdd,
+        });
+      }
+
+      for (const roleToRemove of removedRoles) {
+        const acc = editing.accounts?.find((a) => a.role === roleToRemove);
+        const accountIdToDelete = acc?.accountId || (editing.role === roleToRemove ? editing.accountId : null);
+        if (accountIdToDelete) {
+          await deleteOrganizationAccount(targetOrg, accountIdToDelete);
+        }
+      }
+
       showSuccess(copy.saved);
       setUserModalOpen(false);
-      await loadPage(null);
-    } catch (err) {
-      showError(err instanceof Error ? err.message : copy.empty);
-    }
-  }
-
-  async function handleGrantRole(targetRole) {
-    if (!editing) return;
-    if (targetRole === ACCOUNT_ROLE_ADMINISTRATOR && !canManageAdministrators) return;
-    try {
-      const targetOrg = editing.organizationId || activeOrgId;
-      await createOrganizationAccount(targetOrg, {
-        email: editing.email,
-        name: form.name.trim(),
-        surname: form.surname.trim(),
-        nickname: form.nickname.trim(),
-        role: targetRole,
-      });
-      showSuccess(copy.saved);
       await loadPage(null);
     } catch (err) {
       showError(err instanceof Error ? err.message : copy.empty);
@@ -509,7 +572,14 @@ export default function UserManagementContent() {
     if (!editing) return;
     try {
       const targetOrg = editing.organizationId || activeOrgId;
-      await deleteOrganizationAccount(targetOrg, editing.accountId);
+      const accountsToDelete = editing.accounts && editing.accounts.length > 0
+        ? editing.accounts
+        : [{ accountId: editing.accountId || editing.id }];
+      for (const acc of accountsToDelete) {
+        if (acc.accountId) {
+          await deleteOrganizationAccount(targetOrg, acc.accountId);
+        }
+      }
       showSuccess(copy.removed);
       setUserModalOpen(false);
       setEditing(null);
@@ -768,14 +838,15 @@ export default function UserManagementContent() {
           form={form}
           copy={{ ...copy, roleLabel: roleLabel(editing?.role, copy) }}
           emailOrganization={isEmailOrganization}
+          allowSuper={isSuperAdmin}
           onChange={updateField}
           onSave={userModalMode === 'create' ? () => saveNew(false) : saveEdit}
           onSaveAnother={() => saveNew(true)}
-          onGrantRole={handleGrantRole}
           onRemove={removeRole}
           onSendLink={sendLink}
           onExit={() => setUserModalOpen(false)}
           canManageAdministrators={canManageAdministrators}
+          isSelf={isEditingSelf}
         />
       </Modal>
 

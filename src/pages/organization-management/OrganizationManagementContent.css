@@ -404,6 +404,10 @@
   margin: 0;
 }
 
+.org-admins-modal__search-wrapper {
+  margin-bottom: 0.25rem;
+}
+
 .org-admins-modal__form .maq-text-field {
   margin-bottom: 0.75rem;
 }

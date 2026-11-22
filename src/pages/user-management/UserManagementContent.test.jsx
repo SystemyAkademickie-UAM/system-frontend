@@ -65,10 +65,13 @@ describe('UserManagementContent', () => {
     });
   }
 
-  it('renders a person and row actions menu with change option', async () => {
+  it('renders a person and row actions menu with change option and displays login method badge', async () => {
     listOrganizationAccounts.mockResolvedValue({ items: [ADA], nextAfterAccountId: null });
     await renderPeople();
     expect(container.textContent).toContain('Ada Local');
+    expect(container.textContent).toContain('Magic Links');
+    const badge = container.querySelector('.user-management__login-method-badge--email');
+    expect(badge).not.toBeNull();
     const moreBtn = container.querySelector('.data-table__action-btn--more');
     expect(moreBtn).not.toBeNull();
     act(() => {
@@ -99,9 +102,12 @@ describe('UserManagementContent', () => {
     act(() => {
       addButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
-    const roleSelect = document.body.querySelector('#account-role');
-    const optionValues = [...roleSelect.options].map((option) => option.value);
-    expect(optionValues).toEqual(['student', 'lecturer']);
+    const adminCheckbox = document.body.querySelector('#account-role-administrator');
+    expect(adminCheckbox).toBeNull();
+    const studentCheckbox = document.body.querySelector('#account-role-student');
+    const lecturerCheckbox = document.body.querySelector('#account-role-lecturer');
+    expect(studentCheckbox).not.toBeNull();
+    expect(lecturerCheckbox).not.toBeNull();
     act(() => {
       [...document.body.querySelectorAll('button')].find((node) => node.textContent === 'Anuluj')
         .dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -115,7 +121,6 @@ describe('UserManagementContent', () => {
         .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     });
     expect(document.body.textContent).not.toContain('Usuń tę rolę');
-    expect(document.body.textContent).not.toContain('+ Osoba administrująca');
   });
 
   it('keeps the empty sentence after the first load fails', async () => {
