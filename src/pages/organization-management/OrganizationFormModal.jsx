@@ -28,6 +28,7 @@ const INITIAL_FORM = {
   ssoLoginUrl: '',
   ssoLogoutUrl: '',
   certificatePem: '',
+  storageQuotaMb: 100,
 };
 
 export default function OrganizationFormModal({ isOpen, onClose, organization, onSaved }) {
@@ -56,6 +57,9 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
         ssoLoginUrl: organization.ssoLoginUrl ?? '',
         ssoLogoutUrl: organization.ssoLogoutUrl ?? '',
         certificatePem: '',
+        storageQuotaMb:
+          organization.storageQuotaMb ??
+          (organization.storageQuotaBytes ? Math.round(organization.storageQuotaBytes / (1024 * 1024)) : 100),
       });
     } else {
       setForm(INITIAL_FORM);
@@ -75,6 +79,11 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
     }
     if (!form.addressTown.trim()) return 'Podaj miejscowość siedziby.';
     if (!form.addressStreet.trim()) return 'Podaj ulicę siedziby.';
+
+    const quota = Number(form.storageQuotaMb);
+    if (!Number.isFinite(quota) || quota < 1 || quota > 5120) {
+      return 'Przydzielona przestrzeń dyskowa musi wynosić od 1 do 5120 MB (maks. 5 GB).';
+    }
 
     if (form.loginMethod === 'saml' && !isEdit) {
       const hasMetadata = Boolean(form.metadataUrl.trim());
@@ -113,6 +122,7 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
             postalCode: form.addressPostalCode.trim() || null,
             country: form.addressCountry.trim() || 'PL',
           },
+          storageQuotaMb: Number(form.storageQuotaMb) || 100,
         };
 
         if (form.metadataUrl.trim()) updatePayload.metadataUrl = form.metadataUrl.trim();
@@ -139,6 +149,7 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
             postalCode: form.addressPostalCode.trim() || undefined,
             country: form.addressCountry.trim() || 'PL',
           },
+          storageQuotaMb: Number(form.storageQuotaMb) || 100,
         };
 
         if (form.loginMethod === 'saml') {
@@ -192,6 +203,20 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
               placeholder="np. amu.edu.pl lub localhost"
               value={form.domain}
               onChange={(e) => handleChange('domain', e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="org-form__row">
+            <TextField
+              id="org-storage-quota"
+              type="number"
+              label="Przydzielona przestrzeń dyskowa (MB)"
+              placeholder="100"
+              value={form.storageQuotaMb}
+              onChange={(e) => handleChange('storageQuotaMb', e.target.value)}
+              min={1}
+              max={5120}
               required
             />
           </div>

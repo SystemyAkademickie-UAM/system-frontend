@@ -34,6 +34,7 @@ const COPY = {
     representative: 'Reprezentant',
     admins: 'Administratorzy',
     status: 'Status',
+    storageQuota: 'Limit dysku',
     actions: 'Akcje',
     active: 'Aktywna',
     inactive: 'Nieaktywna',
@@ -58,6 +59,7 @@ const COPY = {
     representative: 'Representative',
     admins: 'Administrators',
     status: 'Status',
+    storageQuota: 'Disk quota',
     actions: 'Actions',
     active: 'Active',
     inactive: 'Inactive',
@@ -233,6 +235,18 @@ export default function OrganizationManagementContent() {
       render: (row) => (
         <span className={`org-cell-status org-cell-status--${row.isActive ? 'active' : 'inactive'}`}>
           {row.isActive ? copy.active : copy.inactive}
+        </span>
+      ),
+    },
+    {
+      key: 'storageQuota',
+      label: copy.storageQuota,
+      width: '10%',
+      sort: 'number',
+      accessor: (row) => row.storageQuotaMb ?? 100,
+      render: (row) => (
+        <span className="org-cell-quota">
+          {row.storageQuotaMb ? `${row.storageQuotaMb} MB` : '100 MB'}
         </span>
       ),
     },

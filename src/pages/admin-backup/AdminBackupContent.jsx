@@ -55,6 +55,8 @@ const TEXTS = {
     scheduleIntervalLabel: 'Częstotliwość:',
     scheduleCustomDaysLabel: 'Liczba dni między kopiami (1 - 365):',
     scheduleCustomDaysPlaceholder: 'Np. 5',
+    scheduleRetentionDaysLabel: 'Okres retencji kopii zapasowych (dni, 1 - 365):',
+    scheduleRetentionDaysPlaceholder: '14',
     scheduleTimeLabel: 'Godzina wykonania (czas serwera):',
     scheduleNextRunLabel: 'Najbliższe planowane wykonanie:',
     scheduleDisabledHint: 'Harmonogram jest obecnie wyłączony. Żadne kopie automatyczne nie będą tworzone.',
@@ -148,6 +150,8 @@ const TEXTS = {
     scheduleIntervalLabel: 'Backup frequency:',
     scheduleCustomDaysLabel: 'Interval in days (1 - 365):',
     scheduleCustomDaysPlaceholder: 'e.g. 5',
+    scheduleRetentionDaysLabel: 'Backup retention period (days, 1 - 365):',
+    scheduleRetentionDaysPlaceholder: '14',
     scheduleTimeLabel: 'Execution time (server time):',
     scheduleNextRunLabel: 'Next scheduled execution:',
     scheduleDisabledHint: 'Automated backup schedule is currently disabled. No automatic backups will run.',
@@ -268,6 +272,7 @@ export default function AdminBackupContent() {
   const [scheduleEnabled, setScheduleEnabled] = useState(true);
   const [scheduleInterval, setScheduleInterval] = useState('daily');
   const [scheduleCustomDays, setScheduleCustomDays] = useState(1);
+  const [scheduleRetentionDays, setScheduleRetentionDays] = useState(14);
   const [scheduleTime, setScheduleTime] = useState('02:00');
   const [isSavingSchedule, setIsSavingSchedule] = useState(false);
 
@@ -302,6 +307,9 @@ export default function AdminBackupContent() {
         setScheduleEnabled(Boolean(result.data.schedule.enabled));
         setScheduleInterval(result.data.schedule.interval || 'daily');
         setScheduleCustomDays(result.data.schedule.customIntervalDays || 1);
+        setScheduleRetentionDays(
+          result.data.schedule.retentionDays ?? result.data.retentionDays ?? 14,
+        );
         setScheduleTime(result.data.schedule.timeOfDay || '02:00');
       }
     }
@@ -320,6 +328,7 @@ export default function AdminBackupContent() {
         enabled: scheduleEnabled,
         interval: scheduleInterval,
         customIntervalDays: scheduleInterval === 'custom' ? Number(scheduleCustomDays) || 1 : null,
+        retentionDays: Number(scheduleRetentionDays) || 14,
         timeOfDay: scheduleTime,
       });
       if (result.ok) {
@@ -600,6 +609,26 @@ export default function AdminBackupContent() {
                 value={scheduleTime}
                 disabled={!scheduleEnabled}
                 onChange={(e) => setScheduleTime(e.target.value)}
+              />
+            </div>
+
+            <div className="admin-backup__form-group">
+              <label htmlFor="schedule-retention-input" className="admin-backup__field-label">
+                {t.scheduleRetentionDaysLabel}
+              </label>
+              <input
+                id="schedule-retention-input"
+                type="number"
+                min="1"
+                max="365"
+                className="admin-backup__input admin-backup__input--number"
+                value={scheduleRetentionDays}
+                disabled={!scheduleEnabled}
+                onChange={(e) => {
+                  const parsed = parseInt(e.target.value, 10);
+                  setScheduleRetentionDays(Number.isNaN(parsed) ? '' : Math.max(1, Math.min(365, parsed)));
+                }}
+                placeholder={t.scheduleRetentionDaysPlaceholder}
               />
             </div>
           </div>
