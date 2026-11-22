@@ -103,4 +103,70 @@ describe('UserAccountForm', () => {
 
     expect(onChange).toHaveBeenCalledWith('roles', ['student', 'lecturer']);
   });
+
+  it('disables save and saveAnother buttons when no roles are selected', () => {
+    const form = {
+      name: 'Jan',
+      surname: 'Kowalski',
+      nickname: 'jank',
+      roles: [],
+    };
+
+    act(() => {
+      root.render(
+        createElement(UserAccountForm, {
+          mode: 'create',
+          form,
+          copy: COPY,
+          onChange: vi.fn(),
+          onSave: vi.fn(),
+          onSaveAnother: vi.fn(),
+          onExit: vi.fn(),
+        }),
+      );
+    });
+
+    const saveButton = [...container.querySelectorAll('button')].find((btn) => btn.textContent === 'Zapisz');
+    const saveAnotherButton = [...container.querySelectorAll('button')].find((btn) => btn.textContent === 'Zapisz i dodaj kolejną');
+
+    expect(saveButton.disabled).toBe(true);
+    expect(saveAnotherButton.disabled).toBe(true);
+    expect(container.textContent).toContain(COPY.atLeastOneRoleRequired);
+  });
+
+  it('disables superadmin role checkbox and hides remove role button when editing self', () => {
+    const form = {
+      name: 'Super',
+      surname: 'Admin',
+      nickname: 'super',
+      roles: ['super', 'lecturer'],
+    };
+
+    act(() => {
+      root.render(
+        createElement(UserAccountForm, {
+          mode: 'edit',
+          form,
+          copy: COPY,
+          allowSuper: true,
+          isSelf: true,
+          onChange: vi.fn(),
+          onSave: vi.fn(),
+          onRemove: vi.fn(),
+          onExit: vi.fn(),
+        }),
+      );
+    });
+
+    const superCb = container.querySelector('#account-role-super');
+    expect(superCb).not.toBeNull();
+    expect(superCb.disabled).toBe(true);
+    expect(superCb.checked).toBe(true);
+
+    const lecturerCb = container.querySelector('#account-role-lecturer');
+    expect(lecturerCb.disabled).toBe(false);
+
+    const removeBtn = [...container.querySelectorAll('button')].find((btn) => btn.textContent === COPY.remove);
+    expect(removeBtn).toBeUndefined();
+  });
 });
