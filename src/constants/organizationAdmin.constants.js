@@ -32,7 +32,8 @@ export const ACCOUNT_ROLE_SUPER = 'super';
 export const LOGIN_METHOD_EMAIL = 'email';
 
 /** People table column widths. The header and body tables size their columns separately, so both need the same widths. */
-export const ACCOUNT_COLUMN_WIDTH_PERSON = '24%';
-export const ACCOUNT_COLUMN_WIDTH_EMAIL = '34%';
-export const ACCOUNT_COLUMN_WIDTH_ROLE = '26%';
-export const ACCOUNT_COLUMN_WIDTH_CHANGE = '16%';
+export const ACCOUNT_COLUMN_WIDTH_PERSON = '20%';
+export const ACCOUNT_COLUMN_WIDTH_EMAIL = '26%';
+export const ACCOUNT_COLUMN_WIDTH_ROLE = '20%';
+export const ACCOUNT_COLUMN_WIDTH_LOGIN_METHOD = '16%';
+export const ACCOUNT_COLUMN_WIDTH_CHANGE = '18%';

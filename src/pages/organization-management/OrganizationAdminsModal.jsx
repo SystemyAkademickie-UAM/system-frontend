@@ -24,15 +24,15 @@ const COPY = {
   polish: {
     title: 'Osoby administrujące',
     search: 'Szukaj osoby (imię, nazwisko, e-mail)',
-    people: 'Osoby w organizacji',
-    assigned: 'Już administrują',
+    peopleWithoutAdmin: 'Pozostałe osoby bez uprawnień administratora',
+    assigned: 'Osoby z uprawnieniami administratora',
     grant: 'Nadaj rolę',
     granting: 'Nadawanie...',
     revoke: 'Odbierz rolę',
     revoking: 'Odbieranie...',
     close: 'Zamknij',
     loading: 'Wczytywanie osób...',
-    emptyPeople: 'Nikt w tej organizacji nie czeka na tę rolę.',
+    emptyPeople: 'Wszyscy użytkownicy w tej organizacji posiadają uprawnienia administratora.',
     emptyAssigned: 'Nikt jeszcze nie administruje tą organizacją.',
     noMatch: 'Brak osób pasujących do wyszukiwania.',
     samlEmpty: 'Osoby pojawią się tutaj po pierwszym logowaniu przez instytucję.',
@@ -56,15 +56,15 @@ const COPY = {
   english: {
     title: 'Administering people',
     search: 'Search for a person (name, surname, email)',
-    people: 'People in the organization',
-    assigned: 'Already administering',
+    peopleWithoutAdmin: 'Other people without administrator role',
+    assigned: 'People with administrator role',
     grant: 'Grant role',
     granting: 'Granting...',
     revoke: 'Remove role',
     revoking: 'Removing...',
     close: 'Close',
     loading: 'Loading people...',
-    emptyPeople: 'Nobody in this organization is waiting for this role.',
+    emptyPeople: 'All users in this organization already have the administrator role.',
     emptyAssigned: 'Nobody administers this organization yet.',
     noMatch: 'No people match this search.',
     samlEmpty: 'People appear here after they sign in through their institution.',
@@ -133,6 +133,16 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
       loadPeople();
     }
   }, [isOpen, organization, loadPeople]);
+
+  const visibleAdmins = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (needle === '') {
+      return admins;
+    }
+    return admins.filter((person) =>
+      `${person.name} ${person.surname} ${person.nickname ?? ''} ${person.email}`.toLowerCase().includes(needle)
+    );
+  }, [admins, query]);
 
   const visibleCandidates = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -269,14 +279,49 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
             ) : null}
 
             {!organizationIsEmpty ? (
-              <div className="org-admins-modal__list-container">
-                <h4 className="org-admins-modal__list-title">{copy.people}</h4>
+              <div className="org-admins-modal__search-wrapper">
                 <SearchBar
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder={copy.search}
                   name="administrator-search"
                 />
+              </div>
+            ) : null}
+
+            {!organizationIsEmpty ? (
+              <div className="org-admins-modal__list-container">
+                <h4 className="org-admins-modal__list-title">{copy.assigned} ({admins.length})</h4>
+                {visibleAdmins.length === 0 ? (
+                  <div className="org-admins-modal__empty">
+                    {admins.length === 0 ? copy.emptyAssigned : copy.noMatch}
+                  </div>
+                ) : (
+                  <ul className="org-admins-modal__list">
+                    {visibleAdmins.map((admin) => (
+                      <li key={admin.accountId} className="org-admins-modal__item">
+                        <div className="org-admins-modal__item-info">
+                          <span className="org-admins-modal__item-name">{personLabel(admin)}</span>
+                          <span className="org-admins-modal__item-email">{admin.email}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          disabled={revokingId === admin.accountId || admin.userId === callerUserId}
+                          onClick={() => handleRevoke(admin)}
+                        >
+                          {revokingId === admin.accountId ? copy.revoking : copy.revoke}
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ) : null}
+
+            {!organizationIsEmpty ? (
+              <div className="org-admins-modal__list-container">
+                <h4 className="org-admins-modal__list-title">{copy.peopleWithoutAdmin} ({candidates.length})</h4>
                 {visibleCandidates.length === 0 ? (
                   <div className="org-admins-modal__empty">
                     {candidates.length === 0 ? copy.emptyPeople : copy.noMatch}
@@ -302,32 +347,6 @@ export default function OrganizationAdminsModal({ isOpen, onClose, organization,
                 )}
               </div>
             ) : null}
-
-            <div className="org-admins-modal__list-container">
-              <h4 className="org-admins-modal__list-title">{copy.assigned} ({admins.length})</h4>
-              {admins.length === 0 ? (
-                <div className="org-admins-modal__empty">{copy.emptyAssigned}</div>
-              ) : (
-                <ul className="org-admins-modal__list">
-                  {admins.map((admin) => (
-                    <li key={admin.accountId} className="org-admins-modal__item">
-                      <div className="org-admins-modal__item-info">
-                        <span className="org-admins-modal__item-name">{personLabel(admin)}</span>
-                        <span className="org-admins-modal__item-email">{admin.email}</span>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        disabled={revokingId === admin.accountId || admin.userId === callerUserId}
-                        onClick={() => handleRevoke(admin)}
-                      >
-                        {revokingId === admin.accountId ? copy.revoking : copy.revoke}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
           </>
         )}
 

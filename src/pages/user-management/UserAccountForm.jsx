@@ -1,32 +1,82 @@
 /**
  * @file UserAccountForm.jsx
- * @description Formularz tworzenia i edycji konta użytkownika w organizacji (używany w modalu).
+ * @description Formularz tworzenia i edycji konta użytkownika w organizacji z pionową listą ról.
  */
 
 import Button from '../../components/ui/Button/Button.jsx';
+import Checkbox from '../../components/ui/Checkbox/Checkbox.jsx';
 import TextField from '../../components/ui/TextField/TextField.jsx';
 import {
   ACCOUNT_ROLE_ADMINISTRATOR,
   ACCOUNT_ROLE_LECTURER,
   ACCOUNT_ROLE_STUDENT,
+  ACCOUNT_ROLE_SUPER,
   ORGANIZATION_ACCOUNT_EMAIL_MAX_LENGTH,
   ORGANIZATION_ACCOUNT_NAME_MAX_LENGTH,
 } from '../../constants/organizationAdmin.constants.js';
 
+/**
+ * @param {{
+ *   mode: 'create' | 'edit',
+ *   form: {
+ *     email?: string,
+ *     name?: string,
+ *     surname?: string,
+ *     nickname?: string,
+ *     role?: string,
+ *     roles?: string[],
+ *   },
+ *   copy: Record<string, string>,
+ *   emailOrganization?: boolean,
+ *   allowSuper?: boolean,
+ *   onChange: (key: string, value: any) => void,
+ *   onSave: () => void,
+ *   onSaveAnother?: () => void,
+ *   onRemove?: () => void,
+ *   onSendLink?: () => void,
+ *   onExit: () => void,
+ * }} props
+ */
 export default function UserAccountForm({
   mode,
   form,
   copy,
   emailOrganization,
+  allowSuper = false,
   onChange,
   onSave,
   onSaveAnother,
-  onGrantRole,
   onRemove,
   onSendLink,
   onExit,
 }) {
-  const currentRole = form.role;
+  const selectedRoles = Array.isArray(form.roles)
+    ? form.roles
+    : (form.role ? [form.role] : [ACCOUNT_ROLE_STUDENT]);
+
+  const handleRoleToggle = (roleValue, isChecked) => {
+    let nextRoles = [...selectedRoles];
+    if (isChecked) {
+      if (!nextRoles.includes(roleValue)) {
+        nextRoles.push(roleValue);
+      }
+    } else {
+      nextRoles = nextRoles.filter((r) => r !== roleValue);
+    }
+    onChange('roles', nextRoles);
+    if (nextRoles.length > 0) {
+      onChange('role', nextRoles[0]);
+    }
+  };
+
+  const roleOptions = [
+    ...(allowSuper || selectedRoles.includes(ACCOUNT_ROLE_SUPER)
+      ? [{ value: ACCOUNT_ROLE_SUPER, label: copy.superadmin ?? 'Osoba nadzorująca' }]
+      : []),
+    { value: ACCOUNT_ROLE_ADMINISTRATOR, label: copy.administrator },
+    { value: ACCOUNT_ROLE_LECTURER, label: copy.lecturer },
+    { value: ACCOUNT_ROLE_STUDENT, label: copy.student },
+  ];
 
   return (
     <form className="user-management__form-modal" onSubmit={(event) => event.preventDefault()}>
@@ -84,56 +134,29 @@ export default function UserAccountForm({
         onChange={(event) => onChange('nickname', event.target.value)}
       />
 
-      {mode === 'create' ? (
-        <div className="user-management__role">
-          <label className="org-form__label" htmlFor="account-role">
-            {copy.role} <span className="org-form__required">*</span>
-          </label>
-          <select
-            id="account-role"
-            className="org-form__select"
-            value={form.role}
-            onChange={(event) => onChange('role', event.target.value)}
-          >
-            <option value={ACCOUNT_ROLE_STUDENT}>{copy.student}</option>
-            <option value={ACCOUNT_ROLE_LECTURER}>{copy.lecturer}</option>
-            <option value={ACCOUNT_ROLE_ADMINISTRATOR}>{copy.administrator}</option>
-          </select>
+      <div className="user-management__roles-section">
+        <label className="org-form__label">
+          {copy.role} <span className="org-form__required">*</span>
+        </label>
+        <div className="user-management__roles-list" role="group" aria-label={copy.role}>
+          {roleOptions.map((roleOpt) => (
+            <Checkbox
+              key={roleOpt.value}
+              id={`account-role-${roleOpt.value}`}
+              name="account-roles"
+              checked={selectedRoles.includes(roleOpt.value)}
+              onChange={(checked) => handleRoleToggle(roleOpt.value, checked)}
+              label={roleOpt.label}
+              variant="danger"
+            />
+          ))}
         </div>
-      ) : (
-        <div className="user-management__role-display">
-          <span className="user-management__role-label">{copy.role}:</span>
-          <strong>
-            {currentRole === ACCOUNT_ROLE_STUDENT && copy.student}
-            {currentRole === ACCOUNT_ROLE_LECTURER && copy.lecturer}
-            {currentRole === ACCOUNT_ROLE_ADMINISTRATOR && copy.administrator}
-            {currentRole === 'super' && (copy.superadmin ?? 'Osoba nadzorująca')}
-          </strong>
-        </div>
-      )}
-
-      {mode === 'edit' ? (
-        <div className="user-management__grant-roles">
-          <span className="user-management__grant-title">Nadaj dodatkową rolę tej osobie:</span>
-          <div className="user-management__grant-buttons">
-            {currentRole !== ACCOUNT_ROLE_STUDENT ? (
-              <Button size="sm" variant="secondary" onClick={() => onGrantRole(ACCOUNT_ROLE_STUDENT)}>
-                + {copy.student}
-              </Button>
-            ) : null}
-            {currentRole !== ACCOUNT_ROLE_LECTURER ? (
-              <Button size="sm" variant="secondary" onClick={() => onGrantRole(ACCOUNT_ROLE_LECTURER)}>
-                + {copy.lecturer}
-              </Button>
-            ) : null}
-            {currentRole !== ACCOUNT_ROLE_ADMINISTRATOR ? (
-              <Button size="sm" variant="secondary" onClick={() => onGrantRole(ACCOUNT_ROLE_ADMINISTRATOR)}>
-                + {copy.administrator}
-              </Button>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
+        {selectedRoles.length === 0 ? (
+          <span className="user-management__role-error" role="alert">
+            {copy.atLeastOneRoleRequired}
+          </span>
+        ) : null}
+      </div>
 
       <div className="user-management__modal-actions">
         <Button variant="ghost" onClick={onExit}>

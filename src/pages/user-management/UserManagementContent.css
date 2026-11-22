@@ -226,6 +226,32 @@
   font-size: var(--font-size-body);
 }
 
+.user-management__roles-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.user-management__roles-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background-color: var(--color-bg-elevated, #292839);
+  border: 1px solid var(--color-divider, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.user-management__role-error {
+  font-size: var(--font-size-body, 14px);
+  color: var(--color-input-error, #f87171);
+}
+
 .user-management__role-display {
   display: flex;
   align-items: center;
@@ -351,3 +377,27 @@
   color: var(--color-text-secondary, #9ca3af);
   font-style: italic;
 }
+
+/* Styl kolumny z badge metody logowania (współdzielony design z /organizations) */
+.user-management__login-method-badge {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm, 4px);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.user-management__login-method-badge--saml {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.user-management__login-method-badge--email {
+  background-color: var(--color-accent-muted, rgba(200, 65, 65, 0.16));
+  color: #fca5a5;
+  border: 1px solid var(--color-accent-2, rgba(200, 65, 65, 0.35));
+}
+

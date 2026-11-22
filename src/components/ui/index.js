@@ -6,6 +6,7 @@
 // === IMPORTY I ZALEŻNOŚCI ===
 export { default as AppLogo } from './AppLogo/AppLogo.jsx';
 export { default as Button } from './Button/Button.jsx';
+export { default as Checkbox } from './Checkbox/Checkbox.jsx';
 export { default as AssetSvg } from './AssetSvg/AssetSvg.jsx';
 export { default as PageHeader } from './PageHeader/PageHeader.jsx';
 export { default as SubNav } from './SubNav/SubNav.jsx';
