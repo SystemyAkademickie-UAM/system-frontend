@@ -72,7 +72,7 @@ const DiskSpacePage = withLazy(() => import('../pages/disk-space/DiskSpaceConten
 const DocumentsPage = withLazy(() => import('../pages/documents/DocumentsContent.jsx'));
 const BroadcastsPage = withLazy(() => import('../pages/broadcasts/BroadcastsContent.jsx'));
 const OrganizationManagementPage = withLazy(() => import('../pages/organization-management/OrganizationManagementContent.jsx'));
-const SuperadminLogsPage = withLazy(() => import('../pages/admin-logs/LogsPage.jsx'));
+const SuperadminLogsPage = withLazy(() => import('../pages/superadmin-logs/SuperadminLogsContent.jsx'));
 const AdminBackupPage = withLazy(() => import('../pages/admin-backup/AdminBackupContent.jsx'));
 const SettingsPage = withLazy(() => import('../pages/settings/SettingsContent.jsx'));
 const StatisticsPage = withLazy(() => import('../pages/statistics/StatisticsContent.jsx'));
@@ -174,7 +174,7 @@ const appRouteTree = [
           { path: 'documents', element: withGuard(<DocumentsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
           { path: 'broadcasts', element: withGuard(<BroadcastsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
           { path: 'boardcasts', element: <Navigate to="/broadcasts" replace /> },
-          { path: 'logs', element: withGuard(<SuperadminLogsPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
+          { path: 'logs', element: withGuard(<SuperadminLogsPage />, { allowedRoles: [APP_ROLE.SUPERADMIN] }) },
           { path: 'system-logs', element: <Navigate to="/logs" replace /> },
           {
             path: 'templates',

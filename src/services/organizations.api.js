@@ -96,12 +96,29 @@ export async function listOrganizationAdministrators(organizationId) {
 }
 
 /**
- * Przypisuje rolę administratora wybranej organizacji dla użytkownika o podanym e-mailu.
+ * Osoby z organizacji, które nie mają jeszcze roli osoby administrującej.
  * @param {number} organizationId
- * @param {string} email
  */
-export async function grantOrganizationAdministrator(organizationId, email) {
-  return requireOk(await postJson(`/admin/organizations/${organizationId}/administrators`, { email }));
+export async function listOrganizationAdministratorCandidates(organizationId) {
+  return requireOk(await getJson(`/admin/organizations/${organizationId}/administrators/candidates`));
+}
+
+/**
+ * Nadaje rolę osoby administrującej osobie, która już jest w organizacji.
+ * @param {number} organizationId
+ * @param {number} userId
+ */
+export async function grantOrganizationAdministrator(organizationId, userId) {
+  return requireOk(await postJson(`/admin/organizations/${organizationId}/administrators`, { userId }));
+}
+
+/**
+ * Tworzy pierwszą osobę w organizacji logującej się łączem e-mail i nadaje jej rolę administrującą.
+ * @param {number} organizationId
+ * @param {{ email: string, name: string, surname: string }} body
+ */
+export async function createFirstOrganizationAdministrator(organizationId, body) {
+  return requireOk(await postJson(`/admin/organizations/${organizationId}/administrators/first`, body));
 }
 
 /**

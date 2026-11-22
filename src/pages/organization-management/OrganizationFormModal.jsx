@@ -8,7 +8,21 @@ import Modal from '../../components/ui/Modal/Modal.jsx';
 import TextField from '../../components/ui/TextField/TextField.jsx';
 import Button from '../../components/ui/Button/Button.jsx';
 import { useToast } from '../../components/ui/Toast/Toast.jsx';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
 import { createOrganization, updateOrganization } from '../../services/organizations.api.js';
+
+const ACCOUNT_LIMIT_COPY = {
+  polish: {
+    label: 'Limit kont',
+    placeholder: 'np. 200',
+    invalid: 'Podaj limit kont jako liczbę całkowitą od 1.',
+  },
+  english: {
+    label: 'Account limit',
+    placeholder: 'e.g. 200',
+    invalid: 'Enter the account limit as a whole number from 1.',
+  },
+};
 
 const INITIAL_FORM = {
   name: '',
@@ -28,6 +42,7 @@ const INITIAL_FORM = {
   ssoLoginUrl: '',
   ssoLogoutUrl: '',
   certificatePem: '',
+  accountLimit: '',
   storageQuotaMb: 100,
 };
 
@@ -54,6 +69,8 @@ function HelpTooltip({ text }) {
 
 export default function OrganizationFormModal({ isOpen, onClose, organization, onSaved }) {
   const { showSuccess, showError } = useToast();
+  const language = READLANGUAGECOOKIE();
+  const accountLimitCopy = ACCOUNT_LIMIT_COPY[language] ?? ACCOUNT_LIMIT_COPY.polish;
   const isEdit = Boolean(organization);
   const [form, setForm] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
@@ -94,6 +111,7 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
         ssoLoginUrl: organization.ssoLoginUrl ?? '',
         ssoLogoutUrl: organization.ssoLogoutUrl ?? '',
         certificatePem: '',
+        accountLimit: organization.accountLimit != null ? String(organization.accountLimit) : '',
         storageQuotaMb:
           organization.storageQuotaMb ??
           (organization.storageQuotaBytes ? Math.round(organization.storageQuotaBytes / (1024 * 1024)) : 100),
@@ -172,6 +190,7 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           name: form.name.trim(),
           domain: form.domain.trim().toLowerCase(),
           isActive: form.isActive,
+          accountLimit: Number(form.accountLimit),
           representative: {
             fullName: form.representativeFullName.trim() || organization.representative?.fullName || 'Administrator',
             email: form.representativeEmail.trim() || organization.representative?.email || `admin@${form.domain.trim().toLowerCase()}`,
@@ -199,7 +218,7 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           name: form.name.trim(),
           domain: form.domain.trim().toLowerCase(),
           loginMethod: form.loginMethod,
-          accountLimit: 200,
+          accountLimit: form.accountLimit ? Number(form.accountLimit) : 200,
         };
 
         if (form.representativeFullName.trim() || form.representativeEmail.trim() || form.representativePhone.trim()) {
@@ -318,6 +337,15 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
                 <option value="saml">SAML 2.0 (Federacja SSO)</option>
               </select>
             </div>
+            <TextField
+              id="org-account-limit"
+              label={accountLimitCopy.label}
+              placeholder={accountLimitCopy.placeholder}
+              type="number"
+              value={form.accountLimit}
+              onChange={(event) => handleChange('accountLimit', event.target.value)}
+              required
+            />
 
             {isEdit ? (
               <div className="org-form__field org-form__field--checkbox">
