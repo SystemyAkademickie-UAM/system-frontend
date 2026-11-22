@@ -22,6 +22,7 @@ import {
   devApiTestPath,
   homePath,
   loginPath,
+  organizationsPath,
   templatesPath,
 } from './pathRegistry.js';
 import {
@@ -53,12 +54,14 @@ function withGuard(element, { requireAuth = true, allowedRoles, redirectTo } = {
 
 const LECTURER_ONLY = [APP_ROLE.LECTURER, APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN];
 const STUDENT_ONLY = [APP_ROLE.STUDENT];
+const GROUPS_LIST_ROLES = [APP_ROLE.STUDENT, APP_ROLE.LECTURER, APP_ROLE.ADMIN];
 
 const LoginPage = withLazy(() => import('../pages/auth/LoginPage.jsx'));
 const LoginMagicPage = withLazy(() => import('../pages/auth/LoginMagicPage.jsx'));
 const WelcomePage = withLazy(() => import('../pages/auth/WelcomePage.jsx'));
 const MaintenancePage = withLazy(() => import('../pages/maintenance/MaintenancePage.jsx'));
 const DevApiTestPage = withLazy(() => import('../pages/api-test/DevApiTestPage.jsx'));
+const DevToolsPage = withLazy(() => import('../pages/dev-tools/DevToolsPage.jsx'));
 
 const CourseManagementPage = withLazy(() => import('../pages/course-management/CourseManagementContent.jsx'));
 const HelpPage = withLazy(() => import('../pages/help/HelpContent.jsx'));
@@ -155,8 +158,10 @@ const appRouteTree = [
           { path: 'help', element: withGuard(<HelpPage />) },
           { path: 'faq', element: withGuard(<FaqPage />) },
           { path: 'patch-notes', element: withGuard(<PatchNotesPage />) },
+          { path: 'dev/tools', element: withGuard(<DevToolsPage />) },
 
-          { path: 'home', element: withGuard(<AdminHomePage />, { allowedRoles: [APP_ROLE.ADMIN] }) },
+          { path: 'my-organization', element: withGuard(<AdminHomePage />, { allowedRoles: [APP_ROLE.ADMIN] }) },
+          { path: 'home', element: <Navigate to="/my-organization" replace /> },
           { path: 'users', element: withGuard(<UserManagementPage />, { allowedRoles: [APP_ROLE.ADMIN, APP_ROLE.SUPERADMIN] }) },
           { path: 'userManagement', element: <Navigate to="/users" replace /> },
           { path: 'courseManagement', element: <Navigate to="/groups" replace /> },
@@ -183,7 +188,7 @@ const appRouteTree = [
           {
             path: 'groups',
             children: [
-              { index: true, element: withGuard(<GroupsListPage />) },
+              { index: true, element: withGuard(<GroupsListPage />, { allowedRoles: GROUPS_LIST_ROLES, redirectTo: organizationsPath() }) },
               {
                 path: ':groupId',
                 children: [

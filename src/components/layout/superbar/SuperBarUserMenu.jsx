@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../../context/SessionContext.jsx';
 import { loginContextMenuLabel } from '../OrganizationRoleDialog.jsx';
 import { logoutUser, isLogoutAvailable } from '../../../services/authService.js';
+import { devToolsPath } from '../../../routes/pathRegistry.js';
 import { IconUserPlaceholder } from './ShellIcons.jsx';
 import SuperBarUserIdentity from './SuperBarUserIdentity.jsx';
 import { getAvatarImageClassName } from '../../../utils/avatarDisplay.js';
@@ -41,6 +42,11 @@ const LOGOUTBUTTONTEXT__TEXTLABEL = {
 const ACCOUNTMENU__TEXTLABEL = {
   polish: 'Menu konta użytkownika',
   english: 'User account menu',
+};
+
+const DEVTOOLS__TEXTLABEL = {
+  polish: 'Narzędzia dev',
+  english: 'Dev tools',
 };
 
 // === GŁÓWNY KOMPONENT WIDOKU ===
@@ -169,6 +175,20 @@ const [logoutError, setLogoutError] = useState(null);
                 {logoutError}
               </li>
             ) : null}
+            <li role="none">
+              <button
+                type="button"
+                className="super-bar-user-menu__dropdown-item"
+                role="menuitem"
+                onClick={() => {
+                  setOpen(false);
+                  onNavigate?.();
+                  navigate(devToolsPath());
+                }}
+              >
+                {DEVTOOLS__TEXTLABEL[LANGUAGE] || 'Narzędzia dev'}
+              </button>
+            </li>
             {changeContextLabel ? (
               <li role="none">
                 <button

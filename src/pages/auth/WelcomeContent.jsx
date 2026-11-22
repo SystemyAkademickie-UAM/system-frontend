@@ -5,7 +5,7 @@
 
 // === IMPORTY I ZALEŻNOŚCI ===
 import { Link, useSearchParams } from 'react-router-dom';
-import { useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { useToast } from '../../components/ui/Toast/Toast.jsx';
 import { groupsListPath, loginPath } from '../../routes/pathRegistry.js';
 import { useSessionOptional } from '../../context/SessionContext.jsx';
@@ -185,7 +185,25 @@ export default function WelcomeContent() {
     setSearchParams({}, { replace: true });
   }, [searchParams, setSearchParams, showSuccess, LANGUAGE]);
 
-  const [isEasterEgg] = useState(() => Math.floor(Math.random() * 100) + 1 === 100);
+  const [isEasterEgg, setIsEasterEgg] = useState(false);
+  const clickCountRef = useRef(0);
+  const clickTimerRef = useRef(null);
+
+  const handleLogoClick = useCallback(() => {
+    clickCountRef.current += 1;
+    if (clickTimerRef.current) {
+      clearTimeout(clickTimerRef.current);
+    }
+    if (clickCountRef.current >= 5) {
+      setIsEasterEgg((prev) => !prev);
+      clickCountRef.current = 0;
+    } else {
+      clickTimerRef.current = setTimeout(() => {
+        clickCountRef.current = 0;
+      }, 1500);
+    }
+  }, []);
+
   const session = useSessionOptional();
 
 const targetJoinPath = session?.isAuthenticated ? groupsListPath() : loginPath();
@@ -227,6 +245,7 @@ const targetJoinPath = session?.isAuthenticated ? groupsListPath() : loginPath()
                   'welcome-hero__brand-logo',
                   isEasterEgg ? 'welcome-hero__brand-logo--easter-egg' : '',
                 ].filter(Boolean).join(' ')}
+                onClick={handleLogoClick}
               />
               <span className="welcome-hero__brand-a" aria-hidden="true">A</span>
               <span className="welcome-hero__brand-q" aria-hidden="true">Q</span>

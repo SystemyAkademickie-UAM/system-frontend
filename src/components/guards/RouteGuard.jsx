@@ -10,7 +10,7 @@ import { useSession } from '../../context/SessionContext.jsx';
 import { useAppRole } from '../../context/AppRoleContext.jsx';
 import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
 import { useRegistrationComplete } from '../../hooks/useRegistrationComplete.js';
-import { groupsListPath, loginPath, maintenancePath, welcomePath } from '../../routes/pathRegistry.js';
+import { adminHomePath, groupsListPath, loginPath, maintenancePath, organizationsPath, welcomePath } from '../../routes/pathRegistry.js';
 import { isCachedMaintenanceActive } from '../../services/maintenance.api.js';
 import './RouteGuard.css';
 
@@ -77,7 +77,13 @@ const location = useLocation();
   if (allowedRoles && allowedRoles.length > 0) {
     const hasAccess = allowedRoles.includes(role);
     if (!hasAccess) {
-      const fallback = redirectTo ?? (isAuthenticated ? groupsListPath() : welcomePath());
+      let defaultRoleFallback = groupsListPath();
+      if (role === APP_ROLE.SUPERADMIN) {
+        defaultRoleFallback = organizationsPath();
+      } else if (role === APP_ROLE.ADMIN) {
+        defaultRoleFallback = adminHomePath();
+      }
+      const fallback = redirectTo ?? (isAuthenticated ? defaultRoleFallback : welcomePath());
       return <Navigate to={fallback} replace />;
     }
   }

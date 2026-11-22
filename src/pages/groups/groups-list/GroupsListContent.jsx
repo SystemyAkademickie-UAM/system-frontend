@@ -25,6 +25,10 @@ const SECTIONTITLE__TEXTLABEL = {
   polish: 'Twoje grupy',
   english: 'Your Groups',
 };
+const ADMINSECTIONTITLE__TEXTLABEL = {
+  polish: 'Grupy',
+  english: 'Groups',
+};
 const SEARCHPLACEHOLDER__TEXTLABEL = {
   polish: 'Szukaj kampanii...',
   english: 'Search campaigns...',
@@ -113,7 +117,7 @@ export default function GroupsListContent() {
   const [editingGroup, setEditingGroup] = useState(null);
   const [deletingGroup, setDeletingGroup] = useState(null);
 
-  const showOtherGroups = role !== APP_ROLE.LECTURER;
+  const showOtherGroups = role !== APP_ROLE.LECTURER && role !== APP_ROLE.ADMIN && role !== APP_ROLE.SUPERADMIN;
   const hasAnyGroups = myGroups.length > 0 || (showOtherGroups && otherGroups.length > 0);
 
 const isFiltering = searchQuery.trim().length > 0;
@@ -152,7 +156,9 @@ const isFiltering = searchQuery.trim().length > 0;
 
       <div className="groups-list__controls">
         <h2 id="groups-list-section-title" className="groups-list__section-title">
-          {SECTIONTITLE__TEXTLABEL[LANGUAGE]}
+          {role === APP_ROLE.ADMIN || role === APP_ROLE.SUPERADMIN
+            ? ADMINSECTIONTITLE__TEXTLABEL[LANGUAGE]
+            : SECTIONTITLE__TEXTLABEL[LANGUAGE]}
         </h2>
         <div className="groups-list__actions">
           <SearchBar

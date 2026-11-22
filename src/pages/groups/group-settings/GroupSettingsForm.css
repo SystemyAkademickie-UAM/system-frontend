@@ -120,8 +120,8 @@
 }
 
 .group-settings-form--drive-layout .group-settings-form__stack > .group-settings-form__field {
-  width: 33.3333%;
-  max-width: 100%;
+  width: 80%;
+  max-width: 80%;
 }
 
 .group-settings-form--lives .group-settings-form__stack > .group-settings-form__field--value {
@@ -130,8 +130,8 @@
 }
 
 .group-settings-form--drive-layout .group-settings-form__field--banner {
-  width: 50%;
-  max-width: 100%;
+  width: 80%;
+  max-width: 80%;
 }
 
 .group-settings-form__banner-picker {

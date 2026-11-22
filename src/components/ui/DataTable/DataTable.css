@@ -357,11 +357,11 @@
   top: calc(100% + 4px);
   z-index: 51;
   box-sizing: border-box;
-  width: min(320px, calc(100vw - 16px));
-  min-width: min(220px, calc(100vw - 16px));
-  max-width: min(320px, calc(100vw - 16px));
+  width: max-content;
+  min-width: 150px;
+  max-width: min(240px, calc(100vw - 16px));
   max-height: calc(100dvh - 16px);
-  padding: 0.5rem 0;
+  padding: 0.35rem 0;
   border-radius: 8px;
   background: var(--color-bg-elevated);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -386,7 +386,7 @@
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  padding: 0.625rem 1rem;
+  padding: 0.5rem 0.85rem;
   border: 0;
   background: transparent;
   font-family: inherit;

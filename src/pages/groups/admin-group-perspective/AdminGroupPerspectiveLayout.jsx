@@ -54,18 +54,35 @@ export default function AdminGroupPerspectiveLayout() {
       const g = result.group || {};
       const teacher = result.availableLecturers?.find((l) => Number(l.accountId) === Number(g.teacherAccountId))
         || g.teacher
-        || { accountId: g.teacherAccountId, name: 'Prowadzący grupy' };
+        || (g.teacherAccountId ? { accountId: g.teacherAccountId, name: 'Prowadzący grupy' } : null);
 
       setGroupData(g);
       setTeacherData(teacher);
       setStudentsList(result.students || []);
 
-      // Default active user is group teacher
-      setActiveUser({
-        type: 'lecturer',
-        accountId: teacher?.accountId || g.teacherAccountId,
-        name: teacher?.name || 'Prowadzący',
-      });
+      // Default active user is group teacher if present, otherwise first student or unassigned
+      if (teacher?.accountId) {
+        setActiveUser({
+          type: 'lecturer',
+          accountId: teacher.accountId,
+          name: teacher.name || 'Prowadzący',
+        });
+      } else if (result.students && result.students.length > 0) {
+        const firstStudent = result.students[0];
+        setActiveUser({
+          type: 'student',
+          accountId: firstStudent.accountId,
+          name: `${firstStudent.name} ${firstStudent.surname}`.trim() || firstStudent.nickname || 'Student',
+          currency: firstStudent.currency,
+          lives: firstStudent.lives,
+        });
+      } else {
+        setActiveUser({
+          type: 'lecturer',
+          accountId: null,
+          name: 'Brak prowadzącego',
+        });
+      }
       setImpersonatedStudentId(null);
     });
 
@@ -154,12 +171,20 @@ export default function AdminGroupPerspectiveLayout() {
           ) : null}
 
           <div className="admin-persp-topbar__user-identity">
-            <span className="admin-persp-topbar__user-label">
-              {activeUser.type === 'lecturer' ? 'Prowadzący:' : 'Student:'}
-            </span>
-            <span className="admin-persp-topbar__user-name" title={activeUser.name}>
-              {activeUser.name}
-            </span>
+            {activeUser.accountId ? (
+              <>
+                <span className="admin-persp-topbar__user-name" title={activeUser.name}>
+                  {activeUser.name}
+                </span>
+                <span className="admin-persp-topbar__user-role">
+                  {activeUser.type === 'lecturer' ? 'Prowadzący' : 'Student'}
+                </span>
+              </>
+            ) : (
+              <span className="admin-persp-topbar__user-role admin-persp-topbar__user-role--empty">
+                Grupa bez prowadzącego
+              </span>
+            )}
           </div>
 
           <button

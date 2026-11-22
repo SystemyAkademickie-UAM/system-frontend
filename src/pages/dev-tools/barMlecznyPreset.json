@@ -1,0 +1,976 @@
+{
+  "groupName": "Bar mleczny na krańcu galaktyki",
+  "subject": "Język angielski",
+  "description": "Bar mleczny na krańcu galaktyki poszukuje pracowników na stanowisko... bliżej nieokreślone. Nie obawiasz się pracy w tylko z pozoru niebezpiecznych warunkach? Chcesz się przekonać jak to jest pracować jakby ten dzień był dniem ostatnim... i to każdego dnia? Nie przeszkadza Ci wieloletni dojazd do miejsca pracy? Potrafisz pracować pod presją czasu, nawet gdy widzisz jak za oknem czas się załamuje? Nie ma znaczenia co odpowiesz na te pytania - jeśli Cię nie zraziły, zapraszamy!",
+  "badges": [
+    {
+      "name": "Pomagier",
+      "rarity": 0,
+      "rewardAmount": 500,
+      "storyDescription": "Świetne początki! Oby tak dalej!",
+      "educationalDescription": "Wykonaj łącznie 15 aktywności."
+    },
+    {
+      "name": "Pomocnik",
+      "rarity": 1,
+      "rewardAmount": 1000,
+      "storyDescription": "Idzie Ci coraz lepiej, świetnie!",
+      "educationalDescription": "Wykonaj łącznie 30 aktywności."
+    },
+    {
+      "name": "Prawa ręka",
+      "rarity": 2,
+      "rewardAmount": 1500,
+      "storyDescription": "Kokorova jest z ciebie dumna.",
+      "educationalDescription": "Wykonaj łącznie 45 aktywności."
+    },
+    {
+      "name": "Obie ręce",
+      "rarity": 3,
+      "rewardAmount": 2000,
+      "storyDescription": "Kokorova na Tobie polega.",
+      "educationalDescription": "Wykonaj łącznie 60 aktywności."
+    },
+    {
+      "name": "Pracowity dzień",
+      "rarity": 1,
+      "rewardAmount": 500,
+      "storyDescription": "Świetna robota, do zobaczenia jutro!",
+      "educationalDescription": "Wykonaj wszystkie aktywności w danym etapie."
+    },
+    {
+      "name": "Pracowity weekend",
+      "rarity": 2,
+      "rewardAmount": 1500,
+      "storyDescription": "Dobrze ci idzie - trzymasz tempo i nie zwalniasz.",
+      "educationalDescription": "Wykonaj wszystkie aktywności w trzech etapach."
+    },
+    {
+      "name": "Pracowity tydzień",
+      "rarity": 3,
+      "rewardAmount": 2500,
+      "storyDescription": "Nawet Kokorova nie pracuje tak wydajnie.",
+      "educationalDescription": "Wykonaj wszystkie aktywności w siedmiu etapach."
+    },
+    {
+      "name": "Pracownik miesiąca",
+      "rarity": 0,
+      "rewardAmount": 500,
+      "storyDescription": "Wszyscy chwalą Twoją pomoc.",
+      "educationalDescription": "Wykonaj większą część zadań w 10 etapach."
+    },
+    {
+      "name": "Tydzień już minął",
+      "rarity": 0,
+      "rewardAmount": 500,
+      "storyDescription": "Jak Ci się tutaj podoba po tygodniu pracy?",
+      "educationalDescription": "Staw się w pracy minimum 7 razy."
+    },
+    {
+      "name": "Solidny pracownik",
+      "rarity": 1,
+      "rewardAmount": 750,
+      "storyDescription": "Chyba nie jest tak źle, prawda?",
+      "educationalDescription": "Staw się w pracy minimum 10 razy."
+    },
+    {
+      "name": "Niezłomny pracownik",
+      "rarity": 2,
+      "rewardAmount": 1000,
+      "storyDescription": "Mamy nadzieję, że Ci się tutaj podoba.",
+      "educationalDescription": "Staw się w pracy minimum 13 razy."
+    },
+    {
+      "name": "Bystrzacha",
+      "rarity": 1,
+      "rewardAmount": 750,
+      "storyDescription": "Nadgodziny? Pamiętaj o odpoczynku i bliskich!",
+      "educationalDescription": "Wykonaj 3 zadania dodatkowe."
+    },
+    {
+      "name": "Groźny zawodnik",
+      "rarity": 2,
+      "rewardAmount": 1000,
+      "storyDescription": "Pora na zasłużony odpoczynek!",
+      "educationalDescription": "Wykonaj 5 zadań dodatkowych."
+    },
+    {
+      "name": "Kuchenny kronikarz",
+      "rarity": 0,
+      "rewardAmount": 250,
+      "storyDescription": "Kokorova chce abyś spisał jej przepisy.",
+      "educationalDescription": "Napisz referat na minimum 3 strony."
+    },
+    {
+      "name": "Perfekcjonizm",
+      "rarity": 2,
+      "rewardAmount": 0,
+      "storyDescription": "1000",
+      "educationalDescription": ""
+    },
+    {
+      "name": "Pilny pracownik",
+      "rarity": 0,
+      "rewardAmount": 300,
+      "storyDescription": "Hatter Chummin chwali Twoją dokładność.",
+      "educationalDescription": "Napisz wyjściówkę na 100%."
+    },
+    {
+      "name": "Rzetelna kuchta",
+      "rarity": 1,
+      "rewardAmount": 900,
+      "storyDescription": "Nawet Malvin nie ukrywa zazdrości.",
+      "educationalDescription": "Napisz 3 wyjściówki na 100%."
+    },
+    {
+      "name": "Rzetelna kuchta",
+      "rarity": 2,
+      "rewardAmount": 1800,
+      "storyDescription": "Twoje dania są niemal tak dobre jak Kokorovy.",
+      "educationalDescription": "Napisz 6 wyjściówki na 100%."
+    },
+    {
+      "name": "Rzetelna kuchta",
+      "rarity": 3,
+      "rewardAmount": 3000,
+      "storyDescription": "Już nawet Kokorova prosi Cię o przepisy!",
+      "educationalDescription": "Napisz 10 wyjściówek na 100%."
+    },
+    {
+      "name": "Pracownik zespołowy",
+      "rarity": 1,
+      "rewardAmount": 300,
+      "storyDescription": "Nie ma to jak gotować razem!",
+      "educationalDescription": "Pomóż w zadaniu na zajęciach innej osobie."
+    },
+    {
+      "name": "Przodownik pracy",
+      "rarity": 1,
+      "rewardAmount": 400,
+      "storyDescription": "Bądź pierwszą osobą, która jako pierwsza wykona zadanie na lekcji.",
+      "educationalDescription": ""
+    }
+  ],
+  "ranks": [
+    {
+      "requiredPoints": 0,
+      "percentage": "0%",
+      "name": "Autostopowicz",
+      "description": "Udało ci się dotrzeć do Baru mlecznego na krańcu wszechświata. Gratulacje! Czeka cię rozmowa kwalifikacyjna."
+    },
+    {
+      "requiredPoints": 1000,
+      "percentage": "1%",
+      "name": "Nowy",
+      "description": "Okres próbny! Świetnie! Na razie nie masz jeszcze żadnych obowiązków, ale obserwuj uważnie pracowników!"
+    },
+    {
+      "requiredPoints": 3000,
+      "percentage": "2%",
+      "name": "Pomywacz",
+      "description": "Cóż... każdy od czegoś zaczynał. Ale to tylko okres przejściowy - w końcu przecież aspirujesz na bycie szefem kuchni!"
+    },
+    {
+      "requiredPoints": 6000,
+      "percentage": "3%",
+      "name": "Sprzątacz",
+      "description": "Od teraz masz dostęp do szerszego zakresu narzędzi sprzątających. Możesz teraz sprzątać korytarze, a nawet pokoje gości."
+    },
+    {
+      "requiredPoints": 10000,
+      "percentage": "4%",
+      "name": "Kelner",
+      "description": "Pora na pierwsze kontakty z klientami. I na obserwowanie ich reakcji na to, co dzieje się za oknem."
+    },
+    {
+      "requiredPoints": 15000,
+      "percentage": "5%",
+      "name": "Przewodnik",
+      "description": "Każdy, kto oswoił się z widokami oraz z różnymi reakcjami gości na te widoki, gotów jest o nich opowiadać i tłumaczyć je na język zrozumiały laikom."
+    },
+    {
+      "requiredPoints": 21000,
+      "percentage": "7%",
+      "name": "Młodszy kucharz",
+      "description": "Trudno jest zdobyć zaufanie Kokorovy, ale każdy, kto je zdobył zyskuje prawo sprawdzenia swoich sił w kuchni."
+    },
+    {
+      "requiredPoints": 28000,
+      "percentage": "9%",
+      "name": "Kucharz",
+      "description": "Kokorova musi naprawdę widzieć w tobie duży potencjał! Od teraz możesz przyrządzać nie tylko przystawki."
+    },
+    {
+      "requiredPoints": 36000,
+      "percentage": "11%",
+      "name": "Starszy kucharz",
+      "description": "Do ciebie należy teraz przygotowywanie najbardziej skomplikowanych dań. Kokorova na ciebie liczy!"
+    },
+    {
+      "requiredPoints": 45000,
+      "percentage": "13%",
+      "name": "Szef kuchni",
+      "description": "Jesteś teraz prawą ręką Kokorovy a przy tym międzygalaktycznym kucharzem, który najprawdopodobniej przygotował potrawę dla istot przybywających z każdego zakamarka wszechświata."
+    },
+    {
+      "requiredPoints": 55000,
+      "percentage": "15%",
+      "name": "Szef",
+      "description": "Kokorova uznała, że zasługujesz na tytuł szefa szefów. Od tej pory musisz zarządzać nie kucharzami, lecz szefami kuchni, którzy mają swoich kucharzy. Świetna robota. Pamiętaj jednak, że to szczególnie odpowiedzialne stanowisko."
+    }
+  ],
+  "categories": [
+    {
+      "name": "Gadżet",
+      "color": "rgb(255, 0, 0)"
+    },
+    {
+      "name": "Prowiant",
+      "color": "rgb(0, 255, 0)"
+    },
+    {
+      "name": "Ekwipunek",
+      "color": "rgb(0, 0, 255)"
+    },
+    {
+      "name": "Urządzenie",
+      "color": "rgb(255, 255, 0)"
+    }
+  ],
+  "items": [
+    {
+      "name": "Ryba",
+      "categoryName": "Ekwipunek",
+      "price": 1100,
+      "description": "Dość interesujący gatunek ryby. Umieszczona w uchu zastąpi nawet najbardziej zaawansowany kieszonkowy tłumacz."
+    },
+    {
+      "name": "Przewodnik dla autostopowicza podróżującego przez galaktykę",
+      "categoryName": "Ekwipunek",
+      "price": 1900,
+      "description": "Chcesz przemierzyć galaktykę autostopem, ale nie wiesz od czego zacząć? Zacznij od poradnika! Absolutnie niezbędny w plecaku każdego autostopowicza."
+    },
+    {
+      "name": "Ręcznik",
+      "categoryName": "Ekwipunek",
+      "price": 750,
+      "description": "Najbardziej uniwersalne narzędzie we wszechświecie. Może posłużyć jako ręcznik, koc, żagiel, broń, filtr dymu, sygnalizator zagrożenia, suszarka, wsparcie psychologiczne, ubiór ceremonialny oraz symbol kompetencji (ludzie ufają tym, którzy wiedzą gdzie jest ich ręcznik)."
+    },
+    {
+      "name": "Elektroniczny kciuk",
+      "categoryName": "Ekwipunek",
+      "price": 450,
+      "description": "We wszechświecie oczekiwanie na okazję potrafię trochę potrwać - łatwo wtedy o ból kciuka. Elektroniczny kciuk to idealny kompan - nigdy się nie męczy, wystarczy go uruchomić i czekać na nadlatujący pojazd kosmiczny."
+    },
+    {
+      "name": "Podeterowy komunikator",
+      "categoryName": "Ekwipunek",
+      "price": 2150,
+      "description": "Można go porównać do ziemskiego urządzenia nazywanego pagerem."
+    },
+    {
+      "name": "Pistolet promieniowy",
+      "categoryName": "Gadżet",
+      "price": 3000,
+      "description": "Bardziej niebezpieczny niż wygląda!"
+    },
+    {
+      "name": "Blaster",
+      "categoryName": "Gadżet",
+      "price": 1800,
+      "description": "Mniej niebezpieczny (również dla użytkownika)"
+    },
+    {
+      "name": "Piłka do krykieta",
+      "categoryName": "Gadżet",
+      "price": 2700,
+      "description": "Wygląda jak zwykła piłeczka pozwalająca uprawiać popularny ziemski sport - nic bardziej mylnego, gdyż jest to tak naprawdę bomba!"
+    },
+    {
+      "name": "Syntezator napojów",
+      "categoryName": "Urządzenie",
+      "price": 8999,
+      "description": "Urządzenie umożliwiające tworzenie nad wyraz odżywczych i zdrowych napojów. Niestety, bez względu na skład, każdy z nich będzie smakował mniej lub bardziej jak zwykła herbata."
+    },
+    {
+      "name": "Nieskończony Napęd Probabilistyczny",
+      "categoryName": "Urządzenie",
+      "price": 19900,
+      "description": "Pozwala podróżować szybko, lecz chaotycznie. Uwaga na niemożliwe do kreślenia efekty uboczne!"
+    },
+    {
+      "name": "Pole kamuflujące 'To nie mój problem'",
+      "categoryName": "Urządzenie",
+      "price": 14500,
+      "description": "Wytwarza silne pole kamuflujące, które sprawia, że osoby z zewnątrz nie postrzegają tego, co znajduje się wewnątrz pola, jako ich problem, przez co ignorują wszystko, co zakryte przez pole."
+    },
+    {
+      "name": "Wszechgalaktyczny blaster",
+      "categoryName": "Prowiant",
+      "price": 350,
+      "description": "Wbrew nazwie jest to napój - nad wyraz mocny, choć bezalkoholowy."
+    },
+    {
+      "name": "Tomik Poezji",
+      "categoryName": "Ekwipunek",
+      "price": 1600,
+      "description": "Stara i zniszczona książeczka zawierająca poezję autora pochodzącego z pewnej planety, która cieszy się ogromną populacją grafomanów."
+    },
+    {
+      "name": "Filiżanka herbaty",
+      "categoryName": "Prowiant",
+      "price": 150,
+      "description": "Po prostu filiżanka wypełniona herbatą."
+    },
+    {
+      "name": "Kryształowy przycisk do papieru",
+      "categoryName": "Ekwipunek",
+      "price": 25000,
+      "description": "Przycisk do papieru wykonany z kryształu - trudno o nim powiedzieć coś więcej... choć... zaraz... jest w nim coś specjalnego... tylko trudno powiedzieć co."
+    },
+    {
+      "name": "POV blaster",
+      "categoryName": "Gadżet",
+      "price": 3800,
+      "description": "Cel tej broni pojmuje punkt widzenia i tok rozumowania osoby pociągającej za spust, dzięki czemu przestaje być wobec niej agresywny."
+    },
+    {
+      "name": "Wszczynacz kryzysu",
+      "categoryName": "Ekwiupunek",
+      "price": 1800,
+      "description": "Popularny gadżet, który użyty wprawia użytkownika w nastrój gotowości do stawienia czoła wyimaginowanemu niebezpieczeństwu - zwiększa czujność oraz refleks."
+    },
+    {
+      "name": "Waga perspektywiczna",
+      "categoryName": "Urządzenie",
+      "price": 7500,
+      "description": "Pokazuje wagę przedmiotu w skali wszechświata."
+    },
+    {
+      "name": "Rezerwacja w barze",
+      "categoryName": "Gadżet",
+      "price": 999,
+      "description": "Jedno jest pracować w barze mlecznym, ale przyjść jako gość - to zupełnie inne doświadczenie!"
+    },
+    {
+      "name": "Czasowy bąbel",
+      "categoryName": "Urządzenie",
+      "price": 4555,
+      "description": "Przenośne urządzenie wykorzystujące tę samą technologię, która pozwala gościom baru mlecznego obserwować niezapomniane widoki."
+    },
+    {
+      "name": "Identyfikator galaktyczny",
+      "categoryName": "Ekwipunek",
+      "price": 2000,
+      "description": "Dowód tożsamości respektowany w całej Drodze Mlecznej."
+    },
+    {
+      "name": "Syntetyczny ser",
+      "categoryName": "Prowiant",
+      "price": 225,
+      "description": "Jeden ze specjałów baru mlecznego, pakowany na wynos."
+    }
+  ],
+  "stages": [
+    {
+      "title": "Han Duo",
+      "story": "Kokorova, która jeszcze przed chwilą zdawała się być opanowana, wbiegła do kuchni i zaczęła krzyczeć:\n\n- Kto przyjmował wczoraj rezerwację dla jednej osoby dla jakiegoś Hana?\n\n- Ja - odpowiedział powoli i spokojnie HEL 8001 - zarejestrowałem go z wie...\n\n- Tak, tak - gorączkowała się Kokorova - ale dlaczego tylko dla niego? Dziś przyszedł z jakimś wrzeszczącym dywanem i nie mogą usiąść, bo otrzymali jednoosobowy stolik!\n\n- Nie popełniłem żadnego błędu. Jegomość nie podał swej pełnej godności, lecz podkreślił wyraźnie, że będzie sam. Uznałem zatem, że nierozsądnie byłoby przypisywać jedną osobę do podwójnego stolika.\n\n- Dobrze już, proszę, zajmijcie się nimi czym prędzej, ten dywan nie sprawia wrażenia cierpliwego!",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Goście, goście",
+          "storyDescription": "Przeproś gości za zaistniałe nieporozumienie.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Rekompensata",
+          "storyDescription": "Pomóż Kokorovie zadbać o to, by goście poczuli się dobrze.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Rezerwacja",
+          "storyDescription": "Porozmawiaj z HEL-em 8001 o potencjalnych przyczynach nieporozumienia.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Gwiezdne Torty",
+          "storyDescription": "Pomóż w dekorowaniu tortów wzorami przypominającymi mgławice.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Pomoc w rezerwacjach",
+          "storyDescription": "Pomagając HAL-owi w prowadzeniu rezerwacji gości zadbaj o to, by podobny błąd się już nie powtórzył.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        }
+      ]
+    },
+    {
+      "title": "Monolit",
+      "story": "Zgodnie z planem dzisiaj kończymy tydzień 'Radosnych Płatów Śniadaniowych' - rozpoczęła swoją mowę motywacyjną Kokorova - zapas płatków w kształtach, smakach, kolorach i teksturach z całego wszechświata powoli się nam kończy, ale bardzo was proszę o rozpoczęcie dzisiejszej pracy od przygotowania możliwie najbardziej kolorowych i radosnych przystawek-upominków dla naszych kochanych gości! Ja tymczasem upewnię się czy w dyspozytorni mleka we wszystkich smakach wszystko ok i czy faktycznie będziemy mieć dzisiaj do dyspozycji każdy smak mleka! - dodała i żwawym krokiem udała się do dyspozytorni.\n\nWszyscy pracownicy z ochotą wzięli się do przygotowywania przystawek. Za moment zjadą się tabuny gości a dla żadnego z nich nie może zabraknąć mlecznego upominku. Kilka chwil później przez drzwi kuchni wtoczyła się pozbawiona energii i siły Kokorova, która w niczym nie przypominała Kokorovy, która przed momentem udała się do dyspozytorni.\n\n- Przepraszam was za spóźnienie! - zaskomlała zupełnie wycieńczona. - Ale miałam fatalną noc... śniło mi się, że się obudziłam a na środku mojej sypialni wyrósł taki czarny graniastosłup o podstawie prosto... zaraz... a co wy robicie, moi drodzy? - zapytała zaskoczona. - Przystawki z płatków śniadaniowych? Przecież dzisiaj zaczynamy tydzień 'Latających Naleśników'! Antygrawitacyjna przyprawa przecież przybyła...\n\n- Przepraszam, że ci przerwę, Kokorovo - zaczął Hatter Chummin, ale sama z rana nam kazałaś przygotowywać płatkowe przystawki...",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Dziwny sen",
+          "storyDescription": "Wyjaśnij z Kokorovą problem z jej rozbieżnymi rozkazami.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Dochodzenie",
+          "storyDescription": "Przeprowadź dochodzenie związane z zaistniałą sytuacją; weź pod uwagę podejrzenie, że mogą istnieć dwie Kokorovy.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Dwie Kokorovy?",
+          "storyDescription": "Skontaktuj się z dyspozytornią mleka we wszystkich smakach i upewnij się, czy rzeczywiście istnieją dwie Kokorovy.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Druga Kokorova",
+          "storyDescription": "Odnajdź drugą Kokorovę.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Kokorova może być tylko jedna",
+          "storyDescription": "Porozmawiaj z drugą Kokorovą i dowiedz się skąd się wzięła i czego chce.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Sen?",
+          "storyDescription": "Zbadaj prawdziwe przyczyny zmęczenia Kokorovy i dokładnie przedyskutuj z nią sen.",
+          "educationalDescription": "Wykonaj zadanie dodatkowe na minimum 50%."
+        },
+        {
+          "currency": 400,
+          "name": "Monolit",
+          "storyDescription": "Udaj się do sypialni Kokorovy i poszukaj monolit, który według jej opisu jest czarnym prostopadłościanem o podstawie prostokąta.",
+          "educationalDescription": "Wykonaj zadanie dodatkowe na minimum 80%."
+        },
+        {
+          "currency": 450,
+          "name": "Latające naleśniki",
+          "storyDescription": "Zabierz się za produkcję latających naleśników i zrób ich jak najwięcej przed przybyciem gości.",
+          "educationalDescription": "Zaprezentuj swoje rozwiązanie zadania dodatkowego."
+        }
+      ]
+    },
+    {
+      "title": "Lunaris",
+      "story": "Dzień w kuchni mijał bez wydarzeń godnych uwagi. Zbliżał się moment kulminacyjny pokazu, który wyjątkowo umilał transmitowany na żywo koncert Bavida Dowiego, odbywający się lata świetlne stąd. Żaden z klientów nie zgłaszał również żadnego problemu. Do czasu.\n\n- Jeden z klientów zgłosił, że do jego stolika przysiadła się jego żona - zdał raport Malvin.\n\n- To... zaraz co, proszę? - zapytała wybita z rytmu Kokorova. - Zgłaszał też, że kelner zapytał go czego sobie życzy? - dodała po chwili.\n\n- Nie - odparł z powagą Malvin.\n\n- Ach, nie przejmuj się mój drogi tą skargą i wracaj do pracy.\n\n- Jest też skarga jego żony - dodał Malvin tym samym tonem.\n\n- Czego dotyczy? Proszę nie każ ciągnąć się za język.\n\n- Ona też zgłasza, że przy stoliku jej męża siedzi jego żona.\n\nKokorova otworzyła usta. W tym samym czasie rozległ się krzyk na sali:\n\n- Bavid! Bavid Dowie!\n\n- We własnej osobie! - dodał ktoś inny a po chwili słychać było tylko chaotyczne krzyki, gwizdy i wrzawę klientów zachwyconych podnieconych klientów namawiających gościa do wspólnego zdjęcia albo zaśpiewania Space Evenity.\n\n- To niemożliwe - skomentował HEL 8001 - Przecież Bavid Dowie koncertuje teraz w...\n\n- Co tu się wyprawia?! - zawołał Hatter Chummin wchodząc bocznymi drzwiami. Dlaczego przy wejściu do restauracji prezydent galaktyki kłóci się sam z sobą?\n\n- To dla niego dość normalne - odrzekła Kokorova nie mogąc oderwać wzroku od gwiazdy glam rocka. - Przecież ma dwie głowy!\n\n- Tak? A od kiedy ma też dwa ciała? - zapytał Hatter Chummin machając ręką by za nim iść na zewnątrz.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Klony",
+          "storyDescription": "Przeprowadź śledztwo w sprawie duplikatów gości.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Oryginały",
+          "storyDescription": "Upewnij się, że 'oryginały' znajdują się tam, gdzie powinny.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Sny",
+          "storyDescription": "Przepytaj 'oryginały' czy w ciągu ostatnich dni nie miały żadnych dziwnych snów albo czy nie widziały jakiegoś dziwnego czarnego monolitu.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Obowiązki przewodnika",
+          "storyDescription": "Zwróć uwagę gości na gwóźdź dzisiejszego programu: planetę w całości składającą się z czegoś, co przypomina ocean, którego powierzchnia przyjmuje różne skomplikowane kształty.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Obowiązki kelnera",
+          "storyDescription": "Podaj w okrągłej misce wytwarzającej własne pole grawitacyjne zupę kształtem i kolorem przypominającą mijaną planetę.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Odpoczynek",
+          "storyDescription": "Przerwij śledztwo, gdy się okaże, że klony zniknęły bezpowrotnie.",
+          "educationalDescription": "Napisz kolokwium częściowe na minimum 60%."
+        },
+        {
+          "currency": 400,
+          "name": "Wyjaśnienie",
+          "storyDescription": "Wyjaśnij gościom, że klony (najprawdopodobniej) były specjalną atrakcją związaną tematycznie z mijaną dziś planetą.",
+          "educationalDescription": "Napisz kolokwium częściowe na minimum 90%."
+        }
+      ]
+    },
+    {
+      "title": "Trapaucjusz i Klurl",
+      "story": "- Przyszli razem... myślałam że będą współpracować - szeptała Kokorova spoglądając to na jednego, to na drugiego z wynalazców, którzy pracowali zawzięcie w osobnych pomieszczeniach. - Tymczasem oni się nawet do siebie nie odzywają.\n\n- Nieprawda - oznajmił HEL 8001 z jednego z głośników - Tuż przed ich przybyciem odebrałem sygnały ich kłótni.\n\n- Nie ufam im - poinformował Malvin.\n\n- To nic nowego - skarcił Hatter Chummin - Wskaż kogoś, komu ufasz.\n\n- Nie myśl, że takie prztyczki uczynią cię bardziej ludzkim - odparł Malvin.\n\nKilka godzin później wynalazcy oznajmili, że zakończyli prace nad wynalazkami mającymi usprawnić pracę w kuchni oraz umilić gościom pobyt w barze. Wśród nich znalazła się inteligentna zupa, która będąc potrawą powinna doradzić jak robi się inne dania lepiej, niż ktokolwiek inny; piekarnik potrafiący przyrządzić praktycznie każde danie, pod warunkiem, że jego nazwa zaczyna się na literę 'n'; barda tworzącego na poczekaniu poezję a nawet maszynę spełniającą życzenia. Kokorova zleciła wam ostrożne przetestowanie wynalazków.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Inteligentna zupa",
+          "storyDescription": "Spróbuj dowiedzieć się od zupy jak powinno się robić dania, aby smakowały najlepiej.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Amatematyczna zupa",
+          "storyDescription": "Przekonaj inteligentną zupę, ugotowaną przez jednego z wynalazców, że dwa plus dwa może jednak nie być siedem w taki sposób, by jej nie urazić... ani tym bardziej zdenerwować.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Piekarnik do potęgi n",
+          "storyDescription": "Przetestuj najnowszy wynalazek drugiego z wynalazców: piekarnik, który potrafi wydać każdą potrawę na literę 'n'.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Nic",
+          "storyDescription": "Okiełznaj piekarnik, któremu Malvin kazał przyrządzić nic a ten zamiast nie robić nic, zaczął zamieniać otaczającą go rzeczywistość w nicość, poczynając od przystawek dla gości.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Elektrybard",
+          "storyDescription": "Przedstaw gościom elektrycznego barda i zaproponuj im, aby poprosili barda o przygotowanie dowolnego utworu.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Poezja",
+          "storyDescription": "Podejmij próbę uspokojenia gości po tym jak za sprawą poezji elektrycznego barda najpierw zostali wprowadzeni w smutny nastrój, później w wesoły... i tak wielokrotnie.",
+          "educationalDescription": "Wykonaj 1 z 3 zadań dodatkowych."
+        },
+        {
+          "currency": 400,
+          "name": "Życzenia",
+          "storyDescription": "Poproś ostatni wynalazek o spełnienie życzenia, jakim jest cofnięcie wszelkich zmian poczynionych przez wszystkie wynalazki oraz ich wynalazców.",
+          "educationalDescription": "Wykonaj 2 z 3 zadań dodatkowych."
+        }
+      ]
+    },
+    {
+      "title": "0-owe prawo",
+      "story": "- Hatter Chummin znów się zawiesił - oznajmił Malvin z charakterystycznym dla siebie spokojem.\n\n- Biedactwo - zmartwiła się Kokorova. - nigdy nie było z nim problemów... może z wyjątkiem pierwszego dnia, kiedy był oprowadzany po całym barze.\n\n- To już czwarty raz w tym tygodniu a mamy czwartek - oznajmił HEL 8001 metodycznie. - I nie byłoby w tym nic niepokojącego, gdyby nie to, że od początku tygodnia po raz pierwszy zaczął pełnić rolę kelnera. Co więcej to zawsze dzieje się w okolicach podwieczorku.\n\n- Rzeczywiści! Czyżby nowe stanowisko mu nie służyło? - zastanawiała się Kokorova.\n\n- Może to przebodźcowanie? - sugerował Malvin. - Na sali musi przetworzyć zbyt dużo informacji i sobie nie radzi. W kuchni patrzył to na garnki, to na kubki i co miałoby go zawiesić?\n\n- A może to wina któregoś z gości? - martwiła się Kokorova. - Może na sali jest jakiś gość, który mu szkodzi... A może nawet celowo? Jakiś haker?\n\n- On ma pozytronowy mózg - zapewnił Malvin. - Sprawia, że jest bardziej ludzki. Na tyle, że żaden haker nie jest mu straszny.\n\n- Coś lub ktoś musi zatem kolidować z jednym z jego praw - oznajmił HEL 8001.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Prawa robotyki",
+          "storyDescription": "Udaj się na salę i sprawdź czy coś nie stwarza bezpośredniego zagrożenia bezpieczeństwo któremukolwiek z gości albo samemu Hatterowi Chumminowi.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Naprawa",
+          "storyDescription": "Odeskortuj do warsztatu Hattera Chummina i upewnij się, że zostanie otoczony odpowiednią opieką.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Pierwsze prawo",
+          "storyDescription": "Przepytaj gości, czy któryś z nich nie czuł się dziś w niebezpieczeństwie albo nie ucierpiał w jakikolwiek sposób na terenie restauracji.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Drugie prawo",
+          "storyDescription": "Spróbuj dowiedzieć się, czy któryś z gości nie wchodził w interakcję z Hatterem Chumminem, a w szczególności czy nie kazał mu zrobić czegoś dziwnego.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Trzecie prawo",
+          "storyDescription": "Upewnij się, że nikt, ani nic nie mogło zrobić krzywdy Hatterowi Chumminowi w trakcie pełnienia przez niego obowiązków kelnera.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Rozmowa",
+          "storyDescription": "Porozmawiaj z Hatterem Chumminem i zapytaj co może powodować jego problemy.",
+          "educationalDescription": "Napisz referat na minimum 1 stronę na podany temat."
+        },
+        {
+          "currency": 400,
+          "name": "Zerowe prawo",
+          "storyDescription": "Wytłumacz Hatterowi Chumminowi, że spoglądanie na roztaczającą się za oknem panoramę międzygalaktyczną wcale nie oznacza doświadczania końca wszechświata, lecz jego krańca, jako lokacji - na dodatek wszystko co widać za oknem dzieje się jedynie w potencjalnej, a co za tym idzie fikcyjnej, przyszłości.",
+          "educationalDescription": "Napisz referat na minimum 2 strony na podany temat."
+        }
+      ]
+    },
+    {
+      "title": "Ubikuitous",
+      "story": "W trakcie dnia pracy w zapleczu kuchni rozległo się pukanie.\n\n- Ktoś się dobija do zaplecza - oznajmił Malvin.\n\n- Mógłbyś mu otworzyć? - zapytała uprzejmie Kokorova próbując rozwiązać problem z cyfrowym piekarnikiem, który odmawiał posłuszeństwa.\n\n- Jasne, jasne - powtarzał monotonnie Malvin. - Już zdążyłem swe kroki skierować do wyjścia - mówił dalej powoli, naciskając klamkę drzwi prowadzących na zewnątrz.\n\n- Dzień dobry! - zawołał głos domokrążnego sprzedawcy obwieszonego różnego rodzaju towarami, na których widniała ta sama nazwa.\n\n- Nie taki znów dobry ten dzień... - odparł Malvin i już miał zapytać w jaki sposób mógłby pomóc, lecz przerwał mu sprzedawca.\n\n- To nawet dobrze się składa! Mam sprawdzony sposób na nienajlepsze dni! - dodał nie czekając na zaproszenie i wchodząc do środka. - Wystarczy, że nakieruje pan dyszę tego sprayu na siebie i naciśnie! - zawołał celując w Malvina puszką aerozolu.\n\n- Dziękuję, ale i bez tego mam zbyt wiele problemów.\n\nMalvin protestował na próżno. Sprzedawca z uśmiechem uwolnił obłok środka trzymanego w dłoni. Malvin zaczął kaszleć, po czym stopniowo zmienił się nieco staroświecki komputer wyposażony w prosty ekran, głośnik i konsolę.\n\n- Co tu się wyprawia? - zmartwiła się Kokorova.\n\n- Nic takiego - odparł kompletnie robotyczny głos Malvina. - Ten miły pan zasugerował rozwiązanie moich problemów i rzeczywiście mu się udało! Moja prosta konstrukcja nie potrafi się już martwić!\n\n- Ani pewno też cieszyć... Tak nie może być! Jesteś teraz... komputerem!",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Sprzedawca",
+          "storyDescription": "Powstrzymaj sprzedawcę zanim użyje sprayu na większej liczbie celów niż Malvin czy szwankujący piekarnik.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Piekarnik",
+          "storyDescription": "Sprawdź jak spray sprzedawcy zadziałał na piekarnik, który przestał już raportować błąd, lecz przestał wyglądać nowocześnie.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Jak działa spray?",
+          "storyDescription": "Spróbuj dowiedzieć się od sprzedawcy jak działa spray.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Test",
+          "storyDescription": "Nie otrzymawszy sensownej informacji o działaniu sprayu, przetestuj swoją teorię, zgodnie z którą użycie sprayu cofa dany przedmiot w czasie.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Raport",
+          "storyDescription": "Poinformuj Kokorovę, że spray nie naprawia urządzeń, lecz cofa dane urządzenie o jedną bądź więcej generacji technologicznych, sprawiając, że problemy jakie mają ich nowoczesne odpowiedniki nie występują w starszych modelach.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Skutki",
+          "storyDescription": "Poproś sprzedawcę, aby odwrócił skutki swojego preparatu i uprzejmie podziękuj mu za jego wymuszone usługi.",
+          "educationalDescription": "Weź udział w grupowym projekcie."
+        }
+      ]
+    },
+    {
+      "title": "Słibl",
+      "story": "Hatter Chummin wyraźnie zaniepokojony (jak na niego) zwrócił się do Kokorovy z głośnika:\n\n- O ile moje dane nie są niekompletne, w barze nigdzie nie ma zainstalowanego Słibla, prawda?\n\n- Teraz ty bawisz się w domokrężnego handlarza? - zapytała Kokorova nie odrywając się od pracy.\n\n- Skądże znowu. Przed drzwiami stoi jakiś jegomość, który twierdzi, że zgłosiliśmy awarię Słibla i zjawiał się aby go naprawić.\n\nKokorova oderwała się od pracy i pogrążyła w myślach.\n\n- To jakiś żart - stwierdził Malvin. Nigdy u nas nie było takiego urządzenia.\n\n- Zaraz to wyjaśnię - powiedziała Kokorova i udała się na zaplecze.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Mechanik",
+          "storyDescription": "Porozmawiaj z mechanikiem o Słiblu.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Wyjaśnienie",
+          "storyDescription": "Zaproś mechanika do środka, by sam poszukał urządzenia, które mogłoby być Słiblem.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Wywiad",
+          "storyDescription": "Popytaj pracowników baru, czy ktoś z nich nie zgłaszał problemu z jakimś urządzeniem.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Dokumenty",
+          "storyDescription": "Poproś złotą rączkę o przedstawienie dokumentów dotyczących naprawy.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Weryfikacja",
+          "storyDescription": "Sprawdź dokładnie dokumentację, aby dowiedzieć się, że zgłoszenie istotnie wykonała Kokorova, lecz za niecałych 100 lat.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        }
+      ]
+    },
+    {
+      "title": "Smutni panowie w czarnych garniturach",
+      "story": "Do kuchni wszedł dynamicznym krokiem Hatter Chummin .\n\n- Jacyś faceci w czarnych garniturach pytają czy nie zaobserwowaliśmy zwiększonego popytu na mleko czekoladowe - powiedział stonowanym głosem, który kontrastował z prędkością, z jaką wszedł do kuchni.\n\n- A co gorsza cztery robaki, jakie im towarzyszą, nie potrafią się pogodzić z tym, że nie podajemy kawy - dodał Malvin nim Kokorova zdążyła otworzyć usta.\n\n- Nie... nie odnotowaliśmy... - zamyśliła się Kokorova. - Mleko czekoladowe? W czarnych garniturach? Przecież wyjaśniałam im już, że nasze widowisko wykorzystuje zjawisko podróży w czasie, ale tylko w sposób bez... - przerwała sama sobie głębokim westchnieniem. - Trudno, miejmy to za sobą. Proszę zajmijcie się gośćmi, zaraz wrócę.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Zastępstwo",
+          "storyDescription": "Postaraj się zastąpić Kokorovę w wykonywaniu jej obowiązków, podczas gdy ona prowadzi rozmowę z niecodziennymi gośćmi.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Zjawisko podróży w czasie",
+          "storyDescription": "Objaśnij funkcjonariuszom wydziału szóstego, że sposób w jaki wykorzystujecie zjawisko podróży w czasie jest zupełnie bezpieczny i kompletnie nieinwazyjny.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Popyt na mleko czekoladowe",
+          "storyDescription": "Sprawdź rejestry w celu określenia jak dużym powodzeniem cieszy się mleko czekoladowe wśród gości.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Sprawozdanie",
+          "storyDescription": "Przedstaw wyniki funkcjonariuszom, zaznaczając, że choć mleko czekoladowe cieszy się zdecydowanie największą popularnością w menu, było tak od początku istnienia baru.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Napój zbożowy",
+          "storyDescription": "Zaproponuj towarzyszom funkcjonariuszy napój zbożowy w miejsce ich ukochanej kawy.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        }
+      ]
+    },
+    {
+      "title": "A-PAX",
+      "story": "Do kuchni wszedł wyjątkowo mocno niepocieszony Hatter Chummin i zameldował:\n\n- Mamy dwie skargi z sali. Pierwsza jest od jakiegoś faceta z latarką, który żali się, że po sali grasuje nieokrzesany mrówkojad z brązowym futrem, który chce zjeść jego pupila. Druga jest od zaskarżonego futrzastego jegomościa, który się skarży, że robimy niepotrzebnie apetyt reklamując żywność, której nie mamy w ofercie.\n\nKokorova nie zdążyła jeszcze przetworzyć wszystkich informacji, gdy do kuchni wszedł mężczyzna trzymający w jednej ręce lusterko a w drugim latarkę.\n\n- Bardzo uprzejmie przepraszam - zaczął grzecznym tonem - ale nie mogłem dłużej czekać na rozpatrzenie mojego zażalenia, gdyż podmiot mojej skargi nieprzerwanie poluje na mojego golfama.\n\nLedwie skończył swoją wypowiedź, a przez podwójne drzwi wskoczył do kuchni jegomość, który wcale nie przypominał mrówkojada.\n\n- Cieszę się, że jednak wzięliście go do kuchni, ale niestety jestem w pośpiechu i chętnie zjem go tak jak teraz. Koty smakują mi podane w sposób dowolny. Nawet, gdy nie są mi podane wcale - oznajmił radosnym głosem wyciągając włochatą łapę w kierunku golfama.\n\n- To nieporozumienie! - krzyczał mężczyzna odwodząc swojego podopiecznego jak najdalej od łap głodnego gościa. - Poza tym to nie jest kot, tylko golfam.\n\n- Imiona nie wpływają na smak - zapewniał 'mrówkojad'.\n\n- To nie jego imię, tylko rasa! Nie jest kotem - bronił dalej mężczyzna. - Przypomina koty, ale kotem nie jest.\n\n- O lwach też tak mówią.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Mrówkojad",
+          "storyDescription": "Podejmij próbę wytłumaczenia głodnemu gościowi, że nie może jeść innych gości.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Kocie ogonki",
+          "storyDescription": "Zaoferuj czekoladki nazywane kocimi ogonkami, które z kotami mają wspólną tylko nazwę.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Kocie ciasto",
+          "storyDescription": "Zaproponuj alternatywę w postaci ciasta kształtem przypominającego kota.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Kisiel i ciastka",
+          "storyDescription": "Zaspokój apetyt wybrednego gościa akceptowaną przez niego alternatywą.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Okno",
+          "storyDescription": "Wskaż mężczyźnie i jego golfamowi standardowe okno, aby mogli wrócić bezpiecznie do domu.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        }
+      ]
+    },
+    {
+      "title": "Spirited to space",
+      "story": "Tej nocy Kokorova nie mogła spać. Rano była przemęczona, choć nie dawała tego po sobie poznać.\n\n- Nadszedł ten dzień - oznajmiła drżącym głosem. - Wizytacja EpidSanu. Jak zwykle nie wiemy o której godzinie przyjdzie inspektor. Wiemy tylko tyle, że to dziś.\n\n- Oby tylko znowu HEL 8001 nie zaczął mówić żadnych niepokojących rzeczy - martwił się Malvin.\n\n- Jestem bardzo entuzjastycznie nastawiony w stosunku do wizytacji - oznajmił spokojnie HEL 8001.\n\n- Oby tylko nie pojawił się żaden gość podobny do tego z przedostatniej wizyty - martwił się Malvin.\n\n- Masz na myśli tego z... - zaczął Malvin.\n\n- Z kierownicą od roweru, tak - dokończył Hatter Chummin - jesteśmy teraz w kuchni! - zgonił go na koniec.\n\n- Nie ma się co martwić na zapas - oznajmiła Kokorova, wyraźnie zmartwiona. - Proszę abyście tylko...\n\nKokorovie przerwała wrzawa na sali. Przełknęła ślinę i tylko skinęła na Malvina, aby opisał jej co się dzieje na sali. Android wyjrzał przez okrągłe okno kuchni i rzekł:\n\n- Mamy zagrożenie klasy 'gość z kierownicą' - oznajmił poważnie. - Oby dał równie duży bonus - dodał mniej poważnym, choć w dalszym ciągu monotonnym głosem Malvin.\n\n- Nie wygląda jakby miał jakieś kieszenie - informował Malvin. - Chyba, że jako bonus chciałbyś dostać ślinę. I to bez gumy. Ma jej na litry... w obu paszczach.\n\nKażde z wypowiadanych przez Hattera Chummina słów powodowało, że Kokorova bladła bardziej i bardziej.\n\n- Dobra - rzekł twardo Malvin. - Sytuacja kryzysowa. Przejmuję dowodzenie.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Interwencja",
+          "storyDescription": "Udaj się na salę, by wyjaśnić nieporozumienie.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Nieproszony gość",
+          "storyDescription": "Postaraj się uprzejmie wyprosić gościa.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Lista gości",
+          "storyDescription": "Wy tłumacz gościowi, że nie ma go na liście gości i dlatego nie możecie go dzisiaj obsłużyć.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Porządki",
+          "storyDescription": "Posprzątaj podłogę dokładnie zmywając ślinę gościa zanim zjawi się inspektor.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Warta",
+          "storyDescription": "Oczekuj w pełnej gotowości przyjścia inspektora.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Pocieszanie",
+          "storyDescription": "Wy tłumacz Kokorovie, żeby się nie martwiła brakiem wizytacji. Możliwe, że inspektorowi coś wypadło i zjawi się w innym terminie.",
+          "educationalDescription": "Napisz częściowe kolokwium na minimum 60%."
+        },
+        {
+          "currency": 400,
+          "name": "Recenzja",
+          "storyDescription": "Następnego dnia przeczytaj na głos Kokorovie recenzję wystawioną w magazynie Restauracje Wszechświata: 'Recenzja Baru Mlecznego na Krańcu Galaktyki będzie nad wyraz krótka, bowiem niestety nie udało mi się skosztować żadnej potrawy. Z przykrością muszę oznajmić, że nad wyraz nieuprzejma obsługa w niezwykle niegrzeczny sposób wyprosiła mnie z baru nim zdołałem nawet złożyć zamówienie.'",
+          "educationalDescription": "Napisz częściowe kolokwium na minimum 90%."
+        }
+      ]
+    },
+    {
+      "title": "Doctor How many?",
+      "story": "Kokorova stanęła na środku kuchni, jak miała w zwyczaju, gdy zamierzała wygłosić ważne przemówienie.\n\n- Gdzie jest Hatter Chummin? - zapytała błądząc wzrokiem po twarzach pracowników.\n\n- Rozmawia od jakiegoś czasu z kilkoma jegomościami przy wejściu - odparł HEL 8001 natychmiastowo.\n\n- Trudno, czas nas goni, a mamy problem: dzień podróży w czasie dopiero co się rozpoczął a Czasochłonna zupa już nam się kończy! To niemożliwe, byśmy wydali już wszystkie. Mieliliśmy składników na dwa dni serwowania jej bez przerwy i to każdemu z gości!\n\n- Zgadza się - zaczął Malvin. - Ale HEL 8001 postanowił usprawnić jej przepis i zupa zamiast cofać się w czasie ze statusu 'zjedzona' do 'na talerzu' zaczęła się już cofać z 'ugotowana' do... no właśnie, sprawdziłem magazyn i na pewno nie 'z powrotem na składzie'. Kto wie czy to nie poszło tak daleko, że 'z powrotem w sklepie' albo nawet 'z powrotem w ziemi'.\n\n- Kokorova rozłożyła kopyta w myślach przygotowując zastępstwo w kuchni za HEL-a, gdy w podwójnych drzwiach stanął Hatter Chummin.\n\n- Mamy problem - powiedziała w chwili, gdy Hatter Chummin otworzył usta.\n\n- Słucham - odrzekł uprzejmie Hatter Chummin.\n\n- Nie, ja słucham.\n\n- Ach - zmieszał się Hatter Chummin. - Mamy problemy. Oprócz skarg, że z budek telefonicznych przy parkingu nie można dzwonić, mamy kilka rezerwacji na nazwisko 'Doktor' od, kilka minut temu powiedziałbym czterech osób, ale teraz będzie już pewno i pięciu, a kto wie czy ta liczba jeszcze nie urośnie.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Przesłuchanie",
+          "storyDescription": "Przesłuchaj Doktorów, aby poznać genezę nieporozumienia.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Doktorzy",
+          "storyDescription": "Znajdź rozwiązanie jak posadzić wszystkich doktorów z różnych linii czasowych w wypełnionej restauracji.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Czasochłonna zupa",
+          "storyDescription": "Przygotuj Czasochłonną zupę trzymając się ściśle jej przepisu.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Budki telefoniczne",
+          "storyDescription": "Dowiedz się co budki telefoniczne w ogóle robią na parkingu.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Problemy z komunikacją",
+          "storyDescription": "Sprawdź dlaczego budki telefoniczne nie działają, jak wskazywałaby na to ich nazwa.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        }
+      ]
+    },
+    {
+      "title": "Fundacja, Imperium i Roboty",
+      "story": "Malvin podawał właśnie zupę wiśniową jednemu z gości, gdy ten powiedział:\n\n- To wspaniałe miejsce. Jaka szkoda, że jeśli nie podejmiecie żadnych działań, niebawem przestanie funkcjonować - mówił uważnie obserwując twarz Malvina, która wbrew oczekiwaniom mówcy nie uległa najmniejszej zmianie.\n\n- Bardzo by mnie to zmartwiło, gdybym nie miał poważniejszych zmartwień - odrzekł Malvin nie chcąc pozostawiać gościa bez odpowiedzi, po czym wrócił do kuchni.\n\nPo chwili z kuchni wybiegła zaaferowana Kokorova. Doskoczyła do jedzącego w spokoju zupę tajemniczego klienta i zapytała:\n\n- Co to znaczy, że bar niebawem przestanie funkcjonować? Skąd pan to wie?\n\nMężczyzna wyprostował się w fotelu i oznajmił, że jeśli jego kalkulacje są prawidłowe, bar zostanie zamknięty nim upłynie milenium. Kokorovą natychmiast się uspokoiła. Bynajmniej nie dlatego, że tysiąc lat to nad wyraz odległa przyszłość, ale dlatego, że uznała słowa mężczyzny za bezsensowne gdybania kogoś, kto choć przez moment chce się poczuć ważny.\n\n- Rozumiem w pełni to spojrzenie - rzekł mężczyzna. - Proszę nie myśleć, że jestem jakimś tam wróżbitą czy naciągaczem.\n\n- Kim pan zatem jest? Wizjonerem?\n\n- Wolę unikać takich nadmuchanych słów. Jestem po prostu matematykiem.\n\n- Czyli zamiast z fusów, wróży pan z liczb?\n\nMężczyzna zaśmiał się w sposób dość wymuszony, jakby nie pierwszy raz usłyszał podobne słowa.\n\n- 'Wróżę' - podkreślił to słowo ironicznie - dzięki psycho historii.\n\n- I to nie są nadmuchane słowa?",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Tajemniczy gość",
+          "storyDescription": "Dowiedz się czegoś więcej o tajemniczym gościu.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Tajemnicza dziedzina nauki",
+          "storyDescription": "Zasięgnij więcej informacji na temat nauki, jaką zajmuje się wieszczący koniec baru mężczyzna.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Profilaktyka",
+          "storyDescription": "Zapytaj czy można coś zrobić, by zapobiec niepożądanemu końcowi baru mlecznego.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Pocieszenie",
+          "storyDescription": "Pomóż Kokorovie zrozumieć czym jest psycho historia.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Plan działania",
+          "storyDescription": "Razem z Kokorovą i HEL-em 8001 stwórzcie plan mający na celu zażegnanie nie powstałego jeszcze kryzysu.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        }
+      ]
+    },
+    {
+      "title": "Epikuous",
+      "story": "- Mam urlop - odezwała się do Hattera Chummina kobieta, której ten podawał czekoladowe mleko. - Zawitałam do waszej restauracji wyłącznie w celach rekreacyjnych.\n\n- Miło nam - odparł Hatter Chummin wyczuwając, że kobieta zrobiła pauzę.\n\n- Wygląda jednak na to, że będę musiała na moment wziąć sobie wolne od urlopu - dodała nie patrząc w stronę rozmówcy. - Chyba że...\n\n- Chyba że?\n\n- Zdajecie sobie sprawę z tego, że w waszych szeregach macie telepatę.\n\n- To pytanie czy... - zmieszał się Hatter Chummin.\n\n- Czyli nie zdajecie. Nawet na krańcu świata znajdzie się coś do roboty - dodała z lekkim uśmiechem. - Trudno.\n\nProszę poprowadź mnie do osoby zwierzchniej.\n\n- Naturalnie. Proszę za mną - odpowiedział uprzejmym, choć drżącym głosem Hatter Chummin.\n\n- Droga Kokorovo, proszę cię o wysłuchanie naszego szanownego gościa - zwrócił się do Kokorovy Hatter Chummin, gdy tylko wraz z gościem wkroczyli do kuchni.\n\n- Dzień dobry - zaczęła Kokorova z przyjaznym uśmiechem. - Czym mogę służyć?\n\n- Dzień dobry. Z całym szacunkiem, ale to pytanie powinna zadać ja - rzekła kobieta niedbale rzucając spojrzenie na pracowników kuchni. - Jestem Inercjałką a wśród osób pracujących w kuchni znajduje się telepata. Chciałam się tylko upewnić czy macie tego świadomość. Ot taka, życzliwość zawodowa.\n\n- Nic mi o tym nie wiadomo... Życzliwość? Co pani sugeruje?\n\n- Utajnieni telepati w przedsiębiorstwach mają zazwyczaj jeden cel: wykraść dane. Z pewnością macie jakieś sekretne składniki czy tajemne przepisy, prawda?\n\nKokorova zaniemówiła.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Inercjałka",
+          "storyDescription": "Dowiedz się więcej na temat inercjałów.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Oferta",
+          "storyDescription": "Uzyskaj informacje na temat tego, jak kobieta mogłaby wam pomóc.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Śledztwo",
+          "storyDescription": "Pomóż w prowadzeniu śledztwa mającego na celu odnalezienie telepaty.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Wywiad środowiskowy",
+          "storyDescription": "Porozmawiaj z pracownikami o tym czy wiedzą czegoś na temat telepaty.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Hatter Chummin",
+          "storyDescription": "Porozmawiaj na osobności z Hatterem Chumminem, który zdaje się wiedzieć coś na temat telepaty.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Telepata",
+          "storyDescription": "Wraz z Hatterem Chumminem poinformuj Kokorovę, że tajemniczym telepatą jest sam Hatter Chummin.",
+          "educationalDescription": "Napisz częściowe kolokwium na minimum 60%."
+        },
+        {
+          "currency": 400,
+          "name": "Sprawozdanie",
+          "storyDescription": "Wyjaśnij inercjałce, że nie skorzystacie z jej usług, gdyż telepatą okazał się robot, którego architektura nie pozwala mu wykorzystać zdobytej wiedzy w złych celach.",
+          "educationalDescription": "Napisz częściowe kolokwium na minimum 90%."
+        }
+      ]
+    },
+    {
+      "title": "Czy łowcy śnią o zbiegłych androidach?",
+      "story": "- Co to za poruszenie na sali? - zapytała Kokorova Malvina, gdy ten wszedł do kuchni.\n\n- Jakiś mężczyzna w prochowcu wymachuje pistoletem z dwoma spustami, wypytuje gości o jakieś żółwie i sowy i mówi coś o jakichś wojnach w różnych językach - odpowiedział Malvin odkładając brudne naczynia.\n\nKokorova pobladła.\n\n- I ty, mój drogi, meldujesz to wszystko jak gdyby nigdy nic?\n\n- W drugiej ręce ma odznakę, więc pewnie wie co robi - westchnął Malvin.\n\n- Poproś go tutaj, jakeś taki chojrak. Nie możemy mieć na sali nikogo z bronią w ręku!\n\nMalvin wyszedł powolnym krokiem, by po chwili wrócić z mężczyzną, którego początkowo poważna mina w jednej sekundzie zmieniła się w radosną.\n\n- Ale świetna krowa! - zawołał mężczyzna chowając pistolet do kabury. - Przepraszam, że pozwolę sobie zapytać, ale czy jest prawdziwa?\n\n- Ja również przepraszam, ale proszę? - zdumiała się Kokorova.\n\n- Mówiąca krowa?! - niemal krzyknął głosem wypełnionym jednocześnie zdumieniem i rozczarowaniem. - Wyglądała jak prawdziwa, ale elektrycznej, która by umiała mówić nie widziałem nawet w żadnej ofercie!\n\n- Proszę mówić do rzeczy! - rozkazała zmieszana Kokorova.\n\n- Przepraszam najmocniej - spoważniał na nowo mężczyzna. - Jestem tutaj w ważnej sprawie. Na terenie baru ukrywa się android. Muszę go aresztować. Poszukuję go już od dawna, ale nie pomyślałbym, że przyjdzie mi dotrzeć za nim aż na kraniec galaktyki.\n\n- Chętnie pomożemy - oznajmiła Kokorova, chcąc by funkcjonariusz jak najszybciej przestał powodować zamęt wśród gości.",
+      "activities": [
+        {
+          "currency": 100,
+          "name": "Android",
+          "storyDescription": "Łowca wie, że na terenie baru przebywa android, lecz nie wie kto nim może być. W celu identyfikacji musi przeprowadzić na potencjalnych podejrzanych test Wojta-Kampfa.",
+          "educationalDescription": "Obecność na zajęciach."
+        },
+        {
+          "currency": 150,
+          "name": "Malvin",
+          "storyDescription": "Wytłumacz łowcy, że Malvin nie jest androidem, którego ten szuka.",
+          "educationalDescription": "Wykaż się aktywnością na zajęciach."
+        },
+        {
+          "currency": 200,
+          "name": "Hatter Chummin",
+          "storyDescription": "Wyjaśnij łowcy, że odczyty w przypadku Hattera Chummina mogą być mylące, gdyż Hatter Chummin jest robotem.",
+          "educationalDescription": "Wykaż się szczególną aktywnością na zajęciach."
+        },
+        {
+          "currency": 250,
+          "name": "Kokorova",
+          "storyDescription": "Stań w imieniu Kokorovy, która nie tylko nie jest elektryczna, lecz nie jest też na sprzedaż i łowca nie może jej kupić bez względu na cenę, jaką zaoferuje.",
+          "educationalDescription": "Wykonaj zadanie w trakcie zajęć."
+        },
+        {
+          "currency": 300,
+          "name": "Wojt-Kampf",
+          "storyDescription": "Poddaj się testowi, aby funkcjonariusz mógł dokonać formalności.",
+          "educationalDescription": "Napisz wyjściówkę na minimum 75%."
+        },
+        {
+          "currency": 350,
+          "name": "Pracownicy",
+          "storyDescription": "Nadzoruj testy przeprowadzane przez łowcę na pozostałych pracownikach.",
+          "educationalDescription": "Wykonaj łatwe zadanie dodatkowe."
+        },
+        {
+          "currency": 400,
+          "name": "Replikant",
+          "storyDescription": "Dogoń jednego z pracowników, który nie chcąc poddać się testowi zaczął uciekać przez zaplecze i na dodatek ukradł arbuz.",
+          "educationalDescription": "Wykonaj trudne zadanie dodatkowe."
+        }
+      ]
+    }
+  ]
+}

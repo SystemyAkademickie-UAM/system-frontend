@@ -5,7 +5,8 @@
 
 /* === UKŁAD KONTENERA I STRUKTURA GŁÓWNA === */
 .admin-backup {
-  max-width: 920px;
+  width: 80%;
+  max-width: 80%;
   margin: 0;
   padding: 1.5rem clamp(1rem, 3vw, 2.5rem);
   text-align: left;

@@ -85,7 +85,8 @@ describe('UserManagementContent', () => {
     listOrganizationAccounts.mockResolvedValue({ items: [], nextAfterAccountId: null });
     await renderPeople();
     expect(container.textContent).toContain('Organizacja:');
-    expect(container.querySelector('#user-org-select')).not.toBeNull();
+    expect(container.textContent).toContain('Org A');
+    expect(container.textContent).toContain('Zmień organizację');
   });
 
   it('keeps the empty sentence after the first load fails', async () => {

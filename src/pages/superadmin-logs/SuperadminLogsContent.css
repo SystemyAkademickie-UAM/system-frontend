@@ -499,3 +499,35 @@
   word-break: break-word;
   text-align: left;
 }
+
+/* === RETENCJA MODAL === */
+.superadmin-logs__retention-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.5rem 0;
+}
+
+.superadmin-logs__retention-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.superadmin-logs__retention-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.superadmin-logs__retention-hint {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.superadmin-logs__retention-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}

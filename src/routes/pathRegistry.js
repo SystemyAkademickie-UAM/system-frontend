@@ -241,9 +241,9 @@ export function appHelpPath() {
   return '/help';
 }
 
-/** Strona główna administratora (zarządzanie organizacją) — `/home`. */
+/** Strona główna administratora (zarządzanie organizacją) — `/my-organization`. */
 export function adminHomePath() {
-  return '/home';
+  return '/my-organization';
 }
 
 /** Zarządzanie użytkownikami — `/users`. */
@@ -312,6 +312,11 @@ export function templatesMyPath() {
 /** @deprecated Galeria przeniesiona na {@link templatesPath}. */
 export function templatesGalleryPath() {
   return templatesPath();
+}
+
+/** Developer tools page (/dev/tools). */
+export function devToolsPath() {
+  return '/dev/tools';
 }
 
 /** Developer-only API test workspace (Login shell). */

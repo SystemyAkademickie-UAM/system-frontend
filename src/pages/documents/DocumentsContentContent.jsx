@@ -1,1233 +1,797 @@
-import {useState, useEffect} from 'react';
-import {getApiBaseUrl} from '../../constants/api.constants.js';
-import {getOrCreateBrowserId} from '../../auth/browserIdStorage.js';
-import {READLANGUAGECOOKIE} from '../../utils/LANGUAGECOOKIE.js';
-import {publicIconPath} from '../../utils/publicAssetUrl.js';
-import {Button, useToast} from '../../components/ui/index.js';
-import {Divider} from '../../components/ui/index.js';
+/**
+ * @file DocumentsContentContent.jsx
+ * @description Zreworkowany komponent zarządzania dokumentami prawnymi i historią zmian (patch notes).
+ */
 
-const theme = document.documentElement.getAttribute('data-theme');
-
-var editicon;
-if (theme == 'dark') {
-  editicon = publicIconPath('edit-02-svgrepo-com.svg');
-} else if (theme == 'light') {
-  editicon = publicIconPath('edit-02-svgrepo-com-light.svg');
-}
-var deleteicon;
-if (theme == 'dark') {
-  deleteicon = publicIconPath('trash-01-svgrepo-com.svg');
-} else if (theme == 'light') {
-  deleteicon = publicIconPath('trash-01-svgrepo-com-light.svg');
-}
-var viewicon;
-if (theme == 'dark') {
-  viewicon = publicIconPath('file-04-svgrepo-com.svg');
-} else if (theme == 'light') {
-  viewicon = publicIconPath('file-04-svgrepo-com-light.svg');
-}
-var downloadicon;
-if (theme == 'dark') {
-  downloadicon = publicIconPath('file-download-03-svgrepo-com.svg');
-} else if (theme == 'light') {
-  downloadicon = publicIconPath('file-download-03-svgrepo-com-light.svg');
-}
-var addfileicon;
-if (theme == 'dark') {
-  addfileicon = publicIconPath('file-plus-03-svgrepo-com.svg');
-} else if (theme == 'light') {
-  addfileicon = publicIconPath('file-plus-03-svgrepo-com-light.svg');
-}
-var fileaddedicon;
-if (theme == 'dark') {
-  fileaddedicon = publicIconPath('file-check-03-svgrepo-com.svg');
-} else if (theme == 'light') {
-  fileaddedicon = publicIconPath('file-check-03-svgrepo-com-light.svg');
-}
-var nextpageicon;
-if (theme == 'dark') {
-  nextpageicon = publicIconPath('chevron-right-svgrepo-com.svg');
-} else if (theme == 'light') {
-  nextpageicon = publicIconPath('chevron-right-svgrepo-com-light.svg');
-}
-var previouspageicon;
-if (theme == 'dark') {
-  previouspageicon = publicIconPath('chevron-left-svgrepo-com.svg');
-} else if (theme == 'light') {
-  previouspageicon = publicIconPath('chevron-left-svgrepo-com-light.svg');
-}
-var firstpageicon;
-if (theme == 'dark') {
-  firstpageicon = publicIconPath('chevron-left-double-svgrepo-com.svg');
-} else if (theme == 'light') {
-  firstpageicon = publicIconPath('chevron-left-double-svgrepo-com-light.svg');
-}
-var lastpageicon;
-if (theme == 'dark') {
-  lastpageicon = publicIconPath('chevron-right-double-svgrepo-com.svg');
-} else if (theme == 'light') {
-  lastpageicon = publicIconPath('chevron-right-double-svgrepo-com-light.svg');
-}
-
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import AppSectionPage from '../../components/page/AppSectionPage.jsx';
+import Button from '../../components/ui/Button/Button.jsx';
+import Modal from '../../components/ui/Modal/Modal.jsx';
+import TextField from '../../components/ui/TextField/TextField.jsx';
+import Divider from '../../components/ui/Divider/Divider.jsx';
+import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner.jsx';
+import { useToast } from '../../components/ui/Toast/Toast.jsx';
+import { getApiBaseUrl } from '../../constants/api.constants.js';
+import { getOrCreateBrowserId } from '../../auth/browserIdStorage.js';
+import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+import { publicIconPath } from '../../utils/publicAssetUrl.js';
+import './DocumentsContentContent.css';
 
 const PAGESIZE = 10;
 
-const DOCUMENTSSECTION__TEXTLABEL = {
-  polish: 'Manager dokumentacji',
-  english: 'Documentation manager'
+const editicon = publicIconPath('edit-02-svgrepo-com.svg');
+const deleteicon = publicIconPath('trash-01-svgrepo-com.svg');
+const viewicon = publicIconPath('file-04-svgrepo-com.svg');
+const downloadicon = publicIconPath('file-download-03-svgrepo-com.svg');
+const addfileicon = publicIconPath('file-plus-03-svgrepo-com.svg');
+const fileaddedicon = publicIconPath('file-check-03-svgrepo-com.svg');
+const nextpageicon = publicIconPath('chevron-right-svgrepo-com.svg');
+const previouspageicon = publicIconPath('chevron-left-svgrepo-com.svg');
+const firstpageicon = publicIconPath('chevron-left-double-svgrepo-com.svg');
+const lastpageicon = publicIconPath('chevron-right-double-svgrepo-com.svg');
+
+const COPY = {
+  polish: {
+    pageTitle: 'Manager dokumentacji i wydań',
+    docsSectionTitle: 'Dokumentacja prawna i regulaminy',
+    docsSectionDesc: 'Zarządzanie oficjalnymi plikami PDF (regulaminy, polityka prywatności, dokumentacja) dostępnymi w systemie.',
+    patchnotesSectionTitle: 'Historia zmian (Patch notes)',
+    patchnotesSectionDesc: 'Publikowanie i wersjonowanie dokumentów historii zmian systemu dostępnych dla użytkowników.',
+    addPatchNote: 'Dodaj dokument zmian',
+    termsOfUse: 'Warunki użytkowania (Regulamin)',
+    privacyPolicy: 'Polityka prywatności',
+    documentation: 'Dokumentacja techniczna',
+    notUploaded: 'Dokument nie został przesłany',
+    emptyValue: '- - -',
+    pdfFileLabel: 'Plik PDF (maksymalny rozmiar 20 MB)',
+    selectPdfHint: 'Kliknij, aby wybrać plik PDF z dysku',
+    fileNameLabel: 'Nazwa pliku',
+    fileSizeLabel: 'Rozmiar pliku',
+    fileDateLabel: 'Data przesłania',
+    save: 'Zapisz',
+    upload: 'Wgraj plik',
+    cancel: 'Anuluj',
+    delete: 'Usuń',
+    confirm: 'Potwierdź',
+    close: 'Zamknij',
+    titleLabel: 'Tytuł dokumentu',
+    versionLabel: 'Wersja (np. 1.0.0)',
+    titlePlaceholder: 'np. Wydanie 1.4.0',
+    versionPlaceholder: 'np. 1.4.0',
+    deleteDocTitle: 'Potwierdzenie usunięcia dokumentu',
+    deleteDocDesc: 'Czy na pewno chcesz usunąć ten plik PDF? Operacji nie można cofnąć.',
+    deletePatchNoteTitle: 'Potwierdzenie usunięcia dokumentu zmian',
+    deletePatchNoteDesc: 'Czy na pewno chcesz usunąć ten wpis historii zmian? Operacji nie można cofnąć.',
+    docSavedSuccess: 'Dokument został pomyślnie zaktualizowany.',
+    docDeletedSuccess: 'Dokument został usunięty.',
+    patchNoteSavedSuccess: 'Dokument zmian został opublikowany.',
+    patchNoteDeletedSuccess: 'Dokument zmian został usunięty.',
+    loading: 'Ładowanie dokumentów...',
+    emptyPatchNotes: 'Brak wpisów historii zmian.',
+    viewFileTooltip: 'Otwórz i wyświetl plik PDF w nowej karcie',
+    downloadFileTooltip: 'Pobierz plik PDF na dysk',
+    editFileTooltip: 'Wgraj nową wersję pliku PDF',
+    deleteFileTooltip: 'Usuń plik z serwera',
+    addPatchNoteTooltip: 'Dodaj nowy plik PDF z listą zmian dla danego wydania',
+    firstPageTooltip: 'Przejdź do pierwszej strony',
+    prevPageTooltip: 'Przejdź do poprzedniej strony',
+    nextPageTooltip: 'Przejdź do następnej strony',
+    lastPageTooltip: 'Przejdź do ostatniej strony',
+  },
+  english: {
+    pageTitle: 'Documentation & Releases Manager',
+    docsSectionTitle: 'Legal documents & regulations',
+    docsSectionDesc: 'Manage official PDF files (terms of use, privacy policy, documentation) in the system.',
+    patchnotesSectionTitle: 'Patch notes',
+    patchnotesSectionDesc: 'Publish and version change log documents available to users.',
+    addPatchNote: 'Add patch note',
+    termsOfUse: 'Terms of Use',
+    privacyPolicy: 'Privacy Policy',
+    documentation: 'Documentation',
+    notUploaded: 'Document not uploaded',
+    emptyValue: '- - -',
+    pdfFileLabel: 'PDF file (max. 20 MB)',
+    selectPdfHint: 'Click to select a PDF file from your computer',
+    fileNameLabel: 'File name',
+    fileSizeLabel: 'File size',
+    fileDateLabel: 'Upload date',
+    save: 'Save',
+    upload: 'Upload file',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    confirm: 'Confirm',
+    close: 'Close',
+    titleLabel: 'Document title',
+    versionLabel: 'Version (e.g. 1.0.0)',
+    titlePlaceholder: 'e.g. Release 1.4.0',
+    versionPlaceholder: 'e.g. 1.4.0',
+    deleteDocTitle: 'Confirm document deletion',
+    deleteDocDesc: 'Are you sure you want to delete this PDF file? This action cannot be undone.',
+    deletePatchNoteTitle: 'Confirm patch note deletion',
+    deletePatchNoteDesc: 'Are you sure you want to delete this patch note? This action cannot be undone.',
+    docSavedSuccess: 'Document has been uploaded successfully.',
+    docDeletedSuccess: 'Document has been deleted.',
+    patchNoteSavedSuccess: 'Patch note has been published.',
+    patchNoteDeletedSuccess: 'Patch note has been deleted.',
+    loading: 'Loading documents...',
+    emptyPatchNotes: 'No patch notes found.',
+    viewFileTooltip: 'View PDF file in a new tab',
+    downloadFileTooltip: 'Download PDF file to your computer',
+    editFileTooltip: 'Upload a new version of this PDF file',
+    deleteFileTooltip: 'Delete file from the server',
+    addPatchNoteTooltip: 'Add a new PDF changelog document for a release',
+    firstPageTooltip: 'Go to first page',
+    prevPageTooltip: 'Go to previous page',
+    nextPageTooltip: 'Go to next page',
+    lastPageTooltip: 'Go to last page',
+  },
 };
 
-const DOCUMENTSSECTIONDESCRIPTION__TEXTLABEL = {
-  polish: 'Sekcja pozwalająca wgrywać i usuwać pliki PDF zawierające dokumentację prawną i regulaminy.',
-  english: 'Section that allows uploading and deleting PDF files containing legal documentation and regulations.'
-};
-
-const DOCUMENTTERMSOFUSE__TEXTLABEL = {
-  polish: 'Warunki użytkowania',
-  english: 'Terms of use'
-};
-
-const DOCUMENTPRIVACYPOLICY__TEXTLABEL = {
-  polish: 'Polityka prywatności',
-  english: 'Privacy policy'
-};
-
-const DOCUMENTDOCUMENTATION__TEXTLABEL = {
-  polish: 'Dokumentacja',
-  english: 'Documentation'
-};
-
-const DOCUMENTNOTUPLOADED__TEXTLABEL = {
-  polish: 'Dokument nie został przesłany',
-  english: 'The document was not uploaded'
-};
-
-const EMPTYVALUE__TEXTLABEL = {
-  polish: '- - -',
-  english: '- - -'
-};
-
-const PDFFILELABEL__TEXTLABEL = {
-  polish: 'Plik PDF (maksymalny rozmiar 20 MB)',
-  english: 'PDF file (max. size 20 MB)'
-};
-
-const FILENAMELABEL__TEXTLABEL = {
-  polish: 'Nazwa pliku',
-  english: 'File name'
-};
-
-const FILESIZELABEL__TEXTLABEL = {
-  polish: 'Rozmiar pliku',
-  english: 'File size'
-};
-
-const FILEDATELABEL__TEXTLABEL = {
-  polish: 'Data przesłania pliku',
-  english: 'Date of upload'
-};
-
-const UPLOADBUTTON__TEXTLABEL = {
-  polish: 'Dodaj',
-  english: 'Upload'
-};
-
-const CANCELBUTTON__TEXTLABEL = {
-  polish: 'Anuluj',
-  english: 'Cancel'
-};
-
-const DOCUMENTDELETECONFIRMATIONTITLE__TEXTLABEL = {
-  polish: 'Potwierdzenie usunięcia',
-  english: 'Deletion confirmation'
-};
-
-const DOCUMENTDELETECONFIRMATIONTEXT__TEXTLABEL = {
-  polish: 'Proszę zatwierdzić usunięcie dokumentu. Operacji nie można cofnąć.',
-  english: 'Please confirm deletion of the document file. The operation cannot be undone.'
-};
-
-const CONFIRMBUTTON__TEXTLABEL = {
-  polish: 'Zatwierdź',
-  english: 'Confirm'
-};
-
-const DOCUMENTSAVINGSUCCESS__TEXTLABEL = {
-  polish: 'Dokument został przesłany.',
-  english: 'The document has been uploaded.'
-};
-
-const DOCUMENTDELETIONSUCCESS__TEXTLABEL = {
-  polish: 'Dokument został usunięty.',
-  english: 'The document has been deleted.'
-};
-
-
-const PATCHNOTESSECTION__TEXTLABEL = {
-  polish: 'Historia zmian',
-  english: 'Patch notes'
-};
-
-const PATCHNOTESSECTIONDESCRYPTION__TEXTLABEL = {
-  polish: 'Moduł umożliwiający zarządzanie dokumentami historii zmian.',
-  english: 'A module that allows managing the files that document changes in the system.'
-};
-
-const NEWPATCHNOTEBUTTON__TEXTLABEL = {
-  polish: 'Dodaj dokument zmian',
-  english: 'Add a patch note'
-};
-
-const CREATEPATCHNOTETITLE__TEXTLABEL = {
-  polish: 'Dodaj dokument zmian',
-  english: 'Add a patch note'
-};
-
-
-const TITLELABEL__TEXTLABEL = {
-  polish: 'Tytuł',
-  english: 'Title'
-};
-
-const VERSIONLABEL__TEXTLABEL = {
-  polish: 'Wersja',
-  english: 'Version'
-};
-
-
-const PATCHNOTEDELETECONFIRMATIONTITLE__TEXTLABEL = {
-  polish: 'Potwierdzenie usunięcia',
-  english: 'Deletion confirmation'
-};
-
-const PATCHNOTEDELETECONFIRMATIONTEXT__TEXTLABEL = {
-  polish: 'Proszę zatwierdzić usunięcie dokumentu zmian. Operacji nie można cofnąć.',
-  english: 'Please confirm deletion of the patch note file. The operation cannot be undone.'
-};
-
-
-const PATCHNOTESAVINGSUCCESS__TEXTLABEL = {
-  polish: 'Dokument zmian został dodany.',
-  english: 'The patch note has been uploaded.'
-};
-
-const PATCHNOTEDELETIONSUCCESS__TEXTLABEL = {
-  polish: 'Dokument zmian został usunięty.',
-  english: 'The patch note has been deleted.'
-};
-
-
-
-function preparedate(data) {
-  if (data == null || data == '') {
-    return '';
-  }
-  var date = new Date(data);
-  var year = date.getFullYear();
-  var month = date.getMonth() + 1;
-  var day = date.getDate();
-  var monthtext = '' + month;
-  var daytext = '' + day;
-  if (month < 10) {
-    monthtext = '0' + month;
-  }
-  if (day < 10) {
-    daytext = '0' + day;
-  }
-  return year + '-' + monthtext + '-' + daytext;
-
+function formatDate(data) {
+  if (!data) return '';
+  const date = new Date(data);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-function preparetime(data) {
-  if (data == null || data == '') {
-    return '';
-  }
-  var date = new Date(data);
-  var hours = date.getHours();
-  var minutes = date.getMinutes();
-  var hourstext = '' + hours;
-  var minutestext = '' + minutes;
-  if (hours < 10) {
-    hourstext = '0' + hours;
-  }
-  if (minutes < 10) {
-    minutestext = '0' + minutes;
-  }
-  return hourstext + ':' + minutestext;
-}
-
-function concatenateexpiration(data) {
-  if (data == null || data == '') {
-    return '- - -';
-  }
-  return preparedate(data) + ' ' + preparetime(data);
-}
-
-function preparefilesize(bytes) {
-  if (bytes == null) {
-    return '- - -';
-  }
-  var kilobytes = Math.floor(bytes / 1024);
-  if (kilobytes < 1) {
-    return bytes + ' B';
-  } else {
-    return kilobytes + ' kB';
-  }
-}
-
-function preparedocumentname(key, language) {
-  if (key == 'termsOfUse') {
-    return DOCUMENTTERMSOFUSE__TEXTLABEL[language];
-  }
-  if (key == 'privacyPolicy') {
-    return DOCUMENTPRIVACYPOLICY__TEXTLABEL[language];
-  }
-  if (key == 'documentation') {
-    return DOCUMENTDOCUMENTATION__TEXTLABEL[language];
-  }
+function formatFileSize(bytes) {
+  if (bytes == null || isNaN(bytes)) return '- - -';
+  const kilobytes = Math.floor(bytes / 1024);
+  if (kilobytes < 1) return `${bytes} B`;
+  return `${kilobytes} kB`;
 }
 
 export default function DocumentsContentContent() {
-  const {showSuccess, showError} = useToast();
+  const { showSuccess, showError } = useToast();
+  const language = READLANGUAGECOOKIE();
+  const copy = COPY[language] ?? COPY.polish;
 
-  const [LANGUAGE] = useState(READLANGUAGECOOKIE);
-
+  // Dokumenty prawne
   const [documents, setDocuments] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(true);
 
-  const [documentdeleteconfirmationopen, setDocumentdeleteconfirmationopen] = useState(0);
-  const [documentdeleteconfirmationkey, setDocumentdeleteconfirmationkey] = useState('');
+  // Modal edycji / wgrywania dokumentu
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorKey, setEditorKey] = useState('');
+  const [editorTitle, setEditorTitle] = useState('');
+  const [editorFile, setEditorFile] = useState(null);
+  const [editorFilename, setEditorFilename] = useState('');
+  const [editorFilesize, setEditorFilesize] = useState('');
+  const [editorFiledate, setEditorFiledate] = useState('');
+  const [isSubmittingDoc, setIsSubmittingDoc] = useState(false);
 
+  // Potwierdzenie usunięcia dokumentu
+  const [deleteDocKey, setDeleteDocKey] = useState(null);
 
-
-  const [editoropen, setEditoropen] = useState(0);
-  const [editorkey, setEditorkey] = useState('');
-  const [editortitletext, setEditortitletext] = useState('');
-  const [editorfile, setEditorfile] = useState(null);
-  const [editorfilechosen, setEditorfilechosen] = useState(0);
-  const [editorfilename, setEditorfilename] = useState('');
-  const [editorfilesize, setEditorfilesize] = useState('');
-  const [editorfiledate, setEditorfiledate] = useState('');
-
-
+  // Patch notes
   const [patchnotes, setPatchnotes] = useState([]);
-  const [patchnotestotal, setPatchnotestotal] = useState(0);
-  const [currentpageindex, setCurrentpageindex] = useState(0);
+  const [patchnotesTotal, setPatchnotesTotal] = useState(0);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [loadingPatchNotes, setLoadingPatchNotes] = useState(true);
 
-  const [patchnotedeleteconfirmationopen, setPatchnotedeleteconfirmationopen] = useState(0);
-  const [patchnotedeleteconfirmationid, setPatchnotedeleteconfirmationid] = useState(0);
+  // Modal tworzenia patch note
+  const [patchNoteModalOpen, setPatchNoteModalOpen] = useState(false);
+  const [patchNoteTitle, setPatchNoteTitle] = useState('');
+  const [patchNoteVersion, setPatchNoteVersion] = useState('');
+  const [patchNoteFile, setPatchNoteFile] = useState(null);
+  const [isSubmittingPatchNote, setIsSubmittingPatchNote] = useState(false);
 
+  // Potwierdzenie usunięcia patch note
+  const [deletePatchNoteId, setDeletePatchNoteId] = useState(null);
 
+  const getDocName = useCallback(
+    (key) => {
+      if (key === 'termsOfUse') return copy.termsOfUse;
+      if (key === 'privacyPolicy') return copy.privacyPolicy;
+      if (key === 'documentation') return copy.documentation;
+      return key;
+    },
+    [copy]
+  );
 
-  const [editorpatchnoteopen, setEditorpatchnoteopen] = useState(0);
-  const [editorpatchnotetitle, setEditorpatchnotetitle] = useState('');
-  const [editorpatchnoteversion, setEditorpatchnoteversion] = useState('');
-  const [editorpatchnotefile, setEditorpatchnotefile] = useState(null);
-  const [editorpatchnotefilechosen, setEditorpatchnotefilechosen] = useState(0);
-
-
-
-  async function onFetchDocuments() {
-
-
+  // Pobieranie dokumentów prawnych
+  const fetchDocuments = useCallback(async () => {
     try {
-
+      setLoadingDocs(true);
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/admin/documents';
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const res = await fetch(`${base}/admin/documents`, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
-
-      const responsetext = await response.text();
-
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-
-      }
-
-
-
-      let receiveddata = data;
-
-      const receiveddocuments = [];
-
-      let i = 0;
-
-      while (i < receiveddata.items.length) {
-
-        receiveddocuments.push({
-          key: receiveddata.items[i].key,
-          isUploaded: receiveddata.items[i].isUploaded,
-          originalFilename: receiveddata.items[i].originalFilename,
-          fileSizeBytes: receiveddata.items[i].fileSizeBytes,
-          uploadedAt: receiveddata.items[i].uploadedAt
-        });
-
-        i = i + 1;
-      }
-
-      setDocuments(receiveddocuments);
-
-    } catch (error) {
-
-
-
+      if (!res.ok) throw new Error('Błąd pobierania dokumentów');
+      const data = await res.json();
+      const items = Array.isArray(data?.items) ? data.items : [];
+      setDocuments(items);
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Nie udało się pobrać dokumentów.');
+    } finally {
+      setLoadingDocs(false);
     }
-  }
+  }, [showError]);
 
-
-
-
-
-
-  async function onFetchDocument(documentkey) {
-
-
+  // Pobieranie wpisów patch notes
+  const fetchPatchNotes = useCallback(async () => {
     try {
-
+      setLoadingPatchNotes(true);
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/admin/documents/' + documentkey;
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const skip = currentPageIndex * PAGESIZE;
+      const res = await fetch(`${base}/admin/patch-notes?take=${PAGESIZE}&skip=${skip}`, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
-
-      const responsetext = await response.text();
-
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-
-      }
-
-
-
-      let receiveddata = data;
-
-      if (receiveddata.isUploaded == true) {
-        setEditorfilechosen(1);
-
-        if (receiveddata.originalFilename == null) {
-          setEditorfilename('');
-        } else {
-          setEditorfilename(receiveddata.originalFilename);
-        }
-
-        setEditorfilesize(preparefilesize(receiveddata.fileSizeBytes));
-        setEditorfiledate(concatenateexpiration(receiveddata.uploadedAt));
-      } else {
-        setEditorfilechosen(0);
-        setEditorfilename(DOCUMENTNOTUPLOADED__TEXTLABEL[LANGUAGE]);
-        setEditorfilesize(EMPTYVALUE__TEXTLABEL[LANGUAGE]);
-        setEditorfiledate(EMPTYVALUE__TEXTLABEL[LANGUAGE]);
-      }
-
-    } catch (error) {
-
-
-
+      if (!res.ok) throw new Error('Błąd pobierania historii zmian');
+      const data = await res.json();
+      setPatchnotes(Array.isArray(data?.items) ? data.items : []);
+      setPatchnotesTotal(data?.total ?? 0);
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Nie udało się pobrać historii zmian.');
+    } finally {
+      setLoadingPatchNotes(false);
     }
-  }
+  }, [currentPageIndex, showError]);
 
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
 
+  useEffect(() => {
+    fetchPatchNotes();
+  }, [fetchPatchNotes]);
 
+  // Akcje dla dokumentu prawnego
+  const handleOpenDocFile = (doc) => {
+    const base = getApiBaseUrl();
+    window.open(`${base}/documents/${doc.key}/file`, '_blank');
+  };
 
+  const handleDownloadDocFile = (doc) => {
+    const base = getApiBaseUrl();
+    window.open(`${base}/documents/${doc.key}/file?download=1`, '_blank');
+  };
 
+  const handleOpenEditDoc = async (doc) => {
+    setEditorKey(doc.key);
+    setEditorTitle(getDocName(doc.key));
+    setEditorFile(null);
+    setEditorFilename(doc.originalFilename || (doc.isUploaded ? doc.key : copy.notUploaded));
+    setEditorFilesize(doc.isUploaded ? formatFileSize(doc.fileSizeBytes) : copy.emptyValue);
+    setEditorFiledate(doc.isUploaded ? formatDate(doc.uploadedAt) : copy.emptyValue);
+    setEditorOpen(true);
+  };
 
-  async function onUploadDocument(documentkey, file) {
+  const handleDocFileChosen = (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    setEditorFile(file);
+    setEditorFilename(file.name);
+    setEditorFilesize(formatFileSize(file.size));
+    setEditorFiledate(formatDate(new Date()));
+  };
 
-
+  const handleSaveDoc = async () => {
+    if (!editorFile) {
+      setEditorOpen(false);
+      return;
+    }
     try {
-
+      setIsSubmittingDoc(true);
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/admin/documents/' + documentkey;
-
+      const browserId = getOrCreateBrowserId();
       const formdata = new FormData();
-      formdata.append('file', file);
+      formdata.append('file', editorFile);
 
-      const response = await fetch(url, {
+      const res = await fetch(`${base}/admin/documents/${editorKey}`, {
         method: 'PUT',
         credentials: 'include',
-        headers: {
-          'X-Browser-ID': browserid
-        },
-        body: formdata
+        headers: { 'X-Browser-ID': browserId },
+        body: formdata,
       });
 
-      const responsetext = await response.text();
-
-
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-
-      }
-      if (response.ok) {
-        showSuccess(DOCUMENTSAVINGSUCCESS__TEXTLABEL[LANGUAGE]);
-      }
-
-
-    } catch (error) {
-
-
-
+      if (!res.ok) throw new Error('Nie udało się wgrać dokumentu');
+      showSuccess(copy.docSavedSuccess);
+      setEditorOpen(false);
+      await fetchDocuments();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Wystąpił błąd podczas wgrywania pliku.');
+    } finally {
+      setIsSubmittingDoc(false);
     }
-  }
+  };
 
-
-
-
-
-  async function onDeleteDocument(documentkey, toast) {
-
-
+  const handleDeleteDoc = async () => {
+    if (!deleteDocKey) return;
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/admin/documents/' + documentkey;
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const res = await fetch(`${base}/admin/documents/${deleteDocKey}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
-
-      const responsetext = await response.text();
-
-
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-
-      }
-      if (response.ok && toast == 1) {
-        showSuccess(DOCUMENTDELETIONSUCCESS__TEXTLABEL[LANGUAGE]);
-      }
-
-
-      onFetchDocuments();
-
-    } catch (error) {
-
-
-
+      if (!res.ok) throw new Error('Nie udało się usunąć dokumentu');
+      showSuccess(copy.docDeletedSuccess);
+      setDeleteDocKey(null);
+      await fetchDocuments();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd podczas usuwania dokumentu.');
     }
-  }
+  };
 
-
-
-  async function openEditorEditor(documentitem) {
-    setEditorkey(documentitem.key);
-    setEditortitletext(preparedocumentname(documentitem.key, LANGUAGE));
-    setEditorfile(null);
-    setEditorfilechosen(0);
-    setEditorfilename('');
-    setEditorfilesize('');
-    setEditorfiledate('');
-    setEditoropen(1);
-
-    var fileinput = document.getElementById('documentfileinput');
-    if (fileinput != null) {
-      fileinput.value = '';
-    }
-
-    await onFetchDocument(documentitem.key);
-  }
-
-
-
-
-  function closeEditor() {
-    setEditoropen(0);
-  }
-
-
-  function openfilepickerdocument() {
-    var fileinput = document.getElementById('documentfileinput');
-    if (fileinput != null) {
-      fileinput.click();
-    }
-  }
-
-
-  function onFileChosen(chosen) {
-    var files = chosen.target.files;
-    if (files == null) {
-      return;
-    } else if (files.length == 0) {
-      return;
-    } else {
-
-      var file = files[0];
-      setEditorfile(file);
-      setEditorfilechosen(1);
-    }
-  }
-
-
-  async function onSaveEditor() {
-
-    await onUploadDocument(editorkey, editorfile);
-
-    setEditoropen(0);
-    onFetchDocuments();
-  }
-
-
-
-
-  function openDocumentFile(documentitem) {
+  // Akcje dla patch notes
+  const handleOpenPatchNoteFile = (item) => {
     const base = getApiBaseUrl();
-    window.open(base + '/documents/' + documentitem.key + '/file', '_blank');
-  }
+    window.open(`${base}/patch-notes/${item.id}/file`, '_blank');
+  };
 
-
-  function downloadDocumentFile(documentitem) {
+  const handleDownloadPatchNoteFile = (item) => {
     const base = getApiBaseUrl();
-    window.open(base + '/documents/' + documentitem.key + '/file?download=1', '_blank');
-  }
+    window.open(`${base}/patch-notes/${item.id}/file?download=1`, '_blank');
+  };
 
-
-
-
-  function openDocumentDeleteConfirmation(documentitem) {
-    setDocumentdeleteconfirmationkey(documentitem.key);
-    setDocumentdeleteconfirmationopen(1);
-  }
-
-  function closeDocumentDeleteConfirmation() {
-    setDocumentdeleteconfirmationopen(0);
-  }
-
-  function confirmDocumentDelete() {
-    setDocumentdeleteconfirmationopen(0);
-    onDeleteDocument(documentdeleteconfirmationkey, 1);
-  }
-
-
-
-
-
-
-  async function onFetchPatchNotes() {
-
-
-    try {
-
-      const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const skip = currentpageindex * PAGESIZE;
-      const url = base + '/admin/patch-notes?take=' + PAGESIZE + '&skip=' + skip;
-
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
-      });
-
-      const responsetext = await response.text();
-
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-
-      }
-
-
-
-      let receiveddata = data;
-
-      const receivedpatchnotes = [];
-
-      let i = 0;
-
-      while (i < receiveddata.items.length) {
-
-        var versionvalue = receiveddata.items[i].version;
-        if (versionvalue == null) {
-          versionvalue = '';
-        }
-
-        receivedpatchnotes.push({
-          id: receiveddata.items[i].id,
-          title: receiveddata.items[i].title,
-          version: versionvalue,
-          originalFilename: receiveddata.items[i].originalFilename,
-          fileSizeBytes: receiveddata.items[i].fileSizeBytes,
-          createdAt: receiveddata.items[i].createdAt
-        });
-
-        i = i + 1;
-      }
-
-      setPatchnotes(receivedpatchnotes);
-      setPatchnotestotal(receiveddata.total);
-
-    } catch (error) {
-
-
-
+  const handlePatchNoteFileChosen = (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    setPatchNoteFile(file);
+    let title = file.name;
+    if (title.toLowerCase().endsWith('.pdf')) {
+      title = title.substring(0, title.length - 4);
     }
-  }
+    setPatchNoteTitle(title);
+  };
 
-
-
-
-
-
-  async function onCreatePatchNote(file, title, version) {
-
-
+  const handleSavePatchNote = async () => {
+    if (!patchNoteFile) {
+      showError('Wybierz plik PDF.');
+      return;
+    }
     try {
-
+      setIsSubmittingPatchNote(true);
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/admin/patch-notes';
-
+      const browserId = getOrCreateBrowserId();
       const formdata = new FormData();
-      formdata.append('file', file);
-      if (title != null && title != '') {
-        formdata.append('title', title);
-      }
-      if (version != null && version != '') {
-        formdata.append('version', version);
-      }
+      formdata.append('file', patchNoteFile);
+      if (patchNoteTitle) formdata.append('title', patchNoteTitle);
+      if (patchNoteVersion) formdata.append('version', patchNoteVersion);
 
-      const response = await fetch(url, {
+      const res = await fetch(`${base}/admin/patch-notes`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'X-Browser-ID': browserid
-        },
-        body: formdata
+        headers: { 'X-Browser-ID': browserId },
+        body: formdata,
       });
 
-      const responsetext = await response.text();
-
-
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-
-      }
-      if (response.ok) {
-        showSuccess(PATCHNOTESAVINGSUCCESS__TEXTLABEL[LANGUAGE]);
-      }
-
-
-    } catch (error) {
-
-
-
+      if (!res.ok) throw new Error('Nie udało się dodać dokumentu zmian');
+      showSuccess(copy.patchNoteSavedSuccess);
+      setPatchNoteModalOpen(false);
+      setPatchNoteFile(null);
+      setPatchNoteTitle('');
+      setPatchNoteVersion('');
+      await fetchPatchNotes();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd podczas tworzenia dokumentu zmian.');
+    } finally {
+      setIsSubmittingPatchNote(false);
     }
-  }
+  };
 
-
-
-
-
-  async function onDeletePatchNote(patchNoteId, toast) {
-
-
+  const handleDeletePatchNote = async () => {
+    if (!deletePatchNoteId) return;
     try {
-
       const base = getApiBaseUrl();
-      const browserid = getOrCreateBrowserId();
-
-      const url = base + '/admin/patch-notes/' + patchNoteId;
-
-      const response = await fetch(url, {
+      const browserId = getOrCreateBrowserId();
+      const res = await fetch(`${base}/admin/patch-notes/${deletePatchNoteId}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-Browser-ID': browserid
-        }
+          'X-Browser-ID': browserId,
+        },
       });
-
-      const responsetext = await response.text();
-
-
-
-      let data;
-
-      try {
-        data = JSON.parse(responsetext);
-      } catch {
-
-      }
-      if (response.ok && toast == 1) {
-        showSuccess(PATCHNOTEDELETIONSUCCESS__TEXTLABEL[LANGUAGE]);
-      }
-
-
-      onFetchPatchNotes();
-
-    } catch (error) {
-
-
-
+      if (!res.ok) throw new Error('Nie udało się usunąć dokumentu zmian');
+      showSuccess(copy.patchNoteDeletedSuccess);
+      setDeletePatchNoteId(null);
+      await fetchPatchNotes();
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd podczas usuwania wpisu.');
     }
-  }
+  };
 
-
-
-  function openCreatorEditorpatchnote() {
-    setEditorpatchnotetitle('');
-    setEditorpatchnoteversion('');
-    setEditorpatchnotefile(null);
-    setEditorpatchnotefilechosen(0);
-    setEditorpatchnoteopen(1);
-
-    var fileinput = document.getElementById('patchnotefileinput');
-    if (fileinput != null) {
-      fileinput.value = '';
-    }
-  }
-
-
-
-
-  function closeEditorpatchnote() {
-    setEditorpatchnoteopen(0);
-  }
-
-
-  function openfilepickerpatchnote() {
-    var fileinput = document.getElementById('patchnotefileinput');
-    if (fileinput != null) {
-      fileinput.click();
-    }
-  }
-
-
-  function onFileChosenpatchnote(chosen) {
-    var files = chosen.target.files;
-    if (files == null) {
-      return;
-    }
-    if (files.length == 0) {
-      return;
-    }
-
-    var file = files[0];
-    setEditorpatchnotefile(file);
-    setEditorpatchnotefilechosen(1);
-
-    var filename = file.name;
-    var lower = filename.toLowerCase();
-
-    if (lower.length >= 4) {
-      var ending = lower.substring(lower.length - 4);
-      if (ending == '.pdf') {
-        filename = filename.substring(0, filename.length - 4);
-      }
-    }
-
-    setEditorpatchnotetitle(filename);
-  }
-
-
-  async function onSaveEditorpatchnote() {
-
-    await onCreatePatchNote(editorpatchnotefile, editorpatchnotetitle, editorpatchnoteversion);
-
-    setEditorpatchnoteopen(0);
-    onFetchPatchNotes();
-  }
-
-
-
-
-  function openPatchNoteFile(patchnote) {
-    const base = getApiBaseUrl();
-    window.open(base + '/patch-notes/' + patchnote.id + '/file', '_blank');
-  }
-
-
-  function downloadPatchNoteFile(patchnote) {
-    const base = getApiBaseUrl();
-    window.open(base + '/patch-notes/' + patchnote.id + '/file?download=1', '_blank');
-  }
-
-
-
-
-  function openPatchNoteDeleteConfirmation(patchnote) {
-    setPatchnotedeleteconfirmationid(patchnote.id);
-    setPatchnotedeleteconfirmationopen(1);
-  }
-
-  function closePatchNoteDeleteConfirmation() {
-    setPatchnotedeleteconfirmationopen(0);
-  }
-
-  function confirmPatchNoteDelete() {
-    setPatchnotedeleteconfirmationopen(0);
-    onDeletePatchNote(patchnotedeleteconfirmationid, 1);
-  }
-
-
-
-  function firstpage() {
-    if (currentpageindex > 0) {
-      setCurrentpageindex(0);
-    }
-  }
-
-  function previouspage() {
-    if (currentpageindex > 0) {
-      setCurrentpageindex(currentpageindex - 1);
-    }
-  }
-
-  function nextpage() {
-    var lastpage = Math.ceil(patchnotestotal / PAGESIZE) - 1;
-    if (lastpage < 0) {
-      lastpage = 0;
-    }
-    if (currentpageindex < lastpage) {
-      setCurrentpageindex(currentpageindex + 1);
-    }
-  }
-
-  function lastpage() {
-    var lastpageindex = Math.ceil(patchnotestotal / PAGESIZE) - 1;
-    if (lastpageindex < 0) {
-      lastpageindex = 0;
-    }
-    if (currentpageindex < lastpageindex) {
-      setCurrentpageindex(lastpageindex);
-    }
-  }
-
-
-
-
-
-
-
-
-
-  useEffect(() => {
-    onFetchDocuments();
-  }, []);
-
-  useEffect(() => {
-    onFetchPatchNotes();
-  }, []);
-
-  useEffect(() => {
-    onFetchPatchNotes();
-  }, [currentpageindex]);
-
-
-
-
-  var editorfileicon = addfileicon;
-
-  if (editorfilechosen == 1) {
-    editorfileicon = fileaddedicon;
-  }
-
-  var currentpagenumber = currentpageindex + 1;
-  var lastpageindex = Math.ceil(patchnotestotal / PAGESIZE) - 1;
-
-  if (lastpageindex < 0) {
-    lastpageindex = 0;
-  }
-
-
-
-  var editorpatchnotefileicon = addfileicon;
-
-  if (editorpatchnotefilechosen == 1) {
-    editorpatchnotefileicon = fileaddedicon;
-  }
-
-
+  // Paginacja
+  const totalPages = Math.ceil(patchnotesTotal / PAGESIZE) || 1;
+  const currentPageNumber = currentPageIndex + 1;
 
   return (
-    <div>
-      <div>
-        <div style = {{width: '98%', height: '7%', position: 'absolute', top: '1vh', left: '1%', color: 'var(--text-primary)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>{DOCUMENTSSECTION__TEXTLABEL[LANGUAGE]}</span></div>
-        <div style = {{width: '98%', height: '7%', position: 'absolute', top: '8vh', left: '1%', color: 'var(--text-primary)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>{DOCUMENTSSECTIONDESCRIPTION__TEXTLABEL[LANGUAGE]}</span></div>
-
-        <div style = {{width: '98%', top: '19vh', position: 'absolute', left: '1%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
-          <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
-            {documents.map((documentitem) => {
-
-
-              return (
-
-              <div key = {'document' + documentitem.key} style = {{backgroundColor: 'var(--bg-surface)', width: '80%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '6px solid var(--color-accent)', borderRadius: '16px'}}>
-                <div style = {{width: '85%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingLeft: '1%'}}>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <div style = {{width: '70%', position: 'relative', color: 'var(--text-primary)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{preparedocumentname(documentitem.key, LANGUAGE)}</span></div>
-                    <div style = {{width: '30%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-end', marginRight: '2%'}}><span>{documentitem.isUploaded == true ? concatenateexpiration(documentitem.uploadedAt) : EMPTYVALUE__TEXTLABEL[LANGUAGE]}</span></div>
-                  </div>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                    <div style = {{backgroundColor: 'var(--color-accent-2)', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', borderRadius: '8px', paddingLeft: '1%', paddingRight: '1%'}}><span>{documentitem.isUploaded == true ? preparefilesize(documentitem.fileSizeBytes) : DOCUMENTNOTUPLOADED__TEXTLABEL[LANGUAGE]}</span></div>
-                  </div>
-                </div>
-                <div style = {{width: '15%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '5%', alignSelf: 'stretch'}}>
-                  <div onClick = {() => openDocumentFile(documentitem)} style = {{width: '32px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {viewicon} style = {{width: '60%', height: '60%'}}/>
-                  </div>
-                  <div onClick = {() => downloadDocumentFile(documentitem)} style = {{width: '32px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {downloadicon} style = {{width: '60%', height: '60%'}}/>
-                  </div>
-                  <div onClick = {() => openEditorEditor(documentitem)} style = {{width: '32px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {editicon} style = {{width: '60%', height: '60%'}}/>
-                  </div>
-                  <div onClick = {() => openDocumentDeleteConfirmation(documentitem)} style = {{width: '32px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-
-
-
-                    <img src = {deleteicon} style = {{width: '60%', height: '60%'}}/>
-                  </div>
-                </div>
-              </div>
-
-              );
-
-            })}
-
+    <AppSectionPage title={copy.pageTitle}>
+      <div className="documents-page">
+        {/* SEKCJA 1: DOKUMENTACJA PRAWNA */}
+        <section className="documents-section">
+          <div className="documents-section__header">
+            <h2 className="documents-section__title">{copy.docsSectionTitle}</h2>
+            <p className="documents-section__description">{copy.docsSectionDesc}</p>
           </div>
 
+          {loadingDocs && documents.length === 0 ? (
+            <LoadingSpinner label={copy.loading} />
+          ) : (
+            <div className="documents-grid">
+              {documents.map((doc) => {
+                const isUploaded = Boolean(doc.isUploaded);
+                return (
+                  <div key={doc.key} className="document-card">
+                    <div className="document-card__main">
+                      <div className="document-card__top">
+                        <span className="document-card__title">{getDocName(doc.key)}</span>
+                        <span className="document-card__date">
+                          {isUploaded ? formatDate(doc.uploadedAt) : copy.emptyValue}
+                        </span>
+                      </div>
+                      <div className="document-card__meta">
+                        <span className="document-card__badge">
+                          {isUploaded ? formatFileSize(doc.fileSizeBytes) : copy.notUploaded}
+                        </span>
+                        {isUploaded && doc.originalFilename ? (
+                          <span className="document-card__filename" title={doc.originalFilename}>
+                            {doc.originalFilename}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
 
+                    <div className="document-card__actions">
+                      <button
+                        type="button"
+                        className="document-action-btn"
+                        onClick={() => handleOpenDocFile(doc)}
+                        disabled={!isUploaded}
+                        title={copy.viewFileTooltip}
+                        aria-label={copy.viewFileTooltip}
+                      >
+                        <img src={viewicon} alt="" />
+                      </button>
+                      <button
+                        type="button"
+                        className="document-action-btn"
+                        onClick={() => handleDownloadDocFile(doc)}
+                        disabled={!isUploaded}
+                        title={copy.downloadFileTooltip}
+                        aria-label={copy.downloadFileTooltip}
+                      >
+                        <img src={downloadicon} alt="" />
+                      </button>
+                      <button
+                        type="button"
+                        className="document-action-btn"
+                        onClick={() => handleOpenEditDoc(doc)}
+                        title={copy.editFileTooltip}
+                        aria-label={copy.editFileTooltip}
+                      >
+                        <img src={editicon} alt="" />
+                      </button>
+                      <button
+                        type="button"
+                        className="document-action-btn document-action-btn--delete"
+                        onClick={() => setDeleteDocKey(doc.key)}
+                        disabled={!isUploaded}
+                        title={copy.deleteFileTooltip}
+                        aria-label={copy.deleteFileTooltip}
+                      >
+                        <img src={deleteicon} alt="" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
 
+        <Divider />
 
-        </div>
+        {/* SEKCJA 2: HISTORIA ZMIAN (PATCH NOTES) */}
+        <section className="documents-section">
+          <div className="documents-section__header">
+            <h2 className="documents-section__title">{copy.patchnotesSectionTitle}</h2>
+            <p className="documents-section__description">{copy.patchnotesSectionDesc}</p>
+          </div>
+
+          <div className="documents-section__toolbar">
+            <Button
+              variant="primary"
+              onClick={() => {
+                setPatchNoteFile(null);
+                setPatchNoteTitle('');
+                setPatchNoteVersion('');
+                setPatchNoteModalOpen(true);
+              }}
+              title={copy.addPatchNoteTooltip}
+            >
+              {copy.addPatchNote}
+            </Button>
+          </div>
+
+          {loadingPatchNotes && patchnotes.length === 0 ? (
+            <LoadingSpinner label={copy.loading} />
+          ) : patchnotes.length === 0 ? (
+            <p className="documents-section__description">{copy.emptyPatchNotes}</p>
+          ) : (
+            <>
+              <div className="documents-grid">
+                {patchnotes.map((item) => (
+                  <div key={item.id} className="document-card">
+                    <div className="document-card__main">
+                      <div className="document-card__top">
+                        <span className="document-card__title">{item.title}</span>
+                        <span className="document-card__date">{formatDate(item.createdAt)}</span>
+                      </div>
+                      <div className="document-card__meta">
+                        {item.version ? (
+                          <span className="document-card__badge document-card__badge--version">
+                            v{item.version}
+                          </span>
+                        ) : null}
+                        <span className="document-card__badge">
+                          {formatFileSize(item.fileSizeBytes)}
+                        </span>
+                        {item.originalFilename ? (
+                          <span className="document-card__filename" title={item.originalFilename}>
+                            {item.originalFilename}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="document-card__actions">
+                      <button
+                        type="button"
+                        className="document-action-btn"
+                        onClick={() => handleOpenPatchNoteFile(item)}
+                        title={copy.viewFileTooltip}
+                        aria-label={copy.viewFileTooltip}
+                      >
+                        <img src={viewicon} alt="" />
+                      </button>
+                      <button
+                        type="button"
+                        className="document-action-btn"
+                        onClick={() => handleDownloadPatchNoteFile(item)}
+                        title={copy.downloadFileTooltip}
+                        aria-label={copy.downloadFileTooltip}
+                      >
+                        <img src={downloadicon} alt="" />
+                      </button>
+                      <button
+                        type="button"
+                        className="document-action-btn document-action-btn--delete"
+                        onClick={() => setDeletePatchNoteId(item.id)}
+                        title={copy.deleteFileTooltip}
+                        aria-label={copy.deleteFileTooltip}
+                      >
+                        <img src={deleteicon} alt="" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Paginacja */}
+              <div className="documents-pagination">
+                <button
+                  type="button"
+                  className="documents-pagination__btn"
+                  onClick={() => setCurrentPageIndex(0)}
+                  disabled={currentPageIndex === 0}
+                  title={copy.firstPageTooltip}
+                  aria-label={copy.firstPageTooltip}
+                >
+                  <img src={firstpageicon} alt="" />
+                </button>
+                <button
+                  type="button"
+                  className="documents-pagination__btn"
+                  onClick={() => setCurrentPageIndex((prev) => Math.max(0, prev - 1))}
+                  disabled={currentPageIndex === 0}
+                  title={copy.prevPageTooltip}
+                  aria-label={copy.prevPageTooltip}
+                >
+                  <img src={previouspageicon} alt="" />
+                </button>
+                <span className="documents-pagination__current">
+                  {currentPageNumber} / {totalPages}
+                </span>
+                <button
+                  type="button"
+                  className="documents-pagination__btn"
+                  onClick={() => setCurrentPageIndex((prev) => Math.min(totalPages - 1, prev + 1))}
+                  disabled={currentPageIndex >= totalPages - 1}
+                  title={copy.nextPageTooltip}
+                  aria-label={copy.nextPageTooltip}
+                >
+                  <img src={nextpageicon} alt="" />
+                </button>
+                <button
+                  type="button"
+                  className="documents-pagination__btn"
+                  onClick={() => setCurrentPageIndex(totalPages - 1)}
+                  disabled={currentPageIndex >= totalPages - 1}
+                  title={copy.lastPageTooltip}
+                  aria-label={copy.lastPageTooltip}
+                >
+                  <img src={lastpageicon} alt="" />
+                </button>
+              </div>
+            </>
+          )}
+        </section>
       </div>
 
+      {/* MODAL 1: Wgrywanie / edycja dokumentu prawnego */}
+      <Modal
+        isOpen={editorOpen}
+        onClose={() => setEditorOpen(false)}
+        title={editorTitle}
+        size="md"
+        showFooter={false}
+      >
+        <div className="document-upload-modal">
+          <label className="document-upload-dropzone">
+            <img src={editorFile ? fileaddedicon : addfileicon} alt="" />
+            <span className="document-upload-dropzone__label">
+              {editorFile ? editorFile.name : copy.pdfFileLabel}
+            </span>
+            <span className="document-upload-dropzone__hint">{copy.selectPdfHint}</span>
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              onChange={handleDocFileChosen}
+              style={{ display: 'none' }}
+            />
+          </label>
 
+          <div className="document-file-info">
+            <span className="document-file-info__label">{copy.fileNameLabel}:</span>
+            <span className="document-file-info__value">{editorFilename || copy.emptyValue}</span>
 
-      {documentdeleteconfirmationopen == 1 ? (
-        <div onClick = {closeDocumentDeleteConfirmation} style = {{width: '100%', height: '100%', position: 'fixed', top: '0%', left: '0%', backgroundColor: 'var(--color-modal-backdrop)', backdropFilter: 'blur(4px)', zIndex: 999999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <div onClick = {(event) => event.stopPropagation()} style = {{backgroundColor: 'var(--bg-surface)', width: '50%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2vw', paddingRight: '2vw'}}>
+            <span className="document-file-info__label">{copy.fileSizeLabel}:</span>
+            <span className="document-file-info__value">{editorFilesize || copy.emptyValue}</span>
 
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '24px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{DOCUMENTDELETECONFIRMATIONTITLE__TEXTLABEL[LANGUAGE]}</span></div>
+            <span className="document-file-info__label">{copy.fileDateLabel}:</span>
+            <span className="document-file-info__value">{editorFiledate || copy.emptyValue}</span>
+          </div>
 
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginTop: '2vh'}}><span>{DOCUMENTDELETECONFIRMATIONTEXT__TEXTLABEL[LANGUAGE]}</span></div>
-
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2.5%', marginTop: '2vh'}}>
-              <Button onClick = {closeDocumentDeleteConfirmation} style = {{width: '15%', height: '5vh'}} variant = "secondary">{CANCELBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-              <Button onClick = {confirmDocumentDelete} style = {{width: '15%', height: '5vh'}} variant = "primary">{CONFIRMBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-            </div>
-
+          <div className="document-modal-actions">
+            <Button variant="secondary" onClick={() => setEditorOpen(false)} disabled={isSubmittingDoc}>
+              {copy.cancel}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSaveDoc}
+              disabled={!editorFile || isSubmittingDoc}
+              title={copy.upload}
+            >
+              {isSubmittingDoc ? 'Wgrywanie...' : copy.upload}
+            </Button>
           </div>
         </div>
-      ) : null}
+      </Modal>
 
+      {/* MODAL 2: Nowy patch note */}
+      <Modal
+        isOpen={patchNoteModalOpen}
+        onClose={() => setPatchNoteModalOpen(false)}
+        title={copy.addPatchNote}
+        size="md"
+        showFooter={false}
+      >
+        <div className="document-upload-modal">
+          <label className="document-upload-dropzone">
+            <img src={patchNoteFile ? fileaddedicon : addfileicon} alt="" />
+            <span className="document-upload-dropzone__label">
+              {patchNoteFile ? patchNoteFile.name : copy.pdfFileLabel}
+            </span>
+            <span className="document-upload-dropzone__hint">{copy.selectPdfHint}</span>
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              onChange={handlePatchNoteFileChosen}
+              style={{ display: 'none' }}
+            />
+          </label>
 
+          <TextField
+            label={copy.titleLabel}
+            value={patchNoteTitle}
+            onChange={(e) => setPatchNoteTitle(e.target.value)}
+            placeholder={copy.titlePlaceholder}
+            required
+          />
 
+          <TextField
+            label={copy.versionLabel}
+            value={patchNoteVersion}
+            onChange={(e) => setPatchNoteVersion(e.target.value)}
+            placeholder={copy.versionPlaceholder}
+          />
 
-      {editoropen == 1 ? (
-        <div onClick = {closeEditor} style = {{width: '100%', height: '100%', position: 'fixed', top: '0%', left: '0%', backgroundColor: 'var(--color-modal-backdrop)', backdropFilter: 'blur(4px)', zIndex: 999999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <div onClick = {(event) => event.stopPropagation()} style = {{backgroundColor: 'var(--bg-surface)', width: '50%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', paddingTop: '1vh', paddingBottom: '2vh', paddingLeft: '2vw', paddingRight: '2vw'}}>
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '24px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{editortitletext}</span></div>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '2vh'}}><span>{PDFFILELABEL__TEXTLABEL[LANGUAGE]}</span></div>
-            <div onClick = {openfilepickerdocument} style = {{width: '64px', height: '64px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2vh', cursor: 'pointer'}}>
-              <img src = {editorfileicon} style = {{width: '100%', height: '100%'}}/>
-            </div>
-            <input id = "documentfileinput" type = "file" accept = "application/pdf,.pdf" onChange = {onFileChosen} style = {{display: 'none'}}/>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '2.5vh'}}><span>{FILENAMELABEL__TEXTLABEL[LANGUAGE]}</span></div>
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '1vh'}}><span>{editorfilename}</span></div>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '2.5vh'}}><span>{FILESIZELABEL__TEXTLABEL[LANGUAGE]}</span></div>
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '1vh'}}><span>{editorfilesize}</span></div>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '2.5vh'}}><span>{FILEDATELABEL__TEXTLABEL[LANGUAGE]}</span></div>
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '1vh'}}><span>{editorfiledate}</span></div>
-
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2.5%', marginTop: '2vh'}}>
-              <Button onClick = {closeEditor} style = {{width: '15%', height: '5vh'}} variant = "secondary">{CANCELBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-              <Button onClick = {onSaveEditor} style = {{width: '15%', height: '5vh'}} variant = "primary">{UPLOADBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-            </div>
+          <div className="document-modal-actions">
+            <Button
+              variant="secondary"
+              onClick={() => setPatchNoteModalOpen(false)}
+              disabled={isSubmittingPatchNote}
+            >
+              {copy.cancel}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSavePatchNote}
+              disabled={!patchNoteFile || !patchNoteTitle.trim() || isSubmittingPatchNote}
+              title={copy.save}
+            >
+              {isSubmittingPatchNote ? 'Zapisywanie...' : copy.save}
+            </Button>
           </div>
         </div>
-      ) : null}
+      </Modal>
 
-
-
-
-
-
-
-      <div style = {{width: '96%', height: '7%', position: 'absolute', top: '56vh', left: '1%', color: 'var(--text-primary)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><Divider className="group-main-subpage__divider" /></div>
-
-      <div>
-        <div style = {{width: '98%', height: '7%', position: 'absolute', top: '62vh', left: '1%', color: 'var(--text-primary)', fontSize: '28px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>{PATCHNOTESSECTION__TEXTLABEL[LANGUAGE]}</span></div>
-        <div style = {{width: '98%', height: '7%', position: 'absolute', top: '68vh', left: '1%', color: 'var(--text-primary)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', paddingLeft: '1%'}}><span>{PATCHNOTESSECTIONDESCRYPTION__TEXTLABEL[LANGUAGE]}</span></div>
-
-        <div style = {{width: '98%', top: '73vh', position: 'absolute', left: '1%', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
-          <div style = {{width: '100%', display: 'flex', justifyContent: 'flex-start', paddingLeft: '1%', marginTop: '2vh'}}>
-            <Button onClick = {openCreatorEditorpatchnote} style = {{width: '15%', height: '5vh', marginBottom: '2vh'}} variant = "primary">{NEWPATCHNOTEBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-          </div>
-
-          <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1vh', alignItems: 'center', paddingBottom: '1vh'}}>
-            <div style = {{width: '98%', height: '10vh', position: 'relative', top: '2%', left: '1%', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: '2%'}}>
-              <div onClick = {firstpage} style = {{backgroundColor: 'var(--bg-surface)', height: '40px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: currentpageindex > 0 ? 'pointer' : 'default', opacity: currentpageindex > 0 ? 1 : 0.5}}>
-                <img src = {firstpageicon} style = {{width: '50%', height: '50%'}}/>
-              </div>
-              <div onClick = {previouspage} style = {{backgroundColor: 'var(--bg-surface)', height: '40px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: currentpageindex > 0 ? 'pointer' : 'default', opacity: currentpageindex > 0 ? 1 : 0.5}}>
-                <img src = {previouspageicon} style = {{width: '50%', height: '50%'}}/>
-              </div>
-              <div style = {{backgroundColor: 'var(--bg-surface)', height: '40px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: 'var(--text-primary)', fontSize: '18px', fontWeight: 900}}><span>{currentpagenumber}</span></div>
-              <div onClick = {nextpage} style = {{backgroundColor: 'var(--bg-surface)', height: '40px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: currentpageindex < lastpageindex ? 'pointer' : 'default', opacity: currentpageindex < lastpageindex ? 1 : 0.5}}>
-                <img src = {nextpageicon} style = {{width: '50%', height: '50%'}}/>
-              </div>
-              <div onClick = {lastpage} style = {{backgroundColor: 'var(--bg-surface)', height: '40px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: currentpageindex < lastpageindex ? 'pointer' : 'default', opacity: currentpageindex < lastpageindex ? 1 : 0.5}}>
-                <img src = {lastpageicon} style = {{width: '50%', height: '50%'}}/>
-              </div>
-            </div>
-            {patchnotes.map((patchnote) => (
-
-              <div key = {'patchnote' + patchnote.id} style = {{backgroundColor: 'var(--bg-surface)', width: '80%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'flex-start', paddingTop: '1%', paddingBottom: '1%', paddingLeft: '1%', paddingRight: '1%', borderLeft: '6px solid var(--color-accent)', borderRadius: '16px'}}>
-                <div style = {{width: '90%', position: 'relative', display: 'flex', flexDirection: 'column', gap: '0.5vh', paddingLeft: '1%'}}>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
-                    <div style = {{width: '70%', position: 'relative', color: 'var(--text-primary)', fontSize: '18px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'flex-start'}}><span style = {{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{patchnote.title}</span></div>
-                    <div style = {{width: '30%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-end', marginRight: '2%'}}><span>{concatenateexpiration(patchnote.createdAt)}</span></div>
-                  </div>
-                  <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '2%'}}>
-                    <div style = {{backgroundColor: 'var(--color-accent-2)', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', borderRadius: '8px', paddingLeft: '1%', paddingRight: '1%'}}><span>{patchnote.version}</span></div>
-                  </div>
-                </div>
-                <div style = {{width: '10%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '5%', alignSelf: 'stretch'}}>
-                  <div onClick = {() => openPatchNoteFile(patchnote)} style = {{width: '32px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {viewicon} style = {{width: '60%', height: '60%'}}/>
-                  </div>
-                  <div onClick = {() => downloadPatchNoteFile(patchnote)} style = {{width: '32px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-                    <img src = {downloadicon} style = {{width: '60%', height: '60%'}}/>
-                  </div>
-                  <div onClick = {() => openPatchNoteDeleteConfirmation(patchnote)} style = {{width: '32px', aspectRatio: '1 / 1', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', cursor: 'pointer'}}>
-
-
-
-                    <img src = {deleteicon} style = {{width: '60%', height: '60%'}}/>
-                  </div>
-                </div>
-              </div>
-
-            ))}
-
-          </div>
-
-
-
-
-        </div>
-      </div>
-
-
-
-      {patchnotedeleteconfirmationopen == 1 ? (
-        <div onClick = {closePatchNoteDeleteConfirmation} style = {{width: '100%', height: '100%', position: 'fixed', top: '0%', left: '0%', backgroundColor: 'var(--color-modal-backdrop)', backdropFilter: 'blur(4px)', zIndex: 999999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <div onClick = {(event) => event.stopPropagation()} style = {{backgroundColor: 'var(--bg-surface)', width: '50%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', paddingTop: '2vh', paddingBottom: '2vh', paddingLeft: '2vw', paddingRight: '2vw'}}>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '24px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{PATCHNOTEDELETECONFIRMATIONTITLE__TEXTLABEL[LANGUAGE]}</span></div>
-
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '16px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'center', textAlign: 'center', marginTop: '2vh'}}><span>{PATCHNOTEDELETECONFIRMATIONTEXT__TEXTLABEL[LANGUAGE]}</span></div>
-
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2.5%', marginTop: '2vh'}}>
-              <Button onClick = {closePatchNoteDeleteConfirmation} style = {{width: '15%', height: '5vh'}} variant = "secondary">{CANCELBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-              <Button onClick = {confirmPatchNoteDelete} style = {{width: '15%', height: '5vh'}} variant = "primary">{CONFIRMBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-            </div>
-
-          </div>
-
-        </div>
-      ) : null}
-
-
-
-
-      {editorpatchnoteopen == 1 ? (
-        <div onClick = {closeEditorpatchnote} style = {{width: '100%', height: '100%', position: 'fixed', top: '0%', left: '0%', backgroundColor: 'var(--color-modal-backdrop)', backdropFilter: 'blur(4px)', zIndex: 999999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-          <div onClick = {(event) => event.stopPropagation()} style = {{backgroundColor: 'var(--bg-surface)', width: '50%', position: 'relative', borderRadius: '16px', display: 'flex', flexDirection: 'column', paddingTop: '1vh', paddingBottom: '2vh', paddingLeft: '2vw', paddingRight: '2vw'}}>
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-primary)', fontSize: '24px', display: 'flex', fontWeight: 900, alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}><span>{CREATEPATCHNOTETITLE__TEXTLABEL[LANGUAGE]}</span></div>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '2vh'}}><span>{PDFFILELABEL__TEXTLABEL[LANGUAGE]}</span></div>
-            <div onClick = {openfilepickerpatchnote} style = {{width: '64px', height: '64px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2vh', cursor: 'pointer'}}>
-              <img src = {editorpatchnotefileicon} style = {{width: '100%', height: '100%'}}/>
-            </div>
-            <input id = "patchnotefileinput" type = "file" accept = "application/pdf,.pdf" onChange = {onFileChosenpatchnote} style = {{display: 'none'}}/>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '2.5vh'}}><span>{TITLELABEL__TEXTLABEL[LANGUAGE]}</span></div>
-            <input onChange = {(event) => setEditorpatchnotetitle(event.target.value)} style = {{backgroundColor: 'var(--bg-elevated)', width: '50%', height: '5vh', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', borderRadius: '8px', paddingLeft: '1%', marginTop: '1vh'}} value = {editorpatchnotetitle} onFocus = {(event) => (event.target.style.border = '2px solid var(--accent)')} onBlur = {(event) => (event.target.style.border = '')}></input>
-
-            <div style = {{width: '100%', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', fontWeight: 500, alignItems: 'center', justifyContent: 'flex-start', marginTop: '2.5vh'}}><span>{VERSIONLABEL__TEXTLABEL[LANGUAGE]}</span></div>
-            <input onChange = {(event) => setEditorpatchnoteversion(event.target.value)} style = {{backgroundColor: 'var(--bg-elevated)', width: '25%', height: '5vh', position: 'relative', color: 'var(--text-secondary)', fontSize: '14px', borderRadius: '8px', paddingLeft: '1%', marginTop: '1vh'}} value = {editorpatchnoteversion} onFocus = {(event) => (event.target.style.border = '2px solid var(--accent)')} onBlur = {(event) => (event.target.style.border = '')}></input>
-
-            <div style = {{width: '100%', position: 'relative', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: '2.5%', marginTop: '2vh'}}>
-              <Button onClick = {closeEditorpatchnote} style = {{width: '15%', height: '5vh'}} variant = "secondary">{CANCELBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-              <Button onClick = {onSaveEditorpatchnote} style = {{width: '15%', height: '5vh'}} variant = "primary">{UPLOADBUTTON__TEXTLABEL[LANGUAGE]}</Button>
-            </div>
+      {/* MODAL 3: Potwierdzenie usunięcia dokumentu */}
+      <Modal
+        isOpen={Boolean(deleteDocKey)}
+        onClose={() => setDeleteDocKey(null)}
+        title={copy.deleteDocTitle}
+        size="sm"
+        showFooter={false}
+      >
+        <div className="document-upload-modal">
+          <p className="documents-section__description">{copy.deleteDocDesc}</p>
+          <div className="document-modal-actions">
+            <Button variant="secondary" onClick={() => setDeleteDocKey(null)}>
+              {copy.cancel}
+            </Button>
+            <Button variant="danger" onClick={handleDeleteDoc} title={copy.delete}>
+              {copy.delete}
+            </Button>
           </div>
         </div>
-      ) : null}
+      </Modal>
 
-
-
-
-
-
-
-
-
-
-
-
-
-    </div>
-  )
+      {/* MODAL 4: Potwierdzenie usunięcia patch note */}
+      <Modal
+        isOpen={Boolean(deletePatchNoteId)}
+        onClose={() => setDeletePatchNoteId(null)}
+        title={copy.deletePatchNoteTitle}
+        size="sm"
+        showFooter={false}
+      >
+        <div className="document-upload-modal">
+          <p className="documents-section__description">{copy.deletePatchNoteDesc}</p>
+          <div className="document-modal-actions">
+            <Button variant="secondary" onClick={() => setDeletePatchNoteId(null)}>
+              {copy.cancel}
+            </Button>
+            <Button variant="danger" onClick={handleDeletePatchNote} title={copy.delete}>
+              {copy.delete}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </AppSectionPage>
+  );
 }

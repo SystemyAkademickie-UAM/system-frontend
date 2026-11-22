@@ -4,18 +4,27 @@
  */
 
 // === IMPORTY I ZALEŻNOŚCI ===
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { APP_ROLE } from '../../navigation/shellTemplates.config.js';
+import { APP_ROLE, ROLE_UI_LABEL } from '../../navigation/shellTemplates.config.js';
 import { useAppRoleOptional } from '../../context/AppRoleContext.jsx';
 import { useSessionOptional } from '../../context/SessionContext.jsx';
+import { useUserProfileOptional } from '../../context/UserProfileContext.jsx';
 import {
   fetchMaintenanceStatus,
   getCachedMaintenanceStatus,
   subscribeMaintenanceStatus,
 } from '../../services/maintenance.api.js';
+import { logoutUser, isLogoutAvailable } from '../../services/authService.js';
+import { IconUserPlaceholder } from '../../components/layout/superbar/ShellIcons.jsx';
+import SuperBarUserIdentity from '../../components/layout/superbar/SuperBarUserIdentity.jsx';
+import { getAvatarImageClassName } from '../../utils/avatarDisplay.js';
+import { useFloatingPanelPosition } from '../../hooks/useFloatingPanelPosition.js';
+import { positionDropdownMenu } from '../../utils/ui/positionTooltipInViewport.js';
 import { homePath, organizationsPath, welcomePath } from '../../routes/pathRegistry.js';
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+import '../../components/layout/superbar/SuperBar.css';
 import './MaintenancePage.css';
 
 // === ETYKIETY JĘZYKOWE ===
@@ -76,7 +85,33 @@ const TEXT = {
     polish: 'Powrót do strony powitalnej',
     english: 'Back to welcome page',
   },
+  logoutBtn: {
+    polish: 'Wyloguj',
+    english: 'Log out',
+  },
+  loggingOut: {
+    polish: 'Wylogowywanie…',
+    english: 'Logging out…',
+  },
+  logoutError: {
+    polish: 'Nie udało się wylogować.',
+    english: 'Logout failed.',
+  },
+  accountMenuLabel: {
+    polish: 'Menu konta użytkownika',
+    english: 'User account menu',
+  },
 };
+
+function buildDisplayName(user) {
+  if (!user) return null;
+  const firstName = user.givenName || user.name || '';
+  const lastName = user.surname || '';
+  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
+  if (fullName) return fullName;
+  if (user.email) return user.email.split('@')[0];
+  return null;
+}
 
 function formatEstimatedEnd(isoString, language) {
   if (!isoString) return null;
@@ -97,6 +132,7 @@ export default function MaintenancePage() {
   const navigate = useNavigate();
   const session = useSessionOptional();
   const roleContext = useAppRoleOptional();
+  const userProfile = useUserProfileOptional();
   const [language] = useState(READLANGUAGECOOKIE);
 
   const initialStatus = getCachedMaintenanceStatus();
@@ -105,8 +141,92 @@ export default function MaintenancePage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState(null);
 
+  // Menu użytkownika
+  const menuId = useId();
+  const userMenuRootRef = useRef(null);
+  const triggerRef = useRef(null);
+  const panelRef = useRef(null);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState(null);
+
   const role = roleContext?.role || session?.role || null;
   const isSuperAdmin = role === APP_ROLE.SUPERADMIN;
+  const roleLabel = role ? (ROLE_UI_LABEL[role] ?? ROLE_UI_LABEL[APP_ROLE.STUDENT]) : '';
+
+  const user = session?.user;
+  const profile = userProfile?.profile;
+  const avatarUrl = userProfile?.avatarUrl;
+
+  const displayName = useMemo(() => {
+    const nickname = profile?.nickname?.trim();
+    const legalName = buildDisplayName(user);
+    if (nickname && legalName) {
+      return `${legalName} (${nickname})`;
+    }
+    return legalName || nickname || (user?.email ? user.email.split('@')[0] : 'Użytkownik');
+  }, [profile, user]);
+
+  const getMenuLayout = useCallback(
+    ({ triggerRect, panelRect }) =>
+      positionDropdownMenu({
+        triggerRect,
+        panelRect,
+        align: 'end',
+      }),
+    [],
+  );
+
+  const menuLayout = useFloatingPanelPosition({
+    open: isUserMenuOpen,
+    triggerRef,
+    panelRef,
+    getLayout: getMenuLayout,
+    deps: [logoutError, isLoggingOut],
+  });
+
+  useEffect(() => {
+    if (!isUserMenuOpen) return undefined;
+    const onPointerDown = (event) => {
+      const target = event.target;
+      if (
+        userMenuRootRef.current?.contains(target) ||
+        panelRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setIsUserMenuOpen(false);
+    };
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isUserMenuOpen]);
+
+  const handleLogout = () => {
+    setLogoutError(null);
+    if (!isLogoutAvailable()) {
+      setLogoutError(TEXT.logoutError[language]);
+      return;
+    }
+    setIsLoggingOut(true);
+    setIsUserMenuOpen(false);
+    void logoutUser(
+      () => {
+        setIsLoggingOut(false);
+        setLogoutError(TEXT.logoutError[language]);
+        setIsUserMenuOpen(true);
+      },
+      { navigate },
+    );
+  };
 
   const checkStatus = async (isManual = false) => {
     if (isManual) {
@@ -152,13 +272,14 @@ export default function MaintenancePage() {
   }, []);
 
   const formattedEstimatedEnd = formatEstimatedEnd(status?.estimatedEndAt, language);
-  const displayMessage = status?.message && status.message.trim().length > 0
-    ? status.message.trim()
-    : TEXT.defaultMessage[language];
+  const displayMessage =
+    status?.message && status.message.trim().length > 0
+      ? status.message.trim()
+      : TEXT.defaultMessage[language];
 
   return (
     <div className="maintenance-page">
-      <header className="maintenance-page__header">
+      <header className="maintenance-page__header super-bar">
         <div className="maintenance-page__brand">
           <img
             src="/images/maq-logo.png"
@@ -167,9 +288,83 @@ export default function MaintenancePage() {
           />
           <span className="maintenance-page__app-title">MyAcademyQuest</span>
         </div>
-        <span className="maintenance-page__status-pill">
-          {TEXT.badge[language]}
-        </span>
+
+        <div className="maintenance-page__header-right">
+          <span className="maintenance-page__status-pill">
+            {TEXT.badge[language]}
+          </span>
+
+          {session?.isAuthenticated ? (
+            <div className="super-bar-user-menu" ref={userMenuRootRef}>
+              <SuperBarUserIdentity
+                displayName={displayName}
+                roleLabel={roleLabel}
+                isLoading={false}
+              />
+              <button
+                ref={triggerRef}
+                type="button"
+                className="super-bar-user-menu__avatar-btn"
+                aria-expanded={isUserMenuOpen}
+                aria-controls={menuId}
+                aria-haspopup="menu"
+                aria-label={TEXT.accountMenuLabel[language]}
+                onClick={() => {
+                  setLogoutError(null);
+                  setIsUserMenuOpen((val) => !val);
+                }}
+              >
+                <span className="super-bar-user-menu__avatar" aria-hidden="true">
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt=""
+                      className={getAvatarImageClassName(avatarUrl, 'super-bar-user-menu__avatar-img')}
+                    />
+                  ) : (
+                    <IconUserPlaceholder />
+                  )}
+                </span>
+              </button>
+
+              {isUserMenuOpen && typeof document !== 'undefined'
+                ? createPortal(
+                    <ul
+                      ref={panelRef}
+                      id={menuId}
+                      className="super-bar-user-menu__dropdown super-bar-user-menu__dropdown--portal"
+                      role="menu"
+                      style={{
+                        visibility: menuLayout ? 'visible' : 'hidden',
+                        left: menuLayout ? `${menuLayout.left}px` : 0,
+                        top: menuLayout ? `${menuLayout.top}px` : 0,
+                      }}
+                    >
+                      {logoutError ? (
+                        <li className="super-bar-user-menu__dropdown-error" role="alert">
+                          {logoutError}
+                        </li>
+                      ) : null}
+                      <li role="none">
+                        <button
+                          type="button"
+                          className="super-bar-user-menu__dropdown-item"
+                          role="menuitem"
+                          onClick={handleLogout}
+                          disabled={isLoggingOut}
+                        >
+                          {isLoggingOut
+                            ? TEXT.loggingOut[language]
+                            : TEXT.logoutBtn[language]}
+                        </button>
+                      </li>
+                    </ul>,
+                    document.body,
+                  )
+                : null}
+            </div>
+          ) : null}
+        </div>
       </header>
 
       <main className="maintenance-page__main">
@@ -184,9 +379,9 @@ export default function MaintenancePage() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
+              <circle cx="12" cy="10" r="8" />
+              <line x1="12" y1="6" x2="12" y2="10" />
+              <line x1="12" y1="14" x2="12.01" y2="14" />
             </svg>
           </div>
 

@@ -9,11 +9,15 @@ import { useEffect, useState, useMemo } from 'react';
 import AppSectionPage from '../../components/page/AppSectionPage.jsx';
 import Button from '../../components/ui/Button/Button.jsx';
 import LoadingSpinner from '../../components/ui/LoadingSpinner/LoadingSpinner.jsx';
+import Modal from '../../components/ui/Modal/Modal.jsx';
+import { useToast } from '../../components/ui/Toast/Toast.jsx';
 import { PRODUCTION_LOG_TODAY_DAY } from '../../constants/productionLogs.constants.js';
 import {
   exportEncryptedProductionLogs,
+  fetchLogRetention,
   fetchOrganizations,
   fetchProductionLogDays,
+  updateLogRetention,
 } from '../../services/productionLogs.api.js';
 import {
   decryptProductionLogExport,
@@ -41,6 +45,15 @@ const TEXTS = {
     copiedNotice: 'Skopiowano do schowka',
     viewStructured: 'Widok tabelaryczny',
     viewRaw: 'Widok surowy (terminal)',
+    retentionButton: 'Retencja logów',
+    retentionModalTitle: 'Zarządzanie retencją logów systemowych',
+    retentionModalDesc: 'Ustal liczbę dni, przez które dzienniki zdarzeń będą przechowywane na serwerze (domyślnie 90 dni). Logi starsze niż ustalony próg są automatycznie usuwane z archiwum.',
+    retentionDaysLabel: 'Okres przechowywania logów (dni, 1 - 3650):',
+    retentionDaysHint: 'Domyślna wartość systemowa: 90 dni.',
+    retentionSave: 'Zapisz ustawienia',
+    retentionSaving: 'Zapisywanie…',
+    retentionSuccess: 'Zaktualizowano okres retencji logów systemowych.',
+    retentionCancel: 'Anuluj',
 
     // Statystyki / KPI
     statTotalEvents: 'Wszystkie zdarzenia',
@@ -121,6 +134,15 @@ const TEXTS = {
     copiedNotice: 'Copied to clipboard',
     viewStructured: 'Structured table',
     viewRaw: 'Raw view (terminal)',
+    retentionButton: 'Log Retention',
+    retentionModalTitle: 'System Log Retention Policy',
+    retentionModalDesc: 'Configure the number of days event logs remain stored on the server (default 90 days). Logs older than this threshold are purged automatically.',
+    retentionDaysLabel: 'Log retention period (days, 1 - 3650):',
+    retentionDaysHint: 'Default system fallback: 90 days.',
+    retentionSave: 'Save Policy',
+    retentionSaving: 'Saving…',
+    retentionSuccess: 'System log retention policy updated.',
+    retentionCancel: 'Cancel',
 
     // Stats / KPI
     statTotalEvents: 'Total events',
@@ -199,6 +221,16 @@ export default function SuperadminLogsContent() {
   const LANGUAGE = READLANGUAGECOOKIE();
   const t = TEXTS[LANGUAGE] || TEXTS.polish;
 
+  let showSuccess = () => {};
+  let showError = () => {};
+  try {
+    const toast = useToast();
+    showSuccess = toast.showSuccess;
+    showError = toast.showError;
+  } catch {
+    // Allows rendering in test environments without ToastProvider
+  }
+
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState(PRODUCTION_LOG_TODAY_DAY);
   const [organizations, setOrganizations] = useState([]);
@@ -206,6 +238,13 @@ export default function SuperadminLogsContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
+
+  // Retention policy state & modal
+  const [retentionModalOpen, setRetentionModalOpen] = useState(false);
+  const [retentionDays, setRetentionDays] = useState(90);
+  const [defaultRetentionDays, setDefaultRetentionDays] = useState(90);
+  const [isSavingRetention, setIsSavingRetention] = useState(false);
+  const [isLoadingRetention, setIsLoadingRetention] = useState(false);
 
   // Filters & sorting
   const [selectedOrg, setSelectedOrg] = useState('all');
@@ -323,6 +362,45 @@ export default function SuperadminLogsContent() {
     setExpandedLogId((prev) => (prev === id ? null : id));
   }
 
+  async function handleOpenRetentionModal() {
+    setIsLoadingRetention(true);
+    setRetentionModalOpen(true);
+    try {
+      const data = await fetchLogRetention();
+      if (data?.ttlDays) {
+        setRetentionDays(data.ttlDays);
+      }
+      if (data?.defaultTtlDays) {
+        setDefaultRetentionDays(data.defaultTtlDays);
+      }
+    } catch {
+      // fallback
+    } finally {
+      setIsLoadingRetention(false);
+    }
+  }
+
+  async function handleSaveRetention() {
+    const val = Number(retentionDays);
+    if (!Number.isFinite(val) || val < 1 || val > 3650) {
+      showError('Podaj poprawną liczbę dni (1 - 3650).');
+      return;
+    }
+    setIsSavingRetention(true);
+    try {
+      const updated = await updateLogRetention(val);
+      if (updated?.ttlDays) {
+        setRetentionDays(updated.ttlDays);
+      }
+      showSuccess(t.retentionSuccess);
+      setRetentionModalOpen(false);
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Błąd zapisu retencji logów.');
+    } finally {
+      setIsSavingRetention(false);
+    }
+  }
+
   return (
     <AppSectionPage title={t.pageTitle} description={t.pageSubtitle}>
       <div className="superadmin-logs">
@@ -416,6 +494,14 @@ export default function SuperadminLogsContent() {
               disabled={!rawLogText || isLoading}
             >
               {copyFeedback ? t.copiedNotice : t.copyButton}
+            </Button>
+
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleOpenRetentionModal}
+            >
+              {t.retentionButton}
             </Button>
 
             <div className="superadmin-logs__view-toggle">
@@ -716,6 +802,62 @@ export default function SuperadminLogsContent() {
           </div>
         )}
       </div>
+
+      <Modal
+        isOpen={retentionModalOpen}
+        onClose={() => setRetentionModalOpen(false)}
+        title={t.retentionModalTitle}
+        subtitle={t.retentionModalDesc}
+        size="md"
+        showFooter={false}
+      >
+        <div className="superadmin-logs__retention-modal">
+          {isLoadingRetention ? (
+            <LoadingSpinner label={t.refreshingButton} />
+          ) : (
+            <>
+              <div className="superadmin-logs__retention-field">
+                <label htmlFor="log-retention-input" className="superadmin-logs__retention-label">
+                  {t.retentionDaysLabel}
+                </label>
+                <input
+                  id="log-retention-input"
+                  type="number"
+                  min="1"
+                  max="3650"
+                  className="superadmin-logs__input"
+                  value={retentionDays}
+                  onChange={(e) => {
+                    const parsed = parseInt(e.target.value, 10);
+                    setRetentionDays(Number.isNaN(parsed) ? '' : Math.max(1, Math.min(3650, parsed)));
+                  }}
+                />
+                <span className="superadmin-logs__retention-hint">
+                  {t.retentionDaysHint} ({defaultRetentionDays} dni)
+                </span>
+              </div>
+              <div className="superadmin-logs__retention-actions">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setRetentionModalOpen(false)}
+                  disabled={isSavingRetention}
+                >
+                  {t.retentionCancel}
+                </Button>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={handleSaveRetention}
+                  disabled={isSavingRetention}
+                >
+                  {isSavingRetention ? t.retentionSaving : t.retentionSave}
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </AppSectionPage>
   );
 }

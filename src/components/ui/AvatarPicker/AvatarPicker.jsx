@@ -104,8 +104,8 @@ const [activeCategory, setActiveCategory] = useState(AVATAR_CATEGORY.ALL);
   );
 
   const filteredAvatars = useMemo(
-    () => filterAvatarsByCategory(avatars, activeCategory),
-    [avatars, activeCategory],
+    () => filterAvatarsByCategory(avatars, activeCategory, value),
+    [avatars, activeCategory, value],
   );
 
   const handleSelect = useCallback((avatarId) => {

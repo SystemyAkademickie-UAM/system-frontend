@@ -184,6 +184,8 @@
   object-fit: contain;
   filter: drop-shadow(0 0 36px rgba(30, 204, 56, 0.35));
   animation: welcome-logo-float 5s ease-in-out infinite;
+  cursor: pointer;
+  user-select: none;
 }
 
 .welcome-hero__brand-logo--easter-egg {
