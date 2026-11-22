@@ -57,3 +57,14 @@ export function setRememberMe(enabled) {
   } catch {
   }
 }
+
+/**
+ * Czyści preferencję "Zapamiętaj mnie" (np. przy wylogowaniu).
+ */
+export function clearRememberMe() {
+  try {
+    document.cookie = `${REMEMBER_ME_COOKIE_NAME}=;path=/;max-age=0;Expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax`;
+    localStorage.removeItem(REMEMBER_ME_STORAGE_KEY);
+  } catch {
+  }
+}

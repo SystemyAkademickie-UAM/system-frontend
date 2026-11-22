@@ -62,3 +62,4 @@ describe('organizations.api', () => {
     await expect(listOrganizations()).rejects.toThrow('Domain already taken Name is required');
   });
 });
+

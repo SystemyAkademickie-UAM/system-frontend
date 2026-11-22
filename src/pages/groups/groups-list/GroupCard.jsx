@@ -4,7 +4,7 @@
  */
 
 // === IMPORTY I ZALEŻNOŚCI ===
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AssetSvg from '../../../components/ui/AssetSvg/AssetSvg.jsx';
 import { isColorBannerRef, parseColorBannerRef } from '../../../constants/drive.constants.js';
@@ -13,6 +13,7 @@ import { groupMainPath, groupRootPath } from '../../../routes/pathRegistry.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { useUserProfile } from '../../../context/UserProfileContext.jsx';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { useSessionOptional } from '../../../context/SessionContext.jsx';
 import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import './GroupCard.css';
 
@@ -36,22 +37,31 @@ const LECTURER__TEXTLABEL = {
  */
 
 // === GŁÓWNY KOMPONENT WIDOKU ===
-export default function GroupCard({ group }) {
+export default function GroupCard({
+  group,
+  onEditGroup = null,
+  onDeleteGroup = null,
+}) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [bannerFailed, setBannerFailed] = useState(!group.bannerUrl);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
   const isColorBanner = isColorBannerRef(group.bannerUrl);
   const colorBannerValue = parseColorBannerRef(group.bannerUrl);
 
-const showFallback = !isColorBanner && (bannerFailed || !group.bannerUrl);
+  const showFallback = !isColorBanner && (bannerFailed || !group.bannerUrl);
 
   const { profile } = useUserProfile();
   const { role } = useAppRole();
+  const session = useSessionOptional();
+  const isAdminOrSuper = role === APP_ROLE.ADMIN || role === APP_ROLE.SUPERADMIN || session?.role === APP_ROLE.ADMIN || session?.role === APP_ROLE.SUPERADMIN;
 
   var userNickname = profile.nickname;
 
   var displayLecturer = group.lecturer;
 
-if (group.isMine && role == APP_ROLE.LECTURER && !displayLecturer.startsWith(userNickname + ' (')) {
+  if (group.isMine && role == APP_ROLE.LECTURER && !displayLecturer.startsWith(userNickname + ' (')) {
     displayLecturer = userNickname + ' (' + group.lecturer + ')';
   }
 
@@ -59,13 +69,88 @@ if (group.isMine && role == APP_ROLE.LECTURER && !displayLecturer.startsWith(use
     setBannerFailed(!group.bannerUrl || isColorBannerRef(group.bannerUrl));
   }, [group.bannerUrl]);
 
-  const targetPath = group.isMine ? groupMainPath(group.id) : groupRootPath(group.id);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleOutsideClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+    };
+  }, [menuOpen]);
+
+  const targetPath = isAdminOrSuper
+    ? `/groups/${group.id}/admin/home`
+    : (group.isMine ? groupMainPath(group.id) : groupRootPath(group.id));
 
 // === RENDEROWANIE WIDOKU ===
   return (
     <article className="group-card">
       <Link className="group-card__link" to={targetPath}>
         <div className="group-card__banner-wrap">
+          {isAdminOrSuper ? (
+            <div
+              className="group-card__admin-actions"
+              ref={menuRef}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              <button
+                type="button"
+                className="group-card__menu-trigger"
+                aria-label="Więcej opcji grupy"
+                aria-expanded={menuOpen}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMenuOpen((prev) => !prev);
+                }}
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <circle cx="10" cy="4" r="2" />
+                  <circle cx="10" cy="10" r="2" />
+                  <circle cx="10" cy="16" r="2" />
+                </svg>
+              </button>
+
+              {menuOpen ? (
+                <div className="group-card__menu-dropdown" role="menu">
+                  <button
+                    type="button"
+                    className="group-card__menu-item"
+                    role="menuitem"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setMenuOpen(false);
+                      onEditGroup?.(group);
+                    }}
+                  >
+                    Edytuj grupę i członków
+                  </button>
+                  <button
+                    type="button"
+                    className="group-card__menu-item group-card__menu-item--danger"
+                    role="menuitem"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setMenuOpen(false);
+                      onDeleteGroup?.(group);
+                    }}
+                  >
+                    Usuń grupę
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
           {isColorBanner ? (
             <div
               className="group-card__banner group-card__banner--color"

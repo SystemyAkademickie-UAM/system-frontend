@@ -12,6 +12,7 @@ import {
   CatalogFiltersPanel,
   CatalogFiltersToggle,
   Divider,
+  Modal,
   ProductCard,
   SearchBar,
   useToast,
@@ -19,11 +20,14 @@ import {
 import { useGroupItemCategories } from '../../../hooks/shop/useGroupItemCategories.js';
 import { useProfileInventory } from '../../../hooks/shop/useProfileInventory.js';
 import { useProfileInventoryHistory } from '../../../hooks/shop/useProfileInventoryHistory.js';
-import { fetchGroupShopItems } from '../../../services/shop.api.js';
+import { deleteGroupPurchasedItem, deleteGroupUsedItemHistory, fetchGroupShopItems } from '../../../services/shop.api.js';
+import { invalidateGroupInventory } from '../../../services/studentProfileEvents.js';
 import { resolveShopCategoryDetails } from '../../../utils/shop/shopCategories.js';
 import { READLANGUAGECOOKIE } from '../../../utils/LANGUAGECOOKIE.js';
 import { useProfileStudentProfileContext } from '../group-profile/ProfileStudentProfileContext.js';
 import { useAppRole } from '../../../context/AppRoleContext.jsx';
+import { useSessionOptional } from '../../../context/SessionContext.jsx';
+import { APP_ROLE } from '../../../navigation/shellTemplates.config.js';
 import ProfileEqUseItemModal from './ProfileEqUseItemModal.jsx';
 import '../group-activities/shared/activitiesShared.css';
 import './ProfileEqContent.css';
@@ -215,6 +219,8 @@ export default function ProfileEqContentContent({
 }) {
   const { groupId, studentId } = useParams();
   const { role } = useAppRole();
+  const session = useSessionOptional();
+  const isAdmin = session?.role === APP_ROLE.ADMIN || session?.role === APP_ROLE.SUPERADMIN;
   const isLecturer = role === 'lecturer';
   const profileContext = useProfileStudentProfileContext();
   const profile = profileContext?.profile;
@@ -230,6 +236,9 @@ export default function ProfileEqContentContent({
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [usingItemId, setUsingItemId] = useState(null);
   const [confirmUseItem, setConfirmUseItem] = useState(null);
+  const [confirmDeletePurchased, setConfirmDeletePurchased] = useState(null);
+  const [confirmDeleteUsed, setConfirmDeleteUsed] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [catalogItems, setCatalogItems] = useState([]);
   const [localUsedItems, setLocalUsedItems] = useState([]);
 
@@ -238,6 +247,7 @@ export default function ProfileEqContentContent({
     isLoading: isInventoryLoading,
     error: inventoryError,
     useItem,
+    refetch: refetchInventory,
   } = useProfileInventory(groupId, {
     studentAccountId: effectiveAccountId,
     readOnly: effectiveReadOnly,
@@ -247,6 +257,7 @@ export default function ProfileEqContentContent({
   const {
     history,
     isLoading: isHistoryLoading,
+    refetch: refetchHistory,
   } = useProfileInventoryHistory(groupId, {
     studentAccountId: effectiveAccountId,
     enabled: isEnabled,
@@ -372,6 +383,36 @@ export default function ProfileEqContentContent({
     setConfirmUseItem({ itemId, itemName });
   };
 
+  const handleConfirmDeletePurchased = async () => {
+    if (!confirmDeletePurchased?.itemId) return;
+    setIsDeleting(true);
+    const result = await deleteGroupPurchasedItem(groupId, confirmDeletePurchased.itemId);
+    setIsDeleting(false);
+    if (result.ok) {
+      showSuccess('Przedmiot został usunięty z ekwipunku.');
+      setConfirmDeletePurchased(null);
+      invalidateGroupInventory(groupId);
+      refetchInventory();
+    } else {
+      showError(result.error || 'Nie udało się usunąć przedmiotu.');
+    }
+  };
+
+  const handleConfirmDeleteUsed = async () => {
+    if (!confirmDeleteUsed?.historyId) return;
+    setIsDeleting(true);
+    const result = await deleteGroupUsedItemHistory(groupId, confirmDeleteUsed.historyId);
+    setIsDeleting(false);
+    if (result.ok) {
+      showSuccess('Wpis został usunięty z historii.');
+      setConfirmDeleteUsed(null);
+      invalidateGroupInventory(groupId);
+      refetchHistory();
+    } else {
+      showError(result.error || 'Nie udało się usunąć wpisu z historii.');
+    }
+  };
+
   const isLoading = isInventoryLoading || isHistoryLoading;
 
 const error = inventoryError;
@@ -479,6 +520,7 @@ const error = inventoryError;
                 hideAddToCart
                 hideActions={effectiveReadOnly}
                 isExtraLife={item.isExtraLife === true}
+                onAdminDelete={isAdmin ? () => setConfirmDeletePurchased({ itemId: entry.itemId, itemName: item.name }) : undefined}
               />
             );
           })}
@@ -523,6 +565,7 @@ const error = inventoryError;
                 dateLabel={`Użyto: ${formatDateTime(record.date)}`}
                 hideAddToCart
                 hideActions
+                onAdminDelete={isAdmin ? () => setConfirmDeleteUsed({ historyId: record.id, itemName: record.itemName || itemMeta?.name || 'Przedmiot' }) : undefined}
               />
             );
           })}
@@ -540,6 +583,42 @@ const error = inventoryError;
         }}
         onConfirm={handleConfirmUseItem}
       />
+
+      {confirmDeletePurchased ? (
+        <Modal
+          isOpen={true}
+          onClose={() => {
+            if (!isDeleting) setConfirmDeletePurchased(null);
+          }}
+          title="Usuń przedmiot z ekwipunku"
+          confirmLabel={isDeleting ? 'Usuwanie...' : 'Usuń'}
+          confirmVariant="danger"
+          confirmDisabled={isDeleting}
+          onConfirm={handleConfirmDeletePurchased}
+        >
+          <p>
+            Czy na pewno chcesz usunąć przedmiot <strong>{confirmDeletePurchased.itemName}</strong> z ekwipunku studenta?
+          </p>
+        </Modal>
+      ) : null}
+
+      {confirmDeleteUsed ? (
+        <Modal
+          isOpen={true}
+          onClose={() => {
+            if (!isDeleting) setConfirmDeleteUsed(null);
+          }}
+          title="Usuń wpis z historii"
+          confirmLabel={isDeleting ? 'Usuwanie...' : 'Usuń'}
+          confirmVariant="danger"
+          confirmDisabled={isDeleting}
+          onConfirm={handleConfirmDeleteUsed}
+        >
+          <p>
+            Czy na pewno chcesz usunąć wpis użycia przedmiotu <strong>{confirmDeleteUsed.itemName}</strong> z historii?
+          </p>
+        </Modal>
+      ) : null}
     </div>
   );
 }

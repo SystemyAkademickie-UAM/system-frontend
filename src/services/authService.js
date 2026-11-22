@@ -132,6 +132,8 @@ export async function logoutUser(onNavigationFailed, options = {}) {
 
   const samlLogoutUrl = `${samlLogoutBase}${separator}postLogoutRedirect=${postLogoutRedirect}`;
 
+  clearClientAuthState();
+
   window.location.replace(samlLogoutUrl);
 
   if (typeof onNavigationFailed === 'function') {

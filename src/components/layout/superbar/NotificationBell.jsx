@@ -59,6 +59,10 @@ export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const isStudentView = role === APP_ROLE.STUDENT;
 
+  if (role === APP_ROLE.ADMIN || role === APP_ROLE.SUPERADMIN) {
+    return null;
+  }
+
   const {
     notifications,
     unreadCount,

@@ -20,6 +20,11 @@
   width: 100%;
 }
 
+.group-main-home__grid--single {
+  grid-template-columns: 1fr;
+  max-width: 800px;
+}
+
 .group-main-home__surface.maq-textured-surface {
   width: 100%;
   max-width: 100%;

@@ -4,14 +4,38 @@
  */
 
 // === IMPORTY I KONFIGURACJA KLIENTA API ===
-import { getJson, postJson } from './api-client.js';
+import { getJson, postJson, putJson } from './api-client.js';
 import { extractApiError } from './apiErrors.js';
 
 // === PUNKTY KOŃCOWE I STAŁE ZAPYTAŃ ===
 export const ADMIN_LOGS_PATH = '/admin/logs';
+export const ADMIN_LOGS_RETENTION_PATH = '/admin/logs/retention';
 export const ADMIN_LOGS_EXPORT_PATH = '/admin/logs/export';
 export const CLIENT_LOGS_PATH = '/client-logs';
 export const ADMIN_ORGANIZATIONS_PATH = '/admin/organizations';
+
+/**
+ * @returns {Promise<{ ttlDays: number, defaultTtlDays: number }>}
+ */
+export async function fetchLogRetention() {
+  const result = await getJson(ADMIN_LOGS_RETENTION_PATH);
+  if (!result.ok) {
+    throw new Error(extractApiError(result.data, 'Nie udało się pobrać konfiguracji retencji logów'));
+  }
+  return result.data;
+}
+
+/**
+ * @param {number} ttlDays
+ * @returns {Promise<{ ttlDays: number, defaultTtlDays: number }>}
+ */
+export async function updateLogRetention(ttlDays) {
+  const result = await putJson(ADMIN_LOGS_RETENTION_PATH, { ttlDays });
+  if (!result.ok) {
+    throw new Error(extractApiError(result.data, 'Nie udało się zaktualizować retencji logów'));
+  }
+  return result.data;
+}
 
 /**
  * @returns {Promise<{ days: string[], timeZone: string }>}

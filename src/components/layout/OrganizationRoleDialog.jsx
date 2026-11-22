@@ -16,7 +16,7 @@ const ROLE_LABEL = {
   student: { polish: 'Osoba studiująca', english: 'Student' },
   lecturer: { polish: 'Osoba prowadząca', english: 'Lecturer' },
   administrator: { polish: 'Osoba administrująca', english: 'Administrator' },
-  super: { polish: 'Nadrzędna osoba administrująca', english: 'Superadmin' },
+  super: { polish: 'Osoba nadzorująca', english: 'Supervisor' },
 };
 
 const TITLE = {
@@ -129,35 +129,82 @@ export default function OrganizationRoleDialog({
     setIsSaving(false);
   }, [isOpen, memberships, organizationId, role]);
 
-  const selectedOrganization = (Array.isArray(memberships) ? memberships : []).find(
+  const list = Array.isArray(memberships) ? memberships : [];
+
+  // All unique available roles across user memberships
+  const allAvailableRoles = Array.from(
+    new Set(list.flatMap((item) => (Array.isArray(item.roles) ? item.roles : [])))
+  );
+
+  // Organizations that offer the currently selected role
+  const orgsForSelectedRole = list.filter((item) =>
+    Array.isArray(item.roles) && item.roles.includes(selectedRole)
+  );
+
+  const selectedOrganization = orgsForSelectedRole.find(
+    (item) => item.organizationId === selectedOrganizationId,
+  ) ?? orgsForSelectedRole[0] ?? list.find(
     (item) => item.organizationId === selectedOrganizationId,
   ) ?? null;
-  const showOrganization = Array.isArray(memberships) && memberships.length > 1;
-  const showRole = (selectedOrganization?.roles?.length ?? 0) > 1;
+
+  const isSuperSelected = selectedRole === 'super';
+
+  // Role control is shown when user has more than 1 role across memberships
+  const showRole = allAvailableRoles.length > 1;
+
+  // Organization control is hidden ONLY when 'super' is selected.
+  // For all other roles, organization selector is shown whenever user belongs to at least one organization
+  const showOrganization = !isSuperSelected && (orgsForSelectedRole.length > 0 || list.length > 0);
+
+  const availableOrgs = orgsForSelectedRole.length > 0 ? orgsForSelectedRole : list;
+
   const menu = loginContextMenu(memberships);
   const titleSource = required ? TITLE : CHANGE_TITLE;
+  const title = titleSource[menu.kind][LANGUAGE];
 
-const title = titleSource[menu.kind][LANGUAGE];
+  const handleRoleChange = (event) => {
+    const nextRole = event.target.value;
+    setSelectedRole(nextRole);
+    setError(null);
+
+    // If super, auto-select the organization holding 'super' (usually internal org 1)
+    if (nextRole === 'super') {
+      const superOrg = list.find((item) => item.roles?.includes('super')) ?? list[0];
+      if (superOrg) {
+        setSelectedOrganizationId(superOrg.organizationId);
+      }
+    } else {
+      // Find matching orgs that support the new role
+      const nextOrgs = list.filter((item) => Array.isArray(item.roles) && item.roles.includes(nextRole));
+      const currentOrgHasRole = nextOrgs.some((item) => item.organizationId === selectedOrganizationId);
+      if (!currentOrgHasRole) {
+        const nextOrg = nextOrgs[0] ?? list[0];
+        if (nextOrg) {
+          setSelectedOrganizationId(nextOrg.organizationId);
+        }
+      }
+    }
+  };
 
   const handleOrganizationChange = (event) => {
     const nextId = Number(event.target.value);
-    const nextOrganization = memberships.find((item) => item.organizationId === nextId);
     setSelectedOrganizationId(nextId);
-    setSelectedRole((current) => (
-      nextOrganization?.roles?.includes(current) ? current : nextOrganization?.roles?.[0] ?? null
-    ));
     setError(null);
   };
 
+  const effectiveOrganizationId = isSuperSelected
+    ? (list.find((item) => item.roles?.includes('super'))?.organizationId ?? selectedOrganizationId)
+    : selectedOrganizationId;
+
   const handleConfirm = async () => {
-    if (selectedOrganizationId === null || !selectedRole || isSaving) {
+    if (effectiveOrganizationId === null || !selectedRole || isSaving) {
       return;
     }
     setIsSaving(true);
     setError(null);
     try {
       const result = await postJson(AUTH_LOGIN_CONTEXT_PATH, {
-        organizationId: selectedOrganizationId,
+        organizationId: effectiveOrganizationId,
         role: selectedRole,
       });
       if (!result.ok) {
@@ -186,7 +233,7 @@ const title = titleSource[menu.kind][LANGUAGE];
       subtitle={SUBTITLE[LANGUAGE]}
       size="md"
       confirmLabel={CONFIRM_LABEL[LANGUAGE]}
-      confirmDisabled={isSaving || selectedOrganizationId === null || !selectedRole}
+      confirmDisabled={isSaving || effectiveOrganizationId === null || !selectedRole}
       onConfirm={() => {
         void handleConfirm();
       }}
@@ -198,6 +245,25 @@ const title = titleSource[menu.kind][LANGUAGE];
           void handleConfirm();
         }}
       >
+        {showRole ? (
+          <div className="organization-role-dialog__field">
+            <label className="organization-role-dialog__label" htmlFor="login-context-role">
+              {ROLE_FIELD[LANGUAGE]}
+            </label>
+            <select
+              id="login-context-role"
+              className="organization-role-dialog__select"
+              value={selectedRole ?? ''}
+              onChange={handleRoleChange}
+            >
+              {allAvailableRoles.map((itemRole) => (
+                <option key={itemRole} value={itemRole}>
+                  {roleLabel(itemRole, LANGUAGE)}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
         {showOrganization ? (
           <div className="organization-role-dialog__field">
             <label className="organization-role-dialog__label" htmlFor="login-context-organization">
@@ -209,31 +275,9 @@ const title = titleSource[menu.kind][LANGUAGE];
               value={selectedOrganizationId ?? ''}
               onChange={handleOrganizationChange}
             >
-              {memberships.map((item) => (
+              {availableOrgs.map((item) => (
                 <option key={item.organizationId} value={item.organizationId}>
                   {item.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : null}
-        {showRole ? (
-          <div className="organization-role-dialog__field">
-            <label className="organization-role-dialog__label" htmlFor="login-context-role">
-              {ROLE_FIELD[LANGUAGE]}
-            </label>
-            <select
-              id="login-context-role"
-              className="organization-role-dialog__select"
-              value={selectedRole ?? ''}
-              onChange={(event) => {
-                setSelectedRole(event.target.value);
-                setError(null);
-              }}
-            >
-              {(selectedOrganization?.roles ?? []).map((itemRole) => (
-                <option key={itemRole} value={itemRole}>
-                  {roleLabel(itemRole, LANGUAGE)}
                 </option>
               ))}
             </select>
