@@ -30,7 +30,7 @@
 /* Top control bar */
 .admin-home-top-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
@@ -40,6 +40,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-right: auto;
 }
 
 .admin-home-picker-label {
@@ -69,6 +70,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-left: auto;
 }
 
 /* Error banner */
@@ -158,9 +160,15 @@
 
 .admin-home-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1.25rem;
   text-align: left;
+}
+
+@media (max-width: 1100px) {
+  .admin-home-info-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
 }
 
 .admin-home-info-item {
@@ -170,7 +178,7 @@
 }
 
 .admin-home-info-full {
-  grid-column: 1 / -1;
+  grid-column: auto;
 }
 
 .admin-home-info-label {

@@ -118,7 +118,7 @@ describe('AdminHomeContent', () => {
     getOrganizationDashboard.mockResolvedValue(MOCK_DASHBOARD);
     await renderComponent();
 
-    expect(container.textContent).toContain('Zarządzanie organizacją');
+    expect(container.textContent).toContain('Moja organizacja');
     expect(container.textContent).toContain('Wydział Matematyki i Informatyki UAM');
     expect(container.textContent).toContain('wmi.amu.edu.pl');
     expect(container.textContent).toContain('Jan Kowalski');
@@ -139,7 +139,7 @@ describe('AdminHomeContent', () => {
     getOrganizationDashboard.mockResolvedValue(MOCK_DASHBOARD);
     await renderComponent();
 
-    expect(container.textContent).toContain('Organization Management');
+    expect(container.textContent).toContain('My organization');
     expect(container.textContent).toContain('People in organization');
     expect(container.textContent).toContain('Studying persons');
     expect(container.textContent).toContain('Leading persons');

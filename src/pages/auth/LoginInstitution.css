@@ -43,6 +43,62 @@
   margin: 0 0 var(--auth-card-logo-to-label-gap);
 }
 
+.login-institution__brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: var(--auth-content-max-width);
+  user-select: none;
+  margin: 0 0 var(--auth-card-logo-to-label-gap);
+}
+
+.login-institution__brand-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.login-institution__brand-pad {
+  height: clamp(6.5rem, 11vw, 8.5rem);
+  max-width: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 32px rgba(30, 204, 56, 0.35));
+}
+
+.login-institution__brand-a,
+.login-institution__brand-q {
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 900;
+  font-size: clamp(6rem, 10.5vw, 8rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+}
+
+.login-institution__brand-a {
+  color: #ffffff;
+}
+
+.login-institution__brand-q {
+  color: #1ecc38;
+  text-shadow: 0 0 32px rgba(30, 204, 56, 0.5);
+}
+
+.login-institution__brand-subtitle {
+  margin: 0;
+  font-family: 'Manrope', var(--font-family-app);
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+  color: rgba(220, 230, 222, 0.88);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
 .login-institution__field {
   display: flex;
   flex-direction: column;

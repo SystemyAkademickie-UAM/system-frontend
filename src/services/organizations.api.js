@@ -45,7 +45,14 @@ export async function getOrganization(organizationId) {
  * @param {number[]} ids
  */
 export async function bulkOrganizations(ids) {
-  return requireOk(await postJson('/admin/organizations/bulk', { ids }));
+  const result = await requireOk(await postJson('/admin/organizations/bulk', { ids }));
+  if (Array.isArray(result?.organizations)) {
+    return result.organizations;
+  }
+  if (Array.isArray(result)) {
+    return result;
+  }
+  return [];
 }
 
 /**

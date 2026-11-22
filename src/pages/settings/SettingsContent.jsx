@@ -23,6 +23,7 @@ import {
   getSavedTheme,
 } from '../../services/themeService.js';
 import { getRememberMe, setRememberMe } from '../../services/rememberMeService.js';
+import { lockSpecialAvatar, unlockSpecialAvatar } from '../../utils/avatarCategories.js';
 import { SETTINGS_NICKNAME_MAX_LENGTH } from '../../constants/fieldLimits.js';
 import SectionPageLayout from '../../components/layout/sectionPage/SectionPageLayout.jsx';
 
@@ -379,6 +380,10 @@ const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish')
       ...(role === APP_ROLE.LECTURER ? { showNickname: result.profile?.showNickname !== false } : {}),
     });
 
+    if (selectedAvatarId !== 34) {
+      lockSpecialAvatar(34);
+    }
+
     setIsSaving(false);
 
     showSuccess(SUCMESSAGETEXT__TEXTLABEL[SELECTEDLANGUAGE] || SUCMESSAGETEXT__TEXTLABEL[LANGUAGE]);
@@ -501,6 +506,53 @@ const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish')
     loadSettings();
   }, [loadSettings]);
 
+  useEffect(() => {
+    const targetSequence = 'oknocraft';
+    let buffer = '';
+    let timeoutId = null;
+
+    const handleKeyDown = (event) => {
+      // Ignorujemy, gdy użytkownik wpisuje tekst w formularzu (input, textarea)
+      const tagName = event.target?.tagName?.toLowerCase();
+      if (tagName === 'input' || tagName === 'textarea' || event.target?.isContentEditable) {
+        return;
+      }
+
+      const key = event.key?.toLowerCase();
+      if (!key || key.length !== 1) {
+        return;
+      }
+
+      buffer += key;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(() => {
+        buffer = '';
+      }, 2000);
+
+      if (buffer.endsWith(targetSequence)) {
+        buffer = '';
+        unlockSpecialAvatar(34);
+        setAvatars((prev) => [...prev]);
+        setSelectedAvatarId(34);
+        showSuccess(
+          LANGUAGE === 'english'
+            ? 'Special avatar unlocked!'
+            : 'Odblokowano specjalny awatar!'
+        );
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [LANGUAGE, showSuccess]);
+
 // === RENDEROWANIE WIDOKU ===
   return (
     <div className="app-page-layout">
@@ -528,7 +580,7 @@ const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish')
               />
             </section>
 
-            <Divider className="settings-page__divider" length="50%" />
+            <Divider className="settings-page__divider" length="80%" />
 
             <section className="settings-page__preferences" aria-label={ACCOUNTPREFARIA__TEXTLABEL[LANGUAGE]}>
               <SettingsSectionHeader title={NICKNAMELABEL__TEXTLABEL[LANGUAGE]} id="settings-nickname-title" />
@@ -564,7 +616,7 @@ const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish')
                 </div>
               ) : null}
 
-              <Divider className="settings-page__divider" length="50%" />
+              <Divider className="settings-page__divider" length="80%" />
 
               <SettingsSectionHeader title={LOGINLABEL__TEXTLABEL[LANGUAGE]} id="settings-login-title" />
               <div className="settings-page__field settings-page__field--toggle">
@@ -580,7 +632,7 @@ const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish')
                 <p className="group-settings-form__hint">{REMEMBERMECHECKDESC__TEXTLABEL[LANGUAGE]}</p>
               </div>
 
-              <Divider className="settings-page__divider" length="50%" />
+              <Divider className="settings-page__divider" length="80%" />
 
               <SettingsSectionHeader title={THEMELABEL__TEXTLABEL[LANGUAGE]} id="settings-theme-title" />
               <div className="settings-page__theme-radio-group" role="radiogroup" aria-labelledby="settings-theme-title">
@@ -610,7 +662,7 @@ const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish')
                 })}
               </div>
 
-              <Divider className="settings-page__divider" length="50%" />
+              <Divider className="settings-page__divider" length="80%" />
 
               <SettingsSectionHeader title={LANGUAGELABEL__TEXTLABEL[LANGUAGE]} id="settings-LANGUAGE-title" />
               <div className="settings-page__field group-settings-form__field">
@@ -631,7 +683,7 @@ const [LANGUAGE, SETLANGUAGE] = useState(() => READLANGUAGECOOKIE() || 'polish')
               </div>
             </section>
 
-            <Divider className="settings-page__divider" length="50%" />
+            <Divider className="settings-page__divider" length="80%" />
 
             <div className="settings-page__footer">
               <p className="settings-page__help-text">

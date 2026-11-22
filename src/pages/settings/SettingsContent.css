@@ -37,7 +37,7 @@
 
 .settings-page__field {
   width: 100%;
-  max-width: min(26rem, 50%);
+  max-width: min(44rem, 80%);
   min-width: 0;
 }
 
@@ -57,7 +57,7 @@
 
 .settings-page__avatar-picker.maq-avatar-picker {
   width: 100%;
-  max-width: min(44rem, 100%);
+  max-width: min(52rem, 80%);
   align-self: flex-start;
 }
 

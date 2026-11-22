@@ -46,6 +46,12 @@ const [roleOverride, setRoleOverride] = useState(null);
     return APP_ROLE.STUDENT;
   }, [roleOverride, session?.role]);
 
+  useEffect(() => {
+    if (role) {
+      document.documentElement.setAttribute('data-app-role', role);
+    }
+  }, [role]);
+
   const value = useMemo(
     () => ({
       role,

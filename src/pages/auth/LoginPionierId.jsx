@@ -17,14 +17,19 @@ const BACK_BUTTON__TEXTLABEL = {
   english: '<- back',
 };
 
-const PIONIER_BUTTON__TEXTLABEL = {
-  polish: 'Zaloguj się przez PIONIER.ID',
-  english: 'Log in via PIONIER.ID'
+const ORGANIZATION_BUTTON__TEXTLABEL = {
+  polish: 'Zaloguj przez organizację',
+  english: 'Sign in with organization'
 };
 
-const EMAIL_LINK__TEXTLABEL = {
-  polish: 'Zaloguj się przez e-mail',
-  english: 'Log in via email'
+const EMAIL_BUTTON__TEXTLABEL = {
+  polish: 'Zaloguj przez e-mail',
+  english: 'Sign in with email'
+};
+
+const SUBTITLE__TEXTLABEL = {
+  polish: 'MyAcademyQuest - system do grywalizacji',
+  english: 'MyAcademyQuest - gamification system'
 };
 
 // === GŁÓWNY KOMPONENT WIDOKU ===
@@ -48,11 +53,20 @@ const [LANGUAGE] = useState(READLANGUAGECOOKIE);
       </div>
 
       <div className="login-pionierid__body">
-        <img
-          src="/images/pionierid-logo.png"
-          alt="PIONIER.id"
-          className="login-pionierid__logo auth-logo--pionier"
-        />
+        <div className="login-pionierid__brand" aria-label="MyAcademyQuest">
+          <div className="login-pionierid__brand-row">
+            <img
+              src="/images/maq-logo.png"
+              alt="MyAcademyQuest"
+              className="login-pionierid__brand-pad"
+            />
+            <span className="login-pionierid__brand-a" aria-hidden="true">A</span>
+            <span className="login-pionierid__brand-q" aria-hidden="true">Q</span>
+          </div>
+          <p className="login-pionierid__brand-subtitle">
+            {SUBTITLE__TEXTLABEL[LANGUAGE]}
+          </p>
+        </div>
 
         <div className="login-pionierid__actions">
           <button
@@ -60,15 +74,15 @@ const [LANGUAGE] = useState(READLANGUAGECOOKIE);
             className="auth-card__primary-btn login-pionierid__btn"
             onClick={onContinue}
           >
-            {PIONIER_BUTTON__TEXTLABEL[LANGUAGE]}
+            {ORGANIZATION_BUTTON__TEXTLABEL[LANGUAGE]}
           </button>
 
           <button
             type="button"
-            className="auth-card__secondary-link login-pionierid__email-link"
+            className="login-pionierid__email-btn"
             onClick={() => onEmailLogin?.()}
           >
-            {EMAIL_LINK__TEXTLABEL[LANGUAGE]}
+            {EMAIL_BUTTON__TEXTLABEL[LANGUAGE]}
           </button>
         </div>
       </div>

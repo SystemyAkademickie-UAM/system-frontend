@@ -40,16 +40,16 @@ describe('organizations.api', () => {
     expect(apiClient.postJson).toHaveBeenCalledWith('/admin/organizations', payload);
   });
 
-  it('grantOrganizationAdministrator posts email to administrators endpoint', async () => {
+  it('grantOrganizationAdministrator posts userId to administrators endpoint', async () => {
     vi.spyOn(apiClient, 'postJson').mockResolvedValue({
       ok: true,
-      data: { accountId: 10, email: 'admin@amu.edu.pl' },
+      data: { accountId: 10, userId: 42 },
     });
 
-    const result = await grantOrganizationAdministrator(1, 'admin@amu.edu.pl');
+    const result = await grantOrganizationAdministrator(1, 42);
     expect(result.accountId).toBe(10);
     expect(apiClient.postJson).toHaveBeenCalledWith('/admin/organizations/1/administrators', {
-      email: 'admin@amu.edu.pl',
+      userId: 42,
     });
   });
 

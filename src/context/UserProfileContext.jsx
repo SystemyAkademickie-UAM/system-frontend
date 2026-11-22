@@ -77,3 +77,7 @@ const ctx = useContext(UserProfileContext);
   }
   return ctx;
 }
+
+export function useUserProfileOptional() {
+  return useContext(UserProfileContext) || null;
+}

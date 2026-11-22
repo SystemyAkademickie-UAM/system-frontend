@@ -1,6 +1,6 @@
 /**
  * @file UserAccountForm.jsx
- * @description Formularz tworzenia i edycji konta użytkownika w organizacji.
+ * @description Formularz tworzenia i edycji konta użytkownika w organizacji (używany w modalu).
  */
 
 import Button from '../../components/ui/Button/Button.jsx';
@@ -9,7 +9,6 @@ import {
   ACCOUNT_ROLE_ADMINISTRATOR,
   ACCOUNT_ROLE_LECTURER,
   ACCOUNT_ROLE_STUDENT,
-  ACCOUNT_ROLE_SUPER,
   ORGANIZATION_ACCOUNT_EMAIL_MAX_LENGTH,
   ORGANIZATION_ACCOUNT_NAME_MAX_LENGTH,
 } from '../../constants/organizationAdmin.constants.js';
@@ -19,7 +18,6 @@ export default function UserAccountForm({
   form,
   copy,
   emailOrganization,
-  isSuperAdmin = false,
   onChange,
   onSave,
   onSaveAnother,
@@ -31,11 +29,15 @@ export default function UserAccountForm({
   const currentRole = form.role;
 
   return (
-    <form className="user-management__form" onSubmit={(event) => event.preventDefault()}>
+    <form className="user-management__form-modal" onSubmit={(event) => event.preventDefault()}>
       {mode === 'create' ? (
         <TextField
           id="account-email"
-          label={copy.email}
+          label={
+            <span>
+              {copy.email} <span className="org-form__required">*</span>
+            </span>
+          }
           value={form.email}
           maxLength={ORGANIZATION_ACCOUNT_EMAIL_MAX_LENGTH}
           required
@@ -45,7 +47,11 @@ export default function UserAccountForm({
 
       <TextField
         id="account-name"
-        label={copy.name}
+        label={
+          <span>
+            {copy.name} <span className="org-form__required">*</span>
+          </span>
+        }
         value={form.name}
         maxLength={ORGANIZATION_ACCOUNT_NAME_MAX_LENGTH}
         required
@@ -54,7 +60,11 @@ export default function UserAccountForm({
 
       <TextField
         id="account-surname"
-        label={copy.surname}
+        label={
+          <span>
+            {copy.surname} <span className="org-form__required">*</span>
+          </span>
+        }
         value={form.surname}
         maxLength={ORGANIZATION_ACCOUNT_NAME_MAX_LENGTH}
         required
@@ -63,22 +73,33 @@ export default function UserAccountForm({
 
       <TextField
         id="account-nickname"
-        label={copy.nickname}
+        label={
+          <span>
+            {copy.nickname} <span className="org-form__required">*</span>
+          </span>
+        }
         value={form.nickname}
         maxLength={ORGANIZATION_ACCOUNT_NAME_MAX_LENGTH}
+        required
         onChange={(event) => onChange('nickname', event.target.value)}
       />
 
       {mode === 'create' ? (
-        <label className="user-management__role" htmlFor="account-role">
-          {copy.role}
-          <select id="account-role" value={form.role} onChange={(event) => onChange('role', event.target.value)}>
+        <div className="user-management__role">
+          <label className="org-form__label" htmlFor="account-role">
+            {copy.role} <span className="org-form__required">*</span>
+          </label>
+          <select
+            id="account-role"
+            className="org-form__select"
+            value={form.role}
+            onChange={(event) => onChange('role', event.target.value)}
+          >
             <option value={ACCOUNT_ROLE_STUDENT}>{copy.student}</option>
             <option value={ACCOUNT_ROLE_LECTURER}>{copy.lecturer}</option>
             <option value={ACCOUNT_ROLE_ADMINISTRATOR}>{copy.administrator}</option>
-            {isSuperAdmin ? <option value={ACCOUNT_ROLE_SUPER}>{copy.superadmin ?? 'Osoba nadzorująca'}</option> : null}
           </select>
-        </label>
+        </div>
       ) : (
         <div className="user-management__role-display">
           <span className="user-management__role-label">{copy.role}:</span>
@@ -86,7 +107,7 @@ export default function UserAccountForm({
             {currentRole === ACCOUNT_ROLE_STUDENT && copy.student}
             {currentRole === ACCOUNT_ROLE_LECTURER && copy.lecturer}
             {currentRole === ACCOUNT_ROLE_ADMINISTRATOR && copy.administrator}
-            {currentRole === ACCOUNT_ROLE_SUPER && (copy.superadmin ?? 'Osoba nadzorująca')}
+            {currentRole === 'super' && (copy.superadmin ?? 'Osoba nadzorująca')}
           </strong>
         </div>
       )}
@@ -105,27 +126,19 @@ export default function UserAccountForm({
                 + {copy.lecturer}
               </Button>
             ) : null}
-            {currentRole !== ACCOUNT_ROLE_ADMINISTRATOR && isSuperAdmin ? (
+            {currentRole !== ACCOUNT_ROLE_ADMINISTRATOR ? (
               <Button size="sm" variant="secondary" onClick={() => onGrantRole(ACCOUNT_ROLE_ADMINISTRATOR)}>
                 + {copy.administrator}
-              </Button>
-            ) : null}
-            {currentRole !== ACCOUNT_ROLE_SUPER && isSuperAdmin ? (
-              <Button size="sm" variant="secondary" onClick={() => onGrantRole(ACCOUNT_ROLE_SUPER)}>
-                + {copy.superadmin ?? 'Osoba nadzorująca'}
               </Button>
             ) : null}
           </div>
         </div>
       ) : null}
 
-      <div className="user-management__toolbar">
-        <Button onClick={onSave}>{copy.save}</Button>
-        {mode === 'create' ? (
-          <Button variant="secondary" onClick={onSaveAnother}>
-            {copy.saveAnother}
-          </Button>
-        ) : null}
+      <div className="user-management__modal-actions">
+        <Button variant="ghost" onClick={onExit}>
+          {copy.exit}
+        </Button>
         {mode === 'edit' ? (
           <Button variant="danger" onClick={onRemove}>
             {copy.remove}
@@ -136,8 +149,13 @@ export default function UserAccountForm({
             {copy.link}
           </Button>
         ) : null}
-        <Button variant="ghost" onClick={onExit}>
-          {copy.exit}
+        {mode === 'create' ? (
+          <Button variant="secondary" onClick={onSaveAnother}>
+            {copy.saveAnother}
+          </Button>
+        ) : null}
+        <Button variant="primary" onClick={onSave}>
+          {copy.save}
         </Button>
       </div>
     </form>

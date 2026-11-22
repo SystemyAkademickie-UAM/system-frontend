@@ -150,3 +150,15 @@
   margin-bottom: 0.5rem;
 }
 
+.group-edit-modal__add-students-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.group-edit-modal__add-students-header {
+  display: flex;
+  align-items: center;
+}
+

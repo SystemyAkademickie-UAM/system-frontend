@@ -58,6 +58,11 @@ const ERROR_NOURL__TEXTLABEL = {
   english: 'No SAML login URL available.'
 };
 
+const SUBTITLE__TEXTLABEL = {
+  polish: 'MyAcademyQuest - system do grywalizacji',
+  english: 'MyAcademyQuest - gamification system'
+};
+
 const CONTINUE_BUTTON__TEXTLABEL = {
   polish: 'Kontynuuj',
   english: 'Continue'
@@ -159,11 +164,20 @@ const [errorMessage, setErrorMessage] = useState(null);
       </button>
 
       <div className="login-institution__body">
-        <img
-          src="/images/pionierid-logo.png"
-          alt="PIONIER.id"
-          className="login-institution__logo auth-logo--pionier"
-        />
+        <div className="login-institution__brand" aria-label="MyAcademyQuest">
+          <div className="login-institution__brand-row">
+            <img
+              src="/images/maq-logo.png"
+              alt="MyAcademyQuest"
+              className="login-institution__brand-pad"
+            />
+            <span className="login-institution__brand-a" aria-hidden="true">A</span>
+            <span className="login-institution__brand-q" aria-hidden="true">Q</span>
+          </div>
+          <p className="login-institution__brand-subtitle">
+            {SUBTITLE__TEXTLABEL[LANGUAGE]}
+          </p>
+        </div>
 
         <div className="login-institution__field">
           <label className="login-institution__field-label" htmlFor="institution-select">
