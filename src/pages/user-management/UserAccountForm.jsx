@@ -25,8 +25,10 @@ export default function UserAccountForm({
   onRemove,
   onSendLink,
   onExit,
+  canManageAdministrators = false,
 }) {
   const currentRole = form.role;
+  const showRemove = canManageAdministrators || currentRole !== ACCOUNT_ROLE_ADMINISTRATOR;
 
   return (
     <form className="user-management__form-modal" onSubmit={(event) => event.preventDefault()}>
@@ -97,7 +99,9 @@ export default function UserAccountForm({
           >
             <option value={ACCOUNT_ROLE_STUDENT}>{copy.student}</option>
             <option value={ACCOUNT_ROLE_LECTURER}>{copy.lecturer}</option>
-            <option value={ACCOUNT_ROLE_ADMINISTRATOR}>{copy.administrator}</option>
+            {canManageAdministrators ? (
+              <option value={ACCOUNT_ROLE_ADMINISTRATOR}>{copy.administrator}</option>
+            ) : null}
           </select>
         </div>
       ) : (
@@ -126,7 +130,7 @@ export default function UserAccountForm({
                 + {copy.lecturer}
               </Button>
             ) : null}
-            {currentRole !== ACCOUNT_ROLE_ADMINISTRATOR ? (
+            {canManageAdministrators && currentRole !== ACCOUNT_ROLE_ADMINISTRATOR ? (
               <Button size="sm" variant="secondary" onClick={() => onGrantRole(ACCOUNT_ROLE_ADMINISTRATOR)}>
                 + {copy.administrator}
               </Button>
@@ -139,7 +143,7 @@ export default function UserAccountForm({
         <Button variant="ghost" onClick={onExit}>
           {copy.exit}
         </Button>
-        {mode === 'edit' ? (
+        {mode === 'edit' && showRemove ? (
           <Button variant="danger" onClick={onRemove}>
             {copy.remove}
           </Button>

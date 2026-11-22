@@ -153,11 +153,13 @@ function roleLabel(role, copy) {
   return role ?? '';
 }
 
-function validatePerson(form, needsEmail, copy) {
+function validatePerson(form, needsEmail, copy, canManageAdministrators) {
   if (needsEmail && !form.email.trim().includes('@')) return copy.emailInvalid;
   if (!form.name.trim() || !form.surname.trim() || !form.nickname.trim()) return copy.nameRequired;
-  // Nadzorca najwyżej może dodać/nadać rolę administratora (brak super)
-  const allowed = [ACCOUNT_ROLE_STUDENT, ACCOUNT_ROLE_LECTURER, ACCOUNT_ROLE_ADMINISTRATOR];
+  const allowed = [ACCOUNT_ROLE_STUDENT, ACCOUNT_ROLE_LECTURER];
+  if (canManageAdministrators) {
+    allowed.push(ACCOUNT_ROLE_ADMINISTRATOR);
+  }
   if (!allowed.includes(form.role)) return copy.roleInvalid;
   return '';
 }
@@ -173,6 +175,8 @@ export default function UserManagementContent() {
     session.user?.roles?.includes('super') ||
     session.user?.activeRole === 'super' ||
     session.user?.role === 'super';
+  const canManageAdministrators =
+    session.user?.activeRole === ACCOUNT_ROLE_SUPER || session.user?.role === ACCOUNT_ROLE_SUPER;
 
   const [organizations, setOrganizations] = useState([]);
   const [activeOrgId, setActiveOrgId] = useState(session.user?.organizationId ?? null);
@@ -436,7 +440,7 @@ export default function UserManagementContent() {
   }
 
   async function saveNew(addAnother) {
-    const problem = validatePerson(form, true, copy);
+    const problem = validatePerson(form, true, copy, canManageAdministrators);
     if (problem) {
       showError(problem);
       return;
@@ -462,7 +466,7 @@ export default function UserManagementContent() {
 
   async function saveEdit() {
     if (!editing) return;
-    const problem = validatePerson(form, false, copy);
+    const problem = validatePerson(form, false, copy, canManageAdministrators);
     if (problem) {
       showError(problem);
       return;
@@ -484,6 +488,7 @@ export default function UserManagementContent() {
 
   async function handleGrantRole(targetRole) {
     if (!editing) return;
+    if (targetRole === ACCOUNT_ROLE_ADMINISTRATOR && !canManageAdministrators) return;
     try {
       const targetOrg = editing.organizationId || activeOrgId;
       await createOrganizationAccount(targetOrg, {
@@ -770,6 +775,7 @@ export default function UserManagementContent() {
           onRemove={removeRole}
           onSendLink={sendLink}
           onExit={() => setUserModalOpen(false)}
+          canManageAdministrators={canManageAdministrators}
         />
       </Modal>
 
