@@ -40,6 +40,7 @@ export default function GroupEditModal({
 
   // Search filter for available students
   const [searchAvailableStudent, setSearchAvailableStudent] = useState('');
+  const [isAddStudentsOpen, setIsAddStudentsOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !group?.id) return;
@@ -49,6 +50,7 @@ export default function GroupEditModal({
     setPendingAddIds([]);
     setPendingRemoveIds([]);
     setSearchAvailableStudent('');
+    setIsAddStudentsOpen(false);
 
     fetchGroupMembersManage(group.id).then((result) => {
       if (isCancelled) return;
@@ -295,47 +297,59 @@ export default function GroupEditModal({
               </div>
             )}
 
-            {/* Dodawanie nowych studentów z organizacji */}
+            {/* Dodawanie nowych studentów z organizacji - domyślnie zwinięte */}
             <div className="group-edit-modal__add-students-wrap">
-              <h4 className="group-edit-modal__subsection-title">
-                Dodaj studentów z organizacji ({effectiveAvailableStudents.length} dostępnych)
-              </h4>
-              <SearchBar
-                className="group-edit-modal__search"
-                value={searchAvailableStudent}
-                onChange={(e) => setSearchAvailableStudent(e.target.value)}
-                placeholder="Szukaj studenta po nazwisku, e-mailu lub indeksie..."
-              />
-
-              <div className="group-edit-modal__available-list">
-                {effectiveAvailableStudents.length === 0 ? (
-                  <p className="group-edit-modal__empty-hint">
-                    {searchAvailableStudent
-                      ? 'Brak pasujących studentów w organizacji.'
-                      : 'Wszyscy studenci z organizacji są już przypisani do tej grupy.'}
-                  </p>
-                ) : (
-                  effectiveAvailableStudents.map((s) => (
-                    <div key={s.accountId} className="group-edit-modal__student-item">
-                      <div className="group-edit-modal__student-info">
-                        <span className="group-edit-modal__student-name">{s.name}</span>
-                        <span className="group-edit-modal__student-meta">
-                          {s.email} {s.studentNumber ? `• Nr indeksu: ${s.studentNumber}` : ''}
-                        </span>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => handleAddStudent(s.accountId)}
-                        disabled={isSaving}
-                      >
-                        + Dodaj
-                      </Button>
-                    </div>
-                  ))
-                )}
+              <div className="group-edit-modal__add-students-header">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsAddStudentsOpen((prev) => !prev)}
+                >
+                  {isAddStudentsOpen ? '▲ Zwiń dodawanie studentów' : `▼ Dodaj studentów z organizacji (${effectiveAvailableStudents.length} dostępnych)`}
+                </Button>
               </div>
+
+              {isAddStudentsOpen ? (
+                <>
+                  <SearchBar
+                    className="group-edit-modal__search"
+                    value={searchAvailableStudent}
+                    onChange={(e) => setSearchAvailableStudent(e.target.value)}
+                    placeholder="Szukaj studenta po nazwisku, e-mailu lub indeksie..."
+                  />
+
+                  <div className="group-edit-modal__available-list">
+                    {effectiveAvailableStudents.length === 0 ? (
+                      <p className="group-edit-modal__empty-hint">
+                        {searchAvailableStudent
+                          ? 'Brak pasujących studentów w organizacji.'
+                          : 'Wszyscy studenci z organizacji są już przypisani do tej grupy.'}
+                      </p>
+                    ) : (
+                      effectiveAvailableStudents.map((s) => (
+                        <div key={s.accountId} className="group-edit-modal__student-item">
+                          <div className="group-edit-modal__student-info">
+                            <span className="group-edit-modal__student-name">{s.name}</span>
+                            <span className="group-edit-modal__student-meta">
+                              {s.email} {s.studentNumber ? `• Nr indeksu: ${s.studentNumber}` : ''}
+                            </span>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleAddStudent(s.accountId)}
+                            disabled={isSaving}
+                          >
+                            + Dodaj
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              ) : null}
             </div>
           </section>
         </div>

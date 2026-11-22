@@ -447,7 +447,9 @@
 
 /* === NAWIGACJA DLA OSOBY ADMINISTRUJĄCEJ I NADZORUJĄCEJ (WARIANT CZERWONY) === */
 .app-shell[data-app-role="admin"],
-.app-shell[data-app-role="superadmin"] {
+.app-shell[data-app-role="superadmin"],
+[data-app-role="admin"],
+[data-app-role="superadmin"] {
   --color-nav-primary: #3d2325;
   --color-nav-scrollbar-track: color-mix(in srgb, var(--color-nav-primary) 80%, #000);
   --color-nav-scrollbar-thumb: color-mix(in srgb, var(--color-nav-primary) 58%, #000);
@@ -462,10 +464,16 @@
   --color-accent-on: #ffffff;
   --color-accent-pressed: #ab3232;
   --color-accent-muted: rgba(200, 65, 65, 0.22);
+  --color-button: var(--color-accent);
+  --color-button-bg: var(--color-accent);
+  --color-button-text: var(--color-accent-on);
+  --accent: var(--color-accent);
 }
 
 [data-theme="light"] .app-shell[data-app-role="admin"],
-[data-theme="light"] .app-shell[data-app-role="superadmin"] {
+[data-theme="light"] .app-shell[data-app-role="superadmin"],
+[data-theme="light"][data-app-role="admin"],
+[data-theme="light"][data-app-role="superadmin"] {
   --color-nav-primary: #5f2b2b;
   --color-nav-scrollbar-track: color-mix(in srgb, var(--color-nav-primary) 80%, #000);
   --color-nav-scrollbar-thumb: color-mix(in srgb, var(--color-nav-primary) 58%, #000);
@@ -482,4 +490,8 @@
   --color-accent-on: #ffffff;
   --color-accent-pressed: #911c1c;
   --color-accent-muted: rgba(179, 38, 38, 0.16);
+  --color-button: var(--color-accent);
+  --color-button-bg: var(--color-accent);
+  --color-button-text: var(--color-accent-on);
+  --accent: var(--color-accent);
 }

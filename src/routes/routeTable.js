@@ -88,8 +88,8 @@ export const ROUTE_TABLE = [
   {
     id: 'app.home',
     section: 'app',
-    pathPattern: '/home',
-    pageTitle: 'Zarządzanie organizacją',
+    pathPattern: '/my-organization',
+    pageTitle: 'Moja organizacja',
     pageModule: 'pages/admin-home/AdminHomeContent.jsx',
     contentModule: 'pages/admin-home/AdminHomeContent.jsx',
     roles: ['admin'],

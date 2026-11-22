@@ -230,7 +230,6 @@ export default function OrganizationRoleDialog({
       onClose={required ? () => {} : onClose}
       dismissible={!required}
       title={title}
-      subtitle={SUBTITLE[LANGUAGE]}
       size="md"
       confirmLabel={CONFIRM_LABEL[LANGUAGE]}
       confirmDisabled={isSaving || effectiveOrganizationId === null || !selectedRole}

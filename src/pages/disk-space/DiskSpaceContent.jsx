@@ -170,10 +170,13 @@ export default function DiskSpaceContent() {
     listManageableOrganizations()
       .then((orgs) => {
         if (!active) return;
-        setOrganizations(orgs);
-        if (orgs.length > 0) {
-          const userOrg = orgs.find((o) => o.id === session.user?.organizationId);
-          setSelectedOrgId(userOrg ? userOrg.id : orgs[0].id);
+        const filteredOrgs = isSuperAdmin
+          ? orgs
+          : orgs.filter((org) => org.name !== 'MyAcademyQuest Internal');
+        setOrganizations(filteredOrgs);
+        if (filteredOrgs.length > 0) {
+          const userOrg = filteredOrgs.find((o) => o.id === session.user?.organizationId);
+          setSelectedOrgId(userOrg ? userOrg.id : filteredOrgs[0].id);
         }
       })
       .catch((err) => {

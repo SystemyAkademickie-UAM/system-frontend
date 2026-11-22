@@ -3,7 +3,7 @@
  * @description Modal formularza tworzenia i edycji organizacji dla roli nadzorcy.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Modal from '../../components/ui/Modal/Modal.jsx';
 import TextField from '../../components/ui/TextField/TextField.jsx';
 import Button from '../../components/ui/Button/Button.jsx';
@@ -46,6 +46,27 @@ const INITIAL_FORM = {
   storageQuotaMb: 100,
 };
 
+/**
+ * Komponent pomocniczy renderujący ikonkę informacyjną z dymkiem wyjaśniającym pojęcie.
+ */
+function HelpTooltip({ text }) {
+  return (
+    <span className="org-form__tooltip-wrap">
+      <button
+        type="button"
+        className="org-form__tooltip-trigger"
+        aria-label="Informacja o polu"
+        tabIndex={0}
+      >
+        ?
+      </button>
+      <span className="org-form__tooltip-bubble" role="tooltip">
+        {text}
+      </span>
+    </span>
+  );
+}
+
 export default function OrganizationFormModal({ isOpen, onClose, organization, onSaved }) {
   const { showSuccess, showError } = useToast();
   const language = READLANGUAGECOOKIE();
@@ -54,8 +75,24 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
   const [form, setForm] = useState(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
 
+  // Sekcje opcjonalne domyślnie zwinięte przy tworzeniu nowej organizacji
+  const [isRepOpen, setIsRepOpen] = useState(false);
+  const [isAddressOpen, setIsAddressOpen] = useState(false);
+
   useEffect(() => {
     if (organization) {
+      const hasRep = Boolean(
+        organization.representative?.fullName ||
+        organization.representative?.email ||
+        organization.representative?.phone
+      );
+      const hasAddr = Boolean(
+        organization.address?.town ||
+        organization.address?.street ||
+        organization.address?.building ||
+        organization.address?.postalCode
+      );
+
       setForm({
         name: organization.name ?? '',
         domain: organization.domain ?? '',
@@ -79,8 +116,12 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           organization.storageQuotaMb ??
           (organization.storageQuotaBytes ? Math.round(organization.storageQuotaBytes / (1024 * 1024)) : 100),
       });
+      setIsRepOpen(hasRep);
+      setIsAddressOpen(hasAddr);
     } else {
       setForm(INITIAL_FORM);
+      setIsRepOpen(false);
+      setIsAddressOpen(false);
     }
   }, [organization, isOpen]);
 
@@ -88,19 +129,31 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
+  // Walidacja czy wymagane pola zostały wypełnione
+  const isFormValid = useMemo(() => {
+    if (!form.name.trim()) return false;
+    if (!form.domain.trim()) return false;
+
+    if (form.loginMethod === 'saml' && !isEdit) {
+      const hasMetadata = Boolean(form.metadataUrl.trim());
+      const hasManual = Boolean(
+        form.entityId.trim() &&
+        form.ssoLoginUrl.trim() &&
+        form.certificatePem.trim()
+      );
+      if (!hasMetadata && !hasManual) return false;
+    }
+
+    if (form.representativeEmail.trim() && !form.representativeEmail.includes('@')) {
+      return false;
+    }
+
+    return true;
+  }, [form, isEdit]);
+
   function validate() {
     if (!form.name.trim()) return 'Podaj nazwę organizacji.';
     if (!form.domain.trim()) return 'Podaj domenę organizacji.';
-    if (!form.representativeFullName.trim()) return 'Podaj imię i nazwisko osoby reprezentującej.';
-    if (!form.representativeEmail.trim() || !form.representativeEmail.includes('@')) {
-      return 'Podaj poprawny adres e-mail osoby reprezentującej.';
-    }
-    if (!form.addressTown.trim()) return 'Podaj miejscowość siedziby.';
-    if (!form.addressStreet.trim()) return 'Podaj ulicę siedziby.';
-    const accountLimit = Number(form.accountLimit);
-    if (!Number.isInteger(accountLimit) || accountLimit < 1) {
-      return accountLimitCopy.invalid;
-    }
 
     const quota = Number(form.storageQuotaMb);
     if (!Number.isFinite(quota) || quota < 1 || quota > 5120) {
@@ -114,6 +167,11 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
         return 'Dla logowania SAML wymagany jest URL metadanych lub komplet: Entity ID, SSO Login URL i Certyfikat PEM.';
       }
     }
+
+    if (form.representativeEmail.trim() && !form.representativeEmail.includes('@')) {
+      return 'Podaj poprawny adres e-mail osoby reprezentującej.';
+    }
+
     return null;
   }
 
@@ -134,13 +192,13 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           isActive: form.isActive,
           accountLimit: Number(form.accountLimit),
           representative: {
-            fullName: form.representativeFullName.trim(),
-            email: form.representativeEmail.trim(),
+            fullName: form.representativeFullName.trim() || organization.representative?.fullName || 'Administrator',
+            email: form.representativeEmail.trim() || organization.representative?.email || `admin@${form.domain.trim().toLowerCase()}`,
             phone: form.representativePhone.trim() || null,
           },
           address: {
-            town: form.addressTown.trim(),
-            street: form.addressStreet.trim(),
+            town: form.addressTown.trim() || organization.address?.town || '-',
+            street: form.addressStreet.trim() || organization.address?.street || '-',
             building: form.addressBuilding.trim() || null,
             postalCode: form.addressPostalCode.trim() || null,
             country: form.addressCountry.trim() || 'PL',
@@ -160,21 +218,28 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           name: form.name.trim(),
           domain: form.domain.trim().toLowerCase(),
           loginMethod: form.loginMethod,
-          accountLimit: Number(form.accountLimit),
-          representative: {
-            fullName: form.representativeFullName.trim(),
-            email: form.representativeEmail.trim(),
+          accountLimit: form.accountLimit ? Number(form.accountLimit) : 200,
+        };
+
+        if (form.representativeFullName.trim() || form.representativeEmail.trim() || form.representativePhone.trim()) {
+          createPayload.representative = {
+            fullName: form.representativeFullName.trim() || 'Administrator',
+            email: form.representativeEmail.trim() || `admin@${createPayload.domain}`,
             phone: form.representativePhone.trim() || undefined,
-          },
-          address: {
-            town: form.addressTown.trim(),
-            street: form.addressStreet.trim(),
+          };
+        }
+
+        if (form.addressTown.trim() || form.addressStreet.trim() || form.addressBuilding.trim() || form.addressPostalCode.trim()) {
+          createPayload.address = {
+            town: form.addressTown.trim() || '-',
+            street: form.addressStreet.trim() || '-',
             building: form.addressBuilding.trim() || undefined,
             postalCode: form.addressPostalCode.trim() || undefined,
             country: form.addressCountry.trim() || 'PL',
-          },
-          storageQuotaMb: Number(form.storageQuotaMb) || 100,
-        };
+          };
+        }
+
+        createPayload.storageQuotaMb = Number(form.storageQuotaMb) || 100;
 
         if (form.loginMethod === 'saml') {
           if (form.metadataUrl.trim()) {
@@ -205,17 +270,22 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
       isOpen={isOpen}
       onClose={onClose}
       title={isEdit ? 'Edycja organizacji' : 'Nowa organizacja'}
-      subtitle={isEdit ? `ID: ${organization.id} - ${organization.name}` : 'Wprowadź dane nowej organizacji w systemie'}
+      subtitle={isEdit ? `ID: ${organization.id} - ${organization.name}` : undefined}
       size="lg"
       showFooter={false}
     >
       <form className="org-form" onSubmit={handleSubmit}>
+        {/* 1. Dane podstawowe - zawsze widoczne i wymagane */}
         <fieldset className="org-form__fieldset">
           <legend className="org-form__legend">Dane podstawowe</legend>
           <div className="org-form__row">
             <TextField
               id="org-name"
-              label="Nazwa organizacji"
+              label={
+                <span>
+                  Nazwa organizacji <span className="org-form__required">*</span>
+                </span>
+              }
               placeholder="np. Uniwersytet im. Adama Mickiewicza"
               value={form.name}
               onChange={(e) => handleChange('name', e.target.value)}
@@ -223,7 +293,12 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
             />
             <TextField
               id="org-domain"
-              label="Domena internetowa"
+              label={
+                <span>
+                  Domena internetowa <span className="org-form__required">*</span>
+                  <HelpTooltip text="Unikalna domena internetowa przypisana do instytucji (np. amu.edu.pl). Służy m.in. do rozpoznawania organizacji podczas logowania." />
+                </span>
+              }
               placeholder="np. amu.edu.pl lub localhost"
               value={form.domain}
               onChange={(e) => handleChange('domain', e.target.value)}
@@ -248,7 +323,8 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           <div className="org-form__row">
             <div className="org-form__field">
               <label className="org-form__label" htmlFor="org-login-method">
-                Metoda uwierzytelniania
+                Metoda uwierzytelniania <span className="org-form__required">*</span>
+                <HelpTooltip text="Wybierz sposób logowania użytkowników: bezpieczny link e-mail (Magic Link) albo centralne logowanie instytucjonalne (SAML 2.0 / federacja SSO)." />
               </label>
               <select
                 id="org-login-method"
@@ -286,90 +362,22 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           </div>
         </fieldset>
 
-        <fieldset className="org-form__fieldset">
-          <legend className="org-form__legend">Osoba reprezentująca / kontakt</legend>
-          <div className="org-form__row">
-            <TextField
-              id="org-rep-name"
-              label="Imię i nazwisko"
-              placeholder="np. Jan Kowalski"
-              value={form.representativeFullName}
-              onChange={(e) => handleChange('representativeFullName', e.target.value)}
-              required
-            />
-            <TextField
-              id="org-rep-email"
-              type="email"
-              label="Adres e-mail"
-              placeholder="np. j.kowalski@amu.edu.pl"
-              value={form.representativeEmail}
-              onChange={(e) => handleChange('representativeEmail', e.target.value)}
-              required
-            />
-          </div>
-          <div className="org-form__row">
-            <TextField
-              id="org-rep-phone"
-              label="Telefon kontaktowy (opcjonalnie)"
-              placeholder="np. +48 61 829 4000"
-              value={form.representativePhone}
-              onChange={(e) => handleChange('representativePhone', e.target.value)}
-            />
-          </div>
-        </fieldset>
-
-        <fieldset className="org-form__fieldset">
-          <legend className="org-form__legend">Adres siedziby</legend>
-          <div className="org-form__row">
-            <TextField
-              id="org-addr-town"
-              label="Miejscowość"
-              placeholder="np. Poznań"
-              value={form.addressTown}
-              onChange={(e) => handleChange('addressTown', e.target.value)}
-              required
-            />
-            <TextField
-              id="org-addr-street"
-              label="Ulica"
-              placeholder="np. ul. Wieniawskiego"
-              value={form.addressStreet}
-              onChange={(e) => handleChange('addressStreet', e.target.value)}
-              required
-            />
-          </div>
-          <div className="org-form__row">
-            <TextField
-              id="org-addr-building"
-              label="Nr budynku / lokalu"
-              placeholder="np. 1"
-              value={form.addressBuilding}
-              onChange={(e) => handleChange('addressBuilding', e.target.value)}
-            />
-            <TextField
-              id="org-addr-postal"
-              label="Kod pocztowy"
-              placeholder="np. 61-712"
-              value={form.addressPostalCode}
-              onChange={(e) => handleChange('addressPostalCode', e.target.value)}
-            />
-            <TextField
-              id="org-addr-country"
-              label="Kraj (kod ISO)"
-              placeholder="PL"
-              value={form.addressCountry}
-              onChange={(e) => handleChange('addressCountry', e.target.value)}
-            />
-          </div>
-        </fieldset>
-
+        {/* 2. Konfiguracja SAML 2.0 - pojawia się zaraz po Danych podstawowych po wyborze SAML 2.0 */}
         {form.loginMethod === 'saml' ? (
           <fieldset className="org-form__fieldset">
-            <legend className="org-form__legend">Konfiguracja SAML 2.0 (IdP)</legend>
+            <legend className="org-form__legend">
+              Konfiguracja SAML 2.0 (IdP) <span className="org-form__required">*</span>
+              <HelpTooltip text="IdP (Identity Provider) to dostawca tożsamości uczelni/organizacji, który uwierzytelnia użytkowników przez protokół SAML 2.0." />
+            </legend>
             <div className="org-form__row">
               <TextField
                 id="org-saml-metadata"
-                label="URL metadanych IdP"
+                label={
+                  <span>
+                    URL metadanych IdP {!form.entityId.trim() && <span className="org-form__required">*</span>}
+                    <HelpTooltip text="Bezpośredni link do pliku XML z metadanymi dostawcy tożsamości. Jeśli go podasz, system pobierze konfigurację automatycznie." />
+                  </span>
+                }
                 placeholder="https://sso.amu.edu.pl/simplesaml/saml2/idp/metadata.php"
                 value={form.metadataUrl}
                 onChange={(e) => handleChange('metadataUrl', e.target.value)}
@@ -380,14 +388,24 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
                 <div className="org-form__row">
                   <TextField
                     id="org-saml-entity"
-                    label="Entity ID IdP"
+                    label={
+                      <span>
+                        Entity ID IdP <span className="org-form__required">*</span>
+                        <HelpTooltip text="Unikalny identyfikator URI dostawcy tożsamości (np. https://sso.amu.edu.pl/idp)." />
+                      </span>
+                    }
                     placeholder="https://sso.amu.edu.pl/idp"
                     value={form.entityId}
                     onChange={(e) => handleChange('entityId', e.target.value)}
                   />
                   <TextField
                     id="org-saml-login"
-                    label="SSO Login URL"
+                    label={
+                      <span>
+                        SSO Login URL <span className="org-form__required">*</span>
+                        <HelpTooltip text="Adres URL usługi logowania jednokrotnego (Single Sign-On Service), na który kierowany jest użytkownik w celu uwierzytelnienia." />
+                      </span>
+                    }
                     placeholder="https://sso.amu.edu.pl/saml2/idp/SSOService.php"
                     value={form.ssoLoginUrl}
                     onChange={(e) => handleChange('ssoLoginUrl', e.target.value)}
@@ -396,7 +414,12 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
                 <div className="org-form__row">
                   <TextField
                     id="org-saml-cert"
-                    label="Certyfikat IdP (PEM)"
+                    label={
+                      <span>
+                        Certyfikat IdP (PEM) <span className="org-form__required">*</span>
+                        <HelpTooltip text="Klucz publiczny certyfikatu X.509 dostawcy tożsamości w formacie PEM (zaczynający się od -----BEGIN CERTIFICATE-----)." />
+                      </span>
+                    }
                     placeholder="-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----"
                     multiline
                     rows={4}
@@ -409,11 +432,119 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
           </fieldset>
         ) : null}
 
+        {/* 3. Osoba reprezentująca / kontakt - sekcja opcjonalna, domyślnie zwinięta */}
+        <div className={`org-form__collapsible ${isRepOpen ? 'org-form__collapsible--open' : ''}`}>
+          <button
+            type="button"
+            className="org-form__collapsible-toggle"
+            onClick={() => setIsRepOpen((prev) => !prev)}
+            aria-expanded={isRepOpen}
+          >
+            <span className="org-form__collapsible-title">Osoba reprezentująca / kontakt (opcjonalnie)</span>
+            <span className="org-form__collapsible-indicator" aria-hidden="true">
+              {isRepOpen ? '▲' : '▼'}
+            </span>
+          </button>
+          {isRepOpen ? (
+            <div className="org-form__collapsible-body">
+              <div className="org-form__row">
+                <TextField
+                  id="org-rep-name"
+                  label="Imię i nazwisko"
+                  placeholder="np. Jan Kowalski"
+                  value={form.representativeFullName}
+                  onChange={(e) => handleChange('representativeFullName', e.target.value)}
+                />
+                <TextField
+                  id="org-rep-email"
+                  type="email"
+                  label="Adres e-mail"
+                  placeholder="np. j.kowalski@amu.edu.pl"
+                  value={form.representativeEmail}
+                  onChange={(e) => handleChange('representativeEmail', e.target.value)}
+                />
+              </div>
+              <div className="org-form__row">
+                <TextField
+                  id="org-rep-phone"
+                  label="Telefon kontaktowy"
+                  placeholder="np. +48 61 829 4000"
+                  value={form.representativePhone}
+                  onChange={(e) => handleChange('representativePhone', e.target.value)}
+                />
+              </div>
+            </div>
+          ) : null}
+        </div>
+
+        {/* 4. Adres siedziby - sekcja opcjonalna, domyślnie zwinięta */}
+        <div className={`org-form__collapsible ${isAddressOpen ? 'org-form__collapsible--open' : ''}`}>
+          <button
+            type="button"
+            className="org-form__collapsible-toggle"
+            onClick={() => setIsAddressOpen((prev) => !prev)}
+            aria-expanded={isAddressOpen}
+          >
+            <span className="org-form__collapsible-title">Adres siedziby (opcjonalnie)</span>
+            <span className="org-form__collapsible-indicator" aria-hidden="true">
+              {isAddressOpen ? '▲' : '▼'}
+            </span>
+          </button>
+          {isAddressOpen ? (
+            <div className="org-form__collapsible-body">
+              <div className="org-form__row">
+                <TextField
+                  id="org-addr-town"
+                  label="Miejscowość"
+                  placeholder="np. Poznań"
+                  value={form.addressTown}
+                  onChange={(e) => handleChange('addressTown', e.target.value)}
+                />
+                <TextField
+                  id="org-addr-street"
+                  label="Ulica"
+                  placeholder="np. ul. Wieniawskiego"
+                  value={form.addressStreet}
+                  onChange={(e) => handleChange('addressStreet', e.target.value)}
+                />
+              </div>
+              <div className="org-form__row">
+                <TextField
+                  id="org-addr-building"
+                  label="Nr budynku / lokalu"
+                  placeholder="np. 1"
+                  value={form.addressBuilding}
+                  onChange={(e) => handleChange('addressBuilding', e.target.value)}
+                />
+                <TextField
+                  id="org-addr-postal"
+                  label="Kod pocztowy"
+                  placeholder="np. 61-712"
+                  value={form.addressPostalCode}
+                  onChange={(e) => handleChange('addressPostalCode', e.target.value)}
+                />
+                <TextField
+                  id="org-addr-country"
+                  label={
+                    <span>
+                      Kraj (kod ISO)
+                      <HelpTooltip text="Dwuliterowy międzynarodowy kod kraju w standardzie ISO 3166-1 alpha-2, np. PL dla Polski." />
+                    </span>
+                  }
+                  placeholder="PL"
+                  value={form.addressCountry}
+                  onChange={(e) => handleChange('addressCountry', e.target.value)}
+                />
+              </div>
+            </div>
+          ) : null}
+        </div>
+
         <div className="org-form__actions">
           <Button variant="ghost" onClick={onClose} disabled={submitting}>
             Anuluj
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting || !isFormValid}>
             {submitting ? 'Zapisywanie...' : isEdit ? 'Zapisz zmiany' : 'Utwórz organizację'}
           </Button>
         </div>
@@ -421,4 +552,3 @@ export default function OrganizationFormModal({ isOpen, onClose, organization, o
     </Modal>
   );
 }
-

@@ -132,13 +132,68 @@ for (const [category, ids] of Object.entries(ORDERED_AVATAR_IDS)) {
 }
 
 // === GŁÓWNA LOGIKA NARZĘDZIOWA I EKSPORTY ===
+const UNLOCKED_AVATARS_STORAGE_KEY = 'maq_unlocked_avatars';
+
 /**
- * Sprawdza, czy dany awatar ma zostać wykluczony z wyboru (np. Nikita / nobodgeit).
- * @param {{ id: number, name?: string, imageUrl?: string }} avatar
+ * Sprawdza, czy specjalny awatar został odblokowany lokalnie przez użytkownika (np. easter egg).
+ * @param {number} avatarId
  * @returns {boolean}
  */
-export function isExcludedAvatar(avatar) {
+export function isSpecialAvatarUnlocked(avatarId) {
+  try {
+    const raw = localStorage.getItem(UNLOCKED_AVATARS_STORAGE_KEY);
+    if (!raw) return false;
+    const ids = JSON.parse(raw);
+    return Array.isArray(ids) && ids.includes(avatarId);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Odblokowuje specjalny awatar w pamięci podręcznej.
+ * @param {number} avatarId
+ */
+export function unlockSpecialAvatar(avatarId) {
+  try {
+    const raw = localStorage.getItem(UNLOCKED_AVATARS_STORAGE_KEY);
+    const ids = raw ? JSON.parse(raw) : [];
+    if (!ids.includes(avatarId)) {
+      ids.push(avatarId);
+      localStorage.setItem(UNLOCKED_AVATARS_STORAGE_KEY, JSON.stringify(ids));
+    }
+  } catch {
+  }
+}
+
+/**
+ * Blokuje (usuwa z odblokowanych) specjalny awatar w pamięci podręcznej.
+ * @param {number} avatarId
+ */
+export function lockSpecialAvatar(avatarId) {
+  try {
+    const raw = localStorage.getItem(UNLOCKED_AVATARS_STORAGE_KEY);
+    if (!raw) return;
+    const ids = JSON.parse(raw);
+    if (Array.isArray(ids)) {
+      const filtered = ids.filter((id) => id !== avatarId);
+      localStorage.setItem(UNLOCKED_AVATARS_STORAGE_KEY, JSON.stringify(filtered));
+    }
+  } catch {
+  }
+}
+
+/**
+ * Sprawdza, czy dany awatar ma zostać wykluczony z wyboru (np. Nikita / nobodgeit).
+ * Jeśli został odblokowany przez easter egg LUB jest obecnie wybrany, nie jest wykluczany.
+ * @param {{ id: number, name?: string, imageUrl?: string }} avatar
+ * @param {number | null} [currentSelectedAvatarId]
+ * @returns {boolean}
+ */
+export function isExcludedAvatar(avatar, currentSelectedAvatarId = null) {
   if (!avatar) return true;
+  if (currentSelectedAvatarId != null && avatar.id === currentSelectedAvatarId) return false;
+  if (isSpecialAvatarUnlocked(avatar.id)) return false;
   if (avatar.id === 34) return true;
   const target = `${avatar.name ?? ''} ${avatar.imageUrl ?? ''}`.toLowerCase();
   return target.includes('nobodgeit') || target.includes('nikita');
@@ -234,12 +289,13 @@ function getAvatarSortIndex(avatar) {
  * Filtruje i sortuje listę awatarów według wybranej kategorii.
  * @param {{ id: number, name?: string, imageUrl?: string }[]} avatars
  * @param {string} categoryId
+ * @param {number | null} [currentSelectedAvatarId]
  * @returns {{ id: number, name?: string, imageUrl?: string }[]}
  */
-export function filterAvatarsByCategory(avatars, categoryId) {
+export function filterAvatarsByCategory(avatars, categoryId, currentSelectedAvatarId = null) {
   if (!Array.isArray(avatars)) return [];
 
-  const available = avatars.filter((avatar) => !isExcludedAvatar(avatar));
+  const available = avatars.filter((avatar) => !isExcludedAvatar(avatar, currentSelectedAvatarId));
 
   let result;
   if (!categoryId || categoryId === AVATAR_CATEGORY.ALL) {
@@ -255,14 +311,15 @@ export function filterAvatarsByCategory(avatars, categoryId) {
  * Losuje określoną liczbę unikalnych awatarów z listy (z pominięciem wykluczonych).
  * @param {{ id: number, name?: string, imageUrl?: string }[]} avatars
  * @param {number} [count=4]
+ * @param {number | null} [currentSelectedAvatarId]
  * @returns {{ id: number, name?: string, imageUrl?: string }[]}
  */
-export function pickRandomAvatars(avatars, count = 4) {
+export function pickRandomAvatars(avatars, count = 4, currentSelectedAvatarId = null) {
   if (!Array.isArray(avatars) || avatars.length === 0) {
     return [];
   }
 
-  const available = avatars.filter((avatar) => !isExcludedAvatar(avatar));
+  const available = avatars.filter((avatar) => !isExcludedAvatar(avatar, currentSelectedAvatarId));
   if (available.length <= count) {
     return [...available];
   }

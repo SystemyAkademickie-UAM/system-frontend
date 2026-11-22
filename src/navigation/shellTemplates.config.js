@@ -53,6 +53,11 @@ const YOURGROUPS__TEXTLABEL = {
   english: 'Your Groups',
 };
 
+const GROUPS__TEXTLABEL = {
+  polish: 'Grupy',
+  english: 'Groups',
+};
+
 const NAVIGATIONMAIN_PAGE__TEXTLABEL = {
   polish: 'Strona Główna',
   english: 'Main Page',
@@ -229,8 +234,8 @@ const NAVIGATIONPRODUCTIONLOGS__TEXTLABEL = {
 };
 
 const NAVIGATIONADMINHOME__TEXTLABEL = {
-  polish: 'Organizacja',
-  english: 'Organization',
+  polish: 'Moja organizacja',
+  english: 'My organization',
 };
 
 const NAVIGATIONDISKSPACE__TEXTLABEL = {
@@ -964,7 +969,7 @@ const adminView = {
       id: 'zarzadzanie-grupami',
       enabled: true,
       kind: 'navlink',
-      label: YOURGROUPS__TEXTLABEL[LANGUAGE],
+      label: GROUPS__TEXTLABEL[LANGUAGE],
       iconId: 'nav/groups',
       hrefKey: 'GROUPS_LIST',
       requiresGroup: false,

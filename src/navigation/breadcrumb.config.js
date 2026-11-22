@@ -36,7 +36,7 @@ import {
 /** @type {Record<string, BreadcrumbSegmentDef[]>} */
 export const BREADCRUMB_BY_PATH = {
   [groupsListPath()]: [{ label: 'Grupy' }],
-  [adminHomePath()]: [{ label: 'Organizacja' }],
+  [adminHomePath()]: [{ label: 'Moja organizacja' }],
 
   [appSettingsPath()]: [{ label: 'Ustawienia' }],
   [appHelpPath()]: [
