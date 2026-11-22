@@ -188,6 +188,7 @@ export default function UserManagementContent() {
     session.user?.role === 'super';
   const canManageAdministrators =
     session.user?.activeRole === ACCOUNT_ROLE_SUPER || session.user?.role === ACCOUNT_ROLE_SUPER;
+  const currentUserId = session.user?.sub ? Number(session.user.sub) : null;
 
   const [organizations, setOrganizations] = useState([]);
   const [activeOrgId, setActiveOrgId] = useState(session.user?.organizationId ?? null);
@@ -215,6 +216,8 @@ export default function UserManagementContent() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(true);
   const [ready, setReady] = useState(false);
+
+  const isEditingSelf = userModalMode === 'edit' && editing && currentUserId !== null && Number(editing.userId) === currentUserId;
 
   // Czy wybrana organizacja obsługuje logowanie przez Magic Links
   const isEmailOrganization = !isAllOrganizations && loginMethod === LOGIN_METHOD_EMAIL;
@@ -843,6 +846,7 @@ export default function UserManagementContent() {
           onSendLink={sendLink}
           onExit={() => setUserModalOpen(false)}
           canManageAdministrators={canManageAdministrators}
+          isSelf={isEditingSelf}
         />
       </Modal>
 

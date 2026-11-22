@@ -50,12 +50,18 @@ export default function UserAccountForm({
   onSendLink,
   onExit,
   canManageAdministrators = false,
+  isSelf = false,
 }) {
   const selectedRoles = Array.isArray(form.roles)
     ? form.roles
     : (form.role ? [form.role] : [ACCOUNT_ROLE_STUDENT]);
 
   const handleRoleToggle = (roleValue, isChecked) => {
+    // Nadzorca edytujący samego siebie nie może odebrać sobie roli nadzorcy
+    if (isSelf && roleValue === ACCOUNT_ROLE_SUPER && !isChecked) {
+      return;
+    }
+
     let nextRoles = [...selectedRoles];
     if (isChecked) {
       if (!nextRoles.includes(roleValue)) {
@@ -72,7 +78,11 @@ export default function UserAccountForm({
 
   const roleOptions = [
     ...(allowSuper || selectedRoles.includes(ACCOUNT_ROLE_SUPER)
-      ? [{ value: ACCOUNT_ROLE_SUPER, label: copy.superadmin ?? 'Osoba nadzorująca' }]
+      ? [{
+          value: ACCOUNT_ROLE_SUPER,
+          label: copy.superadmin ?? 'Osoba nadzorująca',
+          disabled: isSelf && selectedRoles.includes(ACCOUNT_ROLE_SUPER),
+        }]
       : []),
     ...(canManageAdministrators || selectedRoles.includes(ACCOUNT_ROLE_ADMINISTRATOR)
       ? [{ value: ACCOUNT_ROLE_ADMINISTRATOR, label: copy.administrator }]
@@ -81,7 +91,7 @@ export default function UserAccountForm({
     { value: ACCOUNT_ROLE_STUDENT, label: copy.student },
   ];
 
-  const showRemove = canManageAdministrators || !selectedRoles.includes(ACCOUNT_ROLE_ADMINISTRATOR);
+  const showRemove = !isSelf && (canManageAdministrators || !selectedRoles.includes(ACCOUNT_ROLE_ADMINISTRATOR));
 
   return (
     <form className="user-management__form-modal" onSubmit={(event) => event.preventDefault()}>
@@ -153,6 +163,7 @@ export default function UserAccountForm({
               onChange={(checked) => handleRoleToggle(roleOpt.value, checked)}
               label={roleOpt.label}
               variant="danger"
+              disabled={roleOpt.disabled}
             />
           ))}
         </div>
@@ -178,11 +189,11 @@ export default function UserAccountForm({
           </Button>
         ) : null}
         {mode === 'create' ? (
-          <Button variant="secondary" onClick={onSaveAnother}>
+          <Button variant="secondary" onClick={onSaveAnother} disabled={selectedRoles.length === 0}>
             {copy.saveAnother}
           </Button>
         ) : null}
-        <Button variant="primary" onClick={onSave}>
+        <Button variant="primary" onClick={onSave} disabled={selectedRoles.length === 0}>
           {copy.save}
         </Button>
       </div>
