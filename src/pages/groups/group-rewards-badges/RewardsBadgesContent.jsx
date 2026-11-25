@@ -130,6 +130,11 @@ const PUBLISHMESSAGE__TEXTLABEL = {
   english: 'Badge is now visible to students.'
 };
 
+const PUBLISHSECRETMESSAGE__TEXTLABEL = {
+  polish: 'Odznaka jest teraz dostępna jako sekretna dla osób studiujących.',
+  english: 'Badge is now published as secret for students.',
+};
+
 const UNPUBLISHMESSAGE__TEXTLABEL = {
   polish: 'Odznaka jest teraz ukryta przed studentami.',
   english: 'Badge is now hidden from students.'
@@ -238,17 +243,19 @@ const BADGE_COLUMNS = [
     sort: 'text',
     width: '110px',
     mobileRole: 'meta',
-    accessor: (badge) => getVisibilityStatusLabel(badge.isPublished, 'badge'),
+    accessor: (badge) => getVisibilityStatusLabel(badge.isPublished, 'badge', undefined, badge.isSecret),
     render: (badge) => (
       <span
         className={[
           'rewards-table__visibility',
           badge.isPublished === false
             ? 'rewards-table__visibility--hidden'
-            : 'rewards-table__visibility--public',
+            : badge.isSecret
+              ? 'rewards-table__visibility--secret'
+              : 'rewards-table__visibility--public',
         ].join(' ')}
       >
-        {getVisibilityStatusLabel(badge.isPublished, 'badge')}
+        {getVisibilityStatusLabel(badge.isPublished, 'badge', undefined, badge.isSecret)}
       </span>
     ),
   },
@@ -494,10 +501,14 @@ const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
         onSelect: async (badge) => {
           const result = await handleTogglePublished(badge.id);
           if (result.ok) {
+            const isNowPublished = result.badge ? result.badge.isPublished !== false : badge.isPublished === false;
+            const isNowSecret = result.badge ? result.badge.isSecret === true : badge.isSecret === true;
             showSuccess(
-              badge.isPublished === false
-                ? PUBLISHMESSAGE__TEXTLABEL[LANGUAGE]
-                : UNPUBLISHMESSAGE__TEXTLABEL[LANGUAGE],
+              !isNowPublished
+                ? UNPUBLISHMESSAGE__TEXTLABEL[LANGUAGE]
+                : isNowSecret
+                  ? PUBLISHSECRETMESSAGE__TEXTLABEL[LANGUAGE]
+                  : PUBLISHMESSAGE__TEXTLABEL[LANGUAGE],
             );
           } else {
             showError(result.error || VISIBILITYTOGGLEFAILMESSAGE__TEXTLABEL[LANGUAGE]);

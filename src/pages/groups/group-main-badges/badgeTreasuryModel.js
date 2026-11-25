@@ -114,14 +114,17 @@ export const STUDENT_SORT_OPTIONS = getStudentSortOptions();
  * @property {number} dbId
  * @property {number} position
  * @property {string} name
- * @property {string} iconFile
+ * @property {string | null} iconFile
  * @property {string} rarity
  * @property {string} storyDescription
  * @property {string} didacticDescription
- * @property {number} rewardAmount
- * @property {string} rewardEmoji
+ * @property {number | null} rewardAmount
+ * @property {string} [rewardEmoji]
  * @property {boolean} isUnlocked
  * @property {boolean} isPublished
+ * @property {boolean} isSecret
+ * @property {boolean} isRevealed
+ * @property {boolean} isSecretHidden
  */
 
 /**
@@ -143,21 +146,29 @@ export const STUDENT_SORT_OPTIONS = getStudentSortOptions();
 export function mapBadgeForTreasury(badge, index, earnedBadgeIds = null) {
   const dbId = badge.id;
   const isUnlocked = earnedBadgeIds ? earnedBadgeIds.has(dbId) : true;
-  const icon = normalizeRankBadgeIcon(badge.icon, DEFAULT_BADGE_EMOJI);
+  const isSecret = badge.isSecret === true;
+  const isRevealed = badge.isRevealed === false
+    ? false
+    : (earnedBadgeIds ? (!isSecret || isUnlocked) : true);
+  const isSecretHidden = isSecret && !isRevealed;
+  const icon = isSecretHidden ? null : normalizeRankBadgeIcon(badge.icon, DEFAULT_BADGE_EMOJI);
 
   return {
     id: `badge-${dbId}`,
     dbId,
     position: index + 1,
-    name: badge.name || 'Nieznana odznaka',
+    name: isSecretHidden ? '' : (badge.name || 'Nieznana odznaka'),
     icon,
     iconFile: icon,
     rarity: badge.rarity || BADGE_RARITY.common,
-    storyDescription: badge.storyDescription || '',
-    didacticDescription: badge.educationalDescription || '',
-    rewardAmount: badge.rewardAmount ?? 0,
+    storyDescription: isSecretHidden ? '' : (badge.storyDescription || ''),
+    didacticDescription: isSecretHidden ? '' : (badge.educationalDescription || ''),
+    rewardAmount: isSecretHidden ? null : (badge.rewardAmount ?? 0),
     isUnlocked,
     isPublished: badge.isPublished !== false,
+    isSecret,
+    isRevealed,
+    isSecretHidden,
   };
 }
 
@@ -229,12 +240,47 @@ export function filterTreasuryBadges(badges, {
       return false;
     }
 
-    if (query && !badge.name.toLowerCase().includes(query)) {
-      return false;
+    if (query) {
+      if (badge.isSecretHidden) {
+        return false;
+      }
+      if (!(badge.name ?? '').toLowerCase().includes(query)) {
+        return false;
+      }
     }
 
     return true;
   });
+}
+
+function compareBadgeNames(a, b, direction = 'asc') {
+  const aHidden = a.isSecretHidden === true;
+  const bHidden = b.isSecretHidden === true;
+  if (aHidden !== bHidden) {
+    return aHidden ? 1 : -1;
+  }
+  if (aHidden && bHidden) {
+    const rarityDiff = (BADGE_RARITY_ORDER[b.rarity] ?? 0) - (BADGE_RARITY_ORDER[a.rarity] ?? 0);
+    return rarityDiff !== 0 ? rarityDiff : (a.dbId ?? 0) - (b.dbId ?? 0);
+  }
+  return direction === 'desc'
+    ? (b.name ?? '').localeCompare(a.name ?? '', 'pl')
+    : (a.name ?? '').localeCompare(b.name ?? '', 'pl');
+}
+
+function compareRewardValues(a, b, direction) {
+  const aHidden = a.isSecretHidden || a.rewardAmount == null;
+  const bHidden = b.isSecretHidden || b.rewardAmount == null;
+  if (aHidden !== bHidden) {
+    return aHidden ? 1 : -1;
+  }
+  if (aHidden && bHidden) {
+    return (BADGE_RARITY_ORDER[b.rarity] ?? 0) - (BADGE_RARITY_ORDER[a.rarity] ?? 0);
+  }
+  const diff = direction === 'desc'
+    ? (b.rewardAmount ?? 0) - (a.rewardAmount ?? 0)
+    : (a.rewardAmount ?? 0) - (b.rewardAmount ?? 0);
+  return diff !== 0 ? diff : compareBadgeNames(a, b);
 }
 
 /**
@@ -255,7 +301,7 @@ export function sortTreasuryBadges(badges, sortBy) {
         if (rarityDiff !== 0) {
           return rarityDiff;
         }
-        return a.name.localeCompare(b.name, 'pl');
+        return compareBadgeNames(a, b);
       });
     case TREASURY_SORT.lockedFirst:
       return sorted.sort((a, b) => {
@@ -266,32 +312,26 @@ export function sortTreasuryBadges(badges, sortBy) {
         if (rarityDiff !== 0) {
           return rarityDiff;
         }
-        return a.name.localeCompare(b.name, 'pl');
+        return compareBadgeNames(a, b);
       });
     case TREASURY_SORT.qualityDesc:
       return sorted.sort((a, b) => {
         const diff = (BADGE_RARITY_ORDER[b.rarity] ?? 0) - (BADGE_RARITY_ORDER[a.rarity] ?? 0);
-        return diff !== 0 ? diff : a.name.localeCompare(b.name, 'pl');
+        return diff !== 0 ? diff : compareBadgeNames(a, b);
       });
     case TREASURY_SORT.qualityAsc:
       return sorted.sort((a, b) => {
         const diff = (BADGE_RARITY_ORDER[a.rarity] ?? 0) - (BADGE_RARITY_ORDER[b.rarity] ?? 0);
-        return diff !== 0 ? diff : a.name.localeCompare(b.name, 'pl');
+        return diff !== 0 ? diff : compareBadgeNames(a, b);
       });
     case TREASURY_SORT.nameAsc:
-      return sorted.sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+      return sorted.sort((a, b) => compareBadgeNames(a, b, 'asc'));
     case TREASURY_SORT.nameDesc:
-      return sorted.sort((a, b) => b.name.localeCompare(a.name, 'pl'));
+      return sorted.sort((a, b) => compareBadgeNames(a, b, 'desc'));
     case TREASURY_SORT.rewardDesc:
-      return sorted.sort((a, b) => {
-        const diff = (b.rewardAmount ?? 0) - (a.rewardAmount ?? 0);
-        return diff !== 0 ? diff : a.name.localeCompare(b.name, 'pl');
-      });
+      return sorted.sort((a, b) => compareRewardValues(a, b, 'desc'));
     case TREASURY_SORT.rewardAsc:
-      return sorted.sort((a, b) => {
-        const diff = (a.rewardAmount ?? 0) - (b.rewardAmount ?? 0);
-        return diff !== 0 ? diff : a.name.localeCompare(b.name, 'pl');
-      });
+      return sorted.sort((a, b) => compareRewardValues(a, b, 'asc'));
     default:
       return sorted;
   }

@@ -11,12 +11,15 @@ import { extractApiError } from './apiErrors.js';
  * @typedef {Object} Badge
  * @property {number} id
  * @property {number | null} groupId
- * @property {string} name
+ * @property {string | null} name
  * @property {string | null} icon
  * @property {string | null} educationalDescription
  * @property {string | null} storyDescription
  * @property {number | null} rewardAmount
  * @property {'common' | 'uncommon' | 'rare' | 'epic'} rarity
+ * @property {boolean} [isPublished]
+ * @property {boolean} [isSecret]
+ * @property {boolean} [isRevealed]
  */
 
 /**
@@ -48,6 +51,8 @@ return Array.isArray(result.data) ? result.data : [];
  * @param {string} [badgeData.storyDescription]
  * @param {number} [badgeData.rewardAmount]
  * @param {'common' | 'uncommon' | 'rare' | 'epic'} [badgeData.rarity]
+ * @param {boolean} [badgeData.isPublished]
+ * @param {boolean} [badgeData.isSecret]
  * @returns {Promise<{ ok: boolean, badge?: Badge, error?: string }>}
  */
 export async function createBadge(groupId, badgeData) {

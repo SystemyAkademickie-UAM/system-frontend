@@ -6,10 +6,14 @@
 // === IMPORTY I ZALEŻNOŚCI ===
 import { useEffect, useMemo, useState } from 'react';
 import { BADGE_RARITY, BADGE_RARITY_LABELS, Divider, InfoTooltip, Modal, TextField } from '../../../../components/ui/index.js';
-import AssetSvg from '../../../../components/ui/AssetSvg/AssetSvg.jsx';
 import EmojiPickerField from '../../../../components/ui/EmojiPickerField/EmojiPickerField.jsx';
-import { SVG_ICONS } from '../../../../constants/svgIcons.js';
 import { DEFAULT_BADGE_EMOJI } from '../../../../utils/ranks/rankBadgeIcon.js';
+import {
+  BADGE_VISIBILITY,
+  badgeVisibilityModeToFlags,
+  getBadgeVisibilityMode,
+  getBadgeVisibilityOptions,
+} from '../../../../utils/rewards/visibilityStatusLabel.js';
 import { validateWholeNumberInput, sanitizeWholeNumberInput } from '../../../../utils/validation/rewardsNumericValidation.js';
 import RewardsCurrencyLabel from '../../group-rewards/shared/RewardsCurrencyLabel.jsx';
 import '../../group-rewards/shared/rewardsModals.css';
@@ -18,57 +22,57 @@ import { READLANGUAGECOOKIE } from '../../../../utils/LANGUAGECOOKIE.js';
 // === STAŁE I ETYKIETY JĘZYKOWE ===
 const MODALTITLEEDIT__TEXTLABEL = {
   polish: 'Edytuj odznakę',
-  english: 'Edit Badge'
+  english: 'Edit Badge',
 };
 
 const MODALTITLECREATE__TEXTLABEL = {
   polish: 'Dodaj odznakę',
-  english: 'Add Badge'
+  english: 'Add Badge',
 };
 
 const NAMELABEL__TEXTLABEL = {
   polish: 'Nazwa*',
-  english: 'Name*'
+  english: 'Name*',
 };
 
 const REWARDLABEL__TEXTLABEL = {
   polish: 'Nagroda*',
-  english: 'Reward*'
+  english: 'Reward*',
 };
 
 const ICONLABEL__TEXTLABEL = {
   polish: 'Ikona',
-  english: 'Icon'
+  english: 'Icon',
 };
 
 const ICONARIALABEL__TEXTLABEL = {
   polish: 'Wybierz emoji odznaki',
-  english: 'Choose badge emoji'
+  english: 'Choose badge emoji',
 };
 
 const RARITYLABEL__TEXTLABEL = {
   polish: 'Rzadkość',
-  english: 'Rarity'
+  english: 'Rarity',
 };
 
 const RARITYTOOLTIPTEXT__TEXTLABEL = {
   polish: 'Wpływa na rzadkość odznaki w skarbcu.',
-  english: 'Affects badge rarity in the treasury.'
+  english: 'Affects badge rarity in the treasury.',
 };
 
 const STORYDESCRIPTIONLABEL__TEXTLABEL = {
   polish: 'Opis fabularny*',
-  english: 'Story Description*'
+  english: 'Story Description*',
 };
 
 const DIDACTICDESCRIPTIONLABEL__TEXTLABEL = {
   polish: 'Opis dydaktyczny*',
-  english: 'Didactic Description*'
+  english: 'Didactic Description*',
 };
 
-const PUBLISHEDOPTIONTEXT__TEXTLABEL = {
-  polish: 'Odznaka widoczna',
-  english: 'Badge visible to students'
+const VISIBILITYLABEL__TEXTLABEL = {
+  polish: 'Widoczność odznaki',
+  english: 'Badge visibility',
 };
 
 const EMPTY_FORM = {
@@ -78,42 +82,10 @@ const EMPTY_FORM = {
   storyDescription: '',
   didacticDescription: '',
   rewardAmount: '',
-  isPublished: false,
+  visibility: BADGE_VISIBILITY.hidden,
 };
 
 // === KOMPONENT OKNA DIALOGOWEGO ===
-function BadgeOptionCheckbox({
-  id,
-  checked,
-  onChange,
-  children,
-}) {
-
-return (
-    <label className="rewards-modal__option-label" htmlFor={id}>
-      <input
-        id={id}
-        type="checkbox"
-        className="rewards-modal__option-input"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-      <span
-        className={[
-          'rewards-modal__option-checkbox',
-          checked ? 'rewards-modal__option-checkbox--checked' : '',
-        ].filter(Boolean).join(' ')}
-        aria-hidden="true"
-      >
-        {checked ? (
-          <AssetSvg name={SVG_ICONS.status.check} width={18} height={18} alt="" />
-        ) : null}
-      </span>
-      <span className="rewards-modal__option-text">{children}</span>
-    </label>
-  );
-}
-
 export default function BadgeFormModal({
   isOpen,
   badge,
@@ -123,7 +95,8 @@ export default function BadgeFormModal({
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const [form, setForm] = useState(EMPTY_FORM);
 
-const isEdit = Boolean(badge);
+  const isEdit = Boolean(badge);
+  const visibilityOptions = getBadgeVisibilityOptions(LANGUAGE);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -136,7 +109,7 @@ const isEdit = Boolean(badge);
         storyDescription: badge.storyDescription,
         didacticDescription: badge.didacticDescription,
         rewardAmount: String(badge.rewardAmount),
-        isPublished: badge.isPublished !== false,
+        visibility: getBadgeVisibilityMode(badge),
       });
       return;
     }
@@ -167,6 +140,7 @@ const isEdit = Boolean(badge);
   const handleConfirm = () => {
     if (!isValid) return;
 
+    const { isPublished, isSecret } = badgeVisibilityModeToFlags(form.visibility);
     onConfirm?.({
       name: form.name.trim(),
       icon: form.icon.trim(),
@@ -175,11 +149,12 @@ const isEdit = Boolean(badge);
       storyDescription: form.storyDescription.trim(),
       didacticDescription: form.didacticDescription.trim(),
       rewardAmount: rewardValidation.value,
-      isPublished: form.isPublished,
+      isPublished,
+      isSecret,
     });
   };
 
-// === RENDEROWANIE OKNA MODALNEGO ===
+  // === RENDEROWANIE OKNA MODALNEGO ===
   return (
     <Modal
       isOpen={isOpen}
@@ -272,15 +247,21 @@ const isEdit = Boolean(badge);
 
         <Divider className="rewards-modal__divider" />
 
-        {/* Sekcja 3: Dostępność */}
+        {/* Sekcja 3: Widoczność odznaki */}
         <div className="rewards-modal__field">
-          <BadgeOptionCheckbox
-            id="badge-is-published"
-            checked={form.isPublished}
-            onChange={(checked) => setForm((prev) => ({ ...prev, isPublished: checked }))}
+          <label htmlFor="badge-visibility" className="rewards-modal__label">
+            {VISIBILITYLABEL__TEXTLABEL[LANGUAGE] ?? VISIBILITYLABEL__TEXTLABEL.polish}
+          </label>
+          <select
+            id="badge-visibility"
+            className="rewards-modal__input"
+            value={form.visibility}
+            onChange={handleChange('visibility')}
           >
-            {PUBLISHEDOPTIONTEXT__TEXTLABEL[LANGUAGE]}
-          </BadgeOptionCheckbox>
+            {visibilityOptions.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
         </div>
       </div>
     </Modal>

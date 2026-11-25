@@ -209,6 +209,12 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.rewards-table__visibility--secret {
+  color: var(--color-badge-rarity-epic);
+  background: color-mix(in srgb, var(--color-badge-rarity-epic) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-badge-rarity-epic) 35%, transparent);
+}
+
 .rewards-table__cell-text--truncate {
   white-space: nowrap;
   overflow: hidden;
