@@ -9,7 +9,22 @@ import { extractApiError } from './apiErrors.js';
  * @property {string | null} value
  * @property {number} accountId
  * @property {boolean} isRead
+ * @property {string | null} [studentNickname]
+ * @property {string | null} [studentName]
+ * @property {string | null} [studentSurname]
  */
+
+/**
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+function readOptionalString(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
 
 /**
  * @param {unknown} raw
@@ -29,6 +44,9 @@ function mapBacklogItem(raw) {
     value: typeof row.value === 'string' ? row.value : null,
     accountId: Number(row.accountId ?? 0),
     isRead: row.isRead === true,
+    studentNickname: readOptionalString(row.studentNickname),
+    studentName: readOptionalString(row.studentName),
+    studentSurname: readOptionalString(row.studentSurname),
   };
 }
 
