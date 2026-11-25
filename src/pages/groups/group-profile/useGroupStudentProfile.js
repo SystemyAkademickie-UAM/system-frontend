@@ -53,6 +53,8 @@ async function loadStudentFallback(groupId, student, ranksData) {
         storyDescription: b.storyDescription,
         educationalDescription: b.educationalDescription,
         rewardAmount: b.rewardAmount,
+        isSecret: b.isSecret === true,
+        isRevealed: b.isRevealed !== false,
       }));
   } catch {
   }

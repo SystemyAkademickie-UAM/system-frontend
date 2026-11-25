@@ -28,6 +28,16 @@ const REWARD__TEXTLABEL = {
   english: 'Reward',
 };
 
+const SECRETBADGETITLE__TEXTLABEL = {
+  polish: 'Sekretna odznaka',
+  english: 'Secret badge',
+};
+
+const SECRETBADGEHINT__TEXTLABEL = {
+  polish: 'Zdobądź tę odznakę, aby odkryć jej szczegóły.',
+  english: 'Earn this badge to reveal its details.',
+};
+
 /**
  * Pełny kafelek odznaki (Figma: Achievement Card).
  *
@@ -43,7 +53,7 @@ const REWARD__TEXTLABEL = {
  * @param {import('react').ReactNode} [props.icon]
  * @param {string} [props.iconFile]
  * @param {boolean} [props.isLocked=false]
-
+ * @param {boolean} [props.isSecretHidden=false]
  * @param {string} [props.className]
  */
 
@@ -60,12 +70,41 @@ export default function Badge({
   icon,
   iconFile,
   isLocked = false,
+  isSecretHidden = false,
   className = '',
 }) {
   const [LANGUAGE] = useState(READLANGUAGECOOKIE);
   const config = getBadgeRarityConfig(rarity);
 
-const showDate = showEarnedAt && Boolean(earnedAt);
+  const showDate = showEarnedAt && Boolean(earnedAt);
+
+  if (isSecretHidden) {
+    return (
+      <article
+        className={['maq-badge', 'maq-badge--locked', 'maq-badge--secret-hidden', className].filter(Boolean).join(' ')}
+        data-rarity={rarity}
+        data-secret-hidden="true"
+        style={getBadgeCssVars(rarity, { isLocked: true, preserveRarityColor: true })}
+      >
+        <div className="maq-badge__main">
+          <header className="maq-badge__header">
+            <div className="maq-badge__icon-wrap">
+              <div className="maq-badge__icon-circle" aria-hidden="true">
+                <span className="maq-badge__secret-mark">?</span>
+              </div>
+            </div>
+
+            <div className="maq-badge__heading">
+              <h3 className="maq-badge__name">{SECRETBADGETITLE__TEXTLABEL[LANGUAGE] ?? SECRETBADGETITLE__TEXTLABEL.polish}</h3>
+              <span className="maq-badge__rarity">{config.label}</span>
+            </div>
+          </header>
+
+          <p className="maq-badge__secret-hint">{SECRETBADGEHINT__TEXTLABEL[LANGUAGE] ?? SECRETBADGEHINT__TEXTLABEL.polish}</p>
+        </div>
+      </article>
+    );
+  }
 
 // === RENDEROWANIE WIDOKU ===
   return (

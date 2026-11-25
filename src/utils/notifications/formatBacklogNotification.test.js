@@ -106,4 +106,49 @@ describe('formatBacklogNotification', () => {
     expect(studentFormatted.message).toBe('dasdsa · das · Koszt: 111');
     expect(studentFormatted.message).not.toContain('[object Object]');
   });
+
+  it('masks secret BADGE_ADDED notification details for students in Polish and English even if fields are present', () => {
+    const item = {
+      type: 'BADGE_ADDED',
+      accountId: 42,
+      value: JSON.stringify({
+        isSecret: true,
+        badgeId: 9,
+        badgeName: 'Tajna nazwa',
+        storyDescription: 'Tajna fabuła',
+        educationalDescription: 'Tajny opis',
+        rewardAmount: 250,
+      }),
+    };
+
+    const pl = formatBacklogNotification(groupId, item, true, 'polish');
+    expect(pl.title).toBe('Nowa sekretna odznaka');
+    expect(pl.message).not.toContain('Tajna nazwa');
+    expect(pl.message).not.toContain('Tajna fabuła');
+    expect(pl.message).not.toContain('Tajny opis');
+    expect(pl.message).not.toContain('250');
+
+    const en = formatBacklogNotification(groupId, item, true, 'english');
+    expect(en.title).toBe('New secret badge');
+    expect(en.message).not.toContain('Tajna nazwa');
+  });
+
+  it('formats secret BADGE_EARNED notification for students in Polish and English', () => {
+    const item = {
+      type: 'BADGE_EARNED',
+      accountId: 42,
+      value: JSON.stringify({
+        isSecret: true,
+        badgeId: 9,
+        badgeName: 'Ukryty mistrz',
+        rewardAmount: 50,
+      }),
+    };
+
+    const pl = formatBacklogNotification(groupId, item, true, 'polish');
+    expect(pl.title).toBe('Zdobyto sekretną odznakę: Ukryty mistrz');
+
+    const en = formatBacklogNotification(groupId, item, true, 'english');
+    expect(en.title).toBe('Secret badge earned: Ukryty mistrz');
+  });
 });

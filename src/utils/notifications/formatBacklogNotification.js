@@ -360,6 +360,11 @@ const NEWBADGE__TEXTLABEL = {
   english: 'New badge',
 };
 
+const NEWSECRETBADGE__TEXTLABEL = {
+  polish: 'Nowa sekretna odznaka',
+  english: 'New secret badge',
+};
+
 const NEWRANK__TEXTLABEL = {
   polish: 'Nowa ranga',
   english: 'New rank',
@@ -383,6 +388,11 @@ const POSTADDED__TEXTLABEL = {
 const BADGEEARNEDSTUDENT__TEXTLABEL = {
   polish: 'Zdobyto odznakę',
   english: 'Badge earned',
+};
+
+const SECRETBADGEEARNEDSTUDENT__TEXTLABEL = {
+  polish: 'Zdobyto sekretną odznakę',
+  english: 'Secret badge earned',
 };
 
 const RANKUPSTUDENT__TEXTLABEL = {
@@ -708,6 +718,9 @@ const isExtraLife = payload.isExtraLife === true;
     case 'SHOP_ITEM_ADDED':
       return itemName ? `${NEWPRODUCT__TEXTLABEL[language]}: ${itemName}` : null;
     case 'BADGE_ADDED':
+      if (payload?.isSecret === true && (isStudentView || !badgeName)) {
+        return NEWSECRETBADGE__TEXTLABEL[language];
+      }
       return badgeName ? `${NEWBADGE__TEXTLABEL[language]}: ${badgeName}` : null;
     case 'RANK_ADDED':
       return rankName ? `${NEWRANK__TEXTLABEL[language]}: ${rankName}` : null;
@@ -718,6 +731,11 @@ const isExtraLife = payload.isExtraLife === true;
     case 'POST_ADDED':
       return postTitle ? `${POSTADDED__TEXTLABEL[language]}: ${postTitle}` : null;
     case 'BADGE_EARNED':
+      if (payload?.isSecret === true) {
+        return badgeName
+          ? `${SECRETBADGEEARNEDSTUDENT__TEXTLABEL[language]}: ${badgeName}`
+          : SECRETBADGEEARNEDSTUDENT__TEXTLABEL[language];
+      }
       return badgeName ? `${BADGEEARNEDSTUDENT__TEXTLABEL[language]}: ${badgeName}` : null;
     case 'RANK_UP':
       return rankName ? `${RANKUPSTUDENT__TEXTLABEL[language]}: ${rankName}` : null;
@@ -853,12 +871,15 @@ export function formatBacklogNotification(groupId, item, isStudentView = false, 
     title = stripActivityPointsSuffix(title);
   }
 
+  const hideSecretBadgeDetails = isStudentView && item.type === 'BADGE_ADDED' && payload?.isSecret === true;
   const excludeInMessage = [message, title, fallbackTitle, studentLabel].filter(Boolean);
-  const details = collectPayloadDetails(payload, {
-    excludeInMessage,
-    skipPointsLabel: isStudentActivityReward,
-    language: resolvedLanguage,
-  });
+  const details = hideSecretBadgeDetails
+    ? []
+    : collectPayloadDetails(payload, {
+      excludeInMessage,
+      skipPointsLabel: isStudentActivityReward,
+      language: resolvedLanguage,
+    });
 
   if (!isStudentView && LECTURER_STUDENT_EVENT_TYPES.has(item.type) && studentLabel && !title.includes(studentLabel)) {
     details.unshift(studentLabel);

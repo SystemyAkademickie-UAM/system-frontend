@@ -25,6 +25,8 @@ import { DEFAULT_BADGE_EMOJI, normalizeRankBadgeIcon } from '../../../utils/rank
  * @property {string} didacticDescription
  * @property {number} rewardAmount
  * @property {string} rewardEmoji
+ * @property {boolean} isPublished
+ * @property {boolean} isSecret
  */
 
 /**
@@ -49,6 +51,7 @@ function mapBadge(badge, index) {
     didacticDescription: badge.educationalDescription || '',
     rewardAmount: badge.rewardAmount || 0,
     isPublished: badge.isPublished !== false,
+    isSecret: badge.isSecret === true,
   };
 }
 
@@ -103,7 +106,6 @@ const [error, setError] = useState(null);
     if (!groupId) return { ok: false, error: 'Brak ID grupy' };
 
     const icon = normalizeRankBadgeIcon(values.icon ?? values.iconFile, DEFAULT_BADGE_EMOJI);
-    const shouldPublish = values.isPublished === true;
     const result = await createBadge(groupId, {
       name: values.name,
       icon,
@@ -111,17 +113,12 @@ const [error, setError] = useState(null);
       storyDescription: values.storyDescription || '',
       rewardAmount: values.rewardAmount || 0,
       rarity: values.rarity || 'common',
+      isPublished: values.isPublished === true,
+      isSecret: values.isSecret === true,
     });
 
     if (!result.ok || !result.badge) {
       return result;
-    }
-
-    if (shouldPublish) {
-      const publishResult = await updateBadge(groupId, result.badge.id, { isPublished: true });
-      if (!publishResult.ok) {
-        return publishResult;
-      }
     }
 
     await loadData();
@@ -144,6 +141,7 @@ const [error, setError] = useState(null);
       rewardAmount: values.rewardAmount,
       rarity: values.rarity,
       ...(typeof values.isPublished === 'boolean' ? { isPublished: values.isPublished } : {}),
+      ...(typeof values.isSecret === 'boolean' ? { isSecret: values.isSecret } : {}),
     });
 
     if (result.ok && result.badge) {

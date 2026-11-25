@@ -37,7 +37,7 @@
   align-items: center;
   padding: 0.25rem 0.625rem;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
@@ -55,6 +55,12 @@
   color: var(--color-text-secondary);
   background: color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.badge-treasury-card__visibility--secret {
+  color: var(--color-badge-rarity-epic);
+  background: color-mix(in srgb, var(--color-badge-rarity-epic) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-badge-rarity-epic) 35%, transparent);
 }
 
 .badge-treasury-card--has-earners {

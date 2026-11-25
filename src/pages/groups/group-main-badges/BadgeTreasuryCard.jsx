@@ -48,7 +48,7 @@ export default function BadgeTreasuryCard({
   showMemberAvatars = true,
   showLecturerActions = false,
   groupId,
-  LANGUAGE,
+  LANGUAGE = READLANGUAGECOOKIE(),
   onEdit,
   onDelete,
   onAssign,
@@ -56,29 +56,34 @@ export default function BadgeTreasuryCard({
 }) {
   const earners = showMemberAvatars ? getBadgeEarners(earnersByBadgeId, badge.dbId, excludeAccountId) : [];
   const isLocked = isStudentView && !badge.isUnlocked;
+  const isSecret = badge.isSecret === true;
+  const isSecretHidden = isStudentView && (badge.isSecretHidden === true || (isSecret && !badge.isUnlocked));
   const hasEarners = showMemberAvatars && earners.length > 0;
+  const isPublished = badge.isPublished !== false;
 
-const isPublished = badge.isPublished !== false;
-
-// === RENDEROWANIE WIDOKU ===
+  // === RENDEROWANIE WIDOKU ===
   return (
-    <article className={[
-      'badge-treasury-card',
-      hasEarners ? 'badge-treasury-card--has-earners' : '',
-      showLecturerActions ? 'badge-treasury-card--lecturer' : '',
-    ].filter(Boolean).join(' ')}
-    onDoubleClick={() => onDoubleClick()}>
+    <article
+      className={[
+        'badge-treasury-card',
+        hasEarners ? 'badge-treasury-card--has-earners' : '',
+        showLecturerActions ? 'badge-treasury-card--lecturer' : '',
+      ].filter(Boolean).join(' ')}
+      onDoubleClick={() => onDoubleClick?.()}
+    >
       {showLecturerActions ? (
         <>
           <span
             className={[
               'badge-treasury-card__visibility',
-              isPublished
-                ? 'badge-treasury-card__visibility--public'
-                : 'badge-treasury-card__visibility--hidden',
+              !isPublished
+                ? 'badge-treasury-card__visibility--hidden'
+                : isSecret
+                  ? 'badge-treasury-card__visibility--secret'
+                  : 'badge-treasury-card__visibility--public',
             ].join(' ')}
           >
-            {getTileVisibilityLabel(isPublished, 'badge')}
+            {getTileVisibilityLabel(isPublished, 'badge', LANGUAGE, isSecret)}
           </span>
           <LecturerTileActions
             entityLabel={ENTITYLABEL__TEXTLABEL[LANGUAGE]}
@@ -97,10 +102,11 @@ const isPublished = badge.isPublished !== false;
           name={badge.name}
           storyDescription={badge.storyDescription || '—'}
           didacticDescription={badge.didacticDescription || '—'}
-          rewardAmount={badge.rewardAmount}
+          rewardAmount={badge.rewardAmount ?? 0}
           iconFile={badge.iconFile}
           showEarnedAt={false}
           isLocked={isLocked}
+          isSecretHidden={isSecretHidden}
           className="badge-treasury-card__badge maq-badge--grid-fit"
         />
         {(isStudentView ? showMemberAvatars : true) ? (

@@ -67,6 +67,7 @@ const [LANGUAGE] = useState(READLANGUAGECOOKIE);
               rewardAmount={badge.rewardAmount ?? 0}
               iconFile={normalizeRankBadgeIcon(badge.icon, DEFAULT_BADGE_EMOJI)}
               showEarnedAt={false}
+              isSecretHidden={badge.isSecret === true && badge.isRevealed === false}
               className="maq-badge--grid-fit"
             />
           ))}
