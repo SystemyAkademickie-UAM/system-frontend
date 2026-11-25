@@ -1,4 +1,5 @@
 import { READLANGUAGECOOKIE } from '../../utils/LANGUAGECOOKIE.js';
+import { getStudentLegalName } from '../members/studentDisplayName.js';
 import {
   groupActivitiesPath,
   groupMainPath,
@@ -146,14 +147,39 @@ function readNumber(value) {
 }
 
 /**
+ * Formats the student label for lecturer notifications as `nick (Imię Nazwisko)`
+ * when both nickname and legal name are available and differ.
+ *
  * @param {Record<string, unknown>} payload
+ * @param {import('../../services/backlog.api.js').BacklogItem} [item]
  * @returns {string | null}
  */
-function resolveStudentLabel(payload) {
-  return readString(payload.nickname)
+function resolveStudentLabel(payload, item) {
+  const nickname = readString(payload.nickname)
     ?? readString(payload.studentNickname)
+    ?? readString(item?.studentNickname);
+  const firstName = readString(payload.studentFirstName)
+    ?? readString(payload.firstName)
     ?? readString(payload.studentName)
-    ?? readString(payload.displayName);
+    ?? readString(item?.studentName);
+  const lastName = readString(payload.studentLastName)
+    ?? readString(payload.lastName)
+    ?? readString(payload.studentSurname)
+    ?? readString(item?.studentSurname);
+  const fullName = getStudentLegalName({ name: firstName ?? '', surname: lastName ?? '' });
+
+  if (nickname) {
+    if (fullName && nickname !== fullName) {
+      return `${nickname} (${fullName})`;
+    }
+    return nickname;
+  }
+
+  if (fullName) {
+    return fullName;
+  }
+
+  return readString(payload.displayName);
 }
 
 /**
@@ -834,7 +860,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false, 
     }
   }
 
-  const studentLabel = resolveStudentLabel(payload);
+  const studentLabel = resolveStudentLabel(payload, item);
   const isStudentActivityReward = isStudentView && item.type === 'ACTIVITY_COMPLETED';
   const activityRewardAmount = isStudentActivityReward ? resolveActivityRewardAmount(payload) : null;
   const fallbackTitle = buildFallbackTitle(item.type, payload, isStudentView, studentLabel, resolvedLanguage);
@@ -851,7 +877,7 @@ export function formatBacklogNotification(groupId, item, isStudentView = false, 
     language: resolvedLanguage,
   });
 
-  if (!isStudentView && LECTURER_STUDENT_EVENT_TYPES.has(item.type) && studentLabel && !title.includes(studentLabel)) {
+  if (!isStudentView && (LECTURER_STUDENT_EVENT_TYPES.has(item.type) || item.type === 'OTHER') && studentLabel && !title.includes(studentLabel)) {
     details.unshift(studentLabel);
   }
 
